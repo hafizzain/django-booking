@@ -1,0 +1,16 @@
+
+
+# ENVIRONTMENT FILE .env 
+.env
+*.env
+NStyle/.env 
+./NStyle/.env
+
+# VIRTUAL ENVIRONTMENT 
+venv
+/venv
+./venv
+
+# DATABASE
+db.sqlite3
+./db.sqlite3
