@@ -35,16 +35,48 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 
-INSTALLED_APPS = [
+DJANGO_APPS = [
+
+]
+
+NSTYLE_APPS = [
+    
+]
+
+
+SHARED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'django_tenants',
+
+    'Tenants.apps.TenantsConfig',
+    'Api.apps.ApiConfig',
+    'Authentication.apps.AuthenticationConfig'
 ]
 
+TENANT_APPS = [
+    # The following Django contrib apps must be in TENANT_APPS
+    'django.contrib.contenttypes',
+    'django.contrib.auth',
+    'django.contrib.admin',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+
+    'Api.apps.ApiConfig',
+    'Authentication.apps.AuthenticationConfig'
+]
+
+
+INSTALLED_APPS = list(set(SHARED_APPS + TENANT_APPS))
+
+
 MIDDLEWARE = [
+    'django_tenants.middleware.main.TenantMainMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -80,12 +112,16 @@ WSGI_APPLICATION = 'NStyle.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django_tenants.postgresql_backend',
+        'OPTIONS': {
+            'options': '-c search_path=public'
+        },
         'NAME': env('DATABASE_NAME'),
         'USER': env('DATABASE_USER'),
         'PASSWORD': env('DATABASE_PASSWORD'),
         'HOST': env('DATABASE_HOST'),
         'PORT': env('DATABASE_PORT'),
+        'CONN_MAX_AGE': None,
     }
 }
 
@@ -137,3 +173,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+DEFAULT_FILE_STORAGE = 'django_tenants.files.storages.TenantFileSystemStorage'
+DATABASE_ROUTERS = (
+    'django_tenants.routers.TenantSyncRouter',
+)
+TENANT_MODEL = "Tenants.Tenant"
+TENANT_DOMAIN_MODEL = "Tenants.Domain"
