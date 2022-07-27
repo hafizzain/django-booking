@@ -59,19 +59,24 @@ class User(AbstractBaseUser):
     last_name = models.CharField(max_length=128, null=True, blank=True)
     full_name = models.CharField(max_length=100, null=True, blank=True)
     username = models.CharField(max_length=30, unique=True)
-    email = models.EmailField(verbose_name="email", max_length=60, unique=True)
 
-    date_joined = models.DateTimeField(verbose_name='date joined', auto_now_add=True)
+    email = models.EmailField(verbose_name="email", max_length=60, unique=True)
+    is_email_verified = models.BooleanField(default=False)
+
+    joined_at = models.DateTimeField(verbose_name='date joined', auto_now_add=True)
     last_login = models.DateTimeField(verbose_name='last login', auto_now=True)
     is_admin = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
 
+    mobile_number = models.CharField(max_length=20, null=True, blank=True)
+    is_mobile_verified = models.BooleanField(default=False)
+
+
     # User Defined Fields
 
     # maiden_name = models.CharField(max_length=128, null=True, blank=True)
-    mobile_number = models.CharField(max_length=20, null=True, blank=True)
     social_account = models.BooleanField(default=False)
     social_platform = models.CharField(max_length=32, choices=SOCIAL_PLATFORM_CHOICES, null=True, blank=True)
     social_id = models.CharField(max_length=128, default='', blank=True, null=True)
@@ -108,6 +113,9 @@ class AccountType(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+    def username(self):
+        return str(self.user.username)
 
     def is_everyone(self):
         if self.account_type == 'Everyone':
