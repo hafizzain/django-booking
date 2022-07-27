@@ -63,12 +63,11 @@ class User(AbstractBaseUser):
     email = models.EmailField(verbose_name="email", max_length=60, unique=True)
     is_email_verified = models.BooleanField(default=False)
 
-    joined_at = models.DateTimeField(verbose_name='date joined', auto_now_add=True)
-    last_login = models.DateTimeField(verbose_name='last login', auto_now=True)
     is_admin = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
 
     mobile_number = models.CharField(max_length=20, null=True, blank=True)
     is_mobile_verified = models.BooleanField(default=False)
@@ -80,6 +79,12 @@ class User(AbstractBaseUser):
     social_account = models.BooleanField(default=False)
     social_platform = models.CharField(max_length=32, choices=SOCIAL_PLATFORM_CHOICES, null=True, blank=True)
     social_id = models.CharField(max_length=128, default='', blank=True, null=True)
+
+
+    joined_at = models.DateTimeField(verbose_name='date joined', auto_now_add=True)
+    updated_at = models.DateTimeField(verbose_name='Updated Date Time')
+
+    last_login = models.DateTimeField(verbose_name='last login', auto_now=True)
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
@@ -127,3 +132,27 @@ class AccountType(models.Model):
             return True
 
         return False
+
+class NewsLetterDetail(models.Model):
+    id = models.CharField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_newsletter')
+
+    is_subscribed = models.BooleanField(default=False)
+
+
+    def __str__(self):
+        return str(self.id)
+
+
+class TenantDetail(models.Model):
+    id = models.CharField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='tenant_detail')
+
+    is_tenant_admin = models.BooleanField(default=False)
+    is_tenant_staff = models.BooleanField(default=False)
+    is_tenant_superuser = models.BooleanField(default=False)
+
+
+
+    def __str__(self):
+        return str(self.id)
