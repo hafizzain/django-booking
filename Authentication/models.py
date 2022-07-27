@@ -135,10 +135,10 @@ class AccountType(models.Model):
 
 class NewsLetterDetail(models.Model):
     id = models.CharField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_newsletter')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='newsletter')
 
     is_subscribed = models.BooleanField(default=False)
-
+    created_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return str(self.id)
@@ -151,8 +151,27 @@ class TenantDetail(models.Model):
     is_tenant_admin = models.BooleanField(default=False)
     is_tenant_staff = models.BooleanField(default=False)
     is_tenant_superuser = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.id)
 
 
+class VerificationOTP(models.Model):
+    CODE_TYPE = [
+        ('Email' , 'Email'),
+        ('Mobile' , 'Mobile'),
+    ]
+    id = models.CharField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_otp')
+
+    code = models.CharField(default='', max_length=10)
+    code_for = models.CharField(choices=CODE_TYPE, default='Mobile')
+
+    created_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ['user', 'code', 'code_for']
 
     def __str__(self):
         return str(self.id)
