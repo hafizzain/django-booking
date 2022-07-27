@@ -175,3 +175,6 @@ class VerificationOTP(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+    def username(self):
+        return str(self.user.username)

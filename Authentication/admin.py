@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import User, AccountType
+from .models import User, AccountType, TenantDetail, NewsLetterDetail, VerificationOTP
 
 
 
@@ -26,4 +26,30 @@ class AccountTypeAdmin(admin.ModelAdmin):
         'id',
         'account_type',
         'username',
+    ]
+
+
+@admin.register(NewsLetterDetail)
+class NewsLetterDetailAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'is_subscribed'
+    ]
+
+@admin.register(TenantDetail)
+class TenantDetailAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'is_tenant_admin',
+        'is_tenant_staff',
+        'is_tenant_superuser',
+    ]
+
+@admin.register(VerificationOTP)
+class VerificationOTPAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'username',
+        'code',
+        'code_for',
     ]
