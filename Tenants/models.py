@@ -7,13 +7,16 @@ from django.contrib.auth.models import User
 
 class Tenant(TenantMixin):
     id = models.CharField(max_length=200, default=uuid4, primary_key=True, unique=True, editable=False)
-    user  = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=20)
+    user  = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tenant')
+    name = models.CharField(max_length=20, default='')
+    # schema_name Already declared in TenantMixin
+    domain = models.CharField(default='', max_length=200)
 
     is_active = models.BooleanField(default=True)
     is_blocked = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField()
 
 
     auto_create_schema = True
@@ -24,12 +27,17 @@ class Tenant(TenantMixin):
     
 class Domain(DomainMixin):
     id = models.CharField(max_length=200, default=uuid4, primary_key=True, unique=True, editable=False)
+    user  = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_domain')
+    # domain => Already declared in DomainMixin
+    # tenant => Already declared in DomainMixin
+    schema_name = models.CharField(default='', max_length=200)
 
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField()
 
 
     def __str__(self):
         return self.id
-    
