@@ -1,8 +1,8 @@
 
 from django.urls import path, include
 
-from ..views import views_v1
+from ..views.v1 import nstyle
 
 urlpatterns = [
-    path('create_user/', views_v1.create_user )
+    path('create_tenant_business_user/', nstyle.create_tenant_business_user )
 ]

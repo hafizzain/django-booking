@@ -18,7 +18,6 @@ class Tenant(TenantMixin):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField()
 
-
     auto_create_schema = True
     auto_drop_schema = True
 
