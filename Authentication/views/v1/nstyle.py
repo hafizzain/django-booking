@@ -4,6 +4,7 @@ from django.http import HttpResponse
 
 from django_tenants.utils import tenant_context
 from django.db.models import Q
+from Authentication.Constants.CreateTenant import create_tenant_Thread
 # from django.contrib.auth.models import User
 from Authentication.models import User, VerificationOTP
 from Tenants.models import Tenant, Domain
@@ -13,6 +14,8 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from NStyle.Constants import StatusCodes
+
+from threading import Thread
 
 import random
 import string
@@ -77,20 +80,6 @@ def create_tenant_business_user(request):
                 }
             },status=status.HTTP_400_BAD_REQUEST
         )
-    # try:
-    #     pub_tenant = Tenant.objects.get(schema_name='public')
-    # except Tenant.DoesNotExist :
-    #     return Response(
-    #         {
-    #             'status' : False,
-    #             'status_code' : StatusCodes.PUBLIC_TENANT_404_5001,
-    #             'response' : {
-    #                 'message' : 'Internal Server Error',
-    #                 'error_message' : 'Public Tenant not found',
-    #             }
-    #         },
-    #         status=status.HTTP_500_INTERNAL_SERVER_ERROR
-    #     )
 
     user = User.objects.create_user(
         username=username,
@@ -103,34 +92,12 @@ def create_tenant_business_user(request):
     user.mobile_number=mobile_number
     user.save()
 
-    user_tenant = Tenant.objects.create(
-        user=user,
-        name=username,
-        domain=username,
-        schema_name=username
-    )
+    try:
+        thrd = Thread(target=create_tenant_Thread, args=[request], kwargs={'user' : user})
+        thrd.start()
+    except:
+        pass
 
-    user_domain = Domain.objects.create(
-        user=user,
-        schema_name=username,
-        domain=username,
-        tenant=user_tenant,
-    )
-
-    random_digits_for_code = ''.join(random.SystemRandom().choice(string.digits + string.digits) for _ in range(4))
-    otp = VerificationOTP(
-        user=user,
-        code=random_digits_for_code,
-        code_for='Mobile'
-    )
-    otp.save()
-    
-    user_token = Token.objects.create(
-        user=user
-    )
-
-    # with tenant_context():
-    #     pass
     return Response(
             {
                 'status' : True,
@@ -146,47 +113,7 @@ def create_tenant_business_user(request):
                         'is_active' : user.is_active,
                         'mobile_number' : user.mobile_number,
                     },
-                    'access_token' : str(user_token.key)
                 }
             },
             status=status.HTTP_201_CREATED
         )
-
-
-# @csrf_exempt
-# def create_user(request):
-#     if request.method == 'POST':
-#         data = request.POST
-#         pblc_tnt = Tenant.objects.get(schema_name = 'public')
-
-
-#         with tenant_context(pblc_tnt):
-#             user = User.objects.create(
-#                 username=data['username'],
-#                 password=data['password'],
-#             )
-#             usr_tnt = Tenant.objects.create(
-#                 schema_name=data['username'],
-#                 domain_name = data['username'],
-#                 user = user
-#             )
-#             usr_domain = Domain.objects.create(
-#                 tenant = usr_tnt,
-#                 domain = f'{data["username"]}.localhost'
-#             )
-
-#         with tenant_context(usr_tnt):
-#             spr_user = User.objects.create_superuser(
-#                 username = data['username'],
-#                 password = data['password'],
-#                 is_active = True,
-#                 is_staff = True,
-#                 is_superuser = True
-#             )
-#             print('SUPERUSER : ' , spr_user)
-#             print('SUPERUSER : ' , spr_user.is_superuser)
-
-#         return HttpResponse(f'http://{data["username"]}.localhost:8000/admin')
-#     else:
-
-#         return HttpResponse('working')
