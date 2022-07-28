@@ -2,6 +2,7 @@ from django.db import models
 
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 import uuid
+from django.utils.timezone import now
 
 # Create your models here.
 
@@ -73,8 +74,6 @@ class User(AbstractBaseUser):
     is_mobile_verified = models.BooleanField(default=False)
 
 
-    # User Defined Fields
-
     # maiden_name = models.CharField(max_length=128, null=True, blank=True)
     social_account = models.BooleanField(default=False)
     social_platform = models.CharField(max_length=32, choices=SOCIAL_PLATFORM_CHOICES, null=True, blank=True)
@@ -111,10 +110,10 @@ class AccountType(models.Model):
         ('Everyone', 'Everyone'),
         ('Business', 'Business'),
     ]
-    id = models.CharField(default=uuid.uuid4, editable=False, unique=True, primary_key=True)
+    id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, primary_key=True)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_account_type')
-    account_type = models.CharField(default='Everyone', choices=ACCOUNT_TYPES)
+    account_type = models.CharField(default='Everyone', choices=ACCOUNT_TYPES, max_length=20)
 
     def __str__(self):
         return str(self.id)
@@ -134,24 +133,25 @@ class AccountType(models.Model):
         return False
 
 class NewsLetterDetail(models.Model):
-    id = models.CharField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='newsletter')
 
     is_subscribed = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=now)
 
     def __str__(self):
         return str(self.id)
 
 
 class TenantDetail(models.Model):
-    id = models.CharField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='tenant_detail')
+    nstyle_user_id = models.CharField(null=True, blank=True, default='', max_length=1000, unique=True)
 
     is_tenant_admin = models.BooleanField(default=False)
     is_tenant_staff = models.BooleanField(default=False)
     is_tenant_superuser = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=now)
 
     def __str__(self):
         return str(self.id)
@@ -162,13 +162,13 @@ class VerificationOTP(models.Model):
         ('Email' , 'Email'),
         ('Mobile' , 'Mobile'),
     ]
-    id = models.CharField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_otp')
 
     code = models.CharField(default='', max_length=10)
-    code_for = models.CharField(choices=CODE_TYPE, default='Mobile')
+    code_for = models.CharField(choices=CODE_TYPE, default='Mobile', max_length=10)
 
-    created_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=now)
 
     class Meta:
         unique_together = ['user', 'code', 'code_for']

@@ -40,14 +40,14 @@ def create_tenant_business_user(request):
 
     try:
         pub_tenant = Tenant.objects.get(schema_name='public')
-    except Tenant.DoesNotExist:
+    except Tenant.DoesNotExist :
         return Response(
             {
                 'status' : False,
                 'status_code' : StatusCodes.PUBLIC_TENANT_404_5001,
                 'response' : {
                     'message' : 'Internal Server Error',
-                    'error_message' : 'Public Tenant not found'
+                    'error_message' : 'Public Tenant not found',
                 }
             },
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -60,6 +60,22 @@ def create_tenant_business_user(request):
             username=username,
             email=email,
         )
+
+        user_tenant = Tenant.objects.create(
+            user=user,
+            name=username,
+            domain=username,
+            schema_name=username
+        )
+
+        user_domain = Domain.objects.create(
+            
+        )
+
+
+    with tenant_context():
+        pass
+
 
     return HttpResponse(f'')
 

@@ -16,7 +16,13 @@ class CustomTanantMiddleware(MiddlewareMixin):
         return remove_www(request.get_host().split(':')[0])
 
     def get_tenant(self, domain_model, hostname):
-        domain = domain_model.objects.select_related('tenant').get(domain=hostname)
+        # domain = domain_model.objects.select_related('tenant').get(domain=hostname)
+        domain = domain_model.objects.get(
+            domain=hostname,
+            is_deleted=False,
+            is_active=True,
+            is_blocked=False
+        )
         return domain.tenant
 
     def process_request(self, request):
