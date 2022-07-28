@@ -53,6 +53,8 @@ SHARED_APPS = [
     'django.contrib.staticfiles',
 
     'django_tenants',
+    'rest_framework',
+    'rest_framework.authtoken',
 
     'Tenants.apps.TenantsConfig',
     'Api.apps.ApiConfig',
@@ -124,6 +126,9 @@ DATABASES = {
         'CONN_MAX_AGE': None,
     }
 }
+
+AUTH_USER_MODEL = 'Authentication.User'
+
 
 
 # Password validation
