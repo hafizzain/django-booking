@@ -40,7 +40,9 @@ DJANGO_APPS = [
 ]
 
 NSTYLE_APPS = [
-    
+    'Api.apps.ApiConfig',
+    'Authentication.apps.AuthenticationConfig',
+    'Profile.apps.ProfileConfig',
 ]
 
 
@@ -57,9 +59,7 @@ SHARED_APPS = [
     'rest_framework.authtoken',
 
     'Tenants.apps.TenantsConfig',
-    'Api.apps.ApiConfig',
-    'Authentication.apps.AuthenticationConfig'
-]
+] +  NSTYLE_APPS
 
 TENANT_APPS = [
     # The following Django contrib apps must be in TENANT_APPS
@@ -69,10 +69,7 @@ TENANT_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
 
-    'Api.apps.ApiConfig',
-    'Authentication.apps.AuthenticationConfig'
-]
-
+] + NSTYLE_APPS
 
 INSTALLED_APPS = list(set(SHARED_APPS + TENANT_APPS))
 

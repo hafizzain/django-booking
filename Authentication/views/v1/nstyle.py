@@ -4,7 +4,9 @@ from django.http import HttpResponse
 
 from django_tenants.utils import tenant_context
 from django.db.models import Q
-from Authentication.Constants.CreateTenant import create_tenant_Thread
+from Authentication.Constants.CreateTenant import create_tenant
+from Authentication.Constants.UserConstants import create_user_account_type, complete_user_account
+
 # from django.contrib.auth.models import User
 from Authentication.models import User, VerificationOTP
 from Tenants.models import Tenant, Domain
@@ -14,7 +16,6 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from NStyle.Constants import StatusCodes
-
 from threading import Thread
 
 import random
@@ -27,13 +28,14 @@ def create_tenant_business_user(request):
     data = request.data
 
     first_name = data.get('first_name', None)
-    last_name = data.get('last_name', None)
+    # last_name = data.get('last_name', None)
     email = data.get('email', None)
     username = data.get('username', None)
     mobile_number = data.get('mobile_number', None)
     password = data.get('password', None)
+    account_type = data.get('account_type', None)
 
-    if not all([first_name, email, username, mobile_number, password ]):
+    if not all([first_name, email, username, mobile_number, password, account_type ]):
         return Response(
             {
                 'status' : False,
@@ -47,7 +49,8 @@ def create_tenant_business_user(request):
                         'last_name', 
                         'email', 
                         'mobile_number', 
-                        'password'
+                        'password',
+                        'account_type'
                         ]
                 }
             },
@@ -86,14 +89,9 @@ def create_tenant_business_user(request):
         email=email,
         password=password
     )
-    user.first_name=first_name
-    user.last_name=last_name
-    user.full_name=f'{first_name} {last_name}'
-    user.mobile_number=mobile_number
-    user.save()
 
     try:
-        thrd = Thread(target=create_tenant_Thread, args=[request], kwargs={'user' : user})
+        thrd = Thread(target=complete_user_account, args=[request], kwargs={'user' : user, 'data': data})
         thrd.start()
     except:
         pass
@@ -105,13 +103,13 @@ def create_tenant_business_user(request):
                 'response' : {
                     'message' : 'Account created successfully',
                     'user' : {
-                        'first_name' : user.first_name,
-                        'last_name' : user.last_name,
+                        # 'first_name' : user.first_name,
+                        # 'last_name' : user.last_name,
                         'username' : user.username,
-                        'full_name' : user.full_name,
+                        # 'full_name' : user.full_name,
                         'email' : user.email,
-                        'is_active' : user.is_active,
-                        'mobile_number' : user.mobile_number,
+                        # 'is_active' : user.is_active,
+                        # 'mobile_number' : user.mobile_number,
                     },
                 }
             },

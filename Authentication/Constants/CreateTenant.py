@@ -1,7 +1,7 @@
 
 
 
-from Authentication.models import VerificationOTP
+from Authentication.models import AccountType
 import string
 import random
 from Tenants.models import Tenant, Domain
@@ -10,7 +10,7 @@ from .OTP import generate_user_mobile_otp
 from .AuthTokenConstants import create_user_token
 
 
-def create_tenant_Thread(request, user=None ):
+def create_tenant(request=None, user=None):
     if user is None:
         return
     
@@ -27,7 +27,6 @@ def create_tenant_Thread(request, user=None ):
         domain=user.username,
         tenant=user_tenant,
     )
-    create_user_token()
-    generate_user_mobile_otp(user=user)
+ 
 
     

@@ -42,3 +42,17 @@ class Domain(DomainMixin):
 
     def __str__(self):
         return self.id
+
+    
+class TenantDetail(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, primary_key=True, editable=False)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='tenant_detail')
+    nstyle_user_id = models.CharField(null=True, blank=True, default='', max_length=1000, unique=True)
+
+    is_tenant_admin = models.BooleanField(default=False)
+    is_tenant_staff = models.BooleanField(default=False)
+    is_tenant_superuser = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+
+    def __str__(self):
+        return str(self.id)

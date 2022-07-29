@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import User, AccountType, TenantDetail, NewsLetterDetail, VerificationOTP
+from .models import User, AccountType, NewsLetterDetail, VerificationOTP
 
 
 
@@ -36,14 +36,6 @@ class NewsLetterDetailAdmin(admin.ModelAdmin):
         'is_subscribed'
     ]
 
-@admin.register(TenantDetail)
-class TenantDetailAdmin(admin.ModelAdmin):
-    list_display = [
-        'id',
-        'is_tenant_admin',
-        'is_tenant_staff',
-        'is_tenant_superuser',
-    ]
 
 @admin.register(VerificationOTP)
 class VerificationOTPAdmin(admin.ModelAdmin):

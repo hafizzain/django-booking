@@ -3,7 +3,7 @@ from django.contrib import admin
 # Register your models here.
 
 
-from .models import Tenant, Domain
+from .models import Tenant, Domain, TenantDetail
 
 @admin.register(Tenant)
 class TenantAdmin(admin.ModelAdmin):
@@ -30,4 +30,14 @@ class DomainAdmin(admin.ModelAdmin):
         'is_deleted',
         'is_blocked',
         'created_at',
+    ]
+
+
+@admin.register(TenantDetail)
+class TenantDetailAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'is_tenant_admin',
+        'is_tenant_staff',
+        'is_tenant_superuser',
     ]
