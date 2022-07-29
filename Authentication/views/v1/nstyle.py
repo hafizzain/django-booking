@@ -28,7 +28,6 @@ def create_tenant_business_user(request):
     data = request.data
 
     first_name = data.get('first_name', None)
-    # last_name = data.get('last_name', None)
     email = data.get('email', None)
     username = data.get('username', None)
     mobile_number = data.get('mobile_number', None)
@@ -52,6 +51,18 @@ def create_tenant_business_user(request):
                         'password',
                         'account_type'
                         ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    if len(password) < 8:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.PASSWORD_STRENGTH_4003,
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Please enter a strong password.',
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
@@ -102,15 +113,10 @@ def create_tenant_business_user(request):
                 'status_code' : 201,
                 'response' : {
                     'message' : 'Account created successfully',
-                    'user' : {
-                        # 'first_name' : user.first_name,
-                        # 'last_name' : user.last_name,
-                        'username' : user.username,
-                        # 'full_name' : user.full_name,
-                        'email' : user.email,
-                        # 'is_active' : user.is_active,
-                        # 'mobile_number' : user.mobile_number,
-                    },
+                    'messages' : [
+                        'Account created successfully',
+                        'Verification OTP has been sent to your mobile number, Please verify'
+                    ]
                 }
             },
             status=status.HTTP_201_CREATED
