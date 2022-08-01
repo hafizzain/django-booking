@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.timezone import now
 from Authentication.models import User
-
+from Utility.models import Language
 import uuid
 
 
@@ -25,3 +25,13 @@ class Profile(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+class UserLanguage(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_languages')
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='profile_languages')
+
+    language = models.ForeignKey(Language, on_delete=models.SET_NULL, null=True, blank=True)
+    is_default = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
