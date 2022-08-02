@@ -3,6 +3,20 @@ from django.db import models
 from django.utils.timezone import now
 
 
+class Currency(models.Model):
+    id = models.UUIDField(default=uuid4, editable=False, unique=True, primary_key=True)
+
+    name = models.CharField(default='', max_length=200)
+    code = models.CharField(default='', max_length=20)
+    symbol = models.TextField(default='')
+    is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+
+    def __str__(self):
+        return str(self.id)
+
+
 class Country(models.Model):
     id = models.UUIDField(default=uuid4, editable=False, unique=True, primary_key=True)
 

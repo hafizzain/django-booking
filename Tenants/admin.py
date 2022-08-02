@@ -26,11 +26,15 @@ class DomainAdmin(admin.ModelAdmin):
     list_display = [
         'id',
         'domain',
+        'domain_schema_name',
         'is_active',
         'is_deleted',
         'is_blocked',
         'created_at',
     ]
+
+    def domain_schema_name(self, obj):
+        return str(obj.tenant.schema_name)
 
 
 @admin.register(TenantDetail)

@@ -43,7 +43,7 @@ class Domain(DomainMixin):
 
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
     
 class TenantDetail(models.Model):

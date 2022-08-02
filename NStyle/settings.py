@@ -43,6 +43,8 @@ NSTYLE_APPS = [
     'Api.apps.ApiConfig',
     'Authentication.apps.AuthenticationConfig',
     'Profile.apps.ProfileConfig',
+    'Utility.apps.UtilityConfig',
+    'Business.apps.BusinessConfig',
 ]
 
 
@@ -57,6 +59,7 @@ SHARED_APPS = [
     'django_tenants',
     'rest_framework',
     'rest_framework.authtoken',
+    "corsheaders",
 
     'Tenants.apps.TenantsConfig',
 ] +  NSTYLE_APPS
@@ -78,11 +81,17 @@ MIDDLEWARE = [
     'NStyle.Middlewares.TenantMiddleware.CustomTanantMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
 
 ROOT_URLCONF = 'NStyle.urls'
