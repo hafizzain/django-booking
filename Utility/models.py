@@ -28,7 +28,7 @@ class Country(models.Model):
     created_at = models.DateTimeField(auto_now_add=now)
 
     def __str__(self):
-        return str(self.id)
+        return str(f'{self.id} - {self.name}')
 
 
 class State(models.Model):
@@ -43,7 +43,7 @@ class State(models.Model):
     created_at = models.DateTimeField(auto_now_add=now)
 
     def __str__(self):
-        return str(self.id)
+        return str(f'{self.id} - {self.name}')
 
 
 class City(models.Model):
