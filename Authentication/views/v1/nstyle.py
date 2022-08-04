@@ -11,7 +11,8 @@ from Authentication.Constants.UserConstants import create_user_account_type, com
 from Authentication.models import User, VerificationOTP
 from Tenants.models import Tenant, Domain
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework import status
@@ -120,4 +121,127 @@ def create_tenant_business_user(request):
                 }
             },
             status=status.HTTP_201_CREATED
+        )
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def verify_otp(request):
+    code = request.data.get('code', None)
+    code_for = request.data.get('code_for', None)
+    email = request.data.get('email', None)
+    phone_number = request.data.get('phone_number', None)
+    
+    if not all([code, code_for]) or (code_for is not None and code_for == 'Mobile' and phone_number is None ) or (code_for is not None and code_for == 'Email' and email is None ) :
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'code',
+                        'code_for',
+                        'email',
+                        'phone_number',
+                        ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if code_for is not None and code_for not in ['Mobile', 'Email']:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_CHOICE_4004,
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Invalid Choice.',
+                    'valid_choices' : [
+                        'Mobile',
+                        'Email'
+                        ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # try:
+    #     if code_for == 'Email':
+    #         user = User.objects.get(
+    #             email=email
+    #         )
+    #     elif code_for == 'Mobile':
+    #         user = User.objects.get(
+    #             phone_number=phone_number
+    #         )
+    # except Exception as err:
+    #     return Response(
+    #         {
+    #             'status' : False,
+    #             'status_code' : StatusCodes.USER_NOT_EXIST_4005,
+    #             'response' : {
+    #                 'message' : 'User not found',
+    #                 'error_message' : str(err),
+    #                 'messages': [i for i in err],
+    #             }
+    #         },
+    #         status=status.HTTP_400_BAD_REQUEST
+    #     )
+
+    try:
+        if code_for == 'Email':
+            otp = VerificationOTP.objects.get(
+                code_for='Email',
+                user__email=email,
+                code=code
+            )
+        elif code_for == 'Mobile':
+            otp = VerificationOTP.objects.get(
+                code_for='Email',
+                user__email=email,
+                code=code
+            )
+        else:
+            otp = None
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_OTP_4006,
+                'response' : {
+                    'message' : 'OTP not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if otp is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_OTP_4006,
+                'response' : {
+                    'message' : 'OTP not found',
+                    'error_message' : str(err),
+                    'messages': ['OTP not exist', 'May be something went wrong'],
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    otp.delete()
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : StatusCodes.OTP_VERIFIED_4007,
+                'response' : {
+                    'message' : 'OTP Verified',
+                }
+            },
+            status=status.HTTP_200_OK
         )
