@@ -18,6 +18,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework import status
 from NStyle.Constants import StatusCodes
 from threading import Thread
+from Authentication.Constants import OTP
 
 import random
 import string
@@ -130,9 +131,9 @@ def verify_otp(request):
     code = request.data.get('code', None)
     code_for = request.data.get('code_for', None)
     email = request.data.get('email', None)
-    phone_number = request.data.get('phone_number', None)
+    mobile_number = request.data.get('mobile_number', None)
     
-    if not all([code, code_for]) or (code_for is not None and code_for == 'Mobile' and phone_number is None ) or (code_for is not None and code_for == 'Email' and email is None ) :
+    if not all([code, code_for]) or (code_for is not None and code_for == 'Mobile' and mobile_number is None ) or (code_for is not None and code_for == 'Email' and email is None ) :
         return Response(
             {
                 'status' : False,
@@ -144,7 +145,7 @@ def verify_otp(request):
                         'code',
                         'code_for',
                         'email',
-                        'phone_number',
+                        'mobile_number',
                         ]
                 }
             },
@@ -167,30 +168,6 @@ def verify_otp(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-
-    # try:
-    #     if code_for == 'Email':
-    #         user = User.objects.get(
-    #             email=email
-    #         )
-    #     elif code_for == 'Mobile':
-    #         user = User.objects.get(
-    #             phone_number=phone_number
-    #         )
-    # except Exception as err:
-    #     return Response(
-    #         {
-    #             'status' : False,
-    #             'status_code' : StatusCodes.USER_NOT_EXIST_4005,
-    #             'response' : {
-    #                 'message' : 'User not found',
-    #                 'error_message' : str(err),
-    #                 'messages': [i for i in err],
-    #             }
-    #         },
-    #         status=status.HTTP_400_BAD_REQUEST
-    #     )
-
     try:
         if code_for == 'Email':
             otp = VerificationOTP.objects.get(
@@ -198,12 +175,19 @@ def verify_otp(request):
                 user__email=email,
                 code=code
             )
+            otp.user.is_email_verified = True
+            otp.user.save()
+            otp.delete()
+
         elif code_for == 'Mobile':
             otp = VerificationOTP.objects.get(
-                code_for='Email',
-                user__email=email,
+                code_for='Mobile',
+                user__mobile_number=mobile_number,
                 code=code
             )
+            otp.user.is_mobile_verified = True
+            otp.user.save()
+            otp.delete()
         else:
             otp = None
     except Exception as err:
@@ -233,7 +217,6 @@ def verify_otp(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    otp.delete()
     
     return Response(
             {
@@ -241,6 +224,100 @@ def verify_otp(request):
                 'status_code' : StatusCodes.OTP_VERIFIED_4007,
                 'response' : {
                     'message' : 'OTP Verified',
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def resend_otp(request):
+    code_for = request.data.get('code_for', None)
+    email = request.data.get('email', None)
+    mobile_number = request.data.get('mobile_number', None)
+     
+    if code_for is None or (code_for is not None and code_for == 'Mobile' and mobile_number is None ) or (code_for is not None and code_for == 'Email' and email is None ) :
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'code_for',
+                        'email',
+                        'mobile_number',
+                        ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if code_for is not None and code_for not in ['Mobile', 'Email']:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_CHOICE_4004,
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Invalid Choice.',
+                    'valid_choices' : [
+                        'Mobile',
+                        'Email'
+                        ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        if code_for == 'Email':
+            otp = VerificationOTP.objects.get(
+                code_for='Email',
+                user__email=email,
+            )
+            otp.delete()
+        elif code_for == 'Mobile':
+            otp = VerificationOTP.objects.get(
+                code_for='Mobile',
+                user__mobile_number=mobile_number,
+            )
+            otp.delete()
+    except Exception as err:
+        pass
+
+    try:
+        if code_for == 'Email':
+            user = User.objects.get(email=email)
+        elif code_for == 'Mobile':
+            user = User.objects.get(mobile_number=mobile_number)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.USER_NOT_EXIST_4005,
+                    'response' : {
+                        'message' : f'User with this {"Email" if code_for == "Email" else "Mobile Number"} not exist',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    try:
+        thrd = Thread(target=OTP.generate_user_mobile_otp, kwargs={'user' : user})
+        thrd.start()
+    except:
+        pass
+
+    return Response(
+            {
+                'status' : True,
+                'status_code' : StatusCodes.OTP_SEND_SUCCESSFULLY_4008,
+                'response' : {
+                    'message' : f'OTP sent to your {"Email" if code_for == "Email" else "Mobile Number"}',
                 }
             },
             status=status.HTTP_200_OK

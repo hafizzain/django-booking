@@ -16,7 +16,7 @@ def send_twillio_to_phone_number(user=None):
 
         if otp_obj is not None:
             print(otp_obj)
-            text_message = f'{otp_obj.code} is your One Time Password (OTP) for verification on NStyle. Do not share this password with anyone'
+            text_message = f'{otp_obj.code} is your new One Time Password (OTP) for verification on NStyle. Do not share this password with anyone'
             client = Client(settings.TWILLIO_ACCOUNT_SID, settings.TWILLIO_AUTH_TOKEN)
             twilio_message = client.messages.create(
                 body=text_message,

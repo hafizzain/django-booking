@@ -8,4 +8,5 @@ urlpatterns = [
     
     # OTP 
     path('verify_otp/', nstyle.verify_otp ),
+    path('resend_otp/', nstyle.resend_otp ),
 ]
