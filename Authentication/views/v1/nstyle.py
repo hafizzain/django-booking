@@ -221,7 +221,7 @@ def verify_otp(request):
     return Response(
             {
                 'status' : True,
-                'status_code' : StatusCodes.OTP_VERIFIED_4007,
+                'status_code' : StatusCodes.OTP_VERIFIED_2001,
                 'response' : {
                     'message' : 'OTP Verified',
                 }
@@ -272,27 +272,36 @@ def resend_otp(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    try:
-        if code_for == 'Email':
-            otp = VerificationOTP.objects.get(
-                code_for='Email',
-                user__email=email,
-            )
-            otp.delete()
-        elif code_for == 'Mobile':
-            otp = VerificationOTP.objects.get(
-                code_for='Mobile',
-                user__mobile_number=mobile_number,
-            )
-            otp.delete()
-    except Exception as err:
-        pass
 
     try:
         if code_for == 'Email':
             user = User.objects.get(email=email)
+            if user.is_email_verified:
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : StatusCodes.USER_ALREADY_VERIFIED_4007,
+                        'response' : {
+                            'message' : f'Email already verified',
+                            'error_message' : str(err),
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
         elif code_for == 'Mobile':
             user = User.objects.get(mobile_number=mobile_number)
+            if user.is_mobile_verified:
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : StatusCodes.USER_ALREADY_VERIFIED_4007,
+                        'response' : {
+                            'message' : f'Mobile Number already verified',
+                            'error_message' : str(err),
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
     except Exception as err:
             return Response(
                 {
@@ -305,6 +314,18 @@ def resend_otp(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+    try:
+        if code_for == 'Email':
+            otp = VerificationOTP.objects.get(
+                code_for='Email' if code_for == 'Email' else 'Mobile' ,
+                user=user,
+            )
+            otp.delete()
+    except Exception as err:
+        pass
+
+
 
     try:
         thrd = Thread(target=OTP.generate_user_mobile_otp, kwargs={'user' : user})
