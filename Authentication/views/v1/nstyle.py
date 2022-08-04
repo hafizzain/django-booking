@@ -474,3 +474,59 @@ def login(request):
             },
             status=status.HTTP_200_OK
         )
+
+    
+@api_view(['PUT'])
+@permission_classes([AllowAny])
+def change_password(request):
+    password = request.data.get('password', None)
+    email = request.data.get('email', None)
+
+    if not all([password, email]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'email',
+                        'password',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        user = User.objects.get(email=email)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
+                'status_code_text' : 'INVALID_CREDENTIALS_4013',
+                'response' : {
+                    'message' : 'User does not exist with this email',
+                    'error_message' : str(err),
+                    'fields' : ['email']
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    user.set_password(password)
+    user.save()
+
+    return Response(
+            {
+                'status' : False,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Password Changed'
+                }
+            },
+            status=status.HTTP_200_OK
+        )
