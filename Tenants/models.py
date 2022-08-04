@@ -9,7 +9,7 @@ from Authentication.models import User
 
 class Tenant(TenantMixin):
     id = models.CharField(max_length=200, default=uuid4, primary_key=True, unique=True, editable=False)
-    user  = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tenant')
+    user  = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tenant', null=True, blank=True)
     name = models.CharField(max_length=20, default='')
     # schema_name = Already declared in TenantMixin
     domain = models.CharField(default='', max_length=200)
@@ -26,11 +26,11 @@ class Tenant(TenantMixin):
     auto_drop_schema = True
 
     def __str__(self):
-        return self.id
+        return f'{self.id} - {self.schema_name}'
     
 class Domain(DomainMixin):
     id = models.CharField(max_length=200, default=uuid4, primary_key=True, unique=True, editable=False)
-    user  = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_domain')
+    user  = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_domain', null=True, blank=True)
     # domain = Already declared in DomainMixin
     # tenant = Already declared in DomainMixin
     schema_name = models.CharField(default='', max_length=200)

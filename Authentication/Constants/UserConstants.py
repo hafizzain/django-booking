@@ -48,4 +48,4 @@ def complete_user_account(request, user=None, data=None):
 
     CreateTenant.create_tenant(user=user)
     AuthTokenConstants.create_user_token()
-    OTP.generate_user_mobile_otp(user=user)
+    OTP.generate_user_otp(user=user, code_for='Mobile')

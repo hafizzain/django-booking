@@ -15,7 +15,6 @@ def send_twillio_to_phone_number(user=None):
             otp_obj = None
 
         if otp_obj is not None:
-            print(otp_obj)
             text_message = f'{otp_obj.code} is your new One Time Password (OTP) for verification on NStyle. Do not share this password with anyone'
             client = Client(settings.TWILLIO_ACCOUNT_SID, settings.TWILLIO_AUTH_TOKEN)
             twilio_message = client.messages.create(
@@ -27,15 +26,24 @@ def send_twillio_to_phone_number(user=None):
         else:
             print('OTP not found')
 
-def generate_user_mobile_otp(user=None):
+def generate_user_otp(user=None, code_for='Mobile'):
     if user is None:
         return
 
     random_digits_for_code = ''.join(random.SystemRandom().choice(string.digits + string.digits) for _ in range(4))
+    try:
+        get_otp = VerificationOTP.objects.get(
+            user=user,
+            code_for=code_for
+        )
+        get_otp.delete()
+    except:
+        pass
+
     otp = VerificationOTP(
         user=user,
         code=random_digits_for_code,
-        code_for='Mobile'
+        code_for=code_for
     )
     otp.save()
     send_twillio_to_phone_number(user=user)

@@ -1,8 +1,6 @@
 from django.shortcuts import render
 
-from django.http import HttpResponse
-
-from django_tenants.utils import tenant_context
+from django.db import connection
 from django.db.models import Q
 from Authentication.Constants.CreateTenant import create_tenant
 from Authentication.Constants.UserConstants import create_user_account_type, complete_user_account
@@ -19,9 +17,8 @@ from rest_framework import status
 from NStyle.Constants import StatusCodes
 from threading import Thread
 from Authentication.Constants import OTP
-
-import random
-import string
+from django.contrib.auth import authenticate
+from Authentication.serializers import UserLoginSerializer
 # Create your views here.
 
 
@@ -41,6 +38,7 @@ def create_tenant_business_user(request):
             {
                 'status' : False,
                 'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
                 'response' : {
                     'message' : 'Invalid Data!',
                     'error_message' : 'All fields are required.',
@@ -62,6 +60,7 @@ def create_tenant_business_user(request):
             {
                 'status' : False,
                 'status_code' : StatusCodes.PASSWORD_STRENGTH_4003,
+                'status_code_text' : 'PASSWORD_STRENGTH_4003',
                 'response' : {
                     'message' : 'Invalid Data!',
                     'error_message' : 'Please enter a strong password.',
@@ -89,6 +88,7 @@ def create_tenant_business_user(request):
             {
                 'status' : False,
                 'status_code' : StatusCodes.ACCOUNT_ALREADY_EXISTS_4002,
+                'status_code_text' : 'ACCOUNT_ALREADY_EXISTS_4002',
                 'response' : {
                     'message' : 'User already taken from following fields',
                     'error_message' : 'Account already exist',
@@ -138,6 +138,7 @@ def verify_otp(request):
             {
                 'status' : False,
                 'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
                 'response' : {
                     'message' : 'Invalid Data!',
                     'error_message' : 'All fields are required.',
@@ -157,6 +158,7 @@ def verify_otp(request):
             {
                 'status' : False,
                 'status_code' : StatusCodes.INVALID_CHOICE_4004,
+                'status_code_text' : 'INVALID_CHOICE_4004',
                 'response' : {
                     'message' : 'Invalid Data!',
                     'error_message' : 'Invalid Choice.',
@@ -176,6 +178,7 @@ def verify_otp(request):
                 code=code
             )
             otp.user.is_email_verified = True
+            otp.user.is_active = True
             otp.user.save()
             otp.delete()
 
@@ -195,6 +198,7 @@ def verify_otp(request):
             {
                 'status' : False,
                 'status_code' : StatusCodes.INVALID_OTP_4006,
+                'status_code_text' : 'INVALID_OTP_4006',
                 'response' : {
                     'message' : 'OTP not found',
                     'error_message' : str(err),
@@ -208,6 +212,7 @@ def verify_otp(request):
             {
                 'status' : False,
                 'status_code' : StatusCodes.INVALID_OTP_4006,
+                'status_code_text' : 'INVALID_OTP_4006',
                 'response' : {
                     'message' : 'OTP not found',
                     'error_message' : str(err),
@@ -222,6 +227,7 @@ def verify_otp(request):
             {
                 'status' : True,
                 'status_code' : StatusCodes.OTP_VERIFIED_2001,
+                'status_code_text' : 'OTP_VERIFIED_2001',
                 'response' : {
                     'message' : 'OTP Verified',
                 }
@@ -243,6 +249,7 @@ def resend_otp(request):
             {
                 'status' : False,
                 'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
                 'response' : {
                     'message' : 'Invalid Data!',
                     'error_message' : 'All fields are required.',
@@ -261,6 +268,7 @@ def resend_otp(request):
             {
                 'status' : False,
                 'status_code' : StatusCodes.INVALID_CHOICE_4004,
+                'status_code_text' : 'INVALID_CHOICE_4004',
                 'response' : {
                     'message' : 'Invalid Data!',
                     'error_message' : 'Invalid Choice.',
@@ -276,59 +284,48 @@ def resend_otp(request):
     try:
         if code_for == 'Email':
             user = User.objects.get(email=email)
-            if user.is_email_verified:
-                return Response(
-                    {
-                        'status' : False,
-                        'status_code' : StatusCodes.USER_ALREADY_VERIFIED_4007,
-                        'response' : {
-                            'message' : f'Email already verified',
-                            'error_message' : str(err),
-                        }
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                )
         elif code_for == 'Mobile':
             user = User.objects.get(mobile_number=mobile_number)
-            if user.is_mobile_verified:
-                return Response(
-                    {
-                        'status' : False,
-                        'status_code' : StatusCodes.USER_ALREADY_VERIFIED_4007,
-                        'response' : {
-                            'message' : f'Mobile Number already verified',
-                            'error_message' : str(err),
-                        }
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+
+        if (user.is_mobile_verified and code_for == 'Mobile') or (user.is_email_verified and code_for == 'Email'):
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.USER_ALREADY_VERIFIED_4007,
+                    'status_code_text' : 'USER_ALREADY_VERIFIED_4007',
+                    'response' : {
+                        'message' : f'{"Email" if code_for == "Email" and user.is_email_verified else "Mobile Number"} already verified',
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
     except Exception as err:
             return Response(
                 {
                     'status' : False,
                     'status_code' : StatusCodes.USER_NOT_EXIST_4005,
+                    'status_code_text' : 'USER_NOT_EXIST_4005',
                     'response' : {
                         'message' : f'User with this {"Email" if code_for == "Email" else "Mobile Number"} not exist',
+                        'error_fields' : ["email" if code_for == "Email" else "phone_number"],
                         'error_message' : str(err),
                     }
                 },
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_404_NOT_FOUND
             )
 
     try:
-        if code_for == 'Email':
-            otp = VerificationOTP.objects.get(
-                code_for='Email' if code_for == 'Email' else 'Mobile' ,
-                user=user,
-            )
-            otp.delete()
+        otp = VerificationOTP.objects.get(
+            code_for='Email' if code_for == 'Email' else 'Mobile' ,
+            user=user,
+        )
+        otp.delete()
     except Exception as err:
+        print(err)
         pass
 
-
-
     try:
-        thrd = Thread(target=OTP.generate_user_mobile_otp, kwargs={'user' : user})
+        thrd = Thread(target=OTP.generate_user_otp, kwargs={'user' : user, 'code_for':f"{'Email' if code_for == 'Email' else 'Mobile'}"})
         thrd.start()
     except:
         pass
@@ -337,8 +334,142 @@ def resend_otp(request):
             {
                 'status' : True,
                 'status_code' : StatusCodes.OTP_SEND_SUCCESSFULLY_4008,
+                'status_code_text' : 'OTP_SEND_SUCCESSFULLY_4008',
                 'response' : {
                     'message' : f'OTP sent to your {"Email" if code_for == "Email" else "Mobile Number"}',
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def login(request):
+    email = request.data.get('email', None)
+    social_account = request.data.get('social_account', False)
+    password = request.data.get('password', None)
+
+    if social_account:
+        social_platform = request.data.get('social_platform', None)
+    
+    if not email or (not social_account and not password ) or (social_account and not social_platform ):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'email',
+                        'password',
+                        'social_account',
+                        ],
+                    'choices_fields' : ['password if social account', 'social_account if logged in with email']
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    connection.set_schema_to_public()
+    try:
+        user = User.objects.get(
+            email=email,
+            is_deleted=False
+        )
+        
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
+                'status_code_text' : 'INVALID_CREDENTIALS_4013',
+                'response' : {
+                    'message' : 'User does not exist with this email',
+                    'error_message' : str(err),
+                    'fields' : ['email']
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    user = authenticate(username=user.username, password=password)
+    if user is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
+                'status_code_text' : 'INVALID_CREDENTIALS_4013',
+                'response' : {
+                    'message' : 'Invalid Password',
+                    'fields' : ['password']
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    if not user.is_active:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.USER_ACCOUNT_INACTIVE_4009,
+                'status_code_text' : 'USER_ACCOUNT_INACTIVE_4009',
+                'response' : {
+                    'message' : 'Your account is inactive! Please verify.',
+                    'error_message' : 'Account is not active'
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    elif not user.is_email_verified:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.USER_EMAIL_NOT_VERIFIED_4010,
+                'status_code_text' : 'USER_EMAIL_NOT_VERIFIED_4010',
+                'response' : {
+                    'message' : 'Your Email is not verified.',
+                    'error_message' : 'User Email is not verified yet'
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    elif not user.is_mobile_verified:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.USER_PHONE_NUMBER_NOT_VERIFIED_4011,
+                'status_code_text' : 'USER_PHONE_NUMBER_NOT_VERIFIED_4011',
+                'response' : {
+                    'message' : 'Your Mobile Number is not verified',
+                    'error_message' : 'Users"s mobile number is not verified'
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    elif user.is_blocked:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.USER_ACCOUNT_IS_BLOCKED_4012,
+                'status_code_text' : 'USER_ACCOUNT_IS_BLOCKED_4012',
+                'response' : {
+                    'message' : 'Your Account is blocked! Contact our support',
+                    'error_message' : 'Users"s Account is blocked, Can"t access this account'
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    serialized = UserLoginSerializer(user)
+    return Response(
+            {
+                'status' : False,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Authenticated',
+                    'data' : serialized.data
                 }
             },
             status=status.HTTP_200_OK

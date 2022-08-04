@@ -19,7 +19,10 @@ class TenantAdmin(admin.ModelAdmin):
     ]
 
     def username(self, obj):
-        return str(obj.user.username)
+        try:
+            return str(obj.user.username)
+        except:
+            return '--------------'
 
 @admin.register(Domain)
 class DomainAdmin(admin.ModelAdmin):

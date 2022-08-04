@@ -6,7 +6,6 @@ import string
 import random
 from Tenants.models import Tenant, Domain
 from rest_framework.authtoken.models import Token
-from .OTP import generate_user_mobile_otp
 from .AuthTokenConstants import create_user_token
 
 

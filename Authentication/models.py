@@ -69,6 +69,7 @@ class User(AbstractBaseUser):
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
 
     mobile_number = models.CharField(max_length=20, null=True, blank=True)
     is_mobile_verified = models.BooleanField(default=False)
