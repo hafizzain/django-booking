@@ -7,7 +7,7 @@ class SoftwareAdmin(admin.ModelAdmin):
 
 @admin.register(Country)
 class CountryAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'is_active', 'is_deleted']
+    list_display = ['id', 'key', 'name', 'is_active', 'is_deleted']
 
 @admin.register(State)
 class StateAdmin(admin.ModelAdmin):

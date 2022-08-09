@@ -3,7 +3,7 @@ from Authentication.Constants import CreateTenant, AuthTokenConstants, OTP
 from Authentication.models import AccountType
 
 def create_user_account_type(user=None, account_type=None):
-    if ( user is not None and account_type is not None ) and (account_type == 'Everyone' or account_type == 'Business'):
+    if ( user is not None and account_type is not None ) and (account_type == 'everyone' or account_type == 'business'):
         try:
             user_account_type = AccountType.objects.get(user=user, account_type=account_type)
             print('Account Type already exist')
@@ -46,6 +46,7 @@ def complete_user_account(request, user=None, data=None):
     user.save()
     create_user_account_type(user=user, account_type=data['account_type'])
 
-    CreateTenant.create_tenant(user=user)
-    AuthTokenConstants.create_user_token()
+    AuthTokenConstants.create_user_token(user=user)
     OTP.generate_user_otp(user=user, code_for='Mobile')
+
+    CreateTenant.create_tenant(user=user, data=data)

@@ -18,8 +18,18 @@ from NStyle.Constants import StatusCodes
 from threading import Thread
 from Authentication.Constants import OTP
 from django.contrib.auth import authenticate
-from Authentication.serializers import UserLoginSerializer
+from Authentication.serializers import UserLoginSerializer, UserSerializer
 # Create your views here.
+
+@api_view()
+def all_users(request):
+    all_users = User.objects.all()
+    serialized = UserSerializer(all_users, many=True)
+    return Response(
+        {
+            'data' : serialized.data
+        }
+    )
 
 
 @api_view(['POST'])
@@ -239,7 +249,7 @@ def verify_otp(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
-def resend_otp(request):
+def send_verification_otp(request):
     code_for = request.data.get('code_for', None)
     email = request.data.get('email', None)
     mobile_number = request.data.get('mobile_number', None)

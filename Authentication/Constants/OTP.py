@@ -46,4 +46,7 @@ def generate_user_otp(user=None, code_for='Mobile'):
         code_for=code_for
     )
     otp.save()
-    send_twillio_to_phone_number(user=user)
+    try:
+        send_twillio_to_phone_number(user=user)
+    except:
+        pass

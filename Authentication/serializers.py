@@ -5,7 +5,7 @@ from Authentication.models import User
 from Tenants.models import Domain
 
 class UserSerializer(serializers.ModelSerializer):
-    access_token = serializers.SerializerMethodField()
+    # access_token = serializers.SerializerMethodField()
 
     def get_access_token(self,obj):
         return str(obj.auth_token)
@@ -20,7 +20,11 @@ class UserSerializer(serializers.ModelSerializer):
             'email',
             'mobile_number',
             'joined_at',
-            'access_token'
+            'is_superuser',
+            'is_admin',
+            'is_staff',
+            'is_active',
+            # 'access_token'
         ]
 
 class UserLoginSerializer(serializers.ModelSerializer):
