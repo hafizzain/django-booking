@@ -12,5 +12,11 @@ urlpatterns = [
     path('verify_otp/', nstyle.verify_otp ),
     path('send_verification_otp/', nstyle.send_verification_otp ),
 
-    path('all_users/', nstyle.all_users)
+    path('all_users/', nstyle.all_users),
+
+
+
+    # Tenant Special 
+
+    path('tenant_login/', nstyle.login ),
 ]

@@ -436,19 +436,19 @@ def login(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    elif not user.is_email_verified:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.USER_EMAIL_NOT_VERIFIED_4010,
-                'status_code_text' : 'USER_EMAIL_NOT_VERIFIED_4010',
-                'response' : {
-                    'message' : 'Your Email is not verified.',
-                    'error_message' : 'User Email is not verified yet'
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
+    # elif not user.is_email_verified:
+    #     return Response(
+    #         {
+    #             'status' : False,
+    #             'status_code' : StatusCodes.USER_EMAIL_NOT_VERIFIED_4010,
+    #             'status_code_text' : 'USER_EMAIL_NOT_VERIFIED_4010',
+    #             'response' : {
+    #                 'message' : 'Your Email is not verified.',
+    #                 'error_message' : 'User Email is not verified yet'
+    #             }
+    #         },
+    #         status=status.HTTP_404_NOT_FOUND
+    #     )
     elif not user.is_mobile_verified:
         return Response(
             {
