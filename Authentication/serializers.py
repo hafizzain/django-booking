@@ -80,6 +80,7 @@ class UserTenantSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
+            'id',
             'domain',
             'is_tenant'
         ]

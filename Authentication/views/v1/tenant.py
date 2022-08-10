@@ -147,7 +147,118 @@ def login(request):
     serialized = UserTenantLoginSerializer(user)
     return Response(
             {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Authenticated',
+                    'data' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_user(request):
+    user_id = request.GET.get('user', None)
+
+    if user_id is None:
+        return Response(
+            {
                 'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Invalid User ID',
+                    'fields' : [
+                        'user'
+                        ],
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        user = User.objects.get(
+            id=user_id,
+            is_active=True,
+            is_deleted=False,
+            is_blocked=False
+        )
+    except:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'User not found',
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+
+    if not user.is_active:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.USER_ACCOUNT_INACTIVE_4009,
+                'status_code_text' : 'USER_ACCOUNT_INACTIVE_4009',
+                'response' : {
+                    'message' : 'Your account is inactive! Please verify.',
+                    'error_message' : 'Account is not active'
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    # elif not user.is_email_verified:
+    #     return Response(
+    #         {
+    #             'status' : False,
+    #             'status_code' : StatusCodes.USER_EMAIL_NOT_VERIFIED_4010,
+    #             'status_code_text' : 'USER_EMAIL_NOT_VERIFIED_4010',
+    #             'response' : {
+    #                 'message' : 'Your Email is not verified.',
+    #                 'error_message' : 'User Email is not verified yet'
+    #             }
+    #         },
+    #         status=status.HTTP_404_NOT_FOUND
+    #     )
+    elif not user.is_mobile_verified:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.USER_PHONE_NUMBER_NOT_VERIFIED_4011,
+                'status_code_text' : 'USER_PHONE_NUMBER_NOT_VERIFIED_4011',
+                'response' : {
+                    'message' : 'Your Mobile Number is not verified',
+                    'error_message' : 'Users"s mobile number is not verified'
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    elif user.is_blocked:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.USER_ACCOUNT_IS_BLOCKED_4012,
+                'status_code_text' : 'USER_ACCOUNT_IS_BLOCKED_4012',
+                'response' : {
+                    'message' : 'Your Account is blocked! Contact our support',
+                    'error_message' : 'Users"s Account is blocked, Can"t access this account'
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    serialized = UserTenantLoginSerializer(user)
+    return Response(
+            {
+                'status' : True,
                 'status_code' : 200,
                 'response' : {
                     'message' : 'Authenticated',

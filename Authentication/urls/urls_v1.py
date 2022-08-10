@@ -1,7 +1,7 @@
 
 from django.urls import path, include
 
-from ..views.v1 import nstyle
+from ..views.v1 import nstyle, tenant
 
 urlpatterns = [
     path('create_tenant_business_user/', nstyle.create_tenant_business_user ),
@@ -18,5 +18,6 @@ urlpatterns = [
 
     # Tenant Special 
 
-    path('tenant_login/', nstyle.login ),
+    path('tenant_login/', tenant.login ),
+    path('get_user/', tenant.get_user ),
 ]

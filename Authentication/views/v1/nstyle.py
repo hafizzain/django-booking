@@ -7,6 +7,7 @@ from Authentication.Constants.UserConstants import create_user_account_type, com
 
 # from django.contrib.auth.models import User
 from Authentication.models import User, VerificationOTP
+from Tenants.Constants.tenant_constants import verify_tenant_email_mobile
 from Tenants.models import Tenant, Domain
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
@@ -204,6 +205,13 @@ def verify_otp(request):
             otp.delete()
         else:
             otp = None
+            raise Exception('Verification OTP not found')
+        
+        try:
+            thrd = Thread(target=verify_tenant_email_mobile, args=[], kwargs={'prev_tenant_name': 'public', 'user' : user ,'verify': code_for})
+            thrd.start()
+        except:
+            pass
     except Exception as err:
         return Response(
             {

@@ -36,7 +36,7 @@ def create_tenant_user(tenant=None, data=None):
         user.last_name=last_name
         user.full_name=f'{first_name} {last_name}'
         user.mobile_number = data['mobile_number']
-        user.is_superuser=True
+        # user.is_superuser=True
         user.is_staff=True
         user.is_admin=True
         user.is_active=True
@@ -120,7 +120,7 @@ def create_tenant(request=None, user=None, data=None):
     if user is None or data is None:
         return
     
-    td_name = str(data.get('business_name', user.username)).strip().replace(' ' , '-').lower()  # Tenant Domain name
+    td_name = str(data.get('business_name', user.username)).strip().replace(' ' , '-').replace('.', '-').replace('/' , '-').lower()  # Tenant Domain name
     user_tenant = Tenant.objects.create(
         user=user,
         name=td_name,
