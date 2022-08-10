@@ -42,8 +42,9 @@ def create_tenant_business_user(request):
     mobile_number = data.get('mobile_number', None)
     password = data.get('password', None)
     account_type = data.get('account_type', None)
+    business_name = data.get('business_name', None)
 
-    if not all([first_name, email, username, mobile_number, password, account_type ]):
+    if not all([first_name, email, username, mobile_number, password, account_type ]) or (account_type is not None and account_type == 'business' and business_name is None):
         return Response(
             {
                 'status' : False,
@@ -57,7 +58,7 @@ def create_tenant_business_user(request):
                         'first_name', 
                         'last_name', 
                         'email', 
-                        'mobile_number', 
+                        'mobile_number',
                         'password',
                         'account_type'
                         ]

@@ -55,7 +55,7 @@ def add_cities(tenant=None):
 
     with tenant_context(tenant):
         with open('Utility/Files/cities.csv', 'r') as inp_file:
-            for row in inp_file:
+            for index, row in enumerate(inp_file):
                 unique_code = row.split(',')[0]
                 name = row.split(',')[1]
                 state_unique_code = row.split(',')[2].replace('\n', '').strip()
@@ -69,6 +69,6 @@ def add_cities(tenant=None):
                     name=name,
                     unique_code=unique_code
                 )
-                print(f'Added City {name} ...')
+                print(f'Added City {index} ...')
 
     print('Cities Created')

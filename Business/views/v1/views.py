@@ -53,11 +53,6 @@ def create_user_business(request):
     business_types = request.data.get('business_types', None)
     software_used = request.data.get('software_used', None)
 
-
-    print(type(opening_hours))
-    print(type(business_types))
-    print(type(software_used))
-
     if not all([user_id, business_name, country, state, city, postal_code, address, opening_hours, business_types, software_used ]):
         return Response(
             {

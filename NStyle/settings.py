@@ -71,6 +71,7 @@ TENANT_APPS = [
     'django.contrib.admin',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'rest_framework.authtoken',
 
 ] + NSTYLE_APPS
 

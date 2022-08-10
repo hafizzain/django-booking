@@ -20,6 +20,7 @@ class UserAdmin(admin.ModelAdmin):
         'is_email_verified'
     ]
 
+
 @admin.register(AccountType)
 class AccountTypeAdmin(admin.ModelAdmin):
     list_display = [
