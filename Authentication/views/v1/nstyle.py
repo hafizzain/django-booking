@@ -18,7 +18,7 @@ from NStyle.Constants import StatusCodes
 from threading import Thread
 from Authentication.Constants import OTP
 from django.contrib.auth import authenticate
-from Authentication.serializers import UserLoginSerializer, UserSerializer
+from Authentication.serializers import UserLoginSerializer, UserSerializer, UserTenantSerializer
 # Create your views here.
 
 @api_view()
@@ -233,6 +233,8 @@ def verify_otp(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
+    user = otp.user
+    serialized = UserTenantSerializer(user)
     
     return Response(
             {
@@ -241,6 +243,7 @@ def verify_otp(request):
                 'status_code_text' : 'OTP_VERIFIED_2001',
                 'response' : {
                     'message' : 'OTP Verified',
+                    'data' : serialized.data
                 }
             },
             status=status.HTTP_200_OK

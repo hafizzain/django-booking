@@ -34,6 +34,7 @@ class AccountTypeAdmin(admin.ModelAdmin):
 class NewsLetterDetailAdmin(admin.ModelAdmin):
     list_display = [
         'id',
+        'terms_condition',
         'is_subscribed'
     ]
 

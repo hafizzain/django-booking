@@ -1,6 +1,6 @@
 
 from Authentication.Constants import CreateTenant, AuthTokenConstants, OTP
-from Authentication.models import AccountType
+from Authentication.models import AccountType, NewsLetterDetail
 
 def create_user_account_type(user=None, account_type=None):
     if ( user is not None and account_type is not None ) and (account_type == 'everyone' or account_type == 'business'):
@@ -44,8 +44,12 @@ def complete_user_account(request, user=None, data=None):
             user.social_id = social_id
 
     user.save()
+    NewsLetterDetail.objects.create(
+        user = user,
+        terms_condition=data.get('terms_condition', True),
+        is_subscribed=data.get('terms_condition', False)
+    )
     create_user_account_type(user=user, account_type=data['account_type'])
-
     AuthTokenConstants.create_user_token(user=user)
     OTP.generate_user_otp(user=user, code_for='Mobile')
 

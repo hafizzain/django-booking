@@ -7,10 +7,10 @@ from Profile.models import Profile
 from Utility.Constants.add_data_db import add_countries, add_states, add_cities
 
 from rest_framework.authtoken.models import Token
-
+from django.conf import  settings
 
 from django_tenants.utils import tenant_context
-from Authentication.models import AccountType, User
+from Authentication.models import AccountType, User, NewsLetterDetail
 from Authentication.Constants import AuthTokenConstants
 from Authentication.Constants.UserConstants import create_user_account_type
 from threading import Thread
@@ -107,31 +107,31 @@ def add_data_to_tenant_thread(tenant=None):
     if tenant is None:
         return
 
-    try:
-        print('gonna create countries')
-        add_countries(tenant=tenant)
-        add_states(tenant=tenant)
-        add_cities(tenant=tenant)
-    except Exception as err:
-        print(err)
+    # try:
+    #     print('gonna create countries')
+    #     add_countries(tenant=tenant)
+    #     add_states(tenant=tenant)
+    #     add_cities(tenant=tenant)
+    # except Exception as err:
+    #     print(err)
 
 
 def create_tenant(request=None, user=None, data=None):
     if user is None or data is None:
         return
     
-    td_name = str(data.get('business_name', user.username)).strip().replace(' ' , '-')  # Tenant Domain name
+    td_name = str(data.get('business_name', user.username)).strip().replace(' ' , '-').lower()  # Tenant Domain name
     user_tenant = Tenant.objects.create(
         user=user,
         name=td_name,
-        domain=f'{td_name}.localhost',
+        domain=f'{td_name}.{settings.BACKEND_DOMAIN_NAME}',
         schema_name=td_name
     )
 
     Domain.objects.create(
         user=user,
         schema_name=td_name,
-        domain=f'{td_name}.localhost',
+        domain=f'{td_name}.{settings.BACKEND_DOMAIN_NAME}',
         tenant=user_tenant,
     )
 
@@ -139,7 +139,13 @@ def create_tenant(request=None, user=None, data=None):
     with tenant_context(user_tenant):
         t_user = create_tenant_user(tenant=user_tenant, data=data)
         print(t_user)
+        
         if t_user is not None:
+            NewsLetterDetail.objects.create(
+                user = t_user,
+                terms_condition=data.get('terms_condition', True),
+                is_subscribed=data.get('terms_condition', False)
+            )
             t_profile = create_tenant_profile(tenant_user=t_user, data=data, tenant=user_tenant)
             t_business = create_tenant_business(tenant_user=t_user, tenant_profile=t_profile, tenant=user_tenant, data=data)
             try:

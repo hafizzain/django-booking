@@ -2,7 +2,7 @@
 
 from rest_framework import serializers
 from Authentication.models import User
-from Tenants.models import Domain
+from Tenants.models import Domain, Tenant
 
 class UserSerializer(serializers.ModelSerializer):
     # access_token = serializers.SerializerMethodField()
@@ -51,4 +51,35 @@ class UserLoginSerializer(serializers.ModelSerializer):
         fields = [
             'domain',
             'access_token'
+        ]
+
+class UserTenantSerializer(serializers.ModelSerializer):
+    domain = serializers.SerializerMethodField()
+    is_tenant = serializers.SerializerMethodField()
+
+
+    def get_is_tenant(self,obj):
+        try:
+            obj.tenant
+            return True
+        except Exception as err:
+            return False
+
+    def get_domain(self,obj):
+        try:
+            user_domain = Domain.objects.get(
+                user=obj,
+                is_deleted=False,
+                is_blocked=False,
+                is_active=True
+            )
+            return user_domain.schema_name
+        except Exception as err:
+            return None
+
+    class Meta:
+        model = User
+        fields = [
+            'domain',
+            'is_tenant'
         ]

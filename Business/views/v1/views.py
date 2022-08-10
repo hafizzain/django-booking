@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from Business.models import BusinessType
-from Business.serializers.v1_serializers import BusinessTypeSerializer
+from Business.serializers.v1_serializers import BusinessTypeSerializer, Business_GetSerializer
 
 from NStyle.Constants import StatusCodes
 
@@ -153,38 +153,6 @@ def create_user_business(request):
         except:
             tnt_city = None
 
-        # tenant_user = User.objects.get(
-        #     is_superuser=True,
-        #     username=user.username
-        # )
-        # user_business = Business.objects.create(
-        #     user=tenant_user,
-        #     business_name=business_name,
-        # )
-        # business_social = BusinessSocial.objects.create(
-        #     business=user_business,
-        #     user=tenant_user,
-        #     website=website
-        # )
-        # business_address = BusinessAddress.objects.create(
-        #     user=tenant_user,
-        #     business=user_business,
-        #     country=tnt_country,
-        #     state=tnt_state,
-        #     city=tnt_city,
-        #     address=address,
-        #     email=tenant_user.email,
-        #     mobile_number=user.mobile_number
-        # )
-
-        # address_hours = BusinessOpeningHour.objects.create(
-        #     business=user_business,
-        #     business_address=business_address,
-        #     day='Sunday',
-        #     start_time='',
-        #     close_time='',
-        # )
-
     return Response(
             {
                 'status' : True,
@@ -197,4 +165,64 @@ def create_user_business(request):
                 }
             },
             status=status.HTTP_201_CREATED
+        )
+    
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_business(request):
+    user = request.GET.get('user', None)
+
+    if user is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'User id is required',
+                    'fields' : [
+                        'user',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        user_business = Business.objects.get(
+            user=user,
+            is_deleted=False,
+            is_active=True,
+            is_blocked=False
+        )
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                'response' : {
+                    'message' : 'Business Not Found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    serialized = Business_GetSerializer(user_business)
+
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : 'BUSINESS_FOUND',
+                'response' : {
+                    'message' : 'Business Found',
+                    'error_message' : None,
+                    'business' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
         )
