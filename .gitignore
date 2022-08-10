@@ -9,7 +9,7 @@ NStyle/.env
 # VIRTUAL ENVIRONTMENT 
 venv
 /venv
-./venv
+./venv/*
 
 # DATABASE
 db.sqlite3
