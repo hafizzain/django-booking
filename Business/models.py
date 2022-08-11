@@ -78,6 +78,7 @@ class BusinessAddress(models.Model):
     state = models.ForeignKey(State, on_delete=models.SET_NULL, null=True, blank=True, related_name='address_state')
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, related_name='address_city')
     
+    address_name = models.CharField(max_length=500, default='')
     address = models.TextField(default='')
     latitude = models.CharField(default='', max_length=200, null=True, blank=True)
     longitude = models.CharField(default='', max_length=200, null=True, blank=True)
