@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from Business.models import BusinessType
-from Business.serializers.v1_serializers import BusinessTypeSerializer, Business_GetSerializer
+from Business.serializers.v1_serializers import BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer
 
 from NStyle.Constants import StatusCodes
 
@@ -225,4 +225,84 @@ def get_business(request):
                 }
             },
             status=status.HTTP_200_OK
+        )
+
+
+@api_view(['PUT'])
+@permission_classes([AllowAny])
+def update_business(request):
+    business_id = request.data.get('business', None)
+
+    if business_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'User id is required',
+                    'fields' : [
+                        'business',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        business = Business.objects.get(
+            id=business_id,
+            is_deleted=False,
+            is_blocked=False
+        )
+    except Exception as err :
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                'response' : {
+                    'message' : 'Business Not Found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    serialized = Business_PutSerializer(business, data=request.data)
+    
+    if serialized.is_valid():
+        serialized.save()
+        logo = request.data.get('logo', None)
+        if logo is not None:
+            business.logo = logo
+            business.save()
+        serialized = Business_GetSerializer(business)
+        return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : 'Saved Data',
+                'response' : {
+                    'message' : 'Successfully updated',
+                    'error_message' : None,
+                    'business' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
+    else:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.COULD_NOT_SAVE_FORM_DATA_4016,
+                'status_code_text' : 'COULD_NOT_SAVE_FORM_DATA_4016',
+                'response' : {
+                    'message' : 'Could not save, Something went wrong',
+                    'error_message' : serialized.errors,
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
         )

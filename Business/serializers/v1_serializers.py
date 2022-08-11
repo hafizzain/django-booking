@@ -20,3 +20,13 @@ class Business_GetSerializer(serializers.ModelSerializer):
             'id',
             'business_name',
         ]
+
+
+class Business_PutSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Business
+        fields = [
+            'timezone',
+            'time_format',
+            'week_start',
+        ]

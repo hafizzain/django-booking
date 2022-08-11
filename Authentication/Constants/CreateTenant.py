@@ -121,6 +121,14 @@ def create_tenant(request=None, user=None, data=None):
         return
     
     td_name = str(data.get('business_name', user.username)).strip().replace(' ' , '-').replace('.', '-').replace('/' , '-').lower()  # Tenant Domain name
+    try:
+        Domain.objects.get(
+            domain=f'{td_name}.{settings.BACKEND_DOMAIN_NAME}'
+        )
+        all_domains_length = Domain.objects.all().count()
+        td_name = td_name + f'-{int(all_domains_length)}'
+    except:
+        pass
     user_tenant = Tenant.objects.create(
         user=user,
         name=td_name,
