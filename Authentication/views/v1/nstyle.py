@@ -22,7 +22,8 @@ from django.contrib.auth import authenticate
 from Authentication.serializers import UserLoginSerializer, UserSerializer, UserTenantSerializer
 # Create your views here.
 
-@api_view()
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def all_users(request):
     all_users = User.objects.all()
     serialized = UserSerializer(all_users, many=True)
@@ -34,6 +35,7 @@ def all_users(request):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def create_tenant_business_user(request):
     data = request.data
 
@@ -497,7 +499,7 @@ def login(request):
             status=status.HTTP_200_OK
         )
 
-    
+
 @api_view(['PUT'])
 @permission_classes([AllowAny])
 def change_password(request):

@@ -1,4 +1,8 @@
 
+# 100 Category Status codes 
+
+USER_HAS_NO_PERMISSION_1001 = 1001
+
 # 200 Category Status codes 
 
 

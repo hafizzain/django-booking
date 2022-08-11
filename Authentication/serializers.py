@@ -89,6 +89,10 @@ class UserTenantSerializer(serializers.ModelSerializer):
 class UserTenantLoginSerializer(serializers.ModelSerializer):
     domain = serializers.SerializerMethodField()
     is_tenant = serializers.SerializerMethodField()
+    access_token = serializers.SerializerMethodField()
+
+    def get_access_token(self,obj):
+        return str(obj.auth_token)
 
 
     def get_is_tenant(self,obj):
@@ -111,4 +115,4 @@ class UserTenantLoginSerializer(serializers.ModelSerializer):
             return None
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'domain', 'is_tenant']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'domain', 'is_tenant', 'access_token']

@@ -274,6 +274,24 @@ def update_business(request):
     
     if serialized.is_valid():
         serialized.save()
+
+        website_url = request.data.get('website', None)
+        fb_url = request.data.get('facebook', None)
+        insta_url = request.data.get('instagram', None)
+        business_social, created = BusinessSocial.objects.get_or_create(
+            business=business,
+            user=business.user
+        )
+        
+        if website_url is not None:
+            business_social.website = website_url
+        if fb_url is not None:
+            business_social.facebook = fb_url
+        if insta_url is not None:
+            business_social.instagram = insta_url
+        
+        business_social.save()
+    
         logo = request.data.get('logo', None)
         if logo is not None:
             business.logo = logo
@@ -310,7 +328,7 @@ def update_business(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def get_business_locations(request, business_id):
     try:
         business = Business.objects.get(
@@ -348,12 +366,139 @@ def get_business_locations(request, business_id):
             {
                 'status' : True,
                 'status_code' : 200,
-                'status_code_text' : 'Saved Data',
+                'status_code_text' : '200',
                 'response' : {
-                    'message' : 'Successfully updated',
+                    'message' : 'Business All Locations',
                     'error_message' : None,
-                    'business' : data
+                    'locations' : data
                 }
             },
             status=status.HTTP_200_OK
         )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_business_location(request):
+    business_id = request.data.get('business', None)
+    user = request.user
+    address = request.data.get('address', None)
+    country_id = request.data.get('country', None)
+    state_id = request.data.get('state', None)
+    city_id = request.data.get('city', None)
+    postal_code = request.data.get('postal_code', None)
+
+    if not all([business_id, address, country_id, state_id, city_id, postal_code]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'business',
+                        'address',
+                        'country',
+                        'state',
+                        'city',
+                        'postal_code',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        business = Business.objects.get(
+            id=business_id,
+            is_deleted=False,
+            is_blocked=False,
+            is_active=True
+        )
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                'response' : {
+                    'message' : 'Business Not Found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    if business.user.id != user.id:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.USER_HAS_NO_PERMISSION_1001,
+                'status_code_text' : 'USER_HAS_NO_PERMISSION_1001',
+                'response' : {
+                    'message' : 'You are not allowed to add Business Location, Only Business owner can',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    try:
+        country = Country.objects.get(
+            id=country_id,
+            is_deleted=False,
+            is_active=True
+        )
+    except:
+        country = None
+    try:
+        state = State.objects.get(
+            id=state_id,
+            is_deleted=False,
+            is_active=True
+        )
+    except:
+        state = None
+    try:
+        city = City.objects.get(
+            id=city_id,
+            is_deleted=False,
+            is_active=True
+        )
+    except:
+        city = None
+
+    business_address = BusinessAddress(
+        business = business,
+        user = user,
+        address = address,
+        postal_code = postal_code,
+        country=country,
+        state=state,
+        city=city,
+        is_primary = False,
+        is_active = True,
+        is_deleted = False,
+        is_closed = False,
+    )
+    business_address.save()
+
+    serialized = BusinessAddress_GetSerializer(business_address)
+
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'status_code_text' : 'Created',
+                'response' : {
+                    'message' : 'Location Added successful',
+                    'error_message' : None,
+                    'locations' : serialized.data
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+
+        
