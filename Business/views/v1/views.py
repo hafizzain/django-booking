@@ -227,6 +227,79 @@ def get_business(request):
             status=status.HTTP_200_OK
         )
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_business_by_domain(request):
+    domain_name = request.GET.get('domain', None)
+
+    if domain_name is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'User id is required',
+                    'fields' : [
+                        'domain',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        domain = None
+        with tenant_context(Tenant.objects.get(schema_name = 'public')):
+            domain = Domain.objects.get(domain__icontains=domain_name)
+
+        if domain is not None:
+            with tenant_context(domain.tenant):
+                user_business = Business.objects.filter(
+                    is_deleted=False,
+                    is_active=True,
+                    is_blocked=False
+                )
+                if len(user_business) > 0:
+                    user_business = user_business[0]
+                else:
+                    raise Exception('0 Business found')
+        else :
+            raise Exception('Business Not Exist')
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                'response' : {
+                    'message' : 'Business Not Found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : 'BUSINESS_FOUND',
+                'response' : {
+                    'message' : 'Business Found',
+                    'error_message' : None,
+                    'business' : {
+                        'id' : str(user_business.id),
+                        'business_name' : str(user_business.business_name),
+                        'logo' : user_business.logo if user_business.logo else None ,
+                    }
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])

@@ -115,3 +115,15 @@ class BusinessOpeningHour(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+
+    
+# THEME CUSTOMIZATION 
+
+# class BusinessTheme(models.Model):
+#     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_address')
+#     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_address')
+
+#     primary_color_code = models.CharField(max_length=20, default='')
