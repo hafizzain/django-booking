@@ -447,29 +447,22 @@ def add_business_location(request):
         )
     
     try:
-        country = Country.objects.get(
-            id=country_id,
-            is_deleted=False,
-            is_active=True
+        country = Country.objects.get( id=country, is_deleted=False, is_active=True )
+        state = State.objects.get( id=state, is_deleted=False, is_active=True )
+        city = City.objects.get( id=city, is_deleted=False, is_active=True )
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Invalid Country, State or City',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
         )
-    except:
-        country = None
-    try:
-        state = State.objects.get(
-            id=state_id,
-            is_deleted=False,
-            is_active=True
-        )
-    except:
-        state = None
-    try:
-        city = City.objects.get(
-            id=city_id,
-            is_deleted=False,
-            is_active=True
-        )
-    except:
-        city = None
 
     business_address = BusinessAddress(
         business = business,
@@ -570,6 +563,109 @@ def delete_location(request):
                 'response' : {
                     'message' : 'You don"t have permission to delete this location',
                     'error_message' : 'User don"t have permission to delete this Business Address, user must be Business Owner or Location creator',
+                }
+            },
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_location(request):
+    user = request.user
+    location_id = request.GET.get('location', None)
+
+    if location_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'location',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        business_address = BusinessAddress.objects.get(
+            id=location_id,
+            is_deleted = False,
+            is_closed = False,
+        )
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.LOCATION_NOT_FOUND_4017,
+                'status_code_text' : 'LOCATION_NOT_FOUND_4017',
+                'response' : {
+                    'message' : 'Location Not Found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    if business_address.user == user or business_address.business.user == user :
+        business_address.address_name = request.data.get('address_name', business_address.address_name)
+        business_address.address = request.data.get('address', business_address.address)
+        business_address.postal_code = request.data.get('postal_code', business_address.postal_code)
+
+        country = request.data.get('country', None)
+        state = request.data.get('state', None)
+        city = request.data.get('city', None)
+
+        try:
+            country = Country.objects.get( id=country, is_deleted=False, is_active=True )
+            state = State.objects.get( id=state, is_deleted=False, is_active=True )
+            city = City.objects.get( id=city, is_deleted=False, is_active=True )
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 400,
+                    'status_code_text' : 'Invalid Data',
+                    'response' : {
+                        'message' : 'Invalid Country, State or City',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        business_address.save()
+
+        serialized = BusinessAddress_GetSerializer(business_address)
+
+        return Response(
+                {
+                    'status' : True,
+                    'status_code' : 200,
+                    'status_code_text' : 'Updated',
+                    'response' : {
+                        'message' : 'Location updated successful',
+                        'error_message' : None,
+                        'location' : serialized.data
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+
+    else:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.USER_HAS_NO_PERMISSION_1001,
+                'status_code_text' : 'USER_HAS_NO_PERMISSION_1001',
+                'response' : {
+                    'message' : 'You don"t have permission to edit this location',
+                    'error_message' : 'User don"t have permission to edit this Business Address, user must be Business Owner or Location creator',
                 }
             },
             status=status.HTTP_403_FORBIDDEN
