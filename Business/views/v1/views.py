@@ -354,7 +354,7 @@ def get_business_locations(request, business_id):
     business_addresses = BusinessAddress.objects.filter(
         business = business,
         is_deleted=False,
-        is_blocked=False,
+        is_closed=False,
         is_active=True
     )
     data = []
@@ -370,7 +370,8 @@ def get_business_locations(request, business_id):
                 'response' : {
                     'message' : 'Business All Locations',
                     'error_message' : None,
-                    'locations' : data
+                    'count' : len(data),
+                    'locations' : data,
                 }
             },
             status=status.HTTP_200_OK
@@ -501,4 +502,75 @@ def add_business_location(request):
             status=status.HTTP_201_CREATED
         )
 
-        
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_location(request):
+    user = request.user
+    location_id = request.GET.get('location', None)
+
+    if location_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'location',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        business_address = BusinessAddress.objects.get(
+            id=location_id,
+            is_deleted = False,
+            is_closed = False,
+        )
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.LOCATION_NOT_FOUND_4017,
+                'status_code_text' : 'LOCATION_NOT_FOUND_4017',
+                'response' : {
+                    'message' : 'Location Not Found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    if business_address.user == user or business_address.business.user == user :
+        business_address.delete()
+        return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Location deleted!',
+                    'error_message' : None,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
+    else:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.USER_HAS_NO_PERMISSION_1001,
+                'status_code_text' : 'USER_HAS_NO_PERMISSION_1001',
+                'response' : {
+                    'message' : 'You don"t have permission to delete this location',
+                    'error_message' : 'User don"t have permission to delete this Business Address, user must be Business Owner or Location creator',
+                }
+            },
+            status=status.HTTP_403_FORBIDDEN
+        )

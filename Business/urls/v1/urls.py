@@ -12,4 +12,5 @@ urlpatterns = [
     path('update_business/', views.update_business),
     path('<str:business_id>/get_business_locations/', views.get_business_locations),
     path('add_business_location/', views.add_business_location),
+    path('delete_location/', views.delete_location),
 ]
