@@ -3,7 +3,7 @@
 
 from rest_framework import serializers
 
-from Business.models import BusinessType, Business
+from Business.models import BusinessType, Business, BusinessAddress
 from Authentication.serializers import UserSerializer
 
 class BusinessTypeSerializer(serializers.ModelSerializer):
@@ -19,6 +19,15 @@ class Business_GetSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'business_name',
+            'logo',
+            'banner',
+            'postal_code',
+            'week_start',
+            'team_size',
+            'currency',
+            'timezone',
+            'time_format',
+            'how_find_us',
         ]
 
 
@@ -29,4 +38,18 @@ class Business_PutSerializer(serializers.ModelSerializer):
             'timezone',
             'time_format',
             'week_start',
+        ]
+
+class BusinessAddress_GetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessAddress
+        fields = [
+            'id',
+            'country',
+            'state',
+            'city',
+            'address',
+            'postal_code',
+            'website',
+            'is_primary',
         ]

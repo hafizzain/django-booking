@@ -10,4 +10,5 @@ urlpatterns = [
     # path('create_user_business/', views.create_user_business),
     path('get_business/', views.get_business),
     path('update_business/', views.update_business),
+    path('<str:business_id>/get_business_locations/', views.get_business_locations),
 ]

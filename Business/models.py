@@ -37,7 +37,7 @@ class Business(models.Model):
     business_types = models.ManyToManyField(BusinessType, related_name='type_businesses')
     software_used = models.ManyToManyField(Software, related_name='software_businesses')
 
-    week_start = models.CharField(default='', max_length=20)
+    week_start = models.CharField(default='Monday', max_length=20)
     team_size = models.CharField(max_length=100, default='')
     currency = models.ForeignKey(Currency, on_delete=models.SET_NULL, null=True, blank=True)
     timezone = models.CharField(max_length=200, default='')

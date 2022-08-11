@@ -3,12 +3,12 @@
 
 from operator import ge
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
 from Business.models import BusinessType
-from Business.serializers.v1_serializers import BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer
+from Business.serializers.v1_serializers import BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer
 
 from NStyle.Constants import StatusCodes
 
@@ -169,7 +169,7 @@ def create_user_business(request):
     
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def get_business(request):
     user = request.GET.get('user', None)
 
@@ -229,7 +229,7 @@ def get_business(request):
 
 
 @api_view(['PUT'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def update_business(request):
     business_id = request.data.get('business', None)
 
@@ -305,4 +305,55 @@ def update_business(request):
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_business_locations(request, business_id):
+    try:
+        business = Business.objects.get(
+            id=business_id,
+            is_deleted=False,
+            is_blocked=False,
+            is_active=True
+        )
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                'response' : {
+                    'message' : 'Business Not Found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    business_addresses = BusinessAddress.objects.filter(
+        business = business,
+        is_deleted=False,
+        is_blocked=False,
+        is_active=True
+    )
+    data = []
+    if len(business_addresses) > 0:
+        serialized = BusinessAddress_GetSerializer(business_addresses, many=True)
+        data = serialized.data
+
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : 'Saved Data',
+                'response' : {
+                    'message' : 'Successfully updated',
+                    'error_message' : None,
+                    'business' : data
+                }
+            },
+            status=status.HTTP_200_OK
         )
