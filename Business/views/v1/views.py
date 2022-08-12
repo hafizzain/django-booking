@@ -886,7 +886,7 @@ def update_business_theme(request):
         status=status.HTTP_400_BAD_REQUEST
     )
 
-@api_view('POST')
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_business_language(request):
     business = request.data.get('business', None)
@@ -904,7 +904,7 @@ def add_business_language(request):
         status=status.HTTP_400_BAD_REQUEST
     )
 
-@api_view('POST')
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def update_language(request):
     business = request.data.get('business', None)
