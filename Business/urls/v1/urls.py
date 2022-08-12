@@ -11,6 +11,12 @@ urlpatterns = [
     path('get_business/', views.get_business),
     path('get_business_by_domain/', views.get_business_by_domain),
     path('update_business/', views.update_business),
+
+    # Business Theme URLs 
+    path('get_business_theme/', views.update_business),
+
+
+    # Business Location URLs 
     path('<str:business_id>/get_business_locations/', views.get_business_locations),
     path('add_business_location/', views.add_business_location),
     path('delete_location/', views.delete_location),

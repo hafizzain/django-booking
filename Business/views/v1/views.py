@@ -13,7 +13,7 @@ from Business.serializers.v1_serializers import BusinessTypeSerializer, Business
 from NStyle.Constants import StatusCodes
 
 from Authentication.models import User
-from Business.models import Business, BusinessSocial, BusinessAddress, BusinessOpeningHour
+from Business.models import Business, BusinessSocial, BusinessAddress, BusinessOpeningHour, BusinessTheme
 from Tenants.models import Domain, Tenant
 from Utility.models import Country, State, City
 
@@ -743,3 +743,59 @@ def update_location(request):
             },
             status=status.HTTP_403_FORBIDDEN
         )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_business_theme(request):
+    business_id = request.GET.get('business', None)
+
+    if business_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'business',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        business = Business.objects.get(id=business_id, is_deleted=False, is_active=True, is_blocked=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                    'response' : {
+                        'message' : 'Business Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+    business_theme, created = BusinessTheme.objects.get_or_create(business=business, is_deleted=False, is_active=True)
+
+    serialized = {}
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : 'BusinessTheme',
+            'response' : {
+                'message' : 'Business Theme',
+                'error_message' : None,
+                'theme' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
