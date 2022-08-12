@@ -457,12 +457,13 @@ def add_business_location(request):
     business_id = request.data.get('business', None)
     user = request.user
     address = request.data.get('address', None)
+    address_name = request.data.get('address_name', None)
     country_id = request.data.get('country', None)
     state_id = request.data.get('state', None)
     city_id = request.data.get('city', None)
     postal_code = request.data.get('postal_code', None)
 
-    if not all([business_id, address, country_id, state_id, city_id, postal_code]):
+    if not all([business_id, address, address_name, country_id, state_id, city_id, postal_code]):
         return Response(
             {
                 'status' : False,
@@ -474,6 +475,7 @@ def add_business_location(request):
                     'fields' : [
                         'business',
                         'address',
+                        'address_name',
                         'country',
                         'state',
                         'city',
@@ -541,6 +543,7 @@ def add_business_location(request):
         business = business,
         user = user,
         address = address,
+        address_name = address_name,
         postal_code = postal_code,
         country=country,
         state=state,
