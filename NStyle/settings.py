@@ -95,8 +95,11 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     'http://midtechdxb.com',
     'https://midtechdxb.com',
+    'http://us-telecoms.com',
+    'https://us-telecoms.com',
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True
 ROOT_URLCONF = 'NStyle.urls'
 
 TEMPLATES = [

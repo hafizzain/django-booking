@@ -120,10 +120,11 @@ class BusinessOpeningHour(models.Model):
     
 # THEME CUSTOMIZATION 
 
-# class BusinessTheme(models.Model):
-#     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+class BusinessTheme(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     
-#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_address')
-#     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_address')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_theme')
+    business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_theme')
 
-#     primary_color_code = models.CharField(max_length=20, default='')
+    primary_color_code = models.CharField(max_length=20, default='')
+    secondary_color_code = models.CharField(max_length=20, default='')
