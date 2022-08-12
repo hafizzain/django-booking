@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from Business.models import BusinessType
-from Business.serializers.v1_serializers import BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer
+from Business.serializers.v1_serializers import BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer
 
 from NStyle.Constants import StatusCodes
 
@@ -785,7 +785,7 @@ def get_business_theme(request):
         
     business_theme, created = BusinessTheme.objects.get_or_create(business=business, is_deleted=False, is_active=True)
 
-    serialized = {}
+    serialized = BusinessThemeSerializer(business_theme)
     return Response(
         {
             'status' : True,

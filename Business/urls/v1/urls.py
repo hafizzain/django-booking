@@ -13,7 +13,8 @@ urlpatterns = [
     path('update_business/', views.update_business),
 
     # Business Theme URLs 
-    path('get_business_theme/', views.update_business),
+    path('get_business_theme/', views.get_business_theme),
+    # path('update_business_theme/', views.update_business),
 
 
     # Business Location URLs 

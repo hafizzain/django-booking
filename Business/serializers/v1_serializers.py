@@ -3,7 +3,7 @@
 
 from rest_framework import serializers
 
-from Business.models import BusinessType, Business, BusinessAddress, BusinessSocial
+from Business.models import BusinessType, Business, BusinessAddress, BusinessSocial, BusinessTheme
 from Authentication.serializers import UserSerializer
 
 class BusinessTypeSerializer(serializers.ModelSerializer):
@@ -81,4 +81,15 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
             'postal_code',
             'website',
             'is_primary',
+        ]
+
+class BusinessThemeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessTheme
+        fields = [
+            'id',
+            'primary_color',
+            'secondary_color',
+            'menu_option',
+            'calendar_option',
         ]
