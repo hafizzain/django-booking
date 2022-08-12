@@ -520,9 +520,9 @@ def add_business_location(request):
         )
     
     try:
-        country = Country.objects.get( id=country, is_deleted=False, is_active=True )
-        state = State.objects.get( id=state, is_deleted=False, is_active=True )
-        city = City.objects.get( id=city, is_deleted=False, is_active=True )
+        country = Country.objects.get( id=country_id, is_deleted=False, is_active=True )
+        state = State.objects.get( id=state_id, is_deleted=False, is_active=True )
+        city = City.objects.get( id=city_id, is_deleted=False, is_active=True )
     except Exception as err:
         return Response(
             {
