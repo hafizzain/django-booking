@@ -121,10 +121,26 @@ class BusinessOpeningHour(models.Model):
 # THEME CUSTOMIZATION 
 
 class BusinessTheme(models.Model):
+    CALENDAR_CHOICES = [
+        ('HorizontalView', 'Horizontal View'),
+        ('VerticalView', 'Vertical View'),
+    ]
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_theme')
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_theme')
 
-    primary_color_code = models.CharField(max_length=20, default='')
-    secondary_color_code = models.CharField(max_length=20, default='')
+    primary_color = models.CharField(max_length=20, default='')
+    secondary_color = models.CharField(max_length=20, default='')
+
+    menu_option = models.CharField(max_length=300, default='', null=True)
+    calendar_option = models.CharField(max_length=50, default='HorizontalView', choices=CALENDAR_CHOICES)
+
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    is_primary = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+
+
+    def __str__(self):
+        return str(self.id)
