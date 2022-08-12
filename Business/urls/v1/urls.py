@@ -14,7 +14,7 @@ urlpatterns = [
 
     # Business Theme URLs 
     path('get_business_theme/', views.get_business_theme),
-    # path('update_business_theme/', views.update_business),
+    path('update_business_theme/', views.update_business_theme),
 
 
     # Business Location URLs 
