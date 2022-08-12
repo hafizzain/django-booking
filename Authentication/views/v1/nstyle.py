@@ -247,14 +247,13 @@ def verify_otp(request):
     user = otp.user
     serialized = UserTenantSerializer(user)
     s_data = dict(serialized.data)
-    s_data['tnt_user_id'] = None
-    s_data['tenant_access_token'] = None
+    s_data['id'] = None
+    s_data['access_token'] = None
     try:
         with tenant_context(Tenant.objects.get(user=user)):
             tnt_token = Token.objects.get(user__username=user.username)
-            s_data['tnt_user_id'] = str(tnt_token.user.id)
-            s_data['tenant_access_token'] = str(tnt_token.key)
-
+            s_data['id'] = str(tnt_token.user.id)
+            s_data['access_token'] = str(tnt_token.key)
     except:
         pass
 
