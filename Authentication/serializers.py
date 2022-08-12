@@ -49,6 +49,7 @@ class UserLoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
+            'id',
             'domain',
             'access_token'
         ]
