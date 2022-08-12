@@ -107,13 +107,13 @@ def add_data_to_tenant_thread(tenant=None):
     if tenant is None:
         return
 
-    # try:
-    #     print('gonna create countries')
-    #     add_countries(tenant=tenant)
-    #     add_states(tenant=tenant)
-    #     add_cities(tenant=tenant)
-    # except Exception as err:
-    #     print(err)
+    try:
+        print('gonna create countries')
+        add_countries(tenant=tenant)
+        add_states(tenant=tenant)
+        add_cities(tenant=tenant)
+    except Exception as err:
+        print(err)
 
 
 def create_tenant(request=None, user=None, data=None):
