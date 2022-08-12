@@ -783,7 +783,12 @@ def get_business_theme(request):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-    business_theme, created = BusinessTheme.objects.get_or_create(business=business, is_deleted=False, is_active=True)
+    business_theme, created = BusinessTheme.objects.get_or_create(
+        business=business,
+        user=business.user,
+        is_deleted=False, 
+        is_active=True
+    )
 
     serialized = BusinessThemeSerializer(business_theme)
     return Response(
@@ -805,7 +810,7 @@ def get_business_theme(request):
 @permission_classes([IsAuthenticated])
 def update_business_theme(request):
     theme_id = request.data.get('theme', None)
-    business_id = request.GET.get('business', None)
+    business_id = request.data.get('business', None)
 
 
     if not all([theme_id, business_id]):
@@ -842,9 +847,14 @@ def update_business_theme(request):
                 status=status.HTTP_404_NOT_FOUND
             )
     
-    business_theme, created = BusinessTheme.objects.get_or_create(business=business, is_deleted=False, is_active=True)
+    business_theme, created = BusinessTheme.objects.get_or_create(
+        business=business,
+        user=business.user,
+        is_deleted=False,
+        is_active=True
+    )
 
-    serialized = BusinessThemeSerializer(business_theme, data=request.data)
+    serialized = BusinessThemeSerializer(business_theme, data=request.data, partial=True)
     if serialized.is_valid():
         return Response(
             {
@@ -867,7 +877,7 @@ def update_business_theme(request):
             'status_code_text' : 'INVALID DATA',
             'response' : {
                 'message' : 'Invalid Values',
-                'error_message' : str(serialized.error_messages),
+                'error_message' : str(serialized.errors),
             }
         },
         status=status.HTTP_400_BAD_REQUEST
