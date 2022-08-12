@@ -812,7 +812,6 @@ def update_business_theme(request):
     theme_id = request.data.get('theme', None)
     business_id = request.data.get('business', None)
 
-
     if not all([theme_id, business_id]):
         return Response(
             {

@@ -7,7 +7,7 @@ from Authentication.Constants.UserConstants import create_user_account_type, com
 
 # from django.contrib.auth.models import User
 from Authentication.models import User, VerificationOTP
-from Tenants.Constants.tenant_constants import verify_tenant_email_mobile
+from Tenants.Constants.tenant_constants import set_schema, verify_tenant_email_mobile
 from Tenants.models import Tenant, Domain
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
@@ -20,6 +20,7 @@ from threading import Thread
 from Authentication.Constants import OTP
 from django.contrib.auth import authenticate
 from Authentication.serializers import UserLoginSerializer, UserSerializer, UserTenantSerializer
+from django_tenants.utils import tenant_context
 # Create your views here.
 
 @api_view(['GET'])
@@ -146,7 +147,7 @@ def verify_otp(request):
     code_for = request.data.get('code_for', None)
     email = request.data.get('email', None)
     mobile_number = request.data.get('mobile_number', None)
-    
+
     if not all([code, code_for]) or (code_for is not None and code_for == 'Mobile' and mobile_number is None ) or (code_for is not None and code_for == 'Email' and email is None ) :
         return Response(
             {
@@ -194,8 +195,7 @@ def verify_otp(request):
             otp.user.is_email_verified = True
             otp.user.is_active = True
             otp.user.save()
-            otp.delete()
-
+            # otp.delete()
         elif code_for == 'Mobile':
             otp = VerificationOTP.objects.get(
                 code_for='Mobile',
@@ -204,7 +204,7 @@ def verify_otp(request):
             )
             otp.user.is_mobile_verified = True
             otp.user.save()
-            otp.delete()
+            # otp.delete()
         else:
             otp = None
             raise Exception('Verification OTP not found')
@@ -215,6 +215,7 @@ def verify_otp(request):
         except:
             pass
     except Exception as err:
+        print(err)
         return Response(
             {
                 'status' : False,
@@ -245,7 +246,18 @@ def verify_otp(request):
     
     user = otp.user
     serialized = UserTenantSerializer(user)
-    
+    s_data = dict(serialized.data)
+    s_data['tnt_user_id'] = None
+    s_data['tenant_access_token'] = None
+    try:
+        with tenant_context(Tenant.objects.get(user=user)):
+            tnt_token = Token.objects.get(user__username=user.username)
+            s_data['tnt_user_id'] = str(tnt_token.user.id)
+            s_data['tenant_access_token'] = str(tnt_token.key)
+
+    except:
+        pass
+
     return Response(
             {
                 'status' : True,
@@ -253,7 +265,7 @@ def verify_otp(request):
                 'status_code_text' : 'OTP_VERIFIED_2001',
                 'response' : {
                     'message' : 'OTP Verified',
-                    'data' : serialized.data
+                    'data' : s_data
                 }
             },
             status=status.HTTP_200_OK

@@ -24,7 +24,6 @@ class UserSerializer(serializers.ModelSerializer):
             'is_admin',
             'is_staff',
             'is_active',
-            # 'access_token'
         ]
 
 class UserLoginSerializer(serializers.ModelSerializer):
