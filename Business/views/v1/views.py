@@ -854,8 +854,9 @@ def update_business_theme(request):
         is_active=True
     )
 
-    serialized = BusinessThemeSerializer(business_theme, data=request.data, partial=True)
+    serialized = BusinessThemeSerializer(business_theme, data=request.data)
     if serialized.is_valid():
+        serialized.save()
         return Response(
             {
                 'status' : True,
