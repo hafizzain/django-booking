@@ -57,6 +57,10 @@ class UserLoginSerializer(serializers.ModelSerializer):
 class UserTenantSerializer(serializers.ModelSerializer):
     domain = serializers.SerializerMethodField()
     is_tenant = serializers.SerializerMethodField()
+    access_token = serializers.SerializerMethodField()
+
+    def get_access_token(self,obj):
+        return str(obj.auth_token)
 
 
     def get_is_tenant(self,obj):
@@ -83,7 +87,8 @@ class UserTenantSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'domain',
-            'is_tenant'
+            'is_tenant',
+            'access_token'
         ]
     
 
