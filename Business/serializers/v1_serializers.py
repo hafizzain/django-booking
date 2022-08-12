@@ -78,6 +78,7 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
             'state',
             'city',
             'address',
+            'address_name',
             'postal_code',
             'website',
             'is_primary',
