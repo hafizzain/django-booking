@@ -882,3 +882,21 @@ def update_business_theme(request):
         },
         status=status.HTTP_400_BAD_REQUEST
     )
+
+@api_view('POST')
+@permission_classes([IsAuthenticated])
+def add_business_language(request):
+    business = request.data.get('business', None)
+
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 400,
+            'status_code_text' : 'INVALID DATA',
+            'response' : {
+                'message' : 'Language Added',
+                'error_message' : None,
+            }
+        },
+        status=status.HTTP_400_BAD_REQUEST
+    )
