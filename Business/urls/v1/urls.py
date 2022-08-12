@@ -24,6 +24,7 @@ urlpatterns = [
     path('update_location/', views.update_location),
 
     # Language URLs 
-    
+
     path('add_business_language/', views.add_business_language),
+    path('update_language/', views.update_language),
 ]
