@@ -25,22 +25,23 @@ def set_schema(schema_name_=None, user=None):
         return tenant_scm
 
 
-
 def verify_tenant_email_mobile(prev_tenant_name='public', user=None, verify='Mobile'):
+    
     if user is None:
         print('ERROR : User is None')
         return None
+    with tenant_context(Tenant.objects.get(schema_name=prev_tenant_name)):
 
-    set_schema(user=user)
-    try:
-        user = User.objects.get(username=user.username)
-        if verify == 'Mobile':
-            user.is_mobile_verified = True
-        elif verify == 'Email':
-            user.is_email_verified = True
-        user.save()
-        print('USER VERIFIED')
-    except Exception as err:
-        print('ERROR ' , err)
-        return None
-    set_schema(schema_name_=prev_tenant_name)
+        with tenant_context(Tenant.objects.get(user__username=user.username)):
+            try:
+                user_obj = User.objects.get(username=user.username)
+                if verify == 'Mobile':
+                    user_obj.is_mobile_verified = True
+                elif verify == 'Email':
+                    user_obj.is_email_verified = True
+                user_obj.save()
+                print('USER VERIFIED')
+            except Exception as err:
+                print('ERROR ' , err)
+                return None
+        set_schema(schema_name_=prev_tenant_name)

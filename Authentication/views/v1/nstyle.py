@@ -195,7 +195,7 @@ def verify_otp(request):
             otp.user.is_email_verified = True
             otp.user.is_active = True
             otp.user.save()
-            # otp.delete()
+            otp.delete()
         elif code_for == 'Mobile':
             otp = VerificationOTP.objects.get(
                 code_for='Mobile',
@@ -204,15 +204,16 @@ def verify_otp(request):
             )
             otp.user.is_mobile_verified = True
             otp.user.save()
-            # otp.delete()
+            otp.delete()
         else:
             otp = None
             raise Exception('Verification OTP not found')
         
         try:
-            thrd = Thread(target=verify_tenant_email_mobile, args=[], kwargs={'prev_tenant_name': 'public', 'user' : user ,'verify': code_for})
+            thrd = Thread(target=verify_tenant_email_mobile, args=[], kwargs={'prev_tenant_name': 'public', 'user' : otp.user ,'verify': code_for})
             thrd.start()
-        except:
+        except Exception as err:
+            print('ERROR Threading : ', err)
             pass
     except Exception as err:
         print(err)
