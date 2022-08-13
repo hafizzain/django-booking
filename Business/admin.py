@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import BusinessType, Business, BusinessSocial, BusinessAddress, BusinessOpeningHour, BusinessTheme
+from .models import BusinessType, Business, BusinessSocial, BusinessAddress, BusinessOpeningHour, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting
 
 
 @admin.register(BusinessType)
@@ -27,4 +27,41 @@ class BusinessOpeningHourAdmin(admin.ModelAdmin):
 @admin.register(BusinessTheme)
 class BusinessThemeAdmin(admin.ModelAdmin):
     list_display = ['id', 'primary_color' , 'secondary_color' , 'menu_option' ,'calendar_option' , 'is_active', 'is_deleted']
+
+
+@admin.register(StaffNotificationSetting)
+class StaffNotificationSettingAdmin(admin.ModelAdmin):
+    def business_name(self, obj):
+        try:
+            return obj.business.business_name
+        except:
+            return 'N/A'
+    list_display = ['id', 'business_name', 'is_active', 'created_at' ]
+
+
+@admin.register(AdminNotificationSetting)
+class AdminNotificationSettingAdmin(admin.ModelAdmin):
+    def business_name(self, obj):
+        try:
+            return obj.business.business_name
+        except:
+            return 'N/A'
+    list_display = ['id', 'business_name', 'is_active', 'created_at' ]
+
+@admin.register(ClientNotificationSetting)
+class ClientNotificationSettingAdmin(admin.ModelAdmin):
+    def business_name(self, obj):
+        try:
+            return obj.business.business_name
+        except:
+            return 'N/A'
+    list_display = ['id', 'business_name', 'is_active', 'created_at' ]
+@admin.register(StockNotificationSetting)
+class StockNotificationSettingAdmin(admin.ModelAdmin):
+    def business_name(self, obj):
+        try:
+            return obj.business.business_name
+        except:
+            return 'N/A'
+    list_display = ['id', 'business_name', 'is_active', 'created_at' ]
 

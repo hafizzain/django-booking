@@ -144,3 +144,87 @@ class BusinessTheme(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+    
+class StaffNotificationSetting(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_staff_notify_setting')
+    business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_staff_notify_setting')
+
+    sms_daily_sale = models.BooleanField(default=True , verbose_name='Send SMS Notification on Daily Sale')
+    email_daily_sale = models.BooleanField(default=True , verbose_name="Send Email Notification on Daily Sale")
+
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=now)
+
+
+    def __str__(self):
+        return str(self.id)
+
+
+    
+class ClientNotificationSetting(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_client_notify_setting')
+    business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_client_notify_setting')
+
+
+    sms_purchase_plan = models.BooleanField(default=True, verbose_name="Send SMS Notification on Purchase Plan")
+    sms_for_rewards_on_quick_sale = models.BooleanField(default=True , verbose_name="Send SMS Notification for Rewards on quick Sale")
+    sms_pending_services_quicksale = models.BooleanField(default=True , verbose_name="Send SMS Notification on Pending Services Quick Sale")
+    sms_for_ewallet_balance_on_quick_sale = models.BooleanField(default=True , verbose_name="Send SMS Notification for ewallet balance on quick sale")
+    sms_pending_payment = models.BooleanField(default=True , verbose_name="Send SMS Notification on Pending Payment")
+    email_notify_on_purchase_plan = models.BooleanField(default=True , verbose_name="Send Email Notification On Purchase Plan")
+    sms_quick_sale = models.BooleanField(default=True , verbose_name="Send SMS Notification on Quick Sale")
+    sms_appoinment = models.BooleanField(default=True , verbose_name="Send Notification on Appoinment")
+    sms_appoinment_reschedule = models.BooleanField(default=True , verbose_name="Send SMS Notification on Appoinment reschedule")
+    sms_birthday = models.BooleanField(default=True , verbose_name="Send SMS Notification on Birthday")
+
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=now)
+
+
+    def __str__(self):
+        return str(self.id)
+
+
+    
+class AdminNotificationSetting(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_admin_notify_setting')
+    business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_admin_notify_setting')
+
+    sms_notify_on_appoinment = models.BooleanField(default=True , verbose_name="Send SMS Notification on Apoinment")
+    sms_notify_on_quick_sale = models.BooleanField(default=True , verbose_name="Send SMS Notification on quick sale")
+    sms_notify_for_daily_book = models.BooleanField(default=True , verbose_name="Send SMS Notification for daily book")
+    email_notify_on_appoinment = models.BooleanField(default=True , verbose_name="Send Email Notification on Appoinment")
+    email_notify_on_quick_sale = models.BooleanField(default=True , verbose_name="Send Email Notification on Quick Sale")
+    email_notify_on_daily_book = models.BooleanField(default=True , verbose_name="Send Email Notification on Daily Book")
+
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=now)
+
+
+    def __str__(self):
+        return str(self.id)
+
+    
+class StockNotificationSetting(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_stock_notify_setting')
+    business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_stock_notify_setting')
+
+    notify_for_lowest_stock = models.BooleanField(default=True , verbose_name="Alert when stock becomes the lowest")
+    notify_stock_turnover = models.BooleanField(default=True , verbose_name="Alert on highest/lowest turnover")
+
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=now)
+
+    def __str__(self):
+        return str(self.id)
+
+
