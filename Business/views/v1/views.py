@@ -18,6 +18,7 @@ from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
 from Tenants.models import Domain, Tenant
 from Utility.models import Country, Language, State, City
+from Utility.serializers import LanguageSerializer
 
 from django_tenants.utils import tenant_context
 
@@ -1088,6 +1089,27 @@ def get_business_languages(request):
                 'message' : 'Business languages',
                 'error_message' : None,
                 'languages' : seralized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_all_languages(request):
+    all_languages = Language.objects.filter(is_active=True, is_deleted=False)
+
+    serialized = LanguageSerializer(all_languages, many=True)
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'All languages',
+                'error_message' : None,
+                'languages' : serialized.data
             }
         },
         status=status.HTTP_200_OK
