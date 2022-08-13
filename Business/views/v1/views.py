@@ -1036,3 +1036,59 @@ def update_language(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_business_languages(request):
+    business_id = request.GET.get('business', None)
+
+    if not all([business_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'business',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        business = Business.objects.get(id=business_id, is_deleted=False, is_active=True, is_blocked=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                    'response' : {
+                        'message' : 'Business Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+    business_languages = UserLanguage.objects.filter(user=business.user)
+    seralized = UserLanguageSerializer(business_languages, many=True)
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Business languages',
+                'error_message' : None,
+                'languages' : seralized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
