@@ -4,7 +4,7 @@
 from Tenants.models import Tenant, Domain
 from Business.models import Business
 from Profile.models import Profile
-from Utility.Constants.add_data_db import add_countries, add_states, add_cities
+from Utility.Constants.add_data_db import add_countries, add_states, add_cities, add_currencies, add_languages
 
 from rest_framework.authtoken.models import Token
 from django.conf import  settings
@@ -108,7 +108,9 @@ def add_data_to_tenant_thread(tenant=None):
         return
 
     try:
-        print('gonna create countries')
+        print('gonna create DB data')
+        add_currencies(tenant=tenant)
+        add_languages(tenant=tenant)
         add_countries(tenant=tenant)
         add_states(tenant=tenant)
         add_cities(tenant=tenant)

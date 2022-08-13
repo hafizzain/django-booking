@@ -86,6 +86,7 @@ class Language(models.Model):
     id = models.UUIDField(default=uuid4, editable=False, unique=True, primary_key=True)
 
     name = models.CharField(default='', max_length=200)
+    code = models.CharField(default='', max_length=200)
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
     is_default = models.BooleanField(default=False)

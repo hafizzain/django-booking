@@ -1,7 +1,8 @@
 
 
+import csv
 from Tenants.models import Tenant
-from Utility.models import Country, State, City
+from Utility.models import Country, State, City, Currency, Language
 
 from django_tenants.utils import tenant_context
 
@@ -72,3 +73,44 @@ def add_cities(tenant=None):
                 print(f'Added City {index} ...')
 
     print('Cities Created')
+
+
+def add_currencies(tenant=None):
+    if tenant is None:
+        tenant = Tenant.objects.get(schema_name='public')
+
+    with tenant_context(tenant):
+
+        with open('Utility/Files/Currencies.csv', 'r') as f:
+            reader = csv.reader(f)
+            header = next(reader)
+            for i in reader:
+                try:
+                    Currency.objects.get(name=i[0])
+                except:
+                    crc_obj = Currency.objects.create(
+                            name=i[0],
+                            code=i[1]
+                        )
+                    print(crc_obj)
+
+def add_languages(tenant=None):
+    if tenant is None:
+        tenant = Tenant.objects.get(schema_name='public')
+
+    with tenant_context(tenant):
+
+        with open('Utility/Files/languages.csv', 'r') as f:
+            reader = csv.reader(f)
+            header = next(reader)
+            for i in reader:
+                try:
+                    language = Language.objects.get(
+                            code = i[1],
+                        )
+                except:
+                    language = Language.objects.create(
+                        code = i[1],
+                        name = i[2]
+                    )
+                    print(language)

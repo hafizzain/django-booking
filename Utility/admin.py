@@ -1,5 +1,9 @@
 from django.contrib import admin
-from .models import Software, Country, State, City, Language
+from .models import Software, Country, State, City, Language, Currency
+
+@admin.register(Currency)
+class CurrencyAdmin(admin.ModelAdmin):
+    list_display = ['id', 'code', 'name', 'is_active', 'is_deleted']
 
 @admin.register(Software)
 class SoftwareAdmin(admin.ModelAdmin):
