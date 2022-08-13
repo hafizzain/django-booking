@@ -14,8 +14,10 @@ from NStyle.Constants import StatusCodes
 
 from Authentication.models import User
 from Business.models import Business, BusinessSocial, BusinessAddress, BusinessOpeningHour, BusinessTheme
+from Profile.models import UserLanguage
+from Profile.serializers import UserLanguageSerializer
 from Tenants.models import Domain, Tenant
-from Utility.models import Country, State, City
+from Utility.models import Country, Language, State, City
 
 from django_tenants.utils import tenant_context
 
@@ -889,35 +891,148 @@ def update_business_theme(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_business_language(request):
-    business = request.data.get('business', None)
+    business_id = request.data.get('business', None)
+    language_id = request.data.get('language', None)
+    is_default = request.data.get('is_default', False)
 
+    
+    if not all([language_id, business_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'language',
+                        'business',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        business = Business.objects.get(id=business_id, is_deleted=False, is_active=True, is_blocked=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                    'response' : {
+                        'message' : 'Business Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+    try:
+        language = Language.objects.get(id=language_id, is_active=True,  is_deleted=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.LANGUAGE_NOT_FOUND_4018,
+                    'status_code_text' : 'LANGUAGE_NOT_FOUND_4018',
+                    'response' : {
+                        'message' : 'Language Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+    
+    language_obj = UserLanguage.objects.create(
+        user=business.user,
+        profile=business.profile,
+        language=language,
+        is_default=is_default
+    )
+    language_obj.save()
+    seralized = UserLanguageSerializer(language_obj)
     return Response(
         {
             'status' : True,
-            'status_code' : 400,
-            'status_code_text' : 'INVALID DATA',
+            'status_code' : 200,
+            'status_code_text' : '200',
             'response' : {
                 'message' : 'Language Added',
                 'error_message' : None,
+                'language' : seralized.data
             }
         },
-        status=status.HTTP_400_BAD_REQUEST
+        status=status.HTTP_200_OK
     )
 
-@api_view(['POST'])
+@api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_language(request):
-    business = request.data.get('business', None)
+    id = request.data.get('id', None)
 
-    return Response(
-        {
-            'status' : True,
-            'status_code' : 400,
-            'status_code_text' : 'INVALID DATA',
-            'response' : {
-                'message' : 'Language Added',
-                'error_message' : None,
-            }
-        },
-        status=status.HTTP_400_BAD_REQUEST
-    )
+    if not all([id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        language = UserLanguage.objects.get(id=id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.LANGUAGE_NOT_FOUND_4018,
+                    'status_code_text' : 'LANGUAGE_NOT_FOUND_4018',
+                    'response' : {
+                        'message' : 'UserLanguage Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    seralized = UserLanguageSerializer(language, data=request.data, partial=True)
+    if seralized.is_valid():
+        seralized.save()
+        return Response(
+                {
+                    'status' : True,
+                    'status_code' : 200,
+                    'status_code_text' : '200',
+                    'response' : {
+                        'message' : 'Language Added',
+                        'error_message' : None,
+                        'language' : seralized.data
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+
+    else:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'INVALID DATA',
+                'response' : {
+                    'message' : 'Updated unsuccessful',
+                    'error_message' : seralized.error_messages,
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
