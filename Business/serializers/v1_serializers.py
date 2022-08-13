@@ -3,7 +3,7 @@
 
 from rest_framework import serializers
 
-from Business.models import BusinessType, Business, BusinessAddress, BusinessSocial, BusinessTheme
+from Business.models import BusinessType, Business, BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting
 from Authentication.serializers import UserSerializer
 
 class BusinessTypeSerializer(serializers.ModelSerializer):
@@ -93,4 +93,13 @@ class BusinessThemeSerializer(serializers.ModelSerializer):
             'secondary_color',
             'menu_option',
             'calendar_option',
+        ]
+
+class StaffNotificationSettingSerializer(serializers.Serializer):
+    class Meta:
+        model = StaffNotificationSetting
+        fields = [
+            'id',
+            'sms_daily_sale',
+            'email_daily_sale'
         ]
