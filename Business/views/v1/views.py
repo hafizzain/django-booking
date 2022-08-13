@@ -648,8 +648,7 @@ def delete_location(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_location(request):
-    user = request.user
-    location_id = request.GET.get('location', None)
+    location_id = request.data.get('location', None)
 
     if location_id is None:
         return Response(
@@ -688,6 +687,7 @@ def update_location(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
+    user = request.user
     if business_address.user == user or business_address.business.user == user :
         business_address.address_name = request.data.get('address_name', business_address.address_name)
         business_address.address = request.data.get('address', business_address.address)
