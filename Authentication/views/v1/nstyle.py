@@ -529,8 +529,9 @@ def login(request):
 def change_password(request):
     password = request.data.get('password', None)
     email = request.data.get('email', None)
+    mobile_number = request.data.get('mobile_number', None)
 
-    if not all([password, email]):
+    if password is None or not any([email, mobile_number]):
         return Response(
             {
                 'status' : False,
@@ -542,6 +543,7 @@ def change_password(request):
                     'fields' : [
                         'email',
                         'password',
+                        'mobile_number',
                     ]
                 }
             },
@@ -549,7 +551,12 @@ def change_password(request):
         )
 
     try:
-        user = User.objects.get(email=email)
+        if email is not None:
+            user = User.objects.get(email=email)
+        elif mobile_number is not None:
+            user = User.objects.get(mobile_number=mobile_number)
+        else:
+            raise Exception('User not exist')
     except Exception as err:
         return Response(
             {
