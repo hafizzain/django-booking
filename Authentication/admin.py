@@ -46,4 +46,5 @@ class VerificationOTPAdmin(admin.ModelAdmin):
         'username',
         'code',
         'code_for',
+        'created_at',
     ]
