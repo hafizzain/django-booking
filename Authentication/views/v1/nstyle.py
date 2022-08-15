@@ -70,7 +70,7 @@ def create_tenant_business_user(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    if len(password) < 8:
+    if len(password) < 6:
         return Response(
             {
                 'status' : False,

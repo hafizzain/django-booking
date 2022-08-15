@@ -3,7 +3,7 @@
 
 from rest_framework import serializers
 
-from Business.models import BusinessType, Business, BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting
+from Business.models import BookingSetting, BusinessType, Business, BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting
 from Authentication.serializers import UserSerializer
 
 class BusinessTypeSerializer(serializers.ModelSerializer):
@@ -138,4 +138,26 @@ class StockNotificationSettingSerializer(serializers.ModelSerializer):
         fields = [
             'notify_for_lowest_stock',
             'notify_stock_turnover',
+        ]
+
+class BookingSettingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BookingSetting
+        fields = [
+            'id',
+            'cancel_or_reschedule',
+            'client_can_book',
+            'controls_time_slot',
+            'time_slots_interval',
+            'allow_client_to_select_team_member',
+            'send_to_client',
+            'send_to_specific_email_address',
+            'auto_confirmation',
+            'admin_confirmation',
+            'start_time',
+            'services',
+            'duration',
+            'choose_team_member',
+            'select_payment_type',
+            'initial_deposit',
         ]

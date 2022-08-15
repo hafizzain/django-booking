@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import BusinessType, Business, BusinessSocial, BusinessAddress, BusinessOpeningHour, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting
+from .models import BusinessType, Business, BusinessSocial, BusinessAddress, BusinessOpeningHour, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BookingSetting
 
 
 @admin.register(BusinessType)
@@ -58,6 +58,15 @@ class ClientNotificationSettingAdmin(admin.ModelAdmin):
     list_display = ['id', 'business_name', 'is_active', 'created_at' ]
 @admin.register(StockNotificationSetting)
 class StockNotificationSettingAdmin(admin.ModelAdmin):
+    def business_name(self, obj):
+        try:
+            return obj.business.business_name
+        except:
+            return 'N/A'
+    list_display = ['id', 'business_name', 'is_active', 'created_at' ]
+
+@admin.register(BookingSetting)
+class BookingSettingAdmin(admin.ModelAdmin):
     def business_name(self, obj):
         try:
             return obj.business.business_name
