@@ -95,11 +95,47 @@ class BusinessThemeSerializer(serializers.ModelSerializer):
             'calendar_option',
         ]
 
-class StaffNotificationSettingSerializer(serializers.Serializer):
+class StaffNotificationSettingSerializer(serializers.ModelSerializer):
     class Meta:
         model = StaffNotificationSetting
         fields = [
-            'id',
+            # 'id',
             'sms_daily_sale',
             'email_daily_sale'
+        ]
+
+class ClientNotificationSettingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClientNotificationSetting
+        fields = [
+            'sms_purchase_plan',
+            'sms_for_rewards_on_quick_sale',
+            'sms_pending_services_quicksale',
+            'sms_for_ewallet_balance_on_quick_sale',
+            'sms_pending_payment',
+            'email_notify_on_purchase_plan',
+            'sms_quick_sale',
+            'sms_appoinment',
+            'sms_appoinment_reschedule',
+            'sms_birthday',
+        ]
+
+class AdminNotificationSettingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdminNotificationSetting
+        fields = [
+            'sms_notify_on_appoinment',
+            'sms_notify_on_quick_sale',
+            'sms_notify_for_daily_book',
+            'email_notify_on_appoinment',
+            'email_notify_on_quick_sale',
+            'email_notify_on_daily_book',
+        ]
+
+class StockNotificationSettingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StockNotificationSetting
+        fields = [
+            'notify_for_lowest_stock',
+            'notify_stock_turnover',
         ]

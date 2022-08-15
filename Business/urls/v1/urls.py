@@ -32,4 +32,5 @@ urlpatterns = [
 
     # NOTIFICATION SETTINGS 
     path('get_business_notification_settings/', views.get_business_notification_settings),
+    path('update_business_notification_settings/', views.update_business_notification_settings),
 ]

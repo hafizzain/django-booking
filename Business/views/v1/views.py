@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from Business.models import BusinessType
-from Business.serializers.v1_serializers import BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, StaffNotificationSettingSerializer
+from Business.serializers.v1_serializers import AdminNotificationSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer
 
 from NStyle.Constants import StatusCodes
 
@@ -1161,8 +1161,16 @@ def get_business_notification_settings(request):
     stock_set, created = StockNotificationSetting.objects.get_or_create(business=business, user=business.user, is_active=True)
 
 
-    print(staff_set)
-    staff_ser = StaffNotificationSettingSerializer(staff_set)
+    staff_serializer = StaffNotificationSettingSerializer(staff_set)
+    client_serializer = ClientNotificationSettingSerializer(client_set)
+    admin_serializer = AdminNotificationSettingSerializer(admin_set)
+    stock_serializer = StockNotificationSettingSerializer(stock_set)
+
+    data = {}
+    data.update(staff_serializer.data)
+    data.update(client_serializer.data)
+    data.update(admin_serializer.data)
+    data.update(stock_serializer.data)
     return Response(
         {
             'status' : True,
@@ -1171,7 +1179,88 @@ def get_business_notification_settings(request):
             'response' : {
                 'message' : 'All Notification Settings',
                 'error_message' : None,
-                'Settings' : staff_ser.data
+                'settings' : data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_business_notification_settings(request):
+    business_id = request.data.get('business', None)
+    if business_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'business',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    
+    try:
+        business = Business.objects.get(id=business_id, is_deleted=False, is_active=True, is_blocked=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                    'response' : {
+                        'message' : 'Business Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    
+    staff_set, created = StaffNotificationSetting.objects.get_or_create(business=business, user=business.user, is_active=True)
+    client_set, created = ClientNotificationSetting.objects.get_or_create(business=business, user=business.user, is_active=True)
+    admin_set, created = AdminNotificationSetting.objects.get_or_create(business=business, user=business.user, is_active=True)
+    stock_set, created = StockNotificationSetting.objects.get_or_create(business=business, user=business.user, is_active=True)
+
+
+    staff_serializer = StaffNotificationSettingSerializer(staff_set, data=request.data)
+    client_serializer = ClientNotificationSettingSerializer(client_set, data=request.data)
+    admin_serializer = AdminNotificationSettingSerializer(admin_set, data=request.data)
+    stock_serializer = StockNotificationSettingSerializer(stock_set, data=request.data)
+
+    data = {}
+    if staff_serializer.is_valid():
+        staff_serializer.save()
+        data.update(staff_serializer.data)
+    
+    if client_serializer.is_valid():
+        client_serializer.save()
+        data.update(client_serializer.data)
+    
+    if admin_serializer.is_valid():
+        admin_serializer.save()
+        data.update(admin_serializer.data)
+
+    if stock_serializer.is_valid():
+        stock_serializer.save()
+        data.update(stock_serializer.data)
+        
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'All Notification Settings',
+                'error_message' : None,
+                'settings' : data
             }
         },
         status=status.HTTP_200_OK
