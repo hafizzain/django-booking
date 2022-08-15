@@ -147,6 +147,7 @@ def verify_otp(request):
     code_for = request.data.get('code_for', None)
     email = request.data.get('email', None)
     mobile_number = request.data.get('mobile_number', None)
+    change_password = request.data.get('change_password', None)
 
     if not all([code, code_for]) or (code_for is not None and code_for == 'Mobile' and mobile_number is None ) or (code_for is not None and code_for == 'Email' and email is None ) :
         return Response(
@@ -245,18 +246,20 @@ def verify_otp(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    user = otp.user
-    serialized = UserTenantSerializer(user)
-    s_data = dict(serialized.data)
-    s_data['id'] = None
-    s_data['access_token'] = None
-    try:
-        with tenant_context(Tenant.objects.get(user=user)):
-            tnt_token = Token.objects.get(user__username=user.username)
-            s_data['id'] = str(tnt_token.user.id)
-            s_data['access_token'] = str(tnt_token.key)
-    except:
-        pass
+    s_data = dict()
+    if change_password is None:
+        user = otp.user
+        serialized = UserTenantSerializer(user)
+        s_data = dict(serialized.data)
+        s_data['id'] = None
+        s_data['access_token'] = None
+        try:
+            with tenant_context(Tenant.objects.get(user=user)):
+                tnt_token = Token.objects.get(user__username=user.username)
+                s_data['id'] = str(tnt_token.user.id)
+                s_data['access_token'] = str(tnt_token.key)
+        except:
+            pass
 
     return Response(
             {

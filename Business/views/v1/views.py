@@ -1258,7 +1258,7 @@ def update_business_notification_settings(request):
             'status_code' : 200,
             'status_code_text' : '200',
             'response' : {
-                'message' : 'All Notification Settings',
+                'message' : 'Notification setting updated',
                 'error_message' : None,
                 'settings' : data
             }
