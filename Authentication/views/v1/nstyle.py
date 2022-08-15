@@ -499,6 +499,18 @@ def login(request):
         )
 
     serialized = UserLoginSerializer(user)
+    s_data = dict(serialized.data)
+    s_data['id'] = None
+    s_data['access_token'] = None
+    try:
+        with tenant_context(Tenant.objects.get(user=user)):
+            tnt_token = Token.objects.get(user__username=user.username)
+            s_data['id'] = str(tnt_token.user.id)
+            s_data['access_token'] = str(tnt_token.key)
+    except:
+        pass
+
+
     return Response(
             {
                 'status' : False,
