@@ -1,6 +1,7 @@
 
 
 
+from django.conf import settings
 from operator import ge
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -253,9 +254,10 @@ def get_business_by_domain(request):
         )
     
     try:
+        domain_name = f'{domain_name}.{settings.BACKEND_DOMAIN_NAME}'
         domain = None
         with tenant_context(Tenant.objects.get(schema_name = 'public')):
-            domain = Domain.objects.get(domain__icontains=domain_name)
+            domain = Domain.objects.get(domain=domain_name)
 
         if domain is not None:
             with tenant_context(domain.tenant):
