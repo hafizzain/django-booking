@@ -1393,6 +1393,7 @@ def update_business_booking_settings(request):
                 'response' : {
                     'message' : 'Invalid Data',
                     'error_message' : str(serializer.error_messages),
+                    'tech_message' : str(serializer.errors),
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
