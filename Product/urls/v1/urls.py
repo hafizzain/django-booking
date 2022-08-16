@@ -13,6 +13,7 @@ urlpatterns = [
     path('add_brand/', views.add_brand),
 
     # Products Paths 
-    path('add_product/', views.add_brand),
+    path('add_product/', views.add_product),
+    path('get_products/', views.get_products),
 
 ]

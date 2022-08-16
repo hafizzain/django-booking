@@ -8,9 +8,9 @@ from rest_framework import status
 
 from NStyle.Constants import StatusCodes
 
-from Product.models import Category, Brand, Product
+from Product.models import Category, Brand, Product, ProductMedia, ProductStock
 from Business.models import Business, BusinessAddress
-from Product.serializers import CategorySerializer, BrandSerializer
+from Product.serializers import CategorySerializer, BrandSerializer, ProductSerializer
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -104,10 +104,41 @@ def get_brands(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_brand(request):
+    name = request.data.get('name', None)
+    description = request.data.get('description', None)
+    website = request.data.get('website', None)
+    image = request.data.get('image', None)
+    is_active = request.data.get('is_active', False)
+
+    if not all([name, description, website, image]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'name',
+                        'description',
+                        'website',
+                        'image',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_product(request):
+    user = request.user
     business_id = request.data.get('business', None)
     vendor_id = request.data.get('vendor', None)
-    category = request.data.get('category', None)
-    brand = request.data.get('brand', None)
+    category_id = request.data.get('category', None)
+    brand_id = request.data.get('brand', None)
     product_type = request.data.get('product_type', None)
     name = request.data.get('name', None)
     cost_price = request.data.get('cost_price', None)
@@ -117,10 +148,19 @@ def add_brand(request):
     description = request.data.get('description', None)
     barcode_id = request.data.get('barcode_id', None)
     sku = request.data.get('sku', None)
-    is_active = request.data.get('is_active', False)
+    is_active = request.data.get('is_active', True)
+    medias = request.data.getlist('product_images', None)
+
+    # Product Stock Details 
+    quantity = request.data.get('quantity', None)
+    unit = request.data.get('unit', None)
+    amount = request.data.get('amount', None)
+    stock_status = request.data.get('stock_status', True)
+    alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', True)
 
 
-    if not all([name, business_id, vendor_id, category, brand, product_type, cost_price, full_price, sell_price, short_description, description, barcode_id, sku]):
+
+    if not all([name, business_id, medias, vendor_id, category_id, brand_id, product_type, cost_price, full_price, sell_price, short_description, description, barcode_id, sku, quantity, unit, amount, alert_when_stock_becomes_lowest]):
         return Response(
             {
                 'status' : False,
@@ -143,6 +183,11 @@ def add_brand(request):
                         'description',
                         'barcode_id',
                         'sku',
+                        'product_images',
+                        'quantity', 
+                        'unit', 
+                        'amount', 
+                        'alert_when_stock_becomes_lowest'
                     ]
                 }
             },
@@ -180,61 +225,91 @@ def add_brand(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-
+    
+    try:
+        category = Category.objects.get(id=category_id, is_active=True)
+        brand = Brand.objects.get(id=brand_id, is_active=True)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_CATEGORY_BRAND_4020,
+                    'status_code_text' : 'INVALID_CATEGORY_BRAND_4020',
+                    'response' : {
+                        'message' : 'Category or Brand Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    
     product = Product.objects.create(
-        
+        user = user,
+        business = business,
+        vendor = vendor,
+        category = category,
+        brand = brand,
+        product_type = product_type,
+        name = name,
+        cost_price = cost_price,
+        full_price = full_price,
+        sell_price = sell_price,
+        short_description = short_description,
+        description = description,
+        barcode_id = barcode_id,
+        sku = sku,
+        slug = str(name).replace(' ' , '-').replace('/' , '-').replace('?' , '-'),
+        is_active=True,
+        published = True,
     )
-    if True:
-        return Response(
-            {
-                'status' : True,
-                'status_code' : 201,
-                'response' : {
-                    'message' : 'Product Added Added!',
-                    'error_message' : None,
-                    'product' : serialized.data
-                }
-            },
-            status=status.HTTP_201_CREATED
+    for med in medias:
+        ProductMedia.objects.create(
+            user=user,
+            business=business,
+            product=product,
+            image=med
         )
-    else:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : '400',
-                'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : str(serialized.errors),
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
+    
+    ProductStock.objects.create(
+        user = user,
+        business = business,
+        product = product ,
+        quantity = quantity,
+        amount = amount,
+        unit = unit,
+        alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
+        is_active = stock_status,
+    )
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def add_product(request):
-    name = request.data.get('name', None)
-    description = request.data.get('description', None)
-    website = request.data.get('website', None)
-    image = request.data.get('image', None)
-    is_active = request.data.get('is_active', False)
+    serialized = ProductSerializer(product)
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 201,
+            'response' : {
+                'message' : 'Product Added!',
+                'error_message' : None,
+                'product' : serialized.data
+            }
+        },
+        status=status.HTTP_201_CREATED
+    )
+   
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_products(request):
+    all_products = Product.objects.filter(is_deleted=False)
+    serialized = ProductSerializer(all_products, many=True)
 
-    if not all([name, description, website, image]):
-        return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.MISSING_FIELDS_4001,
-                'status_code_text' : 'MISSING_FIELDS_4001',
-                'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : 'All fields are required.',
-                    'fields' : [
-                        'name',
-                        'description',
-                        'website',
-                        'image',
-                    ]
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'All business Products!',
+                'error_message' : None,
+                'products' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
