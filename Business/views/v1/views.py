@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from Business.models import BusinessType
-from Business.serializers.v1_serializers import AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, PaymentMethodSerializer
+from Business.serializers.v1_serializers import AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer
 
 from NStyle.Constants import StatusCodes
 
@@ -1521,4 +1521,116 @@ def get_business_payment_methods(request):
                 }
             },
             status=status.HTTP_200_OK
+        )
+    
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_business_tax(request):
+    business_id = request.data.get('business', None)
+    tax_type = request.data.get('tax_type', 'Individual')
+    name = request.data.get('name', None)
+    tax_rate = request.data.get('tax_rate', None)
+    tax_ids = request.data.get('tax_ids', None)
+    location = request.data.get('location', None)
+    
+    if business_id is None or (tax_type != 'Location' and name is None) or (tax_type == 'Group' and tax_ids is None) or (tax_type != 'Group' and tax_rate is None) or (tax_type == 'Location' and location is None ):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'name',
+                        'business',
+                        'tax_type',
+                        'tax_rate',
+                        'tax_ids',
+                        'location',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    user = request.user
+
+    try:
+        business = Business.objects.get(id=business_id, is_deleted=False, is_active=True, is_blocked=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                    'response' : {
+                        'message' : 'Business Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    
+    if tax_type == 'Location':
+        try:
+            location = BusinessAddress.objects.get(id=location) 
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.LOCATION_NOT_FOUND_4017,
+                    'status_code_text' : 'LOCATION_NOT_FOUND_4017',
+                    'response' : {
+                        'message' : 'Location Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+    if tax_rate is None:
+        tax_rate = 0
+
+    business_tax = BusinessTax.objects.create(
+        user = user,
+        business=business,
+        tax_type = tax_type,
+        tax_rate = tax_rate,
+    )
+    if tax_type == 'Group' or tax_type == 'Individual':
+        business_tax.name = name
+    if tax_type == 'Location':
+        business_tax.location = location
+
+    if tax_type == 'Group':
+        import json
+        ids_data = json.loads(tax_ids)
+        for id in ids_data:
+            try:
+                get_p_tax = BusinessTax.objects.get(id=id)
+                business_tax.parent_tax.add(get_p_tax)
+            except:
+                pass
+            # print(id)
+
+
+    # parent_tax = 
+    business_tax.save()
+    serialized = BusinessTaxSerializer(business_tax)
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'status_code_text' : '201',
+                'response' : {
+                    'message' : 'Business Tax added!',
+                    'error_message' : None,
+                    'tax' : serialized.data
+                }
+            },
+            status=status.HTTP_201_CREATED
         )

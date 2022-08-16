@@ -42,4 +42,7 @@ urlpatterns = [
     path('add_payment_method/', views.add_payment_method),
     path('get_business_payment_methods/', views.get_business_payment_methods),
 
+    # Business Tax 
+    path('add_business_tax/', views.add_business_tax),
+
 ]

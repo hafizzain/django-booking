@@ -3,7 +3,7 @@
 
 from rest_framework import serializers
 
-from Business.models import BookingSetting, BusinessType, Business, BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BusinessPaymentMethod
+from Business.models import BookingSetting, BusinessType, Business, BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BusinessPaymentMethod, BusinessTax
 from Authentication.serializers import UserSerializer
 
 class BusinessTypeSerializer(serializers.ModelSerializer):
@@ -168,3 +168,9 @@ class PaymentMethodSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessPaymentMethod
         fields = ['id', 'method_type', 'is_active']
+
+class BusinessTaxSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = BusinessTax
+        fields = ['id', 'name', 'parent_tax', 'tax_rate', 'location', 'tax_type', 'is_active']
