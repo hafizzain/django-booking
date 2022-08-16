@@ -37,4 +37,9 @@ urlpatterns = [
     # Booking settings 
     path('get_business_booking_settings/', views.get_business_booking_settings),
     path('update_business_booking_settings/', views.update_business_booking_settings),
+
+    # Payment 
+    path('add_payment_method/', views.add_payment_method),
+    path('get_business_payment_methods/', views.get_business_payment_methods),
+
 ]

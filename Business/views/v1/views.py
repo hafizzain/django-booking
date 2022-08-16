@@ -9,12 +9,12 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from Business.models import BusinessType
-from Business.serializers.v1_serializers import AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer
+from Business.serializers.v1_serializers import AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, PaymentMethodSerializer
 
 from NStyle.Constants import StatusCodes
 
 from Authentication.models import User
-from Business.models import Business, BusinessSocial, BusinessAddress, BusinessOpeningHour, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BookingSetting
+from Business.models import Business, BusinessSocial, BusinessAddress, BusinessOpeningHour, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BookingSetting, BusinessPaymentMethod, BusinessTax
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
 from Tenants.models import Domain, Tenant
@@ -1396,4 +1396,129 @@ def update_business_booking_settings(request):
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_payment_method(request):
+    method_type = request.data.get('method_type', None)
+    business_id = request.data.get('business', None)
+
+    if not all([method_type, business_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'method_type',
+                        'business',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    user = request.user
+
+    try:
+        business = Business.objects.get(id=business_id, is_deleted=False, is_active=True, is_blocked=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                    'response' : {
+                        'message' : 'Business Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+
+    payment_method = BusinessPaymentMethod(
+        user=user,
+        business=business,
+        method_type=method_type
+    )
+    payment_method.save()
+    serialized = PaymentMethodSerializer(payment_method)
+
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'status_code_text' : '201',
+                'response' : {
+                    'message' : 'Payment method added!',
+                    'error_message' : None,
+                    'payment_method' : serialized.data
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_business_payment_methods(request):
+    business_id = request.GET.get('business', None)
+
+    if not all([business_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'business',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        business = Business.objects.get(id=business_id, is_deleted=False, is_active=True, is_blocked=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                    'response' : {
+                        'message' : 'Business Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+
+    payment_methods = BusinessPaymentMethod.objects.filter(
+        business=business,
+        is_active=True
+    )
+    serialized = PaymentMethodSerializer(payment_methods, many=True)
+
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Payment method added!',
+                    'error_message' : None,
+                    'payment_methods' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
         )

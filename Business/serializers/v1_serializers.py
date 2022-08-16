@@ -3,7 +3,7 @@
 
 from rest_framework import serializers
 
-from Business.models import BookingSetting, BusinessType, Business, BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting
+from Business.models import BookingSetting, BusinessType, Business, BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BusinessPaymentMethod
 from Authentication.serializers import UserSerializer
 
 class BusinessTypeSerializer(serializers.ModelSerializer):
@@ -161,3 +161,10 @@ class BookingSettingSerializer(serializers.ModelSerializer):
             'select_payment_type',
             'initial_deposit',
         ]
+
+
+class PaymentMethodSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = BusinessPaymentMethod
+        fields = ['id', 'method_type', 'is_active']

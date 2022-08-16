@@ -295,6 +295,53 @@ class BookingSetting(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=now)
 
+    def __str__(self):
+        return str(self.id)
+
+
+class BusinessPaymentMethod(models.Model):
+
+    METHOD_TYPE_CHOICES = [
+        ('Cash', 'Cash'),
+        ('Mastercard', 'Mastercard'),
+        ('Visa', 'Visa'),
+        ('Paypal', 'Paypal'),
+        ('GooglePay', 'Google Pay'),
+        ('ApplePay', 'Apple Pay'),
+    ]
+
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_available_payment_methods')
+    business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_available_payment_methods')
+
+    method_type = models.CharField(choices=METHOD_TYPE_CHOICES, max_length=100, default='Cash')
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=now)
+
+    def __str__(self):
+        return str(self.id)
+
+
+class BusinessTax(models.Model):
+    TAX_TYPES = [
+        ('Individual', 'Individual'),
+        ('Group', 'Group'),
+        ('Location', 'Location'),
+    ]
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_tax')
+    business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_tax')
+
+    tax_type = models.CharField(choices=TAX_TYPES, default='Individual', max_length=20)
+    name = models.CharField(default='', max_length=100)
+    parent_tax = models.ManyToManyField('BusinessTax', null=True, blank=True)
+    tax_rate = models.PositiveIntegerField(default=0, null=True, blank=True)
+    location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='locations_taxs')
+
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=now)
 
     def __str__(self):
         return str(self.id)

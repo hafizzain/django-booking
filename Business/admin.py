@@ -1,5 +1,14 @@
 from django.contrib import admin
-from .models import BusinessType, Business, BusinessSocial, BusinessAddress, BusinessOpeningHour, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BookingSetting
+from .models import BusinessType, Business, BusinessSocial, BusinessAddress, BusinessOpeningHour, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BookingSetting, BusinessPaymentMethod, BusinessTax
+
+
+@admin.register(BusinessPaymentMethod)
+class BusinessTypeAdmin(admin.ModelAdmin):
+    list_display = ['id', 'method_type', 'is_active']
+
+@admin.register(BusinessTax)
+class BusinessTypeAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'tax_rate', 'tax_type', 'is_active']
 
 
 @admin.register(BusinessType)
