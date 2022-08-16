@@ -433,6 +433,21 @@ def login(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
+
+    if not user.is_active:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.USER_ACCOUNT_INACTIVE_4009,
+                'status_code_text' : 'USER_ACCOUNT_INACTIVE_4009',
+                'response' : {
+                    'message' : 'Your account is inactive! Please verify.',
+                    'error_message' : 'Account is not active'
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+        
     user = authenticate(username=user.username, password=password)
     if user is None:
         return Response(
@@ -448,19 +463,6 @@ def login(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    if not user.is_active:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.USER_ACCOUNT_INACTIVE_4009,
-                'status_code_text' : 'USER_ACCOUNT_INACTIVE_4009',
-                'response' : {
-                    'message' : 'Your account is inactive! Please verify.',
-                    'error_message' : 'Account is not active'
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
     # elif not user.is_email_verified:
     #     return Response(
     #         {
