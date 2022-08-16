@@ -299,7 +299,7 @@ def add_product(request):
 @permission_classes([AllowAny])
 def get_products(request):
     all_products = Product.objects.filter(is_deleted=False)
-    serialized = ProductSerializer(all_products, many=True)
+    serialized = ProductSerializer(all_products, many=True, context={'request' : request})
 
     return Response(
         {

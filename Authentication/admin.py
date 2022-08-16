@@ -12,6 +12,7 @@ class UserAdmin(admin.ModelAdmin):
         'username', 
         'first_name', 
         'last_name', 
+        'mobile_number', 
         'is_active', 
         'is_admin', 
         'is_staff', 
@@ -41,9 +42,16 @@ class NewsLetterDetailAdmin(admin.ModelAdmin):
 
 @admin.register(VerificationOTP)
 class VerificationOTPAdmin(admin.ModelAdmin):
+
+    def mobile_number(self, obj):
+        try:
+            return obj.user.mobile_number
+        except:
+            return 'N/A'
     list_display = [
         'id',
         'username',
+        'mobile_number',
         'code',
         'code_for',
         'created_at',

@@ -195,6 +195,9 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+BACKEND_DOMAIN_NAME=env('BACKEND_DOMAIN_NAME')
+BACKEND_HOST=env('BACKEND_HOST')
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -215,5 +218,3 @@ TWILLIO_ACCOUNT_SID = env('TWILLIO_ACCOUNT_SID')
 TWILLIO_AUTH_TOKEN  = env('TWILLIO_AUTH_TOKEN')
 TWILLIO_PHONE_NUMBER = env('TWILLIO_PHONE_NUMBER')
 
-
-BACKEND_DOMAIN_NAME=env('BACKEND_DOMAIN_NAME')

@@ -23,6 +23,10 @@ class CustomTanantMiddleware(MiddlewareMixin):
             is_active=True,
             is_blocked=False
         )
+        try:
+            self.domain_name = domain.domain.split('.')[0]
+        except:
+            self.domain_name = ''
         return domain.tenant
 
     def process_request(self, request):
@@ -38,6 +42,10 @@ class CustomTanantMiddleware(MiddlewareMixin):
 
         tenant.domain_url = hostname
         request.tenant = tenant
+        try:
+            request.tenant_name = self.domain_name
+        except:
+            request.tenant_name = ''
         connection.set_tenant(request.tenant)
         self.setup_url_routing(request)
 
