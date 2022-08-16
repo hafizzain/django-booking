@@ -1374,7 +1374,7 @@ def update_business_booking_settings(request):
                 'status_code' : 200,
                 'status_code_text' : '200',
                 'response' : {
-                    'message' : 'Business Booking Setting',
+                    'message' : 'Business Booking setting updated!',
                     'error_message' : None,
                     'setting' : serializer.data
                 }
@@ -1389,7 +1389,7 @@ def update_business_booking_settings(request):
                 'status_code' : 400,
                 'status_code_text' : '400',
                 'response' : {
-                    'message' : 'Business Booking Setting',
+                    'message' : 'Invalid Data',
                     'error_message' : str(serializer.error_messages),
                 }
             },
