@@ -870,7 +870,7 @@ def update_business_theme(request):
                 'status_code' : 200,
                 'status_code_text' : 'BusinessTheme',
                 'response' : {
-                    'message' : 'Business Theme',
+                    'message' : 'Business theme updated',
                     'error_message' : None,
                     'theme' : serialized.data
                 }
