@@ -1786,8 +1786,8 @@ def update_business_tax(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-    business_tax.tax_type = tax_type,
-    business_tax.tax_rate = tax_rate,
+    business_tax.tax_type = tax_type
+    business_tax.tax_rate = tax_rate
     if tax_type == 'Group' or tax_type == 'Individual':
         business_tax.name = name
     if tax_type == 'Location':
