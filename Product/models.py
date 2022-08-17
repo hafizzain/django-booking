@@ -58,6 +58,8 @@ class Product(models.Model):
     full_price = models.PositiveIntegerField(default=0)
     sell_price = models.PositiveIntegerField(default=0)
 
+    tax_rate = models.PositiveIntegerField(default=0)
+
     short_description = models.TextField(default='')
     description = models.TextField(default='')
 
