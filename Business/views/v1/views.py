@@ -1635,3 +1635,73 @@ def add_business_tax(request):
             },
             status=status.HTTP_201_CREATED
         )
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_business_payment_methods(request):
+    user = request.user
+    method_id = request.data.get('id', None)
+
+    if method_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        payment_method = BusinessPaymentMethod.objects.get(
+            id=method_id,
+            is_active=True
+        )
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Business payment method not found!',
+                    'error_message' : None,
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    if payment_method.business.user != user and payment_method.user != user:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 403,
+                'status_code_text' : '403',
+                'response' : {
+                    'message' : 'You are not allowed to delete this payment method!',
+                    'error_message' : None,
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    payment_method.delete()
+
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Business payment method Deleted!',
+                    'error_message' : None,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
