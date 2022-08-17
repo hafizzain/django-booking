@@ -144,6 +144,7 @@ def add_product(request):
     cost_price = request.data.get('cost_price', None)
     full_price = request.data.get('full_price', None)
     sell_price = request.data.get('sell_price', None)
+    tax_rate = request.data.get('tax_rate', None)
     short_description = request.data.get('short_description', None)
     description = request.data.get('description', None)
     barcode_id = request.data.get('barcode_id', None)
@@ -180,6 +181,7 @@ def add_product(request):
                         'cost_price',
                         'full_price',
                         'sell_price',
+                        'tax_rate',
                         'short_description',
                         'description',
                         'barcode_id',
@@ -255,6 +257,7 @@ def add_product(request):
         cost_price = cost_price,
         full_price = full_price,
         sell_price = sell_price,
+        tax_rate = tax_rate,
         short_description = short_description,
         description = description,
         barcode_id = barcode_id,

@@ -64,6 +64,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'cost_price',
             'full_price',
             'sell_price',
+            'tax_rate',
             'short_description',
             'description',
             'barcode_id',
