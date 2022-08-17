@@ -40,6 +40,7 @@ urlpatterns = [
 
     # Payment 
     path('add_payment_method/', views.add_payment_method),
+    path('update_payment_method/', views.update_payment_method),
     path('get_business_payment_methods/', views.get_business_payment_methods),
     path('delete_business_payment_methods/', views.delete_business_payment_methods),
 

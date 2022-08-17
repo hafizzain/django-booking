@@ -1465,6 +1465,65 @@ def add_payment_method(request):
             status=status.HTTP_201_CREATED
         )
 
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_payment_method(request):
+    method_type = request.data.get('method_type', None)
+    method_id = request.data.get('id', None)
+
+    if not all([method_type, method_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'id',
+                        'method_type',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    user = request.user
+    try:
+        payment_method = BusinessPaymentMethod.objects.get(id=method_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Payment method Not Found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    payment_method.method_type = method_type
+    payment_method.save()
+    serialized = PaymentMethodSerializer(payment_method)
+
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Payment method updated!',
+                    'error_message' : None,
+                    'payment_method' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_business_payment_methods(request):
