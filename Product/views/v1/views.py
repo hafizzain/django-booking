@@ -417,7 +417,7 @@ def get_products(request):
    
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-def get_products(request):
+def delete_product(request):
     product_id = request.data.get('product', None)
 
     if not all([product_id]):
@@ -445,7 +445,7 @@ def get_products(request):
                 'status_code' : 404,
                 'status_code_text' : '404',
                 'response' : {
-                    'message' : 'Product not found!',
+                    'message' : 'Product not found or already deleted!',
                     'error_message' : str(err),
                 }
             },
