@@ -1951,7 +1951,7 @@ def get_business_taxes(request):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_business_tax(request):
-    tax_id = request.GET.get('tax', None)
+    tax_id = request.data.get('tax', None)
 
     if tax_id is None:
         return Response(
