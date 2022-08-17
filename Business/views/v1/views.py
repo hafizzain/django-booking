@@ -1695,6 +1695,132 @@ def add_business_tax(request):
             status=status.HTTP_201_CREATED
         )
 
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_business_tax(request):
+    tax_id = request.data.get('tax_id', None)
+    business_id = request.data.get('business', None)
+    tax_type = request.data.get('tax_type', 'Individual')
+    name = request.data.get('name', None)
+    tax_rate = request.data.get('tax_rate', None)
+    tax_ids = request.data.get('tax_ids', None)
+    location = request.data.get('location', None)
+    
+    if business_id is None or (tax_type != 'Location' and name is None) or (tax_type == 'Group' and tax_ids is None) or (tax_type != 'Group' and tax_rate is None) or (tax_type == 'Location' and location is None ):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'name',
+                        'business',
+                        'tax_type',
+                        'tax_rate',
+                        'tax_ids',
+                        'location',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    user = request.user
+
+    try:
+        business = Business.objects.get(id=business_id, is_deleted=False, is_active=True, is_blocked=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                    'response' : {
+                        'message' : 'Business Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    
+    if tax_type == 'Location':
+        try:
+            location = BusinessAddress.objects.get(id=location) 
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.LOCATION_NOT_FOUND_4017,
+                    'status_code_text' : 'LOCATION_NOT_FOUND_4017',
+                    'response' : {
+                        'message' : 'Location Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+    if tax_rate is None:
+        tax_rate = 0
+
+    try:
+        business_tax = BusinessTax.objects.get(
+            id=tax_id,
+            user = user,
+            business=business,
+        )
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : 404,
+                    'status_code_text' : '404',
+                    'response' : {
+                        'message' : 'Business Tax Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    business_tax.tax_type = tax_type,
+    business_tax.tax_rate = tax_rate,
+    if tax_type == 'Group' or tax_type == 'Individual':
+        business_tax.name = name
+    if tax_type == 'Location':
+        business_tax.location = location
+
+    if tax_type == 'Group':
+        import json
+        ids_data = json.loads(tax_ids)
+        for id in ids_data:
+            try:
+                get_p_tax = BusinessTax.objects.get(id=id)
+                business_tax.parent_tax.add(get_p_tax)
+            except:
+                pass
+            # print(id)
+
+
+    # parent_tax = 
+    business_tax.save()
+    serialized = BusinessTaxSerializer(business_tax)
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Business Tax updated!',
+                    'error_message' : None,
+                    'tax' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_business_payment_methods(request):
