@@ -159,6 +159,7 @@ def add_product(request):
     alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', True)
 
 
+    print([name, business_id, medias, vendor_id, category_id, brand_id, product_type, cost_price, full_price, sell_price, short_description, description, barcode_id, sku, quantity, unit, amount, alert_when_stock_becomes_lowest])
 
     if not all([name, business_id, medias, vendor_id, category_id, brand_id, product_type, cost_price, full_price, sell_price, short_description, description, barcode_id, sku, quantity, unit, amount, alert_when_stock_becomes_lowest]):
         return Response(
@@ -281,7 +282,7 @@ def add_product(request):
         is_active = stock_status,
     )
 
-    serialized = ProductSerializer(product)
+    serialized = ProductSerializer(product, context={'request' : request})
     return Response(
         {
             'status' : True,
@@ -294,6 +295,106 @@ def add_product(request):
         },
         status=status.HTTP_201_CREATED
     )
+   
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_product(request):
+    product_id = request.data.get('product', None)
+    vendor_id = request.data.get('vendor', None)
+    category_id = request.data.get('category', None)
+    brand_id = request.data.get('brand', None)
+
+    if not all([product_id, vendor_id, category_id, brand_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'product',
+                        'vendor',
+                        'category',
+                        'brand',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+            
+    try:
+        vendor = BusinessAddress.objects.get(id=vendor_id, is_deleted=False, is_active=True)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.VENDOR_NOT_FOUND_4019,
+                    'status_code_text' : 'VENDOR_NOT_FOUND_4019',
+                    'response' : {
+                        'message' : 'Vendor Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    
+    try:
+        category = Category.objects.get(id=category_id, is_active=True)
+        brand = Brand.objects.get(id=brand_id, is_active=True)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_CATEGORY_BRAND_4020,
+                    'status_code_text' : 'INVALID_CATEGORY_BRAND_4020',
+                    'response' : {
+                        'message' : 'Category or Brand Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    
+    product = Product.objects.get(
+        id=product_id,
+    )
+    product.category = category
+    product.brand = brand
+    product.vendor = vendor
+    product.save()
+
+    serialized = ProductSerializer(product, data=request.data, partial=True, context={'request':request})
+    if serialized.is_valid():
+        serialized.save()
+        return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Product Updated!',
+                    'error_message' : None,
+                    'product' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    else:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : str(serialized.errors),
+                    'product' : serialized.data
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
    
 @api_view(['GET'])
 @permission_classes([AllowAny])

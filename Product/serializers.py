@@ -73,3 +73,4 @@ class ProductSerializer(serializers.ModelSerializer):
             'media',
             'stocks',
         ]
+        read_only_fields = ['slug', 'id']
