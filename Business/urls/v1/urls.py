@@ -48,4 +48,5 @@ urlpatterns = [
     path('add_business_tax/', views.add_business_tax),
     path('update_business_tax/', views.update_business_tax),
     path('get_business_taxes/', views.get_business_taxes),
+    path('delete_business_tax/', views.get_business_taxes),
 ]

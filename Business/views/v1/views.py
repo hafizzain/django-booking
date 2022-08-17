@@ -1947,3 +1947,56 @@ def get_business_taxes(request):
         )
 
     
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_business_tax(request):
+    tax_id = request.GET.get('tax', None)
+
+    if tax_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'tax',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        tax = BusinessTax.objects.get(id=tax_id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : 404,
+                    'status_code_text' : '404',
+                    'response' : {
+                        'message' : 'Tax Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    tax.delete()
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Business Tax Deleted!',
+                    'error_message' : None,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
+    
