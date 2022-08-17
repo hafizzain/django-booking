@@ -523,7 +523,7 @@ def login(request):
                 'status_code' : 200,
                 'response' : {
                     'message' : 'Authenticated',
-                    'data' : serialized.data
+                    'data' : s_data
                 }
             },
             status=status.HTTP_200_OK
