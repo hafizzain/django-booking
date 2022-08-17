@@ -1728,6 +1728,7 @@ def update_business_tax(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
+    tax_rate = int(tax_rate)
     user = request.user
 
     try:
