@@ -204,6 +204,7 @@ def verify_otp(request):
                 code=code
             )
             otp.user.is_mobile_verified = True
+            otp.user.is_active = True
             otp.user.save()
             otp.delete()
         else:
