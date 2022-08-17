@@ -129,6 +129,34 @@ def add_brand(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+        
+    serialized = BrandSerializer(data=request.data)
+    if serialized.is_valid():
+        serialized.save()
+        return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Brand Added!',
+                    'error_message' : None,
+                    'brand' : serialized.data
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+    else:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : '400',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : str(serialized.errors),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 @api_view(['POST'])
@@ -159,8 +187,6 @@ def add_product(request):
     stock_status = request.data.get('stock_status', True)
     alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', True)
 
-
-    print([name, business_id, medias, vendor_id, category_id, brand_id, product_type, cost_price, full_price, sell_price, short_description, description, barcode_id, sku, quantity, unit, amount, alert_when_stock_becomes_lowest])
 
     if not all([name, business_id, medias, vendor_id, category_id, brand_id, product_type, cost_price, full_price, sell_price, short_description, description, barcode_id, sku, quantity, unit, amount, alert_when_stock_becomes_lowest]):
         return Response(
