@@ -1667,9 +1667,11 @@ def add_business_tax(request):
         business_tax.location = location
 
     if tax_type == 'Group':
-        if type(ids_data) == str :
+        if type(tax_ids) == str :
             import json
             ids_data = json.loads(tax_ids)
+        else:
+            ids_data = tax_ids
         for id in ids_data:
             try:
                 get_p_tax = BusinessTax.objects.get(id=id)
