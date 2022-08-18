@@ -12,6 +12,7 @@ urlpatterns = [
     path('get_brands/', views.get_brands),
     path('add_brand/', views.add_brand),
     path('update_brand/', views.update_brand),
+    path('delete_brand/', views.delete_brand),
 
     # Products Paths 
     path('add_product/', views.add_product),

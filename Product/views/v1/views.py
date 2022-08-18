@@ -226,7 +226,58 @@ def update_brand(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_brand(request):
+    brand_id = request.data.get('brand', None)
 
+    if brand_id is not None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'brand',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        brand = Brand.objects.get(
+            id=brand_id
+        )
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_CATEGORY_BRAND_4020,
+                    'status_code_text' : 'INVALID_CATEGORY_BRAND_4020',
+                    'response' : {
+                        'message' : 'Category or Brand Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    brand.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Brand deleted!',
+                'error_message' : None,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_product(request):
