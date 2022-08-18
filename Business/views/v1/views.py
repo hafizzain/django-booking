@@ -1667,12 +1667,12 @@ def add_business_tax(request):
         business_tax.location = location
     
     all_errors = []
+    import json
 
     if tax_type == 'Group':
         all_errors.append({'type' : type(tax_ids)})
         all_errors.append({'tax_ids' : tax_ids})
         if type(tax_ids) == str :
-            import json
             ids_data = json.loads(tax_ids)
         else:
             ids_data = tax_ids
@@ -1697,7 +1697,7 @@ def add_business_tax(request):
                     'message' : 'Business Tax added!',
                     'error_message' : None,
                     'tax' : serialized.data,
-                    'errors' : all_errors
+                    'errors' : json.dumps(all_errors)
                 }
             },
             status=status.HTTP_201_CREATED
