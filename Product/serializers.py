@@ -21,8 +21,8 @@ class BrandSerializer(serializers.ModelSerializer):
                 url = tenant_media_base_url(request)
                 return f'{url}{obj.image}'
             except:
-                pass
-        return obj.image
+                return obj.image
+        return None
     class Meta:
         model = Brand
         fields = ['id', 'name', 'description', 'website', 'image', 'is_active']
@@ -38,8 +38,8 @@ class ProductMediaSerializer(serializers.ModelSerializer):
                 url = tenant_media_base_url(request)
                 return f'{url}{obj.image}'
             except:
-                pass
-        return obj.image
+                return obj.image
+        return None
     class Meta:
         model = ProductMedia
         fields = ['id', 'image']
