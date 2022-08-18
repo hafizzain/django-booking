@@ -9,7 +9,7 @@ from rest_framework import status
 from NStyle.Constants import StatusCodes
 
 from Product.models import Category, Brand, Product, ProductMedia, ProductStock
-from Business.models import Business, BusinessAddress
+from Business.models import Business, BusinessAddress, BusinessVendor
 from Product.serializers import CategorySerializer, BrandSerializer, ProductSerializer
 
 @api_view(['GET'])
@@ -469,7 +469,7 @@ def add_product(request):
             )
             
     try:
-        vendor = BusinessAddress.objects.get(id=vendor_id, is_deleted=False, is_active=True)
+        vendor = BusinessVendor.objects.get(id=vendor_id, is_deleted=False, is_active=True)
     except Exception as err:
         return Response(
                 {
