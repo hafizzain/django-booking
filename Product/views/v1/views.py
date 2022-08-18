@@ -302,7 +302,12 @@ def update_brand(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-        
+    
+    try:
+        brand.image = request.data.get('image')
+        brand.save()
+    except:
+        pass
     serialized = BrandSerializer(brand, data=request.data, partial=True, context={'request' : request})
     if serialized.is_valid():
         serialized.save()
