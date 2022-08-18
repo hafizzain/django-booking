@@ -2217,4 +2217,54 @@ def update_business_vendor(request):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_business_vendor(request):
-    pass
+    vendor_id = request.data.get('vendor', True)
+
+    if not all([vendor_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'vendor'
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+     
+        
+    try:
+        vendor = BusinessVendor.objects.get(
+            id = vendor_id
+        )
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Vendor not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    vendor.delete()
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Business vendors deleted!',
+                    'error_message' : None,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
