@@ -160,7 +160,7 @@ def add_brand(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def add_brand(request):
+def update_brand(request):
     brand_id = request.data.get('brand', None)
 
     if brand_id is not None:
