@@ -9,12 +9,12 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from Business.models import BusinessType
-from Business.serializers.v1_serializers import AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer
+from Business.serializers.v1_serializers import AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer
 
 from NStyle.Constants import StatusCodes
 
 from Authentication.models import User
-from Business.models import Business, BusinessSocial, BusinessAddress, BusinessOpeningHour, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BookingSetting, BusinessPaymentMethod, BusinessTax
+from Business.models import Business, BusinessSocial, BusinessAddress, BusinessOpeningHour, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BookingSetting, BusinessPaymentMethod, BusinessTax, BusinessVendor
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
 from Tenants.models import Domain, Tenant
@@ -1665,20 +1665,24 @@ def add_business_tax(request):
         business_tax.name = name
     if tax_type == 'Location':
         business_tax.location = location
+    
+    all_errors = []
 
     if tax_type == 'Group':
+        all_errors.append({'type' : type(tax_ids)})
+        all_errors.append({'tax_ids' : tax_ids})
         if type(tax_ids) == str :
             import json
             ids_data = json.loads(tax_ids)
         else:
             ids_data = tax_ids
         for id in ids_data:
+            all_errors.append(str(id))
             try:
                 get_p_tax = BusinessTax.objects.get(id=id)
                 business_tax.parent_tax.add(get_p_tax)
-            except:
-                pass
-            # print(id)
+            except Exception as err:
+                all_errors.append(str(err))
 
 
     # parent_tax = 
@@ -1692,7 +1696,8 @@ def add_business_tax(request):
                 'response' : {
                     'message' : 'Business Tax added!',
                     'error_message' : None,
-                    'tax' : serialized.data
+                    'tax' : serialized.data,
+                    'errors' : all_errors
                 }
             },
             status=status.HTTP_201_CREATED
@@ -2007,3 +2012,83 @@ def delete_business_tax(request):
         )
 
     
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_business_vendors(request):
+    all_vendors = BusinessVendor.objects.filter(is_deleted=False, is_active=True, is_closed=False)
+    serialized = BusinessVendorSerializer(all_vendors, many=True)
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'All available business vendors!',
+                    'error_message' : None,
+                    'vendors' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_business_vendor(request):
+    vendor_name = request.data.get('vendor_name', None)
+    address = request.data.get('address', None)
+    mobile_number = request.data.get('mobile_number', None)
+    email = request.data.get('email', None)
+    country_id = request.data.get('country', None)
+    state_id = request.data.get('state', None)
+    city_id = request.data.get('city', None)
+    gstin = request.data.get('gstin', None)
+    website = request.data.get('website', None)
+    is_active = request.data.get('is_active', None)
+
+    if not all([vendor_name, address, mobile_number, email, country_id, state_id, city_id, gstin, website, is_active]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'vendor_name', 'address', 'mobile_number', 'email', 'country', 'state', 'city', 'gstin', 'website', 'is_active'
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        country = Country.objects.get( id=country_id, is_deleted=False, is_active=True )
+        state = State.objects.get( id=state_id, is_deleted=False, is_active=True )
+        city = City.objects.get( id=city_id, is_deleted=False, is_active=True )
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Invalid Country, State or City',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_business_vendor(request):
+    pass
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_business_vendor(request):
+    pass

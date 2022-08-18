@@ -345,3 +345,36 @@ class BusinessTax(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+
+class BusinessVendor(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_vendors')
+    business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_vendors')
+
+    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True, blank=True, related_name='country_vendors')
+    state = models.ForeignKey(State, on_delete=models.SET_NULL, null=True, blank=True, related_name='state_vendors')
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, related_name='city_vendors')
+    
+    vendor_name = models.CharField(max_length=500, default='')
+    address = models.TextField(default='')
+    latitude = models.CharField(default='', max_length=200, null=True, blank=True)
+    longitude = models.CharField(default='', max_length=200, null=True, blank=True)
+    postal_code = models.CharField(max_length=30, default='')
+    gstin = models.CharField(default='', max_length=1000, null=True, blank=True)
+    website = models.TextField(null=True, blank=True)
+    email = models.EmailField()
+    is_email_verified = models.BooleanField(default=False)
+
+    mobile_number = models.CharField(default='', max_length=30)
+    is_mobile_verified = models.BooleanField(default=False)
+
+    is_primary = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
+    is_closed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+
+    def __str__(self):
+        return str(self.id)

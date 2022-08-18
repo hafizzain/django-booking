@@ -49,4 +49,11 @@ urlpatterns = [
     path('update_business_tax/', views.update_business_tax),
     path('get_business_taxes/', views.get_business_taxes),
     path('delete_business_tax/', views.delete_business_tax),
+
+    # Business Vendor 
+    path('add_business_vendor/', views.add_business_vendor),
+    path('get_business_vendors/', views.get_business_vendors),
+    path('update_business_vendor/', views.update_business_vendor),
+    path('delete_business_vendor/', views.delete_business_vendor),
+    
 ]
