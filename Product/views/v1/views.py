@@ -158,6 +158,74 @@ def add_brand(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def add_brand(request):
+    brand_id = request.data.get('brand', None)
+
+    if brand_id is not None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'brand',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        brand = Brand.objects.get(
+            id=brand_id
+        )
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_CATEGORY_BRAND_4020,
+                    'status_code_text' : 'INVALID_CATEGORY_BRAND_4020',
+                    'response' : {
+                        'message' : 'Category or Brand Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+    serialized = BrandSerializer(brand, data=request.data, partial=True)
+    if serialized.is_valid():
+        serialized.save()
+        return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Brand updates!',
+                    'error_message' : None,
+                    'brand' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    else:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : '400',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : str(serialized.errors),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
