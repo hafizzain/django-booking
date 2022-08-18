@@ -1670,7 +1670,7 @@ def add_business_tax(request):
     import json
 
     if tax_type == 'Group':
-        all_errors.append({'type' : type(tax_ids)})
+        all_errors.append({'type' : str(type(tax_ids))})
         all_errors.append({'tax_ids' : tax_ids})
         if type(tax_ids) == str :
             ids_data = json.loads(tax_ids)
