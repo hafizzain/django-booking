@@ -7,6 +7,8 @@ urlpatterns = [
     # Category Paths 
     path('get_categories/', views.get_categories),
     path('add_category/', views.add_category),
+    path('update_category/', views.update_category),
+    path('delete_category/', views.delete_category),
 
     # Brand Paths 
     path('get_brands/', views.get_brands),
@@ -19,5 +21,4 @@ urlpatterns = [
     path('update_product/', views.update_product),
     path('get_products/', views.get_products),
     path('delete_product/', views.delete_product),
-
 ]

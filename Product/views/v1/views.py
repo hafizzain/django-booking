@@ -80,6 +80,118 @@ def add_category(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_category(request):
+    category_id = request.data.get('category', None)
+    if not all([category_id,]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'category',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        category = Category.objects.get(id=category_id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_CATEGORY_BRAND_4020,
+                    'status_code_text' : 'INVALID_CATEGORY_BRAND_4020',
+                    'response' : {
+                        'message' : 'Category Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    serialized = CategorySerializer(category, data=request.data, partial=True)
+    if serialized.is_valid():
+        serialized.save()
+        return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Category updated!',
+                    'error_message' : None,
+                    'categories' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    else:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : '400',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : str(serialized.error_messages),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_category(request):
+    category_id = request.data.get('category', None)
+    if not all([category_id,]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'category',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        category = Category.objects.get(id=category_id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_CATEGORY_BRAND_4020,
+                    'status_code_text' : 'INVALID_CATEGORY_BRAND_4020',
+                    'response' : {
+                        'message' : 'Category Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    category.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Category deleted!',
+                'error_message' : None,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
 
 @api_view(['GET'])
@@ -191,7 +303,7 @@ def update_brand(request):
                     'status_code' : StatusCodes.INVALID_CATEGORY_BRAND_4020,
                     'status_code_text' : 'INVALID_CATEGORY_BRAND_4020',
                     'response' : {
-                        'message' : 'Category or Brand Not Found',
+                        'message' : 'Brand Not Found',
                         'error_message' : str(err),
                     }
                 },
