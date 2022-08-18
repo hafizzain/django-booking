@@ -407,7 +407,7 @@ def add_product(request):
     barcode_id = request.data.get('barcode_id', None)
     sku = request.data.get('sku', None)
     is_active = request.data.get('is_active', True)
-    medias = request.data.getlist('product_images', None)
+    # medias = request.data.getlist('product_images', None)
 
     # Product Stock Details 
     quantity = request.data.get('quantity', None)
@@ -417,7 +417,7 @@ def add_product(request):
     alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', True)
 
 
-    if not all([name, business_id, medias, vendor_id, category_id, brand_id, product_type, cost_price, full_price, sell_price, short_description, description, barcode_id, sku, quantity, unit, amount, alert_when_stock_becomes_lowest]):
+    if not all([name, business_id, vendor_id, category_id, brand_id, product_type, cost_price, full_price, sell_price, short_description, description, barcode_id, sku, quantity, unit, amount, alert_when_stock_becomes_lowest]):
         return Response(
             {
                 'status' : False,
@@ -521,13 +521,13 @@ def add_product(request):
         is_active=True,
         published = True,
     )
-    for med in medias:
-        ProductMedia.objects.create(
-            user=user,
-            business=business,
-            product=product,
-            image=med
-        )
+    # for med in medias:
+    #     ProductMedia.objects.create(
+    #         user=user,
+    #         business=business,
+    #         product=product,
+    #         image=med
+    #     )
     
     ProductStock.objects.create(
         user = user,
