@@ -1803,6 +1803,10 @@ def update_business_tax(request):
         business_tax.location = location
 
     if tax_type == 'Group':
+        try:
+            business_tax.parent_tax.clear()
+        except:
+            pass
         if type(tax_ids) == str:
             import json
             ids_data = json.loads(tax_ids)
