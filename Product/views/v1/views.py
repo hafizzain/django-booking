@@ -241,35 +241,28 @@ def add_brand(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-        
-    serialized = BrandSerializer(data=request.data, context={'request' : request})
-    if serialized.is_valid():
-        serialized.save()
-        return Response(
-            {
-                'status' : True,
-                'status_code' : 201,
-                'response' : {
-                    'message' : 'Brand Added!',
-                    'error_message' : None,
-                    'brand' : serialized.data
-                }
-            },
-            status=status.HTTP_201_CREATED
-        )
-    else:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : '400',
-                'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : str(serialized.errors),
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
+    brand = Brand.objects.create(
+        name=name,
+        description=description,
+        website=website,
+        image=image,
+        is_active=is_active
+    )
+    serialized = BrandSerializer(brand, context={'request' : request})
+   
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 201,
+            'response' : {
+                'message' : 'Brand Added!',
+                'error_message' : None,
+                'brand' : serialized.data
+            }
+        },
+        status=status.HTTP_201_CREATED
+    )
+    
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_brand(request):
