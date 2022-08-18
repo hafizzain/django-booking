@@ -1,6 +1,7 @@
 
 
 from rest_framework import serializers
+from Product.Constants.index import tenant_media_base_url
 from Product.models import Category, Brand, Product, ProductMedia, ProductStock
 from django.conf import settings
 
@@ -11,6 +12,17 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'is_active']
 
 class BrandSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request)
+                return f'{url}{obj.image}'
+            except:
+                pass
+        return obj.image
     class Meta:
         model = Brand
         fields = ['id', 'name', 'description', 'website', 'image', 'is_active']
@@ -20,10 +32,14 @@ class ProductMediaSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
 
     def get_image(self, obj):
-        print(self.context)
         if obj.image:
-            return f'{settings.BACKEND_HOST}/media/{self.context["request"].tenant_name}/{obj.image}'
-        return None
+            try:
+                request = self.context['request']
+                url = tenant_media_base_url(request)
+                return f'{url}{obj.image}'
+            except:
+                pass
+        return obj.image
     class Meta:
         model = ProductMedia
         fields = ['id', 'image']

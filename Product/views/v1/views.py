@@ -198,7 +198,7 @@ def delete_category(request):
 @permission_classes([AllowAny])
 def get_brands(request):
     all_brands = Brand.objects.all()
-    serialized = BrandSerializer(all_brands, many=True)
+    serialized = BrandSerializer(all_brands, many=True, context={'request' : request})
     return Response(
         {
             'status' : 200,
@@ -242,7 +242,7 @@ def add_brand(request):
             status=status.HTTP_400_BAD_REQUEST
         )
         
-    serialized = BrandSerializer(data=request.data)
+    serialized = BrandSerializer(data=request.data, context={'request' : request})
     if serialized.is_valid():
         serialized.save()
         return Response(
@@ -310,7 +310,7 @@ def update_brand(request):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-    serialized = BrandSerializer(brand, data=request.data, partial=True)
+    serialized = BrandSerializer(brand, data=request.data, partial=True, context={'request' : request})
     if serialized.is_valid():
         serialized.save()
         return Response(
