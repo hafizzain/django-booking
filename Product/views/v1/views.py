@@ -268,7 +268,7 @@ def add_brand(request):
 def update_brand(request):
     brand_id = request.data.get('brand', None)
 
-    if brand_id is not None:
+    if brand_id is None:
         return Response(
             {
                 'status' : False,
