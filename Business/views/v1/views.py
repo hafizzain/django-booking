@@ -2036,6 +2036,8 @@ def get_business_vendors(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_business_vendor(request):
+    user = request.user
+    business_id = request.data.get('business', None)
     vendor_name = request.data.get('vendor_name', None)
     address = request.data.get('address', None)
     mobile_number = request.data.get('mobile_number', None)
@@ -2045,9 +2047,9 @@ def add_business_vendor(request):
     city_id = request.data.get('city', None)
     gstin = request.data.get('gstin', None)
     website = request.data.get('website', None)
-    is_active = request.data.get('is_active', None)
+    is_active = request.data.get('is_active', True)
 
-    if not all([vendor_name, address, mobile_number, email, country_id, state_id, city_id, gstin, website, is_active]):
+    if not all([business_id,vendor_name, address, mobile_number, email, country_id, state_id, city_id, gstin, website, is_active]):
         return Response(
             {
                 'status' : False,
@@ -2057,7 +2059,7 @@ def add_business_vendor(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'Following fields are required',
                     'fields' : [
-                        'vendor_name', 'address', 'mobile_number', 'email', 'country', 'state', 'city', 'gstin', 'website', 'is_active'
+                        'business', 'vendor_name', 'address', 'mobile_number', 'email', 'country', 'state', 'city', 'gstin', 'website', 'is_active'
                     ]
                 }
             },
@@ -2081,7 +2083,65 @@ def add_business_vendor(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    
+     
+    try:
+        business = Business.objects.get(id=business_id, is_deleted=False, is_active=True, is_blocked=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                    'response' : {
+                        'message' : 'Business Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+    try:
+        vendor = BusinessVendor.objects.create(
+            user = user,
+            business = business,
+            country = country,
+            state = state,
+            city = city,
+            vendor_name = vendor_name,
+            address = address,
+            gstin = gstin,
+            website = website,
+            email = email,
+            mobile_number = mobile_number,
+            is_active = is_active,
+        )
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Something went wrong',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    serialized = BusinessVendorSerializer(vendor)
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'status_code_text' : '201',
+                'response' : {
+                    'message' : 'Business vendors created!',
+                    'error_message' : None,
+                    'vendor' : serialized.data
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])

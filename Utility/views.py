@@ -153,3 +153,18 @@ def get_cities(request):
         },
         status=status.HTTP_200_OK
     )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_user_locations_data(request):
+    # print(request.META)
+    data = []
+    for dt in request.META:
+        data.append({dt : str(request.META.get(dt))})
+    return Response(
+        {
+            'data' : data
+        },
+        status=status.HTTP_200_OK
+    )
