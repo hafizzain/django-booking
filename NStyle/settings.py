@@ -35,18 +35,55 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 
-INSTALLED_APPS = [
+DJANGO_APPS = [
+
+]
+
+NSTYLE_APPS = [
+    'Api.apps.ApiConfig',
+    'Authentication.apps.AuthenticationConfig',
+    'Profile.apps.ProfileConfig',
+    'Utility.apps.UtilityConfig',
+    'Business.apps.BusinessConfig',
+    'Product.apps.ProductConfig',
+]
+
+
+SHARED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-]
+
+    'django_tenants',
+    'rest_framework',
+    'rest_framework.authtoken',
+    "corsheaders",
+
+    'Tenants.apps.TenantsConfig',
+] +  NSTYLE_APPS
+
+TENANT_APPS = [
+    # The following Django contrib apps must be in TENANT_APPS
+    'django.contrib.contenttypes',
+    'django.contrib.auth',
+    'django.contrib.admin',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'rest_framework.authtoken',
+
+] + NSTYLE_APPS
+
+INSTALLED_APPS = list(set(SHARED_APPS + TENANT_APPS))
+
 
 MIDDLEWARE = [
+    'NStyle.Middlewares.TenantMiddleware.CustomTanantMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -54,6 +91,17 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:8000",
+    'http://midtechdxb.com',
+    'https://midtechdxb.com',
+    'http://us-telecoms.com',
+    'https://us-telecoms.com',
+]
+
+CORS_ALLOW_ALL_ORIGINS = True
 ROOT_URLCONF = 'NStyle.urls'
 
 TEMPLATES = [
@@ -80,14 +128,21 @@ WSGI_APPLICATION = 'NStyle.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django_tenants.postgresql_backend',
+        'OPTIONS': {
+            'options': '-c search_path=public'
+        },
         'NAME': env('DATABASE_NAME'),
         'USER': env('DATABASE_USER'),
         'PASSWORD': env('DATABASE_PASSWORD'),
         'HOST': env('DATABASE_HOST'),
         'PORT': env('DATABASE_PORT'),
+        'CONN_MAX_AGE': None,
     }
 }
+
+AUTH_USER_MODEL = 'Authentication.User'
+
 
 
 # Password validation
@@ -108,6 +163,15 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES' : [
+        'rest_framework.authentication.TokenAuthentication'
+    ],
+    'DEFAULT_PERMISSION_CLASSES' : [
+        'rest_framework.permissions.IsAuthenticated'
+    ]
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
@@ -132,8 +196,26 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+BACKEND_DOMAIN_NAME=env('BACKEND_DOMAIN_NAME')
+BACKEND_HOST=env('BACKEND_HOST')
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+DEFAULT_FILE_STORAGE = 'django_tenants.files.storages.TenantFileSystemStorage'
+DATABASE_ROUTERS = (
+    'django_tenants.routers.TenantSyncRouter',
+)
+TENANT_MODEL = "Tenants.Tenant"
+TENANT_DOMAIN_MODEL = "Tenants.Domain"
+
+# TWILLIO_SETTINGS  
+
+TWILLIO_ACCOUNT_SID = env('TWILLIO_ACCOUNT_SID')
+TWILLIO_AUTH_TOKEN  = env('TWILLIO_AUTH_TOKEN')
+TWILLIO_PHONE_NUMBER = env('TWILLIO_PHONE_NUMBER')
+
