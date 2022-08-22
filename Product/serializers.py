@@ -49,6 +49,35 @@ class ProductStockSerializer(serializers.ModelSerializer):
         model = ProductStock
         fields = ['id', 'quantity' , 'amount', 'unit' , 'alert_when_stock_becomes_lowest']
 
+class ProductWithStockSerializer(serializers.ModelSerializer):
+    stock = serializers.SerializerMethodField()
+
+    def get_stock(self, obj):
+        stock = ProductStock.objects.filter(product=obj, is_deleted=False)[0]
+        return {
+            'id' : stock.id,
+            'available_stock' : stock.available_quantity,
+            'quantity' : stock.quantity,
+            'sold_stock' : stock.sold_quantity,
+            'price' : stock.product.sell_price,
+            'usage' : (int(stock.quantity) / int(stock.sold_quantity)) * 100 if stock.sold_quantity > 0 else 100,
+            'status' : True if stock.available_quantity > 0 else False,
+            'status_text' : 'In Stock' if stock.available_quantity > 0 else 'Out of stock',
+            'sale_status' : 'High',
+            'turnover' : 'Highest',
+        }
+
+    class Meta:
+        model = Product
+        fields = [
+            'id', 
+            'name', 
+            'cost_price',
+            'full_price',
+            'sell_price',
+            'stock',
+        ]
+        read_only_fields = ['id']
 
 class ProductSerializer(serializers.ModelSerializer):
 

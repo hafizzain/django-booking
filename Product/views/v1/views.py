@@ -12,7 +12,7 @@ from NStyle.Constants import StatusCodes
 
 from Product.models import Category, Brand, Product, ProductMedia, ProductStock
 from Business.models import Business, BusinessAddress, BusinessVendor
-from Product.serializers import CategorySerializer, BrandSerializer, ProductSerializer, ProductStockSerializer
+from Product.serializers import CategorySerializer, BrandSerializer, ProductSerializer, ProductStockSerializer, ProductWithStockSerializer
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -776,8 +776,8 @@ def search_product(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_stocks(request):
-    all_stocks = ProductStock.objects.filter(is_active=True, is_deleted=False)
-    serialized = ProductStockSerializer(all_stocks, many=True)
+    all_stocks = Product.objects.filter(is_active=True, is_deleted=False)
+    serialized = ProductWithStockSerializer(all_stocks, many=True)
     return Response(
         {
             'status' : True,
@@ -845,14 +845,7 @@ def delete_stock(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def filter_stock(request):
-    # vendor_id = request.GET.get('vendor', None)
-    # brand_id = request.GET.get('brand', None)
-    # category_id = request.GET.get('category', None)
-    # low_stock = request.GET.get('low_stock', False)
-    # high_stock = request.GET.get('high_stock', False)
-    # top_sellable_items = request.GET.get('top_sellable_items', False)
-
-    all_stocks = ProductStock.objects.filter(
+    all_products = Product.objects.filter(
         is_active = True,
         is_deleted = False
     )[0:30]
@@ -860,21 +853,44 @@ def filter_stock(request):
     required_fields = ['vendor', 'brand', 'category', 'low_stock', 'high_stock', 'top_sellable_items', 'start_date', 'end_date']
 
     filter_funcs = {
+        'vendor' : lambda product, value : True if str(product.vendor.id) == str(value) else False,
+        'brand' : lambda product, value : True if str(product.brand.id) == str(value) else False,
+        'category' : lambda product, value : True if str(product.category.id) == str(value) else False,
+        'low_stock' : lambda product, value : True if int(product.product_stock.quantity) <= int(value) else False,
+        'high_stock' : lambda product, value : True if int(product.product_stock.quantity) > int(value) else False,
+        'top_sellable_items' : lambda product, value : True,
+        # 'start_date' : lambda product, value : True if product.created_at > value else False,
+        # 'end_date' : lambda product, value : True if product.created_at < value else False,
     }
 
-    for stock in all_stocks:
+    result = []
+    for product in all_products:
+        loop_return_value = False
         for field in required_fields:
             field_value = request.GET.get(field, None)
             if field_value is not None:
-                print(field_value)
+                try:
+                    return_value = filter_funcs[field](product, field_value)
+                    if not return_value:
+                        continue
+                    loop_return_value = True
+                except Exception as err:
+                    print(err)
+                    loop_return_value = False
+
+        if loop_return_value:
+            result.append(product)
     
+    serialized = ProductWithStockSerializer(result, many=True)
     return Response(
         {
             'status' : True,
             'status_code' : 200,
             'response' : {
-                'message' : 'All filtered stocks!',
+                'message' : 'All filtered stocks Products!',
                 'error_message' : None,
+                'count' : len(result),
+                'products' : serialized.data
             }
         },
         status=status.HTTP_200_OK

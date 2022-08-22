@@ -103,7 +103,9 @@ class ProductStock(models.Model):
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_product_stocks')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_stock')
 
-    quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
+    quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0, verbose_name='Total Quantity')
+    available_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
+    sold_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
     amount = models.PositiveIntegerField(default=0, verbose_name='Usage Amount')
     unit = models.PositiveIntegerField(default=0, verbose_name='Usage Unit')
 
