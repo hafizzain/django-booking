@@ -587,7 +587,7 @@ def update_product(request):
         )
             
     try:
-        vendor = BusinessAddress.objects.get(id=vendor_id, is_deleted=False, is_active=True)
+        vendor = BusinessVendor.objects.get(id=vendor_id, is_deleted=False, is_active=True)
     except Exception as err:
         return Response(
                 {
