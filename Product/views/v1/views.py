@@ -6,11 +6,13 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
+from django.db.models import Q
+
 from NStyle.Constants import StatusCodes
 
 from Product.models import Category, Brand, Product, ProductMedia, ProductStock
 from Business.models import Business, BusinessAddress, BusinessVendor
-from Product.serializers import CategorySerializer, BrandSerializer, ProductSerializer
+from Product.serializers import CategorySerializer, BrandSerializer, ProductSerializer, ProductStockSerializer
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -717,6 +719,161 @@ def delete_product(request):
             'status_code' : 200,
             'response' : {
                 'message' : 'Product deleted!',
+                'error_message' : None,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def search_product(request):
+    text = request.GET.get('text', None)
+
+    if text is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'text',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    search_products = Product.objects.filter(
+        Q(category__name__icontains=text) |
+        Q(brand__name__icontains=text) |
+        Q(product_type__icontains=text) |
+        Q(name__icontains=text) |
+        Q(short_description__icontains=text) |
+        Q(description__icontains=text),
+        is_active=True ,
+        is_blocked=False ,
+        is_deleted=False ,
+    )
+    serialized = ProductSerializer(search_products, many=True, context={'request':request})
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'All Search Products!',
+                'error_message' : None,
+                'count' : len(serialized.data),
+                'products' : serialized.data,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_stocks(request):
+    all_stocks = ProductStock.objects.filter(is_active=True, is_deleted=False)
+    serialized = ProductStockSerializer(all_stocks, many=True)
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'All stocks!',
+                'error_message' : None,
+                'stocks' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_stock(request):
+    stock_id = request.data.get('stock', None)
+
+    if not all([stock_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'stock',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        stock = ProductStock.objects.get(id=stock_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Stock not found or already deleted!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    stock.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Stock deleted!',
+                'error_message' : None,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def filter_stock(request):
+    # vendor_id = request.GET.get('vendor', None)
+    # brand_id = request.GET.get('brand', None)
+    # category_id = request.GET.get('category', None)
+    # low_stock = request.GET.get('low_stock', False)
+    # high_stock = request.GET.get('high_stock', False)
+    # top_sellable_items = request.GET.get('top_sellable_items', False)
+
+    all_stocks = ProductStock.objects.filter(
+        is_active = True,
+        is_deleted = False
+    )[0:30]
+
+    required_fields = ['vendor', 'brand', 'category', 'low_stock', 'high_stock', 'top_sellable_items', 'start_date', 'end_date']
+
+    filter_funcs = {
+    }
+
+    for stock in all_stocks:
+        for field in required_fields:
+            field_value = request.GET.get(field, None)
+            if field_value is not None:
+                print(field_value)
+    
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'All filtered stocks!',
                 'error_message' : None,
             }
         },
