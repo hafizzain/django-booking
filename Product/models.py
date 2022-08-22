@@ -4,7 +4,7 @@ from django.core.validators import MinValueValidator
 import uuid
 
 from Authentication.models import User
-from Business.models import Business, BusinessAddress
+from Business.models import Business, BusinessAddress, BusinessVendor
 
 
 
@@ -46,7 +46,7 @@ class Product(models.Model):
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_products')
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_products')
-    vendor = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, related_name='vendor_products')
+    vendor = models.ForeignKey(BusinessVendor, on_delete=models.CASCADE, related_name='vendor_products', default=None, null=True, blank=True)
 
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='category_products')
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True, related_name='brand_products')
