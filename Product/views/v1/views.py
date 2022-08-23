@@ -5,12 +5,15 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from django.db.models import Q
 
 from NStyle.Constants import StatusCodes
 
+
 from Product.models import Category, Brand, Product, ProductMedia, ProductStock
-from Business.models import Business, BusinessAddress
-from Product.serializers import CategorySerializer, BrandSerializer, ProductSerializer
+from Business.models import Business, BusinessAddress, BusinessVendor
+from Product.serializers import CategorySerializer, BrandSerializer, ProductSerializer, ProductStockSerializer, ProductWithStockSerializer
+
 
 
 def ExportCSV(request):
@@ -27,6 +30,7 @@ def ExportCSV(request):
            
 
         return response
+
 
 
 @api_view(['GET'])
@@ -258,41 +262,34 @@ def add_brand(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-        
-    serialized = BrandSerializer(data=request.data, context={'request' : request})
-    if serialized.is_valid():
-        serialized.save()
-        return Response(
-            {
-                'status' : True,
-                'status_code' : 201,
-                'response' : {
-                    'message' : 'Brand Added!',
-                    'error_message' : None,
-                    'brand' : serialized.data
-                }
-            },
-            status=status.HTTP_201_CREATED
-        )
-    else:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : '400',
-                'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : str(serialized.errors),
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
+    brand = Brand.objects.create(
+        name=name,
+        description=description,
+        website=website,
+        image=image,
+        is_active=is_active
+    )
+    serialized = BrandSerializer(brand, context={'request' : request})
+   
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 201,
+            'response' : {
+                'message' : 'Brand Added!',
+                'error_message' : None,
+                'brand' : serialized.data
+            }
+        },
+        status=status.HTTP_201_CREATED
+    )
+    
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_brand(request):
     brand_id = request.data.get('brand', None)
 
-    if brand_id is not None:
+    if brand_id is None:
         return Response(
             {
                 'status' : False,
@@ -327,6 +324,12 @@ def update_brand(request):
                 status=status.HTTP_404_NOT_FOUND
             )
         
+    
+    try:
+        brand.image = request.data.get('image')
+        brand.save()
+    except:
+        pass
     serialized = BrandSerializer(brand, data=request.data, partial=True, context={'request' : request})
     if serialized.is_valid():
         serialized.save()
@@ -360,7 +363,7 @@ def update_brand(request):
 def delete_brand(request):
     brand_id = request.data.get('brand', None)
 
-    if brand_id is not None:
+    if brand_id is None:
         return Response(
             {
                 'status' : False,
@@ -426,7 +429,7 @@ def add_product(request):
     barcode_id = request.data.get('barcode_id', None)
     sku = request.data.get('sku', None)
     is_active = request.data.get('is_active', True)
-    medias = request.data.getlist('product_images', None)
+    # medias = request.data.getlist('product_images', None)
 
     # Product Stock Details 
     quantity = request.data.get('quantity', None)
@@ -436,7 +439,7 @@ def add_product(request):
     alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', True)
 
 
-    if not all([name, business_id, medias, vendor_id, category_id, brand_id, product_type, cost_price, full_price, sell_price, short_description, description, barcode_id, sku, quantity, unit, amount, alert_when_stock_becomes_lowest]):
+    if not all([name, business_id, vendor_id, category_id, brand_id, product_type, cost_price, full_price, sell_price, short_description, description, barcode_id, sku, quantity, unit, amount, alert_when_stock_becomes_lowest]):
         return Response(
             {
                 'status' : False,
@@ -488,7 +491,7 @@ def add_product(request):
             )
             
     try:
-        vendor = BusinessAddress.objects.get(id=vendor_id, is_deleted=False, is_active=True)
+        vendor = BusinessVendor.objects.get(id=vendor_id, is_deleted=False, is_active=True)
     except Exception as err:
         return Response(
                 {
@@ -540,13 +543,13 @@ def add_product(request):
         is_active=True,
         published = True,
     )
-    for med in medias:
-        ProductMedia.objects.create(
-            user=user,
-            business=business,
-            product=product,
-            image=med
-        )
+    # for med in medias:
+    #     ProductMedia.objects.create(
+    #         user=user,
+    #         business=business,
+    #         product=product,
+    #         image=med
+    #     )
     
     ProductStock.objects.create(
         user = user,
@@ -604,7 +607,7 @@ def update_product(request):
         )
             
     try:
-        vendor = BusinessAddress.objects.get(id=vendor_id, is_deleted=False, is_active=True)
+        vendor = BusinessVendor.objects.get(id=vendor_id, is_deleted=False, is_active=True)
     except Exception as err:
         return Response(
                 {
@@ -737,6 +740,178 @@ def delete_product(request):
             'response' : {
                 'message' : 'Product deleted!',
                 'error_message' : None,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def search_product(request):
+    text = request.GET.get('text', None)
+
+    if text is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'text',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    search_products = Product.objects.filter(
+        Q(category__name__icontains=text) |
+        Q(brand__name__icontains=text) |
+        Q(product_type__icontains=text) |
+        Q(name__icontains=text) |
+        Q(short_description__icontains=text) |
+        Q(description__icontains=text),
+        is_active=True ,
+        is_blocked=False ,
+        is_deleted=False ,
+    )
+    serialized = ProductSerializer(search_products, many=True, context={'request':request})
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'All Search Products!',
+                'error_message' : None,
+                'count' : len(serialized.data),
+                'products' : serialized.data,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_stocks(request):
+    all_stocks = Product.objects.filter(is_active=True, is_deleted=False)
+    serialized = ProductWithStockSerializer(all_stocks, many=True)
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'All stocks!',
+                'error_message' : None,
+                'stocks' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_stock(request):
+    stock_id = request.data.get('stock', None)
+
+    if not all([stock_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'stock',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        stock = ProductStock.objects.get(id=stock_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Stock not found or already deleted!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    stock.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Stock deleted!',
+                'error_message' : None,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def filter_stock(request):
+    all_products = Product.objects.filter(
+        is_active = True,
+        is_deleted = False
+    )[0:30]
+
+    required_fields = ['vendor', 'brand', 'category', 'low_stock', 'high_stock', 'top_sellable_items', 'start_date', 'end_date']
+
+    filter_funcs = {
+        'vendor' : lambda product, value : True if str(product.vendor.id) == str(value) else False,
+        'brand' : lambda product, value : True if str(product.brand.id) == str(value) else False,
+        'category' : lambda product, value : True if str(product.category.id) == str(value) else False,
+        'low_stock' : lambda product, value : True if int(product.product_stock.quantity) <= int(value) else False,
+        'high_stock' : lambda product, value : True if int(product.product_stock.quantity) > int(value) else False,
+        'top_sellable_items' : lambda product, value : True,
+        # 'start_date' : lambda product, value : True if product.created_at > value else False,
+        # 'end_date' : lambda product, value : True if product.created_at < value else False,
+    }
+
+    result = []
+    for product in all_products:
+        loop_return_value = False
+        for field in required_fields:
+            field_value = request.GET.get(field, None)
+            if field_value is not None:
+                try:
+                    return_value = filter_funcs[field](product, field_value)
+                    if not return_value:
+                        continue
+                    loop_return_value = True
+                except Exception as err:
+                    print(err)
+                    loop_return_value = False
+
+        if loop_return_value:
+            result.append(product)
+    
+    serialized = ProductWithStockSerializer(result, many=True)
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'All filtered stocks Products!',
+                'error_message' : None,
+                'count' : len(result),
+                'products' : serialized.data
             }
         },
         status=status.HTTP_200_OK

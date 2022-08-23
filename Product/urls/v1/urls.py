@@ -22,6 +22,13 @@ urlpatterns = [
     path('get_products/', views.get_products),
     path('delete_product/', views.delete_product),
     
+    path('search_product/', views.search_product),
+
+    # Stocks Path 
+    path('get_stocks/', views.get_stocks),
+    path('delete_stock/', views.delete_stock),
+    path('filter_stock/', views.filter_stock),
+
     #Export CSV files
     path('export_csv/', views.ExportCSV, name='export_csv')
 ]

@@ -4,7 +4,7 @@ from django.core.validators import MinValueValidator
 import uuid
 
 from Authentication.models import User
-from Business.models import Business, BusinessAddress
+from Business.models import Business, BusinessAddress, BusinessVendor
 
 
 
@@ -46,7 +46,7 @@ class Product(models.Model):
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_products')
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_products')
-    vendor = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, related_name='vendor_products')
+    vendor = models.ForeignKey(BusinessVendor, on_delete=models.CASCADE, related_name='vendor_products', default=None, null=True, blank=True)
 
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='category_products')
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True, related_name='brand_products')
@@ -103,7 +103,9 @@ class ProductStock(models.Model):
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_product_stocks')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_stock')
 
-    quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
+    quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0, verbose_name='Total Quantity')
+    available_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
+    sold_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
     amount = models.PositiveIntegerField(default=0, verbose_name='Usage Amount')
     unit = models.PositiveIntegerField(default=0, verbose_name='Usage Unit')
 
@@ -116,4 +118,3 @@ class ProductStock(models.Model):
 
     def __str__(self):
         return str(self.id)
-    
