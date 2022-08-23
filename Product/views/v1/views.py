@@ -763,7 +763,7 @@ def search_product(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_stocks(request):
-    all_stocks = Product.objects.filter(is_active=True, is_deleted=False)
+    all_stocks = Product.objects.filter(is_active=True, is_deleted=False, product_stock__gt=0 )
     serialized = ProductWithStockSerializer(all_stocks, many=True)
     return Response(
         {
