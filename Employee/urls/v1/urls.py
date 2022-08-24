@@ -1,0 +1,7 @@
+from django.urls import path, include
+
+from Employee.views.v1 import views
+ 
+urlpatterns = [
+     path('get_employee/', views.getEmployees),
+ ]
