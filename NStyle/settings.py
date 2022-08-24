@@ -46,6 +46,7 @@ NSTYLE_APPS = [
     'Utility.apps.UtilityConfig',
     'Business.apps.BusinessConfig',
     'Product.apps.ProductConfig',
+    'Employee.apps.EmployeeConfig',
 ]
 
 
