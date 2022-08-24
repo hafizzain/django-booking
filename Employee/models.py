@@ -6,6 +6,7 @@ from django.utils.timezone import now
 from Authentication.models import User
 from Business.models import Business
 from Utility.models import Country, State, City
+from Service.models  import Service
 
 class Employee(models.Model):
     GENDER_CHOICES = [
@@ -58,7 +59,7 @@ class EmployeeProfessionalInfo(models.Model):
     designation = models.CharField(max_length=300, default='')
     income_type = models.CharField(choices=INCOME_TYPE_CHOICES, default='Hourly_Rate', max_length=30)
     salary = models.PositiveIntegerField(default=0)
-    # services = models.ManyToManyField()
+    services = models.ManyToManyField(Service, related_name='services_employee')
 
     def __str__(self):
         return str(self.id)
