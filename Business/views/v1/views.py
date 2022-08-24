@@ -215,7 +215,7 @@ def get_business(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-    serialized = Business_GetSerializer(user_business)
+    serialized = Business_GetSerializer(user_business , context={'request' : request})
 
     return Response(
             {
@@ -374,7 +374,7 @@ def update_business(request):
         if logo is not None:
             business.logo = logo
             business.save()
-        serialized = Business_GetSerializer(business)
+        serialized = Business_GetSerializer(business, context={'request' : request})
         return Response(
             {
                 'status' : True,

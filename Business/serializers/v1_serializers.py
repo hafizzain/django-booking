@@ -1,10 +1,14 @@
 
 
 
+from cmath import e
 from rest_framework import serializers
 
 from Business.models import BookingSetting, BusinessType, Business, BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BusinessPaymentMethod, BusinessTax, BusinessVendor
 from Authentication.serializers import UserSerializer
+from django.conf import settings
+
+from Product.Constants.index  import tenant_media_base_url
 
 class BusinessTypeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,6 +20,19 @@ class Business_GetSerializer(serializers.ModelSerializer):
     website = serializers.SerializerMethodField()
     facebook = serializers.SerializerMethodField()
     instagram = serializers.SerializerMethodField()
+
+    logo = serializers.SerializerMethodField()
+
+    def get_logo(self, obj):
+        if obj.logo :
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request)
+                return f'{url}{obj.logo}'
+            except:
+                obj.logo
+
+        return None
 
     def get_website(self, obj):
         try:
