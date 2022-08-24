@@ -307,9 +307,7 @@ def update_brand(request):
         )
     
     try:
-        brand = Brand.objects.get(
-            id=brand_id
-        )
+        brand = Brand.objects.get(id=brand_id)
     except Exception as err:
         return Response(
                 {
@@ -325,38 +323,27 @@ def update_brand(request):
             )
         
     
-    try:
-        brand.image = request.data.get('image')
-        brand.save()
-    except:
-        pass
-    serialized = BrandSerializer(brand, data=request.data, partial=True, context={'request' : request})
-    if serialized.is_valid():
-        serialized.save()
-        return Response(
-            {
-                'status' : True,
-                'status_code' : 200,
-                'response' : {
-                    'message' : 'Brand updates!',
-                    'error_message' : None,
-                    'brand' : serialized.data
-                }
-            },
-            status=status.HTTP_200_OK
-        )
-    else:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : '400',
-                'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : str(serialized.errors),
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
+    brand.name = request.data.get('name', brand.name)
+    brand.description = request.data.get('description', brand.description)
+    brand.website = request.data.get('website', brand.website)
+    brand.image = request.data.get('image', brand.image)
+    brand.is_active = request.data.get('is_active', brand.is_active)
+    brand.save()
+    
+    serialized = BrandSerializer(brand, context={'request' : request})
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Brand updated!',
+                'error_message' : None,
+                'brand' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+  
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
@@ -797,7 +784,7 @@ def search_product(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_stocks(request):
-    all_stocks = Product.objects.filter(is_active=True, is_deleted=False)
+    all_stocks = Product.objects.filter(is_active=True, is_deleted=False, product_stock__gt=0 )
     serialized = ProductWithStockSerializer(all_stocks, many=True)
     return Response(
         {
