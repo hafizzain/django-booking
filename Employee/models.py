@@ -63,3 +63,45 @@ class EmployeeProfessionalInfo(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+
+class EmployeePermissionSetting(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_permissions_setting')
+    allow_calendar_booking = models.BooleanField(default=True)
+    access_calendar = models.BooleanField(default=False)
+    change_calendar_color = models.BooleanField(default=False)
+    
+    created_at = models.DateTimeField(auto_now_add=now)
+    
+    def __str__(self):
+        return str(self.id)
+
+
+class EmployeeModulePermission(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_module_permission')
+    access_reports = models.BooleanField(default=False)
+    access_sales = models.BooleanField(default=False)
+    access_inventory = models.BooleanField(default=False)
+    access_expenses = models.BooleanField(default=False)
+    access_products = models.BooleanField(default=False)
+    
+    created_at = models.DateTimeField(auto_now_add=now)
+    
+    def __str__(self):
+        return str(self.id)
+
+class EmployeeMarketingPermission(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_marketing_permission')
+    access_voucher = models.BooleanField(default=False)
+    access_member_discount = models.BooleanField(default=False)
+    access_invite_friend = models.BooleanField(default=False)
+    access_loyalty_points = models.BooleanField(default=False)
+    access_gift_cards = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=now)
+    
+    def __str__(self):
+        return str(self.id)
