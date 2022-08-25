@@ -33,7 +33,7 @@ def get_Employees(request):
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def create_employe(request):
+def create_employee(request):
     # sourcery skip: avoid-builtin-shadow
     id = request.data.get('id' , None)
     user = request.user 
