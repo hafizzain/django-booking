@@ -1,9 +1,17 @@
 from django.shortcuts import render
-from Employee.models import Employee
+from Employee.models import( Employee , EmployeeProfessionalInfo ,
+                        EmployeePermissionSetting,  EmployeeModulePermission
+                        , EmployeeMarketingPermission
+                        )
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from Employee.serializers import EmployeSerializer
+from Employee.serializers import( EmployeSerializer , EmployeInformationsSerializer
+                          , EmployPermissionSerializer,  EmployeModulesSerializer
+                          ,  EmployeeMarketingSerializers
+                                 
+                                 
+                                 )
 from rest_framework import status
 from Business.models import Business
 from Utility.models import Country, State, City
@@ -82,6 +90,33 @@ def create_employee(request):
     created_at = request.data.get('created_at', None)
     updated_at = request.data.get('updated_at', None)
     
+    #UserInformation
+    designation = request.data.get('designation')
+    income_type = request.data.get('income_type')
+    salary = request.data.get('salary')
+    services = request.data.get('services')
+    
+    #EmployeePermissionSetting
+    allow_calendar_booking= request.data.get('allow_calendar_booking')
+    access_calendar= request.data.get('access_calendar')
+    change_calendar_color= request.data.get('change_calendar_color')
+    
+    
+    #EmployeeModulePermission
+    access_reports=request.data.get('access_reports')
+    access_sales= request.data.get('access_sales')
+    access_inventory= request.data.get('access_inventory')
+    access_expenses= request.data.get('access_expenses')
+    access_products= request.data.get('access_products')
+    
+    #EmployeeMarketingPermission
+    access_voucher=request.data.get('access_voucher')
+    access_member_discount= request.data.get('access_member_discount')
+    access_invite_friend=request.data.get('access_invite_friend')
+    access_loyalty_points=request.data.get('access_loyalty_points')
+    access_gift_cards=request.data.get('access_gift_cards')
+    
+    
     if not all([
         business_id, full_name ,employee_id, email, mobile_number, dob ,gender, country , state ,city ,postal_code ,address ,joining_date, to_present, ending_date ]): 
        return Response(
@@ -134,7 +169,27 @@ def create_employee(request):
         to_present = to_present,
         ending_date= ending_date,
     )
+    
     serialized = EmployeSerializer(employee)
+    
+    #EmployeInformations
+    employeinformations = EmployeeProfessionalInfo.objects.create(
+        employee=employee,
+        designation= designation,
+        income_type= income_type,
+        salary= salary,
+        #services= services,
+    )
+    EmployeInformations= EmployeInformationsSerializer(employeinformations)
+    
+    #EmployeePermissionSetting
+    employeePermission = EmployeePermissionSetting.objects.create(
+        employee = employee,
+        allow_calendar_booking =allow_calendar_booking, 
+        access_calendar= access_calendar,
+        change_calendar_color = change_calendar_color
+    )
+    
     
     return Response(
         {
