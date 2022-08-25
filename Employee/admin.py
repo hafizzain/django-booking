@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Employee, EmployeeProfessionalInfo
+from .models import Employee, EmployeeProfessionalInfo, EmployeePermissionSetting, EmployeeModulePermission, EmployeeMarketingPermission
 # Register your models here.
 
 @admin.register(Employee)
@@ -28,4 +28,33 @@ class EmployeeProfessionalInfoAdmin(admin.ModelAdmin):
         'designation',
         'income_type',
         'salary',
+    ]
+
+@admin.register(EmployeePermissionSetting)
+class EmployeePermissionSettingAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'allow_calendar_booking',
+        'access_calendar',
+        'change_calendar_color',
+    ]
+@admin.register(EmployeeModulePermission)
+class EmployeeModulePermissionAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'access_reports',
+        'access_sales',
+        'access_inventory',
+        'access_expenses',
+        'access_products',
+    ]
+@admin.register(EmployeeMarketingPermission)
+class EmployeeMarketingPermissionAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'access_voucher',
+        'access_member_discount',
+        'access_invite_friend',
+        'access_loyalty_points',
+        'access_gift_cards',
     ]
