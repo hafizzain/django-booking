@@ -9,8 +9,6 @@ from rest_framework.response import Response
 from Employee.serializers import( EmployeSerializer , EmployeInformationsSerializer
                           , EmployPermissionSerializer,  EmployeModulesSerializer
                           ,  EmployeeMarketingSerializers
-                                 
-                                 
                                  )
 from rest_framework import status
 from Business.models import Business
@@ -169,9 +167,7 @@ def create_employee(request):
         to_present = to_present,
         ending_date= ending_date,
     )
-    
-    serialized = EmployeSerializer(employee)
-    
+        
     #EmployeInformations
     employeinformations = EmployeeProfessionalInfo.objects.create(
         employee=employee,
@@ -189,8 +185,31 @@ def create_employee(request):
         access_calendar= access_calendar,
         change_calendar_color = change_calendar_color
     )
+    employeePerSetting= EmployPermissionSerializer(employeePermission)
     
+    #EmployeeModulePermission
+    employeModulePermission = EmployeeModulePermission.objects.create(
+        employee=employee,
+        access_reports=access_reports,
+        access_sales=access_sales,
+        access_inventory=access_inventory,
+        access_expenses=access_expenses,
+        access_products=access_products,       
+        
+    )
+    ModulesSerializer= EmployeModulesSerializer(employeModulePermission)
     
+    #EmployeeMarketingSerializers
+    EmployeeMarketing = EmployeeMarketingPermission.objects.create(
+        employee= employee,
+        access_voucher=access_voucher,
+        access_member_discount= access_member_discount,
+        access_invite_friend= access_invite_friend,
+        access_loyalty_points= access_loyalty_points,
+        access_gift_cards= access_gift_cards,
+        
+    )
+    serialized = EmployeSerializer(employee)
     return Response(
         {
             'status' : True,
@@ -258,3 +277,20 @@ def delete_employee(request):
         },
         status=status.HTTP_200_OK
     )
+    
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_employee(request):
+        try:
+            employee = Employee.objects.get(id=id)
+            serializer =EmployeSerializer(employee, data=request.data, partial=True)
+            Employe_Informations= EmployeeProfessionalInfo.objects.get(employee=employee)
+            
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"error":False,"data":serializer.data}, status=status.HTTP_200_OK)
+            return Response({"error":serializer.errors},status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response({"error":repr(e)},status=status.HTTP_400_BAD_REQUEST)
+    
