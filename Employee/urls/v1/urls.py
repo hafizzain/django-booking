@@ -8,4 +8,8 @@ urlpatterns = [
     path('delete_employee/', views.delete_employee),
     path('update_employee/', views.update_employee),
     
+
+    # Staff GROUP URLS 
+    path('get_staff_group/', views.delete_employee),
+
 ]
