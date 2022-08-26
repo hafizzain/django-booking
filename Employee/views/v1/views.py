@@ -192,34 +192,34 @@ def create_employee(request):
     employee_p_setting = EmployeePermissionSetting.objects.create(employee = employee)
     employee_marketing = EmployeeMarketingPermission.objects.create(employee= employee)
     
-    serialized = EmployeInformationsSerializer(employee_p_info, data=request.data, partial=True)
+    serialized = EmployeInformationsSerializer(employee_p_info, data=request.data)
     if serialized.is_valid():
         serialized.save()
-        employee_serialized.update(serialized)
+        employee_serialized.update(serialized.data)
     else:
         errors.append(serialized.errors)
         errors.append(serialized.error_messages)
 
-    serialized = EmployPermissionSerializer(employee_p_setting, data=request.data, partial=True)
+    serialized = EmployPermissionSerializer(employee_p_setting, data=request.data)
     if serialized.is_valid():
         serialized.save()
-        employee_serialized.update(serialized)
+        employee_serialized.update(serialized.data)
     else:
         errors.append(serialized.errors)
         errors.append(serialized.error_messages)
 
-    serialized = EmployeModulesSerializer(employee_mp, data=request.data, partial=True)
+    serialized = EmployeModulesSerializer(employee_mp, data=request.data)
     if serialized.is_valid():
         serialized.save()
-        employee_serialized.update(serialized)
+        employee_serialized.update(serialized.data)
     else:
         errors.append(serialized.errors)
         errors.append(serialized.error_messages)
 
-    serialized = EmployeeMarketingSerializers(employee_marketing, data=request.data, partial=True)
+    serialized = EmployeeMarketingSerializers(employee_marketing, data=request.data)
     if serialized.is_valid():
         serialized.save()
-        employee_serialized.update(serialized)
+        employee_serialized.update(serialized.data)
     else:
         errors.append(serialized.errors)
         errors.append(serialized.error_messages)

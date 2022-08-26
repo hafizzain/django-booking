@@ -69,23 +69,23 @@ class EmployeSerializer(serializers.ModelSerializer):
 class EmployeInformationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployeeProfessionalInfo
-        fields = '__all__'
+        exclude = ['employee', 'created_at', 'id']
         
         
 class EmployPermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployeePermissionSetting
-        fields = '__all__'
+        exclude = ['employee', 'created_at', 'id']
         
 class EmployeModulesSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployeeModulePermission
-        fields = '__all__'
+        exclude = ['employee', 'created_at', 'id']
         
 class EmployeeMarketingSerializers(serializers.ModelSerializer):
     class Meta:
         model = EmployeeMarketingPermission
-        fields = '__all__'
+        exclude = ['employee', 'created_at', 'id']
         
 class StaffGroupSerializers(serializers.ModelSerializer):
     #employe = serializers.SerializerMethodField()
