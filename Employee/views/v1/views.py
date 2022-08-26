@@ -198,33 +198,21 @@ def create_employee(request):
     if serialized.is_valid():
         serialized.save()
         data.update(serialized.data)
-    else:
-        errors.append(serialized.errors)
-        errors.append(serialized.error_messages)
 
     serialized = EmployPermissionSerializer(employee_p_setting, data=request.data)
     if serialized.is_valid():
         serialized.save()
         data.update(serialized.data)
-    else:
-        errors.append(serialized.errors)
-        errors.append(serialized.error_messages)
 
     serialized = EmployeModulesSerializer(employee_mp, data=request.data)
     if serialized.is_valid():
         serialized.save()
         data.update(serialized.data)
-    else:
-        errors.append(serialized.errors)
-        errors.append(serialized.error_messages)
 
     serialized = EmployeeMarketingSerializers(employee_marketing, data=request.data)
     if serialized.is_valid():
         serialized.save()
         data.update(serialized.data)
-    else:
-        errors.append(serialized.errors)
-        errors.append(serialized.error_messages)
 
 
     return Response(
@@ -233,7 +221,7 @@ def create_employee(request):
             'status_code' : 201,
             'response' : {
                 'message' : 'Employees Added!',
-                'error_message' : errors,
+                'error_message' : None,
                 'employees' : data
             }
         },
@@ -299,7 +287,7 @@ def delete_employee(request):
 @permission_classes([IsAuthenticated])
 def update_employee(request): 
     # sourcery skip: avoid-builtin-shadow
-        id = request.data.get('id')
+        id = request.data.get('id', None)
         if id is None:
             return Response(
             {
