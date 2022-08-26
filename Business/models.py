@@ -336,7 +336,7 @@ class BusinessTax(models.Model):
 
     tax_type = models.CharField(choices=TAX_TYPES, default='Individual', max_length=20)
     name = models.CharField(default='', max_length=100)
-    parent_tax = models.ManyToManyField('BusinessTax', null=True, blank=True)
+    parent_tax = models.ManyToManyField('BusinessTax', blank=True)
     tax_rate = models.PositiveIntegerField(default=0, null=True, blank=True)
     location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='locations_taxs')
 

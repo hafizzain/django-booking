@@ -19,6 +19,7 @@ class Employee(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_employees')
 
     full_name = models.CharField(max_length=300, default='')
+    image = models.ImageField(upload_to='employee/employee_images/', null=True, blank=True)
     employee_id = models.CharField(max_length=50, default='')
     email = models.EmailField(default='')
     mobile_number = models.CharField(max_length=30, default='')
@@ -103,5 +104,38 @@ class EmployeeMarketingPermission(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=now)
     
+    def __str__(self):
+        return str(self.id)
+
+
+class StaffGroup(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_staff_group')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_staff_group')
+
+    name = models.CharField(max_length=300, default='')
+    employees = models.ManyToManyField(Employee, related_name='staff_group_employees')
+
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+
+    def __str__(self):
+        return str(self.id)
+
+
+class StaffGroupModulePermission(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    staff_group = models.ForeignKey(StaffGroup, on_delete=models.CASCADE, related_name='staff_group_module_permissions')
+
+    access_reports = models.BooleanField(default=True)
+    access_sales = models.BooleanField(default=False)
+    access_inventory = models.BooleanField(default=False)
+    access_expenses = models.BooleanField(default=True)
+    access_products = models.BooleanField(default=False)
+
+    is_active = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+
     def __str__(self):
         return str(self.id)
