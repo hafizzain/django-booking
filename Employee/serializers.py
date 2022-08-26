@@ -99,6 +99,7 @@ class StaffGroupSerializers(serializers.ModelSerializer):
     staff_permission = serializers.SerializerMethodField()
     
     def get_staff_permission(self, obj):
+        
         try:
             permission = StaffGroupModulePermission.objects.get(staff_group=obj)
             return StaffpermisionSerializers(permission).data

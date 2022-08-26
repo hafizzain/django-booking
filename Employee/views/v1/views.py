@@ -171,7 +171,7 @@ def create_employee(request):
         salary= salary,
         #services= services,
     )
-    EmployeInformations= EmployeInformationsSerializer(employeinformations)
+    #EmployeInformations= EmployeInformationsSerializer(employeinformations)
     
     #EmployeePermissionSetting
     employeePermission = EmployeePermissionSetting.objects.create(
@@ -180,7 +180,7 @@ def create_employee(request):
         access_calendar= access_calendar,
         change_calendar_color = change_calendar_color
     )
-    employeePerSetting= EmployPermissionSerializer(employeePermission)
+    #employeePerSetting= EmployPermissionSerializer(employeePermission)
     
     #EmployeeModulePermission
     employeModulePermission = EmployeeModulePermission.objects.create(
@@ -192,7 +192,7 @@ def create_employee(request):
         access_products=access_products,       
         
     )
-    ModulesSerializer= EmployeModulesSerializer(employeModulePermission)
+   # ModulesSerializer= EmployeModulesSerializer(employeModulePermission)
     
     #EmployeeMarketingSerializers
     EmployeeMarketing = EmployeeMarketingPermission.objects.create(
@@ -394,6 +394,7 @@ def update_employee(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_staff_group(request):
+    
         user = request.user     
         business_id= request.data.get('business', None)
         
@@ -442,9 +443,6 @@ def create_staff_group(request):
             name= name,
         
         )
-
-        
-        
         #StaffGroupModulePermission
         staff_module_permission= StaffGroupModulePermission.objects.create(
             staff_group=staff_group,
@@ -454,38 +452,36 @@ def create_staff_group(request):
             access_expenses=access_expenses,
             access_products=access_products,
         )
-        staff_permission_serializers =  StaffpermisionSerializers(staff_module_permission)
+        # staff_permission_serializers =  StaffpermisionSerializers(staff_module_permission)
         staff_group.employees.add(employees)
-        
-        serialized = StaffGroupSerializers(staff_group ,  data=request.data, )
-        if serialized.is_valid():
-          serialized.save()
-          
+        serialized = StaffGroupSerializers(staff_group)
+       
         return Response(
-        {
-            'status' : True,
-            'status_code' : 201,
-            'response' : {
-                'message' : 'Staff Group a!',
-                'error_message' : None,
-                'Staff Group' : serialized.data
-            }
-        },
-        status=status.HTTP_201_CREATED
-    )  
-        
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Staff Group Create!',
+                    'error_message' : None,
+                    'Staff Group' : serialized.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        ) 
+      
+            
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_staff_group(request):
     all_staff_group= StaffGroup.objects.all()
-    serialized = EmployeSerializer(all_staff_group, many=True)
+    serialized = StaffGroupSerializers(all_staff_group, many=True)
     return Response(
         {
             'status' : 200,
             'status_code' : '200',
             'response' : {
-                'message' : 'All Employee',
+                'message' : 'All Staff Group',
                 'error_message' : None,
                 'employees' : serialized.data
             }
@@ -494,10 +490,9 @@ def get_staff_group(request):
     )
 
 @api_view(['DELETE'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def delete_staff_group(request):
     staff_id = request.data.get('staff_id', None)
-    
     if staff_id is None: 
        return Response(
             {

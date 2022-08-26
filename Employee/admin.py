@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Employee, EmployeeProfessionalInfo, EmployeePermissionSetting, EmployeeModulePermission, EmployeeMarketingPermission
+from .models import Employee, EmployeeProfessionalInfo, EmployeePermissionSetting, EmployeeModulePermission, EmployeeMarketingPermission ,StaffGroup , StaffGroupModulePermission 
 # Register your models here.
 
 @admin.register(Employee)
@@ -57,4 +57,24 @@ class EmployeeMarketingPermissionAdmin(admin.ModelAdmin):
         'access_invite_friend',
         'access_loyalty_points',
         'access_gift_cards',
+    ]
+@admin.register(StaffGroup)
+class StaffGroupAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'name',
+        'is_deleted',
+         'is_active', 
+       
+    ]
+@admin.register(StaffGroupModulePermission)
+class StaffGroupModulePermissionAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'access_reports', 
+        'access_sales', 
+        'access_inventory', 
+        'access_expenses', 
+        'access_products',
+        
     ]

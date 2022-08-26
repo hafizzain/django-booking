@@ -13,5 +13,5 @@ urlpatterns = [
     #Staff GROUP URLS 
     path('create_staff_group/', views.create_staff_group),
     path('get_staff_group/', views.get_staff_group),
-    path('delete_staff_group', views.delete_staff_group),
+    path('delete_staff_group/', views.delete_staff_group),
 ]
