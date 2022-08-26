@@ -276,7 +276,7 @@ def delete_employee(request):
 def update_employee(request): 
     # sourcery skip: avoid-builtin-shadow
         try:
-            id=request.POST.get('id', None)
+            id=request.data.get('id', None)
             employee = Employee.objects.get(id=id)
             serializer =EmployeSerializer(employee, data=request.data, partial=True)
             
