@@ -65,27 +65,27 @@ def create_employee(request):
     designation = request.data.get('designation', None)
     income_type = request.data.get('income_type', 'Hourly_Rate')
     salary = request.data.get('salary', None)
-    services = request.data.get('services', None)
+    # services = request.data.get('services', None)
     
-    #EmployeePermissionSetting
-    allow_calendar_booking= request.data.get('allow_calendar_booking', False)
-    access_calendar= request.data.get('access_calendar', False)
-    change_calendar_color= request.data.get('change_calendar_color',False)
+    # #EmployeePermissionSetting
+    # allow_calendar_booking= request.data.get('allow_calendar_booking', False)
+    # access_calendar= request.data.get('access_calendar', False)
+    # change_calendar_color= request.data.get('change_calendar_color',False)
     
     
-    #EmployeeModulePermission
-    access_reports=request.data.get('access_reports', False)
-    access_sales= request.data.get('access_sales', False)
-    access_inventory= request.data.get('access_inventory' , False)
-    access_expenses= request.data.get('access_expenses', False)
-    access_products= request.data.get('access_products', False)
+    # #EmployeeModulePermission
+    # access_reports=request.data.get('access_reports', False)
+    # access_sales= request.data.get('access_sales', False)
+    # access_inventory= request.data.get('access_inventory' , False)
+    # access_expenses= request.data.get('access_expenses', False)
+    # access_products= request.data.get('access_products', False)
     
-    #EmployeeMarketingPermission
-    access_voucher=request.data.get('access_voucher', False)
-    access_member_discount= request.data.get('access_member_discount', False)
-    access_invite_friend=request.data.get('access_invite_friend' , False)
-    access_loyalty_points=request.data.get('access_loyalty_points' , False)
-    access_gift_cards=request.data.get('access_gift_cards' , False)
+    # #EmployeeMarketingPermission
+    # access_voucher=request.data.get('access_voucher', False)
+    # access_member_discount= request.data.get('access_member_discount', False)
+    # access_invite_friend=request.data.get('access_invite_friend' , False)
+    # access_loyalty_points=request.data.get('access_loyalty_points' , False)
+    # access_gift_cards=request.data.get('access_gift_cards' , False)
     
     business_id= request.data.get('business', None)    
     country_id = request.data.get('country', None)   
@@ -178,47 +178,43 @@ def create_employee(request):
         is_active=True
     )
     if not to_present :
-        employee.ending_date = ending_date
+        # employee.ending_date = ending_date
+        pass
     else:
         employee.to_present = True 
     employee.save()
+    data = {}
+    employee_serialized = EmployeSerializer(employee , context={'request' : request})
+    data.update(employee_serialized.data)
 
-    EmployeeProfessionalInfo.objects.create(
-        employee=employee,
-        designation= designation,
-        income_type= income_type,
-        salary= salary,
-        #services= services,
-    )
+    errors =[]
+
+    employee_p_info = EmployeeProfessionalInfo.objects.create(employee=employee)
+    employee_mp = EmployeeModulePermission.objects.create(employee=employee)
+    employee_p_setting = EmployeePermissionSetting.objects.create(employee = employee)
+    employee_marketing = EmployeeMarketingPermission.objects.create(employee= employee)
     
-    EmployeePermissionSetting.objects.create(
-        employee = employee,
-        allow_calendar_booking =allow_calendar_booking, 
-        access_calendar= access_calendar,
-        change_calendar_color = change_calendar_color
-    )
+    serialized = EmployeInformationsSerializer(employee_p_info, data=request.data)
+    if serialized.is_valid():
+        serialized.save()
+        data.update(serialized.data)
 
-    EmployeeModulePermission.objects.create(
-        employee=employee,
-        access_reports=access_reports,
-        access_sales=access_sales,
-        access_inventory=access_inventory,
-        access_expenses=access_expenses,
-        access_products=access_products,       
-        
-    )
-    
-    #EmployeeMarketingSerializers
-    EmployeeMarketingPermission.objects.create(
-        employee= employee,
-        access_voucher=access_voucher,
-        access_member_discount= access_member_discount,
-        access_invite_friend= access_invite_friend,
-        access_loyalty_points= access_loyalty_points,
-        access_gift_cards= access_gift_cards,
-    )
+    serialized = EmployPermissionSerializer(employee_p_setting, data=request.data)
+    if serialized.is_valid():
+        serialized.save()
+        data.update(serialized.data)
 
-    serialized = EmployeSerializer(employee , context={'request' : request})
+    serialized = EmployeModulesSerializer(employee_mp, data=request.data)
+    if serialized.is_valid():
+        serialized.save()
+        data.update(serialized.data)
+
+    serialized = EmployeeMarketingSerializers(employee_marketing, data=request.data)
+    if serialized.is_valid():
+        serialized.save()
+        data.update(serialized.data)
+
+
     return Response(
         {
             'status' : True,
@@ -226,7 +222,7 @@ def create_employee(request):
             'response' : {
                 'message' : 'Employees Added!',
                 'error_message' : None,
-                'employees' : serialized.data
+                'employees' : data
             }
         },
         status=status.HTTP_201_CREATED
@@ -288,7 +284,7 @@ def delete_employee(request):
 @permission_classes([IsAuthenticated])
 def update_employee(request): 
     # sourcery skip: avoid-builtin-shadow
-        id = request.data.get('id')
+        id = request.data.get('id', None)
         if id is None:
             return Response(
             {
