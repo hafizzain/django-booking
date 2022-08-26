@@ -442,7 +442,7 @@ def login(request):
                 'status_code' : StatusCodes.USER_ACCOUNT_INACTIVE_4009,
                 'status_code_text' : 'USER_ACCOUNT_INACTIVE_4009',
                 'response' : {
-                    'message' : 'Your account is inactive! Please verify.',
+                    'message' : 'This account is inactive! Please verify.',
                     'error_message' : 'Account is not active'
                 }
             },
@@ -464,32 +464,32 @@ def login(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    # elif not user.is_email_verified:
-    #     return Response(
-    #         {
-    #             'status' : False,
-    #             'status_code' : StatusCodes.USER_EMAIL_NOT_VERIFIED_4010,
-    #             'status_code_text' : 'USER_EMAIL_NOT_VERIFIED_4010',
-    #             'response' : {
-    #                 'message' : 'Your Email is not verified.',
-    #                 'error_message' : 'User Email is not verified yet'
-    #             }
-    #         },
-    #         status=status.HTTP_404_NOT_FOUND
-    #     )
-    elif not user.is_mobile_verified:
+    elif not user.is_email_verified:
         return Response(
             {
                 'status' : False,
-                'status_code' : StatusCodes.USER_PHONE_NUMBER_NOT_VERIFIED_4011,
-                'status_code_text' : 'USER_PHONE_NUMBER_NOT_VERIFIED_4011',
+                'status_code' : StatusCodes.USER_EMAIL_NOT_VERIFIED_4010,
+                'status_code_text' : 'USER_EMAIL_NOT_VERIFIED_4010',
                 'response' : {
-                    'message' : 'Your Mobile Number is not verified',
-                    'error_message' : 'Users"s mobile number is not verified'
+                    'message' : 'Your Email is not verified.',
+                    'error_message' : 'User Email is not verified yet'
                 }
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    # elif not user.is_mobile_verified:
+    #     return Response(
+    #         {
+    #             'status' : False,
+    #             'status_code' : StatusCodes.USER_PHONE_NUMBER_NOT_VERIFIED_4011,
+    #             'status_code_text' : 'USER_PHONE_NUMBER_NOT_VERIFIED_4011',
+    #             'response' : {
+    #                 'message' : 'Your Mobile Number is not verified',
+    #                 'error_message' : 'Users"s mobile number is not verified'
+    #             }
+    #         },
+    #         status=status.HTTP_404_NOT_FOUND
+    #     )
     elif user.is_blocked:
         return Response(
             {
