@@ -284,7 +284,9 @@ def update_employee(request):
         try:
             employee = Employee.objects.get(id=id)
             serializer =EmployeSerializer(employee, data=request.data, partial=True)
+            
             Employe_Informations= EmployeeProfessionalInfo.objects.get(employee=employee)
+            serializer_info= EmployeInformationsSerializer(employeinformations,  data=request.data, partial=True)
             
             if serializer.is_valid():
                 serializer.save()
