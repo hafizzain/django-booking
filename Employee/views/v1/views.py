@@ -43,7 +43,6 @@ def get_Employees(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_employee(request):
-    # sourcery skip: avoid-builtin-shadow
     user = request.user     
     
     full_name= request.data.get('full_name', None)
@@ -53,19 +52,18 @@ def create_employee(request):
     
     mobile_number= request.data.get('mobile_number', None)    
     dob= request.data.get('dob', None)
-    gender = request.data.get('gender' , None)
+    gender = request.data.get('gender' , 'Male')
     
-
     postal_code= request.data.get('postal_code' , None)
     address= request.data.get('address' , None)
     joining_date = request.data.get('joining_date', None)
-    to_present = request.data.get('to_present', None)
+    to_present = request.data.get('to_present', False)
     ending_date= request.data.get('ending_date',None)
     
     
     #UserInformation
     designation = request.data.get('designation', None)
-    income_type = request.data.get('income_type', None)
+    income_type = request.data.get('income_type', 'Hourly_Rate')
     salary = request.data.get('salary', None)
     services = request.data.get('services', None)
     
@@ -95,7 +93,7 @@ def create_employee(request):
     city_id = request.data.get('city', None)
    
     if not all([
-        business_id, full_name, image ,employee_id, email, mobile_number, dob ,gender, country_id , state_id ,city_id ,postal_code ,address ,joining_date, to_present, ending_date ]): 
+        business_id, full_name, image ,employee_id, email, mobile_number, dob ,gender, country_id , state_id ,city_id ,postal_code ,address ,joining_date, designation, income_type, salary ]) or ( not to_present and ending_date is None): 
        return Response(
             {
                 'status' : False,
@@ -105,8 +103,7 @@ def create_employee(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'All fields are required.',
                     'fields' : [
-                        
-                        'business_id',
+                        'business',
                         'employee_id',
                         'full_name',
                         'image',
@@ -114,36 +111,55 @@ def create_employee(request):
                         'mobile_number', 
                         'dob', 
                         'gender', 
-                        'country', 
+                        'country',
                         'state', 
                         'postal_code', 
                         'address' ,
                         'joining_date', 
                         'to_present', 
-                        'ending_date',                       
+                        'ending_date',  
+                        'designation',
+                        'income_type',
+                        'salary',
                     ]
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    business=Business.objects.get(id=business_id)
     try:
-       country = Country.objects.get(id=country_id)
-    except Country.DoesNotExist:
-       country = None   
-        
+        business=Business.objects.get(id=business_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : True,
+                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                'status_code_text' :'BUSINESS_NOT_FOUND_4015' ,
+                'response' : {
+                    'message' : 'Business not found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
     try:
-       state= State.objects.get(id=state_id)
-    except State.DoesNotExist:
-        state = None
-    
-    try:
+        country = Country.objects.get(id=country_id)
+        state= State.objects.get(id=state_id)
         city = City.objects.get(id=city_id)
-    except City.DoesNotExist:
-        city = None    
-    
+    except Exception as err:
+        return Response(
+            {
+                'status' : True,
+                'status_code' : StatusCodes.INVALID_COUNTRY_STATE_CITY_4021,
+                'status_code_text' :'INVALID_COUNTRY_STATE_CITY_4021' ,
+                'response' : {
+                    'message' : 'Invalid Country, State, City not found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
     employee= Employee.objects.create(
-        # id=id,
         user=user,
         business=business,
         full_name = full_name,
@@ -159,31 +175,30 @@ def create_employee(request):
         postal_code = postal_code,
         address=address,
         joining_date= joining_date,
-        to_present = to_present,
-        ending_date= ending_date,
+        is_active=True
     )
-        
-    #EmployeInformations
-    employeinformations = EmployeeProfessionalInfo.objects.create(
+    if not to_present :
+        employee.ending_date = ending_date
+    else:
+        employee.to_present = True 
+    employee.save()
+
+    EmployeeProfessionalInfo.objects.create(
         employee=employee,
         designation= designation,
         income_type= income_type,
         salary= salary,
         #services= services,
     )
-    #EmployeInformations= EmployeInformationsSerializer(employeinformations)
     
-    #EmployeePermissionSetting
-    employeePermission = EmployeePermissionSetting.objects.create(
+    EmployeePermissionSetting.objects.create(
         employee = employee,
         allow_calendar_booking =allow_calendar_booking, 
         access_calendar= access_calendar,
         change_calendar_color = change_calendar_color
     )
-    #employeePerSetting= EmployPermissionSerializer(employeePermission)
-    
-    #EmployeeModulePermission
-    employeModulePermission = EmployeeModulePermission.objects.create(
+
+    EmployeeModulePermission.objects.create(
         employee=employee,
         access_reports=access_reports,
         access_sales=access_sales,
@@ -192,18 +207,17 @@ def create_employee(request):
         access_products=access_products,       
         
     )
-   # ModulesSerializer= EmployeModulesSerializer(employeModulePermission)
     
     #EmployeeMarketingSerializers
-    EmployeeMarketing = EmployeeMarketingPermission.objects.create(
+    EmployeeMarketingPermission.objects.create(
         employee= employee,
         access_voucher=access_voucher,
         access_member_discount= access_member_discount,
         access_invite_friend= access_invite_friend,
         access_loyalty_points= access_loyalty_points,
         access_gift_cards= access_gift_cards,
-        
     )
+
     serialized = EmployeSerializer(employee , context={'request' : request})
     return Response(
         {

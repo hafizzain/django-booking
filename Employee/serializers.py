@@ -5,10 +5,10 @@ from .models import( Employee, EmployeeProfessionalInfo ,
                StaffGroup, StaffGroupModulePermission
 )
 class EmployeSerializer(serializers.ModelSerializer):
-    employee_info = serializers.SerializerMethodField()
-    permissions = serializers.SerializerMethodField()
-    module_permissions =serializers.SerializerMethodField()
-    marketing_permissions= serializers.SerializerMethodField()
+    employee_info = serializers.SerializerMethodField(read_only=True)
+    permissions = serializers.SerializerMethodField(read_only=True)
+    module_permissions =serializers.SerializerMethodField(read_only=True)
+    marketing_permissions= serializers.SerializerMethodField(read_only=True)
     
     def get_employee_info(self, obj):
         try:
@@ -19,28 +19,26 @@ class EmployeSerializer(serializers.ModelSerializer):
     #EmployeePermission
     def get_permissions(self, obj):
         try:
-            Permission = EmployeePermissionSetting.objects.get(employee=obj)
+            Permission, created = EmployeePermissionSetting.objects.get_or_create(employee=obj)
             return EmployPermissionSerializer(Permission).data
         except EmployeePermissionSetting.DoesNotExist:
             return None
     #EmployeeModulePermission 
     def get_module_permissions(self, obj):
         try: 
-            ModulePermission = EmployeeModulePermission.objects.get(employee=obj)
+            ModulePermission, created = EmployeeModulePermission.objects.get_or_create(employee=obj)
             return EmployeModulesSerializer(ModulePermission).data
         except EmployeeModulePermission.DoesNotExist:
             return None
     #EmployeeMarketingPermission
     def get_marketing_permissions(self, obj):
         try:
-            MarketingPermission = EmployeeMarketingPermission.objects.get(employee=obj)
+            MarketingPermission, created = EmployeeMarketingPermission.objects.get_or_create(employee=obj)
             return EmployeeMarketingSerializers(MarketingPermission).data
         except EmployeeMarketingPermission.DoesNotExist:
             return None       
 
     class Meta:
-        #EmployeeProfessional
-       
         model = Employee
         fields = [
                 'id', 
@@ -65,7 +63,7 @@ class EmployeSerializer(serializers.ModelSerializer):
                 'permissions',       
                 'module_permissions',
                 'marketing_permissions',
-                  ]
+            ]
         
         
 class EmployeInformationsSerializer(serializers.ModelSerializer):
