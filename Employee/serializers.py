@@ -5,38 +5,38 @@ from .models import( Employee, EmployeeProfessionalInfo ,
                StaffGroup, StaffGroupModulePermission
 )
 class EmployeSerializer(serializers.ModelSerializer):
-    employee_info = serializers.SerializerMethodField(read_only=True)
-    permissions = serializers.SerializerMethodField(read_only=True)
-    module_permissions =serializers.SerializerMethodField(read_only=True)
-    marketing_permissions= serializers.SerializerMethodField(read_only=True)
+    # employee_info = serializers.SerializerMethodField(read_only=True)
+    # permissions = serializers.SerializerMethodField(read_only=True)
+    # module_permissions =serializers.SerializerMethodField(read_only=True)
+    # marketing_permissions= serializers.SerializerMethodField(read_only=True)
     
-    def get_employee_info(self, obj):
-        try:
-            professional = EmployeeProfessionalInfo.objects.get(employee=obj)
-            return EmployeInformationsSerializer(professional).data
-        except EmployeeProfessionalInfo.DoesNotExist:
-            return None
-    #EmployeePermission
-    def get_permissions(self, obj):
-        try:
-            Permission, created = EmployeePermissionSetting.objects.get_or_create(employee=obj)
-            return EmployPermissionSerializer(Permission).data
-        except EmployeePermissionSetting.DoesNotExist:
-            return None
-    #EmployeeModulePermission 
-    def get_module_permissions(self, obj):
-        try: 
-            ModulePermission, created = EmployeeModulePermission.objects.get_or_create(employee=obj)
-            return EmployeModulesSerializer(ModulePermission).data
-        except EmployeeModulePermission.DoesNotExist:
-            return None
-    #EmployeeMarketingPermission
-    def get_marketing_permissions(self, obj):
-        try:
-            MarketingPermission, created = EmployeeMarketingPermission.objects.get_or_create(employee=obj)
-            return EmployeeMarketingSerializers(MarketingPermission).data
-        except EmployeeMarketingPermission.DoesNotExist:
-            return None       
+    # def get_employee_info(self, obj):
+    #     try:
+    #         professional = EmployeeProfessionalInfo.objects.get(employee=obj)
+    #         return EmployeInformationsSerializer(professional).data
+    #     except EmployeeProfessionalInfo.DoesNotExist:
+    #         return None
+    # #EmployeePermission
+    # def get_permissions(self, obj):
+    #     try:
+    #         Permission, created = EmployeePermissionSetting.objects.get_or_create(employee=obj)
+    #         return EmployPermissionSerializer(Permission).data
+    #     except EmployeePermissionSetting.DoesNotExist:
+    #         return None
+    # #EmployeeModulePermission 
+    # def get_module_permissions(self, obj):
+    #     try: 
+    #         ModulePermission, created = EmployeeModulePermission.objects.get_or_create(employee=obj)
+    #         return EmployeModulesSerializer(ModulePermission).data
+    #     except EmployeeModulePermission.DoesNotExist:
+    #         return None
+    # #EmployeeMarketingPermission
+    # def get_marketing_permissions(self, obj):
+    #     try:
+    #         MarketingPermission, created = EmployeeMarketingPermission.objects.get_or_create(employee=obj)
+    #         return EmployeeMarketingSerializers(MarketingPermission).data
+    #     except EmployeeMarketingPermission.DoesNotExist:
+    #         return None       
 
     class Meta:
         model = Employee
@@ -59,10 +59,10 @@ class EmployeSerializer(serializers.ModelSerializer):
                 'joining_date', 
                 'to_present', 
                 'ending_date',  
-                'employee_info',
-                'permissions',       
-                'module_permissions',
-                'marketing_permissions',
+                # 'employee_info',
+                # 'permissions',       
+                # 'module_permissions',
+                # 'marketing_permissions',
             ]
         
         

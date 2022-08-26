@@ -185,6 +185,7 @@ def create_employee(request):
     employee.save()
     employee_serialized = EmployeSerializer(employee , context={'request' : request})
 
+    errors =[]
 
     employee_p_info = EmployeeProfessionalInfo.objects.create(employee=employee)
     employee_mp = EmployeeModulePermission.objects.create(employee=employee)
@@ -195,22 +196,33 @@ def create_employee(request):
     if serialized.is_valid():
         serialized.save()
         employee_serialized.update(serialized)
+    else:
+        errors.append(serialized.errors)
+        errors.append(serialized.error_messages)
 
     serialized = EmployPermissionSerializer(employee_p_setting, data=request.data)
     if serialized.is_valid():
         serialized.save()
         employee_serialized.update(serialized)
+    else:
+        errors.append(serialized.errors)
+        errors.append(serialized.error_messages)
 
     serialized = EmployeModulesSerializer(employee_mp, data=request.data)
     if serialized.is_valid():
         serialized.save()
         employee_serialized.update(serialized)
+    else:
+        errors.append(serialized.errors)
+        errors.append(serialized.error_messages)
 
     serialized = EmployeeMarketingSerializers(employee_marketing, data=request.data)
     if serialized.is_valid():
         serialized.save()
         employee_serialized.update(serialized)
-
+    else:
+        errors.append(serialized.errors)
+        errors.append(serialized.error_messages)
 
 
     return Response(
