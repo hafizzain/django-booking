@@ -41,52 +41,27 @@ def get_Employees(request):
 @permission_classes([IsAuthenticated])
 def create_employee(request):
     # sourcery skip: avoid-builtin-shadow
-    id = request.data.get('id' , None)
-    user = request.user 
-    
-    business_id= request.data.get('business', None)
-    business=Business.objects.get(id=business_id)
-    print(business)
-    
+    user = request.user     
     
     full_name= request.data.get('full_name', None)
     employee_id= request.data.get('employee_id', None)
     email= request.data.get('email', None)
     
     
-    mobile_number= request.data.get('mobile_number', None)
-    email_verified= request.data.get('is_email_verified', False)
-    mobile_verified= request.data.get('is_mobile_verified', False)
-    
+    mobile_number= request.data.get('mobile_number', None)    
     dob= request.data.get('dob', None)
     gender = request.data.get('gender' , None)
     
-    country_id = request.data.get('country', None)
-    try:
-       country = Country.objects.get(id=country_id)
-    except Country.DoesNotExist:
-       country = None 
-    state_id = request.data.get('state', None)
-    try:
-       state= State.objects.get(id=state_id)
-    except State.DoesNotExist:
-        state = None
-        
-    city_id = request.data.get('city', None)
-    try:
-        city = City.objects.get(id=city_id)
-    except City.DoesNotExist:
-        city = None    
     postal_code= request.data.get('postal_code' , None)
     address= request.data.get('address' , None)
     joining_date = request.data.get('joining_date', None)
     to_present = request.data.get('to_present', None)
     ending_date= request.data.get('ending_date',None)
     
-    is_deleted= request.data.get('is_deleted' , None)
-    is_blocked=request.data.get('is_blocked', None)
-    created_at = request.data.get('created_at', None)
-    updated_at = request.data.get('updated_at', None)
+    # is_deleted= request.data.get('is_deleted' , None)
+    # is_blocked=request.data.get('is_blocked', None)
+    # created_at = request.data.get('created_at', None)
+    # updated_at = request.data.get('updated_at', None)
     
     #UserInformation
     designation = request.data.get('designation')
@@ -126,9 +101,9 @@ def create_employee(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'All fields are required.',
                     'fields' : [
-                        'business id',
-                        'full Name',
-                        'employee id',
+                        'business_id',
+                        'full_name',
+                        'employee_id',
                         'email',
                         'mobile number', 
                         'Date of birth', 
@@ -147,6 +122,24 @@ def create_employee(request):
             status=status.HTTP_400_BAD_REQUEST
         )
             
+    business_id= request.data.get('business', None)
+    business=Business.objects.get(id=business_id)
+    country_id = request.data.get('country', None)
+    try:
+       country = Country.objects.get(id=country_id)
+    except Country.DoesNotExist:
+       country = None 
+    state_id = request.data.get('state', None)
+    try:
+       state= State.objects.get(id=state_id)
+    except State.DoesNotExist:
+        state = None
+        
+    city_id = request.data.get('city', None)
+    try:
+        city = City.objects.get(id=city_id)
+    except City.DoesNotExist:
+        city = None    
     
     employee= Employee.objects.create(
         # id=id,
@@ -280,13 +273,15 @@ def delete_employee(request):
     
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def update_employee(request):
+def update_employee(request): 
+    # sourcery skip: avoid-builtin-shadow
         try:
+            id=request.POST.get('id', None)
             employee = Employee.objects.get(id=id)
             serializer =EmployeSerializer(employee, data=request.data, partial=True)
             
             Employe_Informations= EmployeeProfessionalInfo.objects.get(employee=employee)
-            serializer_info= EmployeInformationsSerializer(employeinformations,  data=request.data, partial=True)
+            serializer_info= EmployeInformationsSerializer(Employe_Informations,  data=request.data, partial=True)
             
             if serializer.is_valid():
                 serializer.save()
