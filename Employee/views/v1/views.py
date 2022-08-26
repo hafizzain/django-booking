@@ -183,7 +183,9 @@ def create_employee(request):
     else:
         employee.to_present = True 
     employee.save()
+    data = {}
     employee_serialized = EmployeSerializer(employee , context={'request' : request})
+    data.update(employee_serialized.data)
 
     errors =[]
 
@@ -195,7 +197,7 @@ def create_employee(request):
     serialized = EmployeInformationsSerializer(employee_p_info, data=request.data)
     if serialized.is_valid():
         serialized.save()
-        employee_serialized.update(serialized.data)
+        data.update(serialized.data)
     else:
         errors.append(serialized.errors)
         errors.append(serialized.error_messages)
@@ -203,7 +205,7 @@ def create_employee(request):
     serialized = EmployPermissionSerializer(employee_p_setting, data=request.data)
     if serialized.is_valid():
         serialized.save()
-        employee_serialized.update(serialized.data)
+        data.update(serialized.data)
     else:
         errors.append(serialized.errors)
         errors.append(serialized.error_messages)
@@ -211,7 +213,7 @@ def create_employee(request):
     serialized = EmployeModulesSerializer(employee_mp, data=request.data)
     if serialized.is_valid():
         serialized.save()
-        employee_serialized.update(serialized.data)
+        data.update(serialized.data)
     else:
         errors.append(serialized.errors)
         errors.append(serialized.error_messages)
@@ -219,7 +221,7 @@ def create_employee(request):
     serialized = EmployeeMarketingSerializers(employee_marketing, data=request.data)
     if serialized.is_valid():
         serialized.save()
-        employee_serialized.update(serialized.data)
+        data.update(serialized.data)
     else:
         errors.append(serialized.errors)
         errors.append(serialized.error_messages)
@@ -232,7 +234,7 @@ def create_employee(request):
             'response' : {
                 'message' : 'Employees Added!',
                 'error_message' : errors,
-                'employees' : employee_serialized.data
+                'employees' : data
             }
         },
         status=status.HTTP_201_CREATED
