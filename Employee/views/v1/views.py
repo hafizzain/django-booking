@@ -178,7 +178,8 @@ def create_employee(request):
         is_active=True
     )
     if not to_present :
-        employee.ending_date = ending_date
+        # employee.ending_date = ending_date
+        pass
     else:
         employee.to_present = True 
     employee.save()
