@@ -95,7 +95,15 @@ class StaffGroupSerializers(serializers.ModelSerializer):
     # def get_employe(self, obj):
     #     employe_id = self.context.get('employee')
     #     return employee_id
-        
+    
+    staff_permission = serializers.SerializerMethodField()
+    
+    def get_staff_permission(self, obj):
+        try:
+            permission = StaffGroupModulePermission.objects.get(staff_group=obj)
+            return StaffpermisionSerializers(permission).data
+        except StaffGroupModulePermission.DoesNotExist:
+            return None    
     
     class Meta:
         model = StaffGroup
@@ -104,11 +112,14 @@ class StaffGroupSerializers(serializers.ModelSerializer):
             'user',
             'business',
             'name', 
+            'is_active',
+            'staff_permission', 
             'employees',
-            'is_active'
                   ]
         
-class StaffermisionSerializers(serializers.ModelSerializer):
+class StaffpermisionSerializers(serializers.ModelSerializer):
+    
+    
     class Meta:
         model = StaffGroupModulePermission
-        fields = '__all__'  
+        fields ='__all__'
