@@ -231,7 +231,7 @@ def create_employee(request):
             'status_code' : 201,
             'response' : {
                 'message' : 'Employees Added!',
-                'error_message' : None,
+                'error_message' : errors,
                 'employees' : employee_serialized.data
             }
         },
