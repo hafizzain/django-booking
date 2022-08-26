@@ -288,7 +288,6 @@ def update_employee(request):
         id = request.data.get('id')
         employee = Employee.objects.get(id=id)
         try:
-           
             serializer =EmployeSerializer(employee, data=request.data, partial=True)
             
             Employe_Informations= EmployeeProfessionalInfo.objects.get(employee=id)
