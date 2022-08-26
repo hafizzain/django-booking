@@ -1,14 +1,14 @@
 from rest_framework import serializers
 from .models import( Employee, EmployeeProfessionalInfo ,
                EmployeePermissionSetting, EmployeeModulePermission 
-               , EmployeeMarketingPermission
+               , EmployeeMarketingPermission,
+               StaffGroup, StaffGroupModulePermission
 )
 class EmployeSerializer(serializers.ModelSerializer):
     employee_info = serializers.SerializerMethodField()
     permissions = serializers.SerializerMethodField()
     module_permissions =serializers.SerializerMethodField()
     marketing_permissions= serializers.SerializerMethodField()
-    
     
     def get_employee_info(self, obj):
         try:
@@ -50,6 +50,7 @@ class EmployeSerializer(serializers.ModelSerializer):
                 'employee_id',
                 'email',
                 'mobile_number', 
+                'image',
                 'dob', 
                 'gender', 
                 'country', 
@@ -87,3 +88,13 @@ class EmployeeMarketingSerializers(serializers.ModelSerializer):
     class Meta:
         model = EmployeeMarketingPermission
         fields = '__all__'
+        
+class StaffGroupSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = StaffGroup
+        fields = '__all__'
+        
+class StaffermisionSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = StaffGroupModulePermission
+        fields = '__all__'  

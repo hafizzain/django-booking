@@ -1,14 +1,17 @@
 from django.shortcuts import render
 from Employee.models import( Employee , EmployeeProfessionalInfo ,
                         EmployeePermissionSetting,  EmployeeModulePermission
-                        , EmployeeMarketingPermission
+                        , EmployeeMarketingPermission , StaffGroup 
+                        , StaffGroupModulePermission
                         )
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from Employee.serializers import( EmployeSerializer , EmployeInformationsSerializer
                           , EmployPermissionSerializer,  EmployeModulesSerializer
-                          ,  EmployeeMarketingSerializers
+                          ,  EmployeeMarketingSerializers, StaffGroupSerializers , 
+                          StaffermisionSerializers
+                          
                                  )
 from rest_framework import status
 from Business.models import Business
@@ -46,7 +49,7 @@ def create_employee(request):
     full_name= request.data.get('full_name', None)
     employee_id= request.data.get('employee_id', None)
     email= request.data.get('email', None)
-    
+    image = request.data.get('image', None)
     
     mobile_number= request.data.get('mobile_number', None)    
     dob= request.data.get('dob', None)
@@ -58,10 +61,10 @@ def create_employee(request):
     to_present = request.data.get('to_present', None)
     ending_date= request.data.get('ending_date',None)
     
-    # is_deleted= request.data.get('is_deleted' , None)
-    # is_blocked=request.data.get('is_blocked', None)
-    # created_at = request.data.get('created_at', None)
-    # updated_at = request.data.get('updated_at', None)
+    is_deleted= request.data.get('is_deleted' , None)
+    is_blocked=request.data.get('is_blocked', None)
+    created_at = request.data.get('created_at', None)
+    updated_at = request.data.get('updated_at', None)
     
     #UserInformation
     designation = request.data.get('designation')
@@ -88,10 +91,20 @@ def create_employee(request):
     access_invite_friend=request.data.get('access_invite_friend')
     access_loyalty_points=request.data.get('access_loyalty_points')
     access_gift_cards=request.data.get('access_gift_cards')
+    business_id= request.data.get('business', None)
+    business=Business.objects.get(id=business_id)
+    
+    country_id = request.data.get('country', None)
+   
+    state_id = request.data.get('state', None)
+   
+        
+    city_id = request.data.get('city', None)
+   
     
     
     if not all([
-        business_id, full_name ,employee_id, email, mobile_number, dob ,gender, country , state ,city ,postal_code ,address ,joining_date, to_present, ending_date ]): 
+        business_id, full_name, image ,employee_id, email, mobile_number, dob ,gender, country_id , state_id ,city_id ,postal_code ,address ,joining_date, to_present, ending_date ]): 
        return Response(
             {
                 'status' : False,
@@ -101,41 +114,37 @@ def create_employee(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'All fields are required.',
                     'fields' : [
+                        
                         'business_id',
-                        'full_name',
                         'employee_id',
+                        'full_name',
+                        'image',
                         'email',
-                        'mobile number', 
-                        'Date of birth', 
-                        'Gender', 
-                        'Country', 
-                        'State', 
-                        'city', 
-                        'postal code', 
+                        'mobile_number', 
+                        'dob', 
+                        'gender', 
+                        'country', 
+                        'state', 
+                        'postal_code', 
                         'address' ,
                         'joining_date', 
                         'to_present', 
-                        'ending_date'                         
+                        'ending_date',                       
                     ]
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-            
-    business_id= request.data.get('business', None)
-    business=Business.objects.get(id=business_id)
-    country_id = request.data.get('country', None)
     try:
        country = Country.objects.get(id=country_id)
     except Country.DoesNotExist:
-       country = None 
-    state_id = request.data.get('state', None)
+       country = None   
+        
     try:
        state= State.objects.get(id=state_id)
     except State.DoesNotExist:
         state = None
-        
-    city_id = request.data.get('city', None)
+    
     try:
         city = City.objects.get(id=city_id)
     except City.DoesNotExist:
@@ -146,6 +155,7 @@ def create_employee(request):
         user=user,
         business=business,
         full_name = full_name,
+        image= image,
         employee_id= employee_id,
         email= email,
         mobile_number= mobile_number,
@@ -202,7 +212,7 @@ def create_employee(request):
         access_gift_cards= access_gift_cards,
         
     )
-    serialized = EmployeSerializer(employee)
+    serialized = EmployeSerializer(employee , context={'request' : request})
     return Response(
         {
             'status' : True,
@@ -275,13 +285,37 @@ def delete_employee(request):
 @permission_classes([IsAuthenticated])
 def update_employee(request): 
     # sourcery skip: avoid-builtin-shadow
+        id = request.data.get('id')
+        employee = Employee.objects.get(id=id)
         try:
-            id=request.POST.get('id', None)
-            employee = Employee.objects.get(id=id)
+           
             serializer =EmployeSerializer(employee, data=request.data, partial=True)
             
-            Employe_Informations= EmployeeProfessionalInfo.objects.get(employee=employee)
+            Employe_Informations= EmployeeProfessionalInfo.objects.get(employee=id)
             serializer_info= EmployeInformationsSerializer(Employe_Informations,  data=request.data, partial=True)
+            if serializer_info.is_valid():
+               serializer_info.save()
+            else:
+                 return Response({"error"},status=status.HTTP_400_BAD_REQUEST)
+            
+            permission= EmployeePermissionSetting.objects.get(employee=employee)
+            serializer_permision= EmployPermissionSerializer(permission,  data=request.data, partial=True)
+            if serializer_permision.is_valid():
+               serializer_permision.save()
+            
+            Module_Permission= EmployeeModulePermission.objects.get(employee=employee)
+            serializer_Module = EmployeModulesSerializer(Module_Permission,  data=request.data, partial=True)
+            if serializer_Module.is_valid():
+               serializer_Module.save()
+            else:
+                 return Response({"error"},status=status.HTTP_400_BAD_REQUEST)
+            
+                 
+            Marketing_Permission= EmployeeMarketingPermission.objects.get(employee=employee)
+            serializer_Marketing= EmployeeMarketingSerializers(Marketing_Permission,  data=request.data, partial=True)
+            if serializer_Marketing.is_valid():
+                serializer_Marketing.save()
+            
             
             if serializer.is_valid():
                 serializer.save()
@@ -291,3 +325,62 @@ def update_employee(request):
         except Exception as e:
             return Response({"error":repr(e)},status=status.HTTP_400_BAD_REQUEST)
     
+    
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_staff(request):
+        user = request.user     
+        business_id= request.data.get('business', None)
+        
+        name = request.data.get('name', None)
+        employee_id = request.data.get('employee', None)
+        
+        is_active= request.data.get('is_active' , False)
+        
+        if not all([ business_id, name, employee_id ]):
+              return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business_id',
+                          'name',
+                          'employee_id',
+                          
+                            ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+        business=Business.objects.get(id=business_id)
+        employees= Employee.objects.get(id=employee_id)
+        
+        staff_group= StaffGroup.objects.create(
+            user=user,
+            business= business, 
+            name= name,
+            employees= employees,
+            
+        )
+        serialized = StaffGroupSerializers(staff_group, context={'request' : request})
+   
+        return Response(
+        {
+            'status' : True,
+            'status_code' : 201,
+            'response' : {
+                'message' : 'Staff Group a!',
+                'error_message' : None,
+                'brand' : serialized.data
+            }
+        },
+        status=status.HTTP_201_CREATED
+    )
+        
+        
+
