@@ -55,54 +55,45 @@ def create_employee(request):
     dob= request.data.get('dob', None)
     gender = request.data.get('gender' , None)
     
+
     postal_code= request.data.get('postal_code' , None)
     address= request.data.get('address' , None)
     joining_date = request.data.get('joining_date', None)
     to_present = request.data.get('to_present', None)
     ending_date= request.data.get('ending_date',None)
     
-    is_deleted= request.data.get('is_deleted' , None)
-    is_blocked=request.data.get('is_blocked', None)
-    created_at = request.data.get('created_at', None)
-    updated_at = request.data.get('updated_at', None)
     
     #UserInformation
-    designation = request.data.get('designation')
-    income_type = request.data.get('income_type')
-    salary = request.data.get('salary')
-    services = request.data.get('services')
+    designation = request.data.get('designation', None)
+    income_type = request.data.get('income_type', None)
+    salary = request.data.get('salary', None)
+    services = request.data.get('services', None)
     
     #EmployeePermissionSetting
-    allow_calendar_booking= request.data.get('allow_calendar_booking')
-    access_calendar= request.data.get('access_calendar')
-    change_calendar_color= request.data.get('change_calendar_color')
+    allow_calendar_booking= request.data.get('allow_calendar_booking', False)
+    access_calendar= request.data.get('access_calendar', False)
+    change_calendar_color= request.data.get('change_calendar_color',False)
     
     
     #EmployeeModulePermission
-    access_reports=request.data.get('access_reports')
-    access_sales= request.data.get('access_sales')
-    access_inventory= request.data.get('access_inventory')
-    access_expenses= request.data.get('access_expenses')
-    access_products= request.data.get('access_products')
+    access_reports=request.data.get('access_reports', False)
+    access_sales= request.data.get('access_sales', False)
+    access_inventory= request.data.get('access_inventory' , False)
+    access_expenses= request.data.get('access_expenses', False)
+    access_products= request.data.get('access_products', False)
     
     #EmployeeMarketingPermission
-    access_voucher=request.data.get('access_voucher')
-    access_member_discount= request.data.get('access_member_discount')
-    access_invite_friend=request.data.get('access_invite_friend')
-    access_loyalty_points=request.data.get('access_loyalty_points')
-    access_gift_cards=request.data.get('access_gift_cards')
-    business_id= request.data.get('business', None)
-    business=Business.objects.get(id=business_id)
+    access_voucher=request.data.get('access_voucher', False)
+    access_member_discount= request.data.get('access_member_discount', False)
+    access_invite_friend=request.data.get('access_invite_friend' , False)
+    access_loyalty_points=request.data.get('access_loyalty_points' , False)
+    access_gift_cards=request.data.get('access_gift_cards' , False)
     
-    country_id = request.data.get('country', None)
-   
-    state_id = request.data.get('state', None)
-   
-        
+    business_id= request.data.get('business', None)    
+    country_id = request.data.get('country', None)   
+    state_id = request.data.get('state', None)         
     city_id = request.data.get('city', None)
    
-    
-    
     if not all([
         business_id, full_name, image ,employee_id, email, mobile_number, dob ,gender, country_id , state_id ,city_id ,postal_code ,address ,joining_date, to_present, ending_date ]): 
        return Response(
@@ -135,6 +126,7 @@ def create_employee(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    business=Business.objects.get(id=business_id)
     try:
        country = Country.objects.get(id=country_id)
     except Country.DoesNotExist:
@@ -291,36 +283,93 @@ def update_employee(request):
            
             serializer =EmployeSerializer(employee, data=request.data, partial=True)
             
-            Employe_Informations= EmployeeProfessionalInfo.objects.get(employee=id)
+            Employe_Informations= EmployeeProfessionalInfo.objects.get(employee=employee)
             serializer_info= EmployeInformationsSerializer(Employe_Informations,  data=request.data, partial=True)
             if serializer_info.is_valid():
                serializer_info.save()
             else:
-                 return Response({"error"},status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : str(serializer_info.errors),
+                    'product' : serializer_info.data
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
             
             permission= EmployeePermissionSetting.objects.get(employee=employee)
             serializer_permision= EmployPermissionSerializer(permission,  data=request.data, partial=True)
             if serializer_permision.is_valid():
                serializer_permision.save()
+            else:
+                return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : str(serializer_permision.errors),
+                    'product' : serializer_permision.data
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
             
             Module_Permission= EmployeeModulePermission.objects.get(employee=employee)
             serializer_Module = EmployeModulesSerializer(Module_Permission,  data=request.data, partial=True)
             if serializer_Module.is_valid():
                serializer_Module.save()
             else:
-                 return Response({"error"},status=status.HTTP_400_BAD_REQUEST)
-            
+                return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : str(serializer_Module.errors),
+                    'product' : serializer_Module.data
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
                  
             Marketing_Permission= EmployeeMarketingPermission.objects.get(employee=employee)
             serializer_Marketing= EmployeeMarketingSerializers(Marketing_Permission,  data=request.data, partial=True)
             if serializer_Marketing.is_valid():
                 serializer_Marketing.save()
-            
+            else:
+                return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : str(serializer_Marketing.errors),
+                    'product' : serializer_Marketing.data
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
             
             if serializer.is_valid():
                 serializer.save()
                 return Response({"error":False,"data":serializer.data}, status=status.HTTP_200_OK)
-            return Response({"error":serializer.errors},status=status.HTTP_400_BAD_REQUEST)
+            return  Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : str(serializer.errors),
+                    'product' : serializer.data
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
         except Exception as e:
             return Response({"error":repr(e)},status=status.HTTP_400_BAD_REQUEST)
@@ -334,7 +383,7 @@ def create_staff(request):
         business_id= request.data.get('business', None)
         
         name = request.data.get('name', None)
-        employee_id = request.data.get('employee', None)
+        employee_id = request.data.get('employees', None)
         
         is_active= request.data.get('is_active' , False)
         
@@ -364,10 +413,17 @@ def create_staff(request):
             user=user,
             business= business, 
             name= name,
-            employees= employees,
-            
+            employees= employees
+        
         )
-        serialized = StaffGroupSerializers(staff_group, context={'request' : request})
+    #     serialized = StaffGroupSerializers(
+    #     staff_group, 
+    #     many=True, 
+    #     context={'employee': employees}
+    # ).data
+
+      
+        serialized = StaffGroupSerializers(staff_group, many=True)
    
         return Response(
         {

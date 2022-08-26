@@ -90,9 +90,23 @@ class EmployeeMarketingSerializers(serializers.ModelSerializer):
         fields = '__all__'
         
 class StaffGroupSerializers(serializers.ModelSerializer):
+    #employe = serializers.SerializerMethodField()
+    
+    # def get_employe(self, obj):
+    #     employe_id = self.context.get('employee')
+    #     return employee_id
+        
+    
     class Meta:
         model = StaffGroup
-        fields = '__all__'
+        fields = [
+            'id',
+            'user',
+            'business',
+            'name', 
+            'employees',
+            'is_active'
+                  ]
         
 class StaffermisionSerializers(serializers.ModelSerializer):
     class Meta:
