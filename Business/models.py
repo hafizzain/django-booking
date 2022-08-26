@@ -130,6 +130,7 @@ class BusinessTheme(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_theme')
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_theme')
 
+    theme_name = models.CharField(max_length=100, default='')
     primary_color = models.CharField(max_length=20, default='')
     secondary_color = models.CharField(max_length=20, default='')
 

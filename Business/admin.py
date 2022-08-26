@@ -3,11 +3,11 @@ from .models import BusinessType, Business, BusinessSocial, BusinessAddress, Bus
 
 
 @admin.register(BusinessPaymentMethod)
-class BusinessTypeAdmin(admin.ModelAdmin):
+class BusinessPaymentMethodAdmin(admin.ModelAdmin):
     list_display = ['id', 'method_type', 'is_active']
 
 @admin.register(BusinessTax)
-class BusinessTypeAdmin(admin.ModelAdmin):
+class BusinessTaxAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'tax_rate', 'tax_type', 'is_active']
 
 
@@ -35,7 +35,7 @@ class BusinessOpeningHourAdmin(admin.ModelAdmin):
 
 @admin.register(BusinessTheme)
 class BusinessThemeAdmin(admin.ModelAdmin):
-    list_display = ['id', 'primary_color' , 'secondary_color' , 'menu_option' ,'calendar_option' , 'is_active', 'is_deleted']
+    list_display = ['id', 'theme_name', 'primary_color' , 'secondary_color' , 'menu_option' ,'calendar_option' , 'is_active', 'is_deleted']
 
 
 @admin.register(StaffNotificationSetting)
