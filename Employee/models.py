@@ -19,6 +19,7 @@ class Employee(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_employees')
 
     full_name = models.CharField(max_length=300, default='')
+    image = models.ImageField(upload_to='employee/employee_images/', null=True, blank=True)
     employee_id = models.CharField(max_length=50, default='')
     email = models.EmailField(default='')
     mobile_number = models.CharField(max_length=30, default='')

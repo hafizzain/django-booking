@@ -10,6 +10,6 @@ urlpatterns = [
     
 
     # Staff GROUP URLS 
-    path('get_staff_group/', views.delete_employee),
+    # path('get_staff_group/', views.delete_employee),
 
 ]
