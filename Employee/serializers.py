@@ -69,7 +69,7 @@ class EmployeSerializer(serializers.ModelSerializer):
 class EmployeInformationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployeeProfessionalInfo
-        exclude = ['employee', 'created_at', 'id']
+        exclude = ['employee', 'id']
         
         
 class EmployPermissionSerializer(serializers.ModelSerializer):
