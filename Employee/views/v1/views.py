@@ -697,9 +697,9 @@ def get_attendence(request):
             'status' : 200,
             'status_code' : '200',
             'response' : {
-                'message' : 'All Employee',
+                'message' : 'All Attendance',
                 'error_message' : None,
-                'employees' : serialized.data
+                'attendance' : serialized.data
             }
         },
         status=status.HTTP_200_OK
