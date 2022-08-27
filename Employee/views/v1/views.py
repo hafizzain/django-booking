@@ -307,26 +307,26 @@ def update_employee(request):
               return Response(
              {
                     'status' : False,
-                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
-                    'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                    'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
+                    'status_code_text' : 'INVALID_NOT_FOUND_EMPLOYEE_ID_4022',
                     'response' : {
-                        'message' : 'Business Not Found',
+                        'message' : 'Employee Not Found',
                         'error_message' : str(err),
                     }
                 },
                    status=status.HTTP_404_NOT_FOUND
               )
-        serializer =EmployeSerializer(employee, data=request.data, partial=True)
+        serializer = EmployeSerializer(employee, data=request.data, partial=True)
         if serializer.is_valid():
            serializer.save()
         else: 
              return Response(
             {
                 'status' : False,
-                'status_code' : StatusCodes.USER_NOT_EXIST_4005,
+                'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
                 'response' : {
-                    'message' : 'User not found',
-                    'error_message' : str(err),
+                    'message' : 'Invialid Data',
+                    'error_message' : str(serializer.errors),
                 }
             },
             status=status.HTTP_404_NOT_FOUND
@@ -339,10 +339,10 @@ def update_employee(request):
          return Response(
             {
                 'status' : False,
-                'status_code' : StatusCodes.USER_NOT_EXIST_4005,
+                'status_code' : StatusCodes.INVALID_EMPLOYEE_INFORMATION_4026,
                 'response' : {
-                    'message' : 'User not found',
-                    'error_message' : str(err),
+                    'message' : 'Invalid Data',
+                    'error_message' : str(serializer_info.errors),
                 }
             },
             status=status.HTTP_404_NOT_FOUND
@@ -356,11 +356,10 @@ def update_employee(request):
                 return Response(
             {
                 'status' : False,
-                'status_code' : 400,
+                'status_code' :StatusCodes.INVALID_EMPLOYEE_PERMISSION_4027,
                 'response' : {
                     'message' : 'Invalid Data!',
                     'error_message' : str(serializer_permision.errors),
-                    'Employe Update' : serializer_permision.data
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
@@ -376,11 +375,10 @@ def update_employee(request):
                 return Response(
             {
                 'status' : False,
-                'status_code' : 400,
+                'status_code' : StatusCodes.INVALID_EMPLOYEE_PERMISSION_4027,
                 'response' : {
                     'message' : 'Invalid Data!',
                     'error_message' : str(serializer_Module.errors),
-                    'Employe Update' : serializer_Module.data
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
@@ -393,11 +391,10 @@ def update_employee(request):
               return Response(
             {
                 'status' : False,
-                'status_code' : 400,
+                'status_code' : StatusCodes.INVALID_EMPLOYEE_PERMISSION_4027,
                 'response' : {
                     'message' : 'Invalid Data!',
                     'error_message' : str(serializer_Marketing.errors),
-                    'Employe Update' : serializer_Marketing.data
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
@@ -406,11 +403,10 @@ def update_employee(request):
             {
                 'status' : True,
                 'status_code' : 200,
-                'status_code_text' : 'BusinessTheme',
                 'response' : {
-                    'message' : 'Business theme updated',
+                    'message' : 'Update Employee Successfully',
                     'error_message' : None,
-                    'theme' : serializer.data
+                    'Employee' : serializer.data
                 }
             },
             status=status.HTTP_200_OK
@@ -471,21 +467,9 @@ def create_staff_group(request):
                 }
                 }
             )
-        try:
-            employees= Employee.objects.get(id=employees)
-        except Exception as err:
-            return Response(
-                {
-                    'status': False,
-                    'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
-                    'response' : {
-                    'message' : 'Employee not found',
-                    'error_message' : str(err),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-            )
-               
+        fields = []
+        for usr in employees:
+            fields= Employee.objects.get(id=employees)        
         staff_group= StaffGroup.objects.create(
             user=user,
             business= business, 
@@ -502,7 +486,7 @@ def create_staff_group(request):
             access_products=access_products,
         )
         # staff_permission_serializers =  StaffpermisionSerializers(staff_module_permission)
-        staff_group.employees.add(employees)
+        staff_group.employees.add(fields)
         serialized = StaffGroupSerializers(staff_group)
        
         return Response(
@@ -630,11 +614,24 @@ def update_staff_group(request):
             return Response(
                  {
                 'status' : False,
-                'status_code' : StatusCodes.USER_NOT_EXIST_4005,
+                'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
                 'response' : {
-                    'message' : 'User not found',
+                    'message' : 'StaffGroupSerializers Invalid',
                     'error_message' : str(err),
                 }
             },
             status=status.HTTP_404_NOT_FOUND
             )
+        return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Update Staff Group Successfully',
+                    'error_message' : None,
+                    'Employee' : serializer.data
+                }
+            },
+            status=status.HTTP_200_OK
+           )
+        permission_serializer =StaffpermisionSerializers.objects.create(staff)
