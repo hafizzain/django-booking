@@ -316,9 +316,11 @@ def update_employee(request):
                 },
                    status=status.HTTP_404_NOT_FOUND
               )
+        data={}
         serializer = EmployeSerializer(employee, data=request.data, partial=True)
         if serializer.is_valid():
            serializer.save()
+           data.update(serializer.data)
         else: 
              return Response(
             {
@@ -335,6 +337,7 @@ def update_employee(request):
         serializer_info= EmployeInformationsSerializer(Employe_Informations,  data=request.data, partial=True)
         if serializer_info.is_valid():
                 serializer_info.save()
+                data.update(serializer_info.data)
         else:
          return Response(
             {
@@ -352,6 +355,7 @@ def update_employee(request):
         serializer_permision= EmployPermissionSerializer(permission,  data=request.data, partial=True)
         if serializer_permision.is_valid():
                serializer_permision.save()
+               data.update(serializer_permision.data)
         else:
                 return Response(
             {
@@ -370,6 +374,7 @@ def update_employee(request):
         serializer_Module = EmployeModulesSerializer(Module_Permission,  data=request.data, partial=True)
         if serializer_Module.is_valid():
                serializer_Module.save()
+               data.update(serializer_Module.data)
                
         else:
                 return Response(
@@ -387,6 +392,7 @@ def update_employee(request):
         serializer_Marketing= EmployeeMarketingSerializers(Marketing_Permission,  data=request.data, partial=True)
         if serializer_Marketing.is_valid():
                 serializer_Marketing.save()
+                data.update(serializer_Marketing.data)
         else:
               return Response(
             {
@@ -406,7 +412,7 @@ def update_employee(request):
                 'response' : {
                     'message' : 'Update Employee Successfully',
                     'error_message' : None,
-                    'Employee' : serializer.data
+                    'Employee' : data
                 }
             },
             status=status.HTTP_200_OK
@@ -448,7 +454,7 @@ def create_staff_group(request):
                           'access_inventory', 
                           'access_expenses', 
                           'access_products'
-                          
+
                             ]
                 }
             },
@@ -467,9 +473,8 @@ def create_staff_group(request):
                 }
                 }
             )
-        fields = []
-        for usr in employees:
-            fields= Employee.objects.get(id=employees)        
+          
+                
         staff_group= StaffGroup.objects.create(
             user=user,
             business= business, 
@@ -486,7 +491,20 @@ def create_staff_group(request):
             access_products=access_products,
         )
         # staff_permission_serializers =  StaffpermisionSerializers(staff_module_permission)
-        staff_group.employees.add(fields)
+        employees_error = []
+        if type(employees) == str:
+            import json
+            employees = json.loads(employees)
+        elif type(employees) == list:
+            pass
+        
+        for usr in employees:
+            try:
+               employe = Employee.objects.get(id=usr)  
+               staff_group.employees.add(employe)
+            except Exception as err:
+                employees_error.append(str(err))
+        staff_group.save()
         serialized = StaffGroupSerializers(staff_group)
        
         return Response(
@@ -497,6 +515,7 @@ def create_staff_group(request):
                     'message' : 'Staff Group Create!',
                     'error_message' : None,
                     'Staff Group' : serialized.data,
+                    'staff_errors' : employees_error,
                 }
             },
             status=status.HTTP_201_CREATED
@@ -574,64 +593,72 @@ def delete_staff_group(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_staff_group(request):
-        staff_id = request.data.get('staff_id', None)
-        if staff_id is None: 
-           return Response(
+    staff_id = request.data.get('staff_id', None)
+    if staff_id is None: 
+        return Response(
+        {
+            'status' : False,
+            'status_code' : StatusCodes.MISSING_FIELDS_4001,
+            'status_code_text' : 'MISSING_FIELDS_4001',
+            'response' : {
+                'message' : 'Invalid Data!',
+                'error_message' : 'Staff ID are required.',
+                'fields' : [
+                    'staff_id'                         
+                ]
+            }
+        },
+        status=status.HTTP_400_BAD_REQUEST
+        )
+        
+    try:
+        staff_group = StaffGroup.objects.get(id=staff_id)
+    except Exception as err:
+        return Response(
             {
                 'status' : False,
-                'status_code' : StatusCodes.MISSING_FIELDS_4001,
-                'status_code_text' : 'MISSING_FIELDS_4001',
+                'status_code' : StatusCodes.INVALID_STAFF_GROUP_4028,
+                'status_code_text' : 'INVALID_STAFF_GROUP_4028',
                 'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : 'Staff ID are required.',
-                    'fields' : [
-                        'staff_id'                         
-                    ]
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-         )
-          
-        try:
-           staff_group = StaffGroup.objects.get(id=staff_id)
-        except Exception as err:
-           return Response(
-                {
-                    'status' : False,
-                    'status_code' : StatusCodes.INVALID_NOT_FOUND_StAFF_GROUP_ID_4022,
-                    'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
-                    'response' : {
-                        'message' : 'Staff Group Not Found',
-                        'error_message' : str(err),
-                    }
-                },
-                   status=status.HTTP_404_NOT_FOUND
-           )
-        serializer = StaffGroupSerializers(staff_group, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-        else:
-            return Response(
-                 {
-                'status' : False,
-                'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
-                'response' : {
-                    'message' : 'StaffGroupSerializers Invalid',
+                    'message' : 'Staff Group Not Found',
                     'error_message' : str(err),
                 }
             },
-            status=status.HTTP_404_NOT_FOUND
-            )
+                status=status.HTTP_404_NOT_FOUND
+        )
+    data={}
+    serializer = StaffGroupSerializers(staff_group, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        data.update(serializer.data)
+    else:
         return Response(
-            {
-                'status' : True,
-                'status_code' : 200,
-                'response' : {
-                    'message' : 'Update Staff Group Successfully',
-                    'error_message' : None,
-                    'Employee' : serializer.data
-                }
-            },
-            status=status.HTTP_200_OK
-           )
-        permission_serializer =StaffpermisionSerializers.objects.create(staff)
+                {
+            'status' : False,
+            'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+            'response' : {
+                'message' : 'Staff Group Serializer Invalid',
+                'error_message' : str(err),
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+        ) 
+    staff_gp_permissions = StaffGroupModulePermission.objects.get(staff_group=staff_group)
+    permission_serializer =StaffpermisionSerializers(staff_gp_permissions, data=request.data, partial=True)
+    if permission_serializer.is_valid():
+        permission_serializer.save()
+        data.update(permission_serializer.data)
+        
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Update Staff Group Successfully',
+                'error_message' : None,
+                'Staff Group Update' : data
+            }
+        },
+        status=status.HTTP_200_OK
+        )
+    

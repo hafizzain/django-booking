@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Employee, EmployeeProfessionalInfo, EmployeePermissionSetting, EmployeeModulePermission, EmployeeMarketingPermission ,StaffGroup , StaffGroupModulePermission 
+from .models import Employee, EmployeeProfessionalInfo, EmployeePermissionSetting, EmployeeModulePermission, EmployeeMarketingPermission ,StaffGroup , StaffGroupModulePermission , Attendance 
 # Register your models here.
 
 @admin.register(Employee)
@@ -64,7 +64,7 @@ class StaffGroupAdmin(admin.ModelAdmin):
         'id',
         'name',
         'is_deleted',
-         'is_active', 
+        'is_active', 
        
     ]
 @admin.register(StaffGroupModulePermission)
@@ -77,4 +77,12 @@ class StaffGroupModulePermissionAdmin(admin.ModelAdmin):
         'access_expenses', 
         'access_products',
         
+    ]
+@admin.register(Attendance)
+class AttendanceAdmin(admin.ModelAdmin):
+    list_display = [
+        'id', 
+        'in_time',
+        'out_time', 
+        'is_active',
     ]
