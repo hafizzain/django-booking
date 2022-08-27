@@ -876,7 +876,7 @@ def delete_attendence(request):
                 'status_code' : 404,
                 'status_code_text' : '404',
                 'response' : {
-                    'message' : 'Invalid Employee ID!',
+                    'message' : 'Invalid Attendance ID!',
                     'error_message' : str(err),
                 }
             },
@@ -890,7 +890,7 @@ def delete_attendence(request):
             'status_code' : 200,
             'status_code_text' : '200',
             'response' : {
-                'message' : 'Attendece deleted successful',
+                'message' : 'Attendance deleted successful',
                 'error_message' : None
             }
         },
