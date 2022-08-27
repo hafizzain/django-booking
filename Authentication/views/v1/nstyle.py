@@ -327,8 +327,11 @@ def send_verification_otp(request):
             user = User.objects.get(email=email)
         elif code_for == 'Mobile':
             user = User.objects.get(mobile_number=mobile_number)
+        
+        if ignore_activity:
+            pass
 
-        if not ignore_activity and (user.is_mobile_verified and code_for == 'Mobile') or (user.is_email_verified and code_for == 'Email'):
+        elif (user.is_mobile_verified and code_for == 'Mobile') or (user.is_email_verified and code_for == 'Email'):
             return Response(
                 {
                     'status' : False,
@@ -336,9 +339,6 @@ def send_verification_otp(request):
                     'status_code_text' : 'USER_ALREADY_VERIFIED_4007',
                     'response' : {
                         'message' : f'{"Email" if code_for == "Email" and user.is_email_verified else "Mobile Number"} already verified',
-                        'data' : ignore_activity,
-                        'type' : str(type(ignore_activity)),
-                        'value' : True if ignore_activity else False,
                     }
                 },
                 status=status.HTTP_400_BAD_REQUEST
