@@ -2,7 +2,7 @@ from django.shortcuts import render
 from Employee.models import( Employee , EmployeeProfessionalInfo ,
                         EmployeePermissionSetting,  EmployeeModulePermission
                         , EmployeeMarketingPermission , StaffGroup 
-                        , StaffGroupModulePermission
+                        , StaffGroupModulePermission, Attendance
                         )
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from Employee.serializers import( EmployeSerializer , EmployeInformationsSerializer
                           , EmployPermissionSerializer,  EmployeModulesSerializer
                           ,  EmployeeMarketingSerializers, StaffGroupSerializers , 
-                          StaffpermisionSerializers
+                          StaffpermisionSerializers , AttendanceSerializers
                           
                                  )
 from rest_framework import status
@@ -490,7 +490,7 @@ def create_staff_group(request):
             access_expenses=access_expenses,
             access_products=access_products,
         )
-        # staff_permission_serializers =  StaffpermisionSerializers(staff_module_permission)
+        #staff_permission_serializers =  StaffpermisionSerializers(staff_module_permission)
         employees_error = []
         if type(employees) == str:
             import json
@@ -514,7 +514,7 @@ def create_staff_group(request):
                 'response' : {
                     'message' : 'Staff Group Create!',
                     'error_message' : None,
-                    'Staff Group' : serialized.data,
+                    'StaffGroup' : serialized.data,
                     'staff_errors' : employees_error,
                 }
             },
@@ -610,7 +610,6 @@ def update_staff_group(request):
         },
         status=status.HTTP_400_BAD_REQUEST
         )
-        
     try:
         staff_group = StaffGroup.objects.get(id=staff_id)
     except Exception as err:
@@ -643,12 +642,37 @@ def update_staff_group(request):
         },
         status=status.HTTP_404_NOT_FOUND
         ) 
-    staff_gp_permissions = StaffGroupModulePermission.objects.get(staff_group=staff_group)
+    try:
+       staff_gp_permissions = StaffGroupModulePermission.objects.get(staff_group=staff_group)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_EMPLOYEE_INFORMATION_4026,
+                'response' : {
+                    'message' : 'Invalid Data',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+     )
     permission_serializer =StaffpermisionSerializers(staff_gp_permissions, data=request.data, partial=True)
     if permission_serializer.is_valid():
         permission_serializer.save()
         data.update(permission_serializer.data)
-        
+    else:
+         return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_EMPLOYEE_INFORMATION_4026,
+                'response' : {
+                    'message' : 'Invalid Data',
+                    'error_message' : str(permission_serializer.errors),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+     )
+    
     return Response(
         {
             'status' : True,
@@ -656,9 +680,149 @@ def update_staff_group(request):
             'response' : {
                 'message' : 'Update Staff Group Successfully',
                 'error_message' : None,
-                'Staff Group Update' : data
+                'StaffGroupUpdate' : data
             }
         },
         status=status.HTTP_200_OK
         )
     
+    
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_attendence(request):
+    user = request.user     
+    business = request.data.get('business', None)
+    employees = request.data.get('employees', None)
+    is_active= request.data.get('is_active' , False)
+    in_time= request.data.get('in_time', None)
+    
+    if not all([ business, employees , in_time  ]):
+         return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                          'employees',
+                          'in_time', 
+                            ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+             business_id=Business.objects.get(id=business)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                }
+                }
+            )
+    try:
+        employee_id=Employee.objects.get(id=employees)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'response' : {
+                    'message' : 'Employee not found',
+                    'error_message' : str(err),
+                }
+                }
+            )
+    attendence_employe=Attendance.objects.create(
+        user=user,
+        business= business_id,
+        employee=employee_id,
+        in_time= in_time,
+        is_active=is_active,
+    )
+    
+    attendece_serializers=AttendanceSerializers(attendence_employe)
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Attendence Created Successfully!',
+                    'error_message' : None,
+                    'StaffGroup' : attendece_serializers.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        ) 
+ 
+ 
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_attendence(request):
+    attendence_id = request.data.get('attendence_id', None)
+    if attendence_id is None: 
+        return Response(
+        {
+            'status' : False,
+            'status_code' : StatusCodes.MISSING_FIELDS_4001,
+            'status_code_text' : 'MISSING_FIELDS_4001',
+            'response' : {
+                'message' : 'Invalid Data!',
+                'error_message' : 'Attendence ID are required.',
+                'fields' : [
+                    'attendence_id',                
+                ]
+            }
+        },
+        status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        attendence = Attendance.objects.get(id=attendence_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_ATTENDENCE_ID_OR_NOT_FOUND_4029,
+                'status_code_text' : 'INVALID_ATTENDENCE_ID_OR_NOT_FOUND_4029',
+                'response' : {
+                    'message' : 'Attendence Not Found',
+                    'error_message' : str(err),
+                }
+            },
+                status=status.HTTP_404_NOT_FOUND
+        )
+    serializer = AttendanceSerializers(attendence, data=request.data, partial=True)
+    if not serializer.is_valid():
+        return Response(
+                {
+            'status' : False,
+            'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+            'response' : {
+                'message' : 'Attendence Serializer Invalid',
+                'error_message' : str(err),
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+        )
+    serializer.save()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Update Attendence Successfully',
+                'error_message' : None,
+                'StaffGroupUpdate' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+        )

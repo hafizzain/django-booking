@@ -2,14 +2,44 @@ from rest_framework import serializers
 from .models import( Employee, EmployeeProfessionalInfo ,
                EmployeePermissionSetting, EmployeeModulePermission 
                , EmployeeMarketingPermission,
-               StaffGroup, StaffGroupModulePermission
+               StaffGroup, StaffGroupModulePermission, Attendance
 )
+class EmployeInformationsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmployeeProfessionalInfo
+        exclude = ['employee', 'id', 'services']
+        
+        
+class EmployPermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmployeePermissionSetting
+        exclude = ['employee', 'created_at', 'id']
+        
+class EmployeModulesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmployeeModulePermission
+        exclude = ['employee', 'created_at', 'id']
+        
+class EmployeeMarketingSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = EmployeeMarketingPermission
+        exclude = ['employee', 'created_at', 'id']
+        
 class EmployeSerializer(serializers.ModelSerializer):
     employee_info = serializers.SerializerMethodField(read_only=True)
     permissions = serializers.SerializerMethodField(read_only=True)
     module_permissions =serializers.SerializerMethodField(read_only=True)
     marketing_permissions= serializers.SerializerMethodField(read_only=True)
     
+    # def get_field_names(self, declared_fields , obj):
+        
+    #       expanded_fields = super(EmployPermissionSerializer, self).get_field_names(declared_fields, obj)
+          
+    #       if getattr(self.Meta, 'extra_fields', None):
+    #          return expanded_fields + self.Meta.extra_fields
+    #       else:
+    #           return expanded_fields
+
     def get_employee_info(self, obj):
         try:
             professional = EmployeeProfessionalInfo.objects.get(employee=obj)
@@ -70,27 +100,7 @@ class EmployeSerializer(serializers.ModelSerializer):
             ]
         
         
-class EmployeInformationsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EmployeeProfessionalInfo
-        exclude = ['employee', 'id', 'services']
-        
-        
-class EmployPermissionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EmployeePermissionSetting
-        exclude = ['employee', 'created_at', 'id']
-        
-class EmployeModulesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EmployeeModulePermission
-        exclude = ['employee', 'created_at', 'id']
-        
-class EmployeeMarketingSerializers(serializers.ModelSerializer):
-    class Meta:
-        model = EmployeeMarketingPermission
-        exclude = ['employee', 'created_at', 'id']
-        
+
 class StaffGroupSerializers(serializers.ModelSerializer):
     #employe = serializers.SerializerMethodField()
     
@@ -125,3 +135,9 @@ class StaffpermisionSerializers(serializers.ModelSerializer):
     class Meta:
         model = StaffGroupModulePermission
         fields ='__all__'
+
+class AttendanceSerializers(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Attendance
+        fields = '__all__'

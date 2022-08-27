@@ -1,7 +1,3 @@
-
-
-
-
 from .models import Employee
 
 class Employee_Get_CustomSerializer():
