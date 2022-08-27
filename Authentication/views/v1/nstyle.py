@@ -283,6 +283,7 @@ def send_verification_otp(request):
     code_for = request.data.get('code_for', None)
     email = request.data.get('email', None)
     mobile_number = request.data.get('mobile_number', None)
+    ignore_activity = request.data.get('ignore_activity', False)
      
     if code_for is None or (code_for is not None and code_for == 'Mobile' and mobile_number is None ) or (code_for is not None and code_for == 'Email' and email is None ) :
         return Response(
@@ -327,7 +328,7 @@ def send_verification_otp(request):
         elif code_for == 'Mobile':
             user = User.objects.get(mobile_number=mobile_number)
 
-        if (user.is_mobile_verified and code_for == 'Mobile') or (user.is_email_verified and code_for == 'Email'):
+        if not ignore_activity and (user.is_mobile_verified and code_for == 'Mobile') or (user.is_email_verified and code_for == 'Email'):
             return Response(
                 {
                     'status' : False,
