@@ -134,7 +134,11 @@ class StaffpermisionSerializers(serializers.ModelSerializer):
     
     class Meta:
         model = StaffGroupModulePermission
-        fields ='__all__'
+        exclude = ['id']
+#        fields ='__all__'
+
+       
+        
 
 class AttendanceSerializers(serializers.ModelSerializer):
     
