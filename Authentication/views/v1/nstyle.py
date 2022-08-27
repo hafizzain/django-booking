@@ -458,7 +458,7 @@ def login(request):
                 'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
                 'status_code_text' : 'INVALID_CREDENTIALS_4013',
                 'response' : {
-                    'message' : 'Invalid Password',
+                    'message' : 'Incorrect Password',
                     'fields' : ['password']
                 }
             },
