@@ -423,7 +423,7 @@ def create_staff_group(request):
         business_id= request.data.get('business', None)
         
         name = request.data.get('name', None)
-        employee_id = request.data.get('employees', None)
+        employees = request.data.get('employees', None)
         
         is_active= request.data.get('is_active' , False)
         
@@ -434,7 +434,7 @@ def create_staff_group(request):
         access_products= request.data.get('access_products' , False)
         
         
-        if not all([ business_id, name, employee_id ]):
+        if not all([ business_id, name, employees ]):
               return Response(
             {
                 'status' : False,
@@ -444,9 +444,9 @@ def create_staff_group(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'All fields are required.',
                     'fields' : [
-                          'business_id',
+                          'business',
                           'name',
-                          'employee_id',
+                          'employees',
                           'access_reports', 
                           'access_sales', 
                           'access_inventory', 
@@ -458,9 +458,34 @@ def create_staff_group(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-        business=Business.objects.get(id=business_id)
-        employees= Employee.objects.get(id=employee_id)
-        
+        try:
+             business=Business.objects.get(id=business_id)
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                }
+                }
+            )
+        try:
+            employees= Employee.objects.get(id=employees)
+        except Exception as err:
+            return Response(
+                {
+                    'status': False,
+                    'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
+                    'response' : {
+                    'message' : 'Employee not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+            )
+               
         staff_group= StaffGroup.objects.create(
             user=user,
             business= business, 
@@ -565,23 +590,51 @@ def delete_staff_group(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_staff_group(request):
-     staff_id = request.data.get('staff_id', None)
-     if staff_id is None: 
-       return Response(
+        staff_id = request.data.get('staff_id', None)
+        if staff_id is None: 
+           return Response(
             {
                 'status' : False,
                 'status_code' : StatusCodes.MISSING_FIELDS_4001,
                 'status_code_text' : 'MISSING_FIELDS_4001',
                 'response' : {
                     'message' : 'Invalid Data!',
-                    'error_message' : 'fields are required.',
+                    'error_message' : 'Staff ID are required.',
                     'fields' : [
                         'staff_id'                         
                     ]
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
-        )
+         )
           
-    # try:
-    #     employee = StaffGroup.objects.get(id=staff_id)
+        try:
+           staff_group = StaffGroup.objects.get(id=staff_id)
+        except Exception as err:
+           return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_NOT_FOUND_StAFF_GROUP_ID_4022,
+                    'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                    'response' : {
+                        'message' : 'Staff Group Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                   status=status.HTTP_404_NOT_FOUND
+           )
+        serializer = StaffGroupSerializers(staff_group, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+        else:
+            return Response(
+                 {
+                'status' : False,
+                'status_code' : StatusCodes.USER_NOT_EXIST_4005,
+                'response' : {
+                    'message' : 'User not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+            )
