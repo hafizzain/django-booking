@@ -686,7 +686,25 @@ def update_staff_group(request):
         status=status.HTTP_200_OK
         )
     
-    
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_attendence(request):
+    all_attendence= Attendance.objects.all()
+    serialized = AttendanceSerializers(all_attendence, many=True)
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Employee',
+                'error_message' : None,
+                'employees' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

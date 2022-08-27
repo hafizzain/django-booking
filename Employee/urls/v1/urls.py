@@ -17,6 +17,7 @@ urlpatterns = [
     path('delete_staff_group/', views.delete_staff_group),
     
     #Attendence
+    path('get_attendence/', views.get_attendence),
     path('create_attendence/', views.create_attendence),
     path('update_attendence/', views.update_attendence),
     path('delete_attendence/', views.delete_attendence),
