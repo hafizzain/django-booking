@@ -128,7 +128,7 @@ class StaffGroupSerializers(serializers.ModelSerializer):
             'is_active',
             'staff_permission', 
             'employees',
-                  ]
+        ]
         
 class StaffpermisionSerializers(serializers.ModelSerializer):
     
@@ -136,9 +136,6 @@ class StaffpermisionSerializers(serializers.ModelSerializer):
         model = StaffGroupModulePermission
         exclude = ['id']
 #        fields ='__all__'
-
-       
-        
 
 class AttendanceSerializers(serializers.ModelSerializer):
     
