@@ -522,7 +522,6 @@ def add_product(request):
         business = business,
         vendor = vendor,
         category = category,
-        image= image,
         brand = brand,
         product_type = product_type,
         name = name,
