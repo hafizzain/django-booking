@@ -52,21 +52,21 @@ class EmployeSerializer(serializers.ModelSerializer):
     #EmployeePermission
     def get_permissions(self, obj):
         try:
-            Permission, created = EmployeePermissionSetting.objects.get_or_create(employee=obj)
+            Permission = EmployeePermissionSetting.objects.get(employee=obj)
             return EmployPermissionSerializer(Permission).data
         except EmployeePermissionSetting.DoesNotExist:
             return None
     #EmployeeModulePermission 
     def get_module_permissions(self, obj):
         try: 
-            ModulePermission, created = EmployeeModulePermission.objects.get_or_create(employee=obj)
+            ModulePermission= EmployeeModulePermission.objects.get(employee=obj)
             return EmployeModulesSerializer(ModulePermission).data
         except EmployeeModulePermission.DoesNotExist:
             return None
     #EmployeeMarketingPermission
     def get_marketing_permissions(self, obj):
         try:
-            MarketingPermission, created = EmployeeMarketingPermission.objects.get_or_create(employee=obj)
+            MarketingPermission = EmployeeMarketingPermission.objects.get(employee=obj)
             return EmployeeMarketingSerializers(MarketingPermission).data
         except EmployeeMarketingPermission.DoesNotExist:
             return None       
@@ -158,23 +158,36 @@ class AttendanceSerializers(serializers.ModelSerializer):
         model = Attendance
         fields = '__all__'
         
+class InformationPayrollSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmployeeProfessionalInfo
+        exclude = ['employee', 'id', 'services', 'designation']
+        
 class EmployPayrollSerializers(serializers.ModelSerializer):
-    employee_info = serializers.SerializerMethodField(read_only=True)
+    #employee_info = serializers.SerializerMethodField(read_only=True)
+    salary = serializers.SerializerMethodField(read_only=True)
+    income_type = serializers.SerializerMethodField(read_only=True)
     
-    
-    def get_employee_info(self, obj):
+    def get_salary(self, obj):
         try:
-            professional = EmployeeProfessionalInfo.objects.get(employee=obj)
-            return EmployeInformationsSerializer(professional).data
-        except EmployeeProfessionalInfo.DoesNotExist:
+            salary_info = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return salary_info.salary 
+        except: 
+            return None
+        
+    def get_income_type(self, obj):
+        try:
+            income_info = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return income_info.income_type 
+        except: 
             return None
     
     class Meta:
         model= Employee
         fields = [
-            'id',
-           # 'created_at', 
-            'employee_info'
+           'id',
+            'income_type',
+            'salary'
          ]        
 class PayrollSerializers(serializers.ModelSerializer):
     employee = EmployPayrollSerializers(read_only=True)

@@ -6,6 +6,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Q
+import json
 
 from NStyle.Constants import StatusCodes
 
@@ -26,9 +27,6 @@ def ExportCSV(request):
         
         for product in ProductStock.objects.all():
             writer.writerow(product)
-           
-           
-
         return response
 
 
@@ -422,8 +420,16 @@ def add_product(request):
     quantity = request.data.get('quantity', None)
     unit = request.data.get('unit', None)
     amount = request.data.get('amount', None)
-    stock_status = request.data.get('stock_status', True)
-    alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', True)
+    stock_status = request.data.get('stock_status', None)
+    if stock_status is not None:
+        stock_status = json.loads(stock_status)
+    else: 
+        stock_status = True
+    alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', None)
+    if alert_when_stock_becomes_lowest  is not None:
+        alert_when_stock_becomes_lowest= json.loads(alert_when_stock_becomes_lowest)
+    else:
+        alert_when_stock_becomes_lowest= True
 
 
     if not all([name, business_id, vendor_id, category_id, brand_id, product_type, cost_price, full_price, sell_price, short_description, description, barcode_id, sku, quantity, unit, amount, alert_when_stock_becomes_lowest]):
