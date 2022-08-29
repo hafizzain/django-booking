@@ -45,28 +45,29 @@ class EmployeSerializer(serializers.ModelSerializer):
 
     def get_employee_info(self, obj):
         try:
-            professional = EmployeeProfessionalInfo.objects.get(employee=obj)
+            professional, created = EmployeeProfessionalInfo.objects.get_or_create(employee=obj)
             return EmployeInformationsSerializer(professional).data
         except EmployeeProfessionalInfo.DoesNotExist:
             return None
     #EmployeePermission
     def get_permissions(self, obj):
         try:
-            Permission = EmployeePermissionSetting.objects.get(employee=obj)
+            Permission, created= EmployeePermissionSetting.objects.get_or_create(employee=obj)
+            
             return EmployPermissionSerializer(Permission).data
         except EmployeePermissionSetting.DoesNotExist:
             return None
     #EmployeeModulePermission 
     def get_module_permissions(self, obj):
         try: 
-            ModulePermission= EmployeeModulePermission.objects.get(employee=obj)
+            ModulePermission, created= EmployeeModulePermission.objects.get_or_create(employee=obj)
             return EmployeModulesSerializer(ModulePermission).data
         except EmployeeModulePermission.DoesNotExist:
             return None
     #EmployeeMarketingPermission
     def get_marketing_permissions(self, obj):
         try:
-            MarketingPermission = EmployeeMarketingPermission.objects.get(employee=obj)
+            MarketingPermission, created = EmployeeMarketingPermission.objects.get_or_create(employee=obj)
             return EmployeeMarketingSerializers(MarketingPermission).data
         except EmployeeMarketingPermission.DoesNotExist:
             return None       
@@ -199,4 +200,3 @@ class PayrollSerializers(serializers.ModelSerializer):
             #'employee',
             'employee'
             ]
-    
