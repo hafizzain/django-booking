@@ -21,6 +21,11 @@ urlpatterns = [
     path('create_attendence/', views.create_attendence),
     path('update_attendence/', views.update_attendence),
     path('delete_attendence/', views.delete_attendence),
+    
+    #Payroll
+    path('get_payrolls/', views.get_payrolls),
+    path('delete_payroll/', views.delete_payroll),
+    
 
 
 ]

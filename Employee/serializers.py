@@ -1,8 +1,11 @@
+from dataclasses import fields
+from pyexpat import model
 from rest_framework import serializers
 from .models import( Employee, EmployeeProfessionalInfo ,
                EmployeePermissionSetting, EmployeeModulePermission 
                , EmployeeMarketingPermission,
                StaffGroup, StaffGroupModulePermission, Attendance
+               ,Payroll
 )
 class EmployeInformationsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -49,29 +52,29 @@ class EmployeSerializer(serializers.ModelSerializer):
     #EmployeePermission
     def get_permissions(self, obj):
         try:
-            Permission, created = EmployeePermissionSetting.objects.get_or_create(employee=obj)
+            Permission = EmployeePermissionSetting.objects.get(employee=obj)
             return EmployPermissionSerializer(Permission).data
         except EmployeePermissionSetting.DoesNotExist:
             return None
     #EmployeeModulePermission 
     def get_module_permissions(self, obj):
         try: 
-            ModulePermission, created = EmployeeModulePermission.objects.get_or_create(employee=obj)
+            ModulePermission= EmployeeModulePermission.objects.get(employee=obj)
             return EmployeModulesSerializer(ModulePermission).data
         except EmployeeModulePermission.DoesNotExist:
             return None
     #EmployeeMarketingPermission
     def get_marketing_permissions(self, obj):
         try:
-            MarketingPermission, created = EmployeeMarketingPermission.objects.get_or_create(employee=obj)
+            MarketingPermission = EmployeeMarketingPermission.objects.get(employee=obj)
             return EmployeeMarketingSerializers(MarketingPermission).data
         except EmployeeMarketingPermission.DoesNotExist:
             return None       
-    def get(self, obj):
-        return {
-            "brand": "test",
-            "model": "test2",
-        }
+    # def get(self, obj):
+    #     return {
+    #         "brand": "test",
+    #         "model": "test2",
+    #     }
     class Meta:
         model = Employee
         fields = [
@@ -98,6 +101,18 @@ class EmployeSerializer(serializers.ModelSerializer):
                 'module_permissions',
                 'marketing_permissions',
             ]
+    # def to_representation(self, instace):
+    #     permissions = self.get_permissions(instace)
+    #     # return permissions.update({
+    #     #     'id': instace.id,
+    #     #     'name': instace.full_name,
+            
+    #     # })
+    #     return {
+    #         "nme": instace.full_name,
+    #         permissions: permissions
+    #     }
+
         
         
 
@@ -142,3 +157,46 @@ class AttendanceSerializers(serializers.ModelSerializer):
     class Meta:
         model = Attendance
         fields = '__all__'
+        
+class InformationPayrollSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmployeeProfessionalInfo
+        exclude = ['employee', 'id', 'services', 'designation']
+        
+class EmployPayrollSerializers(serializers.ModelSerializer):
+    salary = serializers.SerializerMethodField(read_only=True)
+    income_type = serializers.SerializerMethodField(read_only=True)
+    
+    def get_salary(self, obj):
+        try:
+            salary_info = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return salary_info.salary
+        except Exception:
+            return None
+        
+    def get_income_type(self, obj):
+        try:
+            income_info = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return income_info.income_type 
+        except: 
+            return None
+    
+    class Meta:
+        model= Employee
+        fields = [
+           'id',
+            'income_type',
+            'salary'
+         ]        
+class PayrollSerializers(serializers.ModelSerializer):
+    employee = EmployPayrollSerializers(read_only=True)
+    class Meta:
+        model = Payroll
+        fields = [
+            'id',
+            'name',
+            'created_at', 
+            #'employee',
+            'employee'
+            ]
+    
