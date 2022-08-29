@@ -164,15 +164,14 @@ class InformationPayrollSerializer(serializers.ModelSerializer):
         exclude = ['employee', 'id', 'services', 'designation']
         
 class EmployPayrollSerializers(serializers.ModelSerializer):
-    #employee_info = serializers.SerializerMethodField(read_only=True)
     salary = serializers.SerializerMethodField(read_only=True)
     income_type = serializers.SerializerMethodField(read_only=True)
     
     def get_salary(self, obj):
         try:
             salary_info = EmployeeProfessionalInfo.objects.get(employee=obj)
-            return salary_info.salary 
-        except: 
+            return salary_info.salary
+        except Exception:
             return None
         
     def get_income_type(self, obj):

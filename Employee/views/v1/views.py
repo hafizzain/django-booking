@@ -969,3 +969,15 @@ def delete_payroll(request):
         status=status.HTTP_200_OK
     )
     
+    
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def create_payroll(request):
+#     user = request.user
+#     business = request.data.get('business', None)
+#     employees = request.data.get('employees', None)
+#     name = request.data.get('name', None)
+#     Total_hours= request.data.get('Total_hours', None)
+    
+#     if not all([    ]):
+#         return Response()
