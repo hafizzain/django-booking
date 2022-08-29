@@ -3,6 +3,7 @@ from Employee.models import( Employee , EmployeeProfessionalInfo ,
                         EmployeePermissionSetting,  EmployeeModulePermission
                         , EmployeeMarketingPermission , StaffGroup 
                         , StaffGroupModulePermission, Attendance
+                        ,Payroll
                         )
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -11,6 +12,7 @@ from Employee.serializers import( EmployeSerializer , EmployeInformationsSeriali
                           , EmployPermissionSerializer,  EmployeModulesSerializer
                           ,  EmployeeMarketingSerializers, StaffGroupSerializers , 
                           StaffpermisionSerializers , AttendanceSerializers
+                          ,PayrollSerializers,EmployPayrollSerializers
                           
                                  )
 from rest_framework import status
@@ -896,3 +898,74 @@ def delete_attendence(request):
         },
         status=status.HTTP_200_OK
     )
+    
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_payrolls(request):
+    all_payroll= Payroll.objects.all()
+    serialized = PayrollSerializers(all_payroll, many=True)
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Payroll',
+                'error_message' : None,
+                'payroll' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_payroll(request):
+    payroll_id = request.data.get('payroll_id', None)
+    if payroll_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'payroll_id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        payroll = Payroll.objects.get(id=payroll_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Payroll ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    payroll.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Payroll deleted successful',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    

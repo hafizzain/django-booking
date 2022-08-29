@@ -1,8 +1,11 @@
+from dataclasses import fields
+from pyexpat import model
 from rest_framework import serializers
 from .models import( Employee, EmployeeProfessionalInfo ,
                EmployeePermissionSetting, EmployeeModulePermission 
                , EmployeeMarketingPermission,
                StaffGroup, StaffGroupModulePermission, Attendance
+               ,Payroll
 )
 class EmployeInformationsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -154,3 +157,34 @@ class AttendanceSerializers(serializers.ModelSerializer):
     class Meta:
         model = Attendance
         fields = '__all__'
+        
+class EmployPayrollSerializers(serializers.ModelSerializer):
+    employee_info = serializers.SerializerMethodField(read_only=True)
+    
+    
+    def get_employee_info(self, obj):
+        try:
+            professional = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return EmployeInformationsSerializer(professional).data
+        except EmployeeProfessionalInfo.DoesNotExist:
+            return None
+    
+    class Meta:
+        model= Employee
+        fields = [
+            'id',
+           # 'created_at', 
+            'employee_info'
+         ]        
+class PayrollSerializers(serializers.ModelSerializer):
+    employee = EmployPayrollSerializers(read_only=True)
+    class Meta:
+        model = Payroll
+        fields = [
+            'id',
+            'name',
+            'created_at', 
+            #'employee',
+            'employee'
+            ]
+    

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Employee, EmployeeProfessionalInfo, EmployeePermissionSetting, EmployeeModulePermission, EmployeeMarketingPermission ,StaffGroup , StaffGroupModulePermission , Attendance 
+from .models import Employee, EmployeeProfessionalInfo, EmployeePermissionSetting, EmployeeModulePermission, EmployeeMarketingPermission ,StaffGroup , StaffGroupModulePermission , Attendance , Payroll
 # Register your models here.
 
 @admin.register(Employee)
@@ -85,4 +85,13 @@ class AttendanceAdmin(admin.ModelAdmin):
         'in_time',
         'out_time', 
         'is_active',
+    ]
+    
+@admin.register(Payroll)
+class AttendanceAdmin(admin.ModelAdmin):
+    list_display = [
+        'id', 
+        'name',
+        'created_at', 
+        'Total_hours',
     ]
