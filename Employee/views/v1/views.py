@@ -12,7 +12,8 @@ from Employee.serializers import( EmployeSerializer , EmployeInformationsSeriali
                           , EmployPermissionSerializer,  EmployeModulesSerializer
                           ,  EmployeeMarketingSerializers, StaffGroupSerializers , 
                           StaffpermisionSerializers , AttendanceSerializers
-                          ,PayrollSerializers,EmployPayrollSerializers
+                          ,PayrollSerializers,EmployPayrollSerializers 
+                          
                           
                                  )
 from rest_framework import status
@@ -970,14 +971,83 @@ def delete_payroll(request):
     )
     
     
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# def create_payroll(request):
-#     user = request.user
-#     business = request.data.get('business', None)
-#     employees = request.data.get('employees', None)
-#     name = request.data.get('name', None)
-#     Total_hours= request.data.get('Total_hours', None)
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_payroll(request):
+    user = request.user
     
-#     if not all([    ]):
-#         return Response()
+    business = request.data.get('business', None)
+    employees = request.data.get('employees', None)
+    name = request.data.get('name', None)
+    Total_hours= request.data.get('Total_hours', None)
+    
+    if not all([ business, employees , name , Total_hours ]):
+         return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                          'employees',
+                          'name', 
+                          'Total_hours'
+                            ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+         
+    try:
+             business_id=Business.objects.get(id=business)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                }
+                }
+            )
+    try:
+        employee_id=Employee.objects.get(id=employees)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'response' : {
+                    'message' : 'Employee not found',
+                    'error_message' : str(err),
+                }
+                }
+            )
+            
+    payroll= Payroll.objects.create(
+        user= user,
+        business= business_id,
+        employee=employee_id,
+        name= name,
+        Total_hours=Total_hours
+        
+    )
+    
+    payroll_serializers= PayrollSerializers(payroll)
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Payroll Created Successfully!',
+                    'error_message' : None,
+                    'StaffGroup' : payroll_serializers.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        ) 

@@ -23,6 +23,7 @@ urlpatterns = [
     path('delete_attendence/', views.delete_attendence),
     
     #Payroll
+    path('create_payroll/', views.create_payroll),
     path('get_payrolls/', views.get_payrolls),
     path('delete_payroll/', views.delete_payroll),
     
