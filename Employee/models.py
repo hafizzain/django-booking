@@ -157,3 +157,17 @@ class Attendance(models.Model):
     class Meta:
         verbose_name = 'Employee Attendance'
         verbose_name_plural = 'Employee Attendances'
+        
+
+class Payroll(models.Model):
+     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_attendances')
+     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_employee_attendances')
+     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_attendances')
+     
+     name = models.CharField(max_length=300, default='')
+     date = models.DateTimeField(auto_now_add=now)
+     income =  models.CharField(max_length=300, default='')
+     
+    
+    

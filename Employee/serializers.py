@@ -67,11 +67,11 @@ class EmployeSerializer(serializers.ModelSerializer):
             return EmployeeMarketingSerializers(MarketingPermission).data
         except EmployeeMarketingPermission.DoesNotExist:
             return None       
-    def get(self, obj):
-        return {
-            "brand": "test",
-            "model": "test2",
-        }
+    # def get(self, obj):
+    #     return {
+    #         "brand": "test",
+    #         "model": "test2",
+    #     }
     class Meta:
         model = Employee
         fields = [
@@ -98,6 +98,18 @@ class EmployeSerializer(serializers.ModelSerializer):
                 'module_permissions',
                 'marketing_permissions',
             ]
+    # def to_representation(self, instace):
+    #     permissions = self.get_permissions(instace)
+    #     # return permissions.update({
+    #     #     'id': instace.id,
+    #     #     'name': instace.full_name,
+            
+    #     # })
+    #     return {
+    #         "nme": instace.full_name,
+    #         permissions: permissions
+    #     }
+
         
         
 
