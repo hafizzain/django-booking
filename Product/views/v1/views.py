@@ -402,6 +402,7 @@ def add_product(request):
     business_id = request.data.get('business', None)
     vendor_id = request.data.get('vendor', None)
     category_id = request.data.get('category', None)
+    #image = request.data.getlist('image', None)
     brand_id = request.data.get('brand', None)
     product_type = request.data.get('product_type', None)
     name = request.data.get('name', None)
@@ -414,7 +415,7 @@ def add_product(request):
     barcode_id = request.data.get('barcode_id', None)
     sku = request.data.get('sku', None)
     is_active = request.data.get('is_active', True)
-    # medias = request.data.getlist('product_images', None)
+    medias = request.data.getlist('product_images', None)
 
     # Product Stock Details 
     quantity = request.data.get('quantity', None)
@@ -536,13 +537,13 @@ def add_product(request):
         is_active=True,
         published = True,
     )
-    # for med in medias:
-    #     ProductMedia.objects.create(
-    #         user=user,
-    #         business=business,
-    #         product=product,
-    #         image=med
-    #     )
+    for img in medias:
+        ProductMedia.objects.create(
+            user=user,
+            business=business,
+            product=product,
+            image=img
+        )
     
     ProductStock.objects.create(
         user = user,

@@ -1,4 +1,5 @@
 from dataclasses import fields
+from genericpath import exists
 from pyexpat import model
 from rest_framework import serializers
 from .models import( Employee, EmployeeProfessionalInfo ,
@@ -45,14 +46,14 @@ class EmployeSerializer(serializers.ModelSerializer):
 
     def get_employee_info(self, obj):
         try:
-            professional, created = EmployeeProfessionalInfo.objects.get_or_create(employee=obj)
+            professional = EmployeeProfessionalInfo.objects.get(employee=obj)
             return EmployeInformationsSerializer(professional).data
         except EmployeeProfessionalInfo.DoesNotExist:
             return None
     #EmployeePermission
     def get_permissions(self, obj):
         try:
-            Permission, created= EmployeePermissionSetting.objects.get_or_create(employee=obj)
+            Permission= EmployeePermissionSetting.objects.get(employee=obj)
             
             return EmployPermissionSerializer(Permission).data
         except EmployeePermissionSetting.DoesNotExist:
@@ -60,14 +61,14 @@ class EmployeSerializer(serializers.ModelSerializer):
     #EmployeeModulePermission 
     def get_module_permissions(self, obj):
         try: 
-            ModulePermission, created= EmployeeModulePermission.objects.get_or_create(employee=obj)
+            ModulePermission= EmployeeModulePermission.objects.get(employee=obj)      
             return EmployeModulesSerializer(ModulePermission).data
         except EmployeeModulePermission.DoesNotExist:
             return None
     #EmployeeMarketingPermission
     def get_marketing_permissions(self, obj):
         try:
-            MarketingPermission, created = EmployeeMarketingPermission.objects.get_or_create(employee=obj)
+            MarketingPermission = EmployeeMarketingPermission.objects.get(employee=obj)
             return EmployeeMarketingSerializers(MarketingPermission).data
         except EmployeeMarketingPermission.DoesNotExist:
             return None       

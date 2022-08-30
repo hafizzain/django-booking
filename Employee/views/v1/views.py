@@ -50,9 +50,10 @@ def create_employee(request):
     
     full_name= request.data.get('full_name', None)
     employee_id= request.data.get('employee_id', None)
+    
     email= request.data.get('email', None)
     image = request.data.get('image', None)
-    
+    business_id= request.data.get('business', None)  
     mobile_number= request.data.get('mobile_number', None)    
     dob= request.data.get('dob', None)
     gender = request.data.get('gender' , 'Male')
@@ -90,13 +91,13 @@ def create_employee(request):
     # access_loyalty_points=request.data.get('access_loyalty_points' , False)
     # access_gift_cards=request.data.get('access_gift_cards' , False)
     
-    business_id= request.data.get('business', None)    
+     
     country_id = request.data.get('country', None)   
     state_id = request.data.get('state', None)         
     city_id = request.data.get('city', None)
    
     if not all([
-        business_id, full_name, image ,employee_id, email, mobile_number, dob ,gender, country_id , state_id ,city_id ,postal_code ,address ,joining_date, designation, income_type, salary ]) or ( not to_present and ending_date is None): 
+         business_id, full_name, image ,employee_id, email, mobile_number, dob ,gender, country_id , state_id ,city_id ,postal_code ,address ,joining_date, designation, income_type, salary ]) or ( not to_present and ending_date is None):
        return Response(
             {
                 'status' : False,
@@ -187,8 +188,6 @@ def create_employee(request):
         employee.to_present = True 
     employee.save()
     data = {}
-    employee_serialized = EmployeSerializer(employee , context={'request' : request})
-    data.update(employee_serialized.data)
 
     errors =[]
 
@@ -216,6 +215,8 @@ def create_employee(request):
     if serialized.is_valid():
         serialized.save()
         data.update(serialized.data)
+    employee_serialized = EmployeSerializer(employee , context={'request' : request})
+    data.update(employee_serialized.data)
 
 
     return Response(
@@ -420,6 +421,16 @@ def update_employee(request):
             },
             status=status.HTTP_200_OK
            )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def delete_all_employees(request):
+    all_employees = Employee.objects.all()
+
+    for empl in all_employees:
+        empl.delete()
+    return Response({'deleted' : True})
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_staff_group(request):
