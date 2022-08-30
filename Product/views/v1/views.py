@@ -325,7 +325,13 @@ def update_brand(request):
     brand.description = request.data.get('description', brand.description)
     brand.website = request.data.get('website', brand.website)
     brand.image = request.data.get('image', brand.image)
-    brand.is_active = request.data.get('is_active', brand.is_active)
+    is_active = request.data.get('is_active', brand.is_active)
+    if is_active is not None:
+        is_active = json.loads(is_active)
+    else:
+        is_active = True
+        
+    brand.is_active
     brand.save()
     
     serialized = BrandSerializer(brand, context={'request' : request})
@@ -421,19 +427,19 @@ def add_product(request):
     quantity = request.data.get('quantity', None)
     unit = request.data.get('unit', None)
     amount = request.data.get('amount', None)
-    stock_status = request.data.get('stock_status', None)
+    stock_status = request.data.get('stock_status', True)
     if stock_status is not None:
         stock_status = json.loads(stock_status)
     else: 
         stock_status = True
-    alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', None)
+    alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', True)
     if alert_when_stock_becomes_lowest  is not None:
         alert_when_stock_becomes_lowest= json.loads(alert_when_stock_becomes_lowest)
     else:
         alert_when_stock_becomes_lowest= True
 
 
-    if not all([name, business_id, vendor_id, category_id, brand_id, product_type, cost_price, full_price, sell_price, short_description, description, barcode_id, sku, quantity, unit, amount, alert_when_stock_becomes_lowest]):
+    if not all([name, business_id, vendor_id, category_id, brand_id, product_type, cost_price, full_price, sell_price, short_description, description, barcode_id, sku, quantity, unit, amount, ]):
         return Response(
             {
                 'status' : False,
@@ -569,8 +575,6 @@ def add_product(request):
         },
         status=status.HTTP_201_CREATED
     )
-   
-
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])

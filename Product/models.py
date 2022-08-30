@@ -48,7 +48,7 @@ class Product(models.Model):
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_products')
     vendor = models.ForeignKey(BusinessVendor, on_delete=models.CASCADE, related_name='vendor_products', default=None, null=True, blank=True)
     
-    image = models.ImageField(upload_to='product/product_images/', null=True, blank=True)
+    #image = models.ImageField(upload_to='product/product_images/', null=True, blank=True)
 
     
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='category_products')
