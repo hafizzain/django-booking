@@ -326,10 +326,10 @@ def update_brand(request):
     brand.website = request.data.get('website', brand.website)
     brand.image = request.data.get('image', brand.image)
     is_active = request.data.get('is_active', None)
-    if is_active is not None:
-        is_active = json.loads(is_active)
-    else:
-        is_active = True
+    # if is_active is not None:
+    #     is_active = json.loads(is_active)
+    # else:
+    #     is_active = True
         
     brand.is_active
     brand.save()
