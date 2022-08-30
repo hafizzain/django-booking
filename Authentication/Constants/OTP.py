@@ -3,7 +3,7 @@
 import random, string
 from Authentication.models import VerificationOTP
 from twilio.rest import Client
-
+from .Email import send_otp_to_email
 from django.conf import  settings
 
 def send_twillio_to_phone_number(user=None):
@@ -47,6 +47,7 @@ def generate_user_otp(user=None, code_for='Mobile'):
     )
     otp.save()
     try:
-        send_twillio_to_phone_number(user=user)
+        # send_twillio_to_phone_number(user=user)
+        send_otp_to_email(user=user)
     except:
         pass
