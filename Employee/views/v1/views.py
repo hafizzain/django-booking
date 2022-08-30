@@ -12,7 +12,7 @@ from Employee.serializers import( EmployeSerializer , EmployeInformationsSeriali
                           , EmployPermissionSerializer,  EmployeModulesSerializer
                           ,  EmployeeMarketingSerializers, StaffGroupSerializers , 
                           StaffpermisionSerializers , AttendanceSerializers
-                          ,PayrollSerializers,EmployPayrollSerializers 
+                          ,PayrollSerializers,singleEmployeeSerializer 
                           
                           
                                  )
@@ -28,7 +28,7 @@ from NStyle.Constants import StatusCodes
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_Employees(request):
-    all_employe= Employee.objects.all()
+    all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
     serialized = EmployeSerializer(all_employe, many=True)
     return Response(
         {
@@ -42,6 +42,61 @@ def get_Employees(request):
         },
         status=status.HTTP_200_OK
     )
+    
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_single_employee(request):
+    employee_id = request.GET.get('employee_id', None)
+
+    if not all([employee_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Employee id are required',
+                    'fields' : [
+                        'employee_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        employee_id = Employee.objects.get(id=employee_id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                    'response' : {
+                        'message' : 'Employee Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    seralized = singleEmployeeSerializer(employee_id)
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Business languages',
+                'error_message' : None,
+                'languages' : seralized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+    
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
