@@ -1,4 +1,5 @@
 from dataclasses import fields
+from genericpath import exists
 from pyexpat import model
 from rest_framework import serializers
 from .models import( Employee, EmployeeProfessionalInfo ,
@@ -52,14 +53,15 @@ class EmployeSerializer(serializers.ModelSerializer):
     #EmployeePermission
     def get_permissions(self, obj):
         try:
-            Permission = EmployeePermissionSetting.objects.get(employee=obj)
+            Permission= EmployeePermissionSetting.objects.get(employee=obj)
+            
             return EmployPermissionSerializer(Permission).data
         except EmployeePermissionSetting.DoesNotExist:
             return None
     #EmployeeModulePermission 
     def get_module_permissions(self, obj):
         try: 
-            ModulePermission= EmployeeModulePermission.objects.get(employee=obj)
+            ModulePermission= EmployeeModulePermission.objects.get(employee=obj)      
             return EmployeModulesSerializer(ModulePermission).data
         except EmployeeModulePermission.DoesNotExist:
             return None
@@ -199,4 +201,3 @@ class PayrollSerializers(serializers.ModelSerializer):
             #'employee',
             'employee'
             ]
-    

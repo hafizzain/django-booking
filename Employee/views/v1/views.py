@@ -12,7 +12,8 @@ from Employee.serializers import( EmployeSerializer , EmployeInformationsSeriali
                           , EmployPermissionSerializer,  EmployeModulesSerializer
                           ,  EmployeeMarketingSerializers, StaffGroupSerializers , 
                           StaffpermisionSerializers , AttendanceSerializers
-                          ,PayrollSerializers,EmployPayrollSerializers
+                          ,PayrollSerializers,EmployPayrollSerializers 
+                          
                           
                                  )
 from rest_framework import status
@@ -49,9 +50,10 @@ def create_employee(request):
     
     full_name= request.data.get('full_name', None)
     employee_id= request.data.get('employee_id', None)
+    
     email= request.data.get('email', None)
     image = request.data.get('image', None)
-    
+    business_id= request.data.get('business', None)  
     mobile_number= request.data.get('mobile_number', None)    
     dob= request.data.get('dob', None)
     gender = request.data.get('gender' , 'Male')
@@ -89,13 +91,13 @@ def create_employee(request):
     # access_loyalty_points=request.data.get('access_loyalty_points' , False)
     # access_gift_cards=request.data.get('access_gift_cards' , False)
     
-    business_id= request.data.get('business', None)    
+     
     country_id = request.data.get('country', None)   
     state_id = request.data.get('state', None)         
     city_id = request.data.get('city', None)
    
     if not all([
-        business_id, full_name, image ,employee_id, email, mobile_number, dob ,gender, country_id , state_id ,city_id ,postal_code ,address ,joining_date, designation, income_type, salary ]) or ( not to_present and ending_date is None): 
+         business_id, full_name, image ,employee_id, email, mobile_number, dob ,gender, country_id , state_id ,city_id ,postal_code ,address ,joining_date, designation, income_type, salary ]) or ( not to_present and ending_date is None):
        return Response(
             {
                 'status' : False,
@@ -186,8 +188,6 @@ def create_employee(request):
         employee.to_present = True 
     employee.save()
     data = {}
-    employee_serialized = EmployeSerializer(employee , context={'request' : request})
-    data.update(employee_serialized.data)
 
     errors =[]
 
@@ -215,6 +215,8 @@ def create_employee(request):
     if serialized.is_valid():
         serialized.save()
         data.update(serialized.data)
+    employee_serialized = EmployeSerializer(employee , context={'request' : request})
+    data.update(employee_serialized.data)
 
 
     return Response(
@@ -970,14 +972,83 @@ def delete_payroll(request):
     )
     
     
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# def create_payroll(request):
-#     user = request.user
-#     business = request.data.get('business', None)
-#     employees = request.data.get('employees', None)
-#     name = request.data.get('name', None)
-#     Total_hours= request.data.get('Total_hours', None)
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_payroll(request):
+    user = request.user
     
-#     if not all([    ]):
-#         return Response()
+    business = request.data.get('business', None)
+    employees = request.data.get('employees', None)
+    name = request.data.get('name', None)
+    Total_hours= request.data.get('Total_hours', None)
+    
+    if not all([ business, employees , name , Total_hours ]):
+         return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                          'employees',
+                          'name', 
+                          'Total_hours'
+                            ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+         
+    try:
+             business_id=Business.objects.get(id=business)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                }
+                }
+            )
+    try:
+        employee_id=Employee.objects.get(id=employees)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'response' : {
+                    'message' : 'Employee not found',
+                    'error_message' : str(err),
+                }
+                }
+            )
+            
+    payroll= Payroll.objects.create(
+        user= user,
+        business= business_id,
+        employee=employee_id,
+        name= name,
+        Total_hours=Total_hours
+        
+    )
+    
+    payroll_serializers= PayrollSerializers(payroll)
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Payroll Created Successfully!',
+                    'error_message' : None,
+                    'StaffGroup' : payroll_serializers.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        ) 
