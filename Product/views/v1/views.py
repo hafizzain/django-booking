@@ -439,7 +439,7 @@ def add_product(request):
         alert_when_stock_becomes_lowest= True
 
 
-    if not all([name, business_id, vendor_id, category_id, brand_id, product_type, cost_price, full_price, sell_price, short_description, description, barcode_id, sku, quantity, unit, amount, ]):
+    if not all([name, business_id, vendor_id, category_id, brand_id, product_type, cost_price, full_price, sell_price, short_description, description, barcode_id, sku, quantity, unit, amount,alert_when_stock_becomes_lowest ]):
         return Response(
             {
                 'status' : False,
