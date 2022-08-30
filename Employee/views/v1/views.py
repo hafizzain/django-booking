@@ -421,6 +421,16 @@ def update_employee(request):
             },
             status=status.HTTP_200_OK
            )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def delete_all_employees(request):
+    all_employees = Employee.objects.all()
+
+    for empl in all_employees:
+        empl.delete()
+    return Response({'deleted' : True})
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_staff_group(request):
