@@ -110,6 +110,7 @@ class BusinessThemeSerializer(serializers.ModelSerializer):
             'secondary_color',
             'menu_option',
             'calendar_option',
+            'theme_name',
         ]
 
 class StaffNotificationSettingSerializer(serializers.ModelSerializer):
