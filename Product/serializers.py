@@ -9,7 +9,7 @@ from django.conf import settings
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'name', 'is_active']
+        fields = ['id', 'name', 'is_active', 'created_at']
 
 class BrandSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
