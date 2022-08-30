@@ -1097,6 +1097,58 @@ def get_business_languages(request):
     )
 
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_languages(request):
+    id = request.data.get('id', None)
+    
+    if id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        language = UserLanguage.objects.get(id=id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'UserLanguage Not Found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    language.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Language deleted successful',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_all_languages(request):
