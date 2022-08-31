@@ -360,6 +360,7 @@ class BusinessVendor(models.Model):
     
     vendor_name = models.CharField(max_length=500, default='')
     address = models.TextField(default='')
+    
     latitude = models.CharField(default='', max_length=200, null=True, blank=True)
     longitude = models.CharField(default='', max_length=200, null=True, blank=True)
     postal_code = models.CharField(max_length=30, default='')
