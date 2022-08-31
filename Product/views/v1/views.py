@@ -432,7 +432,7 @@ def add_product(request):
     alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', None)
    
 
-    if not all([name, product_type, cost_price, full_price, sell_price, short_description, description, barcode_id, sku, quantity, unit, amount,alert_when_stock_becomes_lowest ]):
+    if not all([name,medias, brand_id, category_id, cost_price, full_price, sell_price, sku, quantity, stock_status, amount,alert_when_stock_becomes_lowest ]):
         return Response(
             {
                 'status' : False,
@@ -458,7 +458,7 @@ def add_product(request):
                         'sku',
                         'product_images',
                         'quantity', 
-                        'unit', 
+                        'status',
                         'amount', 
                         'alert_when_stock_becomes_lowest'
                     ]
@@ -505,10 +505,9 @@ def add_product(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-    if category_id is not None:
-        try:
+    try:
             category_id = Category.objects.get(id=category_id, is_active=True)
-        except Exception as err:
+    except Exception as err:
             return Response(
                 {
                     'status' : False,
@@ -522,10 +521,9 @@ def add_product(request):
                 status=status.HTTP_404_NOT_FOUND
             )
             
-    if brand_id is not None:
-        try:
+    try:
             brand_id = Brand.objects.get(id=brand_id, is_active=True)
-        except Exception as err:
+    except Exception as err:
             return Response(
                 {
                     'status' : False,
@@ -693,7 +691,7 @@ def update_product(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_products(request):
-    all_products = Product.objects.filter(is_deleted=False)
+    all_products = Product.objects.filter(is_deleted=False).order_by('-created_at')
     serialized = ProductSerializer(all_products, many=True, context={'request' : request})
 
     return Response(
