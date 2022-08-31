@@ -202,6 +202,37 @@ class PayrollSerializers(serializers.ModelSerializer):
             'employee'
             ]
 class singleEmployeeSerializer(serializers.ModelSerializer):
+    salary = serializers.SerializerMethodField(read_only=True)
+    income_type = serializers.SerializerMethodField(read_only=True)
+    designation = serializers.SerializerMethodField(read_only=True)
+    
+    def get_salary(self, obj):
+        try:
+            salary_info = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return salary_info.salary
+        except Exception:
+            return None
+        
+    def get_income_type(self, obj):        
+        try:
+            income_info = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return income_info.income_type 
+        except: 
+            return None
+        
+    def get_designation(self, obj):        
+        try:
+            designation = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return designation.designation 
+        except: 
+            return None
+        
     class Meta:
         model =Employee
-        fields = '__all__'    
+        fields = [
+            'id',
+            'full_name',
+            'salary',
+            'income_type',
+            'designation',           
+            ]   

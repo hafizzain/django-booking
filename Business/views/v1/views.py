@@ -463,12 +463,12 @@ def add_business_location(request):
     user = request.user
     address = request.data.get('address', None)
     address_name = request.data.get('address_name', None)
-    country_id = request.data.get('country', None)
-    state_id = request.data.get('state', None)
-    city_id = request.data.get('city', None)
+    country = request.data.get('country', None)
+    state = request.data.get('state', None)
+    city = request.data.get('city', None)
     postal_code = request.data.get('postal_code', None)
 
-    if not all([business_id, address, address_name, country_id, state_id, city_id, postal_code]):
+    if not all([business_id, address, address_name, postal_code]):
         return Response(
             {
                 'status' : False,
@@ -527,9 +527,12 @@ def add_business_location(request):
         )
     
     try:
-        country = Country.objects.get( id=country_id, is_deleted=False, is_active=True )
-        state = State.objects.get( id=state_id, is_deleted=False, is_active=True )
-        city = City.objects.get( id=city_id, is_deleted=False, is_active=True )
+        if country is not None:
+            country = Country.objects.get( id=country, is_deleted=False, is_active=True )
+        if state is not None:
+            state = State.objects.get( id=state, is_deleted=False, is_active=True )
+        if city is not None:
+            city = City.objects.get( id=city, is_deleted=False, is_active=True )
     except Exception as err:
         return Response(
             {

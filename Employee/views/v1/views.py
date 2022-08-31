@@ -13,7 +13,7 @@ from Employee.serializers import( EmployeSerializer , EmployeInformationsSeriali
                           ,  EmployeeMarketingSerializers, StaffGroupSerializers , 
                           StaffpermisionSerializers , AttendanceSerializers
                           ,PayrollSerializers,singleEmployeeSerializer 
-                          
+                        
                           
                                  )
 from rest_framework import status
@@ -21,7 +21,7 @@ from Business.models import Business
 from Utility.models import Country, State, City
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
-
+import json
 
 
 # Create your views here.
@@ -29,7 +29,7 @@ from NStyle.Constants import StatusCodes
 @permission_classes([AllowAny])
 def get_Employees(request):
     all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
-    serialized = EmployeSerializer(all_employe, many=True)
+    serialized = singleEmployeeSerializer(all_employe, many=True)
     return Response(
         {
             'status' : 200,
@@ -81,7 +81,18 @@ def get_single_employee(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-    seralized = singleEmployeeSerializer(employee_id)
+    seralized = EmployeSerializer(employee_id)
+    data = dict()
+    data.update(seralized.data)
+    data.update(data['permissions'])
+    del data['permissions']
+    data.update(data['module_permissions'])
+    del data['module_permissions']
+    data.update(data['employee_info'])
+    del data['employee_info']
+    data.update(data['marketing_permissions'])
+    del data['marketing_permissions']
+
     return Response(
         {
             'status' : True,
@@ -90,7 +101,7 @@ def get_single_employee(request):
             'response' : {
                 'message' : 'Business languages',
                 'error_message' : None,
-                'languages' : seralized.data
+                'Employee' : data
             }
         },
         status=status.HTTP_200_OK
@@ -185,6 +196,20 @@ def create_employee(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    if len(salary) > 7:
+        return Response(
+            {
+                'status' : True,
+                'status_code' : StatusCodes.INVALID_LENGTH_4030,
+                'status_code_text' :'INVALID_LENGTH_4030' ,
+                'response' : {
+                    'message' : 'Business not found!',
+                    'error_message' : 'Salary length to be 6 Integer',
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
     try:
         business=Business.objects.get(id=business_id)
     except Exception as err:
@@ -496,7 +521,7 @@ def create_staff_group(request):
         name = request.data.get('name', None)
         employees = request.data.get('employees', None)
         
-        is_active= request.data.get('is_active' , False)
+        is_active= request.data.get('is_active' , None)
         
         access_reports=request.data.get('access_reports', True)
         access_sales=request.data.get('access_sales', False)
@@ -542,12 +567,16 @@ def create_staff_group(request):
                 }
                 }
             )
-          
+        if is_active is not None:
+             is_active = json.loads(is_active)
+        else: 
+              is_active = False
                 
         staff_group= StaffGroup.objects.create(
             user=user,
             business= business, 
             name= name,
+            is_active=is_active,
         
         )
         #StaffGroupModulePermission
@@ -562,7 +591,6 @@ def create_staff_group(request):
         #staff_permission_serializers =  StaffpermisionSerializers(staff_module_permission)
         employees_error = []
         if type(employees) == str:
-            import json
             employees = json.loads(employees)
         elif type(employees) == list:
             pass
