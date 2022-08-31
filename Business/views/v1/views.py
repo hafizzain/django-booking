@@ -2135,8 +2135,8 @@ def add_business_vendor(request):
     gstin = request.data.get('gstin', None)
     website = request.data.get('website', None)
     is_active = request.data.get('is_active', None)
-
-    if not all([business_id,vendor_name, address, mobile_number, email, gstin, website, is_active]):
+    
+    if not all([business_id,vendor_name, address, email, is_active]):
         return Response(
             {
                 'status' : False,
@@ -2146,7 +2146,7 @@ def add_business_vendor(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'Following fields are required',
                     'fields' : [
-                        'business', 'vendor_name', 'address', 'mobile_number', 'email', 'country', 'state', 'city', 'gstin', 'website', 'is_active'
+                        'business', 'vendor_name', 'address', 'email', 'is_active'
                     ]
                 }
             },
