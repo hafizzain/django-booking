@@ -325,13 +325,16 @@ def update_brand(request):
     brand.description = request.data.get('description', brand.description)
     brand.website = request.data.get('website', brand.website)
     brand.image = request.data.get('image', brand.image)
-    is_active = request.data.get('is_active', None)
+    try:
+        brand.is_active = request.data.get('is_active', brand.is_active)
+    except Exception as err:
+        brand.is_active = False
     # if is_active is not None:
     #     is_active = json.loads(is_active)
     # else:
     #     is_active = True
         
-    brand.is_active
+    #brand.is_active
     brand.save()
     
     serialized = BrandSerializer(brand, context={'request' : request})
