@@ -203,7 +203,7 @@ def create_employee(request):
                 'status_code' : StatusCodes.INVALID_LENGTH_4030,
                 'status_code_text' :'INVALID_LENGTH_4030' ,
                 'response' : {
-                    'message' : 'Business not found!',
+                    'message' : 'Length not Valid!',
                     'error_message' : 'Salary length to be 6 Integer',
                 }
             },

@@ -3,6 +3,7 @@
 from rest_framework import serializers
 from Product.Constants.index import tenant_media_base_url
 from Product.models import Category, Brand, Product, ProductMedia, ProductStock
+from Business.models import BusinessVendor
 from django.conf import settings
 
 
@@ -66,6 +67,7 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
             'sale_status' : 'High',
             'turnover' : 'Highest',
         }
+        
 
     class Meta:
         model = Product
@@ -78,9 +80,18 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
             'stock',
         ]
         read_only_fields = ['id']
+        
+        
+class VendorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessVendor
+        fields = '__all__'
 
 class ProductSerializer(serializers.ModelSerializer):
-
+    brand=BrandSerializer(read_only=True)
+    category= CategorySerializer(read_only=True)
+    vendor= VendorSerializer(read_only=True)
+    
     media = serializers.SerializerMethodField()
     stocks = serializers.SerializerMethodField()
 
@@ -104,7 +115,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'name', 
             'vendor',
             'category',
-            'brand',
+            'brand',    
             'product_type',
             'cost_price',
             'full_price',
