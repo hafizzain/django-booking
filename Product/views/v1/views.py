@@ -432,7 +432,7 @@ def add_product(request):
     alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', None)
    
 
-    if not all([name, business_id, vendor_id, category_id, brand_id, product_type, cost_price, full_price, sell_price, short_description, description, barcode_id, sku, quantity, unit, amount,alert_when_stock_becomes_lowest ]):
+    if not all([name,  product_type, cost_price, full_price, sell_price, short_description, description, barcode_id, sku, quantity, unit, amount,alert_when_stock_becomes_lowest ]):
         return Response(
             {
                 'status' : False,
@@ -489,11 +489,11 @@ def add_product(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-            
-    try:
-        vendor = BusinessVendor.objects.get(id=vendor_id, is_deleted=False, is_active=True)
-    except Exception as err:
-        return Response(
+    if vendor_id is not None:     
+        try:
+            vendor_id = BusinessVendor.objects.get(id=vendor_id, is_deleted=False, is_active=True)
+        except Exception as err:
+            return Response(
                 {
                     'status' : False,
                     'status_code' : StatusCodes.VENDOR_NOT_FOUND_4019,
@@ -505,12 +505,28 @@ def add_product(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-    
-    try:
-        category = Category.objects.get(id=category_id, is_active=True)
-        brand = Brand.objects.get(id=brand_id, is_active=True)
-    except Exception as err:
-        return Response(
+    if category_id is not None:
+        try:
+            category_id = Category.objects.get(id=category_id, is_active=True)
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_CATEGORY_BRAND_4020,
+                    'status_code_text' : 'INVALID_CATEGORY_BRAND_4020',
+                    'response' : {
+                        'message' : 'Category or Brand Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+            
+    if brand_id is not None:
+        try:
+            brand_id = Brand.objects.get(id=brand_id, is_active=True)
+        except Exception as err:
+            return Response(
                 {
                     'status' : False,
                     'status_code' : StatusCodes.INVALID_CATEGORY_BRAND_4020,
@@ -526,9 +542,9 @@ def add_product(request):
     product = Product.objects.create(
         user = user,
         business = business,
-        vendor = vendor,
-        category = category,
-        brand = brand,
+        vendor = vendor_id,
+        category = category_id,
+        brand = brand_id,
         product_type = product_type,
         name = name,
         cost_price = cost_price,
