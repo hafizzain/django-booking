@@ -731,9 +731,12 @@ def update_location(request):
         city = request.data.get('city', None)
 
         try:
-            country = Country.objects.get( id=country, is_deleted=False, is_active=True )
-            state = State.objects.get( id=state, is_deleted=False, is_active=True )
-            city = City.objects.get( id=city, is_deleted=False, is_active=True )
+            if country is not None:
+                country = Country.objects.get( id=country, is_deleted=False, is_active=True )
+            if state is not None:
+                state = State.objects.get( id=state, is_deleted=False, is_active=True )
+            if city is not None:
+                city = City.objects.get( id=city, is_deleted=False, is_active=True )
         except Exception as err:
             return Response(
                 {

@@ -1,6 +1,7 @@
 from dataclasses import fields
 from genericpath import exists
 from pyexpat import model
+from Product.Constants.index import tenant_media_base_url
 from rest_framework import serializers
 from .models import( Employee, EmployeeProfessionalInfo ,
                EmployeePermissionSetting, EmployeeModulePermission 
@@ -34,6 +35,18 @@ class EmployeSerializer(serializers.ModelSerializer):
     permissions = serializers.SerializerMethodField(read_only=True)
     module_permissions =serializers.SerializerMethodField(read_only=True)
     marketing_permissions= serializers.SerializerMethodField(read_only=True)
+    image = serializers.SerializerMethodField()
+
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request)
+                return f'{url}{obj.image}'
+            except:
+                return obj.image
+        return None
+    
     
     # def get_field_names(self, declared_fields , obj):
         
@@ -205,6 +218,17 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
     salary = serializers.SerializerMethodField(read_only=True)
     income_type = serializers.SerializerMethodField(read_only=True)
     designation = serializers.SerializerMethodField(read_only=True)
+    image = serializers.SerializerMethodField()
+
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request)
+                return f'{url}{obj.image}'
+            except:
+                return obj.image
+        return None
     
     def get_salary(self, obj):
         try:

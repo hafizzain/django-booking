@@ -29,7 +29,7 @@ import json
 @permission_classes([AllowAny])
 def get_Employees(request):
     all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
-    serialized = singleEmployeeSerializer(all_employe, many=True)
+    serialized = singleEmployeeSerializer(all_employe,  many=True, context={'request' : request} )
     return Response(
         {
             'status' : 200,
@@ -81,7 +81,7 @@ def get_single_employee(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-    seralized = EmployeSerializer(employee_id)
+    seralized = EmployeSerializer(employee_id, context={'request' : request})
     data = dict()
     data.update(seralized.data)
     data.update(data['permissions'])
