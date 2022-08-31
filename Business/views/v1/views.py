@@ -20,6 +20,7 @@ from Profile.serializers import UserLanguageSerializer
 from Tenants.models import Domain, Tenant
 from Utility.models import Country, Language, State, City
 from Utility.serializers import LanguageSerializer
+import json
 
 from django_tenants.utils import tenant_context
 
@@ -2130,7 +2131,7 @@ def add_business_vendor(request):
     city = request.data.get('city', None)
     gstin = request.data.get('gstin', None)
     website = request.data.get('website', None)
-    is_active = request.data.get('is_active', True)
+    is_active = request.data.get('is_active', None)
 
     if not all([business_id,vendor_name, address, mobile_number, email, gstin, website, is_active]):
         return Response(
@@ -2185,6 +2186,10 @@ def add_business_vendor(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
+    if is_active is not None:
+        is_active= json.loads(is_active)
+    else:
+        is_active= True
         
     try:
         vendor = BusinessVendor.objects.create(
