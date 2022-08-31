@@ -130,7 +130,7 @@ class StaffGroupSerializers(serializers.ModelSerializer):
     def get_staff_permission(self, obj):
         
         try:
-            permission = StaffGroupModulePermission.objects.get(staff_group=obj)
+            permission, created = StaffGroupModulePermission.objects.get_or_create(staff_group=obj)
             return StaffpermisionSerializers(permission).data
         except StaffGroupModulePermission.DoesNotExist:
             return None    

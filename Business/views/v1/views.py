@@ -467,8 +467,14 @@ def add_business_location(request):
     state = request.data.get('state', None)
     city = request.data.get('city', None)
     postal_code = request.data.get('postal_code', None)
+    
+    email= request.data.get('email',None)
+    mobile_number = request.data.get('mobile_number', None)
+    
+    start_time = request.data.get('start_time', None)
+    close_time = request.data.get('close_time', None)
 
-    if not all([business_id, address, address_name, postal_code]):
+    if not all([business_id, address, email, mobile_number, address_name, postal_code]):
         return Response(
             {
                 'status' : False,
@@ -562,7 +568,25 @@ def add_business_location(request):
         is_closed = False,
     )
     business_address.save()
-
+    
+    if start_time or close_time is not None:
+        days = [
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thursday',
+            'Friday',
+            'Saturday',
+            'Sunday',
+        ]
+        for day in days:
+            BusinessOpeningHour.objects.create(
+                day = day,
+                start_time = start_time,
+                close_time = close_time,
+                business_address = business_address,
+                business = business
+            )
     serialized = BusinessAddress_GetSerializer(business_address)
 
     return Response(
@@ -2076,7 +2100,7 @@ def delete_business_tax(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_business_vendors(request):
-    all_vendors = BusinessVendor.objects.filter(is_deleted=False, is_active=True, is_closed=False)
+    all_vendors = BusinessVendor.objects.filter(is_deleted=False, is_closed=False)
     serialized = BusinessVendorSerializer(all_vendors, many=True)
     return Response(
             {
@@ -2101,14 +2125,14 @@ def add_business_vendor(request):
     address = request.data.get('address', None)
     mobile_number = request.data.get('mobile_number', None)
     email = request.data.get('email', None)
-    country_id = request.data.get('country', None)
-    state_id = request.data.get('state', None)
-    city_id = request.data.get('city', None)
+    country = request.data.get('country', None)
+    state = request.data.get('state', None)
+    city = request.data.get('city', None)
     gstin = request.data.get('gstin', None)
     website = request.data.get('website', None)
     is_active = request.data.get('is_active', True)
 
-    if not all([business_id,vendor_name, address, mobile_number, email, country_id, state_id, city_id, gstin, website, is_active]):
+    if not all([business_id,vendor_name, address, mobile_number, email, gstin, website, is_active]):
         return Response(
             {
                 'status' : False,
@@ -2126,9 +2150,12 @@ def add_business_vendor(request):
         )
 
     try:
-        country = Country.objects.get( id=country_id, is_deleted=False, is_active=True )
-        state = State.objects.get( id=state_id, is_deleted=False, is_active=True )
-        city = City.objects.get( id=city_id, is_deleted=False, is_active=True )
+        if country is not None:
+            country = Country.objects.get( id=country, is_deleted=False, is_active=True )
+        if state is not None:
+            state = State.objects.get( id=state, is_deleted=False, is_active=True )
+        if city is not None:
+            city = City.objects.get( id=city, is_deleted=False, is_active=True )
     except Exception as err:
         return Response(
             {

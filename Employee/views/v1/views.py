@@ -158,12 +158,12 @@ def create_employee(request):
     # access_gift_cards=request.data.get('access_gift_cards' , False)
     
      
-    country_id = request.data.get('country', None)   
-    state_id = request.data.get('state', None)         
-    city_id = request.data.get('city', None)
+    country = request.data.get('country', None)   
+    state = request.data.get('state', None)         
+    city = request.data.get('city', None)
    
     if not all([
-         business_id, full_name, image ,employee_id, email, mobile_number, dob ,gender, country_id , state_id ,city_id ,postal_code ,address ,joining_date, designation, income_type, salary ]) or ( not to_present and ending_date is None):
+         business_id, full_name, image ,employee_id, email, mobile_number, dob ,gender ,postal_code ,address ,joining_date, designation, income_type, salary ]) or ( not to_present and ending_date is None):
        return Response(
             {
                 'status' : False,
@@ -226,9 +226,12 @@ def create_employee(request):
             status=status.HTTP_404_NOT_FOUND
         )
     try:
-        country = Country.objects.get(id=country_id)
-        state= State.objects.get(id=state_id)
-        city = City.objects.get(id=city_id)
+        if country is not None:
+            country = Country.objects.get(id=country)
+        if state is not None:
+            state= State.objects.get(id=state)
+        if city is not None:
+            city = City.objects.get(id=city)
     except Exception as err:
         return Response(
             {
@@ -568,7 +571,8 @@ def create_staff_group(request):
                 }
             )
         if is_active is not None:
-             is_active = json.loads(is_active)
+             #is_active = json.loads(is_active)
+             pass
         else: 
               is_active = False
                 
@@ -592,6 +596,7 @@ def create_staff_group(request):
         employees_error = []
         if type(employees) == str:
             employees = json.loads(employees)
+
         elif type(employees) == list:
             pass
         
@@ -621,7 +626,7 @@ def create_staff_group(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_staff_group(request):
-    all_staff_group= StaffGroup.objects.all()
+    all_staff_group= StaffGroup.objects.all().order_by('-created_at')
     serialized = StaffGroupSerializers(all_staff_group, many=True)
     return Response(
         {
