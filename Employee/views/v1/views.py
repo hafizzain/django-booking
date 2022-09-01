@@ -211,7 +211,7 @@ def create_employee(request):
     city = request.data.get('city', None)
    
     if not all([
-         business_id, full_name, image ,employee_id, email, mobile_number, dob ,gender ,postal_code ,address ,joining_date, designation, income_type, salary ]) or ( not to_present and ending_date is None):
+         business_id, full_name, image ,employee_id, email, country, state, city ,gender  ,address , designation, income_type, salary ]) or ( not to_present and ending_date is None):
        return Response(
             {
                 'status' : False,
@@ -226,14 +226,10 @@ def create_employee(request):
                         'full_name',
                         'image',
                         'email',
-                        'mobile_number', 
-                        'dob', 
                         'gender', 
                         'country',
-                        'state', 
-                        'postal_code', 
+                        'state',  
                         'address' ,
-                        'joining_date', 
                         'to_present', 
                         'ending_date',  
                         'designation',
@@ -274,12 +270,9 @@ def create_employee(request):
             status=status.HTTP_404_NOT_FOUND
         )
     try:
-        if country is not None:
-            country = Country.objects.get(id=country)
-        if state is not None:
-            state= State.objects.get(id=state)
-        if city is not None:
-            city = City.objects.get(id=city)
+        country = Country.objects.get(id=country)
+        state= State.objects.get(id=state)
+        city = City.objects.get(id=city)
     except Exception as err:
         return Response(
             {
@@ -452,6 +445,10 @@ def update_employee(request):
                    status=status.HTTP_404_NOT_FOUND
               )
         data={}
+        image=request.data.get('image',None)
+        if image is not None:
+            employee.image=image
+            employee.save()
         serializer = EmployeSerializer(employee, data=request.data, partial=True, context={'request' : request})
         if serializer.is_valid():
            serializer.save()
@@ -468,6 +465,7 @@ def update_employee(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+        
         Employe_Informations= EmployeeProfessionalInfo.objects.get(employee=employee)
         serializer_info= EmployeInformationsSerializer(Employe_Informations,  data=request.data, partial=True)
         if serializer_info.is_valid():

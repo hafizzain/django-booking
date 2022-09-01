@@ -26,17 +26,17 @@ class Employee(models.Model):
     is_email_verified = models.BooleanField(default=False)
     is_mobile_verified = models.BooleanField(default=False)
 
-    dob = models.DateField(verbose_name='Date of Birth')
+    dob = models.DateField(verbose_name='Date of Birth', null=True, blank=True)
     gender = models.CharField(choices=GENDER_CHOICES, default='Male', max_length=20)
 
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True, blank=True, related_name='country_employees')
     state = models.ForeignKey(State, on_delete=models.SET_NULL, null=True, blank=True, related_name='state_employees')
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, related_name='city_employees')
 
-    postal_code = models.CharField(max_length=20, default='')
+    postal_code = models.CharField(max_length=20, null=True, blank=True)
     address = models.TextField(default='')
 
-    joining_date = models.DateField()
+    joining_date = models.DateField(null=True, blank=True)
     to_present = models.BooleanField(default=False)
     ending_date = models.DateField(null=True, blank=True)
 

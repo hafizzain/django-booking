@@ -111,6 +111,7 @@ class EmployeSerializer(serializers.ModelSerializer):
                 'joining_date', 
                 'to_present', 
                 'ending_date',  
+                'is_active',
                 'employee_info',
                 'permissions',       
                 'module_permissions',
