@@ -2139,7 +2139,7 @@ def add_business_vendor(request):
     vendor_name = request.data.get('vendor_name', None)
     address = request.data.get('address', None)
     mobile_number = request.data.get('mobile_number', None)
-    
+
     email = request.data.get('email', None)
     country = request.data.get('country', None)
     state = request.data.get('state', None)

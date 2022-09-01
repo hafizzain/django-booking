@@ -369,7 +369,7 @@ class BusinessVendor(models.Model):
     email = models.EmailField()
     is_email_verified = models.BooleanField(default=False, null=True, blank=True)
 
-    mobile_number = models.CharField(max_length=30)
+    mobile_number = models.CharField(max_length=30, null=True, blank=True)
     is_mobile_verified = models.BooleanField(default=False)
 
     is_primary = models.BooleanField(default=False)
