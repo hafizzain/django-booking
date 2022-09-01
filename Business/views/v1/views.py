@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from Business.models import BusinessType
-from Business.serializers.v1_serializers import AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer
+from Business.serializers.v1_serializers import OpeningHoursSerializer,AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer
 
 from NStyle.Constants import StatusCodes
 
@@ -488,9 +488,8 @@ def add_business_location(request):
                         'business',
                         'address',
                         'address_name',
-                        'country',
-                        'state',
-                        'city',
+                        'email',
+                        'mobile_number',
                         'postal_code',
                     ]
                 }
@@ -527,7 +526,7 @@ def add_business_location(request):
                 'status_code_text' : 'USER_HAS_NO_PERMISSION_1001',
                 'response' : {
                     'message' : 'You are not allowed to add Business Location, Only Business owner can',
-                    'error_message' : str(err),
+                    'error_message' : 'Error message',
                 }
             },
             status=status.HTTP_404_NOT_FOUND
@@ -569,7 +568,7 @@ def add_business_location(request):
         is_closed = False,
     )
     business_address.save()
-    
+    data={}
     if start_time or close_time is not None:
         days = [
             'Monday',
@@ -581,15 +580,25 @@ def add_business_location(request):
             'Sunday',
         ]
         for day in days:
-            BusinessOpeningHour.objects.create(
+            day =day
+        BusinessOpeningHour.objects.create(
                 day = day,
                 start_time = start_time,
                 close_time = close_time,
                 business_address = business_address,
                 business = business
             )
+            
+    
+            
+    # serialized = OpeningHoursSerializer(busines_opening,  data=request.data)
+    # if serialized.is_valid():
+    #     serialized.save()
+    #     data.update(serialized.data)
     serialized = BusinessAddress_GetSerializer(business_address)
-
+    # if serialized.is_valid():
+    #     serialized.save()
+    #     data.update(serialized.data)
     return Response(
             {
                 'status' : True,
@@ -2279,6 +2288,7 @@ def update_business_vendor(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+        
     serialized = BusinessVendorSerializer(vendor, data=request.data)
     if serialized.is_valid():
         serialized.save()

@@ -575,6 +575,7 @@ def add_product(request):
         quantity = quantity,
         amount = amount,
         unit = unit,
+        available_quantity= quantity,
         alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
         is_active = stock_status,
     )

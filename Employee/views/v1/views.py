@@ -22,9 +22,57 @@ from Utility.models import Country, State, City
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
+from django.db.models import Q
+
 
 
 # Create your views here.
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def search_employee(request):
+    text = request.GET.get('text', None)
+
+    if text is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'text',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    search_employee = Employee.objects.filter(
+        Q(full_name__icontains=text)|
+        Q(employee_id__icontains=text) |
+        Q(email__icontains=text)|
+        Q(mobile_number__icontains=text)|
+        Q(gender__icontains=text)|
+        Q(employee_professional_details__designation__icontains=text)|
+        Q(employee_professional_details__income_type__icontains=text) 
+    )
+    serialized = singleEmployeeSerializer(search_employee, many=True, context={'request':request})
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'All Search Products!',
+                'error_message' : None,
+                'count' : len(serialized.data),
+                'Employees' : serialized.data,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_Employees(request):

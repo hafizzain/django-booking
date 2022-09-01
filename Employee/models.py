@@ -22,7 +22,7 @@ class Employee(models.Model):
     image = models.ImageField(upload_to='employee/employee_images/', null=True, blank=True)
     employee_id = models.CharField(max_length=50, default='')
     email = models.EmailField(default='')
-    mobile_number = models.CharField(max_length=30, default='')
+    mobile_number = models.CharField(max_length=30, null=True, blank=True)
     is_email_verified = models.BooleanField(default=False)
     is_mobile_verified = models.BooleanField(default=False)
 

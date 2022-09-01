@@ -4,7 +4,7 @@
 from cmath import e
 from rest_framework import serializers
 
-from Business.models import BookingSetting, BusinessType, Business, BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BusinessPaymentMethod, BusinessTax, BusinessVendor
+from Business.models import BookingSetting, BusinessType, Business, BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BusinessPaymentMethod, BusinessTax, BusinessVendor,BusinessOpeningHour
 from Authentication.serializers import UserSerializer
 from django.conf import settings
 
@@ -86,7 +86,41 @@ class Business_PutSerializer(serializers.ModelSerializer):
             'week_start',
         ]
 
+
+class OpeningHoursSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model= BusinessOpeningHour
+        fields= '__all__'
+
 class BusinessAddress_GetSerializer(serializers.ModelSerializer):
+    #opening_hours= OpeningHoursSerializer(read_only=True)
+    # busines_location = serializers.SerializerMethodField(read_only=True)
+    
+    # def get_busines_location(self, obj):
+    #     try:
+    #         location = BusinessOpeningHour.objects.get(business_address=obj)
+    #         return OpeningHoursSerializer(location).data
+    #     except BusinessOpeningHour.DoesNotExist:
+    #         return None
+    
+    start_time=  serializers.SerializerMethodField(read_only=True)
+    end_time= serializers.SerializerMethodField(read_only=True)
+    
+    
+    def get_start_time(self, obj):
+        try:
+            location = BusinessOpeningHour.objects.get(business_address=obj)
+            return location.start_time
+        except BusinessOpeningHour.DoesNotExist:
+            return None
+    def get_end_time(self, obj):
+        try:
+            location = BusinessOpeningHour.objects.get(business_address=obj)
+            return location.close_time
+        except BusinessOpeningHour.DoesNotExist:
+            return None
+
     class Meta:
         model = BusinessAddress
         fields = [
@@ -99,6 +133,8 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
             'postal_code',
             'website',
             'is_primary',
+            'start_time',
+            'end_time',
         ]
 
 class BusinessThemeSerializer(serializers.ModelSerializer):
