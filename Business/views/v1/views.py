@@ -475,7 +475,7 @@ def add_business_location(request):
     start_time = request.data.get('start_time', None)
     close_time = request.data.get('close_time', None)
 
-    if not all([business_id, address, email, mobile_number, address_name, postal_code]):
+    if not all([business_id, address, email, mobile_number, address_name]):
         return Response(
             {
                 'status' : False,
@@ -490,7 +490,6 @@ def add_business_location(request):
                         'address_name',
                         'email',
                         'mobile_number',
-                        'postal_code',
                     ]
                 }
             },

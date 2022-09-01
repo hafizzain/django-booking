@@ -14,6 +14,25 @@ import json
 
 from NStyle.Constants import StatusCodes
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_client(request):
+    all_client=Client.objects.all().order_by('-created_at')
+    serialized = ClientSerializer(all_client, many=True,  context={'request' : request})
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Staff Group',
+                'error_message' : None,
+                'employees' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_client(request):
@@ -98,16 +117,15 @@ def create_client(request):
             status=status.HTTP_404_NOT_FOUND
         )
         
-    if postal_code is not None:
-        postal_code=postal_code
-    else:
-        postal_code=' '
     client=Client.objects.create(
         user=user,
         business=business,
         full_name = full_name,
         image= image,
+        client_id=client_id,
         email= email,
+        mobile_number=mobile_number,
+        dob=dob,
         address=address,
         gender= gender,
         country= country,
@@ -116,7 +134,7 @@ def create_client(request):
         postal_code= postal_code,
         card_number= card_number,
     )
-    serialized= ClientSerializer(client)
+    serialized= ClientSerializer(client, partial=True, context={'request' : request})
     return Response(
         {
             'status' : True,
@@ -128,4 +146,123 @@ def create_client(request):
             }
         },
         status=status.HTTP_201_CREATED
+    )
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_client(request): 
+    # sourcery skip: avoid-builtin-shadow
+        id = request.data.get('id', None)
+        if id is None:
+            return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'User id is required',
+                    'fields' : [
+                        'id',
+                    ]
+                }
+            },
+             status=status.HTTP_400_BAD_REQUEST
+           )
+        try:
+            client = Client.objects.get(id=id)
+        except Exception as err:
+              return Response(
+             {
+                    'status' : False,
+                    'status_code' : StatusCodes.USER_NOT_EXIST_4005,
+                    'status_code_text' : 'USER_NOT_EXIST_4005',
+                    'response' : {
+                        'message' : 'Client Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                   status=status.HTTP_404_NOT_FOUND
+              )
+              
+        serialized= ClientSerializer(client, data=request.data, partial=True, context={'request' : request})
+        if serialized.is_valid():
+           serialized.save()
+           return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Update Employee Successfully',
+                    'error_message' : None,
+                    'Employee' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+           )
+        else:
+              return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_EMPLOYEE_PERMISSION_4027,
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : str(serialized.errors),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+        
+        
+        
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_client(request):
+    client_id = request.data.get('client_id', None)
+    if client_id is None:
+     return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required.',
+                    'fields' : [
+                        'client_id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        client = Client.objects.get(id=client_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Employee ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    client.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Client deleted successful',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
     )

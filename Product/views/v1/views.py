@@ -34,7 +34,7 @@ def ExportCSV(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_categories(request):
-    all_categories = Category.objects.all()
+    all_categories = Category.objects.all().order_by('-created_at')
     serialized = CategorySerializer(all_categories, many=True)
     return Response(
         {
@@ -432,10 +432,10 @@ def add_product(request):
     amount = request.data.get('amount', None)
     stock_status = request.data.get('stock_status', None)
    
-    alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', None)
+    alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', False)
    
 
-    if not all([name,medias, brand_id, category_id, cost_price, full_price, sell_price, sku, quantity, stock_status, amount,alert_when_stock_becomes_lowest ]):
+    if not all([name,medias, brand_id, category_id, cost_price, full_price, sell_price, sku, quantity, stock_status ]):
         return Response(
             {
                 'status' : False,
@@ -446,7 +446,6 @@ def add_product(request):
                     'error_message' : 'All fields are required.',
                     'fields' : [
                         'business',
-                        'vendor',
                         'category',
                         'brand',
                         'product_type',
@@ -454,16 +453,10 @@ def add_product(request):
                         'cost_price',
                         'full_price',
                         'sell_price',
-                        'tax_rate',
-                        'short_description',
-                        'description',
-                        'barcode_id',
                         'sku',
                         'product_images',
-                        'quantity', 
                         'status',
-                        'amount', 
-                        'alert_when_stock_becomes_lowest'
+                        'quantity',
                     ]
                 }
             },
