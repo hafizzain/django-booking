@@ -7,6 +7,7 @@ from django.db.models import Q
 from Business.models import Business
 from Utility.models import Country, State, City
 from Client.models import Client
+from Client.serializers import ClientSerializer
 
 
 import json
@@ -31,14 +32,14 @@ def create_client(request):
     
     postal_code= request.data.get('postal_code' , None)
     address= request.data.get('address' , None)
-    crad_number= request.data.get('crad_number' , None)
+    card_number= request.data.get('card_number' , None)
     is_active = request.data.get('is_active', None)
     
     city= request.data.get('city', None)
     state= request.data.get('state', None)
     country= request.data.get('country', None)
     
-    if not all([business_id, client_id, full_name, image , email ,gender  ,address, is_active ]):
+    if not all([business_id, client_id, full_name , email ,gender  ,address, is_active ]):
         return Response(
             {
                 'status' : False,
@@ -51,13 +52,11 @@ def create_client(request):
                         'business_id',
                         'client_id',
                         'full_name',
-                        'image',
                         'email',
                         'gender', 
                         'postal_code', 
                         'address' ,
                         'is_active',
-                        'business_id',
                     ]
                 }
             },
@@ -98,20 +97,35 @@ def create_client(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+        
+    if postal_code is not None:
+        postal_code=postal_code
+    else:
+        postal_code=' '
     client=Client.objects.create(
         user=user,
         business=business,
         full_name = full_name,
         image= image,
         email= email,
-        mobile_number= mobile_number,
-        dob=dob,
+        address=address,
         gender= gender,
         country= country,
         state = state,
         city = city,
-        postal_code = postal_code,
-        address=address,
-        crad_number=crad_number,
-        
+        postal_code= postal_code,
+        card_number= card_number,
+    )
+    serialized= ClientSerializer(client)
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 201,
+            'response' : {
+                'message' : 'Employees Added!',
+                'error_message' : None,
+                'Client' : serialized.data
+            }
+        },
+        status=status.HTTP_201_CREATED
     )

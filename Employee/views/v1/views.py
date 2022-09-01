@@ -452,7 +452,7 @@ def update_employee(request):
                    status=status.HTTP_404_NOT_FOUND
               )
         data={}
-        serializer = EmployeSerializer(employee, data=request.data, partial=True)
+        serializer = EmployeSerializer(employee, data=request.data, partial=True, context={'request' : request})
         if serializer.is_valid():
            serializer.save()
            data.update(serializer.data)

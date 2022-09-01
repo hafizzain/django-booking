@@ -558,6 +558,8 @@ def add_business_location(request):
         user = user,
         address = address,
         address_name = address_name,
+        email= email,
+        mobile_number=mobile_number,
         postal_code = postal_code,
         country=country,
         state=state,
@@ -2136,7 +2138,7 @@ def add_business_vendor(request):
     business_id = request.data.get('business', None)
     vendor_name = request.data.get('vendor_name', None)
     address = request.data.get('address', None)
-    mobile_number = request.data.get('mobile_number', ' ')
+    mobile_number = request.data.get('mobile_number', None)
     
     email = request.data.get('email', None)
     country = request.data.get('country', None)

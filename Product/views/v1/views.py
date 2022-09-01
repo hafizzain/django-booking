@@ -662,10 +662,21 @@ def update_product(request):
     product.brand = brand
     product.vendor = vendor
     product.save()
-
+    
+    data={}
+    
+    stock=ProductStock.objects.get(product=product)
+    serialized= ProductStockSerializer(stock, data=request.data, partial=True)
+    if serialized.is_valid():
+        serialized.save()
+        data.update(serialized.data)
+        
+    
     serialized = ProductSerializer(product, data=request.data, partial=True, context={'request':request})
     if serialized.is_valid():
         serialized.save()
+        data.update(serialized.data)
+    
         return Response(
             {
                 'status' : True,
@@ -673,7 +684,7 @@ def update_product(request):
                 'response' : {
                     'message' : 'Product Updated!',
                     'error_message' : None,
-                    'product' : serialized.data
+                    'product' : data
                 }
             },
             status=status.HTTP_200_OK

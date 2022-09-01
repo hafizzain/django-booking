@@ -367,9 +367,9 @@ class BusinessVendor(models.Model):
     gstin = models.CharField(default='', max_length=1000, null=True, blank=True)
     website = models.TextField(null=True, blank=True)
     email = models.EmailField()
-    is_email_verified = models.BooleanField(default=False)
+    is_email_verified = models.BooleanField(default=False, null=True, blank=True)
 
-    mobile_number = models.CharField(default=' ', max_length=30)
+    mobile_number = models.CharField(max_length=30)
     is_mobile_verified = models.BooleanField(default=False)
 
     is_primary = models.BooleanField(default=False)

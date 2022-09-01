@@ -128,6 +128,8 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
             'country',
             'state',
             'city',
+            'email',
+            'mobile_number',
             'address',
             'address_name',
             'postal_code',
