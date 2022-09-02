@@ -41,26 +41,26 @@ def export_csv(request):
         return response
 
 
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# def import_csv(request):
-#     product_csv = request.data.get('file', None)
-#     with open( product_csv , 'r') as imp_file:
-#         for row in imp_file:
-#             row = row.split(',')
-#             name= row[0]
-#             quantity= row[1]
-#             category= row[2]
-#             product_type= row[3].replace('\n', '').strip()
-#             product= Product.objects.create(
-#                 name=name, 
-#                 product_type=product_type, 
-#                 category=category)
-#             ProductStock.objects.create(
-#                 product=product,
-#                 quantity=quantity,
-#             )
-#             print(f'Added Product {name} ...')
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def import_csv(request):
+    product_csv = request.data.get('file', None)
+    with open( product_csv , 'r') as imp_file:
+        for row in imp_file:
+            row = row.split(',')
+            name= row[0]
+            quantity= row[1]
+            category= row[2]
+            product_type= row[3].replace('\n', '').strip()
+            product= Product.objects.create(
+                name=name, 
+                product_type=product_type, 
+                category=category)
+            ProductStock.objects.create(
+                product=product,
+                quantity=quantity,
+            )
+            print(f'Added Product {name} ...')
     
     
 
