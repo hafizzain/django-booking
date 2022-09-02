@@ -105,7 +105,7 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
     #         return None
     
     start_time=  serializers.SerializerMethodField(read_only=True)
-    end_time= serializers.SerializerMethodField(read_only=True)
+    close_time= serializers.SerializerMethodField(read_only=True)
     
     
     def get_start_time(self, obj):
@@ -114,7 +114,7 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
             return location.start_time
         except BusinessOpeningHour.DoesNotExist:
             return None
-    def get_end_time(self, obj):
+    def get_close_time(self, obj):
         try:
             location = BusinessOpeningHour.objects.get(business_address=obj)
             return location.close_time
@@ -136,7 +136,7 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
             'website',
             'is_primary',
             'start_time',
-            'end_time',
+            'close_time',
         ]
 
 class BusinessThemeSerializer(serializers.ModelSerializer):

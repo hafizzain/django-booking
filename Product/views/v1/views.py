@@ -1,12 +1,15 @@
 
 
-
+#from math import prod
+from django.http import HttpResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Q
 import json
+import csv
+
 
 from NStyle.Constants import StatusCodes
 
@@ -16,17 +19,29 @@ from Business.models import Business, BusinessAddress, BusinessVendor
 from Product.serializers import CategorySerializer, BrandSerializer, ProductSerializer, ProductStockSerializer, ProductWithStockSerializer
 
 
-
-def ExportCSV(request):
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def export_csv(request):
         #product = ProductStock.objects.all()
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="ProductStock.csv"'
 
         writer = csv.writer(response)
-        writer.writerow('id', 'user', 'business', 'product', 'quantity', 'amount', 'unit', 'is_active')
+        writer.writerow(['id', 'user', 'business', 'product', 'quantity', 'amount', 'unit', 'is_active'])
         
         for product in ProductStock.objects.all():
-            writer.writerow(product)
+            writer.writerow(
+                [
+                    product.id,
+                    product.user,
+                    product.business,
+                    product.product,
+                    product.quantity,
+                    product.amount,
+                    product.unit,
+                    product.is_active
+                ]
+            )
         return response
 
 
@@ -651,6 +666,9 @@ def update_product(request):
     product = Product.objects.get(
         id=product_id,
     )
+    image= request.data.get('image', None)
+    if image is not None:
+        product.image = image        
     product.category = category
     product.brand = brand
     product.vendor = vendor

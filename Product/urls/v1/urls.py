@@ -30,5 +30,5 @@ urlpatterns = [
     path('filter_stock/', views.filter_stock),
 
     #Export CSV files
-    path('export_csv/', views.ExportCSV, name='export_csv')
+    path('export_csv/', views.export_csv, name='export_csv')
 ]

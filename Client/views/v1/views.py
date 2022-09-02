@@ -6,8 +6,8 @@ from rest_framework import status
 from django.db.models import Q
 from Business.models import Business
 from Utility.models import Country, State, City
-from Client.models import Client
-from Client.serializers import ClientSerializer
+from Client.models import Client, ClientGroup
+from Client.serializers import ClientSerializer, ClientGroupSerializer
 
 
 import json
@@ -266,3 +266,93 @@ def delete_client(request):
         },
         status=status.HTTP_200_OK
     )
+    
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_client_group(request):
+    user = request.user     
+    business_id= request.data.get('business', None)
+        
+    email= request.data.get('email', None)    
+    name = request.data.get('name', None)
+    client = request.data.get('client', None)
+        
+    is_active= request.data.get('is_active' , None)
+    
+    if not all([ business_id, name, client ]):
+              return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                          'client',
+                          'email', 
+                          'name',
+                            ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+             business=Business.objects.get(id=business_id)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                }
+                }
+            )
+    
+    if is_active is not None:
+        is_active = json.loads(is_active)
+    else: 
+        is_active = False
+    
+    client_group=ClientGroup.objects.create(
+        user=user,
+        business=business,
+        name= name,
+        email= email,
+        is_active= is_active,
+    )
+    client_error = []
+    if type(client) == str:
+            client = json.loads(client)
+
+    elif type(client) == list:
+            pass
+        
+    for usr in client:
+            try:
+               employe = Client.objects.get(id=usr)  
+               client_group.client.add(employe)
+            except Exception as err:
+                client_error.append(str(err))
+        # client_group.save()
+        # serialized = ClientGroupSerializer(staff_group)
+       
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Staff Group Create!',
+                    'error_message' : None,
+                    'StaffGroup' : serialized.data,
+                    'staff_errors' : employees_error,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        ) 
+    
+    serialized=ClientGroupSerializer(client_group)
