@@ -211,7 +211,7 @@ def create_employee(request):
     city = request.data.get('city', None)
    
     if not all([
-         business_id, full_name, image ,employee_id, email, country, state, city ,gender  ,address , designation, income_type, salary ]) or ( not to_present and ending_date is None):
+         business_id, full_name ,employee_id, email, country, state, city ,gender  ,address , designation, income_type, salary ]): #or ( not to_present and ending_date is None):
        return Response(
             {
                 'status' : False,
@@ -224,14 +224,11 @@ def create_employee(request):
                         'business',
                         'employee_id',
                         'full_name',
-                        'image',
                         'email',
                         'gender', 
                         'country',
                         'state',  
                         'address' ,
-                        'to_present', 
-                        'ending_date',  
                         'designation',
                         'income_type',
                         'salary',
@@ -551,14 +548,14 @@ def update_employee(request):
             status=status.HTTP_200_OK
            )
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def delete_all_employees(request):
-    all_employees = Employee.objects.all()
+# @api_view(['GET'])
+# @permission_classes([AllowAny])
+# def delete_all_employees(request):
+#     all_employees = Employee.objects.all()
 
-    for empl in all_employees:
-        empl.delete()
-    return Response({'deleted' : True})
+#     for empl in all_employees:
+#         empl.delete()
+#     return Response({'deleted' : True})
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -617,8 +614,7 @@ def create_staff_group(request):
                 }
             )
         if is_active is not None:
-             #is_active = json.loads(is_active)
-             pass
+             is_active = json.loads(is_active)
         else: 
               is_active = False
                 

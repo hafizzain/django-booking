@@ -63,3 +63,7 @@ class ClientGroup(models.Model):
 
     def __str__(self):
         return str(self.id)
+    
+    
+# class Promotions(models.Model):
+    

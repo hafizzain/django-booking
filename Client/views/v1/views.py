@@ -280,7 +280,7 @@ def get_client_group(request):
             'response' : {
                 'message' : 'All Client Group',
                 'error_message' : None,
-                'employees' : serialized.data
+                'clientsgroup' : serialized.data
             }
         },
         status=status.HTTP_200_OK
@@ -332,11 +332,6 @@ def create_client_group(request):
                 }
             )
     
-    # if is_active is not None:
-    #     is_active = json.loads(is_active)
-    # else: 
-    #     is_active = False
-    
     client_group=ClientGroup.objects.create(
         user=user,
         business=business,
@@ -359,7 +354,6 @@ def create_client_group(request):
                 client_error.append(str(err))
             client_group.save()
             serialized=ClientGroupSerializer(client_group)
-        # serialized = ClientGroupSerializer(staff_group)
        
     return Response(
             {
@@ -368,11 +362,126 @@ def create_client_group(request):
                 'response' : {
                     'message' : 'Client Group Create!',
                     'error_message' : None,
-                    'StaffGroup' : serialized.data,
-                    'staff_errors' : client_error,
+                    'ClientGroup' : serialized.data,
+                    'client_errors' : client_error,
                 }
             },
             status=status.HTTP_201_CREATED
         ) 
     
- 
+
+   
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_client_group(request):
+    client_group_id = request.data.get('client_group_id', None)
+    if client_group_id is None: 
+        return Response(
+        {
+            'status' : False,
+            'status_code' : StatusCodes.MISSING_FIELDS_4001,
+            'status_code_text' : 'MISSING_FIELDS_4001',
+            'response' : {
+                'message' : 'Invalid Data!',
+                'error_message' : 'Staff ID are required.',
+                'fields' : [
+                    'client_group_id'                         
+                ]
+            }
+        },
+        status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        client_group = ClientGroup.objects.get(id=client_group_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_STAFF_GROUP_4028,
+                'status_code_text' : 'INVALID_STAFF_GROUP_4028',
+                'response' : {
+                    'message' : 'Client Group Not Found',
+                    'error_message' : str(err),
+                }
+            },
+                status=status.HTTP_404_NOT_FOUND
+        )
+    serializer = ClientGroupSerializer(client_group, data=request.data, partial=True)
+    if not serializer.is_valid():
+        return Response(
+                {
+            'status' : False,
+            'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+            'response' : {
+                'message' : 'Client Group Serializer Invalid',
+                'error_message' : 'Invalid Data!',
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+        )
+    serializer.save()
+    return Response(
+        {
+        'status' : True,
+        'status_code' : 200,
+        'response' : {
+            'message' : 'Update Client Group Successfully',
+            'error_message' : None,
+            'StaffGroupUpdate' : serializer.data
+            }
+        },
+    status=status.HTTP_200_OK
+    )
+    
+    
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_client_group(request):
+    client_group_id = request.data.get('client_group_id', None)
+    if client_group_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required.',
+                    'fields' : [
+                        'client_group_id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        client_group = ClientGroup.objects.get(id=client_group_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Employee ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    client_group.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Client Group deleted successful',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )

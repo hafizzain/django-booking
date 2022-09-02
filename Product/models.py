@@ -23,7 +23,7 @@ class Brand(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
 
     name = models.CharField(max_length=500, default='')
-    description = models.TextField(default='')
+    description = models.TextField(default='', null=True, blank=True)
     website = models.URLField(null=True, blank=True)
     image = models.ImageField(upload_to='brand/images/')
 
@@ -63,8 +63,8 @@ class Product(models.Model):
 
     tax_rate = models.PositiveIntegerField(default=0)
 
-    short_description = models.TextField(default='')
-    description = models.TextField(default='')
+    short_description = models.TextField(default='', null=True, blank=True)
+    description = models.TextField(default='', null=True, blank=True)
 
     barcode_id = models.CharField(max_length=500, default='')
     sku = models.CharField(max_length=500, default='')
@@ -112,7 +112,7 @@ class ProductStock(models.Model):
     amount = models.PositiveIntegerField(default=0, verbose_name='Usage Amount')
     unit = models.PositiveIntegerField(default=0, verbose_name='Usage Unit')
 
-    alert_when_stock_becomes_lowest = models.BooleanField(default=True)
+    alert_when_stock_becomes_lowest = models.BooleanField(default=None, null=True, blank=True)
 
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)

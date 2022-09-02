@@ -15,6 +15,8 @@ urlpatterns = [
     path('add_brand/', views.add_brand),
     path('update_brand/', views.update_brand),
     path('delete_brand/', views.delete_brand),
+    path('search_brand/', views.search_brand),
+    
 
     # Products Paths 
     path('add_product/', views.add_product),
@@ -30,5 +32,7 @@ urlpatterns = [
     path('filter_stock/', views.filter_stock),
 
     #Export CSV files
-    path('export_csv/', views.export_csv, name='export_csv')
+    path('export_csv/', views.export_csv, name='export_csv'),
+    #path('import_csv/', views.import_csv, name='import_csv')
+
 ]

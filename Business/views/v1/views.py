@@ -1,6 +1,7 @@
 
 
 
+import email
 from django.conf import settings
 from operator import ge
 from rest_framework.decorators import api_view, permission_classes
@@ -21,6 +22,7 @@ from Tenants.models import Domain, Tenant
 from Utility.models import Country, Language, State, City
 from Utility.serializers import LanguageSerializer
 import json
+from django.db.models import Q
 
 from django_tenants.utils import tenant_context
 
@@ -2374,3 +2376,47 @@ def delete_business_vendor(request):
             },
             status=status.HTTP_200_OK
         )
+    
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def search_business_vendor(request):
+    text = request.GET.get('text', None)
+
+    if text is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'text',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    search_vendor = BusinessVendor.objects.filter(
+        Q(vendor_name__icontains=text)|
+        Q(address__icontains=text)|
+        Q(mobile_number__icontains=text)|
+        Q(email__icontains=text)
+        
+    )
+    serialized = BusinessVendorSerializer(search_vendor, many=True, context={'request':request})
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'All Search Business Vendor!',
+                'error_message' : None,
+                'count' : len(serialized.data),
+                'vendors' : serialized.data,
+            }
+        },
+        status=status.HTTP_200_OK
+    )

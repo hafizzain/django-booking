@@ -27,7 +27,7 @@ def export_csv(request):
         response['Content-Disposition'] = 'attachment; filename="ProductStock.csv"'
 
         writer = csv.writer(response)
-        writer.writerow(['name', 'quantity', 'Category', 'Product_type'])
+        writer.writerow(['name', 'quantity', 'category', 'product_type'])
         
         for stock in ProductStock.objects.all():
             writer.writerow(
@@ -47,7 +47,20 @@ def export_csv(request):
 #     product_csv = request.data.get('file', None)
 #     with open( product_csv , 'r') as imp_file:
 #         for row in imp_file:
-            
+#             row = row.split(',')
+#             name= row[0]
+#             quantity= row[1]
+#             category= row[2]
+#             product_type= row[3].replace('\n', '').strip()
+#             product= Product.objects.create(
+#                 name=name, 
+#                 product_type=product_type, 
+#                 category=category)
+#             ProductStock.objects.create(
+#                 product=product,
+#                 quantity=quantity,
+#             )
+#             print(f'Added Product {name} ...')
     
     
 
@@ -261,7 +274,7 @@ def add_brand(request):
     image = request.data.get('image', None)
     is_active = request.data.get('is_active', False)
 
-    if not all([name, description, website, image]):
+    if not all([name, is_active , image]):
         return Response(
             {
                 'status' : False,
@@ -272,8 +285,7 @@ def add_brand(request):
                     'error_message' : 'All fields are required.',
                     'fields' : [
                         'name',
-                        'description',
-                        'website',
+                        'is_active',
                         'image',
                     ]
                 }
@@ -433,7 +445,7 @@ def add_product(request):
     category_id = request.data.get('category', None)
     #image = request.data.getlist('image', None)
     brand_id = request.data.get('brand', None)
-    product_type = request.data.get('product_type', None)
+    product_type = request.data.get('product_type', 'Sellable')
     name = request.data.get('name', None)
     cost_price = request.data.get('cost_price', None)
     full_price = request.data.get('full_price', None)
@@ -452,7 +464,7 @@ def add_product(request):
     amount = request.data.get('amount', None)
     stock_status = request.data.get('stock_status', None)
    
-    alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', False)
+    alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', None)
    
 
     if not all([name,medias, brand_id, category_id, cost_price, full_price, sell_price, sku, quantity, stock_status ]):
@@ -468,7 +480,6 @@ def add_product(request):
                         'business',
                         'category',
                         'brand',
-                        'product_type',
                         'name',
                         'cost_price',
                         'full_price',
@@ -489,7 +500,7 @@ def add_product(request):
     if alert_when_stock_becomes_lowest  is not None:
         alert_when_stock_becomes_lowest= json.loads(alert_when_stock_becomes_lowest)
     else:
-        alert_when_stock_becomes_lowest= True
+        alert_when_stock_becomes_lowest= False
     try:
         business = Business.objects.get(id=business_id, is_deleted=False, is_active=True, is_blocked=False)
     except Exception as err:
@@ -955,6 +966,47 @@ def filter_stock(request):
                 'error_message' : None,
                 'count' : len(result),
                 'products' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def search_brand(request):
+    text = request.GET.get('text', None)
+
+    if text is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'text',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+        
+    search_brand= Brand.objects.filter(
+        Q(name__icontains=text)|
+        Q(description=text)
+    )
+    serialized = BrandSerializer(search_brand, many=True, context={'request':request})
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'All Search Products!',
+                'error_message' : None,
+                'count' : len(serialized.data),
+                'Employees' : serialized.data,
             }
         },
         status=status.HTTP_200_OK
