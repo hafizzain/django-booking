@@ -10,6 +10,7 @@ urlpatterns = [
    path('delete_client/', views.delete_client),
    
    #Client_Group
-   
+   path('create_client_group/',views.create_client_group),
+   path('get_client_group/', views.get_client_group),
 
 ]

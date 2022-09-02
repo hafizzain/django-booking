@@ -26,5 +26,5 @@ class ClientGroupSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ClientGroup
-        fields = '__all__'
+        fields = ['name','business','is_active','client','email']
     

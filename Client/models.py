@@ -52,7 +52,7 @@ class ClientGroup(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_client_group')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_client_group')
     
-    email = models.EmailField(default='')
+    email = models.EmailField(default='', null=True, blank=True)
     name = models.CharField(max_length=300, default='')
     
     client = models.ManyToManyField(Client, related_name='group_clients')

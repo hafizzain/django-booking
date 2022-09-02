@@ -268,6 +268,25 @@ def delete_client(request):
     )
     
     
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_client_group(request):
+    all_client_group= ClientGroup.objects.all().order_by('-created_at')
+    serialized = ClientGroupSerializer(all_client_group, many=True)
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Client Group',
+                'error_message' : None,
+                'employees' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+    
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_client_group(request):
@@ -278,7 +297,7 @@ def create_client_group(request):
     name = request.data.get('name', None)
     client = request.data.get('client', None)
         
-    is_active= request.data.get('is_active' , None)
+    is_active= request.data.get('is_active' , True)
     
     if not all([ business_id, name, client ]):
               return Response(
@@ -313,10 +332,10 @@ def create_client_group(request):
                 }
             )
     
-    if is_active is not None:
-        is_active = json.loads(is_active)
-    else: 
-        is_active = False
+    # if is_active is not None:
+    #     is_active = json.loads(is_active)
+    # else: 
+    #     is_active = False
     
     client_group=ClientGroup.objects.create(
         user=user,
@@ -338,7 +357,8 @@ def create_client_group(request):
                client_group.client.add(employe)
             except Exception as err:
                 client_error.append(str(err))
-        # client_group.save()
+            client_group.save()
+            serialized=ClientGroupSerializer(client_group)
         # serialized = ClientGroupSerializer(staff_group)
        
     return Response(
@@ -346,13 +366,13 @@ def create_client_group(request):
                 'status' : True,
                 'status_code' : 201,
                 'response' : {
-                    'message' : 'Staff Group Create!',
+                    'message' : 'Client Group Create!',
                     'error_message' : None,
                     'StaffGroup' : serialized.data,
-                    'staff_errors' : employees_error,
+                    'staff_errors' : client_error,
                 }
             },
             status=status.HTTP_201_CREATED
         ) 
     
-    serialized=ClientGroupSerializer(client_group)
+ 

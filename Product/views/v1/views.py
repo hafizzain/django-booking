@@ -27,24 +27,29 @@ def export_csv(request):
         response['Content-Disposition'] = 'attachment; filename="ProductStock.csv"'
 
         writer = csv.writer(response)
-        writer.writerow(['id', 'user', 'business', 'product', 'quantity', 'amount', 'unit', 'is_active'])
+        writer.writerow(['name', 'quantity', 'Category', 'Product_type'])
         
-        for product in ProductStock.objects.all():
+        for stock in ProductStock.objects.all():
             writer.writerow(
                 [
-                    product.id,
-                    product.user,
-                    product.business,
-                    product.product,
-                    product.quantity,
-                    product.amount,
-                    product.unit,
-                    product.is_active
+                    stock.product.name,
+                    stock.quantity,
+                    stock.product.category,
+                    stock.product.product_type,
                 ]
             )
         return response
 
 
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def import_csv(request):
+#     product_csv = request.data.get('file', None)
+#     with open( product_csv , 'r') as imp_file:
+#         for row in imp_file:
+            
+    
+    
 
 @api_view(['GET'])
 @permission_classes([AllowAny])

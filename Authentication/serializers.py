@@ -120,4 +120,4 @@ class UserTenantLoginSerializer(serializers.ModelSerializer):
             return None
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'domain', 'is_tenant', 'access_token']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'domain', 'is_tenant', 'access_token','joined_at']
