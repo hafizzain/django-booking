@@ -61,12 +61,12 @@ class Product(models.Model):
     full_price = models.PositiveIntegerField(default=0)
     sell_price = models.PositiveIntegerField(default=0)
 
-    tax_rate = models.PositiveIntegerField(default=0)
+    tax_rate = models.PositiveIntegerField(default=0, null=True, blank=True)
 
     short_description = models.TextField(default='', null=True, blank=True)
     description = models.TextField(default='', null=True, blank=True)
 
-    barcode_id = models.CharField(max_length=500, default='')
+    barcode_id = models.CharField(max_length=500, default='', null=True, blank=True)
     sku = models.CharField(max_length=500, default='')
     slug = models.CharField(max_length=1000, default='')
 
@@ -109,8 +109,8 @@ class ProductStock(models.Model):
     quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0, verbose_name='Total Quantity')
     available_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
     sold_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
-    amount = models.PositiveIntegerField(default=0, verbose_name='Usage Amount')
-    unit = models.PositiveIntegerField(default=0, verbose_name='Usage Unit')
+    amount = models.PositiveIntegerField(default=0, verbose_name='Usage Amount', null=True, blank=True)
+    unit = models.PositiveIntegerField(default=0, verbose_name='Usage Unit', null=True, blank=True)
 
     alert_when_stock_becomes_lowest = models.BooleanField(default=None, null=True, blank=True)
 
