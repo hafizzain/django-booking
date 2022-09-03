@@ -737,7 +737,11 @@ def update_location(request):
         business_address.address_name = request.data.get('address_name', business_address.address_name)
         business_address.address = request.data.get('address', business_address.address)
         business_address.postal_code = request.data.get('postal_code', business_address.postal_code)
-
+        business_address.mobile_number= request.data.get('mobile_number', business_address.mobile_number)
+        business_address.email= request.data.get('email', business_address.email)
+        business_address.start_time= request.data.get('start_time', business_address.start_time)
+        business_address.ending_date= request.data.get('ending_date', business_address.ending_date)
+             
         country = request.data.get('country', None)
         state = request.data.get('state', None)
         city = request.data.get('city', None)

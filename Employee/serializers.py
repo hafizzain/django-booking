@@ -139,7 +139,13 @@ class StaffGroupSerializers(serializers.ModelSerializer):
     #     employe_id = self.context.get('employee')
     #     return employee_id
     
+    employees = serializers.SerializerMethodField()
     staff_permission = serializers.SerializerMethodField()
+    
+    def get_employees(self, obj):
+        all_employees = obj.employees.all()
+        return singleEmployeeSerializer(all_employees, many=True, context=self.context).data
+            
     
     def get_staff_permission(self, obj):
         
@@ -264,3 +270,4 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'income_type',
             'designation',           
             ]   
+

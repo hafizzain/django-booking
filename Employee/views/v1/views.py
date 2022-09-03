@@ -674,7 +674,7 @@ def create_staff_group(request):
 @permission_classes([AllowAny])
 def get_staff_group(request):
     all_staff_group= StaffGroup.objects.all().order_by('-created_at')
-    serialized = StaffGroupSerializers(all_staff_group, many=True)
+    serialized = StaffGroupSerializers(all_staff_group, many=True, context={'request' : request})
     return Response(
         {
             'status' : 200,
@@ -775,22 +775,6 @@ def update_staff_group(request):
                 status=status.HTTP_404_NOT_FOUND
         )
     data={}
-    serializer = StaffGroupSerializers(staff_group, data=request.data, partial=True)
-    if serializer.is_valid():
-        serializer.save()
-        data.update(serializer.data)
-    else:
-        return Response(
-                {
-            'status' : False,
-            'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
-            'response' : {
-                'message' : 'Staff Group Serializer Invalid',
-                'error_message' : str(err),
-            }
-        },
-        status=status.HTTP_404_NOT_FOUND
-        ) 
     try:
        staff_gp_permissions = StaffGroupModulePermission.objects.get(staff_group=staff_group)
     except Exception as err:
@@ -821,6 +805,23 @@ def update_staff_group(request):
             },
             status=status.HTTP_404_NOT_FOUND
      )
+    serializer = StaffGroupSerializers(staff_group, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        data.update(serializer.data)
+    else:
+        return Response(
+                {
+            'status' : False,
+            'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+            'response' : {
+                'message' : 'Staff Group Serializer Invalid',
+                'error_message' : str(serializer.errors),
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+        ) 
+
     
     return Response(
         {
