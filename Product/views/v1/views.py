@@ -2,6 +2,7 @@
 
 #from math import prod
 from django.http import HttpResponse
+from Utility.models import NstyleFile
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -10,9 +11,20 @@ from django.db.models import Q
 import json
 import csv
 
+from rest_framework.views import APIView
+from rest_framework.settings import api_settings
+from rest_framework_csv import renderers as r
+
+# from django.shortcuts import render
+# from rest_framework import generics
+# import io, csv, pandas as pd
+# from rest_framework.response import Response
+# # remember to import the File model
+# from Product.serializers import FileUploadSerializer , SaveFileSerializer
+# from django.views.decorators.csrf import csrf_exempt
+
 
 from NStyle.Constants import StatusCodes
-
 
 from Product.models import Category, Brand, Product, ProductMedia, ProductStock
 from Business.models import Business, BusinessAddress, BusinessVendor
@@ -42,12 +54,18 @@ def export_csv(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def import_csv(request):
     product_csv = request.data.get('file', None)
-    with open( product_csv , 'r') as imp_file:
+    #reader=csv.reader(product_csv)
+    file = NstyleFile.objects.create(
+        file = product_csv
+    )
+    print(file.file.path)
+    with open( file.file.path , 'r', encoding='utf-8') as imp_file:
         for row in imp_file:
             row = row.split(',')
+            row = row
             name= row[0]
             quantity= row[1]
             category= row[2]
@@ -55,12 +73,35 @@ def import_csv(request):
             product= Product.objects.create(
                 name=name, 
                 product_type=product_type, 
-                category=category)
+                )
+            try:
+                category_obj = Category.objects.get(id=category)
+                product.category = category_obj
+                product.save()
+                
+            except Exception as err:
+                return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                }
+                )
+            # Category.objects.create(
+            #     product=product, 
+                
+            # )
             ProductStock.objects.create(
                 product=product,
                 quantity=quantity,
             )
-            print(f'Added Product {name} ...')
+            print(f'Added Product {name} ... {quantity} ....{category}.... {product_type}...')
+
+    file.delete()
+    return Response({'status' : 'hello'})
     
     
 

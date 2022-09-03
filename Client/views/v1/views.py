@@ -295,7 +295,7 @@ def create_client_group(request):
         
     email= request.data.get('email', None)    
     name = request.data.get('name', None)
-    client = request.data.get('client', None)
+    client = request.data.getlist('client', None)
         
     is_active= request.data.get('is_active' , True)
     

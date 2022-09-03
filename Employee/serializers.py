@@ -169,10 +169,12 @@ class StaffpermisionSerializers(serializers.ModelSerializer):
 #        fields ='__all__'
 
 class AttendanceSerializers(serializers.ModelSerializer):
+    employee= EmployeSerializer(read_only=True)
     
     class Meta:
         model = Attendance
-        fields = '__all__'
+        
+        fields = ['id','user','business','employee','in_time','out_time','is_active','employee']
         
 class InformationPayrollSerializer(serializers.ModelSerializer):
     class Meta:

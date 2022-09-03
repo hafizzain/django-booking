@@ -94,3 +94,9 @@ class Language(models.Model):
     
     def __str__(self):
         return str(self.id)
+    
+class NstyleFile(models.Model):
+    file = models.FileField(upload_to='utility/files/')
+
+    def __str__(self):
+        return 'Custom file uploaded'

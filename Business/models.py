@@ -82,7 +82,7 @@ class BusinessAddress(models.Model):
     address = models.TextField(default='')
     latitude = models.CharField(default='', max_length=200, null=True, blank=True)
     longitude = models.CharField(default='', max_length=200, null=True, blank=True)
-    postal_code = models.CharField(max_length=30, default='')
+    postal_code = models.CharField(max_length=30, default='', null=True, blank=True)
     gstin = models.CharField(default='', max_length=1000, null=True, blank=True)
     website = models.TextField(null=True, blank=True)
     email = models.EmailField()

@@ -565,7 +565,7 @@ def create_staff_group(request):
         business_id= request.data.get('business', None)
         
         name = request.data.get('name', None)
-        employees = request.data.get('employees', None)
+        employees = request.data.getlist('employees', None)
         
         is_active= request.data.get('is_active' , None)
         

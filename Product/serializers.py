@@ -7,6 +7,19 @@ from Business.models import BusinessVendor
 from django.conf import settings
 
 
+
+class FileUploadSerializer(serializers.Serializer):
+    file = serializers.FileField()
+    
+class SaveFileSerializer(serializers.Serializer):
+    
+    class Meta:
+        model = Product
+        fields = "__all__"
+
+
+
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
@@ -48,7 +61,7 @@ class ProductMediaSerializer(serializers.ModelSerializer):
 class ProductStockSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductStock
-        fields = ['id', 'quantity' , 'amount', 'unit' , 'alert_when_stock_becomes_lowest']
+        fields = ['id', 'quantity' , 'amount', 'unit' , 'alert_when_stock_becomes_lowest', 'is_active' ]
 
 class ProductWithStockSerializer(serializers.ModelSerializer):
     stock = serializers.SerializerMethodField()
