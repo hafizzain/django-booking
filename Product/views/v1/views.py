@@ -619,12 +619,15 @@ def add_product(request):
         is_active=True,
         published = True,
     )
+
+
     for img in medias:
         ProductMedia.objects.create(
             user=user,
             business=business,
             product=product,
-            image=img
+            image=img,
+            is_cover = True
         )
     
     ProductStock.objects.create(
@@ -720,15 +723,17 @@ def update_product(request):
     product = Product.objects.get(
         id=product_id,
     )
-    image = request.data.getlist('product_images', None)
-
-    if image is not None:
-        ProductMedia.objects.create(
-            user = product.user, 
-            business = product.business,
-            product = product,
-            image = image
-        )
+    images = request.data.getlist('product_images', None)
+    
+    if images is not None:
+        for image in images:
+            ProductMedia.objects.create(
+                user = product.user, 
+                business = product.business,
+                product = product,
+                image = image,
+                is_cover = True
+            )
 
     product.category = category
     product.brand = brand
