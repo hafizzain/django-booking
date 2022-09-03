@@ -565,7 +565,7 @@ def create_staff_group(request):
         business_id= request.data.get('business', None)
         
         name = request.data.get('name', None)
-        employees = request.data.getlist('employees', None)
+        employees = request.data.get('employees', None)
         
         is_active= request.data.get('is_active' , None)
         
@@ -614,7 +614,8 @@ def create_staff_group(request):
                 }
             )
         if is_active is not None:
-             is_active = json.loads(is_active)
+           #     is_active= json.loads(is_active)
+           is_active = True
         else: 
               is_active = False
                 
@@ -636,15 +637,19 @@ def create_staff_group(request):
         )
         #staff_permission_serializers =  StaffpermisionSerializers(staff_module_permission)
         employees_error = []
+        print(type(employees))
         if type(employees) == str:
             employees = json.loads(employees)
 
         elif type(employees) == list:
             pass
-        
+        print(type(employees))
+        print(employees)
+        print(len(employees))
         for usr in employees:
             try:
                employe = Employee.objects.get(id=usr)  
+               print(employe)
                staff_group.employees.add(employe)
             except Exception as err:
                 employees_error.append(str(err))

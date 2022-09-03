@@ -1,5 +1,6 @@
 
 
+from unicodedata import category
 from rest_framework import serializers
 from Product.Constants.index import tenant_media_base_url
 from Product.models import Category, Brand, Product, ProductMedia, ProductStock
@@ -57,6 +58,12 @@ class ProductMediaSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductMedia
         fields = ['id', 'image']
+        
+        
+class VendorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessVendor
+        fields = '__all__'
 
 class ProductStockSerializer(serializers.ModelSerializer):
     class Meta:
@@ -65,6 +72,10 @@ class ProductStockSerializer(serializers.ModelSerializer):
 
 class ProductWithStockSerializer(serializers.ModelSerializer):
     stock = serializers.SerializerMethodField()
+    category= CategorySerializer(read_only=True)
+    brand = BrandSerializer(read_only=True)
+    vendor= VendorSerializer(read_only=True)
+    
 
     def get_stock(self, obj):
         stock = ProductStock.objects.filter(product=obj, is_deleted=False)[0]
@@ -90,15 +101,14 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
             'cost_price',
             'full_price',
             'sell_price',
+            'category', 
+            'brand', 
+            'vendor',
             'stock',
         ]
         read_only_fields = ['id']
         
         
-class VendorSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BusinessVendor
-        fields = '__all__'
 
 class ProductSerializer(serializers.ModelSerializer):
     brand=BrandSerializer(read_only=True)
