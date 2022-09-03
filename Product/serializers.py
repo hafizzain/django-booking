@@ -73,8 +73,13 @@ class ProductStockSerializer(serializers.ModelSerializer):
 class ProductWithStockSerializer(serializers.ModelSerializer):
     stock = serializers.SerializerMethodField()
     category= CategorySerializer(read_only=True)
-    brand = BrandSerializer(read_only=True)
+    brand = serializers.SerializerMethodField()
     vendor= VendorSerializer(read_only=True)
+
+
+    def get_brand(self, obj):
+        brand = BrandSerializer(obj.brand, read_only=True, context=self.context)
+        return brand.data
     
 
     def get_stock(self, obj):
