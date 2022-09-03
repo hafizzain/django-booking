@@ -720,9 +720,16 @@ def update_product(request):
     product = Product.objects.get(
         id=product_id,
     )
-    image= request.data.get('image', None)
+    image = request.data.getlist('product_images', None)
+
     if image is not None:
-        product.image = image        
+        ProductMedia.objects.create(
+            user = product.user, 
+            business = product.business,
+            product = product,
+            image = image
+        )
+
     product.category = category
     product.brand = brand
     

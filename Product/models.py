@@ -48,8 +48,6 @@ class Product(models.Model):
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_products')
     vendor = models.ForeignKey(BusinessVendor, on_delete=models.CASCADE, related_name='vendor_products', default=None, null=True, blank=True)
     
-    #image = models.ImageField(upload_to='product/product_images/', null=True, blank=True)
-
     
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='category_products')
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True, related_name='brand_products')
@@ -90,6 +88,7 @@ class ProductMedia(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_medias')
 
     image = models.ImageField(upload_to='business/product_images/')
+    is_cover = models.BooleanField(default=False)
 
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)

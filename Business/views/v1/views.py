@@ -2422,3 +2422,4 @@ def search_business_vendor(request):
         },
         status=status.HTTP_200_OK
     )
+
