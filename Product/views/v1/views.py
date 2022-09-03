@@ -312,9 +312,9 @@ def add_brand(request):
     description = request.data.get('description', None)
     website = request.data.get('website', None)
     image = request.data.get('image', None)
-    is_active = request.data.get('is_active', False)
+    is_active = request.data.get('is_active', None)
 
-    if not all([name, is_active , image]):
+    if not all([name, image]):
         return Response(
             {
                 'status' : False,
@@ -337,8 +337,14 @@ def add_brand(request):
         description=description,
         website=website,
         image=image,
-        is_active=is_active
     )
+    if is_active is not None:
+        brand.is_active = True
+    else :
+        brand.is_active = False
+        
+    brand.save()
+
     serialized = BrandSerializer(brand, context={'request' : request})
    
     return Response(
@@ -724,7 +730,7 @@ def update_product(request):
         id=product_id,
     )
     images = request.data.getlist('product_images', None)
-    
+
     if images is not None:
         for image in images:
             ProductMedia.objects.create(
