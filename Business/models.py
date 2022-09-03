@@ -174,14 +174,14 @@ class ClientNotificationSetting(models.Model):
 
     sms_purchase_plan = models.BooleanField(default=True, verbose_name="Send SMS Notification on Purchase Plan")
     sms_for_rewards_on_quick_sale = models.BooleanField(default=True , verbose_name="Send SMS Notification for Rewards on quick Sale")
-    sms_pending_services_quicksale = models.BooleanField(default=True , verbose_name="Send SMS Notification on Pending Services Quick Sale")
+    sms_pending_services_quicksale = models.BooleanField(default=False , verbose_name="Send SMS Notification on Pending Services Quick Sale")
     sms_for_ewallet_balance_on_quick_sale = models.BooleanField(default=True , verbose_name="Send SMS Notification for ewallet balance on quick sale")
     sms_pending_payment = models.BooleanField(default=True , verbose_name="Send SMS Notification on Pending Payment")
     email_notify_on_purchase_plan = models.BooleanField(default=True , verbose_name="Send Email Notification On Purchase Plan")
     sms_quick_sale = models.BooleanField(default=True , verbose_name="Send SMS Notification on Quick Sale")
     sms_appoinment = models.BooleanField(default=True , verbose_name="Send Notification on Appoinment")
-    sms_appoinment_reschedule = models.BooleanField(default=True , verbose_name="Send SMS Notification on Appoinment reschedule")
-    sms_birthday = models.BooleanField(default=True , verbose_name="Send SMS Notification on Birthday")
+    sms_appoinment_reschedule = models.BooleanField(default=False , verbose_name="Send SMS Notification on Appoinment reschedule")
+    sms_birthday = models.BooleanField(default=False , verbose_name="Send SMS Notification on Birthday")
 
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=now)
@@ -203,7 +203,7 @@ class AdminNotificationSetting(models.Model):
     sms_notify_for_daily_book = models.BooleanField(default=True , verbose_name="Send SMS Notification for daily book")
     email_notify_on_appoinment = models.BooleanField(default=True , verbose_name="Send Email Notification on Appoinment")
     email_notify_on_quick_sale = models.BooleanField(default=True , verbose_name="Send Email Notification on Quick Sale")
-    email_notify_on_daily_book = models.BooleanField(default=True , verbose_name="Send Email Notification on Daily Book")
+    email_notify_on_daily_book = models.BooleanField(default=False , verbose_name="Send Email Notification on Daily Book")
 
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=now)
