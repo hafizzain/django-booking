@@ -654,7 +654,7 @@ def create_staff_group(request):
             except Exception as err:
                 employees_error.append(str(err))
         staff_group.save()
-        serialized = StaffGroupSerializers(staff_group)
+        serialized = StaffGroupSerializers(staff_group, context={'request' : request})
        
         return Response(
             {
@@ -805,7 +805,7 @@ def update_staff_group(request):
             },
             status=status.HTTP_404_NOT_FOUND
      )
-    serializer = StaffGroupSerializers(staff_group, data=request.data, partial=True)
+    serializer = StaffGroupSerializers(staff_group, data=request.data, partial=True, context={'request' : request})
     if serializer.is_valid():
         serializer.save()
         data.update(serializer.data)
