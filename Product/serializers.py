@@ -82,10 +82,6 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
         return brand.data
     
 
-    def get_brand(self, obj):
-        brand = BrandSerializer(obj.brand, read_only=True, context=self.context)
-        return brand.data
-
 
     def get_stock(self, obj):
         stock = ProductStock.objects.filter(product=obj, is_deleted=False)[0]
