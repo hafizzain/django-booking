@@ -666,7 +666,7 @@ def update_product(request):
     category_id = request.data.get('category', None)
     brand_id = request.data.get('brand', None)
 
-    if not all([product_id, vendor_id, category_id, brand_id]):
+    if not all([product_id, category_id, brand_id]):
         return Response(
             {
                 'status' : False,
@@ -677,7 +677,7 @@ def update_product(request):
                     'error_message' : 'All fields are required.',
                     'fields' : [
                         'product',
-                        'vendor',
+                        # 'vendor',
                         'category',
                         'brand',
                     ]
@@ -686,21 +686,24 @@ def update_product(request):
             status=status.HTTP_400_BAD_REQUEST
         )
             
-    try:
-        vendor = BusinessVendor.objects.get(id=vendor_id, is_deleted=False, is_active=True)
-    except Exception as err:
-        return Response(
-                {
-                    'status' : False,
-                    'status_code' : StatusCodes.VENDOR_NOT_FOUND_4019,
-                    'status_code_text' : 'VENDOR_NOT_FOUND_4019',
-                    'response' : {
-                        'message' : 'Vendor Not Found',
-                        'error_message' : str(err),
-                    }
-                },
-                status=status.HTTP_404_NOT_FOUND
-            )
+    if vendor_id is not None:
+        try:
+            vendor = BusinessVendor.objects.get(id=vendor_id, is_deleted=False, is_active=True)
+        except Exception as err:
+            return Response(
+                    {
+                        'status' : False,
+                        'status_code' : StatusCodes.VENDOR_NOT_FOUND_4019,
+                        'status_code_text' : 'VENDOR_NOT_FOUND_4019',
+                        'response' : {
+                            'message' : 'Vendor Not Found',
+                            'error_message' : str(err),
+                        }
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+    else :
+        vendor = None
     
     try:
         category = Category.objects.get(id=category_id, is_active=True)
@@ -727,7 +730,9 @@ def update_product(request):
         product.image = image        
     product.category = category
     product.brand = brand
-    product.vendor = vendor
+    
+    if vendor is not None:
+        product.vendor = vendor
     product.save()
     
     data={}
