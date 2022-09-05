@@ -773,10 +773,29 @@ def update_location(request):
             busineshour = BusinessOpeningHour.objects.filter(
                     business_address = business_address
                 )
-            for bhr in busineshour:
-                bhr.start_time = start_time
-                bhr.close_time = close_time
-                bhr.save()
+            if len(busineshour) > 0:
+                for bhr in busineshour:
+                    bhr.start_time = start_time
+                    bhr.close_time = close_time
+                    bhr.save()
+            else:
+                days = [
+                    'Monday',
+                    'Tuesday',
+                    'Wednesday',
+                    'Thursday',
+                    'Friday',
+                    'Saturday',
+                    'Sunday',
+                ]
+                for day in days:
+                    BusinessOpeningHour.objects.create(
+                            day = day,
+                            start_time = start_time,
+                            close_time = close_time,
+                            business_address = business_address,
+                            business = business_address.business
+                        )
 
 
         serialized = BusinessAddress_GetSerializer(business_address)
