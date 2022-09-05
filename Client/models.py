@@ -7,6 +7,7 @@ from Business.models import Business
 from Utility.models import Country, State, City
 from django.utils.timezone import now
 from Product.models import Product
+from Service.models import Service
 
 class Client(models.Model):
     GENDER_CHOICES = [
@@ -66,16 +67,45 @@ class ClientGroup(models.Model):
     
     
 class Subscription(models.Model):
+
+    AMOUNT_CHOICES = [
+        ('Limited', 'Limited'),
+        ('Unlimited', 'Unlimited'),
+    ]
+
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_subscription')
-    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_subscription')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_subscriptions')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_subscriptions')
     
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_subscriptions')
+    service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_subscriptions')
+
     name = models.CharField(max_length=300, default='')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product')
-    no_days = models.PositiveIntegerField(default=0)
-    select_amount = models.CharField(max_length=100, default='')
-    total_no_services = models.PositiveIntegerField(default=0)
-    set_price = models.PositiveIntegerField(default=0)
-    
+    days = models.PositiveIntegerField(default=0, verbose_name='Number of Days')
+    select_amount = models.CharField(max_length=100, default='Limited', choices=AMOUNT_CHOICES)
+    services_count = models.PositiveIntegerField(default=0, verbose_name='Total Number of Services')
+    price = models.PositiveIntegerField(default=0, verbose_name='Subscription Price')
+
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+
     def __str__(self):
         return str(self.id)
+    
+
+
+# class Promotion(models.Model):
+#     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_subscriptions')
+#     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_subscriptions')
+
+#     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_subscriptions')
+#     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_subscriptions')
+
+
+#     is_deleted = models.BooleanField(default=False)
+#     is_active = models.BooleanField(default=False)
+#     created_at = models.DateTimeField(auto_now_add=now)
+#     def __str__(self):
+#         return str(self.id)
