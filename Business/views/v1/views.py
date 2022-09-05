@@ -585,15 +585,13 @@ def add_business_location(request):
             'Sunday',
         ]
         for day in days:
-            day =day
-        BusinessOpeningHour.objects.create(
-                day = day,
-                start_time = start_time,
-                close_time = close_time,
-                business_address = business_address,
-                business = business
-            )
-            
+            BusinessOpeningHour.objects.create(
+                    day = day,
+                    start_time = start_time,
+                    close_time = close_time,
+                    business_address = business_address,
+                    business = business
+                )
     
             
     # serialized = OpeningHoursSerializer(busines_opening,  data=request.data)
