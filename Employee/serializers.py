@@ -7,7 +7,7 @@ from .models import( Employee, EmployeeProfessionalInfo ,
                EmployeePermissionSetting, EmployeeModulePermission 
                , EmployeeMarketingPermission,
                StaffGroup, StaffGroupModulePermission, Attendance
-               ,Payroll
+               ,Payroll , 
 )
 class EmployeInformationsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -270,4 +270,6 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'income_type',
             'designation',           
             ]   
+        
+        
 

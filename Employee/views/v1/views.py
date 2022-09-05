@@ -743,6 +743,7 @@ def delete_staff_group(request):
 @permission_classes([IsAuthenticated])
 def update_staff_group(request):
     staff_id = request.data.get('staff_id', None)
+    employees_error = []
     if staff_id is None: 
         return Response(
         {

@@ -56,6 +56,7 @@ def export_csv(request):
 @permission_classes([AllowAny])
 def import_csv(request):
     product_csv = request.data.get('file', None)
+    user= request.user
     #reader=csv.reader(product_csv)
     file = NstyleFile.objects.create(
         file = product_csv
@@ -70,6 +71,7 @@ def import_csv(request):
             category= row[2]
             product_type= row[3].replace('\n', '').strip()
             product= Product.objects.create(
+                user=user,
                 name=name, 
                 product_type=product_type, 
                 )

@@ -6,8 +6,8 @@ from rest_framework import status
 from django.db.models import Q
 from Business.models import Business
 from Utility.models import Country, State, City
-from Client.models import Client, ClientGroup
-from Client.serializers import ClientSerializer, ClientGroupSerializer
+from Client.models import Client, ClientGroup, Subscription
+from Client.serializers import ClientSerializer, ClientGroupSerializer, SubscriptionSerializer
 
 
 import json
@@ -295,7 +295,7 @@ def create_client_group(request):
         
     email= request.data.get('email', None)    
     name = request.data.get('name', None)
-    client = request.data.getlist('client', None)
+    client = request.data.get('client', None)
         
     is_active= request.data.get('is_active' , True)
     
@@ -331,7 +331,11 @@ def create_client_group(request):
                 }
                 }
             )
-    
+    if is_active is not None:
+           #     is_active= json.loads(is_active)
+        is_active = True
+    else: 
+        is_active = False
     client_group=ClientGroup.objects.create(
         user=user,
         business=business,
@@ -406,6 +410,26 @@ def update_client_group(request):
             },
                 status=status.HTTP_404_NOT_FOUND
         )
+    # client_error = []
+    # client=request.data.get('client', None)
+    # print(type(client))
+    # if client is not None:
+    #     print(type(client))
+    #     if type(client) == str:
+    #         client = json.loads(client)
+    #     elif type(client) == list:
+    #         pass
+    #     print(type(client))
+    #     print(client)
+    #     print(len(client))
+    #     for usr in client:
+    #         try:
+    #            employe = Client.objects.get(id=usr)  
+    #            print(employe)
+    #            client_group.employees.add(employe)
+    #         except Exception as err:
+    #             client_error.append(str(err))
+    #     client_group.save()    
     serializer = ClientGroupSerializer(client_group, data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(
@@ -481,6 +505,75 @@ def delete_client_group(request):
             'response' : {
                 'message' : 'Client Group deleted successful',
                 'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_subscription(request):
+    user= request.user
+    business= request.data.get('business', None)
+    
+    name= request.data.get('name', None)
+    product= request.data.get('product', None)
+    no_days= request.data.get('no_days',None)
+    select_amount = request.data.get('select_amount', None)
+    total_no_services= request.data.get('total_no_services', None)
+    set_price= request.data.get('set_price', None)
+    
+    if not all([business, name ,product , no_days ,select_amount , total_no_services , set_price  ]):
+          return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                          'name',
+                          'product',
+                          'no_days', 
+                          'select_amount', 
+                          'total_no_services', 
+                          'set_price', 
+
+                            ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+             business=Business.objects.get(id=business)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                }
+                }
+            )
+            
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_subscription(request):
+    all_subscription= Subscription.objects.all().order_by('-created_at')
+    serialized = SubscriptionSerializer(all_subscription, many=True)
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Staff Group',
+                'error_message' : None,
+                'employees' : serialized.data
             }
         },
         status=status.HTTP_200_OK
