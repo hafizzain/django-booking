@@ -312,9 +312,9 @@ def add_brand(request):
     description = request.data.get('description', None)
     website = request.data.get('website', None)
     image = request.data.get('image', None)
-    is_active = request.data.get('is_active', False)
+    is_active = request.data.get('is_active', None)
 
-    if not all([name, is_active , image]):
+    if not all([name, image]):
         return Response(
             {
                 'status' : False,
@@ -337,8 +337,14 @@ def add_brand(request):
         description=description,
         website=website,
         image=image,
-        is_active=is_active
     )
+    if is_active is not None:
+        brand.is_active = True
+    else :
+        brand.is_active = False
+        
+    brand.save()
+
     serialized = BrandSerializer(brand, context={'request' : request})
    
     return Response(
@@ -397,16 +403,11 @@ def update_brand(request):
     brand.description = request.data.get('description', brand.description)
     brand.website = request.data.get('website', brand.website)
     brand.image = request.data.get('image', brand.image)
-    try:
-        brand.is_active = request.data.get('is_active', brand.is_active)
-    except Exception as err:
+    is_active = request.data.get('is_active', None)
+    if is_active is not None:
+        brand.is_active = True
+    else:
         brand.is_active = False
-    # if is_active is not None:
-    #     is_active = json.loads(is_active)
-    # else:
-    #     is_active = True
-        
-    #brand.is_active
     brand.save()
     
     serialized = BrandSerializer(brand, context={'request' : request})
@@ -624,12 +625,15 @@ def add_product(request):
         is_active=True,
         published = True,
     )
+
+
     for img in medias:
         ProductMedia.objects.create(
             user=user,
             business=business,
             product=product,
-            image=img
+            image=img,
+            is_cover = True
         )
     
     ProductStock.objects.create(
@@ -725,9 +729,18 @@ def update_product(request):
     product = Product.objects.get(
         id=product_id,
     )
-    image= request.data.get('image', None)
-    if image is not None:
-        product.image = image        
+    images = request.data.getlist('product_images', None)
+
+    if images is not None:
+        for image in images:
+            ProductMedia.objects.create(
+                user = product.user, 
+                business = product.business,
+                product = product,
+                image = image,
+                is_cover = True
+            )
+
     product.category = category
     product.brand = brand
     

@@ -561,7 +561,6 @@ def add_business_location(request):
         address_name = address_name,
         email= email,
         mobile_number=mobile_number,
-        postal_code = postal_code,
         country=country,
         state=state,
         city=city,
@@ -570,6 +569,9 @@ def add_business_location(request):
         is_deleted = False,
         is_closed = False,
     )
+    if postal_code is not None:
+        business_address.postal_code = postal_code
+        
     business_address.save()
     data={}
     if start_time or close_time is not None:
@@ -2428,3 +2430,4 @@ def search_business_vendor(request):
         },
         status=status.HTTP_200_OK
     )
+

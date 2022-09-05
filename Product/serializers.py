@@ -1,6 +1,7 @@
 
 
 from unicodedata import category
+from requests import request
 from rest_framework import serializers
 from Product.Constants.index import tenant_media_base_url
 from Product.models import Category, Brand, Product, ProductMedia, ProductStock
@@ -121,13 +122,26 @@ class ProductSerializer(serializers.ModelSerializer):
     
     media = serializers.SerializerMethodField()
     stocks = serializers.SerializerMethodField()
+    cover_image = serializers.SerializerMethodField()
+
+    def get_cover_image(self, obj):
+        cvr_img = ProductMedia.objects.filter(product=obj, is_cover=True, is_deleted=False).order_by('-created_at')
+        try:
+            request = self.context['request']
+            url = tenant_media_base_url(request)
+            if len(cvr_img) > 0 :
+                cvr_img = cvr_img[0]
+            return f'{url}{cvr_img.image}'
+        except:
+            return None
+
 
     def get_media(self, obj):
         try:
             context = self.context
         except:
             context = {}
-        all_medias = ProductMedia.objects.filter(product=obj, is_deleted=False)
+        all_medias = ProductMedia.objects.filter(product=obj, is_deleted=False).order_by('-created_at')
         return ProductMediaSerializer(all_medias, many=True, context=context).data
 
     def get_stocks(self, obj):
@@ -155,6 +169,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'slug',
             'is_active',
             'media',
+            'cover_image',
             'stocks',
         ]
         read_only_fields = ['slug', 'id']
