@@ -739,8 +739,6 @@ def update_location(request):
         business_address.postal_code = request.data.get('postal_code', business_address.postal_code)
         business_address.mobile_number= request.data.get('mobile_number', business_address.mobile_number)
         business_address.email= request.data.get('email', business_address.email)
-        business_address.start_time= request.data.get('start_time', business_address.start_time)
-        business_address.ending_date= request.data.get('ending_date', business_address.ending_date)
              
         country = request.data.get('country', None)
         state = request.data.get('state', None)
@@ -768,6 +766,11 @@ def update_location(request):
             )
 
         business_address.save()
+        
+        busineshour=BusinessOpeningHour.objects.get(business_address=business_address)
+        serializer_hour=OpeningHoursSerializer(busineshour,  data=request.data, partial=True, context={'request' : request})
+        if serializer_hour.is_valid():
+            serializer_hour.save()
 
         serialized = BusinessAddress_GetSerializer(business_address)
 
@@ -784,6 +787,7 @@ def update_location(request):
                 },
                 status=status.HTTP_200_OK
             )
+        
 
     else:
         return Response(

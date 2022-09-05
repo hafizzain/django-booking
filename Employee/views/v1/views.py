@@ -637,15 +637,15 @@ def create_staff_group(request):
         )
         #staff_permission_serializers =  StaffpermisionSerializers(staff_module_permission)
         employees_error = []
-        print(type(employees))
+        #print(type(employees))
         if type(employees) == str:
             employees = json.loads(employees)
 
         elif type(employees) == list:
             pass
-        print(type(employees))
-        print(employees)
-        print(len(employees))
+        #print(type(employees))
+        #print(employees)
+        #print(len(employees))
         for usr in employees:
             try:
                employe = Employee.objects.get(id=usr)  
@@ -805,7 +805,28 @@ def update_staff_group(request):
             },
             status=status.HTTP_404_NOT_FOUND
      )
-    serializer = StaffGroupSerializers(staff_group, data=request.data, partial=True)
+    employees= request.data.get('employees',None)
+    #print(type(employees))
+    if employees is not None:
+        #print(type(employees))
+        if type(employees) == str:
+            employees = json.loads(employees)
+        elif type(employees) == list:
+            pass
+        #print(type(employees))
+        #print(employees)
+        #print(len(employees))
+        for usr in employees:
+            try:
+               employe = Employee.objects.get(id=usr)  
+               #print(employe)
+               staff_group.employees.add(employe)
+            except Exception as err:
+                employees_error.append(str(err))
+        staff_group.save()    
+    
+         
+    serializer = StaffGroupSerializers(staff_group, data=request.data, partial=True, context={'request' : request})
     if serializer.is_valid():
         serializer.save()
         data.update(serializer.data)
