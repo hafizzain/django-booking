@@ -767,10 +767,17 @@ def update_location(request):
 
         business_address.save()
         
-        busineshour=BusinessOpeningHour.objects.get(business_address=business_address)
-        serializer_hour=OpeningHoursSerializer(busineshour,  data=request.data, partial=True, context={'request' : request})
-        if serializer_hour.is_valid():
-            serializer_hour.save()
+        start_time = request.data.get('start_time', None)
+        close_time = request.data.get('close_time', None)
+        if start_time is not None and close_time is not None:
+            busineshour = BusinessOpeningHour.objects.filter(
+                    business_address = business_address
+                )
+            for bhr in busineshour:
+                bhr.start_time = start_time
+                bhr.close_time = close_time
+                bhr.save()
+
 
         serialized = BusinessAddress_GetSerializer(business_address)
 
