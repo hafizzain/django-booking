@@ -65,17 +65,17 @@ class ClientGroup(models.Model):
         return str(self.id)
     
     
-# class Subscription(models.Model):
-#     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
-#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_subscription')
-#     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_subscription')
+class Subscription(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_subscription')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_subscription')
     
-#     name = models.CharField(max_length=300, default='')
-#     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product')
-#     no_days = models.PositiveIntegerField(default=0)
-#     select_amount = models.CharField(max_length=100, default='')
-#     total_no_services = models.PositiveIntegerField(default=0)
-#     set_price = models.PositiveIntegerField(default=0)
+    name = models.CharField(max_length=300, default='')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product')
+    no_days = models.PositiveIntegerField(default=0)
+    select_amount = models.CharField(max_length=100, default='')
+    total_no_services = models.PositiveIntegerField(default=0)
+    set_price = models.PositiveIntegerField(default=0)
     
-#     def __str__(self):
-#         return str(self.id)
+    def __str__(self):
+        return str(self.id)
