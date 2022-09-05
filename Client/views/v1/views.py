@@ -96,6 +96,10 @@ def create_client(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    if is_active is not None:
+           is_active = True
+    else: 
+              is_active = False
     try:
         if country is not None:
             country = Country.objects.get(id=country)
@@ -410,27 +414,31 @@ def update_client_group(request):
             },
                 status=status.HTTP_404_NOT_FOUND
         )
-    # client_error = []
-    # client=request.data.get('client', None)
-    # print(type(client))
-    # if client is not None:
-    #     print(type(client))
-    #     if type(client) == str:
-    #         client = json.loads(client)
-    #     elif type(client) == list:
-    #         pass
-    #     print(type(client))
-    #     print(client)
-    #     print(len(client))
-    #     for usr in client:
-    #         try:
-    #            employe = Client.objects.get(id=usr)  
-    #            print(employe)
-    #            client_group.employees.add(employe)
-    #         except Exception as err:
-    #             client_error.append(str(err))
-    #     client_group.save()    
-    serializer = ClientGroupSerializer(client_group, data=request.data, partial=True)
+    client_error = []
+    client=request.data.get('client', None)
+    print(type(client))
+    if client is not None:
+        if type(client) == str:
+            client = json.loads(client)
+        elif type(client) == list:
+            pass
+        for usr in client:
+            try:
+               employe = Client.objects.get(id=usr)  
+               print(employe)
+               client_group.employees.add(employe)
+            except Exception as err:
+                client_error.append(str(err))
+        client_group.save()
+        
+    
+    try:
+        request.data._mutable = True
+        del request.data['client']
+    except Exception as err:
+        pass
+    
+    serializer = ClientGroupSerializer(client_group,context={'request' : request} , data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(
                 {
@@ -438,7 +446,8 @@ def update_client_group(request):
             'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
             'response' : {
                 'message' : 'Client Group Serializer Invalid',
-                'error_message' : 'Invalid Data!',
+                #'error_message' : 'Invalid Data!' ,
+                'error_message' : str(serializer.errors),
             }
         },
         status=status.HTTP_404_NOT_FOUND
