@@ -243,7 +243,11 @@ def update_client(request):
                 },
                    status=status.HTTP_404_NOT_FOUND
               )
-              
+        image=request.data.get('image',None)
+
+        if image is not None:
+            client.image=image
+            client.save()
         serialized= ClientSerializer(client, data=request.data, partial=True, context={'request' : request})
         if serialized.is_valid():
            serialized.save()

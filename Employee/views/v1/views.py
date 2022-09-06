@@ -434,7 +434,7 @@ def update_employee(request):
                     'status' : False,
                     'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
                     'status_code_text' : 'INVALID_NOT_FOUND_EMPLOYEE_ID_4022',
-                    'response' : {
+                          'response' : {
                         'message' : 'Employee Not Found',
                         'error_message' : str(err),
                     }
@@ -463,8 +463,9 @@ def update_employee(request):
             status=status.HTTP_404_NOT_FOUND
         )
         
+
         Employe_Informations= EmployeeProfessionalInfo.objects.get(employee=employee)
-        serializer_info= EmployeInformationsSerializer(Employe_Informations,  data=request.data, partial=True)
+        serializer_info= EmployeInformationsSerializer(Employe_Informations,  data= request.data, partial=True)
         if serializer_info.is_valid():
                 serializer_info.save()
                 data.update(serializer_info.data)
@@ -481,8 +482,13 @@ def update_employee(request):
             status=status.HTTP_404_NOT_FOUND
      )
          
+        ps_data = {}
+        ps_data['allow_calendar_booking'] = True if request.data.get('allow_calendar_booking', None) is not None else False
+        ps_data['access_calendar'] = True if request.data.get('access_calendar', None) is not None else False
+        ps_data['change_calendar_color'] = True if request.data.get('change_calendar_color', None) is not None else False
+
         permission= EmployeePermissionSetting.objects.get(employee=employee)
-        serializer_permision= EmployPermissionSerializer(permission,  data=request.data, partial=True)
+        serializer_permision= EmployPermissionSerializer(permission,  data=ps_data, partial=True)
         if serializer_permision.is_valid():
                serializer_permision.save()
                data.update(serializer_permision.data)
@@ -498,10 +504,15 @@ def update_employee(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-                
+        md_data = {}
+        md_data['access_reports'] = True if request.data.get('access_reports', None) is not None else False
+        md_data['access_sales'] = True if request.data.get('access_sales', None) is not None else False
+        md_data['access_inventory'] = True if request.data.get('access_inventory', None) is not None else False
+        md_data['access_expenses'] = True if request.data.get('access_expenses', None) is not None else False
+        md_data['access_products'] = True if request.data.get('access_products', None) is not None else False
     
         Module_Permission= EmployeeModulePermission.objects.get(employee=employee)
-        serializer_Module = EmployeModulesSerializer(Module_Permission,  data=request.data, partial=True)
+        serializer_Module = EmployeModulesSerializer(Module_Permission,  data=md_data, partial=True)
         if serializer_Module.is_valid():
                serializer_Module.save()
                data.update(serializer_Module.data)
@@ -518,8 +529,16 @@ def update_employee(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+                
+        mp_data = {}
+        mp_data['access_voucher'] = True if request.data.get('access_voucher', None) is not None else False
+        mp_data['access_member_discount'] = True if request.data.get('access_member_discount', None) is not None else False
+        mp_data['access_invite_friend'] = True if request.data.get('access_invite_friend', None) is not None else False
+        mp_data['access_loyalty_points'] = True if request.data.get('access_loyalty_points', None) is not None else False
+        mp_data['access_gift_cards'] = True if request.data.get('access_gift_cards', None) is not None else False
+        
         Marketing_Permission= EmployeeMarketingPermission.objects.get(employee=employee)
-        serializer_Marketing= EmployeeMarketingSerializers(Marketing_Permission,  data=request.data, partial=True)
+        serializer_Marketing= EmployeeMarketingSerializers(Marketing_Permission,  data=mp_data, partial=True)
         if serializer_Marketing.is_valid():
                 serializer_Marketing.save()
                 data.update(serializer_Marketing.data)
@@ -1267,7 +1286,7 @@ def get_commission (request):
             'response' : {
                 'message' : 'All Commission',
                 'error_message' : None,
-                'employees' : serializer.data
+                'commission' : serializer.data
             }
         },
         status=status.HTTP_200_OK
