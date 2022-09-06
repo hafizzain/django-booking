@@ -792,16 +792,13 @@ def update_staff_group(request):
      )
     
     employees=request.data.get('employees', None)
-    print(type(employees))
     if employees is not None:
-        print(type(employees))
+       
         if type(employees) == str:
             employees = json.loads(employees)
         elif type(employees) == list:
             pass
-        print(type(employees))
-        print(employees)
-        print(len(employees))
+        staff_group.employees.clear()
         for usr in employees:
             try:
                employe = Employee.objects.get(id=usr)  
