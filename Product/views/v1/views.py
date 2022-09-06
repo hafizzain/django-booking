@@ -77,8 +77,9 @@ def import_csv(request):
                 )
             try:
                 category_obj = Category.objects.get(id=category)
-                product.category = category_obj
-                product.save()
+                if category_obj is not None:
+                    product.category = category_obj
+                    product.save()
                 
             except Exception as err:
                 return Response(

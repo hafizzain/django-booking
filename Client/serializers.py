@@ -23,6 +23,11 @@ class ClientSerializer(serializers.ModelSerializer):
         
         
 class ClientGroupSerializer(serializers.ModelSerializer):
+    # client =serializers.SerializerMethodField()
+    
+    # def get_client(self, obj):
+    #     all_client =obj.client.all()
+    #     return ClientSerializer(all_client, many=True, context=self.context)
     
     class Meta:
         model = ClientGroup
