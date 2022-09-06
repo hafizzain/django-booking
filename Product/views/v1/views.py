@@ -53,7 +53,7 @@ def export_csv(request):
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def import_csv(request):
     product_csv = request.data.get('file', None)
     user= request.user
