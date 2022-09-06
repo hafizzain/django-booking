@@ -25,7 +25,7 @@ from rest_framework.settings import api_settings
 
 from NStyle.Constants import StatusCodes
 
-from Product.models import Category, Brand, Product, ProductMedia, ProductStock
+from Product.models import Category, Brand , Product, ProductMedia, ProductStock
 from Business.models import Business, BusinessAddress, BusinessVendor
 from Product.serializers import CategorySerializer, BrandSerializer, ProductSerializer, ProductStockSerializer, ProductWithStockSerializer
 
@@ -87,8 +87,11 @@ def import_csv(request):
             
             product= Product.objects.create(
                 user=user,
+                cost_price=cost_price,
+                full_price=full_price,
                 name = name,
-                product_type=product_type
+                product_type=product_type,
+                barcode_id=barcode_id
             )
             # product.category=category
             # product.save()
@@ -101,9 +104,9 @@ def import_csv(request):
                 # vendor=vendor
             
             try:
-                brand_obj = Brand.objects.get(id=category)
-                if category_obj is not None:
-                    product.category = category_obj
+                vendor_obj = BusinessVendor.objects.get(id=vendor)
+                if vendor_obj is not None:
+                    product.vendor = vendor_obj
                     product.save()
                 
             except Exception as err:
@@ -112,7 +115,25 @@ def import_csv(request):
                     'status' : False,
                     'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
                     'response' : {
-                    'message' : 'Business not found',
+                    'message' : 'Vendor not found',
+                    'error_message' : str(err),
+                    }
+                }
+                )
+            
+            try:
+                brand_obj = Brand.objects.get(id=brand)
+                if brand_obj is not None:
+                    product.brand = brand_obj
+                    product.save()
+                
+            except Exception as err:
+                return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Brand not found',
                     'error_message' : str(err),
                     }
                 }

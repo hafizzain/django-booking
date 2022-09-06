@@ -1293,7 +1293,7 @@ def get_commission (request):
     )
    
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def update_commision(request):
     commission_id = request.data.get('commission_id', None)
     
