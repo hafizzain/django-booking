@@ -77,9 +77,9 @@ def get_client(request):
             'status' : 200,
             'status_code' : '200',
             'response' : {
-                'message' : 'All Staff Group',
+                'message' : 'All Client',
                 'error_message' : None,
-                'employees' : serialized.data
+                'client' : serialized.data
             }
         },
         status=status.HTTP_200_OK
@@ -199,7 +199,7 @@ def create_client(request):
             'response' : {
                 'message' : 'Employees Added!',
                 'error_message' : None,
-                'Client' : serialized.data
+                'client' : serialized.data
             }
         },
         status=status.HTTP_201_CREATED
@@ -219,7 +219,7 @@ def update_client(request):
                 'status_code_text' : 'MISSING_FIELDS_4001',
                 'response' : {
                     'message' : 'Invalid Data!',
-                    'error_message' : 'User id is required',
+                    'error_message' : 'Client ID is required',
                     'fields' : [
                         'id',
                     ]
@@ -253,7 +253,7 @@ def update_client(request):
                 'response' : {
                     'message' : 'Update Employee Successfully',
                     'error_message' : None,
-                    'Employee' : serialized.data
+                    'client' : serialized.data
                 }
             },
             status=status.HTTP_200_OK
@@ -746,9 +746,9 @@ def delete_subscription(request):
     
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def update_staff_group(request):
-    subsciption_id = request.data.get('subsciption_id', None)
-    if subsciption_id is None: 
+def update_subscription(request):
+    subscription_id = request.data.get('subscription_id', None)
+    if subscription_id is None: 
         return Response(
         {
             'status' : False,
@@ -758,14 +758,14 @@ def update_staff_group(request):
                 'message' : 'Invalid Data!',
                 'error_message' : 'Staff ID are required.',
                 'fields' : [
-                    'subsciption_id'                         
+                    'subscription'                         
                 ]
             }
         },
         status=status.HTTP_400_BAD_REQUEST
         )
     try:
-        subsciption = Subscription.objects.get(id=subsciption_id)
+        subscription = Subscription.objects.get(id=subscription_id)
     except Exception as err:
         return Response(
             {
@@ -773,9 +773,35 @@ def update_staff_group(request):
                 'status_code' : StatusCodes.INVALID_SUBSCRIPTION_ID_4031,
                 'status_code_text' : 'INVALID_SUBSCRIPTION_ID_4031',
                 'response' : {
-                    'message' : 'Subsciption Not Found',
+                    'message' : 'Subscription Not Found',
                     'error_message' : str(err),
                 }
             },
                 status=status.HTTP_404_NOT_FOUND
+        )
+    serializer = SubscriptionSerializer(subscription, data=request.data, partial=True)
+    if not serializer.is_valid():
+        return Response(
+                {
+            'status' : False,
+            'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+            'response' : {
+                'message' : 'Subscription Serializer Invalid',
+                'error_message' : str(err),
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+        )
+    serializer.save()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Update Subscription Successfully',
+                'error_message' : None,
+                'StaffGroupUpdate' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
         )

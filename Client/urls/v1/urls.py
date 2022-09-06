@@ -20,6 +20,7 @@ urlpatterns = [
    path('create_subscription/', views.create_subscription),
    path('get_subscription/', views.get_subscription),
    path('delete_subscription/', views.delete_subscription),
+   path('update_subscription/', views.update_subscription),
    
 
 ]
