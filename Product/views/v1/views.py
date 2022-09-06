@@ -67,12 +67,12 @@ def import_csv(request):
             row = row.split(',')
             row = row
             
-            # if len(row) < 4:
-            #     continue
+            if len(row) < 4:
+                continue
                 
             name=row[0]
             quantity= row[1]
-            #category= row[2]
+            category= row[2]
             product_type = row[3].replace('\n', '').strip()
             
             # row = row
@@ -88,6 +88,7 @@ def import_csv(request):
             product= Product.objects.create(
                 user=user,
                 name = name,
+                #category=category,
                 product_type=product_type
             )
             # product.category=category
@@ -100,23 +101,23 @@ def import_csv(request):
                 # barcode_id=barcode_id,
                 # vendor=vendor
             
-            # try:
-            #     category_obj = Category.objects.get(id=category)
-            #     if category_obj is not None:
-            #         product.category = category_obj
-            #         product.save()
+            try:
+                category_obj = Category.objects.get(id=category)
+                if category_obj is not None:
+                    product.category = category_obj
+                    product.save()
                 
-            # except Exception as err:
-            #     return Response(
-            #     {
-            #         'status' : False,
-            #         'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
-            #         'response' : {
-            #         'message' : 'Business not found',
-            #         'error_message' : str(err),
-            #         }
-            #     }
-            #     )
+            except Exception as err:
+                return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                }
+                )
             
             # Category.objects.create(
             #     product=product, 
