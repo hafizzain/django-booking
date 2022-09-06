@@ -67,6 +67,9 @@ def import_csv(request):
             row = row.split(',')
             row = row
             
+            # if len(row) < 4:
+            #     continue
+                
             name=row[0]
             quantity= row[1]
             #category= row[2]
@@ -119,12 +122,14 @@ def import_csv(request):
             #     product=product, 
                 
             # )
+            
             ProductStock.objects.create(
+                user=user,
                 product=product,
                 quantity=quantity,
                 
             )
-            print(f'Added Product {name} ... {quantity} ....{category}.... {product_type}...')
+            print(f'Added Product {name} ... {quantity} .... {product_type}...')
 
     file.delete()
     return Response({'status' : 'hello'})

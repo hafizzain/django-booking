@@ -268,6 +268,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'image',
             'full_name',
             'salary',
+            'email',
             'income_type',
             'designation',           
             ]   
