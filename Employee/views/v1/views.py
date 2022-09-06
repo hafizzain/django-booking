@@ -3,7 +3,7 @@ from Employee.models import( Employee , EmployeeProfessionalInfo ,
                         EmployeePermissionSetting,  EmployeeModulePermission
                         , EmployeeMarketingPermission , StaffGroup 
                         , StaffGroupModulePermission, Attendance
-                        ,Payroll
+                        ,Payroll, CommissionSchemeSetting
                         )
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -12,7 +12,7 @@ from Employee.serializers import( EmployeSerializer , EmployeInformationsSeriali
                           , EmployPermissionSerializer,  EmployeModulesSerializer
                           ,  EmployeeMarketingSerializers, StaffGroupSerializers , 
                           StaffpermisionSerializers , AttendanceSerializers
-                          ,PayrollSerializers,singleEmployeeSerializer 
+                          ,PayrollSerializers,singleEmployeeSerializer , CommissionSerializer
                         
                           
                                  )
@@ -1220,3 +1220,43 @@ def create_payroll(request):
             },
             status=status.HTTP_201_CREATED
         ) 
+    
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_commission (request):
+    business = request.GET.get('business', None)
+    if business is None:
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required.',
+                    'fields' : [
+                        'business',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    commission , created =  CommissionSchemeSetting.objects.get_or_create(business=business)
+    serializer = CommissionSerializer(commission)
+    
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Commission',
+                'error_message' : None,
+                'employees' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+#def update_commision(request):

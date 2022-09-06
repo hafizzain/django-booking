@@ -42,8 +42,8 @@ def get_single_client(request):
         return Response(
                 {
                     'status' : False,
-                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
-                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                    'status_code' : StatusCodes.INVALID_CLIENT_4032,
+                    'status_code_text' : 'INVALID_CLIENT_4032',
                     'response' : {
                         'message' : 'Client Not Found',
                         'error_message' : str(err),
@@ -58,7 +58,7 @@ def get_single_client(request):
             'status' : 200,
             'status_code' : '200',
             'response' : {
-                'message' : 'All Staff Group',
+                'message' : 'Single client',
                 'error_message' : None,
                 'client' : seralized.data
             }
@@ -152,7 +152,7 @@ def create_client(request):
     if is_active is not None:
            is_active = True
     else: 
-              is_active = False
+            is_active = False
     try:
         if country is not None:
             country = Country.objects.get(id=country)
@@ -190,14 +190,15 @@ def create_client(request):
         city = city,
         postal_code= postal_code,
         card_number= card_number,
+        is_active = is_active
     )
-    serialized= ClientSerializer(client, partial=True, context={'request' : request})
+    serialized= ClientSerializer(client, context={'request' : request})
     return Response(
         {
             'status' : True,
             'status_code' : 201,
             'response' : {
-                'message' : 'Employees Added!',
+                'message' : 'Client Added!',
                 'error_message' : None,
                 'client' : serialized.data
             }
@@ -233,8 +234,8 @@ def update_client(request):
               return Response(
              {
                     'status' : False,
-                    'status_code' : StatusCodes.USER_NOT_EXIST_4005,
-                    'status_code_text' : 'USER_NOT_EXIST_4005',
+                    'status_code' : StatusCodes.INVALID_CLIENT_4032,
+                    'status_code_text' : 'INVALID_CLIENT_4032',
                     'response' : {
                         'message' : 'Client Not Found',
                         'error_message' : str(err),
@@ -251,7 +252,7 @@ def update_client(request):
                 'status' : True,
                 'status_code' : 200,
                 'response' : {
-                    'message' : 'Update Employee Successfully',
+                    'message' : 'Update Client Successfully',
                     'error_message' : None,
                     'client' : serialized.data
                 }
@@ -262,7 +263,7 @@ def update_client(request):
               return Response(
             {
                 'status' : False,
-                'status_code' : StatusCodes.INVALID_EMPLOYEE_PERMISSION_4027,
+                'status_code' : StatusCodes.INVALID_CLIENT_4032,
                 'response' : {
                     'message' : 'Invalid Data!',
                     'error_message' : str(serialized.errors),
@@ -303,7 +304,7 @@ def delete_client(request):
                 'status_code' : 404,
                 'status_code_text' : '404',
                 'response' : {
-                    'message' : 'Invalid Employee ID!',
+                    'message' : 'Invalid Client ID!',
                     'error_message' : str(err),
                 }
             },
@@ -317,7 +318,7 @@ def delete_client(request):
             'status_code' : 200,
             'status_code_text' : '200',
             'response' : {
-                'message' : 'Client deleted successful',
+                'message' : 'Client deleted successfully',
                 'error_message' : None
             }
         },
@@ -444,7 +445,7 @@ def update_client_group(request):
             'status_code_text' : 'MISSING_FIELDS_4001',
             'response' : {
                 'message' : 'Invalid Data!',
-                'error_message' : 'Staff ID are required.',
+                'error_message' : 'Client Group ID are required.',
                 'fields' : [
                     'client_group_id'                         
                 ]
@@ -458,8 +459,8 @@ def update_client_group(request):
         return Response(
             {
                 'status' : False,
-                'status_code' : StatusCodes.INVALID_STAFF_GROUP_4028,
-                'status_code_text' : 'INVALID_STAFF_GROUP_4028',
+                'status_code' : StatusCodes.INVIALID_CLIENT_GROUP_4033,
+                'status_code_text' : 'INVIALID_CLIENT_GROUP_4033',
                 'response' : {
                     'message' : 'Client Group Not Found',
                     'error_message' : str(err),
@@ -513,7 +514,7 @@ def update_client_group(request):
         'response' : {
             'message' : 'Update Client Group Successfully',
             'error_message' : None,
-            'StaffGroupUpdate' : serializer.data
+            'ClientGroupUpdate' : serializer.data
             }
         },
     status=status.HTTP_200_OK
@@ -664,7 +665,7 @@ def create_subscription(request):
                 'response' : {
                     'message' : 'New Subscription Created!',
                     'error_message' : None,
-                    'StaffGroup' : serialized.data,
+                    'subscription' : serialized.data,
                 }
             },
             status=status.HTTP_201_CREATED
@@ -684,7 +685,7 @@ def get_subscription(request):
             'response' : {
                 'message' : 'All Subscription!',
                 'error_message' : None,
-                'employees' : serialized.data
+                'subscription' : serialized.data
             }
         },
         status=status.HTTP_200_OK
@@ -756,7 +757,7 @@ def update_subscription(request):
             'status_code_text' : 'MISSING_FIELDS_4001',
             'response' : {
                 'message' : 'Invalid Data!',
-                'error_message' : 'Staff ID are required.',
+                'error_message' : 'Subscription ID are required.',
                 'fields' : [
                     'subscription'                         
                 ]
@@ -800,7 +801,7 @@ def update_subscription(request):
             'response' : {
                 'message' : 'Update Subscription Successfully',
                 'error_message' : None,
-                'StaffGroupUpdate' : serializer.data
+                'subscription' : serializer.data
             }
         },
         status=status.HTTP_200_OK

@@ -7,7 +7,7 @@ from .models import( Employee, EmployeeProfessionalInfo ,
                EmployeePermissionSetting, EmployeeModulePermission 
                , EmployeeMarketingPermission,
                StaffGroup, StaffGroupModulePermission, Attendance
-               ,Payroll , 
+               ,Payroll , CommissionSchemeSetting
 )
 class EmployeInformationsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -273,5 +273,10 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'designation',           
             ]   
         
+class CommissionSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = CommissionSchemeSetting
+        fields = '__all__'
         
 
