@@ -1239,7 +1239,21 @@ def get_commission (request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-
+       
+    try:
+             business=Business.objects.get(id=business)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                }
+            )
+       
     commission , created =  CommissionSchemeSetting.objects.get_or_create(business=business)
     serializer = CommissionSerializer(commission)
     
@@ -1255,5 +1269,66 @@ def get_commission (request):
         },
         status=status.HTTP_200_OK
     )
-    
-#def update_commision(request):
+   
+@api_view(['POST'])
+@permission_classes([AllowAny]) 
+def update_commision(request):
+    commission_id = request.GET.get('commission_id', None)
+    if commission_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'text',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+        
+    try:
+        commission = CommissionSchemeSetting.objects.get(id=commission_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_COMMISSION_ID_4034,
+                'status_code_text' : 'INVALID_COMMISSION_ID_4034',
+                'response' : {
+                    'message' : 'Attendence Not Found',
+                    'error_message' : str(err),
+                }
+            },
+                status=status.HTTP_404_NOT_FOUND
+        )
+    serializer = CommissionSerializer(commission, data=request.data, partial=True)
+    if not serializer.is_valid():
+        return Response(
+                {
+            'status' : False,
+            'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+            'response' : {
+                'message' : 'Commission Serializer Invalid',
+                'error_message' : str(err),
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+        )
+    serializer.save()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Update Commission Successfully',
+                'error_message' : None,
+                'commission' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+        )
