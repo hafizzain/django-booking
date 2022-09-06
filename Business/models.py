@@ -153,7 +153,7 @@ class StaffNotificationSetting(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_staff_notify_setting')
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_staff_notify_setting')
 
-    sms_daily_sale = models.BooleanField(default=True , verbose_name='Send SMS Notification on Daily Sale')
+    sms_daily_sale = models.BooleanField(default=False , verbose_name='Send SMS Notification on Daily Sale')
     email_daily_sale = models.BooleanField(default=True , verbose_name="Send Email Notification on Daily Sale")
 
     is_active = models.BooleanField(default=True)
@@ -172,11 +172,11 @@ class ClientNotificationSetting(models.Model):
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_client_notify_setting')
 
 
-    sms_purchase_plan = models.BooleanField(default=True, verbose_name="Send SMS Notification on Purchase Plan")
-    sms_for_rewards_on_quick_sale = models.BooleanField(default=True , verbose_name="Send SMS Notification for Rewards on quick Sale")
+    sms_purchase_plan = models.BooleanField(default=False, verbose_name="Send SMS Notification on Purchase Plan")
+    sms_for_rewards_on_quick_sale = models.BooleanField(default=False , verbose_name="Send SMS Notification for Rewards on quick Sale")
     sms_pending_services_quicksale = models.BooleanField(default=False , verbose_name="Send SMS Notification on Pending Services Quick Sale")
-    sms_for_ewallet_balance_on_quick_sale = models.BooleanField(default=True , verbose_name="Send SMS Notification for ewallet balance on quick sale")
-    sms_pending_payment = models.BooleanField(default=True , verbose_name="Send SMS Notification on Pending Payment")
+    sms_for_ewallet_balance_on_quick_sale = models.BooleanField(default=False , verbose_name="Send SMS Notification for ewallet balance on quick sale")
+    sms_pending_payment = models.BooleanField(default=False , verbose_name="Send SMS Notification on Pending Payment")
     email_notify_on_purchase_plan = models.BooleanField(default=True , verbose_name="Send Email Notification On Purchase Plan")
     sms_quick_sale = models.BooleanField(default=True , verbose_name="Send SMS Notification on Quick Sale")
     sms_appoinment = models.BooleanField(default=True , verbose_name="Send Notification on Appoinment")
@@ -198,9 +198,9 @@ class AdminNotificationSetting(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_admin_notify_setting')
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_admin_notify_setting')
 
-    sms_notify_on_appoinment = models.BooleanField(default=True , verbose_name="Send SMS Notification on Apoinment")
-    sms_notify_on_quick_sale = models.BooleanField(default=True , verbose_name="Send SMS Notification on quick sale")
-    sms_notify_for_daily_book = models.BooleanField(default=True , verbose_name="Send SMS Notification for daily book")
+    sms_notify_on_appoinment = models.BooleanField(default=False , verbose_name="Send SMS Notification on Apoinment")
+    sms_notify_on_quick_sale = models.BooleanField(default=False , verbose_name="Send SMS Notification on quick sale")
+    sms_notify_for_daily_book = models.BooleanField(default=False , verbose_name="Send SMS Notification for daily book")
     email_notify_on_appoinment = models.BooleanField(default=True , verbose_name="Send Email Notification on Appoinment")
     email_notify_on_quick_sale = models.BooleanField(default=True , verbose_name="Send Email Notification on Quick Sale")
     email_notify_on_daily_book = models.BooleanField(default=False , verbose_name="Send Email Notification on Daily Book")
