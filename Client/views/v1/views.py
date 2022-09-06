@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Q
 from Business.models import Business
+from Product.models import Product
 from Utility.models import Country, State, City
 from Client.models import Client, ClientGroup, Subscription
 from Client.serializers import ClientSerializer, ClientGroupSerializer, SubscriptionSerializer
@@ -13,6 +14,58 @@ from Client.serializers import ClientSerializer, ClientGroupSerializer, Subscrip
 import json
 
 from NStyle.Constants import StatusCodes
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_single_client(request):
+    client_id = request.GET.get('client_id', None)
+    if not all([client_id]):
+        return Response(
+        {
+            'status' : False,
+            'status_code' : StatusCodes.MISSING_FIELDS_4001,
+            'status_code_text' : 'MISSING_FIELDS_4001',
+            'response' : {
+                'message' : 'Invalid Data!',
+                'error_message' : 'Client id are required',
+                'fields' : [
+                    'client_id',
+                ]
+            }
+        },
+        status=status.HTTP_400_BAD_REQUEST
+        )
+        
+    try:
+        client = Client.objects.get(id=client_id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                    'response' : {
+                        'message' : 'Client Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+    seralized = ClientSerializer(client, context={'request' : request})
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Staff Group',
+                'error_message' : None,
+                'employees' : seralized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -528,12 +581,13 @@ def create_subscription(request):
     
     name= request.data.get('name', None)
     product= request.data.get('product', None)
-    no_days= request.data.get('no_days',None)
+    days= request.data.get('days',None)
     select_amount = request.data.get('select_amount', None)
-    total_no_services= request.data.get('total_no_services', None)
-    set_price= request.data.get('set_price', None)
+    services_count= request.data.get('services_count', None)
+    price= request.data.get('price', None)
+    is_active= request.data.get('is_active', None)
     
-    if not all([business, name ,product , no_days ,select_amount , total_no_services , set_price  ]):
+    if not all([business, name ,product , days ,select_amount , services_count , price  ]):
           return Response(
             {
                 'status' : False,
@@ -546,10 +600,10 @@ def create_subscription(request):
                           'business',
                           'name',
                           'product',
-                          'no_days', 
+                          'days', 
                           'select_amount', 
-                          'total_no_services', 
-                          'set_price', 
+                          'services_count', 
+                          'price', 
 
                             ]
                 }
@@ -570,6 +624,54 @@ def create_subscription(request):
                 }
             )
             
+    try:
+             product=Product.objects.get(id=product)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Product not found',
+                    'error_message' : str(err),
+                }
+                }
+            )
+            
+    client_subscription= Subscription.objects.create(
+        user =user,
+        business=business, 
+        name= name,
+        product=product,
+        days=days,
+        select_amount=select_amount,
+        services_count=services_count,
+        price=price,
+        
+        
+    )
+    if is_active is not None:
+        is_active = True
+    else: 
+        is_active = False
+    
+    serialized = SubscriptionSerializer(client_subscription, context={'request' : request})
+       
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'New Subscription Created!',
+                    'error_message' : None,
+                    'StaffGroup' : serialized.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        ) 
+ 
+            
+            
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_subscription(request):
@@ -580,10 +682,100 @@ def get_subscription(request):
             'status' : 200,
             'status_code' : '200',
             'response' : {
-                'message' : 'All Staff Group',
+                'message' : 'All Subscription!',
                 'error_message' : None,
                 'employees' : serialized.data
             }
         },
         status=status.HTTP_200_OK
     )
+    
+    
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_subscription(request):
+    subsciption_id = request.data.get('subsciption_id', None)
+    if subsciption_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required.',
+                    'fields' : [
+                        'subsciption_id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        subsciption = Subscription.objects.get(id=subsciption_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Subscription ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    subsciption.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Subscription deleted successful',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+
+    
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_staff_group(request):
+    subsciption_id = request.data.get('subsciption_id', None)
+    if subsciption_id is None: 
+        return Response(
+        {
+            'status' : False,
+            'status_code' : StatusCodes.MISSING_FIELDS_4001,
+            'status_code_text' : 'MISSING_FIELDS_4001',
+            'response' : {
+                'message' : 'Invalid Data!',
+                'error_message' : 'Staff ID are required.',
+                'fields' : [
+                    'subsciption_id'                         
+                ]
+            }
+        },
+        status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        subsciption = Subscription.objects.get(id=subsciption_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_SUBSCRIPTION_ID_4031,
+                'status_code_text' : 'INVALID_SUBSCRIPTION_ID_4031',
+                'response' : {
+                    'message' : 'Subsciption Not Found',
+                    'error_message' : str(err),
+                }
+            },
+                status=status.HTTP_404_NOT_FOUND
+        )

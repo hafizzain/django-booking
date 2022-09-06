@@ -66,32 +66,55 @@ def import_csv(request):
         for row in imp_file:
             row = row.split(',')
             row = row
-            name= row[0]
+            
+            name=row[0]
             quantity= row[1]
-            category= row[2]
-            product_type= row[3].replace('\n', '').strip()
+            #category= row[2]
+            product_type = row[3].replace('\n', '').strip()
+            
+            # row = row
+            # name= row[0]
+            # cost_price= row[1]
+            # full_price= row[2]
+            # quantity= row[3]
+            # category= row[4]
+            # brand= row[5]
+            # product_type= row[6] 
+            # barcode_id= row[7]
+            #  vendor= row[8].replace('\n', '').strip()
             product= Product.objects.create(
                 user=user,
-                name=name, 
-                product_type=product_type, 
-                )
-            try:
-                category_obj = Category.objects.get(id=category)
-                if category_obj is not None:
-                    product.category = category_obj
-                    product.save()
+                name = name,
+                product_type=product_type
+            )
+            # product.category=category
+            # product.save()
+                # name=name, 
+                # cost_price=cost_price,
+                # full_price=full_price,
+                # product_type=product_type, 
+                # brand=brand,
+                # barcode_id=barcode_id,
+                # vendor=vendor
+            
+            # try:
+            #     category_obj = Category.objects.get(id=category)
+            #     if category_obj is not None:
+            #         product.category = category_obj
+            #         product.save()
                 
-            except Exception as err:
-                return Response(
-                {
-                    'status' : False,
-                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
-                    'response' : {
-                    'message' : 'Business not found',
-                    'error_message' : str(err),
-                    }
-                }
-                )
+            # except Exception as err:
+            #     return Response(
+            #     {
+            #         'status' : False,
+            #         'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+            #         'response' : {
+            #         'message' : 'Business not found',
+            #         'error_message' : str(err),
+            #         }
+            #     }
+            #     )
+            
             # Category.objects.create(
             #     product=product, 
                 
@@ -99,6 +122,7 @@ def import_csv(request):
             ProductStock.objects.create(
                 product=product,
                 quantity=quantity,
+                
             )
             print(f'Added Product {name} ... {quantity} ....{category}.... {product_type}...')
 

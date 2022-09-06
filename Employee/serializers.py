@@ -164,6 +164,7 @@ class StaffGroupSerializers(serializers.ModelSerializer):
             'name', 
             'is_active',
             'staff_permission', 
+            'created_at',
             'employees',
         ]
         

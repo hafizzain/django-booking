@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from requests import request
 from Employee.models import( Employee , EmployeeProfessionalInfo ,
                         EmployeePermissionSetting,  EmployeeModulePermission
                         , EmployeeMarketingPermission , StaffGroup 
@@ -410,163 +409,144 @@ def delete_employee(request):
 @permission_classes([IsAuthenticated])
 def update_employee(request): 
     # sourcery skip: avoid-builtin-shadow
-    id = request.data.get('id', None)
-    if id is None:
-        return Response(
-        {
-            'status' : False,
-            'status_code' : StatusCodes.MISSING_FIELDS_4001,
-            'status_code_text' : 'MISSING_FIELDS_4001',
-            'response' : {
-                'message' : 'Invalid Data!',
-                'error_message' : 'User id is required',
-                'fields' : [
-                    'id',
-                ]
-            }
-        },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    try:
-        employee = Employee.objects.get(id=id)
-    except Exception as err:
+        id = request.data.get('id', None)
+        if id is None:
             return Response(
             {
                 'status' : False,
-                'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
-                'status_code_text' : 'INVALID_NOT_FOUND_EMPLOYEE_ID_4022',
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
                 'response' : {
-                    'message' : 'Employee Not Found',
-                    'error_message' : str(err),
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'User id is required',
+                    'fields' : [
+                        'id',
+                    ]
                 }
             },
-                status=status.HTTP_404_NOT_FOUND
-            )
-    data={}
-    image=request.data.get('image',None)
-    if image is not None:
-        employee.image=image
-        employee.save()
-    serializer = EmployeSerializer(employee, data=request.data, partial=True, context={'request' : request})
-    if serializer.is_valid():
-        serializer.save()
-        data.update(serializer.data)
-    else: 
-            return Response(
-        {
-            'status' : False,
-            'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
-            'response' : {
-                'message' : 'Invialid Data',
-                'error_message' : str(serializer.errors),
-            }
-        },
-        status=status.HTTP_404_NOT_FOUND
-    )
-
-    Employe_Informations= EmployeeProfessionalInfo.objects.get(employee=employee)
-    serializer_info= EmployeInformationsSerializer(Employe_Informations,  data=request.data, partial=True)
-    if serializer_info.is_valid():
-            serializer_info.save()
-            data.update(serializer_info.data)
-    else:
-        return Response(
-        {
-            'status' : False,
-            'status_code' : StatusCodes.INVALID_EMPLOYEE_INFORMATION_4026,
-            'response' : {
-                'message' : 'Invalid Data',
-                'error_message' : str(serializer_info.errors),
-            }
-        },
-        status=status.HTTP_404_NOT_FOUND
-    )
-
-    p_data = dict()
-    p_data['allow_calendar_booking'] = request.data.get('allow_calendar_booking', False)
-    p_data['access_calendar'] = request.data.get('access_calendar', False)
-    p_data['change_calendar_color'] = request.data.get('change_calendar_color', False)
-         
-    permission= EmployeePermissionSetting.objects.get(employee=employee)
-    serializer_permision= EmployPermissionSerializer(permission,  data=p_data, partial=True)
-    if serializer_permision.is_valid():
-            serializer_permision.save()
-            data.update(serializer_permision.data)
-    else:
-            return Response(
-        {
-            'status' : False,
-            'status_code' :StatusCodes.INVALID_EMPLOYEE_PERMISSION_4027,
-            'response' : {
-                'message' : 'Invalid Data!',
-                'error_message' : str(serializer_permision.errors),
-            }
-        },
-        status=status.HTTP_400_BAD_REQUEST
-    )
-
-    mdp_data = dict()
-    mdp_data['access_reports'] = request.data.get('access_reports', False)
-    mdp_data['access_sales'] = request.data.get('access_sales', False)
-    mdp_data['access_inventory'] = request.data.get('access_inventory', False)
-    mdp_data['access_expenses'] = request.data.get('access_expenses', False)
-    mdp_data['access_products'] = request.data.get('access_products', False)       
-    
-    Module_Permission= EmployeeModulePermission.objects.get(employee=employee)
-    serializer_Module = EmployeModulesSerializer(Module_Permission,  data=mdp_data, partial=True)
-    if serializer_Module.is_valid():
-            serializer_Module.save()
-            data.update(serializer_Module.data)
-            
-    else:
-            return Response(
-        {
-            'status' : False,
-            'status_code' : StatusCodes.INVALID_EMPLOYEE_PERMISSION_4027,
-            'response' : {
-                'message' : 'Invalid Data!',
-                'error_message' : str(serializer_Module.errors),
-            }
-        },
-        status=status.HTTP_400_BAD_REQUEST
-    )
-
-    mp_data = dict()
-    mp_data['access_voucher'] = request.data.get('access_voucher', False)
-    mp_data['access_member_discount'] = request.data.get('access_member_discount', False)
-    mp_data['access_invite_friend'] = request.data.get('access_invite_friend', False)
-    mp_data['access_loyalty_points'] = request.data.get('access_loyalty_points', False)
-    mp_data['access_gift_cards'] = request.data.get('access_gift_cards', False)
-
-    Marketing_Permission= EmployeeMarketingPermission.objects.get(employee=employee)
-    serializer_Marketing= EmployeeMarketingSerializers(Marketing_Permission,  data=mp_data, partial=True)
-    if serializer_Marketing.is_valid():
-            serializer_Marketing.save()
-            data.update(serializer_Marketing.data)
-    else:
-            return Response(
-        {
-            'status' : False,
-            'status_code' : StatusCodes.INVALID_EMPLOYEE_PERMISSION_4027,
-            'response' : {
-                'message' : 'Invalid Data!',
-                'error_message' : str(serializer_Marketing.errors),
-            }
-        },
-        status=status.HTTP_400_BAD_REQUEST
-    )
-    return Response(
-        {
-            'status' : True,
-            'status_code' : 200,
-            'response' : {
-                'message' : 'Update Employee Successfully',
-                'error_message' : None,
-                'Employee' : data
-            }
-        },
-        status=status.HTTP_200_OK
+             status=status.HTTP_400_BAD_REQUEST
+           )
+        try:
+            employee = Employee.objects.get(id=id)
+        except Exception as err:
+              return Response(
+             {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
+                    'status_code_text' : 'INVALID_NOT_FOUND_EMPLOYEE_ID_4022',
+                    'response' : {
+                        'message' : 'Employee Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                   status=status.HTTP_404_NOT_FOUND
+              )
+        data={}
+        image=request.data.get('image',None)
+        if image is not None:
+            employee.image=image
+            employee.save()
+        serializer = EmployeSerializer(employee, data=request.data, partial=True, context={'request' : request})
+        if serializer.is_valid():
+           serializer.save()
+           data.update(serializer.data)
+        else: 
+             return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                'response' : {
+                    'message' : 'Invialid Data',
+                    'error_message' : str(serializer.errors),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
         )
+        
+        Employe_Informations= EmployeeProfessionalInfo.objects.get(employee=employee)
+        serializer_info= EmployeInformationsSerializer(Employe_Informations,  data=request.data, partial=True)
+        if serializer_info.is_valid():
+                serializer_info.save()
+                data.update(serializer_info.data)
+        else:
+         return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_EMPLOYEE_INFORMATION_4026,
+                'response' : {
+                    'message' : 'Invalid Data',
+                    'error_message' : str(serializer_info.errors),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+     )
+         
+        permission= EmployeePermissionSetting.objects.get(employee=employee)
+        serializer_permision= EmployPermissionSerializer(permission,  data=request.data, partial=True)
+        if serializer_permision.is_valid():
+               serializer_permision.save()
+               data.update(serializer_permision.data)
+        else:
+                return Response(
+            {
+                'status' : False,
+                'status_code' :StatusCodes.INVALID_EMPLOYEE_PERMISSION_4027,
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : str(serializer_permision.errors),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+                
+    
+        Module_Permission= EmployeeModulePermission.objects.get(employee=employee)
+        serializer_Module = EmployeModulesSerializer(Module_Permission,  data=request.data, partial=True)
+        if serializer_Module.is_valid():
+               serializer_Module.save()
+               data.update(serializer_Module.data)
+               
+        else:
+                return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_EMPLOYEE_PERMISSION_4027,
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : str(serializer_Module.errors),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+        Marketing_Permission= EmployeeMarketingPermission.objects.get(employee=employee)
+        serializer_Marketing= EmployeeMarketingSerializers(Marketing_Permission,  data=request.data, partial=True)
+        if serializer_Marketing.is_valid():
+                serializer_Marketing.save()
+                data.update(serializer_Marketing.data)
+        else:
+              return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_EMPLOYEE_PERMISSION_4027,
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : str(serializer_Marketing.errors),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+        return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Update Employee Successfully',
+                    'error_message' : None,
+                    'Employee' : data
+                }
+            },
+            status=status.HTTP_200_OK
+           )
 
 # @api_view(['GET'])
 # @permission_classes([AllowAny])
