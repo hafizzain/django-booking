@@ -1254,7 +1254,10 @@ def get_commission (request):
                 }
             )
        
-    commission , created =  CommissionSchemeSetting.objects.get_or_create(business=business)
+    commission , created =  CommissionSchemeSetting.objects.get_or_create(
+        business=business,
+        user=business.user,
+        )
     serializer = CommissionSerializer(commission)
     
     return Response(
@@ -1271,9 +1274,14 @@ def get_commission (request):
     )
    
 @api_view(['POST'])
-@permission_classes([AllowAny]) 
+@permission_classes([AllowAny])
 def update_commision(request):
-    commission_id = request.GET.get('commission_id', None)
+    commission_id = request.data.get('commission_id', None)
+    
+    service_price_before_membership_discount= request.data.get('service_price_before_membership_discount',None)
+    sale_price_including_tax= request.data.get('sale_price_including_tax',None)
+    sale_price_before_discount= request.data.get('sale_price_before_discount' , False)
+    
     if commission_id is None:
         return Response(
             {
@@ -1284,7 +1292,7 @@ def update_commision(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'All fields are required.',
                     'fields' : [
-                        'text',
+                        'commission_id',
                     ]
                 }
             },
@@ -1306,6 +1314,24 @@ def update_commision(request):
             },
                 status=status.HTTP_404_NOT_FOUND
         )
+    if sale_price_before_discount is not None:
+        sale_price_before_discount = True
+    else:
+        sale_price_before_discount = False
+    if sale_price_including_tax is not None:
+        sale_price_including_tax = True
+    else:
+        sale_price_including_tax = False
+    if service_price_before_membership_discount is not None:
+        service_price_before_membership_discount= True
+    else:
+        service_price_before_membership_discount= False
+        
+    commission.sale_price_including_tax=sale_price_including_tax
+    commission.service_price_before_membership_discount=service_price_before_membership_discount
+    commission.sale_price_before_discount=sale_price_before_discount
+    commission.save()
+        
     serializer = CommissionSerializer(commission, data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(
