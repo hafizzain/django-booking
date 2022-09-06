@@ -60,7 +60,7 @@ def get_single_client(request):
             'response' : {
                 'message' : 'All Staff Group',
                 'error_message' : None,
-                'employees' : seralized.data
+                'client' : seralized.data
             }
         },
         status=status.HTTP_200_OK
