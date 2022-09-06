@@ -171,3 +171,18 @@ class Payroll(models.Model):
      
      def __str__(self):
         return str(self.id)
+
+
+class CommissionSchemeSetting(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_commission_setting')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_commission_setting')
+    
+    sale_price_before_discount = models.BooleanField(default=True)
+    sale_price_including_tax = models.BooleanField(default=True)
+    service_price_before_membership_discount = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=now)
+    
+    def __str__(self):
+        return str(self.id)
