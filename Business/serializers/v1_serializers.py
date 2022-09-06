@@ -110,13 +110,20 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
     
     def get_start_time(self, obj):
         try:
-            location = BusinessOpeningHour.objects.get(business_address=obj)
+            location = BusinessOpeningHour.objects.get(
+                business_address=obj,
+                day__iexact = 'Monday'
+            )
             return location.start_time
         except BusinessOpeningHour.DoesNotExist:
             return None
+            
     def get_close_time(self, obj):
         try:
-            location = BusinessOpeningHour.objects.get(business_address=obj)
+            location = BusinessOpeningHour.objects.get(
+                business_address=obj,
+                day__iexact = 'Monday'
+            )
             return location.close_time
         except BusinessOpeningHour.DoesNotExist:
             return None

@@ -107,8 +107,8 @@ class BusinessOpeningHour(models.Model):
 
     day = models.CharField(max_length=20, default='')
 
-    start_time = models.TimeField()
-    close_time = models.TimeField()
+    start_time = models.TimeField(null=True, blank=True)
+    close_time = models.TimeField(null=True, blank=True)
     is_closed = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)

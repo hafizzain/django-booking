@@ -585,15 +585,13 @@ def add_business_location(request):
             'Sunday',
         ]
         for day in days:
-            day =day
-        BusinessOpeningHour.objects.create(
-                day = day,
-                start_time = start_time,
-                close_time = close_time,
-                business_address = business_address,
-                business = business
-            )
-            
+            BusinessOpeningHour.objects.create(
+                    day = day,
+                    start_time = start_time,
+                    close_time = close_time,
+                    business_address = business_address,
+                    business = business
+                )
     
             
     # serialized = OpeningHoursSerializer(busines_opening,  data=request.data)
@@ -769,10 +767,36 @@ def update_location(request):
 
         business_address.save()
         
-        busineshour=BusinessOpeningHour.objects.get(business_address=business_address)
-        serializer_hour=OpeningHoursSerializer(busineshour,  data=request.data, partial=True, context={'request' : request})
-        if serializer_hour.is_valid():
-            serializer_hour.save()
+        start_time = request.data.get('start_time', None)
+        close_time = request.data.get('close_time', None)
+        if start_time is not None and close_time is not None:
+            busineshour = BusinessOpeningHour.objects.filter(
+                    business_address = business_address
+                )
+            if len(busineshour) > 0:
+                for bhr in busineshour:
+                    bhr.start_time = start_time
+                    bhr.close_time = close_time
+                    bhr.save()
+            else:
+                days = [
+                    'Monday',
+                    'Tuesday',
+                    'Wednesday',
+                    'Thursday',
+                    'Friday',
+                    'Saturday',
+                    'Sunday',
+                ]
+                for day in days:
+                    BusinessOpeningHour.objects.create(
+                            day = day,
+                            start_time = start_time,
+                            close_time = close_time,
+                            business_address = business_address,
+                            business = business_address.business
+                        )
+
 
         serialized = BusinessAddress_GetSerializer(business_address)
 
