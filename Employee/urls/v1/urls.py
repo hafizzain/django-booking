@@ -30,6 +30,9 @@ urlpatterns = [
     path('get_payrolls/', views.get_payrolls),
     path('delete_payroll/', views.delete_payroll),
     
+    #commssion
+    path('get_commission/', views.get_commission)
+    
 
 
 ]
