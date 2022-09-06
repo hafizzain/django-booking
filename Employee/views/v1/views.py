@@ -1299,7 +1299,7 @@ def update_commision(request):
     
     service_price_before_membership_discount= request.data.get('service_price_before_membership_discount',None)
     sale_price_including_tax= request.data.get('sale_price_including_tax',None)
-    sale_price_before_discount= request.data.get('sale_price_before_discount' , False)
+    sale_price_before_discount= request.data.get('sale_price_before_discount' , None)
     
     if commission_id is None:
         return Response(
