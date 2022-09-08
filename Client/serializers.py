@@ -23,15 +23,15 @@ class ClientSerializer(serializers.ModelSerializer):
         
         
 class ClientGroupSerializer(serializers.ModelSerializer):
-    # client =serializers.SerializerMethodField()
+    client =serializers.SerializerMethodField()
     
-    # def get_client(self, obj):
-    #     all_client =obj.client.all()
-    #     return ClientSerializer(all_client, many=True, context=self.context)
+    def get_client(self, obj):
+        all_client =obj.client.all()
+        return ClientSerializer(all_client, many=True, context=self.context).data
     
     class Meta:
         model = ClientGroup
-        fields = ['id','name','business','is_active','client','email']
+        fields = ['id','name','business','is_active','email','created_at','client']
     
 class SubscriptionSerializer(serializers.ModelSerializer):
     

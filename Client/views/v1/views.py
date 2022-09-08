@@ -334,7 +334,7 @@ def delete_client(request):
 @permission_classes([AllowAny])
 def get_client_group(request):
     all_client_group= ClientGroup.objects.all().order_by('-created_at')
-    serialized = ClientGroupSerializer(all_client_group, many=True)
+    serialized = ClientGroupSerializer(all_client_group, many=True,  context={'request' : request})
     return Response(
         {
             'status' : 200,
@@ -419,7 +419,7 @@ def create_client_group(request):
             except Exception as err:
                 client_error.append(str(err))
             client_group.save()
-            serialized=ClientGroupSerializer(client_group)
+            serialized=ClientGroupSerializer(client_group, context={'request' : request})
        
     return Response(
             {

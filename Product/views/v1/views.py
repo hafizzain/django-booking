@@ -67,23 +67,23 @@ def import_csv(request):
             row = row.split(',')
             row = row
             
-            if len(row) < 4:
+            if len(row) < 10:
                 continue
-                
+            name= row[0]
+            cost_price= row[1]
+            full_price= row[2]
+            sell_price= row[3]
+            quantity= row[4]
+            category= row[5]
+            brand= row[6]
+            product_type= row[7] 
+            barcode_id= row[8]
+            vendor= row[9].replace('\n', '').strip()
+            
             # name=row[0]
             # quantity= row[1]
             # category= row[2]
             # product_type = row[3].replace('\n', '').strip()
-            
-            name= row[0]
-            cost_price= row[1]
-            full_price= row[2]
-            quantity= row[3]
-            category= row[4]
-            brand= row[5]
-            product_type= row[6] 
-            barcode_id= row[7]
-            vendor= row[8].replace('\n', '').strip()
             
             product= Product.objects.create(
                 user=user,
@@ -103,12 +103,15 @@ def import_csv(request):
                 # barcode_id=barcode_id,
                 # vendor=vendor
             
+            
             try:
-                vendor_obj = BusinessVendor.objects.get(id=vendor)
+                print(vendor)
+                vendor_obj = BusinessVendor.objects.get(vendor_name=vendor)
                 if vendor_obj is not None:
                     product.vendor = vendor_obj
                     product.save()
-                
+            # else:
+            #         pass
             except Exception as err:
                 return Response(
                 {
@@ -118,11 +121,11 @@ def import_csv(request):
                     'message' : 'Vendor not found',
                     'error_message' : str(err),
                     }
-                }
+                    }
                 )
             
             try:
-                brand_obj = Brand.objects.get(id=brand)
+                brand_obj = Brand.objects.get(name=brand)
                 if brand_obj is not None:
                     product.brand = brand_obj
                     product.save()
@@ -140,7 +143,7 @@ def import_csv(request):
                 )
             
             try:
-                category_obj = Category.objects.get(id=category)
+                category_obj = Category.objects.get(name=category)
                 if category_obj is not None:
                     product.category = category_obj
                     product.save()
@@ -157,6 +160,7 @@ def import_csv(request):
                 }
                 )
             
+            
             # Category.objects.create(
             #     product=product, 
                 
@@ -171,7 +175,7 @@ def import_csv(request):
             print(f'Added Product {name} ... {quantity} .... {product_type}...')
 
     file.delete()
-    return Response({'status' : 'hello'})
+    return Response({'Status' : 'Success'})
     
     
 
