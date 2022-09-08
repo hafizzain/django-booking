@@ -24,12 +24,7 @@ def country_code(request):
     g = GeoIP2()
     location = g.city(ip)
     location_country = location["country_code"]
-    if location_country is not None:
-          return Response({
-           'status' : 404,
-            'error_message' : 'Country not in database'
-        })
-      
+
     return Response({
         'country_code' : location_country,
     })
