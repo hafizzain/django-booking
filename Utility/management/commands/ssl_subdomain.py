@@ -1,5 +1,4 @@
 
-# ssl_sub_domain
 from Authentication.Constants.Domain import ssl_sub_domain
 
 from django.core.management.base import BaseCommand, CommandError
