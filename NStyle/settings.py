@@ -64,6 +64,7 @@ SHARED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     "corsheaders",
+    'geoip2',
 
     'Tenants.apps.TenantsConfig',
 ] +  NSTYLE_APPS
@@ -231,3 +232,5 @@ EMAIL_PORT = env('EMAIL_PORT')
 EMAIL_USE_TLS = env('EMAIL_USE_TLS')
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+
+GEOIP_PATH =os.path.join('geoip')
