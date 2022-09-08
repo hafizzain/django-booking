@@ -105,13 +105,13 @@ def create_client(request):
     postal_code= request.data.get('postal_code' , None)
     address= request.data.get('address' , None)
     card_number= request.data.get('card_number' , None)
-    is_active = request.data.get('is_active', None)
+    is_active = True if request.data.get('is_active', None) is not None else False
     
     city= request.data.get('city', None)
     state= request.data.get('state', None)
     country= request.data.get('country', None)
     
-    if not all([business_id, client_id, full_name , email ,gender  ,address, is_active ]):
+    if not all([business_id, client_id, full_name , email ,gender  ,address ]):
         return Response(
             {
                 'status' : False,
@@ -149,10 +149,7 @@ def create_client(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    if is_active is not None:
-           is_active = True
-    else: 
-            is_active = False
+
     try:
         if country is not None:
             country = Country.objects.get(id=country)
@@ -244,10 +241,12 @@ def update_client(request):
                    status=status.HTTP_404_NOT_FOUND
               )
         image=request.data.get('image',None)
+        client.is_active = True  if request.data.get('image',None) is not None else False
 
         if image is not None:
             client.image=image
-            client.save()
+
+        client.save()
         serialized= ClientSerializer(client, data=request.data, partial=True, context={'request' : request})
         if serialized.is_valid():
            serialized.save()
