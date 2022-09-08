@@ -1,6 +1,7 @@
 
 
 
+from Authentication.Constants.Domain import ssl_sub_domain
 from Tenants.models import Tenant, Domain
 from Business.models import Business
 from Profile.models import Profile
@@ -148,7 +149,6 @@ def create_tenant(request=None, user=None, data=None):
 
     with tenant_context(user_tenant):
         t_user = create_tenant_user(tenant=user_tenant, data=data)
-        print(t_user)
         
         if t_user is not None:
             NewsLetterDetail.objects.create(
@@ -169,6 +169,12 @@ def create_tenant(request=None, user=None, data=None):
                 pass
             try:
                 thrd = Thread(target=add_data_to_tenant_thread, kwargs={'tenant' : user_tenant})
+                thrd.start()
+            except:
+                pass
+            
+            try:
+                thrd = Thread(target=ssl_sub_domain, args=[td_name])
                 thrd.start()
             except:
                 pass
