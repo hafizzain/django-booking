@@ -52,7 +52,7 @@ def create_tenant_business_user(request):
     required_fields = [first_name, email, mobile_number, account_type ]
     return_fields = ['first_name', 'last_name', 'email', 'mobile_number','account_type']
 
-    if social_account is not None:
+    if social_account is None:
         required_fields.append(password)
         return_fields.append('password')
 
