@@ -49,6 +49,8 @@ NSTYLE_APPS = [
     'Employee.apps.EmployeeConfig',
     'Service.apps.ServiceConfig',
     'Client.apps.ClientConfig',
+    'Appointment.apps.AppointmentConfig',
+
 ]
 
 
