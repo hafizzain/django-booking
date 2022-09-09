@@ -751,7 +751,7 @@ def delete_staff_group(request):
             'status_code' : 200,
             'status_code_text' : '200',
             'response' : {
-                'message' : 'Staff Group deleted successful',
+                'message' : 'Staff Group deleted successfully',
                 'error_message' : None
             }
         },

@@ -113,19 +113,20 @@ def import_csv(request):
             # else:
             #         pass
             except Exception as err:
-                return Response(
-                {
-                    'status' : False,
-                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
-                    'response' : {
-                    'message' : 'Vendor not found',
-                    'error_message' : str(err),
-                    }
-                    }
-                )
+                pass
+                # return Response(
+                # {
+                #     'status' : False,
+                #     'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                #     'response' : {
+                #     'message' : 'Vendor not found',
+                #     'error_message' : str(err),
+                #     }
+                #     }
+                # )
             
             try:
-                brand_obj = Brand.objects.get(name=brand)
+                brand_obj = Brand.objects.filter(name=brand)
                 if brand_obj is not None:
                     product.brand = brand_obj
                     product.save()
@@ -134,14 +135,13 @@ def import_csv(request):
                 return Response(
                 {
                     'status' : False,
-                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'status_code' : StatusCodes.INVALID_CATEGORY_BRAND_4020,
                     'response' : {
                     'message' : 'Brand not found',
                     'error_message' : str(err),
                     }
                 }
                 )
-            
             try:
                 category_obj = Category.objects.get(name=category)
                 if category_obj is not None:
@@ -152,9 +152,9 @@ def import_csv(request):
                 return Response(
                 {
                     'status' : False,
-                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'status_code' : StatusCodes.INVALID_CATEGORY_BRAND_4020,
                     'response' : {
-                    'message' : 'Business not found',
+                    'message' : 'Category not found',
                     'error_message' : str(err),
                     }
                 }
