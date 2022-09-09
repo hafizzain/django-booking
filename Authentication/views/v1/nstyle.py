@@ -49,14 +49,14 @@ def create_tenant_business_user(request):
     business_name = data.get('business_name', None)
     social_account = data.get('social_account', None)
 
-    required_fields = [first_name, email, mobile_number, account_type ]
-    return_fields = ['first_name', 'last_name', 'email', 'mobile_number','account_type']
+    required_fields = [first_name, email, mobile_number, account_type, business_name ]
+    return_fields = ['first_name', 'last_name', 'email', 'mobile_number','account_type', 'business_name']
 
     if social_account is None:
         required_fields.append(password)
         return_fields.append('password')
 
-    if not all(required_fields) or (account_type is not None and account_type == 'business' and business_name is None):
+    if not all(required_fields) :
         return Response(
             {
                 'status' : False,
