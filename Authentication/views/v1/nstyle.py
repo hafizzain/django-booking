@@ -42,13 +42,14 @@ def create_tenant_business_user(request):
 
     first_name = data.get('first_name', None)
     email = data.get('email', None)
-    username = data.get('username', None)
+    # username = data.get('username', None)
     mobile_number = data.get('mobile_number', None)
     password = data.get('password', None)
     account_type = data.get('account_type', None)
     business_name = data.get('business_name', None)
+    social_account = data.get('social_account', None)
 
-    if not all([first_name, email, username, mobile_number, password, account_type ]) or (account_type is not None and account_type == 'business' and business_name is None):
+    if not all([first_name, email, mobile_number, account_type ]) or (social_account is not None and password is None) or (account_type is not None and account_type == 'business' and business_name is None):
         return Response(
             {
                 'status' : False,
@@ -58,7 +59,7 @@ def create_tenant_business_user(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'All fields are required.',
                     'fields' : [
-                        'username', 
+                        # 'username', 
                         'first_name', 
                         'last_name', 
                         'email', 
@@ -85,15 +86,15 @@ def create_tenant_business_user(request):
         )
 
     existing_users = User.objects.filter(
-        Q(username=username) |
+        # Q(username=username) |
         Q(email=email) |
         Q(mobile_number=mobile_number)
     )
     if len(existing_users) > 0:
         existing_fields = []
         for usr in existing_users:
-            if usr.username == username:
-                existing_fields.append('username')
+            # if usr.username == username:
+            #     existing_fields.append('username')
             if usr.email == email:
                 existing_fields.append('email')
             
@@ -113,7 +114,7 @@ def create_tenant_business_user(request):
         )
 
     user = User.objects.create_user(
-        username=username,
+        # username=username,
         email=email,
         password=password
     )
