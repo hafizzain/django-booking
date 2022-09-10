@@ -1,6 +1,4 @@
-
-
-#from math import prod
+from cmath import cos
 from django.http import HttpResponse
 from Utility.models import NstyleFile
 from rest_framework.decorators import api_view, permission_classes
@@ -13,14 +11,6 @@ import csv
 
 from rest_framework.views import APIView
 from rest_framework.settings import api_settings
-
-# from django.shortcuts import render
-# from rest_framework import generics
-# import io, csv, pandas as pd
-# from rest_framework.response import Response
-# # remember to import the File model
-# from Product.serializers import FileUploadSerializer , SaveFileSerializer
-# from django.views.decorators.csrf import csrf_exempt
 
 
 from NStyle.Constants import StatusCodes
@@ -57,93 +47,89 @@ def export_csv(request):
 def import_csv(request):
     product_csv = request.data.get('file', None)
     user= request.user
-    #reader=csv.reader(product_csv)
+
     file = NstyleFile.objects.create(
         file = product_csv
     )
     print(file.file.path)
     with open( file.file.path , 'r', encoding='utf-8') as imp_file:
-        for row in imp_file:
+        for index, row in enumerate(imp_file):
+            if index == 0:
+                continue
+            
             row = row.split(',')
             row = row
             
             if len(row) < 10:
                 continue
             name= row[0]
+            n_name= json.loads(name)
             cost_price= row[1]
+            c_price= json.loads(cost_price)
             full_price= row[2]
+            f_price=json.loads(full_price)
             sell_price= row[3]
+            s_price= json.loads(sell_price)
             quantity= row[4]
+            q_quantity= json.loads(quantity)
             category= row[5]
-            brand= row[6]
+            c_category= json.loads(category)
+            brand = row[6]
+            b_brand= json.loads(brand)
             product_type= row[7] 
+            p_type= json.loads(product_type)
             barcode_id= row[8]
+            b_id= json.loads(barcode_id)
             vendor= row[9].replace('\n', '').strip()
-            
-            # name=row[0]
-            # quantity= row[1]
-            # category= row[2]
-            # product_type = row[3].replace('\n', '').strip()
-            
+            v_vendor=json.loads(vendor)
             product= Product.objects.create(
                 user=user,
-                cost_price=cost_price,
-                full_price=full_price,
-                name = name,
-                product_type=product_type,
-                barcode_id=barcode_id
+                cost_price=c_price,
+                full_price=f_price,
+                sell_price=s_price,
+                name = n_name,
+                product_type=p_type,
+                barcode_id=b_id
             )
-            # product.category=category
-            # product.save()
-                # name=name, 
-                # cost_price=cost_price,
-                # full_price=full_price,
-                # product_type=product_type, 
-                # brand=brand,
-                # barcode_id=barcode_id,
-                # vendor=vendor
-            
-            
             try:
                 print(vendor)
-                vendor_obj = BusinessVendor.objects.get(vendor_name=vendor)
+                vendor_obj = BusinessVendor.objects.get(vendor_name=v_vendor)
                 if vendor_obj is not None:
                     product.vendor = vendor_obj
                     product.save()
-            # else:
-            #         pass
             except Exception as err:
                 pass
-                # return Response(
-                # {
-                #     'status' : False,
-                #     'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
-                #     'response' : {
-                #     'message' : 'Vendor not found',
-                #     'error_message' : str(err),
-                #     }
-                #     }
-                # )
-            
-            try:
-                brand_obj = Brand.objects.filter(name=brand)
-                if brand_obj is not None:
-                    product.brand = brand_obj
+            print(len(brand))
+            if len(brand) > 3:
+                brand_obj = Brand.objects.filter(name=b_brand).order_by('is_active')
+                if len(brand_obj) > 0:
+                    brand_obj = brand_obj[0]
+                    product.brand=brand_obj
                     product.save()
-                
-            except Exception as err:
+                else:
+                    return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_CATEGORY_BRAND_4020,
+                    'response' : {
+                    'message' : 'Brand not found',
+                        }
+                    }
+                )
+                # Q(name__icontains=brand) | Q(is_active__icontains= True) | Q(website__isnull=True)
+            else:
                 return Response(
                 {
                     'status' : False,
                     'status_code' : StatusCodes.INVALID_CATEGORY_BRAND_4020,
                     'response' : {
                     'message' : 'Brand not found',
-                    'error_message' : str(err),
+                        }
                     }
-                }
                 )
+                
             try:
-                category_obj = Category.objects.get(name=category)
+                category_obj = Category.objects.get(name=c_category)
                 if category_obj is not None:
                     product.category = category_obj
                     product.save()
@@ -156,9 +142,9 @@ def import_csv(request):
                     'response' : {
                     'message' : 'Category not found',
                     'error_message' : str(err),
+                        }
                     }
-                }
-                )
+            )
             
             
             # Category.objects.create(
@@ -169,7 +155,8 @@ def import_csv(request):
             ProductStock.objects.create(
                 user=user,
                 product=product,
-                quantity=quantity,
+                quantity=q_quantity,
+                
                 
             )
             print(f'Added Product {name} ... {quantity} .... {product_type}...')
