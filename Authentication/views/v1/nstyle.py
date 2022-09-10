@@ -49,11 +49,14 @@ def create_tenant_business_user(request):
     business_name = data.get('business_name', None)
     social_account = data.get('social_account', None)
 
-    required_fields = [first_name, email, mobile_number, account_type ]
-    if social_account is not None:
-        required_fields.append(password)
+    required_fields = [first_name, email, mobile_number, account_type, business_name ]
+    return_fields = ['first_name', 'last_name', 'email', 'mobile_number','account_type', 'business_name']
 
-    if not all(required_fields) or (account_type is not None and account_type == 'business' and business_name is None):
+    if social_account is None:
+        required_fields.append(password)
+        return_fields.append('password')
+
+    if not all(required_fields) :
         return Response(
             {
                 'status' : False,
@@ -62,15 +65,7 @@ def create_tenant_business_user(request):
                 'response' : {
                     'message' : 'Invalid Data!',
                     'error_message' : 'All fields are required.',
-                    'fields' : [
-                        # 'username', 
-                        'first_name', 
-                        'last_name', 
-                        'email', 
-                        'mobile_number',
-                        'password',
-                        'account_type'
-                        ]
+                    'fields' : return_fields
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
