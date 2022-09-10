@@ -22,10 +22,44 @@ from Utility.models import Country, State, City
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
+from Utility.models import NstyleFile
 from django.db.models import Q
+import csv
+import numpy as np 
 
 
 
+
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def import_employee(request):
+#     product_csv = request.data.get('file', None)
+#     user= request.user
+
+#     file = NstyleFile.objects.create(
+#         file = product_csv
+#     )
+#     with open( file.file.path , 'r', encoding='utf-8') as imp_file:
+#         reader = csv.DictReader(imp_file) 
+#     for row in reader: #
+#         for index, row in enumerate(imp_file):
+#             if index == 0:
+#                 continue
+#             row = row.split(',')
+#             row = row
+#             if len(row) < 4:
+#                 continue
+            
+#             employee= row[0]
+#             e_name= json.loads(employee)
+#             designation= row[1]
+#             e_designation= json.loads(designation)
+#             income_type= row[2]
+#             i_type=json.loads(income_type)
+#             salary= row[3]
+#             e_salary= json.loads(salary)
+            
+            
 # Create your views here.
 @api_view(['GET'])
 @permission_classes([AllowAny])
