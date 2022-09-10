@@ -70,7 +70,7 @@ def create_tenant_business_user(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    if len(password) < 6:
+    if social_account is None and len(password) < 6:
         return Response(
             {
                 'status' : False,
@@ -112,11 +112,16 @@ def create_tenant_business_user(request):
             },status=status.HTTP_400_BAD_REQUEST
         )
 
-    user = User.objects.create_user(
-        # username=username,
-        email=email,
-        password=password
-    )
+    if social_account:
+        user = User.objects.create_user(
+            email = email
+        )
+    else:
+        user = User.objects.create_user(
+            # username=username,
+            email=email,
+            password=password
+        )
 
     try:
         thrd = Thread(target=complete_user_account, args=[request], kwargs={'user' : user, 'data': data})
