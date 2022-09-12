@@ -159,6 +159,28 @@ def create_appointment(request):
                 }
             }
         )
+    try:
+        client = Client.objects.get(id=client)
+    except Exception as err:
+        return Response(
+            {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_CLIENT_4032,
+                    'response' : {
+                    'message' : 'Client not found',
+                    'error_message' : str(err),
+                }
+            }
+        )
+            
+    appointment= Appointment.objects.create(
+            user = user,
+            business=business,
+            client=client,
+            business_address=business_address,
+            client_type=client_type
+            
+        )
     
     print(type(appointments))
     print(appointments)
@@ -199,27 +221,7 @@ def create_appointment(request):
                 }
             }
         )
-        try:
-            client = Client.objects.get(id=client)
-        except Exception as err:
-            return Response(
-            {
-                    'status' : False,
-                    'status_code' : StatusCodes.INVALID_CLIENT_4032,
-                    'response' : {
-                    'message' : 'Client not found',
-                    'error_message' : str(err),
-                }
-            }
-        )
-        appointment= Appointment.objects.create(
-            user = user,
-            business=business,
-            client=client,
-            business_address=business_address,
-            client_type=client_type
-            
-        )
+        
         
          #BusinessAddress = business_address,
         # service = service,

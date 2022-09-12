@@ -298,15 +298,18 @@ def verify_otp(request):
             status=status.HTTP_200_OK
         )
 
-data= {}
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([AllowAny])
-def tenant(request):
+def get_tenant_detail(request):
+    data= {}
+    email= request.data.get('email', None)
     user = request.user
-    Tenant.objects.get(user=user)
-    tnt_token = Token.objects.get(user__username=user.username)
-    data['id'] = str(tnt_token.user.id)
-    data['access_token'] = str(tnt_token.key)
+    user_tnt = Tenant.objects.get(user__email=email)
+    # tnt_token = Token.objects.get(user__username=user.username)
+    with tenant_context(user_tnt):
+        tnt_user = User.objects.get(email = email)
+        data['id'] = str(tnt_user.id)
+        data['access_token'] = str(tnt_user.auth_token.key)
     
     return Response(
             {
@@ -315,7 +318,7 @@ def tenant(request):
                 'status_code_text' : 'OTP_VERIFIED_2001',
                 'response' : {
                     'message' : 'Tenant Data',
-                    'data' : data
+                    'data' : data   
                 }
             },
     )
