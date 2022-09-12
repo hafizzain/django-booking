@@ -269,6 +269,11 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'full_name',
             'salary',
             'email',
+            'gender',
+            'address', 
+            'country', 
+            'state', 
+            'city',
             'income_type',
             'designation',           
             ]   
