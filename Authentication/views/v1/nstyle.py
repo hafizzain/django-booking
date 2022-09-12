@@ -41,6 +41,7 @@ def create_tenant_business_user(request):
     data = request.data
 
     first_name = data.get('first_name', None)
+    last_name = data.get('last_name', None)
     email = data.get('email', None)
     # username = data.get('username', None)
     mobile_number = data.get('mobile_number', None)
@@ -49,7 +50,7 @@ def create_tenant_business_user(request):
     business_name = data.get('business_name', None)
     social_account = data.get('social_account', None)
 
-    required_fields = [first_name, email, mobile_number, account_type, business_name ]
+    required_fields = [first_name, last_name, email, mobile_number, account_type, business_name ]
     return_fields = ['first_name', 'last_name', 'email', 'mobile_number','account_type', 'business_name']
 
     if social_account is None:
@@ -70,7 +71,7 @@ def create_tenant_business_user(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    if len(password) < 6:
+    if social_account is None and len(password) < 6:
         return Response(
             {
                 'status' : False,
@@ -83,6 +84,7 @@ def create_tenant_business_user(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    
 
     existing_users = User.objects.filter(
         # Q(username=username) |
@@ -112,8 +114,29 @@ def create_tenant_business_user(request):
             },status=status.HTTP_400_BAD_REQUEST
         )
 
+    username = f'{first_name} {last_name}'
+
+    
+    try:
+        User.objects.get(username = username)
+    except:
+        username +=  str(len(User.objects.all()))
+
+    try:
+        data._mutable = True
+    except:
+        pass
+
+    try:
+        data['username'] = username
+    except:
+        pass
+
+    if social_account:
+       password = 'systemadmin!@#4'
+
     user = User.objects.create_user(
-        # username=username,
+        username=username,
         email=email,
         password=password
     )

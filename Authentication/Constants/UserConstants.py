@@ -31,13 +31,7 @@ def complete_user_account(request, user=None, data=None):
 
     user.first_name = first_name
     user.last_name = last_name
-    username = f'{first_name}{last_name}'.trim()
-    try:
-        User.objects.get(username = username)
-    except:
-        username +=  len(User.objects.all())
-
-    user.username = username
+    
     user.full_name=f'{first_name} {last_name}'
     user.mobile_number=mobile_number
 
