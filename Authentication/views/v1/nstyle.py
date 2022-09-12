@@ -115,6 +115,11 @@ def create_tenant_business_user(request):
         )
 
     username = f'{first_name} {last_name}'
+    
+    try:
+        User.objects.get(username = username)
+    except:
+        username +=  len(User.objects.all())
 
     if social_account:
        password = 'systemadmin!@#4'
