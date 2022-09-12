@@ -115,11 +115,22 @@ def create_tenant_business_user(request):
         )
 
     username = f'{first_name} {last_name}'
+
     
     try:
         User.objects.get(username = username)
     except:
         username +=  str(len(User.objects.all()))
+
+    try:
+        data._mutable = True
+    except:
+        pass
+
+    try:
+        data['username'] = username
+    except:
+        pass
 
     if social_account:
        password = 'systemadmin!@#4'
