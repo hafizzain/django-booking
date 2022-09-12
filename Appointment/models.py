@@ -5,6 +5,7 @@ from Authentication.models import User
 from Business.models import Business, BusinessAddress
 from django.utils.timezone import now
 from Service.models import Service
+from Client.models import Client
 from Employee.models import Employee
 
 
@@ -29,6 +30,31 @@ class Appointment(models.Model):
 
     duration = models.CharField(choices=DURATION_CHOICES, max_length=100, default='')
 
+    is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+
+    def __str__(self):
+        return str(self.id)
+    
+    
+class Checkout(models.Model):
+    TYPE_CHOICES = [
+        ('IN HOUSE', 'IN HOUSE'),
+        ('SALOON', 'SALOON'),
+    ]
+    
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_checkout', verbose_name='Creator ( User )')
+    business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_checkout')
+    
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name = 'client_details', verbose_name= 'checkout_name'  )
+    business_address = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='b_address_checkout')
+    
+    client_type= models.CharField(choices=TYPE_CHOICES, max_length=50, null=True, blank=True, )
+    
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
