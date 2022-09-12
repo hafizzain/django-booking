@@ -10,7 +10,7 @@ urlpatterns = [
     
     # OTP 
     path('verify_otp/', nstyle.verify_otp ),
-    path('tenant_context/', nstyle.tenant),
+    path('get_tenant_detail/', nstyle.get_tenant_detail),
     path('send_verification_otp/', nstyle.send_verification_otp ),
 
     path('all_users/', nstyle.all_users),
