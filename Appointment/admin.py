@@ -3,11 +3,9 @@ from Appointment.models import Appointment
 
 @admin.register(Appointment)
 class AppointmentAdmin(admin.ModelAdmin):
+
     list_display = [
         'id',
-        'business',
-        'service', 
+        'business_name',
         'is_active',
     ]
-
-

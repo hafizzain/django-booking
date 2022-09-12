@@ -112,20 +112,20 @@ class Subscription(models.Model):
 #     def __str__(self):
 #         return str(self.id)
     
-class Rewards(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+# class Rewards(models.Model):
+#     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_reward', verbose_name='Creator ( User )')
-    business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_reward')
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_reward', verbose_name='Creator ( User )')
+#     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_reward')
     
-    name = models.CharField(max_length=100, default='')
-    service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_reward')
+#     name = models.CharField(max_length=100, default='')
+#     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_reward')
     
     
-    is_active = models.BooleanField(default=True)
-    is_deleted = models.BooleanField(default=False)
-    is_blocked = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=now)
+#     is_active = models.BooleanField(default=True)
+#     is_deleted = models.BooleanField(default=False)
+#     is_blocked = models.BooleanField(default=False)
+#     created_at = models.DateTimeField(auto_now_add=now)
 
-    def __str__(self):
-        return str(self.id)
+#     def __str__(self):
+#         return str(self.id)
