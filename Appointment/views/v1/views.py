@@ -12,8 +12,9 @@ from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
 from django.db.models import Q
+from Client.models import Client
 
-from Appointment.models import Appointment
+from Appointment.models import Appointment, AppointmentService
 from Appointment.serializers import AppoinmentSerializer
 
 @api_view(['GET'])
@@ -91,14 +92,22 @@ def delete_appointment(request):
 def create_appointment(request):
     user = request.user    
     business_id= request.data.get('business', None)
+    appointments = request.data.get('appointments', None)
+    # business_address= request.data.get('business_address', None)
+    # service= request.data.get('service', None)
+    # member = request.data.get('member', None)
+    # appointment_date= request.data.get('appointment_date', None)
+    # appointment_time= request.data.get('appointment_time', None)
+    # duration= request.data.get('duration')
+    #[business_id, member, appointment_date, appointment_time, duration
+
+    client = request.data.get('client', None)
+    client_type = request.data.get('client_type', None)
     business_address= request.data.get('business_address', None)
-    service= request.data.get('service', None)
-    member = request.data.get('member', None)
-    appointment_date= request.data.get('appointment_date', None)
-    appointment_time= request.data.get('appointment_time', None)
-    duration= request.data.get('duration')
     
-    if not all([business_id, member, appointment_date, appointment_time, duration]):
+
+    
+    if not all([ client]):
          return Response(
             {
                 'status' : False,
@@ -113,7 +122,9 @@ def create_appointment(request):
                           'member', 
                           'appointment_date', 
                           'appointment_time', 
-                          'duration', 
+                          'duration',
+                          'client', 
+
 
                             ]
                 }
@@ -149,23 +160,23 @@ def create_appointment(request):
             }
         )
     
-    try:
-        service=Service.objects.get(id=service)
-    except Exception as err:
-        return Response(
-            {
-                    'status' : False,
-                    'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
-                    'response' : {
-                    'message' : 'Service not found',
-                    'error_message' : str(err),
-                }
-            }
-        )
-    try:
-        member=Employee.objects.get(id=member)
-    except Exception as err:
-        return Response(
+    print(type(appointments))
+    print(appointments)
+    if type(appointments) == str:
+        appointments = json.loads(appointments)
+
+    elif type(appointments) == list:
+        pass
+    for appointment in appointments:
+        member = appointment['member']
+        service = appointment['service']
+        duration= appointment['duration']
+        date_time= appointment['date_time']
+        
+        try:
+            member=Employee.objects.get(id=member)
+        except Exception as err:
+            return Response(
             {
                     'status' : False,
                     'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
@@ -175,17 +186,55 @@ def create_appointment(request):
                 }
             }
         )
-    appoinment= Appointment.objects.create(
-        user = user,
-        business = business,
-        #BusinessAddress = business_address,
-        service = service,
-        member = member,
-        appointment_date = appointment_date,
-        appointment_time = appointment_time,
-        duration = duration,        
+        try:
+            service=Service.objects.get(id=service)
+        except Exception as err:
+            return Response(
+            {
+                    'status' : False,
+                    'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
+                    'response' : {
+                    'message' : 'Service not found',
+                    'error_message' : str(err),
+                }
+            }
+        )
+        try:
+            client = Client.objects.get(id=client)
+        except Exception as err:
+            return Response(
+            {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_CLIENT_4032,
+                    'response' : {
+                    'message' : 'Client not found',
+                    'error_message' : str(err),
+                }
+            }
+        )
+        appointment= Appointment.objects.create(
+            user = user,
+            business=business,
+            client=client,
+            business_address=business_address,
+            client_type=client_type
+            
+        )
+        
+         #BusinessAddress = business_address,
+        # service = service,
+        # member = member,
+        # appointment_date = appointment_date,
+        # appointment_time = appointment_time,
+        # duration = duration,      
+        
+        appoinmentservice = AppointmentService.objects.create(
+            user = user,
+            business = business,
+            appointment = appointment
     )
-    serialized = AppoinmentSerializer(appoinment)
+    
+    serialized = AppoinmentSerializer(appointment)
     return Response(
             {
                 'status' : True,

@@ -64,6 +64,9 @@ class AppointmentService(models.Model):
     is_deleted = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
+    
+    def member_name(self):
+        return str(self.member.full_name)
 
     def __str__(self):
         return str(self.id)
