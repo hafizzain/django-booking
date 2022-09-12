@@ -63,34 +63,36 @@ def import_csv(request):
             if len(row) < 10:
                 continue
             name= row[0]
-            n_name= json.loads(name)
-            cost_price= row[1]
-            c_price= json.loads(cost_price)
-            full_price= row[2]
-            f_price=json.loads(full_price)
-            sell_price= row[3]
-            s_price= json.loads(sell_price)
-            quantity= row[4]
-            q_quantity= json.loads(quantity)
-            category= row[5]
-            c_category= json.loads(category)
-            brand = row[6]
-            b_brand= json.loads(brand)
-            product_type= row[7] 
-            p_type= json.loads(product_type)
-            barcode_id= row[8]
-            b_id= json.loads(barcode_id)
-            vendor= row[9].replace('\n', '').strip()
-            v_vendor=json.loads(vendor)
-            product= Product.objects.create(
-                user=user,
-                cost_price=c_price,
-                full_price=f_price,
-                sell_price=s_price,
-                name = n_name,
-                product_type=p_type,
-                barcode_id=b_id
-            )
+            print(type(name))
+            if type(name) == str:
+                n_name= json.loads(name)
+            # cost_price= row[1]
+            # c_price= json.loads(cost_price)
+            # full_price= row[2]
+            # f_price=json.loads(full_price)
+            # sell_price= row[3]
+            # s_price= json.loads(sell_price)
+            # quantity= row[4]
+            # q_quantity= json.loads(quantity)
+            # category= row[5]
+            # c_category= json.loads(category)
+            # brand = row[6]
+            # b_brand= json.loads(brand)
+            # product_type= row[7] 
+            # p_type= json.loads(product_type)
+            # barcode_id= row[8]
+            # b_id= json.loads(barcode_id)
+            # vendor= row[9].replace('\n', '').strip()
+            # v_vendor=json.loads(vendor)
+            # product= Product.objects.create(
+            #     user=user,
+            #     cost_price=c_price,
+            #     full_price=f_price,
+            #     sell_price=s_price,
+            #     name = n_name,
+            #     product_type=p_type,
+            #     barcode_id=b_id
+            # )
             try:
                 print(vendor)
                 vendor_obj = BusinessVendor.objects.get(vendor_name=v_vendor)
