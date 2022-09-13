@@ -280,14 +280,23 @@ def verify_otp(request):
 def get_tenant_detail(request):
     data= {}
     email= request.data.get('email', None)
-    user = request.user
-    user_tnt = Tenant.objects.get(user__email=email)
-    # tnt_token = Token.objects.get(user__username=user.username)
-    with tenant_context(user_tnt):
-        tnt_user = User.objects.get(email = email)
-        data['id'] = str(tnt_user.id)
-        data['access_token'] = str(tnt_user.auth_token.key)
     
+    user = request.user
+    
+    user_tnt = Tenant.objects.get(user__email=email)
+    with tenant_context(user_tnt):
+        try:
+            tnt_user = User.objects.get(email = email)
+            data['id'] = str(tnt_user.id)
+            data['access_token'] = str(tnt_user.auth_token.key)
+        
+        except Exception as err:
+            return Response({
+                'response' : {
+                'message' : 'Tenant Data',
+                'data' : str(err)   
+                }
+            })
     return Response(
             {
                 'status' : True,

@@ -233,7 +233,9 @@ def create_appointment(request):
         appoinmentservice = AppointmentService.objects.create(
             user = user,
             business = business,
-            appointment = appointment
+            appointment = appointment,
+            duration=duration,
+            date_time=date_time
     )
     
     serialized = AppoinmentSerializer(appointment)
