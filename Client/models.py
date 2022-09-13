@@ -97,53 +97,123 @@ class Subscription(models.Model):
     
 
 
-# class Promotion(models.Model):
-#     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
-#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_subscriptions')
-#     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_subscriptions')
+class Promotion(models.Model):
+    PROMOTION_TYPES = [
+        ('Product' , 'Product'),
+        ('Service' , 'Service'),
+    ]
 
-#     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_subscriptions')
-#     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_subscriptions')
+    DISCOUNT_DURATION = [
+        ('Day' , 'Day'),
+        ('Month' , 'Month'),
+    ]
+
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_promotions')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_promotions')
+
+    promotion_type = models.CharField(default='Service', choices=PROMOTION_TYPES, max_length=20)
+
+    service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_promotions')
+    services = models.PositiveIntegerField(verbose_name='No. of Services', default=0)
+
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_promotions')
+    products = models.PositiveIntegerField(verbose_name='No. of Products', default=0)
+
+    discount_service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='discount_service_promotions')
+    discount_product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='discount_product_promotions')
+
+    discount = models.PositiveIntegerField(default=0)
+
+    duration = models.CharField(default='Month', choices=DISCOUNT_DURATION, max_length=20)
+
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
 
 
-#     is_deleted = models.BooleanField(default=False)
-#     is_active = models.BooleanField(default=False)
-#     created_at = models.DateTimeField(auto_now_add=now)
-#     def __str__(self):
-#         return str(self.id)
+    def __str__(self):
+        return str(self.id)
     
-# class Rewards(models.Model):
-#     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
-    
-#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_reward', verbose_name='Creator ( User )')
-#     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_reward')
-    
-#     name = models.CharField(max_length=100, default='')
-#     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_reward')
-    
-    
-#     is_active = models.BooleanField(default=True)
-#     is_deleted = models.BooleanField(default=False)
-#     is_blocked = models.BooleanField(default=False)
-#     created_at = models.DateTimeField(auto_now_add=now)
 
-#     def __str__(self):
-#         return str(self.id)
 
-# class Membership(models.Model):
-#     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
-#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='client')
-#     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_client')
-    
-#     name =  models.CharField(max_length=100, default='')
-#     description =  models.CharField(max_length=300, null=True, blank=True)
-    
-    
-#     is_deleted = models.BooleanField(default=False)
-#     is_active = models.BooleanField(default=False)
-#     is_blocked = models.BooleanField(default=False)
-#     created_at = models.DateTimeField(auto_now_add=now)
-#     updated_at = models.DateTimeField(null=True, blank=True)
+class Rewards(models.Model):
 
-#     def __str__(self):
-#         return str(self.id)
+    REWARD_TYPES = [
+        ('Product' , 'Product'),
+        ('Service' , 'Service'),
+    ]
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_reward', verbose_name='Creator ( User )')
+    business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_reward')
+    
+    name = models.CharField(max_length=100, default='')
+    service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_rewards')
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_rewards')
+
+    reward_value = models.PositiveIntegerField(default=0)
+    reward_point = models.PositiveIntegerField(default=0)
+
+    total_points = models.PositiveIntegerField(default=0)
+    discount = models.PositiveIntegerField(default=0)
+    
+    is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+
+    def __str__(self):
+        return str(self.id)
+
+class Membership(models.Model):
+
+    VALIDITY_CHOICE = [
+        ('Days' , 'Days'),
+        ('Months' , 'Months'),
+    ]
+
+    COLOR_CHOICES = [
+        ('Red', 'Red'),
+        ('Purple', 'Purple'),
+        ('Black', 'Black'),
+        ('White', 'White'),
+        ('Yellow', 'Yellow'),
+        ('Orange', 'Orange'),
+        ('Pink', 'Pink'),
+        ('Gray', 'Gray'),
+        ('DarkGray', 'DarkGray'),
+        ('Blue', 'Blue'),
+        ('Golden', 'Golden'),
+        ('Green', 'Green'),
+        ('Brown', 'Brown'),
+        ('SkyBlue', 'SkyBlue'),
+        ('DarkBlue', 'DarkBlue'),
+    ]
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_memberships')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_memberships')
+    
+    name =  models.CharField(max_length=100, default='')
+    description =  models.CharField(max_length=300, null=True, blank=True)
+    service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_memberships')
+    session = models.PositiveIntegerField(default=0)
+
+    valid_for = models.CharField(choices=VALIDITY_CHOICE, default='Months' , verbose_name='Validity for Days or Months', max_length=20)
+
+    days = models.PositiveIntegerField(default=0, verbose_name='No. of Days')
+    months = models.PositiveIntegerField(default=0, verbose_name='No. of Months')
+
+    price = models.PositiveIntegerField(default=0)
+    tax_rate = models.PositiveIntegerField(default=0)
+
+    color = models.CharField(default='White', choices=COLOR_CHOICES, max_length=30)
+    
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+    updated_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return str(self.id)
