@@ -33,8 +33,16 @@ class AccountTypeAdmin(admin.ModelAdmin):
 
 @admin.register(NewsLetterDetail)
 class NewsLetterDetailAdmin(admin.ModelAdmin):
+
+    def username(self, obj):
+        try:
+            return str(obj.user.username)
+        except Exception as err:
+            return str(err)
+
     list_display = [
         'id',
+        'username',
         'terms_condition',
         'is_subscribed'
     ]
