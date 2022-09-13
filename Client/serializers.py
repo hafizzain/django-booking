@@ -2,7 +2,7 @@ from rest_framework import serializers
 from Product.Constants.index import tenant_media_base_url
 
 
-from Client.models import Client, ClientGroup, Subscription
+from Client.models import Client, ClientGroup, Subscription, Promotion , Rewards , Membership
 
 class ClientSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
@@ -39,3 +39,20 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         model = Subscription
         fields ='__all__'
      
+     
+class RewardSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Rewards
+        fields = '__all__'
+        
+class PromotionSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Promotion
+        fields = '__all__'
+class MembershipSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Membership
+        fields = '__all__'

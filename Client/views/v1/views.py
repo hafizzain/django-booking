@@ -1,14 +1,16 @@
 from http import client
+from tkinter import N
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Q
+from Service.models import Service
 from Business.models import Business
 from Product.models import Product
 from Utility.models import Country, State, City
-from Client.models import Client, ClientGroup, Subscription
-from Client.serializers import ClientSerializer, ClientGroupSerializer, SubscriptionSerializer
+from Client.models import Client, ClientGroup, Subscription , Rewards , Promotion , Membership
+from Client.serializers import ClientSerializer, ClientGroupSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer
 
 
 import json
@@ -589,6 +591,7 @@ def create_subscription(request):
     select_amount = request.data.get('select_amount', None)
     services_count= request.data.get('services_count', None)
     price= request.data.get('price', None)
+    
     is_active= request.data.get('is_active', None)
     
     if not all([business, name ,product , days ,select_amount , services_count , price  ]):
@@ -624,8 +627,9 @@ def create_subscription(request):
                     'response' : {
                     'message' : 'Business not found',
                     'error_message' : str(err),
-                }
-                }
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
             )
             
     try:
@@ -638,8 +642,9 @@ def create_subscription(request):
                     'response' : {
                     'message' : 'Product not found',
                     'error_message' : str(err),
-                }
-                }
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
             )
             
     client_subscription= Subscription.objects.create(
@@ -809,3 +814,412 @@ def update_subscription(request):
         },
         status=status.HTTP_200_OK
         )
+    
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_rewards(request):
+    user = request.user
+    business = request.data.get('business', None)
+    
+    name = request.data.get('name', None)
+    service = request.data.get('service', None)
+    product = request.data.get('product', None)
+    
+    reward_type= request.data.get('reward_type', None)
+    reward_value = request.data.get('reward_value', None)
+    reward_point = request.data.get('reward_point', None)
+    
+    total_points = request.data.get('total_points', None)
+    discount = request.data.get('discount', None)
+    
+    if not all([business , name , reward_value , reward_type , reward_point , total_points, discount ]):
+          return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                          'name',
+                          'reward_type',
+                          'Service/Product' ,
+                          'reward_point', 
+                          'total_points',
+                          'discount'
+                            ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        business=Business.objects.get(id=business)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    if reward_type == 'Product':
+        try:
+            product=Product.objects.get(id=product)
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
+                    'response' : {
+                    'message' : 'Product not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+    else:
+        try:
+            service=Service.objects.get(id=service)
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
+                    'response' : {
+                    'message' : 'Service not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+    rewards = Rewards.objects.create(
+        user = user,
+        business=business, 
+        name=name,
+        service=service,
+        product=product,
+        reward_value=reward_value,
+        reward_point=reward_point,
+        total_points = total_points,
+        discount = discount,
+    )
+    
+    serialized = RewardSerializer(rewards)
+       
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Rewards Create!',
+                    'error_message' : None,
+                    'rewards' : serialized.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        ) 
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_rewards(request):
+    all_rewards= Rewards.objects.all().order_by('-created_at')
+    serialized = RewardSerializer(all_rewards, many=True)
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Rewards',
+                'error_message' : None,
+                'rewards' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_promotion(request):
+    user = request.user
+    business = request.data.get('business', None)
+    promotion_type = request.data.get('promotion_type', None)
+    
+    service  = request.data.get('service', None)
+    services = request.data.get('services', None)
+    
+    product = request.data.get('product', None)
+    products = request.data.get('products', None)
+    
+    discount_product= request.data.get('discount_product', None)
+    discount_service = request.data.get('discount_service', None)
+    discount = request.data.get('discount', None)
+    duration = request.data.get('duration', None)
+    
+    if not all([business, promotion_type, duration, discount]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                          'promotion_type',
+                          'discount_product',
+                          'discount_service', 
+                          'discount', 
+                          'duration', 
+
+                            ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        business=Business.objects.get(id=business)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    if promotion_type == 'Product':
+        try:
+            product=Product.objects.get(id=product)
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
+                    'response' : {
+                    'message' : 'Product not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            discount_product=Product.objects.get(id=discount_product)
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
+                    'response' : {
+                    'message' : 'Discount Product not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+    else:
+        try:
+            service=Service.objects.get(id=service)
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
+                    'response' : {
+                    'message' : 'Service not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        try:
+            discount_service=Service.objects.get(id=discount_service)
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
+                    'response' : {
+                    'message' : 'Discount Service not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    
+    promotion = Promotion.objects.create(
+        user = user,
+        business = business,
+        promotion_type = promotion_type,
+        service= service,
+        services= services,
+        product = product,
+        products = products,
+        discount_service = discount_service,
+        discount_product = discount_product,
+        discount = discount,
+        duration = duration,
+    )
+    
+    serialized = PromotionSerializer(promotion)
+       
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Promotion Create!',
+                    'error_message' : None,
+                    'promotion' : serialized.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        ) 
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_promotion(request):
+    all_promotion= Promotion.objects.all().order_by('-created_at')
+    serialized = PromotionSerializer(all_promotion, many=True)
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Promotion',
+                'error_message' : None,
+                'promotion' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_memberships(request):
+    user = request.user
+    business = request.data.get('business', None)
+    name = request.data.get('name', None)
+    description = request.data.get('description', None)
+    service = request.data.get('service', None)
+    session = request.data.get('session', None)
+    valid_for = request.data.get('valid_for', None)
+    days = request.data.get('days', None)
+    months = request.data.get('months',None)
+    price = request.data.get('price',None)
+    tax_rate = request.data.get('tax_rate',None)
+    color = request.data.get('color', None)
+    
+    if not all([business, name , service, session, valid_for, price, tax_rate]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                          'name',
+                          'service',
+                          'session', 
+                          'valid_for', 
+                          'price',
+                          'tax_rate'
+
+                            ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        business=Business.objects.get(id=business)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    try:
+        service=Service.objects.get(id=service)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
+                    'response' : {
+                    'message' : 'Service not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    membership = Membership.objects.create(
+        user = user,
+        business=business, 
+        name= name,
+        description= description,
+        service = service,
+        session = session,
+        valid_for = valid_for,
+        days = days,
+        months = months,
+        price = price,
+        tax_rate= tax_rate,
+        color = color, 
+    )
+    
+    serialized = MembershipSerializer(membership)
+       
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Membership Create!',
+                    'error_message' : None,
+                    'membership' : serialized.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_memberships(request):
+    all_memberships= Membership.objects.all().order_by('-created_at')
+    serialized = MembershipSerializer(all_memberships, many=True)
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Promotion',
+                'error_message' : None,
+                'promotion' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )

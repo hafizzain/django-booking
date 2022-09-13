@@ -115,10 +115,10 @@ class Promotion(models.Model):
     promotion_type = models.CharField(default='Service', choices=PROMOTION_TYPES, max_length=20)
 
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_promotions')
-    services = models.PositiveIntegerField(verbose_name='No. of Services', default=0)
+    services = models.PositiveIntegerField(verbose_name='No. of Services', default=0, null=True, blank=True)
 
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_promotions')
-    products = models.PositiveIntegerField(verbose_name='No. of Products', default=0)
+    products = models.PositiveIntegerField(verbose_name='No. of Products', default=0, null=True, blank=True)
 
     discount_service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='discount_service_promotions')
     discount_product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='discount_product_promotions')
@@ -154,6 +154,7 @@ class Rewards(models.Model):
 
     reward_value = models.PositiveIntegerField(default=0)
     reward_point = models.PositiveIntegerField(default=0)
+    reward_type =  models.CharField(default='Product', choices=REWARD_TYPES, max_length=20)
 
     total_points = models.PositiveIntegerField(default=0)
     discount = models.PositiveIntegerField(default=0)
@@ -201,8 +202,8 @@ class Membership(models.Model):
 
     valid_for = models.CharField(choices=VALIDITY_CHOICE, default='Months' , verbose_name='Validity for Days or Months', max_length=20)
 
-    days = models.PositiveIntegerField(default=0, verbose_name='No. of Days')
-    months = models.PositiveIntegerField(default=0, verbose_name='No. of Months')
+    days = models.PositiveIntegerField(default=0, verbose_name='No. of Days', null=True, blank=True)
+    months = models.PositiveIntegerField(default=0, verbose_name='No. of Months', null=True, blank=True)
 
     price = models.PositiveIntegerField(default=0)
     tax_rate = models.PositiveIntegerField(default=0)

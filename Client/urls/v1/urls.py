@@ -22,5 +22,15 @@ urlpatterns = [
    path('delete_subscription/', views.delete_subscription),
    path('update_subscription/', views.update_subscription),
    
-
+   #Rewards
+   path('create_rewards/', views.create_rewards),
+   path('get_rewards/', views.get_rewards),
+   
+   #Promotion
+   path('create_promotion/', views.create_promotion),
+   path('get_promotion/', views.get_promotion),
+   
+   #Membership
+   path('create_memberships/', views.create_memberships),
+   path('get_memberships/', views.get_memberships),
 ]
