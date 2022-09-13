@@ -509,23 +509,37 @@ def login(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-        
-    user = authenticate(username=user.username, password=password)
-    if user is None:
+
+    if user.social_account and not social_account:
         return Response(
             {
                 'status' : False,
-                'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
-                'status_code_text' : 'INVALID_CREDENTIALS_4013',
+                'status_code' : StatusCodes.ACCOUNT_ASSOCIATED_WITH_SOCIAL,
+                'status_code_text' : 'ACCOUNT_ASSOCIATED_WITH_SOCIAL',
                 'response' : {
-                    'message' : 'Incorrect Password',
-                    'fields' : ['password']
+                    'message' : f'This Account associated with {user.social_platform}, Please signin with {user.social_platform}',
                 }
             },
             status=status.HTTP_404_NOT_FOUND
         )
 
-    elif not user.is_email_verified:
+    else:
+        user = authenticate(username=user.username, password=password)
+        if user is None:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
+                    'status_code_text' : 'INVALID_CREDENTIALS_4013',
+                    'response' : {
+                        'message' : 'Incorrect Password',
+                        'fields' : ['password']
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+    if not user.is_email_verified:
         return Response(
             {
                 'status' : False,
