@@ -56,54 +56,50 @@ def import_csv(request):
         for index, row in enumerate(imp_file):
             if index == 0:
                 continue
-            
             row = row.split(',')
             row = row
             
             if len(row) < 10:
                 continue
-            name= row[0]
-            print(type(name))
-            if type(name) == str:
-                n_name= json.loads(name)
-            # cost_price= row[1]
-            # c_price= json.loads(cost_price)
-            # full_price= row[2]
-            # f_price=json.loads(full_price)
-            # sell_price= row[3]
-            # s_price= json.loads(sell_price)
-            # quantity= row[4]
-            # q_quantity= json.loads(quantity)
-            # category= row[5]
-            # c_category= json.loads(category)
-            # brand = row[6]
-            # b_brand= json.loads(brand)
-            # product_type= row[7] 
-            # p_type= json.loads(product_type)
-            # barcode_id= row[8]
-            # b_id= json.loads(barcode_id)
-            # vendor= row[9].replace('\n', '').strip()
-            # v_vendor=json.loads(vendor)
-            # product= Product.objects.create(
-            #     user=user,
-            #     cost_price=c_price,
-            #     full_price=f_price,
-            #     sell_price=s_price,
-            #     name = n_name,
-            #     product_type=p_type,
-            #     barcode_id=b_id
-            # )
+            name= row[0].strip('"')
+            cost_price= row[1].strip('"')
+            print(cost_price)
+            print(type(cost_price))
+            #c_price= json.loads(cost_price)
+            full_price= row[2].strip('"')
+            #f_price=json.loads(full_price)
+            sell_price= row[3].strip('"')
+            #s_price= json.loads(sell_price)
+            quantity= row[4].strip('"')
+            #q_quantity= json.loads(quantity)
+            category= row[5].strip('"')
+            #c_category= json.loads(category)
+            brand = row[6].strip('"')
+            #b_brand= json.loads(brand)
+            product_type= row[7].strip('"')
+            #p_type= json.loads(product_type)
+            barcode_id= row[8].strip('"')
+            #b_id= json.loads(barcode_id)
+            vendor= row[9].replace('\n', '').strip()
+            #v_vendor=json.loads(vendor)
+            product= Product.objects.create(
+                user=user,
+                cost_price=cost_price,
+                full_price=full_price,
+                sell_price=sell_price,
+                name = name,
+                product_type=product_type,
+                barcode_id=barcode_id
+            )
             try:
-                print(vendor)
-                vendor_obj = BusinessVendor.objects.get(vendor_name=v_vendor)
+                vendor_obj = BusinessVendor.objects.get(vendor_name=vendor)
                 if vendor_obj is not None:
                     product.vendor = vendor_obj
                     product.save()
             except Exception as err:
                 pass
-            print(len(brand))
             if len(brand) > 3:
-                brand_obj = Brand.objects.filter(name=b_brand).order_by('is_active')
+                brand_obj = Brand.objects.filter(name=brand).order_by('is_active')
                 if len(brand_obj) > 0:
                     brand_obj = brand_obj[0]
                     product.brand=brand_obj
@@ -131,7 +127,7 @@ def import_csv(request):
                 )
                 
             try:
-                category_obj = Category.objects.get(name=c_category)
+                category_obj = Category.objects.get(name=category)
                 if category_obj is not None:
                     product.category = category_obj
                     product.save()
@@ -157,7 +153,7 @@ def import_csv(request):
             ProductStock.objects.create(
                 user=user,
                 product=product,
-                quantity=q_quantity,
+                quantity=quantity,
                 
                 
             )
