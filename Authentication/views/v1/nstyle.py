@@ -505,7 +505,7 @@ def login(request):
         )
 
 
-    if not user.is_active:
+    if not social_account and not user.is_active:
         return Response(
             {
                 'status' : False,
@@ -548,7 +548,7 @@ def login(request):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-    if not user.is_email_verified:
+    if not social_account and not user.is_email_verified:
         return Response(
             {
                 'status' : False,
