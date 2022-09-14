@@ -9,6 +9,7 @@ urlpatterns = [
    path('update_client/', views.update_client),
    path('delete_client/', views.delete_client),
    path('get_single_client/', views.get_single_client),
+   path('import_client/', views.import_client),
    
    #Client_Group
    path('create_client_group/',views.create_client_group),

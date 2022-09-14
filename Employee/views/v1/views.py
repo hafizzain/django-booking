@@ -29,36 +29,96 @@ import csv
 
 
 
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# def import_employee(request):
-#     product_csv = request.data.get('file', None)
-#     user= request.user
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def import_employee(request):
+    employee_csv = request.data.get('file', None)
+    user= request.user
+    business = request.data.get('business', None)
 
-#     file = NstyleFile.objects.create(
-#         file = product_csv
-#     )
-#     with open( file.file.path , 'r', encoding='utf-8') as imp_file:
-#         reader = csv.DictReader(imp_file) 
-#     for row in reader: #
-#         for index, row in enumerate(imp_file):
-#             if index == 0:
-#                 continue
-#             row = row.split(',')
-#             row = row
-#             if len(row) < 4:
-#                 continue
+    file = NstyleFile.objects.create(
+        file = employee_csv
+    )
+    with open( file.file.path , 'r', encoding='utf-8') as imp_file:
+        for index, row in enumerate(imp_file):
+            if index == 0:
+                continue
+            row = row.split(',')
+            row = row
+            if len(row) < 11:
+                continue
             
-#             employee= row[0]
-#             e_name= json.loads(employee)
-#             designation= row[1]
-#             e_designation= json.loads(designation)
-#             income_type= row[2]
-#             i_type=json.loads(income_type)
-#             salary= row[3]
-#             e_salary= json.loads(salary)
+            name= row[0].strip('"')
+            designation= row[1].strip('"')
+            email=row[2].strip('"')
+            income_type= row[3].strip('"')
+            salary= row[4].strip('"')
+            address= row[5].strip('"')
+            gender= row[6].strip('"')
+            country= row[7].strip('"')
+            city= row[8].strip('"')
+            state= row[9].replace('\n', '').strip('"')
+            employee_id = row[10].replace('\n', '').strip('"')
+    
+            try:
+                business=Business.objects.get(id=business)
+            except Exception as err:
+                return Response(
+                    {
+                'status' : True,
+                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                'status_code_text' :'BUSINESS_NOT_FOUND_4015' ,
+                'response' : {
+                    'message' : 'Business not found!',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+            try:
+                country = Country.objects.get(name=country)
+                state= State.objects.get(name=state)
+                city = City.objects.get(name=city)
+            except Exception as err:
+                return Response(
+                    {
+                'status' : True,
+                'status_code' : StatusCodes.INVALID_COUNTRY_STATE_CITY_4021,
+                'status_code_text' :'INVALID_COUNTRY_STATE_CITY_4021' ,
+                'response' : {
+                    'message' : 'Invalid Country, State, City not found!',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
             
+            employee= Employee.objects.create(
+                user = user,
+                business = business,
+                full_name= name,
+                employee_id= employee_id,
+                email= email,
+                address=address,
+                gender=gender,
+                country= country, 
+                state = state,
+                city = city,
+            )
             
+            employee_professional = EmployeeProfessionalInfo.objects.create(
+                employee = employee,
+                designation = designation,
+                income_type = income_type,
+                salary = salary,
+            )
+        
+    file.delete()
+    return Response({'Status' : 'Success'})
+        
+            
+                                    
 # Create your views here.
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -73,7 +133,7 @@ def search_employee(request):
                 'status_code_text' : 'MISSING_FIELDS_4001',
                 'response' : {
                     'message' : 'Invalid Data!',
-                    'error_message' : 'All fields are required.',
+                    'error_message' : 'Fields are required.',
                     'fields' : [
                         'text',
                     ]
@@ -592,7 +652,7 @@ def update_employee(request):
                 'status' : True,
                 'status_code' : 200,
                 'response' : {
-                    'message' : 'Update Employee Successfully',
+                    'message' : ' Employee updated successfully',
                     'error_message' : None,
                     'Employee' : data
                 }
