@@ -123,7 +123,7 @@ def create_tenant(request=None, user=None, data=None):
     if user is None or data is None:
         return
     
-    td_name = str(data.get('business_name', user.username)).strip().replace(' ' , '-').replace('.', '-').replace('/' , '-').lower()  # Tenant Domain name
+    td_name = str(data.get('business_name', user.username)).strip().replace(' ' , '-').replace('.', '').replace('/' , '-').lower()  # Tenant Domain name
     try:
         Domain.objects.get(
             domain=f'{td_name}.{settings.BACKEND_DOMAIN_NAME}'
