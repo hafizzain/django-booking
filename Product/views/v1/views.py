@@ -51,7 +51,7 @@ def import_csv(request):
     file = NstyleFile.objects.create(
         file = product_csv
     )
-    print(file.file.path)
+    #print(file.file.path)
     with open( file.file.path , 'r', encoding='utf-8') as imp_file:
         for index, row in enumerate(imp_file):
             if index == 0:
@@ -77,11 +77,9 @@ def import_csv(request):
             brand = row[6].strip('"')
             #b_brand= json.loads(brand)
             product_type= row[7].strip('"')
-            #p_type= json.loads(product_type)
             barcode_id= row[8].strip('"')
-            #b_id= json.loads(barcode_id)
             vendor= row[9].replace('\n', '').strip()
-            #v_vendor=json.loads(vendor)
+            
             product= Product.objects.create(
                 user=user,
                 cost_price=cost_price,

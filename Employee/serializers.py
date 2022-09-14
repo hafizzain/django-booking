@@ -275,7 +275,8 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'state', 
             'city',
             'income_type',
-            'designation',           
+            'designation', 
+            'employee_id'          
             ]   
         
 class CommissionSerializer(serializers.ModelSerializer):

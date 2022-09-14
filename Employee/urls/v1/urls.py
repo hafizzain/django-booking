@@ -10,6 +10,8 @@ urlpatterns = [
     path('delete_employee/', views.delete_employee),
     path('update_employee/', views.update_employee),
     path('search_employee/', views.search_employee),
+    path('import_employee/', views.import_employee),
+
     #path('delete_all_employees/', views.delete_all_employees),
     
 

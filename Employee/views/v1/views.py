@@ -32,45 +32,91 @@ import csv
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def import_employee(request):
-    product_csv = request.data.get('file', None)
+    employee_csv = request.data.get('file', None)
     user= request.user
     business = request.data.get('business', None)
 
     file = NstyleFile.objects.create(
-        file = product_csv
+        file = employee_csv
     )
     with open( file.file.path , 'r', encoding='utf-8') as imp_file:
-        reader = csv.DictReader(imp_file) 
-    for row in reader: #
         for index, row in enumerate(imp_file):
             if index == 0:
                 continue
             row = row.split(',')
             row = row
-            if len(row) < 10:
+            if len(row) < 11:
                 continue
             
             name= row[0].strip('"')
-            #e_name= json.loads(employee)
             designation= row[1].strip('"')
             email=row[2].strip('"')
-            #e_designation= json.loads(designation)
             income_type= row[3].strip('"')
-            #i_type=json.loads(income_type)
             salary= row[4].strip('"')
-            #e_salary= json.loads(salary)
             address= row[5].strip('"')
             gender= row[6].strip('"')
             country= row[7].strip('"')
             city= row[8].strip('"')
-            state= row[9].replace('\n', '').strip()
+            state= row[9].replace('\n', '').strip('"')
+            employee_id = row[10].replace('\n', '').strip('"')
+    
+            try:
+                business=Business.objects.get(id=business)
+            except Exception as err:
+                return Response(
+                    {
+                'status' : True,
+                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                'status_code_text' :'BUSINESS_NOT_FOUND_4015' ,
+                'response' : {
+                    'message' : 'Business not found!',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+            try:
+                country = Country.objects.get(name=country)
+                state= State.objects.get(name=state)
+                city = City.objects.get(name=city)
+            except Exception as err:
+                return Response(
+                    {
+                'status' : True,
+                'status_code' : StatusCodes.INVALID_COUNTRY_STATE_CITY_4021,
+                'status_code_text' :'INVALID_COUNTRY_STATE_CITY_4021' ,
+                'response' : {
+                    'message' : 'Invalid Country, State, City not found!',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
             
             employee= Employee.objects.create(
+                user = user,
                 business = business,
                 full_name= name,
-                #employee_id= employee_id
+                employee_id= employee_id,
+                email= email,
+                address=address,
+                gender=gender,
+                country= country, 
+                state = state,
+                city = city,
             )
             
+            employee_professional = EmployeeProfessionalInfo.objects.create(
+                employee = employee,
+                designation = designation,
+                income_type = income_type,
+                salary = salary,
+            )
+        
+    file.delete()
+    return Response({'Status' : 'Success'})
+        
             
                                     
 # Create your views here.

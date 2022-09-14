@@ -11,11 +11,71 @@ from Product.models import Product
 from Utility.models import Country, State, City
 from Client.models import Client, ClientGroup, Subscription , Rewards , Promotion , Membership
 from Client.serializers import ClientSerializer, ClientGroupSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer
-
+from Utility.models import NstyleFile
 
 import json
-
 from NStyle.Constants import StatusCodes
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def import_client(request):
+    client_csv = request.data.get('file', None)
+    user= request.user
+    business_id = request.data.get('business', None)
+
+    file = NstyleFile.objects.create(
+        file = client_csv
+    )
+    with open( file.file.path , 'r', encoding='utf-8') as imp_file:
+        for index, row in enumerate(imp_file):
+            if index == 0:
+                continue
+            row = row.split(',')
+            row = row
+            
+            if len(row) < 6:
+                continue
+            
+            name= row[0].strip('"')
+            email = row[1].strip('"')
+            client_id = row[2].strip('"')
+            gender = row[3].strip('"')
+            address = row[4].strip('"')
+            active = row[5].replace('\n', '').strip('"') 
+
+            if active == 'Active':
+                active = True
+            else:
+                active = False
+            
+            try:
+                business=Business.objects.get(id=business_id)
+            except Exception as err:
+                return Response(
+                    {
+                'status' : True,
+                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                'status_code_text' :'BUSINESS_NOT_FOUND_4015' ,
+                'response' : {
+                    'message' : 'Business not found!',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+            
+            client = Client.objects.create(
+                user = user,
+                business= business,
+                full_name = name,
+                client_id = client_id,
+                email = email,
+                gender = gender,
+                address = address,
+                is_active = active
+            )
+    file.delete()
+    return Response({'Status' : 'Success'})
 
 @api_view(['GET'])
 @permission_classes([AllowAny])

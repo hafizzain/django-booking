@@ -215,7 +215,7 @@ def get_user(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    elif not user.is_email_verified:
+    elif not user.social_account and not user.is_email_verified:
         return Response(
             {
                 'status' : False,
