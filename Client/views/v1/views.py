@@ -64,7 +64,7 @@ def import_client(request):
                 status=status.HTTP_404_NOT_FOUND
             )
             
-            client = Client.objects.create(
+            Client.objects.create(
                 user = user,
                 business= business,
                 full_name = name,

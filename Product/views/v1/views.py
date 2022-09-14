@@ -44,7 +44,7 @@ def export_csv(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def import_csv(request):
+def import_product(request):
     product_csv = request.data.get('file', None)
     user= request.user
 
@@ -65,20 +65,14 @@ def import_csv(request):
             cost_price= row[1].strip('"')
             print(cost_price)
             print(type(cost_price))
-            #c_price= json.loads(cost_price)
             full_price= row[2].strip('"')
-            #f_price=json.loads(full_price)
             sell_price= row[3].strip('"')
-            #s_price= json.loads(sell_price)
             quantity= row[4].strip('"')
-            #q_quantity= json.loads(quantity)
             category= row[5].strip('"')
-            #c_category= json.loads(category)
             brand = row[6].strip('"')
-            #b_brand= json.loads(brand)
             product_type= row[7].strip('"')
             barcode_id= row[8].strip('"')
-            vendor= row[9].replace('\n', '').strip()
+            vendor= row[9].replace('\n', '').strip('"')
             
             product= Product.objects.create(
                 user=user,
@@ -160,7 +154,42 @@ def import_csv(request):
     file.delete()
     return Response({'Status' : 'Success'})
     
-    
+ 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def import_category(request): 
+    user = request.user
+    category_csv = request.data.get('file', None)
+
+
+    file = NstyleFile.objects.create(
+        file = category_csv
+    )
+    with open( file.file.path , 'r', encoding='utf-8') as imp_file:
+        for index, row in enumerate(imp_file):
+            if index == 0:
+                continue
+            row = row.split(',')
+            row = row
+            
+            if len(row) < 2:
+                continue
+            name = row[0].strip('"')
+            active=row[1].replace('\n', '').strip('"')
+            
+            if active == 'Active':
+                active = True
+            else:
+                active = False
+                
+                
+            Category.objects.create(
+                name = name,
+                is_active=active,
+            )  
+            
+    file.delete()
+    return Response({'Status' : 'Success'})
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
