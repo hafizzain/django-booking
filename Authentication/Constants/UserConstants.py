@@ -29,12 +29,6 @@ def complete_user_account(request, user=None, data=None):
     if user is None:
         return
 
-    try:
-        create_tenant_thread = Thread(target=CreateTenant.create_tenant, args=[], kwargs={'user' : user, 'data' : data})
-        create_tenant_thread.start()
-    except Exception as error:
-        ExceptionRecord.objects.create(text=f'error from create_tenant_thread \n{str(error)}')
-
     first_name = data['first_name']
     last_name = data['last_name']
     mobile_number = data['mobile_number']
@@ -64,3 +58,9 @@ def complete_user_account(request, user=None, data=None):
     create_user_account_type(user=user, account_type=data['account_type'])
     AuthTokenConstants.create_user_token(user=user)
     OTP.generate_user_otp(user=user, code_for='Email')
+
+    try:
+        create_tenant_thread = Thread(target=CreateTenant.create_tenant, args=[], kwargs={'user' : user, 'data' : data})
+        create_tenant_thread.start()
+    except Exception as error:
+        ExceptionRecord.objects.create(text=f'error from create_tenant_thread \n{str(error)}')
