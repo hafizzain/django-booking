@@ -312,6 +312,7 @@ def get_tenant_detail(request):
             tnt_user = User.objects.get(email = email)
             data['id'] = str(tnt_user.id)
             data['access_token'] = str(tnt_user.auth_token.key)
+            data['domain'] = str(user_tnt.schema_name)
         
         except Exception as err:
             return Response({
