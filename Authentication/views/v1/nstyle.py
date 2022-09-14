@@ -319,16 +319,21 @@ def get_tenant_detail(request):
         
         except Exception as err:
             return Response({
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Tenant Not Found',
                 'response' : {
                 'message' : 'Tenant Data',
                 'data' : str(err)   
                 }
-            })
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
     return Response(
             {
                 'status' : True,
-                'status_code' : StatusCodes.OTP_VERIFIED_2001,
-                'status_code_text' : 'OTP_VERIFIED_2001',
+                'status_code' : 200,
+                'status_code_text' : '200',
                 'response' : {
                     'message' : 'Tenant Data',
                     'data' : data   
