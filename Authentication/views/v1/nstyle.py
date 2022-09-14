@@ -127,13 +127,16 @@ def create_tenant_business_user(request):
     except:
         pass
 
-    try:
-        data['username'] = username
-    except:
-        pass
+
 
     if social_account:
        password = 'systemadmin!@#4'
+
+    try:
+        data['username'] = username
+        data['password'] = password
+    except:
+        pass
 
     user = User.objects.create_user(
         username=username,
