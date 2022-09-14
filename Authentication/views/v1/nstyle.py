@@ -127,13 +127,16 @@ def create_tenant_business_user(request):
     except:
         pass
 
-    try:
-        data['username'] = username
-    except:
-        pass
+
 
     if social_account:
        password = 'systemadmin!@#4'
+
+    try:
+        data['username'] = username
+        data['password'] = password
+    except:
+        pass
 
     user = User.objects.create_user(
         username=username,
@@ -312,19 +315,25 @@ def get_tenant_detail(request):
             tnt_user = User.objects.get(email = email)
             data['id'] = str(tnt_user.id)
             data['access_token'] = str(tnt_user.auth_token.key)
+            data['domain'] = str(user_tnt.schema_name)
         
         except Exception as err:
             return Response({
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Tenant Not Found',
                 'response' : {
                 'message' : 'Tenant Data',
                 'data' : str(err)   
                 }
-            })
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
     return Response(
             {
                 'status' : True,
-                'status_code' : StatusCodes.OTP_VERIFIED_2001,
-                'status_code_text' : 'OTP_VERIFIED_2001',
+                'status_code' : 200,
+                'status_code_text' : '200',
                 'response' : {
                     'message' : 'Tenant Data',
                     'data' : data   

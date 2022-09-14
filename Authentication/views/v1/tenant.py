@@ -13,6 +13,7 @@ from Authentication.models import User
 from NStyle.Constants import StatusCodes
 
 
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):
@@ -58,6 +59,19 @@ def login(request):
                 email=email,
                 is_deleted=False,
             )
+            if user.social_account:
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : StatusCodes.ACCOUNT_ASSOCIATED_WITH_SOCIAL,
+                        'status_code_text' : 'ACCOUNT_ASSOCIATED_WITH_SOCIAL',
+                        'response' : {
+                            'message' : f'This account associated with {user.social_platform}, Please login with {user.social_platform}',
+                            'error_message' : 'Social Account trying to login with Email',
+                        }
+                    },
+                    status=status.HTTP_403_FORBIDDEN
+                )
 
     except Exception as err:
         return Response(

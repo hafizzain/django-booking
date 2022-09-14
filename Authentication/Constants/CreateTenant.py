@@ -123,7 +123,7 @@ def create_tenant(request=None, user=None, data=None):
     if user is None or data is None:
         return
     
-    td_name = str(data.get('business_name', user.username)).strip().replace(' ' , '-').replace('.', '-').replace('/' , '-').lower()  # Tenant Domain name
+    td_name = str(data.get('business_name', user.username)).strip().replace(' ' , '-').replace('.', '').replace('/' , '-').lower()  # Tenant Domain name
     try:
         Domain.objects.get(
             domain=f'{td_name}.{settings.BACKEND_DOMAIN_NAME}'
@@ -151,18 +151,19 @@ def create_tenant(request=None, user=None, data=None):
         t_user = create_tenant_user(tenant=user_tenant, data=data)
         
         if t_user is not None:
-            NewsLetterDetail.objects.create(
-                user = t_user,
-                terms_condition=data.get('terms_condition', True),
-                is_subscribed=data.get('terms_condition', False)
-            )
+
             t_profile = create_tenant_profile(tenant_user=t_user, data=data, tenant=user_tenant)
             t_business = create_tenant_business(tenant_user=t_user, tenant_profile=t_profile, tenant=user_tenant, data=data)
             try:
                 t_token = create_tenant_user_token(tenant_user=t_user, tenant=user_tenant)
             except:
                 pass
-            
+            NewsLetterDetail.objects.create(
+                user = t_user,
+                terms_condition=data.get('terms_condition', True),
+                is_subscribed=data.get('terms_condition', False)
+            )
+
             try:
                 create_tenant_account_type(tenant_user=t_user, tenant=user_tenant, account_type=data['account_type'])
             except:

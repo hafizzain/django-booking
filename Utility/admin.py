@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Software, Country, State, City, Language, Currency
+from .models import ExceptionRecord, Software, Country, State, City, Language, Currency
 
 @admin.register(Currency)
 class CurrencyAdmin(admin.ModelAdmin):
@@ -24,3 +24,6 @@ class CityAdmin(admin.ModelAdmin):
 @admin.register(Language)
 class LanguageAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'is_active', 'is_deleted']
+@admin.register(ExceptionRecord)
+class ExceptionRecordAdmin(admin.ModelAdmin):
+    list_display = ['id', 'text']
