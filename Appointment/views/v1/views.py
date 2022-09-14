@@ -222,14 +222,6 @@ def create_appointment(request):
             }
         )
         
-        
-         #BusinessAddress = business_address,
-        # service = service,
-        # member = member,
-        # appointment_date = appointment_date,
-        # appointment_time = appointment_time,
-        # duration = duration,      
-        
         appoinmentservice = AppointmentService.objects.create(
             user = user,
             business = business,
