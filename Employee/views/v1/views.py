@@ -34,7 +34,7 @@ import csv
 def import_employee(request):
     employee_csv = request.data.get('file', None)
     user= request.user
-    business = request.data.get('business', None)
+    business_id = request.data.get('business', None)
 
     file = NstyleFile.objects.create(
         file = employee_csv
@@ -61,7 +61,7 @@ def import_employee(request):
             employee_id = row[10].replace('\n', '').strip('"')
     
             try:
-                business=Business.objects.get(id=business)
+                business=Business.objects.get(id=business_id )
             except Exception as err:
                 return Response(
                     {
