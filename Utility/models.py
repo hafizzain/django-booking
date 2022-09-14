@@ -100,3 +100,16 @@ class NstyleFile(models.Model):
 
     def __str__(self):
         return 'Custom file uploaded'
+    
+
+class ExceptionRecord(models.Model):
+    id = models.UUIDField(default=uuid4, editable=False, unique=True, primary_key=True)
+
+    text = models.TextField()
+    is_resolved = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+
+
+    def __str__(self):
+        return str(self.id)
+    
