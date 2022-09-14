@@ -59,8 +59,5 @@ def complete_user_account(request, user=None, data=None):
     AuthTokenConstants.create_user_token(user=user)
     OTP.generate_user_otp(user=user, code_for='Email')
 
-    try:
-        create_tenant_thread = Thread(target=CreateTenant.create_tenant, args=[], kwargs={'user' : user, 'data' : data})
-        create_tenant_thread.start()
-    except Exception as error:
-        ExceptionRecord.objects.create(text=f'error from create_tenant_thread \n{str(error)}')
+    CreateTenant.create_tenant(user=user, data=data)
+    # ExceptionRecord.objects.create(text=f'error from create_tenant_thread \n{str(error)}')
