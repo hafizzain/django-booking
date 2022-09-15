@@ -15,6 +15,7 @@ from Authentication.models import AccountType, User, NewsLetterDetail
 from Authentication.Constants import AuthTokenConstants
 from Authentication.Constants.UserConstants import create_user_account_type
 from threading import Thread
+from Service.models import Service
 
 
 def create_tenant_user(tenant=None, data=None):
@@ -37,7 +38,7 @@ def create_tenant_user(tenant=None, data=None):
         user.last_name=last_name
         user.full_name=f'{first_name} {last_name}'
         user.mobile_number = data['mobile_number']
-        # user.is_superuser=True
+        user.is_superuser=True
         user.is_staff=True
         user.is_admin=True
         user.is_active=True
@@ -92,7 +93,7 @@ def create_tenant_user_token(tenant_user=None, tenant=None):
         )
         user_token.save()
         return user_token
-
+        
 
 def create_tenant_account_type(tenant_user=None, tenant=None, account_type='everyone'):
     if tenant_user is None or tenant is None :
@@ -104,6 +105,18 @@ def create_tenant_account_type(tenant_user=None, tenant=None, account_type='ever
             account_type=account_type.capitalize()
         )
 
+def create_service_user(tenant_user=None, business=None):
+    service_list = ['Car wash', 'Haircolor', 'Bridal Makeup', 'Menicure', 'Pedicure', 'Bike Service', 'Bike Wash']
+    print(tenant_user)
+    for service in service_list :
+        test = Service.objects.create(
+            user = tenant_user, 
+            name=service
+            )   
+        
+        print('test')
+        
+    print(test)
 def add_data_to_tenant_thread(tenant=None):
     if tenant is None:
         return
@@ -168,6 +181,13 @@ def create_tenant(request=None, user=None, data=None):
                 create_tenant_account_type(tenant_user=t_user, tenant=user_tenant, account_type=data['account_type'])
             except:
                 pass
+            
+            try:
+                service_thrd = Thread(target=create_service_user, kwargs={'tenant' : t_user, 'business': t_business})
+                service_thrd.start()
+            except:
+                pass
+            
             try:
                 thrd = Thread(target=add_data_to_tenant_thread, kwargs={'tenant' : user_tenant})
                 thrd.start()

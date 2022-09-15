@@ -11,5 +11,6 @@ urlpatterns = [
     path('v1/employee/', include('Employee.urls.v1.urls')),
     path('v1/client/', include('Client.urls.v1.urls')),
     path('v1/appointment/', include('Appointment.urls.v1.urls')),
-    
+    path('v1/service/', include('Service.urls.v1.urls')),
+
     ]

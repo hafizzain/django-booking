@@ -10,7 +10,7 @@ from Business.models import Business
 class Service(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_services')
-    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_services')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_services', null=True, blank=True)
 
     name = models.CharField(max_length=500, default='')
     
