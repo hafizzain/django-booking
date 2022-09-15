@@ -105,18 +105,19 @@ def create_tenant_account_type(tenant_user=None, tenant=None, account_type='ever
             account_type=account_type.capitalize()
         )
 
-def create_service_user(tenant_user=None, business=None):
-    service_list = ['Car wash', 'Haircolor', 'Bridal Makeup', 'Menicure', 'Pedicure', 'Bike Service', 'Bike Wash']
-    print(tenant_user)
-    for service in service_list :
-        test = Service.objects.create(
-            user = tenant_user, 
-            name=service
-            )   
+def create_service_user(tenant=None, user = None, business=None):
+    if tenant is not None and user is not None and business is not None:
+        with tenant_context(tenant):
+
+            service_list = ['Car wash', 'Haircolor', 'Bridal Makeup', 'Menicure', 'Pedicure', 'Bike Service', 'Bike Wash']
+            print(user)
+            for service in service_list :
+                test = Service.objects.create(
+                    user = user, 
+                    name=service
+                    )   
+
         
-        print('test')
-        
-    print(test)
 def add_data_to_tenant_thread(tenant=None):
     if tenant is None:
         return
@@ -183,7 +184,7 @@ def create_tenant(request=None, user=None, data=None):
                 pass
             
             try:
-                service_thrd = Thread(target=create_service_user, kwargs={'tenant' : t_user, 'business': t_business})
+                service_thrd = Thread(target=create_service_user, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
                 service_thrd.start()
             except:
                 pass
