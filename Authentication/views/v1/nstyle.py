@@ -475,6 +475,7 @@ def login(request):
                         'email',
                         'password',
                         'social_account',
+                        'social_platform',
                         ],
                     'choices_fields' : ['password if social account', 'social_account if logged in with email']
                 }
