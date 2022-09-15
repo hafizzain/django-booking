@@ -1,4 +1,5 @@
 from http import client
+from re import M
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -8,8 +9,8 @@ from Service.models import Service
 from Business.models import Business
 from Product.models import Product
 from Utility.models import Country, State, City
-from Client.models import Client, ClientGroup, Subscription , Rewards , Promotion , Membership
-from Client.serializers import ClientSerializer, ClientGroupSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer
+from Client.models import Client, ClientGroup, Subscription , Rewards , Promotion , Membership , Vouchers
+from Client.serializers import ClientSerializer, ClientGroupSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer
 from Utility.models import NstyleFile
 
 import json
@@ -1270,6 +1271,113 @@ def create_memberships(request):
 def get_memberships(request):
     all_memberships= Membership.objects.all().order_by('-created_at')
     serialized = MembershipSerializer(all_memberships, many=True)
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Promotion',
+                'error_message' : None,
+                'promotion' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_vouchers(request):
+    user = request.user
+    business_id = request.data.get('business', None)
+    
+    name = request.data.get('name', None)
+    value = request.data.get('value', None)
+    voucher_type= request.data.get('voucher_type', None)
+    
+    valid_for = request.data.get('valid_for', None)
+    days= request.data.get('days', None)
+    months = request.data.get('months', None)
+    
+    sales = request.data.get('sales', None)
+    price = request.data.get('price', None)
+    if not all([business_id , name , value ,valid_for,sales, price, voucher_type]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                          'name',
+                          'value',
+                          'voucher_type' ,
+                          'valid_for', 
+                          'sales',
+                          'price'
+                            ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        business=Business.objects.get(id=business_id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    
+    if valid_for.lower() == 'days':
+        days= days
+    else:
+        months = months
+        
+    voucher = Vouchers.objects.create(
+        user = user,
+        business = business, 
+        name = name,
+        value = value,
+        voucher_type=voucher_type,
+        valid_for = valid_for,
+        sales = sales,
+        price = price,     
+        
+    )
+    voucher.days = days
+    voucher.months = months
+    voucher.save()
+    
+    serialized = VoucherSerializer(voucher)
+       
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Voucher Create!',
+                    'error_message' : None,
+                    'voucher' : serialized.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_vouchers(request):
+    all_voucher= Vouchers.objects.all().order_by('-created_at')
+    serialized = VoucherSerializer(all_voucher, many=True)
     return Response(
         {
             'status' : 200,
