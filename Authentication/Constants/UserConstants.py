@@ -39,7 +39,7 @@ def complete_user_account(request, user=None, data=None):
     first_name = data['first_name']
     last_name = data['last_name']
     mobile_number = data['mobile_number']
-    social_account = data.get('social_account', False)
+    social_account = data.get('social_account', None)
 
     user.first_name = first_name
     user.last_name = last_name
@@ -47,7 +47,7 @@ def complete_user_account(request, user=None, data=None):
     user.full_name=f'{first_name} {last_name}'
     user.mobile_number=mobile_number
 
-    if social_account and social_account is not None:
+    if social_account is not None:
         social_platform = data.get('social_platform', None)
         social_id = data.get('social_id', None)
         user.social_account = True
@@ -55,6 +55,13 @@ def complete_user_account(request, user=None, data=None):
             user.social_platform = social_platform
         if social_id is not None:
             user.social_id = social_id
+    else:
+        ExceptionRecord.objects.create(text=f'This account was not social account {data.get("social_platform", None)}')
+
+        try:
+            OTP.generate_user_otp(user=user, code_for='Email')
+        except Exception as error:
+            ExceptionRecord.objects.create(text=f'error from create_tenant_thread \n{str(error)}')
 
     user.save()
     NewsLetterDetail.objects.create(
@@ -64,4 +71,3 @@ def complete_user_account(request, user=None, data=None):
     )
     create_user_account_type(user=user, account_type=data['account_type'])
     AuthTokenConstants.create_user_token(user=user)
-    OTP.generate_user_otp(user=user, code_for='Email')
