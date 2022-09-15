@@ -12,19 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = [
-            'id',
-            'first_name',
-            'last_name',
-            'username',
-            'email',
-            'mobile_number',
-            'joined_at',
-            'is_superuser',
-            'is_admin',
-            'is_staff',
-            'is_active',
-        ]
+        fields = '__all__'
 
 class UserLoginSerializer(serializers.ModelSerializer):
     access_token = serializers.SerializerMethodField()

@@ -26,7 +26,7 @@ def create_tenant_user(tenant=None, data=None):
 
         first_name = data['first_name']
         last_name = data['last_name']
-        social_account = data.get('social_account', False)
+        social_account = data.get('social_account', None)
 
         user = User.objects.create_user(
             username = data['username'],
@@ -43,7 +43,8 @@ def create_tenant_user(tenant=None, data=None):
         user.is_admin=True
         user.is_active=True
 
-        if social_account and social_account is not None:
+        if social_account is not None:
+            user.is_email_verified = True
             social_platform = data.get('social_platform', None)
             social_id = data.get('social_id', None)
             user.social_account = True
