@@ -1276,9 +1276,9 @@ def get_memberships(request):
             'status' : 200,
             'status_code' : '200',
             'response' : {
-                'message' : 'All Promotion',
+                'message' : 'All Membership',
                 'error_message' : None,
-                'promotion' : serialized.data
+                'membership' : serialized.data
             }
         },
         status=status.HTTP_200_OK
@@ -1383,9 +1383,9 @@ def get_vouchers(request):
             'status' : 200,
             'status_code' : '200',
             'response' : {
-                'message' : 'All Promotion',
+                'message' : 'All Voucher',
                 'error_message' : None,
-                'promotion' : serialized.data
+                'vouchers' : serialized.data
             }
         },
         status=status.HTTP_200_OK
