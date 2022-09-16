@@ -107,7 +107,7 @@ def create_appointment(request):
     
 
     
-    if not all([ client]):
+    if not all([ client, client_type, business_address, appointments, business_id ]):
          return Response(
             {
                 'status' : False,
@@ -124,9 +124,7 @@ def create_appointment(request):
                           'appointment_time', 
                           'duration',
                           'client', 
-
-
-                            ]
+                        ]
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
@@ -184,16 +182,25 @@ def create_appointment(request):
     
     print(type(appointments))
     print(appointments)
+
+    return_data = {}
+    return_data['appointments'] = appointments
+    return_data['appointments_type'] = str(type(appointments))
+    
     if type(appointments) == str:
         appointments = json.loads(appointments)
 
     elif type(appointments) == list:
         pass
+
+    return_data['appointments_loop'] = []
+
     for appointment in appointments:
         member = appointment['member']
         service = appointment['service']
         duration= appointment['duration']
         date_time= appointment['date_time']
+        return_data['appointments_loop'].append(appointment)
         
         try:
             member=Employee.objects.get(id=member)
@@ -228,7 +235,7 @@ def create_appointment(request):
             appointment = appointment,
             duration=duration,
             date_time=date_time
-    )
+        )
     
     serialized = AppoinmentSerializer(appointment)
     return Response(
