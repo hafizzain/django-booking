@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from Product.Constants.index import tenant_media_base_url
 
+from Product.models import Product
+from Service.models import Service
 
 from Client.models import Client, ClientGroup, Subscription, Promotion , Rewards , Membership, Vouchers
 
@@ -41,16 +43,45 @@ class SubscriptionSerializer(serializers.ModelSerializer):
      
      
 class RewardSerializer(serializers.ModelSerializer):
+    product_name = serializers.SerializerMethodField(read_only=True)
+    service_name = serializers.SerializerMethodField(read_only=True)
+    
+    def get_product_name(self, obj):
+        try:
+            return obj.product.name
+        except Exception as err:
+            return None
+        
+    def get_service_name(self, obj):
+        try:
+            return obj.service.name
+        except Exception:
+            return None
     
     class Meta:
         model = Rewards
-        fields = '__all__'
+        fields =['id','name', 'reward_value', 'discount', 'total_points' ,'product_name' , 'service_name' ]
         
 class PromotionSerializer(serializers.ModelSerializer):
     
+    product_name = serializers.SerializerMethodField(read_only=True)
+    service_name = serializers.SerializerMethodField(read_only=True)
+    
+    def get_product_name(self, obj):
+        try:
+            return obj.product.name
+        except Exception as err:
+            return None
+        
+    def get_service_name(self, obj):
+        try:
+            return obj.service.name
+        except Exception:
+            return None
+    
     class Meta:
         model = Promotion
-        fields = '__all__'
+        fields = ['id','promotion_type', 'product_name', 'products', 'service_name','services', 'discount_service', 'discount_product','discount','duration']
         
 class MembershipSerializer(serializers.ModelSerializer):
     
