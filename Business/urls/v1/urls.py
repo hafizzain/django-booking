@@ -20,7 +20,7 @@ urlpatterns = [
     # Business Location URLs 
     path('<str:business_id>/get_business_locations/', views.get_business_locations),
     path('add_business_location/', views.add_business_location),
-    path('delete_location/', views.delete_location),
+    #path('delete_location/', views.delete_location),
     path('update_location/', views.update_location),
 
     # Language URLs 

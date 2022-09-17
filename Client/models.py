@@ -74,10 +74,16 @@ class Subscription(models.Model):
         ('Limited', 'Limited'),
         ('Unlimited', 'Unlimited'),
     ]
+    SUBSCRIPTION_TYPES = [
+        ('Product' , 'Product'),
+        ('Service' , 'Service'),
+    ]
 
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_subscriptions')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_subscriptions')
+    
+    subscription_type = models.CharField(default='Product', choices=SUBSCRIPTION_TYPES, max_length=20)
     
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_subscriptions')
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_subscriptions')

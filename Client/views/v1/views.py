@@ -645,8 +645,10 @@ def create_subscription(request):
     user= request.user
     business= request.data.get('business', None)
     
+    subscription_type = request.data.get('subscription_type',None)
     name= request.data.get('name', None)
     product= request.data.get('product', None)
+    service_id= request.data.get('service', None)
     days= request.data.get('days',None)
     select_amount = request.data.get('select_amount', None)
     services_count= request.data.get('services_count', None)
@@ -692,37 +694,60 @@ def create_subscription(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
             
-    try:
-             product=Product.objects.get(id=product)
-    except Exception as err:
+    
+    if is_active is not None:
+        is_active = True
+    else: 
+        is_active = False
+            
+    client_subscription= Subscription.objects.create(
+        user =user,
+        business=business, 
+        name= name,
+        days=days,
+        select_amount=select_amount,
+        services_count=services_count,
+        price=price,
+        subscription_type = subscription_type,
+        is_active= is_active,
+
+    )
+    if subscription_type == 'Product':
+        try:
+            product=Product.objects.get(id=product)
+        except Exception as err:
             return Response(
                 {
                     'status' : False,
-                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
                     'response' : {
                     'message' : 'Product not found',
                     'error_message' : str(err),
                     }
                 },
                 status=status.HTTP_400_BAD_REQUEST
+            ) 
+        client_subscription.product = product     
+    else:
+        try:
+            service=Service.objects.get(id=service_id)
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
+                    'response' : {
+                    'message' : 'Service not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
             )
             
-    client_subscription= Subscription.objects.create(
-        user =user,
-        business=business, 
-        name= name,
-        product=product,
-        days=days,
-        select_amount=select_amount,
-        services_count=services_count,
-        price=price,
+        client_subscription.service = service
+    
+    client_subscription.save()
         
-        
-    )
-    if is_active is not None:
-        is_active = True
-    else: 
-        is_active = False
     
     serialized = SubscriptionSerializer(client_subscription, context={'request' : request})
        
