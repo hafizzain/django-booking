@@ -126,7 +126,6 @@ def add_data_to_tenant_thread(tenant=None):
 
     try:
         print('gonna create DB data')
-        add_business_types(tenant=tenant)
         add_currencies(tenant=tenant)
         add_languages(tenant=tenant)
         add_countries(tenant=tenant)
@@ -165,6 +164,12 @@ def create_tenant(request=None, user=None, data=None):
 
 
     with tenant_context(user_tenant):
+        try:
+            thrd = Thread(target=add_business_types, kwargs={'tenant' : user_tenant})
+            thrd.start()
+        except:
+            pass
+
         t_user = create_tenant_user(tenant=user_tenant, data=data)
         
         if t_user is not None:

@@ -15,11 +15,13 @@ def add_business_types(tenant=None):
     with tenant_context(tenant):
         with open('Utility/Files/business_types.json', 'r') as inp_file:
             file = json.load(inp_file)
-            print(type(file))
-            # BusinessType(
-            #     name = '',
-            #     image = ''
-            # )
+            for row in file:
+                bd_type = BusinessType(
+                    name = row['name'],
+                    image = row['image']
+                )
+                bd_type.save()
+                print(bd_type)
 
 
 def add_countries(tenant=None):
