@@ -13,6 +13,8 @@ class Service(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_services', null=True, blank=True)
 
     name = models.CharField(max_length=500, default='')
+
+    price = models.PositiveIntegerField(default=0)
     
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)

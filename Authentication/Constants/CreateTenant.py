@@ -114,8 +114,9 @@ def create_service_user(tenant=None, user = None, business=None):
             print(user)
             for service in service_list :
                 test = Service.objects.create(
-                    user = user, 
-                    name=service
+                        user = user, 
+                        name=service,
+                        price=342
                     )  
                 print(test) 
 
