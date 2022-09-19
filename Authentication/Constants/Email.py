@@ -19,7 +19,7 @@ def send_otp_to_email(user=None, ):
         print(err)
         return
 
-    html_file = render_to_string("otp_email.html", {'user_name': user_otp.user.username,'otp': user_otp.code, 'email':user_otp.user.email})
+    html_file = render_to_string("otp_email.html", {'user_name': f'{user_otp.user.first_name} {user_otp.user.last_name}','otp': user_otp.code, 'email':user_otp.user.email})
     text_content = strip_tags(html_file)
     
     email = EmailMultiAlternatives(
