@@ -107,32 +107,45 @@ def create_tenant_account_type(tenant_user=None, tenant=None, account_type='ever
         )
 
 def create_service_user(tenant=None, user = None, business=None):
-    service_list = []   
-    class service: 
-        def __init__(self, name, salary): 
-            self.name = name 
-            self.salary = salary
-       
-            list.append( service('Car wash', 2) )
-            list.append( service('Haircolor', 40) )
-            list.append( service('Bridal Makeup', 44) )
-            
-            list.append( service('Menicure', 23) )
-            list.append( service('Pedicure', 45) )
-            list.append( service('Bike Service', 47) )
-            
-            list.append( service('Bike Wash', 678))   
-        
     if tenant is not None and user is not None and business is not None:
         with tenant_context(tenant):
 
-            #service_list = [ 'Car wash', 'Haircolor', 'Bridal Makeup', 'Menicure', 'Pedicure', 'Bike Service', 'Bike Wash']
+            service_list = [
+                {
+                    'name' : 'Car wash',
+                    'price' : 355
+                },
+                {
+                    'name' : 'Haircolor',
+                    'price' : 123
+                },
+                {
+                    'name' : 'Bridal Makeup',
+                    'price' : 87
+                },
+                {
+                    'name' : 'Menicure',
+                    'price' : 1997
+                },
+                {
+                    'name' : 'Pedicure',
+                    'price' : 9886
+                },
+                {
+                    'name' : 'Bike Service',
+                    'price' : 1223
+                },
+                {
+                    'name' : 'Bike Wash',
+                    'price' : 1124
+                },
+            ]
 
             for service in service_list :
                 test = Service.objects.create(
-                    user = user, 
-                    name=service.name,
-                    price= service.salary
+                        user = user, 
+                        name=service['name'],
+                        price= service['price']
                     )  
 
         
