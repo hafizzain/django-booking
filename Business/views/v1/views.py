@@ -365,6 +365,7 @@ def update_business_additional_information(request):
     elif type(selected_softwares) == list:
         pass
     
+    business.software_used.clear()
     for software_id in selected_softwares:
         software = Software.objects.get(id=software_id)
         business.software_used.add(software)
@@ -374,6 +375,7 @@ def update_business_additional_information(request):
     elif type(selected_types) == list:
         pass
 
+    business.business_types.clear()
     for type_id in selected_types:
         type_obj = BusinessType.objects.get(id=type_id)
         business.business_types.add(type_obj)
