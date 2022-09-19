@@ -18,7 +18,7 @@ def add_business_types(tenant=None):
             for row in file:
                 bd_type = BusinessType(
                     name = row['name'],
-                    image = row['image']
+                    image_path = row['image']
                 )
                 bd_type.save()
                 print(bd_type)

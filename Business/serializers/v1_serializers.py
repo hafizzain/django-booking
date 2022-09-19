@@ -14,13 +14,7 @@ class BusinessTypeSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
 
     def get_image(self, obj):
-        if obj.image :
-            try:
-                request = self.context["request"]
-                url = tenant_media_base_url(request)
-                return f'{url}{obj.image}'
-            except:
-                obj.image
+        return obj.image_path
                 
     class Meta:
         model = BusinessType
