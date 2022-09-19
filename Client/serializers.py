@@ -7,10 +7,21 @@ from Utility.models import Country, State, City
 
 from Client.models import Client, ClientGroup, Subscription, Promotion , Rewards , Membership, Vouchers
 
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        exclude = ['is_deleted', 'created_at', 'slug', 'published']
+
+class ServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Service
+        exclude = ['is_deleted', 'created_at', 'updated_at']
+
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
-        fields ='__all__'
+        exclude = ['is_deleted', 'created_at', 'unique_code', 'key']
 
 class ClientSerializer(serializers.ModelSerializer):
     country_obj = serializers.SerializerMethodField(read_only=True)
@@ -19,9 +30,8 @@ class ClientSerializer(serializers.ModelSerializer):
     
     def get_country_obj(self, obj):
         try:
-            country_info= Country.objects.get(id=obj)
-            return CountrySerializer(country_info).data
-        except Country.DoesNotExist:
+            return CountrySerializer(obj.country).data
+        except Exception as err:
             return None
     
     def get_image(self, obj):
@@ -63,14 +73,14 @@ class RewardSerializer(serializers.ModelSerializer):
     
     def get_product_name(self, obj):
         try:
-            return obj.product.name
+            return ProductSerializer(obj.product).data
         except Exception as err:
             return None
         
     def get_service_name(self, obj):
         try:
-            return obj.service.name
-        except Exception:
+            return ServiceSerializer(obj.service).data
+        except Exception as err:
             return None
     
     class Meta:
@@ -84,14 +94,14 @@ class PromotionSerializer(serializers.ModelSerializer):
     
     def get_product_name(self, obj):
         try:
-            return obj.product.name
+            return ProductSerializer(obj.product).data
         except Exception as err:
             return None
         
     def get_service_name(self, obj):
         try:
-            return obj.service.name
-        except Exception:
+            return ServiceSerializer(obj.service).data
+        except Exception as err:
             return None
     
     class Meta:

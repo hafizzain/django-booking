@@ -2,6 +2,8 @@ from dataclasses import fields
 from genericpath import exists
 from pyexpat import model
 from Product.Constants.index import tenant_media_base_url
+from Utility.models import Country, State, City
+
 from rest_framework import serializers
 from .models import( Employee, EmployeeProfessionalInfo ,
                EmployeePermissionSetting, EmployeeModulePermission 
@@ -9,6 +11,22 @@ from .models import( Employee, EmployeeProfessionalInfo ,
                StaffGroup, StaffGroupModulePermission, Attendance
                ,Payroll , CommissionSchemeSetting
 )
+
+class CountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        exclude = ['is_deleted', 'created_at', 'unique_code', 'key']
+    
+class StateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = State
+        exclude = ['is_deleted', 'created_at', 'unique_code', 'key']
+        
+class CitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        exclude = ['is_deleted', 'created_at', 'unique_code', 'key']
+        
 class EmployeInformationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployeeProfessionalInfo
@@ -37,25 +55,25 @@ class EmployeSerializer(serializers.ModelSerializer):
     marketing_permissions= serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
     
-    country_name = serializers.SerializerMethodField(read_only=True)
-    state_name = serializers.SerializerMethodField(read_only=True)
-    city_name = serializers.SerializerMethodField(read_only=True)   
+    country = serializers.SerializerMethodField(read_only=True)
+    state = serializers.SerializerMethodField(read_only=True)
+    city = serializers.SerializerMethodField(read_only=True)   
     
-    def get_country_name(self, obj):
+    def get_country(self, obj):
         try:
-           return obj.country.name
-        except Exception as err:
+            return CountrySerializer(obj.country).data
+        except Country.DoesNotExist:
             return None
-    def get_state_name(self, obj):
+    def get_state(self, obj):
         try:
-           return obj.state.name
-        except Exception as err:
+            return StateSerializer(obj.state).data
+        except State.DoesNotExist:
             return None
     
-    def get_city_name(self, obj):
+    def get_city(self, obj):
         try:
-           return obj.city.name
-        except Exception as err:
+            return CitySerializer(obj.city).data
+        except City.DoesNotExist:
             return None
     
 
@@ -125,9 +143,9 @@ class EmployeSerializer(serializers.ModelSerializer):
                 'image',
                 'dob', 
                 'gender', 
-                'country_name',
-                'state_name',
-                'city_name',
+                'country',
+                'state',
+                'city',
                 'postal_code', 
                 'address' ,
                 'joining_date', 
