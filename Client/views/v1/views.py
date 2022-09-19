@@ -541,6 +541,7 @@ def update_client_group(request):
             client = json.loads(client)
         elif type(client) == list:
             pass
+        client_group.client.clear()
         for usr in client:
             try:
                employe = Client.objects.get(id=usr)  
@@ -1031,6 +1032,57 @@ def get_rewards(request):
         status=status.HTTP_200_OK
     )
     
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_rewards(request):
+    rewards_id = request.data.get('rewards_id', None)
+    if rewards_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'rewards_id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        attendence = Rewards.objects.get(id=rewards_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Rewards ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    attendence.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Rewards deleted successful',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+   
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_promotion(request):

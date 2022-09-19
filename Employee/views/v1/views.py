@@ -905,7 +905,6 @@ def update_staff_group(request):
     
     employees=request.data.get('employees', None)
     if employees is not None:
-       
         if type(employees) == str:
             employees = json.loads(employees)
         elif type(employees) == list:

@@ -3,12 +3,27 @@ from Product.Constants.index import tenant_media_base_url
 
 from Product.models import Product
 from Service.models import Service
+from Utility.models import Country, State, City
 
 from Client.models import Client, ClientGroup, Subscription, Promotion , Rewards , Membership, Vouchers
 
-class ClientSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
+class CountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        fields ='__all__'
 
+class ClientSerializer(serializers.ModelSerializer):
+    country_obj = serializers.SerializerMethodField(read_only=True)
+    image = serializers.SerializerMethodField()
+    
+    
+    def get_country_obj(self, obj):
+        try:
+            country_info= Country.objects.get(id=obj)
+            return CountrySerializer(country_info).data
+        except Country.DoesNotExist:
+            return None
+    
     def get_image(self, obj):
         if obj.image:
             try:
@@ -21,7 +36,7 @@ class ClientSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Client
-        fields =['id','full_name','image','client_id','email','mobile_number','dob','postal_code','address','gender','card_number','country','city','state', 'is_active']
+        fields =['id','full_name','image','client_id','email','mobile_number','dob','postal_code','address','gender','card_number','country','city','state', 'is_active', 'country_obj']
         
         
 class ClientGroupSerializer(serializers.ModelSerializer):
