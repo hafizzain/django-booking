@@ -11,6 +11,17 @@ from django.conf import settings
 from Product.Constants.index  import tenant_media_base_url
 
 class BusinessTypeSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
+    def get_image(self, obj):
+        if obj.image :
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request)
+                return f'{url}{obj.image}'
+            except:
+                obj.image
+                
     class Meta:
         model = BusinessType
         fields = ['id', 'name', 'image']

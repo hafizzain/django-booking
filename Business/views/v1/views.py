@@ -33,7 +33,7 @@ def get_business_types(request):
         is_active=True,
         is_deleted=False
     )
-    serialized = BusinessTypeSerializer(all_types, many=True)
+    serialized = BusinessTypeSerializer(all_types, many=True, context={'request' : request})
     return Response(
         {
             'status' : True,
