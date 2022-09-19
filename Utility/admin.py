@@ -1,5 +1,9 @@
 from django.contrib import admin
-from .models import ExceptionRecord, Software, Country, State, City, Language, Currency
+from .models import ExceptionRecord, NstyleFile, Software, Country, State, City, Language, Currency
+
+admin.site.register(NstyleFile)
+
+
 
 @admin.register(Currency)
 class CurrencyAdmin(admin.ModelAdmin):

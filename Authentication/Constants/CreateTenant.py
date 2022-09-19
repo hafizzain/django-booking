@@ -5,7 +5,7 @@ from Authentication.Constants.Domain import ssl_sub_domain
 from Tenants.models import Tenant, Domain
 from Business.models import Business
 from Profile.models import Profile
-from Utility.Constants.add_data_db import add_countries, add_states, add_cities, add_currencies, add_languages
+from Utility.Constants.add_data_db import add_business_types, add_countries, add_states, add_cities, add_currencies, add_languages
 
 from rest_framework.authtoken.models import Token
 from django.conf import  settings
@@ -126,6 +126,7 @@ def add_data_to_tenant_thread(tenant=None):
 
     try:
         print('gonna create DB data')
+        add_business_types(tenant=tenant)
         add_currencies(tenant=tenant)
         add_languages(tenant=tenant)
         add_countries(tenant=tenant)
