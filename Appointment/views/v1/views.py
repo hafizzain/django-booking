@@ -233,7 +233,7 @@ def create_appointment(request):
             business = business,
             appointment = appointment,
             duration=duration,
-            date_time=date_time
+            appointment_time=date_time
         )
     
     serialized = AppoinmentSerializer(appointment)
