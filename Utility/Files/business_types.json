@@ -1,62 +1,62 @@
 [
     {
         "name": "Hair Salon",
-        "image": ""
+        "image": "https://us-telecoms.com/media/public/utility/files/hair-cutting_1.png"
     },
     {
         "name": "Nail Salon",
-        "image": ""
+        "image": "https://us-telecoms.com/media/public/utility/files/nail_1.png"
     },
     {
         "name": "Barber Shop",
-        "image": ""
+        "image": "https://us-telecoms.com/media/public/utility/files/barbershop_1.png"
     },
     {
         "name": "Beauty Salon",
-        "image": ""
+        "image": "https://us-telecoms.com/media/public/utility/files/makeover_1.png"
     },
     {
         "name": "Aesthetics",
-        "image": ""
+        "image": "https://us-telecoms.com/media/public/utility/files/lips_1.png"
     },
     {
         "name": "Spa",
-        "image": ""
+        "image": "https://us-telecoms.com/media/public/utility/files/sauna_1.png"
     },
     {
         "name": "Massage",
-        "image": ""
+        "image": "https://us-telecoms.com/media/public/utility/files/massage_1.png"
     },
     {
         "name": "Waxing",
-        "image": ""
+        "image": "https://us-telecoms.com/media/public/utility/files/hair-removal_1.png"
     },
     {
         "name": "Tanning Studio",
-        "image": ""
+        "image": "https://us-telecoms.com/media/public/utility/files/tanning_1.png"
     },
     {
         "name": "Eyebrows & Lashes",
-        "image": ""
+        "image": "https://us-telecoms.com/media/public/utility/files/eyebrow-pencil_1.png"
     },
     {
         "name": "Tattoo & Piercing",
-        "image": ""
+        "image": "https://us-telecoms.com/media/public/utility/files/tattoo_1.png"
     },
     {
         "name": "Therapy Center",
-        "image": ""
+        "image": "https://us-telecoms.com/media/public/utility/files/healthcare_1_1.png"
     },
     {
         "name": "Weight Loss",
-        "image": ""
+        "image": "https://us-telecoms.com/media/public/utility/files/weight-loss_1.png"
     },
     {
         "name": "Personal Trainer",
-        "image": ""
+        "image": "https://us-telecoms.com/media/public/utility/files/trainer_1.png"
     },
     {
         "name": "Fitness & Gym",
-        "image": ""
+        "image": "https://us-telecoms.com/media/public/utility/files/treadmill_1.png"
     }
 ]

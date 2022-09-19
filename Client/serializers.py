@@ -19,8 +19,7 @@ class ClientSerializer(serializers.ModelSerializer):
     
     def get_country_obj(self, obj):
         try:
-            country_info= Country.objects.get(id=obj)
-            return CountrySerializer(country_info).data
+            return CountrySerializer(obj.country).data
         except Country.DoesNotExist:
             return None
     
