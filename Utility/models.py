@@ -99,6 +99,11 @@ class NstyleFile(models.Model):
     file = models.FileField(upload_to='utility/files/')
 
     def __str__(self):
+        try:
+            return str(self.file.path)
+        except:
+            pass
+
         return 'Custom file uploaded'
     
 
