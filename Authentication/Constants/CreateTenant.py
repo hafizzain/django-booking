@@ -5,7 +5,7 @@ from Authentication.Constants.Domain import ssl_sub_domain
 from Tenants.models import Tenant, Domain
 from Business.models import Business
 from Profile.models import Profile
-from Utility.Constants.add_data_db import add_business_types, add_countries, add_states, add_cities, add_currencies, add_languages
+from Utility.Constants.add_data_db import add_business_types, add_countries, add_software_types, add_states, add_cities, add_currencies, add_languages
 
 from rest_framework.authtoken.models import Token
 from django.conf import  settings
@@ -166,6 +166,11 @@ def create_tenant(request=None, user=None, data=None):
     with tenant_context(user_tenant):
         try:
             thrd = Thread(target=add_business_types, kwargs={'tenant' : user_tenant})
+            thrd.start()
+        except:
+            pass
+        try:
+            thrd = Thread(target=add_software_types, kwargs={'tenant' : user_tenant})
             thrd.start()
         except:
             pass

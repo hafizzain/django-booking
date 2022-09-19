@@ -74,6 +74,7 @@ class Software(models.Model):
 
     name = models.CharField(default='', max_length=200)
     image = models.ImageField(upload_to='Utility/softwares/', null=True, blank=True)
+    image_path = models.CharField(default='', max_length=2000, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
