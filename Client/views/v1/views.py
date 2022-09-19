@@ -650,16 +650,17 @@ def create_subscription(request):
     
     subscription_type = request.data.get('subscription_type',None)
     name= request.data.get('name', None)
-    product= request.data.get('product', None)
+    product = request.data.get('product', None)
     service_id= request.data.get('service', None)
     days= request.data.get('days',None)
     select_amount = request.data.get('select_amount', None)
-    services_count= request.data.get('services_count', None)
+    services_count= request.data.get('services', 0)
+    products_count= request.data.get('products', 0)
     price= request.data.get('price', None)
     
     is_active= request.data.get('is_active', None)
     
-    if not all([business, name ,product , days ,select_amount , services_count , price  ]):
+    if not all([business, name, days ,select_amount , price]) or (subscription_type is not None and subscription_type == 'Product' and product is None) or (subscription_type is not None and subscription_type == 'Service'  and service_id is None):
           return Response(
             {
                 'status' : False,
@@ -676,8 +677,7 @@ def create_subscription(request):
                           'select_amount', 
                           'services_count', 
                           'price', 
-
-                            ]
+                        ]
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
@@ -709,7 +709,6 @@ def create_subscription(request):
         name= name,
         days=days,
         select_amount=select_amount,
-        services_count=services_count,
         price=price,
         subscription_type = subscription_type,
         is_active= is_active,
@@ -730,7 +729,9 @@ def create_subscription(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             ) 
-        client_subscription.product = product     
+        client_subscription.product = product
+        client_subscription.products_count = products_count
+
     else:
         try:
             service=Service.objects.get(id=service_id)
@@ -748,6 +749,8 @@ def create_subscription(request):
             )
             
         client_subscription.service = service
+        client_subscription.services_count = services_count
+
     
     client_subscription.save()
         
