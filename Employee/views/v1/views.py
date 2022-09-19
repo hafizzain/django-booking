@@ -43,12 +43,15 @@ def import_employee(request):
         for index, row in enumerate(imp_file):
             if index == 0:
                 continue
+            
             row = row.split(',')
             row = row
             if len(row) < 11:
-                continue
+                # continue
+                pass
             
             name= row[0].strip('"')
+            print(name)
             designation= row[1].strip('"')
             email=row[2].strip('"')
             income_type= row[3].strip('"')
@@ -59,6 +62,7 @@ def import_employee(request):
             city= row[8].strip('"')
             state= row[9].replace('\n', '').strip('"')
             employee_id = row[10].replace('\n', '').strip('"')
+            print(country)
     
             try:
                 business=Business.objects.get(id=business_id )
@@ -107,7 +111,7 @@ def import_employee(request):
                 city = city,
             )
             
-            employee_professional = EmployeeProfessionalInfo.objects.create(
+            EmployeeProfessionalInfo.objects.create(
                 employee = employee,
                 designation = designation,
                 income_type = income_type,

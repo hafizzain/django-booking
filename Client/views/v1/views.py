@@ -546,9 +546,11 @@ def update_client_group(request):
             try:
                employe = Client.objects.get(id=usr)  
                #print(employe)
-               client_group.employees.add(employe)
+               client_group.client.add(employe)
+               
             except Exception as err:
                 client_error.append(str(err))
+                
         client_group.save()
         
     
