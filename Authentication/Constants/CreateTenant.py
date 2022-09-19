@@ -115,7 +115,8 @@ def create_service_user(tenant=None, user = None, business=None):
                 test = Service.objects.create(
                     user = user, 
                     name=service
-                    )   
+                    )  
+                print(test) 
 
         
 def add_data_to_tenant_thread(tenant=None):

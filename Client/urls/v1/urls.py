@@ -34,4 +34,8 @@ urlpatterns = [
    #Membership
    path('create_memberships/', views.create_memberships),
    path('get_memberships/', views.get_memberships),
+   
+   #Vouchers
+   path('create_vouchers/', views.create_vouchers),
+   path('get_vouchers/', views.get_vouchers),
 ]

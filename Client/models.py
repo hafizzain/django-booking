@@ -74,10 +74,16 @@ class Subscription(models.Model):
         ('Limited', 'Limited'),
         ('Unlimited', 'Unlimited'),
     ]
+    SUBSCRIPTION_TYPES = [
+        ('Product' , 'Product'),
+        ('Service' , 'Service'),
+    ]
 
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_subscriptions')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_subscriptions')
+    
+    subscription_type = models.CharField(default='Product', choices=SUBSCRIPTION_TYPES, max_length=20)
     
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_subscriptions')
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_subscriptions')
@@ -136,6 +142,43 @@ class Promotion(models.Model):
         return str(self.id)
     
 
+
+class Vouchers(models.Model):
+    VALIDITY_CHOICE = [
+        ('Days' , 'Days'),
+        ('Months' , 'Months'),
+    ]
+    VOUCHER_CHOICES =[
+        ('Product' , 'Product'),
+        ('Service' , 'Service'),
+    ]
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_voucher', verbose_name='Creator ( User )')
+    business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_voucher')
+    
+    name = models.CharField(max_length=100, default='')
+    value = models.PositiveIntegerField(default=0)
+    
+    voucher_type = models.CharField(choices= VOUCHER_CHOICES,default= 'Product', verbose_name = 'Voucher Type', max_length=20)
+    # service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_voucher')
+    # product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_voucher')
+    
+    valid_for = models.CharField(choices=VALIDITY_CHOICE, default='Months' , verbose_name='Validity for Days or Months', max_length=20)
+
+    days = models.PositiveIntegerField(default=0, verbose_name='No. of Days', null=True, blank=True)
+    months = models.PositiveIntegerField(default=0, verbose_name='No. of Months', null=True, blank=True)
+    
+    sales = models.PositiveIntegerField(default=0)
+    price = models.PositiveIntegerField(default=0)
+    
+    is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+
+    def __str__(self):
+        return str(self.id)
 
 class Rewards(models.Model):
 
