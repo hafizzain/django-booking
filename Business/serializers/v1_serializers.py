@@ -78,6 +78,8 @@ class Business_GetSerializer(serializers.ModelSerializer):
             'website',
             'facebook',
             'instagram',
+            'business_types',
+            'software_used'
         ]
 
 
