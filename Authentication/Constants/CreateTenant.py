@@ -164,6 +164,13 @@ def create_tenant(request=None, user=None, data=None):
 
 
     with tenant_context(user_tenant):
+
+        try:
+            thrd = Thread(target=ssl_sub_domain, args=[td_name])
+            thrd.start()
+        except:
+            pass
+        
         try:
             thrd = Thread(target=add_business_types, kwargs={'tenant' : user_tenant})
             thrd.start()
@@ -208,9 +215,4 @@ def create_tenant(request=None, user=None, data=None):
             except:
                 pass
             
-            try:
-                thrd = Thread(target=ssl_sub_domain, args=[td_name])
-                thrd.start()
-            except:
-                pass
 

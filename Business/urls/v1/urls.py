@@ -11,6 +11,7 @@ urlpatterns = [
     path('get_business/', views.get_business),
     path('get_business_by_domain/', views.get_business_by_domain),
     path('update_business/', views.update_business),
+    path('update_business_additional_information/', views.update_business_additional_information),
 
     # Business Theme URLs 
     path('get_business_theme/', views.get_business_theme),

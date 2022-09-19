@@ -19,7 +19,7 @@ from Business.models import Business, BusinessSocial, BusinessAddress, BusinessO
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
 from Tenants.models import Domain, Tenant
-from Utility.models import Country, Language, State, City
+from Utility.models import Country, Language, Software, State, City
 from Utility.serializers import LanguageSerializer
 import json
 from django.db.models import Q
@@ -307,6 +307,96 @@ def get_business_by_domain(request):
             },
             status=status.HTTP_200_OK
         )
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_business_additional_information(request):
+    business_id = request.data.get('business', None)
+    
+
+    if business_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'User id is required',
+                    'fields' : [
+                        'business',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        business = Business.objects.get(
+            id=business_id,
+            is_deleted=False,
+            is_blocked=False
+        )
+    except Exception as err :
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                'response' : {
+                    'message' : 'Business Not Found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    team_size = request.data.get('team_size', business.team_size)
+    how_find_us = request.data.get('how_find_us', business.how_find_us)
+    selected_softwares = request.data.get('selected_softwares', [])
+    selected_types = request.data.get('selected_types', [])
+
+    business.team_size = team_size
+    business.how_find_us = how_find_us
+    business.save()
+
+    if type(selected_softwares) == str:
+        selected_softwares = json.loads(selected_softwares)
+    elif type(selected_softwares) == list:
+        pass
+    
+    for software_id in selected_softwares:
+        software = Software.objects.get(id=software_id)
+        business.software_used.add(software)
+
+    if type(selected_types) == str:
+        selected_types = json.loads(selected_types)
+    elif type(selected_types) == list:
+        pass
+
+    for type_id in selected_types:
+        type_obj = BusinessType.objects.get(id=type_id)
+        business.business_types.add(type_obj)
+    
+    business.save()
+
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : 'Saved Data',
+                'response' : {
+                    'message' : 'Successfully updated',
+                    'error_message' : None,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
+    
+
+# business_types
+# software_used
 
 
 @api_view(['PUT'])
