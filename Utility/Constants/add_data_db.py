@@ -1,10 +1,26 @@
 
 
-import csv
+import csv, json
+from Business.models import BusinessType
 from Tenants.models import Tenant
 from Utility.models import Country, State, City, Currency, Language
 
 from django_tenants.utils import tenant_context
+
+
+def add_business_types(tenant=None):
+    if tenant is None:
+        tenant = Tenant.objects.get(schema_name='public')
+
+    with tenant_context(tenant):
+        with open('Utility/Files/business_types.json', 'r') as inp_file:
+            file = json.load(inp_file)
+            print(type(file))
+            # BusinessType(
+            #     name = '',
+            #     image = ''
+            # )
+
 
 def add_countries(tenant=None):
     if tenant is None:

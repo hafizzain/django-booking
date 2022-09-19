@@ -48,6 +48,8 @@ def complete_user_account(request, user=None, data=None):
     user.mobile_number=mobile_number
 
     if social_account is not None:
+        user.is_email_verified = True
+        user.is_active = True
         social_platform = data.get('social_platform', None)
         social_id = data.get('social_id', None)
         user.social_account = True

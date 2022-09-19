@@ -5,7 +5,7 @@ from Authentication.Constants.Domain import ssl_sub_domain
 from Tenants.models import Tenant, Domain
 from Business.models import Business
 from Profile.models import Profile
-from Utility.Constants.add_data_db import add_countries, add_states, add_cities, add_currencies, add_languages
+from Utility.Constants.add_data_db import add_business_types, add_countries, add_states, add_cities, add_currencies, add_languages
 
 from rest_framework.authtoken.models import Token
 from django.conf import  settings
@@ -26,7 +26,7 @@ def create_tenant_user(tenant=None, data=None):
 
         first_name = data['first_name']
         last_name = data['last_name']
-        social_account = data.get('social_account', False)
+        social_account = data.get('social_account', None)
 
         user = User.objects.create_user(
             username = data['username'],
@@ -43,7 +43,8 @@ def create_tenant_user(tenant=None, data=None):
         user.is_admin=True
         user.is_active=True
 
-        if social_account and social_account is not None:
+        if social_account is not None:
+            user.is_email_verified = True
             social_platform = data.get('social_platform', None)
             social_id = data.get('social_id', None)
             user.social_account = True
@@ -125,6 +126,7 @@ def add_data_to_tenant_thread(tenant=None):
 
     try:
         print('gonna create DB data')
+        add_business_types(tenant=tenant)
         add_currencies(tenant=tenant)
         add_languages(tenant=tenant)
         add_countries(tenant=tenant)
