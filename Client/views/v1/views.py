@@ -541,6 +541,7 @@ def update_client_group(request):
             client = json.loads(client)
         elif type(client) == list:
             pass
+        client_group.client.clear()
         for usr in client:
             try:
                employe = Client.objects.get(id=usr)  
@@ -645,8 +646,10 @@ def create_subscription(request):
     user= request.user
     business= request.data.get('business', None)
     
+    subscription_type = request.data.get('subscription_type',None)
     name= request.data.get('name', None)
     product= request.data.get('product', None)
+    service_id= request.data.get('service', None)
     days= request.data.get('days',None)
     select_amount = request.data.get('select_amount', None)
     services_count= request.data.get('services_count', None)
@@ -692,37 +695,60 @@ def create_subscription(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
             
-    try:
-             product=Product.objects.get(id=product)
-    except Exception as err:
+    
+    if is_active is not None:
+        is_active = True
+    else: 
+        is_active = False
+            
+    client_subscription= Subscription.objects.create(
+        user =user,
+        business=business, 
+        name= name,
+        days=days,
+        select_amount=select_amount,
+        services_count=services_count,
+        price=price,
+        subscription_type = subscription_type,
+        is_active= is_active,
+
+    )
+    if subscription_type == 'Product':
+        try:
+            product=Product.objects.get(id=product)
+        except Exception as err:
             return Response(
                 {
                     'status' : False,
-                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
                     'response' : {
                     'message' : 'Product not found',
                     'error_message' : str(err),
                     }
                 },
                 status=status.HTTP_400_BAD_REQUEST
+            ) 
+        client_subscription.product = product     
+    else:
+        try:
+            service=Service.objects.get(id=service_id)
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
+                    'response' : {
+                    'message' : 'Service not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
             )
             
-    client_subscription= Subscription.objects.create(
-        user =user,
-        business=business, 
-        name= name,
-        product=product,
-        days=days,
-        select_amount=select_amount,
-        services_count=services_count,
-        price=price,
+        client_subscription.service = service
+    
+    client_subscription.save()
         
-        
-    )
-    if is_active is not None:
-        is_active = True
-    else: 
-        is_active = False
     
     serialized = SubscriptionSerializer(client_subscription, context={'request' : request})
        
@@ -1006,6 +1032,57 @@ def get_rewards(request):
         status=status.HTTP_200_OK
     )
     
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_rewards(request):
+    rewards_id = request.data.get('rewards_id', None)
+    if rewards_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'rewards_id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        attendence = Rewards.objects.get(id=rewards_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Rewards ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    attendence.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Rewards deleted successful',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+   
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_promotion(request):

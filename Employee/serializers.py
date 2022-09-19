@@ -36,6 +36,28 @@ class EmployeSerializer(serializers.ModelSerializer):
     module_permissions =serializers.SerializerMethodField(read_only=True)
     marketing_permissions= serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
+    
+    country_name = serializers.SerializerMethodField(read_only=True)
+    state_name = serializers.SerializerMethodField(read_only=True)
+    city_name = serializers.SerializerMethodField(read_only=True)   
+    
+    def get_country_name(self, obj):
+        try:
+           return obj.country.name
+        except Exception as err:
+            return None
+    def get_state_name(self, obj):
+        try:
+           return obj.state.name
+        except Exception as err:
+            return None
+    
+    def get_city_name(self, obj):
+        try:
+           return obj.city.name
+        except Exception as err:
+            return None
+    
 
     def get_image(self, obj):
         if obj.image:
@@ -103,9 +125,9 @@ class EmployeSerializer(serializers.ModelSerializer):
                 'image',
                 'dob', 
                 'gender', 
-                'country', 
-                'state', 
-                'city', 
+                'country_name',
+                'state_name',
+                'city_name',
                 'postal_code', 
                 'address' ,
                 'joining_date', 
@@ -229,7 +251,28 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
     income_type = serializers.SerializerMethodField(read_only=True)
     designation = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
-
+    
+    country_name = serializers.SerializerMethodField(read_only=True)
+    state_name = serializers.SerializerMethodField(read_only=True)
+    city_name = serializers.SerializerMethodField(read_only=True)   
+    
+    def get_country_name(self, obj):
+        try:
+           return obj.country.name
+        except Exception as err:
+            return None
+    def get_state_name(self, obj):
+        try:
+           return obj.state.name
+        except Exception as err:
+            return None
+    
+    def get_city_name(self, obj):
+        try:
+           return obj.city.name
+        except Exception as err:
+            return None
+    
     def get_image(self, obj):
         if obj.image:
             try:
@@ -266,14 +309,14 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'image',
-            'full_name',
             'salary',
             'email',
             'gender',
             'address', 
-            'country', 
-            'state', 
-            'city',
+            'full_name',
+            'country_name',
+            'state_name',
+            'city_name',
             'income_type',
             'designation', 
             'employee_id'          
