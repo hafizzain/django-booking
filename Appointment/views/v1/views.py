@@ -93,10 +93,10 @@ def create_appointment(request):
     user = request.user    
     business_id= request.data.get('business', None)
     appointments = request.data.get('appointments', None)
+    appointment_date= request.data.get('appointment_date', None)
     # business_address= request.data.get('business_address', None)
     # service= request.data.get('service', None)
     # member = request.data.get('member', None)
-    # appointment_date= request.data.get('appointment_date', None)
     # appointment_time= request.data.get('appointment_time', None)
     # duration= request.data.get('duration')
     #[business_id, member, appointment_date, appointment_time, duration
@@ -107,7 +107,7 @@ def create_appointment(request):
     
 
     
-    if not all([ client, client_type, business_address, appointments, business_id ]):
+    if not all([ client, client_type, business_address, appointments, appointment_date, business_id ]):
          return Response(
             {
                 'status' : False,
@@ -150,10 +150,10 @@ def create_appointment(request):
             return Response(
             {
                     'status' : False,
+                    # 'error_message' : str(err),
                     'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
                     'response' : {
                     'message' : 'Business not found',
-                    'error_message' : str(err),
                 }
             }
         )
@@ -177,7 +177,6 @@ def create_appointment(request):
             client=client,
             business_address=business_address,
             client_type=client_type
-            
         )
     
     print(type(appointments))
@@ -233,7 +232,10 @@ def create_appointment(request):
             business = business,
             appointment = appointment,
             duration=duration,
-            date_time=date_time
+            appointment_time=date_time,
+            appointment_date = appointment_date,
+            service = service,
+            member = member
         )
     
     serialized = AppoinmentSerializer(appointment)
