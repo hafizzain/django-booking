@@ -3,7 +3,7 @@
 import csv, json
 from Business.models import BusinessType
 from Tenants.models import Tenant
-from Utility.models import Country, State, City, Currency, Language
+from Utility.models import Country, Software, State, City, Currency, Language
 
 from django_tenants.utils import tenant_context
 
@@ -15,11 +15,27 @@ def add_business_types(tenant=None):
     with tenant_context(tenant):
         with open('Utility/Files/business_types.json', 'r') as inp_file:
             file = json.load(inp_file)
-            print(type(file))
-            # BusinessType(
-            #     name = '',
-            #     image = ''
-            # )
+            for row in file:
+                bd_type = BusinessType(
+                    name = row['name'],
+                    image_path = row['image']
+                )
+                bd_type.save()
+                print(bd_type)
+
+def add_software_types(tenant=None):
+    if tenant is None:
+        tenant = Tenant.objects.get(schema_name='public')
+
+    with tenant_context(tenant):
+        with open('Utility/Files/software_types.json', 'r') as inp_file:
+            file = json.load(inp_file)
+            for row in file:
+                sf_type = Software(
+                    name = row['name'],
+                )
+                sf_type.save()
+                print(sf_type)
 
 
 def add_countries(tenant=None):

@@ -171,7 +171,7 @@ def create_appointment(request):
             }
         )
             
-    appointment= Appointment.objects.create(
+    appointment = Appointment.objects.create(
             user = user,
             business=business,
             client=client,
@@ -195,12 +195,11 @@ def create_appointment(request):
 
     return_data['appointments_loop'] = []
 
-    for appointment in appointments:
-        member = appointment['member']
-        service = appointment['service']
-        duration= appointment['duration']
-        date_time= appointment['date_time']
-        return_data['appointments_loop'].append(appointment)
+    for appoinmnt in appointments:
+        member = appoinmnt['member']
+        service = appoinmnt['service']
+        duration= appoinmnt['duration']
+        date_time= appoinmnt['date_time']
         
         try:
             member=Employee.objects.get(id=member)

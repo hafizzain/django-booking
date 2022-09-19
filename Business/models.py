@@ -13,6 +13,7 @@ class BusinessType(models.Model):
 
     name = models.CharField(default='', max_length=100)
     image = models.ImageField(upload_to='business/business_types/images/', null=True, blank=True)
+    image_path = models.CharField(default='', max_length=2000, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)

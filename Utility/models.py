@@ -74,6 +74,7 @@ class Software(models.Model):
 
     name = models.CharField(default='', max_length=200)
     image = models.ImageField(upload_to='Utility/softwares/', null=True, blank=True)
+    image_path = models.CharField(default='', max_length=2000, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
@@ -99,6 +100,11 @@ class NstyleFile(models.Model):
     file = models.FileField(upload_to='utility/files/')
 
     def __str__(self):
+        try:
+            return str(self.file.path)
+        except:
+            pass
+
         return 'Custom file uploaded'
     
 
