@@ -4,6 +4,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse
+
 #import geoip2.database
 from django.contrib.gis.geoip2 import GeoIP2
     
@@ -28,3 +31,15 @@ def country_code(request):
     return Response({
         'country_code' : location_country,
     })
+
+    
+def EmailTemplate(request):
+   
+   # context={'user_name': 'Abdullah',
+   #           'otp': '7891',
+   #           'email': 'user_otp.user.email',
+             
+   #           }
+   
+   return render(request, "otp_email.html", context = {'user_name': 'Abdullah' , 'email': 'abc@user_otp.user.email',  'otp': '7891', })
+      

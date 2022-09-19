@@ -46,13 +46,13 @@ def import_employee(request):
             
             row = row.split(',')
             row = row
-            if len(row) < 11:
-                # continue
-                pass
-            
+            if len(row) < 10:
+                print(len(row))
+                continue
+                #pass
             name= row[0].strip('"')
-            print(name)
             designation= row[1].strip('"')
+           
             email=row[2].strip('"')
             income_type= row[3].strip('"')
             salary= row[4].strip('"')
@@ -60,10 +60,10 @@ def import_employee(request):
             gender= row[6].strip('"')
             country= row[7].strip('"')
             city= row[8].strip('"')
-            state= row[9].replace('\n', '').strip('"')
-            employee_id = row[10].replace('\n', '').strip('"')
-            print(country)
-    
+            state= row[9].strip('"').replace('\n', '').strip('"')
+            #employee_id = row[10]
+            print(city)
+            
             try:
                 business=Business.objects.get(id=business_id )
             except Exception as err:
@@ -102,13 +102,12 @@ def import_employee(request):
                 user = user,
                 business = business,
                 full_name= name,
-                employee_id= employee_id,
                 email= email,
                 address=address,
                 gender=gender,
                 country= country, 
                 state = state,
-                city = city,
+                #city = city,
             )
             
             EmployeeProfessionalInfo.objects.create(
