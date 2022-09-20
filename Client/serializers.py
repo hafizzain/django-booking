@@ -106,7 +106,7 @@ class PromotionSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Promotion
-        fields = ['id','name', 'promotion_type', 'product_name', 'products', 'service_name','services', 'discount_service', 'discount_product','discount','duration']
+        fields = ['id', 'promotion_type', 'product_name', 'products', 'service_name','services', 'discount_service', 'discount_product','discount','duration']
         
 class MembershipSerializer(serializers.ModelSerializer):
     

@@ -80,9 +80,9 @@ def import_employee(request):
                 status=status.HTTP_404_NOT_FOUND
             )
             try:
-                country = Country.objects.get(name=country)
-                state= State.objects.get(name=state)
-                city = City.objects.get(name=city)
+                country = Country.objects.get(name__icontains=country)
+                state= State.objects.get(name__icontains=state)
+                city = City.objects.get(name__icontains=city)
             except Exception as err:
                 return Response(
                     {
@@ -107,7 +107,7 @@ def import_employee(request):
                 gender=gender,
                 country= country, 
                 state = state,
-                #city = city,
+                city = city,
             )
             
             EmployeeProfessionalInfo.objects.create(
@@ -228,15 +228,18 @@ def get_single_employee(request):
     seralized = EmployeSerializer(employee_id, context={'request' : request})
     data = dict()
     data.update(seralized.data)
-    data.update(data['permissions'])
-    del data['permissions']
-    data.update(data['module_permissions'])
-    del data['module_permissions']
-    data.update(data['employee_info'])
-    del data['employee_info']
-    data.update(data['marketing_permissions'])
-    del data['marketing_permissions']
-
+    try:
+        data.update(data['permissions'])
+        del data['permissions']
+        data.update(data['module_permissions'])
+        del data['module_permissions']
+        data.update(data['employee_info'])
+        del data['employee_info']
+        data.update(data['marketing_permissions'])
+        del data['marketing_permissions']
+    except Exception as err:
+        print(err)
+        None
     return Response(
         {
             'status' : True,
