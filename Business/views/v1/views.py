@@ -458,10 +458,18 @@ def update_business(request):
         
         if website_url is not None:
             business_social.website = website_url
+        else:
+            business_social.website = ''
+
         if fb_url is not None:
             business_social.facebook = fb_url
+        else:
+            business_social.facebook = ''
+
         if insta_url is not None:
             business_social.instagram = insta_url
+        else:
+            business_social.instagram = ''
         
         business_social.save()
     

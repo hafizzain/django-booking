@@ -91,23 +91,17 @@ def delete_appointment(request):
 @permission_classes([IsAuthenticated])
 def create_appointment(request):
     user = request.user    
-    business_id= request.data.get('business', None)
+    business_id = request.data.get('business', None)
     appointments = request.data.get('appointments', None)
-    appointment_date= request.data.get('appointment_date', None)
-    # business_address= request.data.get('business_address', None)
-    # service= request.data.get('service', None)
-    # member = request.data.get('member', None)
-    # appointment_time= request.data.get('appointment_time', None)
-    # duration= request.data.get('duration')
+    appointment_date = request.data.get('appointment_date', None)
     #[business_id, member, appointment_date, appointment_time, duration
 
     client = request.data.get('client', None)
     client_type = request.data.get('client_type', None)
-    business_address= request.data.get('business_address', None)
     
 
     
-    if not all([ client, client_type, business_address, appointments, appointment_date, business_id ]):
+    if not all([ client, client_type, appointments, appointment_date, business_id ]):
          return Response(
             {
                 'status' : False,
@@ -118,12 +112,10 @@ def create_appointment(request):
                     'error_message' : 'All fields are required.',
                     'fields' : [
                           'business',
-                          'service',
-                          'member', 
                           'appointment_date', 
-                          'appointment_time', 
-                          'duration',
                           'client', 
+                          'client_type',
+                          'appointments',
                         ]
                 }
             },
@@ -143,6 +135,9 @@ def create_appointment(request):
             }
     
         )
+    
+    business_address = request.data.get('business_address', None)
+
     if business_address is not None:
         try:
             business_address=BusinessAddress.objects.get(id=business_address)
@@ -175,16 +170,11 @@ def create_appointment(request):
             user = user,
             business=business,
             client=client,
-            business_address=business_address,
             client_type=client_type
         )
-    
-    print(type(appointments))
-    print(appointments)
-
-    return_data = {}
-    return_data['appointments'] = appointments
-    return_data['appointments_type'] = str(type(appointments))
+    if business_address is not None:
+        appointment.business_address = business_address
+        appointment.save()
     
     if type(appointments) == str:
         appointments = json.loads(appointments)
@@ -192,13 +182,12 @@ def create_appointment(request):
     elif type(appointments) == list:
         pass
 
-    return_data['appointments_loop'] = []
 
     for appoinmnt in appointments:
         member = appoinmnt['member']
         service = appoinmnt['service']
-        duration= appoinmnt['duration']
-        date_time= appoinmnt['date_time']
+        duration = appoinmnt['duration']
+        date_time = appoinmnt['date_time']
         
         try:
             member=Employee.objects.get(id=member)
@@ -227,7 +216,7 @@ def create_appointment(request):
             }
         )
         
-        appoinmentservice = AppointmentService.objects.create(
+        AppointmentService.objects.create(
             user = user,
             business = business,
             appointment = appointment,
