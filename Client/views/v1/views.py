@@ -1056,7 +1056,7 @@ def delete_rewards(request):
         )
           
     try:
-        attendence = Rewards.objects.get(id=rewards_id)
+        rewards = Rewards.objects.get(id=rewards_id)
     except Exception as err:
         return Response(
             {
@@ -1071,7 +1071,7 @@ def delete_rewards(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-    attendence.delete()
+    rewards.delete()
     return Response(
         {
             'status' : True,
@@ -1084,6 +1084,69 @@ def delete_rewards(request):
         },
         status=status.HTTP_200_OK
     )
+   
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_rewards(request):
+    rewards_id = request.data.get('rewards_id', None)
+    if rewards_id is None: 
+        return Response(
+        {
+            'status' : False,
+            'status_code' : StatusCodes.MISSING_FIELDS_4001,
+            'status_code_text' : 'MISSING_FIELDS_4001',
+            'response' : {
+                'message' : 'Invalid Data!',
+                'error_message' : 'Subscription ID are required.',
+                'fields' : [
+                    'rewards_id'                         
+                ]
+            }
+        },
+        status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        reward = Rewards.objects.get(id=rewards_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                #'status_code' : StatusCodes.INVALID_SUBSCRIPTION_ID_4031,
+                'status_code_text' : 'INVALID_REWARD_ID',
+                'response' : {
+                    'message' : 'Reward Not Found',
+                    'error_message' : str(err),
+                }
+            },
+                status=status.HTTP_404_NOT_FOUND
+        )
+    serializer = RewardSerializer(reward, data=request.data, partial=True)
+    if not serializer.is_valid():
+        return Response(
+                {
+            'status' : False,
+            'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+            'response' : {
+                'message' : 'Reward Serializer Invalid',
+                'error_message' : str(err),
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+        )
+    serializer.save()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Update Rewward Successfully',
+                'error_message' : None,
+                'reward' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+        )
+    
    
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -1247,6 +1310,123 @@ def get_promotion(request):
         status=status.HTTP_200_OK
     )
     
+    
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_promotion(request):
+    promotion_id = request.data.get('promotion_id', None)
+    if promotion_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'promotion_id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+       promotion = Promotion.objects.get(id=promotion_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Promotion ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    promotion.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Promotion deleted successful',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+    
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_promotion(request):
+    promotion_id = request.data.get('spromotion_id', None)
+    if promotion_id is None: 
+        return Response(
+        {
+            'status' : False,
+            'status_code' : StatusCodes.MISSING_FIELDS_4001,
+            'status_code_text' : 'MISSING_FIELDS_4001',
+            'response' : {
+                'message' : 'Invalid Data!',
+                'error_message' : 'Subscription ID are required.',
+                'fields' : [
+                    'promotion_id'                         
+                ]
+            }
+        },
+        status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        promotion = Promotion.objects.get(id=promotion_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                #'status_code' : StatusCodes.INVALID_SUBSCRIPTION_ID_4031,
+                'status_code_text' : 'INVALID_PROMOTION_ID',
+                'response' : {
+                    'message' : 'Promotion Not Found',
+                    'error_message' : str(err),
+                }
+            },
+                status=status.HTTP_404_NOT_FOUND
+        )
+    serializer = PromotionSerializer(promotion, data=request.data, partial=True)
+    if not serializer.is_valid():
+        return Response(
+                {
+            'status' : False,
+            'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+            'response' : {
+                'message' : 'Promotion Serializer Invalid',
+                'error_message' : str(err),
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+        )
+    serializer.save()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Update Promotion Successfully',
+                'error_message' : None,
+                'promotion' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+        )
+        
+
+    
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_memberships(request):
@@ -1364,6 +1544,120 @@ def get_memberships(request):
     )
     
     
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_memberships(request):
+    memberships_id = request.data.get('memberships_id', None)
+    if memberships_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'memberships_id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        memberships = Membership.objects.get(id=memberships_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Membership ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    memberships.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Membership deleted successfully',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_memberships(request):
+    membership_id = request.data.get('membership_id', None)
+    if membership_id is None: 
+        return Response(
+        {
+            'status' : False,
+            'status_code' : StatusCodes.MISSING_FIELDS_4001,
+            'status_code_text' : 'MISSING_FIELDS_4001',
+            'response' : {
+                'message' : 'Invalid Data!',
+                'error_message' : 'Subscription ID are required.',
+                'fields' : [
+                    'membership_id'                         
+                ]
+            }
+        },
+        status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        membership = Subscription.objects.get(id=membership_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code_text' : 'INVALID_MEMBERSHIP_ID',
+                'response' : {
+                    'message' : 'Membership Not Found',
+                    'error_message' : str(err),
+                }
+            },
+                status=status.HTTP_404_NOT_FOUND
+        )
+    serializer = MembershipSerializer(membership, data=request.data, partial=True)
+    if not serializer.is_valid():
+        return Response(
+                {
+            'status' : False,
+            'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+            'response' : {
+                'message' : 'Membership Serializer Invalid',
+                'error_message' : str(err),
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+        )
+    serializer.save()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Update Membership Successfully',
+                'error_message' : None,
+                'membership' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+        )
+    
+
+    
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_vouchers(request):
@@ -1469,3 +1763,116 @@ def get_vouchers(request):
         },
         status=status.HTTP_200_OK
     )
+    
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_vouchers(request):
+    vouchers_id = request.data.get('vouchers_id', None)
+    if vouchers_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'vouchers_id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        voucher = Vouchers.objects.get(id=vouchers_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Voucher ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    voucher.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Voucher deleted successfully',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_vouchers(request):
+    vouchers_id = request.data.get('vouchers_id', None)
+    if vouchers_id is None: 
+        return Response(
+        {
+            'status' : False,
+            'status_code' : StatusCodes.MISSING_FIELDS_4001,
+            'status_code_text' : 'MISSING_FIELDS_4001',
+            'response' : {
+                'message' : 'Invalid Data!',
+                'error_message' : 'Subscription ID are required.',
+                'fields' : [
+                    'subscription'                         
+                ]
+            }
+        },
+        status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        vouchers = Subscription.objects.get(id=vouchers_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code_text' : 'INVALID_VOUCHER_ID',
+                'response' : {
+                    'message' : 'Voucher Not Found',
+                    'error_message' : str(err),
+                }
+            },
+                status=status.HTTP_404_NOT_FOUND
+        )
+    serializer = VoucherSerializer(vouchers, data=request.data, partial=True)
+    if not serializer.is_valid():
+        return Response(
+                {
+            'status' : False,
+            'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+            'response' : {
+                'message' : 'Voucher Serializer Invalid',
+                'error_message' : str(err),
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+        )
+    serializer.save()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Update Voucher Successfully',
+                'error_message' : None,
+                'voucher' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+        )
+    
