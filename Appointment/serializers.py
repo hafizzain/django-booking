@@ -16,7 +16,7 @@ class EmployeAppoinmentSerializer(serializers.ModelSerializer):
         model = Employee
         fields = ('id', 'full_name', 'image')
         
-class CalenderSerializer(serializers.ModelSerializer):
+class AppointmentServiceSerializer(serializers.ModelSerializer):
     member = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
     appointment_id= serializers.SerializerMethodField(read_only=True)
@@ -54,3 +54,36 @@ class AppoinmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
         fields = '__all__'
+
+
+class EmployeeAppointmentSerializer(serializers.ModelSerializer):
+
+
+    employee = serializers.SerializerMethodField()
+    appointments = serializers.SerializerMethodField()
+
+    def get_appointment_id(self, obj):
+        return None
+
+    def get_appointments(self, obj):
+        appoint_services = AppointmentService.objects.filter(
+            member=obj,
+            is_active = True,
+            is_deleted = False,
+            is_blocked = False
+        )
+        serialized = AppointmentServiceSerializer(appoint_services, many=True)
+        return serialized.data
+
+    def get_employee(self, obj):
+        try:
+            return EmployeAppoinmentSerializer(obj).data
+        except:
+            return None
+
+    class Meta:
+        model = Employee
+        fields = [
+            'employee',
+            'appointments',
+        ]
