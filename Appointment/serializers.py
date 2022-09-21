@@ -40,11 +40,14 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     def get_end_time(self, obj):
         app_date_time = f'2000-01-01 {obj.appointment_time}'
 
-        duration = DURATION_CHOICES_DATA[str(obj.duration)]
-        datetime_duration = app_date_time + timedelta(minutes=duration)
-        datetime_duration = datetime_duration.strftime('%H:%M:%S')
-        return datetime_duration
-
+        try:
+            duration = DURATION_CHOICES_DATA[obj.duration]
+            datetime_duration = app_date_time + timedelta(minutes=duration)
+            datetime_duration = datetime_duration.strftime('%H:%M:%S')
+            return datetime_duration
+        except Exception as err:
+            return None
+    
     def get_client_type(self, obj):
         try:
             return obj.appointment.client_type
