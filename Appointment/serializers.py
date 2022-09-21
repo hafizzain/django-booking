@@ -45,8 +45,8 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
             datetime_duration = app_date_time + timedelta(minutes=30)
             datetime_duration = datetime_duration.strftime('%H:%M:%S')
             return datetime_duration
-        except:
-            return None
+        except Exception as err:
+            return f'{err}'
     
     def get_client_type(self, obj):
         try:
