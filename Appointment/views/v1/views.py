@@ -20,7 +20,7 @@ from Appointment.serializers import AppoinmentSerializer, EmployeeAppointmentSer
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_appointment_test(request):
+def get_all_appointments(request):
     test = AppointmentService.objects.all()
     serialize = AppointmentServiceSerializer(test, many=True)
     return Response(

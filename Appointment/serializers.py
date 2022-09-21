@@ -84,8 +84,6 @@ class AppoinmentSerializer(serializers.ModelSerializer):
 
 
 class EmployeeAppointmentSerializer(serializers.ModelSerializer):
-
-
     employee = serializers.SerializerMethodField()
     appointments = serializers.SerializerMethodField()
 
@@ -114,3 +112,25 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             'employee',
             'appointments',
         ]
+
+class AllAppoinmentSerializer(serializers.ModelSerializer):
+    member = serializers.SerializerMethodField(read_only=True)
+    service = serializers.SerializerMethodField(read_only=True)
+    client = serializers.SerializerMethodField(read_only=True)
+    price = serializers.SerializerMethodField(read_only=True)
+    
+    def get_client(self, obj):
+        return obj.appointment.client.full_name
+
+    def get_member(self, obj):
+        return obj.member.name
+
+    def get_service(self, obj):
+        return obj.service.name
+            
+    def get_price(self, obj):
+        return obj.service.price
+    
+    class Meta:
+        model = AppointmentService
+        fields= ('id', 'service', 'member', 'price', 'client')
