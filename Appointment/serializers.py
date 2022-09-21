@@ -40,7 +40,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     def get_end_time(self, obj):
         app_date_time = f'2000-01-01 {obj.appointment_time}'
 
-        duration = DURATION_CHOICES_DATA.get(obj.duration)
+        duration = DURATION_CHOICES_DATA[str(obj.duration)]
         datetime_duration = app_date_time + timedelta(minutes=duration)
         datetime_duration = datetime_duration.strftime('%H:%M:%S')
         return datetime_duration
