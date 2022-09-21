@@ -15,13 +15,13 @@ from django.db.models import Q
 from Client.models import Client
 
 from Appointment.models import Appointment, AppointmentService
-from Appointment.serializers import AppoinmentSerializer
+from Appointment.serializers import AppoinmentSerializer, CalenderSerializer
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_appointment(request):
     all_staff_group= Appointment.objects.all().order_by('-created_at')
-    serialized = AppoinmentSerializer(all_staff_group, many=True)
+    serialized = CalenderSerializer(all_staff_group, many=True)
     return Response(
         {
             'status' : 200,
