@@ -26,16 +26,24 @@ urlpatterns = [
    #Rewards
    path('create_rewards/', views.create_rewards),
    path('get_rewards/', views.get_rewards),
+   path('delete_rewards/', views.delete_rewards),
+   path('update_rewards/', views.update_rewards),
    
    #Promotion
    path('create_promotion/', views.create_promotion),
    path('get_promotion/', views.get_promotion),
+   path('delete_promotion/', views.delete_promotion),
+   path('update_promotion/', views.update_promotion),
    
    #Membership
    path('create_memberships/', views.create_memberships),
    path('get_memberships/', views.get_memberships),
+   path('delete_memberships/', views.delete_memberships),
+   path('update_memberships/', views.update_memberships),
    
    #Vouchers
    path('create_vouchers/', views.create_vouchers),
    path('get_vouchers/', views.get_vouchers),
+   path('delete_vouchers/', views.delete_vouchers),
+   path('update_vouchers/', views.update_vouchers),
 ]

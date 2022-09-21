@@ -10,9 +10,26 @@ from Employee.models import Employee
 
 
 class Appointment(models.Model):
+    DISCOUNT_CHOICES =[
+        ('Promotions' , 'Promotions'),
+        ('Rewards', 'Rewards'),
+        ('Vouchers', 'Vouchers'),
+        ('Memberships', 'Memberships'),
+        ('Subscriptions', 'Subscriptions')
+    ]
     TYPE_CHOICES = [
         ('IN HOUSE', 'IN HOUSE'),
         ('SALOON', 'SALOON'),
+    ]
+    PAYMENT_CHOICES = [
+        ('Cash', 'Cash'),
+        ('Voucher', 'Voucher'),
+        ('SplitBill', 'SplitBill'),
+        ('MasterCard', 'MasterCard'),
+        ('Visa', 'Visa'),
+        ('Paypal', 'Paypal'),
+        ('GooglePay', 'Google Pay'),
+        ('ApplePay', 'Apple Pay')
     ]
     
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
@@ -24,6 +41,8 @@ class Appointment(models.Model):
     business_address = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='appointment_address')
     
     client_type= models.CharField(choices=TYPE_CHOICES, max_length=50, null=True, blank=True, )
+    discount_type = models.CharField(max_length=50, choices= DISCOUNT_CHOICES, null=True, blank=True)
+    payment_method = models.CharField(max_length=100, choices= PAYMENT_CHOICES, default='')  
 
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
@@ -59,6 +78,7 @@ class AppointmentService(models.Model):
     appointment_time = models.TimeField()
 
     duration = models.CharField(choices=DURATION_CHOICES, max_length=100, default='')
+    tip = models.PositiveIntegerField(default=0, null=True, blank=True)
 
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)

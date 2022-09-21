@@ -1594,7 +1594,11 @@ def update_business_booking_settings(request):
                 status=status.HTTP_404_NOT_FOUND
             )
     
-    booking_setting, created = BookingSetting.objects.get_or_create(business=business, user=business.user, is_active=True)
+    booking_setting, created = BookingSetting.objects.get_or_create(
+        business=business, 
+        user=business.user,
+        is_active=True
+        )
     serializer = BookingSettingSerializer(booking_setting, data=request.data)
 
     if serializer.is_valid():

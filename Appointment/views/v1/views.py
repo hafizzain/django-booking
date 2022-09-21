@@ -99,9 +99,10 @@ def create_appointment(request):
     client = request.data.get('client', None)
     client_type = request.data.get('client_type', None)
     
+    payment_method = request.data.get('payment_method', None)
+    discount_type = request.data.get('discount_type', None)
 
-    
-    if not all([ client, client_type, appointments, appointment_date, business_id ]):
+    if not all([ client, client_type, business_address, appointments, appointment_date, business_id, payment_method  ]):
          return Response(
             {
                 'status' : False,
@@ -111,11 +112,14 @@ def create_appointment(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'All fields are required.',
                     'fields' : [
-                          'business',
-                          'appointment_date', 
-                          'client', 
+                          'client',
                           'client_type',
-                          'appointments',
+                          'member', 
+                          'appointment_date', 
+                          'business_address', 
+                          'business',
+                          'appointments', 
+                          'payment_method',
                         ]
                 }
             },
@@ -136,11 +140,11 @@ def create_appointment(request):
     
         )
     
-    business_address = request.data.get('business_address', None)
+    business_address_id = request.data.get('business_address', None)
 
-    if business_address is not None:
+    if business_address_id is not None:
         try:
-            business_address=BusinessAddress.objects.get(id=business_address)
+            business_address = BusinessAddress.objects.get(id=business_address_id)
         except Exception as err:
             return Response(
             {
@@ -170,9 +174,11 @@ def create_appointment(request):
             user = user,
             business=business,
             client=client,
-            client_type=client_type
+            client_type=client_type,
+            payment_method=payment_method,
+            discount_type=discount_type,
         )
-    if business_address is not None:
+    if business_address_id is not None:
         appointment.business_address = business_address
         appointment.save()
     
@@ -188,6 +194,7 @@ def create_appointment(request):
         service = appoinmnt['service']
         duration = appoinmnt['duration']
         date_time = appoinmnt['date_time']
+        tip = appoinmnt['tip']
         
         try:
             member=Employee.objects.get(id=member)
@@ -220,11 +227,13 @@ def create_appointment(request):
             user = user,
             business = business,
             appointment = appointment,
+            business_address = business_address,
             duration=duration,
             appointment_time=date_time,
             appointment_date = appointment_date,
             service = service,
-            member = member
+            member = member,
+            tip=tip
         )
     
     serialized = AppoinmentSerializer(appointment)
