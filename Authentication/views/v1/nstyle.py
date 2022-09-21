@@ -119,8 +119,9 @@ def create_tenant_business_user(request):
     
     try:
         User.objects.get(username = username)
-    except:
         username +=  str(len(User.objects.all()))
+    except:
+        pass
 
     try:
         data._mutable = True

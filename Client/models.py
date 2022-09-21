@@ -92,6 +92,7 @@ class Subscription(models.Model):
     days = models.PositiveIntegerField(default=0, verbose_name='Number of Days')
     select_amount = models.CharField(max_length=100, default='Limited', choices=AMOUNT_CHOICES)
     services_count = models.PositiveIntegerField(default=0, verbose_name='Total Number of Services')
+    products_count = models.PositiveIntegerField(default=0, verbose_name='Total Number of Products')
     price = models.PositiveIntegerField(default=0, verbose_name='Subscription Price')
 
     is_deleted = models.BooleanField(default=False)
