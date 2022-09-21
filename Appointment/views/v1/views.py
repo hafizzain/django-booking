@@ -15,7 +15,7 @@ from django.db.models import Q
 from Client.models import Client
 
 from Appointment.models import Appointment, AppointmentService
-from Appointment.serializers import AppoinmentSerializer, CalenderSerializer, EmployeeAppointmentSerializer
+from Appointment.serializers import AppoinmentSerializer, EmployeeAppointmentSerializer
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
