@@ -20,7 +20,7 @@ from Appointment.serializers import AppoinmentSerializer, CalenderSerializer
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_appointment(request):
-    all_staff_group= Appointment.objects.all().order_by('-created_at')
+    all_staff_group= AppointmentService.objects.all().order_by('-created_at')
     serialized = CalenderSerializer(all_staff_group, many=True)
     return Response(
         {
