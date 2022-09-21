@@ -93,21 +93,16 @@ def create_appointment(request):
     user = request.user    
     business_id= request.data.get('business', None)
     appointments = request.data.get('appointments', None)
+    
     appointment_date= request.data.get('appointment_date', None)
-    # business_address= request.data.get('business_address', None)
-    # service= request.data.get('service', None)
-    # member = request.data.get('member', None)
-    # appointment_time= request.data.get('appointment_time', None)
-    # duration= request.data.get('duration')
-    #[business_id, member, appointment_date, appointment_time, duration
+    discount_type= request.data.get('discount_type', None)
+    payment_method= request.data.get('payment_method', None)
 
     client = request.data.get('client', None)
     client_type = request.data.get('client_type', None)
     business_address= request.data.get('business_address', None)
-    
-
-    
-    if not all([ client, client_type, business_address, appointments, appointment_date, business_id ]):
+  
+    if not all([ client, client_type, business_address, appointments, appointment_date, business_id, payment_method  ]):
          return Response(
             {
                 'status' : False,
@@ -117,13 +112,14 @@ def create_appointment(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'All fields are required.',
                     'fields' : [
-                          'business',
-                          'service',
+                          'client',
+                          'client_type',
                           'member', 
                           'appointment_date', 
-                          'appointment_time', 
-                          'duration',
-                          'client', 
+                          'business_address', 
+                          'business',
+                          'appointments', 
+                          'payment_method',
                         ]
                 }
             },
@@ -175,8 +171,10 @@ def create_appointment(request):
             user = user,
             business=business,
             client=client,
-            business_address=business_address,
-            client_type=client_type
+            business_address=business_address, 
+            client_type=client_type,
+            payment_method=payment_method,
+            discount_type=discount_type,
         )
     
     print(type(appointments))
@@ -199,6 +197,7 @@ def create_appointment(request):
         service = appoinmnt['service']
         duration= appoinmnt['duration']
         date_time= appoinmnt['date_time']
+        tip = appoinmnt['tip']
         
         try:
             member=Employee.objects.get(id=member)
@@ -231,11 +230,13 @@ def create_appointment(request):
             user = user,
             business = business,
             appointment = appointment,
+            business_address = business_address,
             duration=duration,
             appointment_time=date_time,
             appointment_date = appointment_date,
             service = service,
-            member = member
+            member = member,
+            tip=tip
         )
     
     serialized = AppoinmentSerializer(appointment)
