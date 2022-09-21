@@ -41,8 +41,8 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
         app_date_time = f'2000-01-01 {obj.appointment_time}'
 
         try:
-            DURATION_CHOICES_DATA[obj.duration]
-            datetime_duration = app_date_time + timedelta(minutes=30)
+            duration = DURATION_CHOICES_DATA[obj.duration]
+            datetime_duration = app_date_time + timedelta(minutes=duration)
             datetime_duration = datetime_duration.strftime('%H:%M:%S')
             return datetime_duration
         except Exception as err:
