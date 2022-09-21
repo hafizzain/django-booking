@@ -16,13 +16,13 @@ from django.db.models import Q
 from Client.models import Client
 
 from Appointment.models import Appointment, AppointmentService
-from Appointment.serializers import AppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer
+from Appointment.serializers import AllAppoinmentSerializer, AppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_all_appointments(request):
     test = AppointmentService.objects.all()
-    serialize = AppointmentServiceSerializer(test, many=True)
+    serialize = AllAppoinmentSerializer(test, many=True)
     return Response(
         {
             'status' : 200,
