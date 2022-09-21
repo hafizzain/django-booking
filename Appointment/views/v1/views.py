@@ -1,3 +1,4 @@
+from pickle import GET
 from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -15,11 +16,30 @@ from django.db.models import Q
 from Client.models import Client
 
 from Appointment.models import Appointment, AppointmentService
-from Appointment.serializers import AppoinmentSerializer, EmployeeAppointmentSerializer
+from Appointment.serializers import AppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_appointment(request):
+def get_appointment_test(request):
+    test = AppointmentService.objects.all()
+    serialize = AppointmentServiceSerializer(test, many=True)
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Appointment',
+                'error_message' : None,
+                'appointment' : serialize.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_calendar_appointment(request):
     all_memebers= Employee.objects.filter(
         is_deleted = False,
         is_active = True,

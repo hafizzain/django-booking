@@ -3,6 +3,7 @@ from rest_framework import serializers
 from Appointment.models import Appointment, AppointmentService
 from Employee.models import Employee
 from Service.models import Service
+from datetime import datetime, timedelta
 
 
 
@@ -21,6 +22,24 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     service = serializers.SerializerMethodField(read_only=True)
     appointment_id= serializers.SerializerMethodField(read_only=True)
     client_type= serializers.SerializerMethodField(read_only=True)
+    end_time = serializers.SerializerMethodField(read_only=True)
+    price = serializers.SerializerMethodField(read_only=True)
+    
+    def get_price(self, obj):
+        try:
+            return obj.service.price
+        except Exception as err:
+            None
+        
+    def get_end_time(self, obj):
+        end = obj.appointment_time
+        dur = obj.duration.split(" ")[0]
+        
+        test = end  + \
+            timedelta(minutes  = 30 )
+        print(test)
+      
+        return dur
     
     def get_client_type(self, obj):
         try:
@@ -48,7 +67,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = AppointmentService
-        fields =['id','appointment_id','appointment_date', 'appointment_time','client_type','duration','service', 'member']
+        fields =['id','appointment_id','appointment_date', 'price','appointment_time', 'end_time','client_type','duration','service', 'member']
 
 class AppoinmentSerializer(serializers.ModelSerializer):
     class Meta:
