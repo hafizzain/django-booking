@@ -5,6 +5,8 @@ from Employee.models import Employee
 from Service.models import Service
 from datetime import datetime, timedelta
 
+from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
+
 
 
 class ServiceAppointmentSerializer(serializers.ModelSerializer):
@@ -24,6 +26,10 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     client_type= serializers.SerializerMethodField(read_only=True)
     end_time = serializers.SerializerMethodField(read_only=True)
     price = serializers.SerializerMethodField(read_only=True)
+    currency = serializers.SerializerMethodField(read_only=True)
+
+    def get_currency(self, obj):
+        return 'AED'
     
     def get_price(self, obj):
         try:
@@ -32,14 +38,15 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
             None
         
     def get_end_time(self, obj):
-        end = obj.appointment_time
-        dur = obj.duration.split(" ")[0]
-        
-        test = end  + \
-            timedelta(minutes  = 30 )
-        print(test)
-      
-        return dur
+        app_date_time = f'2000-01-01 {obj.appointment_time}'
+
+        try:
+            DURATION_CHOICES_DATA[obj.duration]
+            datetime_duration = app_date_time + timedelta(minutes=30)
+            datetime_duration = datetime_duration.strftime('%H:%M:%S')
+            return datetime_duration
+        except:
+            return None
     
     def get_client_type(self, obj):
         try:
@@ -67,7 +74,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = AppointmentService
-        fields =['id','appointment_id','appointment_date', 'price','appointment_time', 'end_time','client_type','duration','service', 'member']
+        fields =['id','appointment_id','appointment_date', 'price','appointment_time', 'end_time','client_type','duration','service', 'member', 'currency']
 
 class AppoinmentSerializer(serializers.ModelSerializer):
     class Meta:
