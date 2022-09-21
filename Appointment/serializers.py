@@ -123,7 +123,7 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
         return obj.appointment.client.full_name
 
     def get_member(self, obj):
-        return obj.member.name
+        return obj.member.full_name
 
     def get_service(self, obj):
         return obj.service.name
