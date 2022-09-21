@@ -127,7 +127,7 @@ def create_appointment(request):
     payment_method = request.data.get('payment_method', None)
     discount_type = request.data.get('discount_type', None)
 
-    if not all([ client, client_type, business_address, appointments, appointment_date, business_id, payment_method  ]):
+    if not all([ client, client_type, appointments, appointment_date, business_id, payment_method  ]):
          return Response(
             {
                 'status' : False,
@@ -141,7 +141,6 @@ def create_appointment(request):
                           'client_type',
                           'member', 
                           'appointment_date', 
-                          'business_address', 
                           'business',
                           'appointments', 
                           'payment_method',
