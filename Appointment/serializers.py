@@ -42,6 +42,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
 
         try:
             duration = DURATION_CHOICES_DATA[obj.duration]
+            app_date_time = datetime.fromisoformat(app_date_time)
             datetime_duration = app_date_time + timedelta(minutes=duration)
             datetime_duration = datetime_duration.strftime('%H:%M:%S')
             return datetime_duration
