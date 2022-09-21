@@ -247,11 +247,10 @@ def create_appointment(request):
             }
         )
         
-        AppointmentService.objects.create(
+        appointment_service = AppointmentService.objects.create(
             user = user,
             business = business,
             appointment = appointment,
-            business_address = business_address,
             duration=duration,
             appointment_time=date_time,
             appointment_date = appointment_date,
@@ -259,6 +258,9 @@ def create_appointment(request):
             member = member,
             tip=tip
         )
+        if business_address_id is not None:
+            appointment_service.business_address = business_address
+            appointment_service.save()
     
     serialized = AppoinmentSerializer(appointment)
     return Response(
