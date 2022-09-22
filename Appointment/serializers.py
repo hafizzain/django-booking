@@ -19,6 +19,39 @@ class EmployeAppoinmentSerializer(serializers.ModelSerializer):
         model = Employee
         fields = ('id', 'full_name', 'image')
         
+class TodayAppoinmentSerializer(serializers.ModelSerializer):
+    member = serializers.SerializerMethodField(read_only=True)
+    service = serializers.SerializerMethodField(read_only=True)
+    end_time = serializers.SerializerMethodField(read_only=True)
+    
+    def get_member(self, obj):
+        try: 
+            return obj.member.full_name
+        except Exception as err:
+            print(err)
+            None
+    def get_service(self, obj):
+        try:
+            return obj.service.name
+        except Exception as err:
+            None
+    
+    def get_end_time(self, obj):
+        app_date_time = f'2000-01-01 {obj.appointment_time}'
+
+        try:
+            duration = DURATION_CHOICES_DATA[obj.duration]
+            app_date_time = datetime.fromisoformat(app_date_time)
+            datetime_duration = app_date_time + timedelta(minutes=duration)
+            datetime_duration = datetime_duration.strftime('%H:%M:%S')
+            return datetime_duration
+        except Exception as err:
+            print(err)
+            return None
+    class Meta:
+        model = AppointmentService
+        fields = ('id', 'appointment_time', 'appointment_date', 'member' , 'service', 'end_time' )
+        
 class AppointmentServiceSerializer(serializers.ModelSerializer):
     member = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
@@ -75,7 +108,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = AppointmentService
-        fields =['id','appointment_id','appointment_date', 'price','appointment_time', 'end_time','client_type','duration','service', 'member', 'currency']
+        fields =['id','appointment_id','appointment_date', 'price','appointment_time', 'end_time','client_type','duration', 'currency','created_at','service', 'member']
 
 class AppoinmentSerializer(serializers.ModelSerializer):
     class Meta:

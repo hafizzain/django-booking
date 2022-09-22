@@ -14,15 +14,36 @@ from NStyle.Constants import StatusCodes
 import json
 from django.db.models import Q
 from Client.models import Client
+from datetime import date
 
 from Appointment.models import Appointment, AppointmentService
-from Appointment.serializers import AllAppoinmentSerializer, AppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer
+from Appointment.serializers import AllAppoinmentSerializer, AppoinmentSerializer,TodayAppoinmentSerializer,  EmployeeAppointmentSerializer, AppointmentServiceSerializer
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_today_appointments(request):
+    today = date.today()
+    today_appointment = AppointmentService.objects.filter(appointment_date__icontains = today )
+    serialize = TodayAppoinmentSerializer(today_appointment, many=True)
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Today Appointments',
+                'error_message' : None,
+                'appointments' : serialize.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_all_appointments(request):
-    test = AppointmentService.objects.all()
-    serialize = AllAppoinmentSerializer(test, many=True)
+    test = AppointmentService.objects.all().order_by('-created_at')
+    serialize = AppointmentServiceSerializer(test, many=True)
     return Response(
         {
             'status' : 200,
@@ -30,7 +51,7 @@ def get_all_appointments(request):
             'response' : {
                 'message' : 'All Appointment',
                 'error_message' : None,
-                'appointment' : serialize.data
+                'appointments' : serialize.data
             }
         },
         status=status.HTTP_200_OK
@@ -52,9 +73,9 @@ def get_calendar_appointment(request):
             'status' : 200,
             'status_code' : '200',
             'response' : {
-                'message' : 'All Appointment',
+                'message' : 'Calender Appointment',
                 'error_message' : None,
-                'appointment' : serialized.data
+                'appointments' : serialized.data
             }
         },
         status=status.HTTP_200_OK

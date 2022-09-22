@@ -116,6 +116,31 @@ def import_employee(request):
                 income_type = income_type,
                 salary = salary,
             )
+            
+            EmployeePermissionSetting.objects.create(
+                employee = employee,
+                allow_calendar_booking = True,
+                access_calendar = False,
+                change_calendar_color = False,
+            )
+            
+            EmployeeModulePermission.objects.create(
+                employee = employee,
+                access_reports = False,
+                access_sales = False,
+                access_inventory = False,
+                access_expenses = False, 
+                access_products = False,
+            )
+            
+            EmployeeMarketingPermission.objects.create(
+                employee = employee,
+                access_voucher = False,
+                access_member_discount = False,
+                access_invite_friend = False,
+                access_loyalty_points = False,
+                access_gift_cards = False
+            )
         
     file.delete()
     return Response({'Status' : 'Success'})
