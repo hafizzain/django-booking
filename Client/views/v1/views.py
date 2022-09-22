@@ -914,8 +914,8 @@ def create_rewards(request):
     business = request.data.get('business', None)
     
     name = request.data.get('name', None)
-    service = request.data.get('service', None)
-    product = request.data.get('product', None)
+    service_id = request.data.get('service', None)
+    product_id = request.data.get('product', None)
     
     reward_type= request.data.get('reward_type', None)
     reward_value = request.data.get('reward_value', None)
@@ -960,9 +960,21 @@ def create_rewards(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+  
+            
+    rewards = Rewards.objects.create(
+        user = user,
+        business=business, 
+        name=name,
+        reward_value=reward_value,
+        reward_point=reward_point,
+        total_points = total_points,
+        discount = discount,
+    )
+    
     if reward_type == 'Product':
         try:
-            product=Product.objects.get(id=product)
+            product=Product.objects.get(id=product_id)
         except Exception as err:
             return Response(
                 {
@@ -976,9 +988,12 @@ def create_rewards(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
             
-    else:
+        rewards.product = product
+        rewards.save()
+            
+    elif reward_type == 'Service':
         try:
-            service=Service.objects.get(id=service)
+            service=Service.objects.get(id=service_id)
         except Exception as err:
             return Response(
                 {
@@ -991,19 +1006,9 @@ def create_rewards(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+        rewards.service = service
+        rewards.save()
             
-    rewards = Rewards.objects.create(
-        user = user,
-        business=business, 
-        name=name,
-        service=service,
-        product=product,
-        reward_value=reward_value,
-        reward_point=reward_point,
-        total_points = total_points,
-        discount = discount,
-    )
-    
     serialized = RewardSerializer(rewards)
        
     return Response(
