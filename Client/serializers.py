@@ -11,12 +11,17 @@ from Client.models import Client, ClientGroup, Subscription, Promotion , Rewards
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        exclude = ['is_deleted', 'created_at', 'slug', 'published']
+        fields = ('id', 'name')
+        # exclude = ['is_deleted', 'created_at', 'slug', 'published'
+        #            , 'user', 'business' , 'vendor', 'category' ,'brand' , 'product_type' ,'cost_price' , 'full_price'
+        #            , 'sell_price', 'tax_rate', 'short_description' , 'description' , 'barcode_id', ''
+        #            ]
 
 class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
-        exclude = ['is_deleted', 'created_at', 'updated_at']
+        fields = ('id', 'name')
+        #exclude = ['is_deleted', 'created_at', 'updated_at']
 
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
@@ -68,45 +73,21 @@ class SubscriptionSerializer(serializers.ModelSerializer):
      
      
 class RewardSerializer(serializers.ModelSerializer):
-    product_name = serializers.SerializerMethodField(read_only=True)
-    service_name = serializers.SerializerMethodField(read_only=True)
-    
-    def get_product_name(self, obj):
-        try:
-            return ProductSerializer(obj.product).data
-        except Exception as err:
-            return None
-        
-    def get_service_name(self, obj):
-        try:
-            return ServiceSerializer(obj.service).data
-        except Exception as err:
-            return None
+    product = ProductSerializer()
+    service = ServiceSerializer()
     
     class Meta:
         model = Rewards
-        fields =['id','name', 'reward_value', 'discount', 'total_points' ,'product_name' , 'service_name' ]
+        fields =['id','name', 'reward_value', 'discount', 'total_points' ,'product' , 'service' ]
         
 class PromotionSerializer(serializers.ModelSerializer):
     
-    product_name = serializers.SerializerMethodField(read_only=True)
-    service_name = serializers.SerializerMethodField(read_only=True)
-    
-    def get_product_name(self, obj):
-        try:
-            return ProductSerializer(obj.product).data
-        except Exception as err:
-            return None
-        
-    def get_service_name(self, obj):
-        try:
-            return ServiceSerializer(obj.service).data
-        except Exception as err:
-            return None
+    product = ProductSerializer()
+    service = ServiceSerializer()
     
     class Meta:
         model = Promotion
-        fields = ['id', 'promotion_type', 'product_name', 'service_name', 'discount_service', 'discount_product','discount','duration']
+        fields = ['id', 'name','purchases' , 'promotion_type', 'product', 'service','discount','duration']
         
 class MembershipSerializer(serializers.ModelSerializer):
     

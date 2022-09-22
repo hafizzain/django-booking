@@ -1165,9 +1165,6 @@ def create_promotion(request):
     service  = request.data.get('service', None)
     product_id = request.data.get('product_id', None)
     
-    discount_product= request.data.get('discount_product', None)
-    discount_service = request.data.get('discount_service', None)
-    
     discount = request.data.get('discount', None)
     duration = request.data.get('duration', None)
     
@@ -1233,22 +1230,7 @@ def create_promotion(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-        try:
-            dis_product=Product.objects.get(id=discount_product)
-        except Exception as err:
-            return Response(
-                {
-                    'status' : False,
-                    'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
-                    'response' : {
-                    'message' : 'Discount Product not found',
-                    'error_message' : str(err),
-                    }
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
         promotion.product = product
-        promotion.discount_product = dis_product
         promotion.save()
     else:
         try:
@@ -1265,23 +1247,7 @@ def create_promotion(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-            
-        try:
-            dis_service=Service.objects.get(id=discount_service)
-        except Exception as err:
-            return Response(
-                {
-                    'status' : False,
-                    'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
-                    'response' : {
-                    'message' : 'Discount Service not found',
-                    'error_message' : str(err),
-                    }
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
         promotion.service= service
-        promotion.discount_service= dis_service
         promotion.save()    
     
     serialized = PromotionSerializer(promotion)
