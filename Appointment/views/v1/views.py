@@ -23,7 +23,6 @@ from Appointment.serializers import AppoinmentSerializer, TodayAppoinmentSeriali
 @permission_classes([AllowAny])
 def get_today_appointments(request):
     today = date.today()
-    print(today)
     today_appointment = AppointmentService.objects.filter(appointment_date__icontains = today )
     serialize = TodayAppoinmentSerializer(today_appointment, many=True)
     return Response(
