@@ -119,14 +119,13 @@ class Promotion(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_promotions')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_promotions')
 
-    #name = models.CharField(max_length=100, default='')
+    name = models.CharField(max_length=100, default='', verbose_name='Promotion Name')
     promotion_type = models.CharField(default='Service', choices=PROMOTION_TYPES, max_length=20)
 
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_promotions')
-    services = models.PositiveIntegerField(verbose_name='No. of Services', default=0, null=True, blank=True)
-
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_promotions')
-    products = models.PositiveIntegerField(verbose_name='No. of Products', default=0, null=True, blank=True)
+    
+    purchases  = models.PositiveIntegerField(verbose_name='No. of Purchases', default=0, null=True, blank=True)
 
     discount_service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='discount_service_promotions')
     discount_product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='discount_product_promotions')

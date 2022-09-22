@@ -1155,21 +1155,23 @@ def update_rewards(request):
 @permission_classes([IsAuthenticated])
 def create_promotion(request):
     user = request.user
+    
     business = request.data.get('business', None)
     promotion_type = request.data.get('promotion_type', None)
     
-    service  = request.data.get('service', None)
-    services = request.data.get('services', None)
+    name = request.data.get('name', None)
+    purchases = request.data.get('purchases', None)
     
-    product = request.data.get('product', None)
-    products = request.data.get('products', None)
+    service  = request.data.get('service', None)
+    product_id = request.data.get('product_id', None)
     
     discount_product= request.data.get('discount_product', None)
     discount_service = request.data.get('discount_service', None)
+    
     discount = request.data.get('discount', None)
     duration = request.data.get('duration', None)
     
-    if not all([business, promotion_type, duration, discount]):
+    if not all([business, name,promotion_type,purchases, duration, discount]):
         return Response(
             {
                 'status' : False,
@@ -1180,7 +1182,9 @@ def create_promotion(request):
                     'error_message' : 'All fields are required.',
                     'fields' : [
                           'business',
+                          'name',
                           'promotion_type',
+                          'purchases',
                           'discount_product',
                           'discount_service', 
                           'discount', 
@@ -1205,9 +1209,18 @@ def create_promotion(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+    promotion = Promotion.objects.create(
+        user = user,
+        business = business,
+        promotion_type = promotion_type,
+      
+        discount = discount,
+        duration = duration,
+        name = name,
+    )
     if promotion_type == 'Product':
         try:
-            product=Product.objects.get(id=product)
+            product=Product.objects.get(id=product_id)
         except Exception as err:
             return Response(
                 {
@@ -1221,7 +1234,7 @@ def create_promotion(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
         try:
-            discount_product=Product.objects.get(id=discount_product)
+            dis_product=Product.objects.get(id=discount_product)
         except Exception as err:
             return Response(
                 {
@@ -1234,7 +1247,9 @@ def create_promotion(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-            
+        promotion.product = product
+        promotion.discount_product = dis_product
+        promotion.save()
     else:
         try:
             service=Service.objects.get(id=service)
@@ -1252,7 +1267,7 @@ def create_promotion(request):
             )
             
         try:
-            discount_service=Service.objects.get(id=discount_service)
+            dis_service=Service.objects.get(id=discount_service)
         except Exception as err:
             return Response(
                 {
@@ -1265,20 +1280,9 @@ def create_promotion(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-    
-    promotion = Promotion.objects.create(
-        user = user,
-        business = business,
-        promotion_type = promotion_type,
-        service= service,
-        services= services,
-        product = product,
-        products = products,
-        discount_service = discount_service,
-        discount_product = discount_product,
-        discount = discount,
-        duration = duration,
-    )
+        promotion.service= service
+        promotion.discount_service= dis_service
+        promotion.save()    
     
     serialized = PromotionSerializer(promotion)
        
