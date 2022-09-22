@@ -1160,7 +1160,7 @@ def create_promotion(request):
     promotion_type = request.data.get('promotion_type', None)
     
     name = request.data.get('name', None)
-    purchases = request.data.get('purchases', None)
+    purchases = request.data.get('no_of_purchases', None)
     
     service  = request.data.get('service', None)
     product_id = request.data.get('product_id', None)
@@ -1213,7 +1213,7 @@ def create_promotion(request):
         user = user,
         business = business,
         promotion_type = promotion_type,
-      
+        purchases = purchases,
         discount = discount,
         duration = duration,
         name = name,
