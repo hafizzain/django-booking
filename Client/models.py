@@ -119,6 +119,7 @@ class Promotion(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_promotions')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_promotions')
 
+    #name = models.CharField(max_length=100, default='')
     promotion_type = models.CharField(default='Service', choices=PROMOTION_TYPES, max_length=20)
 
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_promotions')
