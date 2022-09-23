@@ -17,7 +17,8 @@ from Client.models import Client
 from datetime import date
 
 from Appointment.models import Appointment, AppointmentService
-from Appointment.serializers import AppoinmentSerializer,SingleAppointmentSerializer ,BlockSerializer ,AllAppoinmentSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer
+from Appointment.serializers import AppoinmentSerializer,SingleAppointmentSerializer ,BlockSerializer ,AllAppoinmentSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -354,8 +355,8 @@ def create_appointment(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_appointment(request):
-    appointment_id = request.data.get('appointment_id', None)
-    if appointment_id is None: 
+    appointment_service_id = request.data.get('ap_service_id', None)
+    if appointment_service_id is None: 
        return Response(
             {
                 'status' : False,
@@ -365,7 +366,7 @@ def update_appointment(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'fields are required.',
                     'fields' : [
-                        'appointment_id'                         
+                        'appointment_service_id'                         
                     ]
                 }
             },
@@ -373,7 +374,7 @@ def update_appointment(request):
         )
           
     try:
-        appointment = Appointment.objects.get(id=appointment_id)
+        service_appointment = Appointment.objects.get(id=appointment_service_id)
     except Exception as err:
         return Response(
             {
@@ -387,7 +388,8 @@ def update_appointment(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    serializer = AppoinmentSerializer(appointment, data=request.data, partial=True)
+    serializer = UpdateAppointmentSerializer(service_appointment)
+, data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(
                 {

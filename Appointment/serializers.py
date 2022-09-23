@@ -8,6 +8,10 @@ from datetime import datetime, timedelta
 
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 
+class UpdateAppointmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AppointmentService
+        fields = '__all__'
 
 
 class ServiceAppointmentSerializer(serializers.ModelSerializer):
