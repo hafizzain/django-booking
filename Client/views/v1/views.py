@@ -1344,7 +1344,7 @@ def delete_promotion(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_promotion(request):
-    promotion_id = request.data.get('spromotion_id', None)
+    promotion_id = request.data.get('id', None)
     if promotion_id is None: 
         return Response(
         {
