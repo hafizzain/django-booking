@@ -180,9 +180,21 @@ class SingleAppointmentSerializer(serializers.ModelSerializer):
     service = ServiceAppointmentSerializer()
     currency = serializers.SerializerMethodField(read_only=True)
     booked_by = serializers.SerializerMethodField(read_only=True)
+    client_type = serializers.SerializerMethodField(read_only=True)
+    Booking_id = serializers.SerializerMethodField(read_only=True)
 
     def get_booked_by(self, obj):
         return f'{obj.user.first_name} {obj.user.last_name}'
+    
+    def get_Booking_id(self, obj):
+        id = str(obj.id).split('-')[0:2].join('')
+        return id
+    
+    def get_client_type(self, obj):
+        try:
+            return obj.appointment.client_type
+        except Exception :
+            None
     
     def get_currency(self, obj):
         return 'AED'
@@ -208,9 +220,10 @@ class SingleAppointmentSerializer(serializers.ModelSerializer):
         except Exception as err:
             return None
     
+        
     class Meta:
         model = AppointmentService
         fields= ('id', 'location','client','service',
-                 'appointment_time', 'end_time', 'appointment_time',
-                 'appointment_status', 'currency', 'booked_by'
-                 )
+                 'appointment_time', 'end_time',
+                 'appointment_status', 'currency', 'booked_by', 'Booking_id', 'appointment_date'
+            )
