@@ -32,7 +32,7 @@ def get_single_appointments(request):
                 'status_code_text' : 'MISSING_FIELDS_4001',
                 'response' : {
                     'message' : 'Invalid Data!',
-                    'error_message' : 'Appointment id are required',
+                    'error_message' : 'Appointment id is required',
                     'fields' : [
                         'appointment_id',
                     ]
@@ -41,7 +41,7 @@ def get_single_appointments(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     try:
-        appoinment_id = AppointmentService.objects.get(id=appointment_id)
+        appointment = AppointmentService.objects.get(id=appointment_id, is_blocked=False, is_deleted=False )
     except Exception as err:
         return Response(
                 {
@@ -56,16 +56,16 @@ def get_single_appointments(request):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-    serialized = SingleAppointmentSerializer(appoinment_id)
+    serialized = SingleAppointmentSerializer(appointment)
     return Response(
         {
             'status' : True,
             'status_code' : 200,
             'status_code_text' : '200',
             'response' : {
-                'message' : 'Business languages',
+                'message' : 'Single Appointment',
                 'error_message' : None,
-                'Employee' : serialized.data
+                'appointment' : serialized.data
             }
         },
         status=status.HTTP_200_OK

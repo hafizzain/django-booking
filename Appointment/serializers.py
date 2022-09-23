@@ -1,3 +1,4 @@
+from pkgutil import read_code
 from pyexpat import model
 from rest_framework import serializers
 from Appointment.models import Appointment, AppointmentService
@@ -175,25 +176,22 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
 class SingleAppointmentSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
     end_time = serializers.SerializerMethodField(read_only=True)
-    business_address_name=  serializers.SerializerMethodField(read_only=True)
-    service = serializers.SerializerMethodField(read_only=True)
+    location =  serializers.SerializerMethodField(read_only=True)
+    service = ServiceAppointmentSerializer()
     currency = serializers.SerializerMethodField(read_only=True)
+    booked_by = serializers.SerializerMethodField(read_only=True)
+
+    def get_booked_by(self, obj):
+        return f'{obj.user.first_name} {obj.user.last_name}'
     
     def get_currency(self, obj):
         return 'AED'
     
-    def get_service(self, obj):
-        try:
-            return ServiceAppointmentSerializer(obj.service).data
-        except Exception:
-            return None
-    
-    def get_business_address_name(self, obj):
+    def get_location(self, obj):
         try:
             return obj.business_address.address_name
         except Exception as err:
             None
-    
     
     def get_client(self, obj):
         return obj.appointment.client.full_name
@@ -212,7 +210,7 @@ class SingleAppointmentSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = AppointmentService
-        fields= ('id', 'business_address_name','client','service',
+        fields= ('id', 'location','client','service',
                  'appointment_time', 'end_time', 'appointment_time',
-                 'appointment_status', 'currency'
+                 'appointment_status', 'currency', 'booked_by'
                  )
