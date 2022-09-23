@@ -78,7 +78,7 @@ class RewardSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Rewards
-        fields =['id','name', 'reward_value', 'discount', 'total_points' ,'product' , 'service' ]
+        fields =['id','name', 'reward_value','reward_point','reward_type' ,'discount', 'total_points' ,'product' , 'service' ]
         
 class PromotionSerializer(serializers.ModelSerializer):
     

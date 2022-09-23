@@ -847,7 +847,7 @@ def delete_subscription(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_subscription(request):
-    subscription_id = request.data.get('subscription_id', None)
+    subscription_id = request.data.get('id', None)
     if subscription_id is None: 
         return Response(
         {
@@ -858,7 +858,7 @@ def update_subscription(request):
                 'message' : 'Invalid Data!',
                 'error_message' : 'Subscription ID are required.',
                 'fields' : [
-                    'subscription'                         
+                    'id'                         
                 ]
             }
         },
@@ -1096,7 +1096,7 @@ def delete_rewards(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_rewards(request):
-    rewards_id = request.data.get('rewards_id', None)
+    rewards_id = request.data.get('id', None)
     if rewards_id is None: 
         return Response(
         {
@@ -1107,7 +1107,7 @@ def update_rewards(request):
                 'message' : 'Invalid Data!',
                 'error_message' : 'Subscription ID are required.',
                 'fields' : [
-                    'rewards_id'                         
+                    'id'                         
                 ]
             }
         },
@@ -1168,7 +1168,7 @@ def create_promotion(request):
     purchases = request.data.get('purchases', None)
     
     service  = request.data.get('service', None)
-    product_id = request.data.get('product_id', None)
+    product_id = request.data.get('id', None)
     
     discount = request.data.get('discount', None)
     duration = request.data.get('duration', None)
@@ -1353,9 +1353,9 @@ def update_promotion(request):
             'status_code_text' : 'MISSING_FIELDS_4001',
             'response' : {
                 'message' : 'Invalid Data!',
-                'error_message' : 'Subscription ID are required.',
+                'error_message' : 'Promotion ID are required.',
                 'fields' : [
-                    'promotion_id'                         
+                    'id'                         
                 ]
             }
         },
@@ -1384,7 +1384,7 @@ def update_promotion(request):
             'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
             'response' : {
                 'message' : 'Promotion Serializer Invalid',
-                'error_message' : str(err),
+                'error_message' : 'Invalid data',
             }
         },
         status=status.HTTP_404_NOT_FOUND
@@ -1576,8 +1576,8 @@ def delete_memberships(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_memberships(request):
-    membership_id = request.data.get('membership_id', None)
-    if membership_id is None: 
+    id = request.data.get('id', None)
+    if id is None: 
         return Response(
         {
             'status' : False,
@@ -1585,16 +1585,16 @@ def update_memberships(request):
             'status_code_text' : 'MISSING_FIELDS_4001',
             'response' : {
                 'message' : 'Invalid Data!',
-                'error_message' : 'Subscription ID are required.',
+                'error_message' : 'Membership ID are required.',
                 'fields' : [
-                    'membership_id'                         
+                    'id'                         
                 ]
             }
         },
         status=status.HTTP_400_BAD_REQUEST
         )
     try:
-        membership = Subscription.objects.get(id=membership_id)
+        membership = Subscription.objects.get(id=id)
     except Exception as err:
         return Response(
             {
@@ -1796,8 +1796,8 @@ def delete_vouchers(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_vouchers(request):
-    vouchers_id = request.data.get('vouchers_id', None)
-    if vouchers_id is None: 
+    id = request.data.get('id', None)
+    if id is None: 
         return Response(
         {
             'status' : False,
@@ -1805,16 +1805,16 @@ def update_vouchers(request):
             'status_code_text' : 'MISSING_FIELDS_4001',
             'response' : {
                 'message' : 'Invalid Data!',
-                'error_message' : 'Subscription ID are required.',
+                'error_message' : 'Voucher ID are required.',
                 'fields' : [
-                    'subscription'                         
+                    'id'                         
                 ]
             }
         },
         status=status.HTTP_400_BAD_REQUEST
         )
     try:
-        vouchers = Subscription.objects.get(id=vouchers_id)
+        vouchers = Subscription.objects.get(id=id)
     except Exception as err:
         return Response(
             {
