@@ -355,7 +355,7 @@ def create_appointment(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_appointment(request):
-    appointment_service_id = request.data.get('ap_service_id', None)
+    appointment_service_id = request.data.get('id', None)
     if appointment_service_id is None: 
        return Response(
             {
@@ -366,7 +366,7 @@ def update_appointment(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'fields are required.',
                     'fields' : [
-                        'appointment_service_id'                         
+                        'id'                         
                     ]
                 }
             },
@@ -388,8 +388,7 @@ def update_appointment(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    serializer = UpdateAppointmentSerializer(service_appointment)
-, data=request.data, partial=True)
+    serializer = UpdateAppointmentSerializer(service_appointment , data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(
                 {
@@ -397,7 +396,7 @@ def update_appointment(request):
             'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
             'response' : {
                 'message' : 'Attendence Serializer Invalid',
-                'error_message' : str(err),
+                'error_message' : str(serializer.errors),
             }
         },
         status=status.HTTP_404_NOT_FOUND
@@ -414,7 +413,7 @@ def update_appointment(request):
             }
         },
         status=status.HTTP_200_OK
-        )
+    )
     
 
 @api_view(['POST'])

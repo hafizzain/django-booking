@@ -1478,7 +1478,7 @@ def update_promotion(request):
             'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
             'response' : {
                 'message' : 'Promotion Serializer Invalid',
-                'error_message' : str(serializer.error_messages),
+                'error_message' : str(serializer.errors),
             }
         },
         status=status.HTTP_404_NOT_FOUND
