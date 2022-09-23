@@ -1270,7 +1270,7 @@ def create_promotion(request):
         promotion_type = promotion_type,
         purchases = purchases,
         discount = discount,
-        duration = duration,
+        valid_til = duration,
         name = name,
     )
     if promotion_type == 'Product':

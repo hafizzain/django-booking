@@ -127,9 +127,6 @@ class Promotion(models.Model):
     
     purchases  = models.PositiveIntegerField(verbose_name='No. of Purchases', default=0, null=True, blank=True)
 
-    discount_service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='discount_service_promotions')
-    discount_product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='discount_product_promotions')
-
     discount = models.PositiveIntegerField(default=0)
     
     valid_til= models.DateField(null=True, blank=True)
