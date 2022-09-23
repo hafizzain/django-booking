@@ -28,7 +28,6 @@ class TodayAppoinmentSerializer(serializers.ModelSerializer):
         try: 
             return obj.member.full_name
         except Exception as err:
-            print(err)
             None
     def get_service(self, obj):
         try:
@@ -108,11 +107,16 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = AppointmentService
-        fields =['id','appointment_id','appointment_date', 'price','appointment_time', 'end_time','client_type','duration', 'currency','created_at','service', 'member']
+        fields =['id','appointment_id','appointment_date','appointment_status', 'price','appointment_time', 'end_time','client_type','duration', 'currency','created_at','service', 'member']
 
 class AppoinmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
+        fields = '__all__'
+        
+class BlockSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AppointmentService
         fields = '__all__'
 
 
@@ -154,7 +158,7 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
     
     def get_client(self, obj):
         return obj.appointment.client.full_name
-
+    
     def get_member(self, obj):
         return obj.member.full_name
 

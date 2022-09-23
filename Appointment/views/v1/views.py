@@ -17,7 +17,7 @@ from Client.models import Client
 from datetime import date
 
 from Appointment.models import Appointment, AppointmentService
-from Appointment.serializers import AllAppoinmentSerializer, AppoinmentSerializer,TodayAppoinmentSerializer,  EmployeeAppointmentSerializer, AppointmentServiceSerializer
+from Appointment.serializers import AppoinmentSerializer,BlockSerializer ,AllAppoinmentSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -42,8 +42,8 @@ def get_today_appointments(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_all_appointments(request):
-    test = AppointmentService.objects.all().order_by('-created_at')
-    serialize = AppointmentServiceSerializer(test, many=True)
+    test = AppointmentService.objects.filter(is_blocked=False).order_by('-created_at')
+    serialize = AllAppoinmentSerializer(test, many=True)
     return Response(
         {
             'status' : 200,
@@ -277,7 +277,7 @@ def create_appointment(request):
             appointment_date = appointment_date,
             service = service,
             member = member,
-            tip=tip
+            tip=tip,
         )
         if business_address_id is not None:
             appointment_service.business_address = business_address
@@ -362,3 +362,87 @@ def update_appointment(request):
         status=status.HTTP_200_OK
         )
     
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_blockTime(request):
+    user = request.user    
+    business_id = request.data.get('business', None)
+    
+    date = request.data.get('date', None)
+    start_time = request.data.get('start_time', None)
+    end_time = request.data.get('end_time',None)
+    
+    member = request.data.get('member',None)
+    details = request.data.get('details', None)
+    
+    if not all([business_id, date, start_time, end_time , member]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business_id',
+                          'date',
+                          'start_time', 
+                          'end_time', 
+                          'member',
+                        ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )    
+    try:
+        business=Business.objects.get(id=business_id)
+    except Exception as err:
+        return Response(
+            {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                }
+            }
+    
+        )
+    try:
+        member=Employee.objects.get(id=member)
+    except Exception as err:
+        return Response(
+            {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
+                    'response' : {
+                    'message' : 'Employee not found',
+                    'error_message' : str(err),
+                }
+            }
+        )
+    block_time = AppointmentService.objects.create(
+            user = user,
+            business = business,
+            appointment_time=start_time,
+            appointment_date = date,
+            member = member,
+            destails = details,
+            is_blocked = True,
+        )
+    
+    serialized = BlockSerializer(block_time)
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Appointment Create!',
+                    'error_message' : None,
+                    'appointment' : serialized.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+    ) 

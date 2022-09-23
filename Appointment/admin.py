@@ -16,5 +16,6 @@ class AppointmentServiceAdmin(admin.ModelAdmin):
         'member_name',
         'appointment_date',
         'is_active',
+        'is_blocked',
         
     ]
