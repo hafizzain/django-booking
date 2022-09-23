@@ -962,7 +962,7 @@ def create_rewards(request):
             )
   
             
-    rewards = Rewards.objects.create(
+    rewards = Rewards(
         user = user,
         business=business, 
         name=name,
@@ -970,6 +970,7 @@ def create_rewards(request):
         reward_point=reward_point,
         total_points = total_points,
         discount = discount,
+        reward_type = reward_type,
     )
     
     if reward_type == 'Product':
@@ -1384,7 +1385,7 @@ def update_promotion(request):
             'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
             'response' : {
                 'message' : 'Promotion Serializer Invalid',
-                'error_message' : 'Invalid data',
+                'error_message' : str(serializer.error_messages),
             }
         },
         status=status.HTTP_404_NOT_FOUND
