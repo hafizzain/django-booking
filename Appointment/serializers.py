@@ -187,7 +187,8 @@ class SingleAppointmentSerializer(serializers.ModelSerializer):
         return f'{obj.user.first_name} {obj.user.last_name}'
     
     def get_Booking_id(self, obj):
-        id = str(obj.id).split('-')[0:2].join('')
+        id = str(obj.id).split('-')[0:2]
+        id = ''.join(id)
         return id
     
     def get_client_type(self, obj):
