@@ -962,10 +962,11 @@ def create_rewards(request):
             )
   
             
-    rewards = Rewards.objects.create(
+    rewards = Rewards(
         user = user,
         business=business, 
         name=name,
+        reward_type = reward_type,
         reward_value=reward_value,
         reward_point=reward_point,
         total_points = total_points,
@@ -1008,6 +1009,17 @@ def create_rewards(request):
             )
         rewards.service = service
         rewards.save()
+    else :
+        return Response(
+                {
+                    'status' : False,
+                    'response' : {
+                    'message' : 'Invalid Reward Type',
+                    'error_message' : 'Reward Type',
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
             
     serialized = RewardSerializer(rewards)
        
@@ -1097,6 +1109,10 @@ def delete_rewards(request):
 @permission_classes([IsAuthenticated])
 def update_rewards(request):
     rewards_id = request.data.get('id', None)
+    reward_type = request.data.get('reward_type', None)
+    product= request.data.get('product', None)
+    service = request.data.get('service',None)
+    
     if rewards_id is None: 
         return Response(
         {
@@ -1128,6 +1144,43 @@ def update_rewards(request):
             },
                 status=status.HTTP_404_NOT_FOUND
         )
+    if reward_type == 'Product':
+        try:
+            product_id=Product.objects.get(id=product)
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
+                    'response' : {
+                    'message' : 'Product not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        reward.product = product_id
+        reward.service = None
+        reward.save()
+    elif reward_type == 'Service':
+        try:
+            service_id=Service.objects.get(id=service)
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
+                    'response' : {
+                    'message' : 'Service not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        reward.service= service_id
+        reward.product = None
+        reward.save()    
+        
     serializer = RewardSerializer(reward, data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(
@@ -1345,6 +1398,9 @@ def delete_promotion(request):
 @permission_classes([IsAuthenticated])
 def update_promotion(request):
     promotion_id = request.data.get('id', None)
+    promotion_type = request.data.get('promotion_type', None)
+    product = request.data.get('product', None)
+    service = request.data.get('service', None)
     if promotion_id is None: 
         return Response(
         {
@@ -1376,6 +1432,43 @@ def update_promotion(request):
             },
                 status=status.HTTP_404_NOT_FOUND
         )
+        
+    if promotion_type == 'Product':
+        try:
+            product_id=Product.objects.get(id=product)
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
+                    'response' : {
+                    'message' : 'Product not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        promotion.product = product_id
+        promotion.service = None
+        promotion.save()
+    elif promotion_type == 'Service':
+        try:
+            service_id=Service.objects.get(id=service)
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
+                    'response' : {
+                    'message' : 'Service not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        promotion.service= service_id
+        promotion.product = None
+        promotion.save()    
     serializer = PromotionSerializer(promotion, data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(
