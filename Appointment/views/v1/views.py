@@ -17,7 +17,59 @@ from Client.models import Client
 from datetime import date
 
 from Appointment.models import Appointment, AppointmentService
-from Appointment.serializers import AppoinmentSerializer,BlockSerializer ,AllAppoinmentSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer
+from Appointment.serializers import AppoinmentSerializer,SingleAppointmentSerializer ,BlockSerializer ,AllAppoinmentSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_single_appointments(request):
+    appointment_id = request.GET.get('appointment_id', None) 
+    
+    if not all([appointment_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Appointment id are required',
+                    'fields' : [
+                        'appointment_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        appoinment_id = AppointmentService.objects.get(id=appointment_id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_APPOINMENT_ID_4038,
+                    'status_code_text' : 'INVALID_APPOINMENT_ID_4038',
+                    'response' : {
+                        'message' : 'Appointment Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+    serialized = SingleAppointmentSerializer(appoinment_id)
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Business languages',
+                'error_message' : None,
+                'Employee' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
 @api_view(['GET'])
 @permission_classes([AllowAny])

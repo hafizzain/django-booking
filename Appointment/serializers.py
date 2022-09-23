@@ -174,3 +174,48 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentService
         fields= ('id', 'service', 'member', 'price', 'client')
+        
+class SingleAppointmentSerializer(serializers.ModelSerializer):
+    client = serializers.SerializerMethodField(read_only=True)
+    end_time = serializers.SerializerMethodField(read_only=True)
+    business_address_name=  serializers.SerializerMethodField(read_only=True)
+    service = serializers.SerializerMethodField(read_only=True)
+    currency = serializers.SerializerMethodField(read_only=True)
+    
+    def get_currency(self, obj):
+        return 'AED'
+    
+    def get_service(self, obj):
+        try:
+            return ServiceAppointmentSerializer(obj.service).data
+        except Exception:
+            return None
+    
+    def get_business_address_name(self, obj):
+        try:
+            return obj.business_address.address_name
+        except Exception as err:
+            None
+    
+    
+    def get_client(self, obj):
+        return obj.appointment.client.full_name
+    
+    def get_end_time(self, obj):
+        app_date_time = f'2000-01-01 {obj.appointment_time}'
+
+        try:
+            duration = DURATION_CHOICES_DATA[obj.duration]
+            app_date_time = datetime.fromisoformat(app_date_time)
+            datetime_duration = app_date_time + timedelta(minutes=duration)
+            datetime_duration = datetime_duration.strftime('%H:%M:%S')
+            return datetime_duration
+        except Exception as err:
+            return None
+    
+    class Meta:
+        model = AppointmentService
+        fields= ('id', 'business_address_name','client','service',
+                 'appointment_time', 'end_time', 'appointment_time',
+                 'appointment_status', 'currency'
+                 )
