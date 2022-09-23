@@ -7,9 +7,12 @@ urlpatterns = [
     path('get_calendar_appointment/', views.get_calendar_appointment),
     path('get_all_appointments/',views.get_all_appointments),
     path('get_today_appointments/', views.get_today_appointments),
+    path('get_single_appointments/', views.get_single_appointments),
+    
     path('delete_appointment/', views.delete_appointment),
     path('update_appointment/', views.update_appointment),
     
     path('create_blockTime/', views.create_blockTime),
+    
     
 ]
