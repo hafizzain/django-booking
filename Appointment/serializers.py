@@ -181,12 +181,12 @@ class SingleAppointmentSerializer(serializers.ModelSerializer):
     currency = serializers.SerializerMethodField(read_only=True)
     booked_by = serializers.SerializerMethodField(read_only=True)
     client_type = serializers.SerializerMethodField(read_only=True)
-    Booking_id = serializers.SerializerMethodField(read_only=True)
+    booking_id = serializers.SerializerMethodField(read_only=True)
 
     def get_booked_by(self, obj):
         return f'{obj.user.first_name} {obj.user.last_name}'
     
-    def get_Booking_id(self, obj):
+    def get_booking_id(self, obj):
         id = str(obj.id).split('-')[0:2]
         id = ''.join(id)
         return id
@@ -226,5 +226,5 @@ class SingleAppointmentSerializer(serializers.ModelSerializer):
         model = AppointmentService
         fields= ('id', 'location','client','service',
                  'appointment_time', 'end_time',
-                 'appointment_status', 'currency', 'booked_by', 'Booking_id', 'appointment_date', 'client_type'
+                 'appointment_status', 'currency', 'booked_by', 'booking_id', 'appointment_date', 'client_type'
             )
