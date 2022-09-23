@@ -40,7 +40,6 @@ class PromotionAdmin(admin.ModelAdmin):
     list_display= [
         'id', 
         'user', 
-        'duration',
         ] 
 @admin.register(Membership)
 class MembershipAdmin(admin.ModelAdmin):

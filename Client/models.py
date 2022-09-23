@@ -132,7 +132,7 @@ class Promotion(models.Model):
 
     discount = models.PositiveIntegerField(default=0)
     
-    valid_til= models.DateField()
+    valid_til= models.DateField(null=True, blank=True)
 
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
