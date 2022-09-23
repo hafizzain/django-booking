@@ -966,7 +966,6 @@ def create_rewards(request):
         user = user,
         business=business, 
         name=name,
-        reward_type = reward_type,
         reward_value=reward_value,
         reward_point=reward_point,
         total_points = total_points,
