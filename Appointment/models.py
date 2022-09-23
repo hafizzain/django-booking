@@ -58,6 +58,13 @@ class Appointment(models.Model):
 
     
 class AppointmentService(models.Model):
+    
+    BOOKED_CHOICES = [
+        ('Appointment_Booked',  'Appointment Booked'),
+        ('Arrived', 'Arrived'),
+        ('In Progress', 'In Progress'),
+        ('Done', 'Done')
+    ]
 
     DURATION_CHOICES = [
         ('30 MIN', '30 MIN'), 
@@ -76,14 +83,18 @@ class AppointmentService(models.Model):
     appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, null=True, blank=True, related_name='appointment_services')
     business_address = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='b_address_appointment_services')
 
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='serivce_appointments')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='serivce_appointments', null=True, blank=True)
     member = models.ForeignKey(Employee, on_delete=models.SET_NULL, related_name='member_appointments', null=True, blank=True)
     
     appointment_date = models.DateField()
     appointment_time = models.TimeField()
 
     duration = models.CharField(choices=DURATION_CHOICES, max_length=100, default='')
+    appointment_status = models.CharField(choices=BOOKED_CHOICES, max_length=100, default='Appointment Booked')
     tip = models.PositiveIntegerField(default=0, null=True, blank=True)
+    
+    end_time = models.TimeField(null=True, blank=True)
+    destails = models.CharField(max_length=255, null=True, blank=True)
 
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)

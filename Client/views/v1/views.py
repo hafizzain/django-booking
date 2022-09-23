@@ -1211,7 +1211,7 @@ def create_promotion(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-    promotion = Promotion.objects.create(
+    promotion = Promotion(
         user = user,
         business = business,
         promotion_type = promotion_type,
