@@ -1168,7 +1168,7 @@ def create_promotion(request):
     purchases = request.data.get('no_of_purchases', None)
     
     service  = request.data.get('service', None)
-    product_id = request.data.get('id', None)
+    product_id = request.data.get('product', None)
     
     discount = request.data.get('discount', None)
     duration = request.data.get('duration', None)
