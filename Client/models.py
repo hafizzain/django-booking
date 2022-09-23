@@ -131,8 +131,8 @@ class Promotion(models.Model):
     discount_product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='discount_product_promotions')
 
     discount = models.PositiveIntegerField(default=0)
-
-    duration = models.CharField(default='Month', choices=DISCOUNT_DURATION, max_length=20)
+    
+    valid_til= models.DateField()
 
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
