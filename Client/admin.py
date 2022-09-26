@@ -55,5 +55,5 @@ class VouchersAdmin(admin.ModelAdmin):
         'id', 
         'user', 
         'name', 
-        'days',
+        'validity',
         ] 

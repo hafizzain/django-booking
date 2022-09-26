@@ -61,6 +61,8 @@ class EmployeeProfessionalInfo(models.Model):
     income_type = models.CharField(choices=INCOME_TYPE_CHOICES, default='Hourly_Rate', max_length=30)
     salary = models.PositiveIntegerField(default=0)
     services = models.ManyToManyField(Service, related_name='services_employee')
+    
+    
 
     def __str__(self):
         return str(self.id)

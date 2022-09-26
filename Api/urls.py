@@ -12,6 +12,8 @@ urlpatterns = [
     path('v1/client/', include('Client.urls.v1.urls')),
     path('v1/appointment/', include('Appointment.urls.v1.urls')),
     path('v1/service/', include('Service.urls.v1.urls')),
-    path('Emailtemplate/', views.EmailTemplate)
+    path('v1/sale/', include('Sale.urls.v1.urls')),
+    path('Emailtemplate/', views.EmailTemplate),
+    
 
     ]

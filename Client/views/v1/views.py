@@ -887,7 +887,7 @@ def update_subscription(request):
             'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
             'response' : {
                 'message' : 'Subscription Serializer Invalid',
-                'error_message' : str(err),
+                'error_message' : str(serializer.errors),
             }
         },
         status=status.HTTP_404_NOT_FOUND
@@ -1687,7 +1687,7 @@ def update_memberships(request):
         status=status.HTTP_400_BAD_REQUEST
         )
     try:
-        membership = Subscription.objects.get(id=id)
+        membership = Membership.objects.get(id=id)
     except Exception as err:
         return Response(
             {
@@ -1740,12 +1740,11 @@ def create_vouchers(request):
     voucher_type= request.data.get('voucher_type', None)
     
     valid_for = request.data.get('valid_for', None)
-    days= request.data.get('days', None)
-    months = request.data.get('months', None)
+    validity= request.data.get('validity', None)
     
     sales = request.data.get('sales', None)
     price = request.data.get('price', None)
-    if not all([business_id , name , value ,valid_for,sales, price, voucher_type]):
+    if not all([business_id , name , value ,valid_for,sales, price, voucher_type, validity]):
         return Response(
             {
                 'status' : False,
@@ -1761,7 +1760,8 @@ def create_vouchers(request):
                           'voucher_type' ,
                           'valid_for', 
                           'sales',
-                          'price'
+                          'price', 
+                          'validity',
                             ]
                 }
             },
@@ -1782,10 +1782,10 @@ def create_vouchers(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
     
-    if valid_for.lower() == 'days':
-        days= days
-    else:
-        months = months
+    # if valid_for.lower() == 'days':
+    #     days= days
+    # else:
+    #     months = months
         
     voucher = Vouchers.objects.create(
         user = user,
@@ -1795,12 +1795,13 @@ def create_vouchers(request):
         voucher_type=voucher_type,
         valid_for = valid_for,
         sales = sales,
-        price = price,     
+        price = price,    
+        validity=validity 
         
     )
-    voucher.days = days
-    voucher.months = months
-    voucher.save()
+    # voucher.days = days
+    # voucher.months = months
+    # voucher.save()
     
     serialized = VoucherSerializer(voucher)
        
@@ -1838,7 +1839,7 @@ def get_vouchers(request):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_vouchers(request):
-    vouchers_id = request.data.get('vouchers_id', None)
+    vouchers_id = request.data.get('id', None)
     if vouchers_id is None: 
        return Response(
             {
@@ -1849,7 +1850,7 @@ def delete_vouchers(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'fields are required!',
                     'fields' : [
-                        'vouchers_id'                         
+                        'id'                         
                     ]
                 }
             },
@@ -1907,7 +1908,7 @@ def update_vouchers(request):
         status=status.HTTP_400_BAD_REQUEST
         )
     try:
-        vouchers = Subscription.objects.get(id=id)
+        vouchers = Vouchers.objects.get(id=id)
     except Exception as err:
         return Response(
             {

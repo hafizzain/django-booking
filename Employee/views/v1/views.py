@@ -780,15 +780,13 @@ def create_staff_group(request):
         )
         #staff_permission_serializers =  StaffpermisionSerializers(staff_module_permission)
         employees_error = []
-        #print(type(employees))
+       
         if type(employees) == str:
             employees = json.loads(employees)
 
         elif type(employees) == list:
             pass
-        #print(type(employees))
-        #print(employees)
-        #print(len(employees))
+        
         for usr in employees:
             try:
                employe = Employee.objects.get(id=usr)  
@@ -1319,8 +1317,9 @@ def create_payroll(request):
                     'response' : {
                     'message' : 'Business not found',
                     'error_message' : str(err),
-                }
-                }
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
             )
     try:
         employee_id=Employee.objects.get(id=employees)

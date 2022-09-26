@@ -164,8 +164,10 @@ class Vouchers(models.Model):
     
     valid_for = models.CharField(choices=VALIDITY_CHOICE, default='Months' , verbose_name='Validity for Days or Months', max_length=20)
 
-    days = models.PositiveIntegerField(default=0, verbose_name='No. of Days', null=True, blank=True)
-    months = models.PositiveIntegerField(default=0, verbose_name='No. of Months', null=True, blank=True)
+    # days = models.PositiveIntegerField(default=0, verbose_name='No. of Days', null=True, blank=True)
+    # months = models.PositiveIntegerField(default=0, verbose_name='No. of Months', null=True, blank=True)
+    validity = models.PositiveIntegerField(default=0, verbose_name='No of Days/Month')
+    
     
     sales = models.PositiveIntegerField(default=0)
     price = models.PositiveIntegerField(default=0)
