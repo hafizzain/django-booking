@@ -50,7 +50,7 @@ NSTYLE_APPS = [
     'Service.apps.ServiceConfig',
     'Client.apps.ClientConfig',
     'Appointment.apps.AppointmentConfig',
-
+    'Sale.apps.SaleConfig',
 ]
 
 
