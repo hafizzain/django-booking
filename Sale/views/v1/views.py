@@ -118,13 +118,13 @@ def create_service(request):
         duration=duration,
         enable_team_comissions =enable_team_comissions,
         enable_vouchers=enable_vouchers,
-        is_package =is_package,
     )
     
-    if is_package == True:
+    if is_package is not None:
+        service_obj.is_package = True
         service_obj.treatment_type = treatment_type
         service_obj.save()
-    elif is_package == False:
+    else :
         if type(service) == str:
             service = json.loads(service)
 
@@ -133,11 +133,12 @@ def create_service(request):
         
         for ser in service:
             try:
-                service_id=Service.objects.get(id=ser)  
+                service_id=Service.objects.get(id=ser)
                 print(service_id)
                 service_obj.service.add(service_id)
             except Exception as err:
                 employees_error.append(str(err))
+
     service_obj.save()
             
     employees_error = []
