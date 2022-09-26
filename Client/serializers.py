@@ -69,7 +69,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Subscription
-        fields ='__all__'
+        fields =['id','name', 'days','select_amount', 'subscription_type','is_active']
      
      
 class RewardSerializer(serializers.ModelSerializer):

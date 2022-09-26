@@ -660,7 +660,7 @@ def create_subscription(request):
     
     is_active= request.data.get('is_active', None)
     
-    if not all([business, name, days ,select_amount , price]) or (subscription_type is not None and subscription_type == 'Product' and product is None) or (subscription_type is not None and subscription_type == 'Service'  and service_id is None):
+    if not all([business, name, days ,select_amount , price]): #or (subscription_type is not None and subscription_type == 'Product' and product is None) or (subscription_type is not None and subscription_type == 'Service'  and service_id is None):
           return Response(
             {
                 'status' : False,
@@ -714,45 +714,45 @@ def create_subscription(request):
         is_active= is_active,
 
     )
-    if subscription_type == 'Product':
-        try:
-            product=Product.objects.get(id=product)
-        except Exception as err:
-            return Response(
-                {
-                    'status' : False,
-                    'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
-                    'response' : {
-                    'message' : 'Product not found',
-                    'error_message' : str(err),
-                    }
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            ) 
-        client_subscription.product = product
-        client_subscription.products_count = products_count
+    # if subscription_type == 'Product':
+    #     try:
+    #         product=Product.objects.get(id=product)
+    #     except Exception as err:
+    #         return Response(
+    #             {
+    #                 'status' : False,
+    #                 'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
+    #                 'response' : {
+    #                 'message' : 'Product not found',
+    #                 'error_message' : str(err),
+    #                 }
+    #             },
+    #             status=status.HTTP_400_BAD_REQUEST
+    #         ) 
+    #     client_subscription.product = product
+    #     client_subscription.products_count = products_count
 
-    else:
-        try:
-            service=Service.objects.get(id=service_id)
-        except Exception as err:
-            return Response(
-                {
-                    'status' : False,
-                    'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
-                    'response' : {
-                    'message' : 'Service not found',
-                    'error_message' : str(err),
-                    }
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+    # else:
+    #     try:
+    #         service=Service.objects.get(id=service_id)
+    #     except Exception as err:
+    #         return Response(
+    #             {
+    #                 'status' : False,
+    #                 'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
+    #                 'response' : {
+    #                 'message' : 'Service not found',
+    #                 'error_message' : str(err),
+    #                 }
+    #             },
+    #             status=status.HTTP_400_BAD_REQUEST
+    #         )
             
-        client_subscription.service = service
-        client_subscription.services_count = services_count
+    #     client_subscription.service = service
+    #     client_subscription.services_count = services_count
 
     
-    client_subscription.save()
+    # client_subscription.save()
         
     
     serialized = SubscriptionSerializer(client_subscription, context={'request' : request})
