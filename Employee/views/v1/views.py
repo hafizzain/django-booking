@@ -302,6 +302,8 @@ def create_employee(request):
     to_present = request.data.get('to_present', False)
     ending_date= request.data.get('ending_date',None)
     
+    working_hour = request.data.get('working_hour',None)
+    
     
     #UserInformation
     designation = request.data.get('designation', None)
