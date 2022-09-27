@@ -7,24 +7,6 @@ from Authentication.models import User
 from Business.models import Business
 from Utility.models import Country, State, City
 from Service.models  import Service
-#from Employee.models import WorkingDays
-
-class WorkingDays(models.Model):
-    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='working_days')
-    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='working_busines')
-    
-    monday = models.BooleanField(default=False)
-    tuesday = models.BooleanField(default=False)
-    wednesday = models.BooleanField(default=False)
-    thursday = models.BooleanField(default=False)
-    firday = models.BooleanField(default=False)
-    saturday = models.BooleanField(default=False)
-    sunday = models.BooleanField(default=False)
-    
-    def __str__(self):
-        return str(self.id)
-    
 
 class Employee(models.Model):
     GENDER_CHOICES = [
@@ -66,6 +48,24 @@ class Employee(models.Model):
 
     def __str__(self):
         return str(self.id)
+    
+    
+# class WorkingDays(models.Model):
+#     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+#     #user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='working_days')
+#     #employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_professional_details')
+#     #business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_employees')
+
+#     monday = models.BooleanField(default=False)
+#     tuesday = models.BooleanField(default=False)
+#     wednesday = models.BooleanField(default=False)
+#     thursday = models.BooleanField(default=False)
+#     firday = models.BooleanField(default=False)
+#     saturday = models.BooleanField(default=False)
+#     sunday = models.BooleanField(default=False)
+    
+#     def __str__(self):
+#         return str(self.id)
 
 class EmployeeProfessionalInfo(models.Model):
     INCOME_TYPE_CHOICES = [
@@ -80,9 +80,18 @@ class EmployeeProfessionalInfo(models.Model):
     salary = models.PositiveIntegerField(default=0)
     services = models.ManyToManyField(Service, related_name='services_employee')
     
-    working_days = models.ManyToManyField(WorkingDays, related_name='days_employee')
+    #working_days = models.ManyToManyField(WorkingDays, related_name='days_employee')
     start_time = models.TimeField(null=True, blank=True)
     end_time = models.TimeField(null=True, blank=True)
+    
+    monday = models.BooleanField(default=False)
+    tuesday = models.BooleanField(default=False)
+    wednesday = models.BooleanField(default=False)
+    thursday = models.BooleanField(default=False)
+    firday = models.BooleanField(default=False)
+    saturday = models.BooleanField(default=False)
+    sunday = models.BooleanField(default=False)
+    
 
     def __str__(self):
         return str(self.id)

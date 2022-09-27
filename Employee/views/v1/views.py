@@ -302,13 +302,17 @@ def create_employee(request):
     to_present = request.data.get('to_present', False)
     ending_date= request.data.get('ending_date',None)
     
-    working_hour = request.data.get('working_hour',None)
+   
     
     
     #UserInformation
     designation = request.data.get('designation', None)
     income_type = request.data.get('income_type', 'Hourly_Rate')
-    salary = request.data.get('salary', None)
+    salary = request.data.get('salary', None) 
+    
+    end_time= request.data.get('end_time',None)
+    start_time = request.data.get('start_time', None)
+    working_days = request.data.get('working_days',None)
     # services = request.data.get('services', None)
     
     # #EmployeePermissionSetting
@@ -442,6 +446,31 @@ def create_employee(request):
     employee_mp = EmployeeModulePermission.objects.create(employee=employee)
     employee_p_setting = EmployeePermissionSetting.objects.create(employee = employee)
     employee_marketing = EmployeeMarketingPermission.objects.create(employee= employee)
+    
+    if type(working_days) == str:
+            working_days = json.loads(working_days)
+            print('str')
+
+    elif type(working_days) == list:
+            pass
+    
+    for day in working_days:
+        print(day)
+        if day is 'Monday':
+            employee_p_info.monday = True
+            print('OOO',day)
+        elif day == 'Tuesday':
+            employee_p_info.tuesday = True
+        elif day == 'Wednesday':
+            employee_p_info.wednesday = True
+        elif day == 'Thursday':
+            employee_p_info.thursday = True
+        elif day == 'Friday':
+            employee_p_info.friday = True    
+        elif day == 'Saturday':
+            employee_p_info.saturday = True
+        
+    employee_p_info.save()
     
     serialized = EmployeInformationsSerializer(employee_p_info, data=request.data)
     if serialized.is_valid():
