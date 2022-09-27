@@ -453,22 +453,14 @@ def create_employee(request):
 
     elif type(working_days) == list:
             pass
-    
-    for day in working_days:
-        print(day)
-        if day is 'Monday':
-            employee_p_info.monday = True
-            print('OOO',day)
-        elif day == 'Tuesday':
-            employee_p_info.tuesday = True
-        elif day == 'Wednesday':
-            employee_p_info.wednesday = True
-        elif day == 'Thursday':
-            employee_p_info.thursday = True
-        elif day == 'Friday':
-            employee_p_info.friday = True    
-        elif day == 'Saturday':
-            employee_p_info.saturday = True
+
+    employee_p_info.monday = True if 'monday' in request.data else False
+    employee_p_info.tuesday = True if 'tuesday' in request.data else False
+    employee_p_info.wednesday = True if 'wednesday' in request.data else False
+    employee_p_info.thursday = True if 'thursday' in request.data else False
+    employee_p_info.friday = True if 'friday' in request.data else False
+    employee_p_info.saturday = True if 'saturday' in request.data else False
+    employee_p_info.sunday = True if 'sunday' in request.data else False
         
     employee_p_info.save()
     

@@ -88,7 +88,7 @@ class EmployeeProfessionalInfo(models.Model):
     tuesday = models.BooleanField(default=False)
     wednesday = models.BooleanField(default=False)
     thursday = models.BooleanField(default=False)
-    firday = models.BooleanField(default=False)
+    friday = models.BooleanField(default=False)
     saturday = models.BooleanField(default=False)
     sunday = models.BooleanField(default=False)
     
