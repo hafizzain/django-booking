@@ -1,3 +1,4 @@
+from itertools import count
 from django.db import models
 
 from uuid import uuid4
@@ -211,38 +212,29 @@ class Rewards(models.Model):
         return str(self.id)
 
 class Membership(models.Model):
-
+    MEMBERSHIP_CHOICES =[
+        ('Product' , 'Product'),
+        ('Service' , 'Service'),
+    ]
     VALIDITY_CHOICE = [
         ('Days' , 'Days'),
         ('Months' , 'Months'),
     ]
 
-    COLOR_CHOICES = [
-        ('Red', 'Red'),
-        ('Purple', 'Purple'),
-        ('Black', 'Black'),
-        ('White', 'White'),
-        ('Yellow', 'Yellow'),
-        ('Orange', 'Orange'),
-        ('Pink', 'Pink'),
-        ('Gray', 'Gray'),
-        ('DarkGray', 'DarkGray'),
-        ('Blue', 'Blue'),
-        ('Golden', 'Golden'),
-        ('Green', 'Green'),
-        ('Brown', 'Brown'),
-        ('SkyBlue', 'SkyBlue'),
-        ('DarkBlue', 'DarkBlue'),
-    ]
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_memberships')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_memberships')
     
     name =  models.CharField(max_length=100, default='')
-    description =  models.CharField(max_length=300, null=True, blank=True)
+    membership = models.CharField(default='Product', choices=MEMBERSHIP_CHOICES, max_length=30, verbose_name = 'Membership_type')
+    
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_memberships')
-    session = models.PositiveIntegerField(default=0)
-
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_memberships')
+    
+    #description =  models.CharField(max_length=300, null=True, blank=True)
+    #session = models.PositiveIntegerField(default=0)
+    
+    total_number = models.PositiveIntegerField(default=0, null=True, blank=True)
     valid_for = models.CharField(choices=VALIDITY_CHOICE, default='Months' , verbose_name='Validity for Days or Months', max_length=20)
 
     days = models.PositiveIntegerField(default=0, verbose_name='No. of Days', null=True, blank=True)
@@ -251,7 +243,7 @@ class Membership(models.Model):
     price = models.PositiveIntegerField(default=0)
     tax_rate = models.PositiveIntegerField(default=0)
 
-    color = models.CharField(default='White', choices=COLOR_CHOICES, max_length=30)
+    
     
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)

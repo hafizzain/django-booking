@@ -1,5 +1,6 @@
 from http import client
 from re import M
+from tkinter import N
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -1504,17 +1505,20 @@ def create_memberships(request):
     user = request.user
     business = request.data.get('business', None)
     name = request.data.get('name', None)
-    description = request.data.get('description', None)
+    #description = request.data.get('description', None)
     service = request.data.get('service', None)
-    session = request.data.get('session', None)
+    product = request.data.get('product',None)
+    membership_type = request.data.get('membership_type',None)
+    total_number = request.data.get('total_number',None)
+    #session = request.data.get('session', None)
     valid_for = request.data.get('valid_for', None)
     days = request.data.get('days', None)
     months = request.data.get('months',None)
     price = request.data.get('price',None)
     tax_rate = request.data.get('tax_rate',None)
-    color = request.data.get('color', None)
+    #color = request.data.get('color', None)
     
-    if not all([business, name , service, session, valid_for, price, tax_rate]):
+    if not all([business, name , service, valid_for, price, tax_rate]):
         return Response(
             {
                 'status' : False,
@@ -1527,7 +1531,6 @@ def create_memberships(request):
                           'business',
                           'name',
                           'service',
-                          'session', 
                           'valid_for', 
                           'price',
                           'tax_rate'
@@ -1551,9 +1554,42 @@ def create_memberships(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-    try:
-        service=Service.objects.get(id=service)
-    except Exception as err:
+            
+    membership_cr = Membership(
+        user = user,
+        business=business, 
+        name= name,
+        membership=membership_type,
+        valid_for = valid_for,
+        days = days,
+        months = months,
+        price = price,
+        tax_rate= tax_rate,
+        total_number=total_number
+    )
+    if membership_type == 'Product':
+        try:
+            product_id=Product.objects.get(id=product)
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
+                    'response' : {
+                    'message' : 'Product not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        membership_cr.product = product_id
+        membership_cr.save()
+            
+    elif membership_type == 'Service':
+        try:
+            service_id=Service.objects.get(id=service)
+        except Exception as err:
             return Response(
                 {
                     'status' : False,
@@ -1565,22 +1601,21 @@ def create_memberships(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-    membership = Membership.objects.create(
-        user = user,
-        business=business, 
-        name= name,
-        description= description,
-        service = service,
-        session = session,
-        valid_for = valid_for,
-        days = days,
-        months = months,
-        price = price,
-        tax_rate= tax_rate,
-        color = color, 
-    )
+        membership_cr.service = service_id
+        membership_cr.save()
+    else :
+        return Response(
+                {
+                    'status' : False,
+                    'response' : {
+                    'message' : 'Invalid Memberdhip Type',
+                    'error_message' : 'Membership Type',
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
     
-    serialized = MembershipSerializer(membership)
+    serialized = MembershipSerializer(membership_cr)
        
     return Response(
             {
@@ -1670,6 +1705,10 @@ def delete_memberships(request):
 @permission_classes([IsAuthenticated])
 def update_memberships(request):
     id = request.data.get('id', None)
+    service = request.data.get('service', None)
+    product = request.data.get('product',None)
+    membership_type = request.data.get('membership_type',None)
+    
     if id is None: 
         return Response(
         {
@@ -1700,6 +1739,44 @@ def update_memberships(request):
             },
                 status=status.HTTP_404_NOT_FOUND
         )
+    if membership_type == 'Product':
+        try:
+            product_id=Product.objects.get(id=product)
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
+                    'response' : {
+                    'message' : 'Product not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        membership.product = product_id
+        membership.service = None
+        membership.save()
+    elif membership_type == 'Service':
+        try:
+            service_id=Service.objects.get(id=service)
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
+                    'response' : {
+                    'message' : 'Service not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        membership.service= service_id
+        membership.product = None
+        membership.save()
+        
+        
     serializer = MembershipSerializer(membership, data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(
@@ -1929,7 +2006,7 @@ def update_vouchers(request):
             'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
             'response' : {
                 'message' : 'Voucher Serializer Invalid',
-                'error_message' : str(err),
+                'error_message' : str(serializer.errors),
             }
         },
         status=status.HTTP_404_NOT_FOUND
