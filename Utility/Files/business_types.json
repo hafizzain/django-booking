@@ -1,62 +1,77 @@
 [
     {
         "name": "Hair Salon",
-        "image": "https://us-telecoms.com/media/public/utility/files/hair-cutting_1.png"
+        "image": "https://us-telecoms.com/media/public/utility/files/hair-cutting_1.png",
+        "slug" : "HairSaloonNS001"
     },
     {
         "name": "Nail Salon",
-        "image": "https://us-telecoms.com/media/public/utility/files/nail_1.png"
+        "image": "https://us-telecoms.com/media/public/utility/files/nail_1.png",
+        "slug" : "NailSaloonNS002"
     },
     {
         "name": "Barber Shop",
-        "image": "https://us-telecoms.com/media/public/utility/files/barbershop_1.png"
+        "image": "https://us-telecoms.com/media/public/utility/files/barbershop_1.png",
+        "slug" : "BarbarShopNS003"
     },
     {
         "name": "Beauty Salon",
-        "image": "https://us-telecoms.com/media/public/utility/files/makeover_1.png"
+        "image": "https://us-telecoms.com/media/public/utility/files/makeover_1.png",
+        "slug" : "BeautySaloonNS004"
     },
     {
         "name": "Aesthetics",
-        "image": "https://us-telecoms.com/media/public/utility/files/lips_1.png"
+        "image": "https://us-telecoms.com/media/public/utility/files/lips_1.png",
+        "slug" : "AestheticsNS005"
     },
     {
         "name": "Spa",
-        "image": "https://us-telecoms.com/media/public/utility/files/sauna_1.png"
+        "image": "https://us-telecoms.com/media/public/utility/files/sauna_1.png",
+        "slug" : "SPANS006"
     },
     {
         "name": "Massage",
-        "image": "https://us-telecoms.com/media/public/utility/files/massage_1.png"
+        "image": "https://us-telecoms.com/media/public/utility/files/massage_1.png",
+        "slug" : "MassageNS007"
     },
     {
         "name": "Waxing",
-        "image": "https://us-telecoms.com/media/public/utility/files/hair-removal_1.png"
+        "image": "https://us-telecoms.com/media/public/utility/files/hair-removal_1.png",
+        "slug" : "WaxingNS008"
     },
     {
         "name": "Tanning Studio",
-        "image": "https://us-telecoms.com/media/public/utility/files/tanning_1.png"
+        "image": "https://us-telecoms.com/media/public/utility/files/tanning_1.png",
+        "slug" : "TanningStudioNS009"
     },
     {
         "name": "Eyebrows & Lashes",
-        "image": "https://us-telecoms.com/media/public/utility/files/eyebrow-pencil_1.png"
+        "image": "https://us-telecoms.com/media/public/utility/files/eyebrow-pencil_1.png",
+        "slug" : "EyeBrows&LashesNS0010"
     },
     {
         "name": "Tattoo & Piercing",
-        "image": "https://us-telecoms.com/media/public/utility/files/tattoo_1.png"
+        "image": "https://us-telecoms.com/media/public/utility/files/tattoo_1.png",
+        "slug" : "Tattoo&PiercingNS0011"
     },
     {
         "name": "Therapy Center",
-        "image": "https://us-telecoms.com/media/public/utility/files/healthcare_1_1.png"
+        "image": "https://us-telecoms.com/media/public/utility/files/healthcare_1_1.png",
+        "slug" : "TherapyCenterNS0012"
     },
     {
         "name": "Weight Loss",
-        "image": "https://us-telecoms.com/media/public/utility/files/weight-loss_1.png"
+        "image": "https://us-telecoms.com/media/public/utility/files/weight-loss_1.png",
+        "slug" : "WeightLossNS0013"
     },
     {
         "name": "Personal Trainer",
-        "image": "https://us-telecoms.com/media/public/utility/files/trainer_1.png"
+        "image": "https://us-telecoms.com/media/public/utility/files/trainer_1.png",
+        "slug" : "PersonalTrainerNS0014"
     },
     {
         "name": "Fitness & Gym",
-        "image": "https://us-telecoms.com/media/public/utility/files/treadmill_1.png"
+        "image": "https://us-telecoms.com/media/public/utility/files/treadmill_1.png",
+        "slug" : "Fitness&GymNS0015"
     }
 ]
