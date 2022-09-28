@@ -48,11 +48,19 @@ def create_tenant_business_user(request):
     password = data.get('password', None)
     account_type = data.get('account_type', None)
     business_name = data.get('business_name', None)
+    business_industry = data.get('business_industry', None)
     social_account = data.get('social_account', None)
 
-    required_fields = [first_name, last_name, email, mobile_number, account_type, business_name ]
-    return_fields = ['first_name', 'last_name', 'email', 'mobile_number','account_type', 'business_name']
+    required_fields = [first_name, last_name, email, mobile_number, account_type ]
+    return_fields = ['first_name', 'last_name', 'email', 'mobile_number','account_type']
 
+    if account_type is not None and account_type.lower() == 'business':
+        required_fields.append(business_name)
+        required_fields.append(business_industry)
+
+        return_fields.append('business_name')
+        return_fields.append('business_industry')
+        
     if social_account is None:
         required_fields.append(password)
         return_fields.append('password')
