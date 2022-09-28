@@ -40,7 +40,8 @@ class Brand(models.Model):
 class Product(models.Model):
     PRODUCT_TYPE_CHOICES = [
         ('Sellable', 'Sellable'),
-        ('Non_Sellable', 'Non_Sellable')
+        ('Consumable', 'Consumable'),
+        ('Both', 'Both'),
     ]
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     
@@ -58,6 +59,8 @@ class Product(models.Model):
     cost_price = models.PositiveIntegerField(default=0)
     full_price = models.PositiveIntegerField(default=0)
     sell_price = models.PositiveIntegerField(default=0)
+    product_size = models.PositiveIntegerField(default=0)
+
 
     tax_rate = models.PositiveIntegerField(default=0, null=True, blank=True)
 

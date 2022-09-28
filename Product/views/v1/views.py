@@ -571,6 +571,7 @@ def add_product(request):
     business_id = request.data.get('business', None)
     vendor_id = request.data.get('vendor', None)
     category_id = request.data.get('category', None)
+    product_size = request.data.get('product_size', None)
     #image = request.data.getlist('image', None)
     brand_id = request.data.get('brand', None)
     product_type = request.data.get('product_type', 'Sellable')
@@ -703,6 +704,7 @@ def add_product(request):
         cost_price = cost_price,
         full_price = full_price,
         sell_price = sell_price,
+        product_size=product_size,
         tax_rate = tax_rate,
         short_description = short_description,
         description = description,
