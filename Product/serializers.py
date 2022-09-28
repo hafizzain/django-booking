@@ -69,7 +69,7 @@ class VendorSerializer(serializers.ModelSerializer):
 class ProductStockSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductStock
-        fields = ['id', 'quantity' , 'amount', 'unit' , 'alert_when_stock_becomes_lowest', 'is_active' ]
+        fields = ['id', 'sellable_quantity','consumable_quantity' , 'amount', 'unit' , 'alert_when_stock_becomes_lowest', 'is_active' ]
 
 class ProductWithStockSerializer(serializers.ModelSerializer):
     stock = serializers.SerializerMethodField()
@@ -154,9 +154,7 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = [
             'id', 
             'name', 
-            'vendor',
-            'category',
-            'brand',    
+            'product_size',
             'product_type',
             'cost_price',
             'full_price',
@@ -171,5 +169,8 @@ class ProductSerializer(serializers.ModelSerializer):
             'media',
             'cover_image',
             'stocks',
+            'vendor',
+            'category',
+            'brand', 
         ]
         read_only_fields = ['slug', 'id']
