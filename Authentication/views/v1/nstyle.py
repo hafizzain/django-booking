@@ -21,6 +21,7 @@ from Authentication.Constants import OTP
 from django.contrib.auth import authenticate
 from Authentication.serializers import UserLoginSerializer, UserSerializer, UserTenantSerializer
 from django_tenants.utils import tenant_context
+from Authentication.Constants.Email import send_welcome_email
 # Create your views here.
 
 @api_view(['GET'])
@@ -297,7 +298,11 @@ def verify_otp(request):
         except:
             pass
 
-    
+    try:
+        thrd = Thread(target=send_welcome_email(user=otp.user))
+        thrd.start()
+    except:
+        pass
     return Response(
             {
                 'status' : True,

@@ -41,3 +41,25 @@ def send_otp_to_email(user=None, ):
     #     fail_silently=False,
         
     # )
+def send_welcome_email(user=None, ):
+    if user is None:
+        return
+
+    # try:
+    #     user_otp = VerificationOTP.objects.get(user=user, code_for='Email')
+    # except Exception as err:
+    #     print(err)
+    #     return
+
+    html_file = render_to_string("welcome-email.html", {'user_name': user.username})
+    text_content = strip_tags(html_file)
+    
+    email = EmailMultiAlternatives(
+        'Welcome to NStyle',
+        text_content,
+        settings.EMAIL_HOST_USER,
+        to = [user.email]
+    )
+    
+    email.attach_alternative(html_file, "text/html")
+    email.send()
