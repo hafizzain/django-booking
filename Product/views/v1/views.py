@@ -588,7 +588,9 @@ def add_product(request):
     medias = request.data.getlist('product_images', None)
 
     # Product Stock Details 
-    quantity = request.data.get('quantity', None)
+    #quantity = request.data.get('quantity', None)
+    sellable_quantity = request.data.get('sellable_quantity', None)
+    consumable_quantity = request.data.get('consumable_quantity',None)
     unit = request.data.get('unit', None)
     amount = request.data.get('amount', None)
     stock_status = request.data.get('stock_status', None)
@@ -596,7 +598,7 @@ def add_product(request):
     alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', None)
    
 
-    if not all([name,medias, brand_id, category_id, cost_price, full_price, sell_price, sku, quantity, stock_status ]):
+    if not all([name,medias, brand_id, category_id, cost_price, full_price, sell_price, sku,  stock_status ]):
         return Response(
             {
                 'status' : False,
@@ -725,17 +727,20 @@ def add_product(request):
             is_cover = True
         )
     
-    ProductStock.objects.create(
+    product_stock= ProductStock.objects.create(
         user = user,
         business = business,
         product = product ,
-        quantity = quantity,
+        #quantity = quantity,
         amount = amount,
         unit = unit,
-        available_quantity= quantity,
+        sellable_quantity=sellable_quantity,
+        consumable_quantity =consumable_quantity,
+        #available_quantity= quantity,
         alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
         is_active = stock_status,
-    )
+        )
+    
 
     serialized = ProductSerializer(product, context={'request' : request})
     return Response(

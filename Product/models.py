@@ -107,10 +107,14 @@ class ProductStock(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_product_stocks')
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_product_stocks')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_stock')
-
+    
+    sellable_quantity = models.IntegerField(validators=[MinValueValidator(0)],null=True, blank=True, default=0, verbose_name= 'Sellable Quantity')
+    consumable_quantity = models.IntegerField(validators=[MinValueValidator(0)],null=True, blank=True, default=0, verbose_name= 'Consumable Quantity')
+    
     quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0, verbose_name='Total Quantity')
     available_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
     sold_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
+    
     amount = models.PositiveIntegerField(default=0, verbose_name='Usage Amount', null=True, blank=True)
     unit = models.PositiveIntegerField(default=0, verbose_name='Usage Unit', null=True, blank=True)
 
