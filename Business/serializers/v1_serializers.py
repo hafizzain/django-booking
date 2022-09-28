@@ -18,7 +18,7 @@ class BusinessTypeSerializer(serializers.ModelSerializer):
                 
     class Meta:
         model = BusinessType
-        fields = ['id', 'name', 'image']
+        fields = ['id', 'name', 'image', 'slug']
 
 
 class Business_GetSerializer(serializers.ModelSerializer):
