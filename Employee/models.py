@@ -68,6 +68,10 @@ class Employee(models.Model):
 #         return str(self.id)
 
 class EmployeeProfessionalInfo(models.Model):
+    LEVEL_CHOICE =[
+        ('Average', 'Average'),
+        ('Above_Averge', 'Above Average'),
+    ]
     INCOME_TYPE_CHOICES = [
         ('Hourly_Rate', 'Hourly_Rate'),
         ('Daily_Income', 'Daily_Income'),
@@ -79,6 +83,8 @@ class EmployeeProfessionalInfo(models.Model):
     income_type = models.CharField(choices=INCOME_TYPE_CHOICES, default='Hourly_Rate', max_length=30)
     salary = models.PositiveIntegerField(default=0)
     services = models.ManyToManyField(Service, related_name='services_employee')
+    
+    level= models.CharField(max_length=100, choices=LEVEL_CHOICE, default = 'Average', verbose_name = 'Employee Level')
     
     #working_days = models.ManyToManyField(WorkingDays, related_name='days_employee')
     start_time = models.TimeField(null=True, blank=True)
