@@ -47,7 +47,7 @@ class MembershipAdmin(admin.ModelAdmin):
         'id', 
         'user', 
         'name', 
-        'days',
+        'validity',
         ] 
 @admin.register(Vouchers)
 class VouchersAdmin(admin.ModelAdmin):

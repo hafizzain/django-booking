@@ -104,7 +104,7 @@ class BusinessAddress(models.Model):
 class BusinessOpeningHour(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_hours')
-    business_address = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, related_name='business_address_hours')
+    business_address = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_address_hours')
 
     day = models.CharField(max_length=20, default='')
 
@@ -113,6 +113,9 @@ class BusinessOpeningHour(models.Model):
     is_closed = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
+    
+    class Meta:
+        unique_together = ['business', 'business_address', 'day']
 
     def __str__(self):
         return str(self.id)

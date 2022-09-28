@@ -1509,13 +1509,13 @@ def create_memberships(request):
     total_number = request.data.get('total_number',None)
     #session = request.data.get('session', None)
     valid_for = request.data.get('valid_for', None)
-    days = request.data.get('days', None)
-    months = request.data.get('months',None)
+    validity = request.data.get('validity', None)
+    #months = request.data.get('months',None)
     price = request.data.get('price',None)
     tax_rate = request.data.get('tax_rate',None)
     #color = request.data.get('color', None)
     
-    if not all([business, name , service, valid_for, price, tax_rate]):
+    if not all([business, name , validity, valid_for, price, tax_rate]):
         return Response(
             {
                 'status' : False,
@@ -1527,7 +1527,7 @@ def create_memberships(request):
                     'fields' : [
                           'business',
                           'name',
-                          'service',
+                          'validity',
                           'valid_for', 
                           'price',
                           'tax_rate'
@@ -1558,8 +1558,7 @@ def create_memberships(request):
         name= name,
         membership=membership_type,
         valid_for = valid_for,
-        days = days,
-        months = months,
+        validity = validity,
         price = price,
         tax_rate= tax_rate,
         total_number=total_number
@@ -1782,7 +1781,7 @@ def update_memberships(request):
             'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
             'response' : {
                 'message' : 'Membership Serializer Invalid',
-                'error_message' : str(err),
+                'error_message' : str(serializer.errors),
             }
         },
         status=status.HTTP_404_NOT_FOUND
