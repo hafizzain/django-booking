@@ -14,7 +14,7 @@ class BusinessTaxAdmin(admin.ModelAdmin):
 
 @admin.register(BusinessType)
 class BusinessTypeAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'is_active', 'is_deleted']
+    list_display = ['id', 'name', 'slug', 'is_active', 'is_deleted']
 
 
 @admin.register(Business)
