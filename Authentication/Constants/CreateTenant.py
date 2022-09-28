@@ -3,7 +3,7 @@
 
 from Authentication.Constants.Domain import ssl_sub_domain
 from Tenants.models import Tenant, Domain
-from Business.models import Business
+from Business.models import Business, BusinessType
 from Profile.models import Profile
 from Utility.Constants.add_data_db import add_business_types, add_countries, add_software_types, add_states, add_cities, add_currencies, add_languages
 
@@ -217,6 +217,13 @@ def create_tenant(request=None, user=None, data=None):
 
             t_profile = create_tenant_profile(tenant_user=t_user, data=data, tenant=user_tenant)
             t_business = create_tenant_business(tenant_user=t_user, tenant_profile=t_profile, tenant=user_tenant, data=data)
+            try:
+                ubs_type = BusinessType.objects.get(slug=data['business_industry']) # User Business Type
+                t_business.business_types.add(ubs_type)
+                t_business.save()
+            except:
+                pass
+            
             try:
                 t_token = create_tenant_user_token(tenant_user=t_user, tenant=user_tenant)
             except:

@@ -297,6 +297,7 @@ def verify_otp(request):
         except:
             pass
 
+    
     return Response(
             {
                 'status' : True,
