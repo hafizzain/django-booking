@@ -574,6 +574,8 @@ def add_business_location(request):
     email= request.data.get('email',None)
     mobile_number = request.data.get('mobile_number', None)
     
+    banking = request.data.get('banking',None)
+    
     start_time = request.data.get('start_time', None)
     close_time = request.data.get('close_time', None)
 
@@ -664,6 +666,7 @@ def add_business_location(request):
         country=country,
         state=state,
         city=city,
+        banking = banking,
         is_primary = False,
         is_active = True,
         is_deleted = False,
@@ -1828,6 +1831,8 @@ def add_business_tax(request):
     tax_ids = request.data.get('tax_ids', None)
     location = request.data.get('location', None)
     
+    tax_id = request.data.get('tax_id',None)
+    
     if business_id is None or (tax_type != 'Location' and name is None) or (tax_type == 'Group' and tax_ids is None) or (tax_type != 'Group' and tax_rate is None) or (tax_type == 'Location' and location is None ):
         return Response(
             {
@@ -1884,13 +1889,28 @@ def add_business_tax(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-
-    if tax_rate is None:
+        try:
+                tax = BusinessTax.objects.get(id=tax_id)
+        except Exception as err:
+                return Response(
+                        {
+                            'status' : False,
+                            'status_code' : StatusCodes.LOCATION_NOT_FOUND_4017,
+                            'status_code_text' : 'BUSINESSS_TAX_NOT_FOUND',
+                            'response' : {
+                                'message' : 'Business Tax Not Found',
+                                'error_message' : str(err),
+                            }
+                        },
+                        status=status.HTTP_404_NOT_FOUND
+                    )
+    if tax_rate is None:  
         tax_rate = 0
-
+        
     business_tax = BusinessTax.objects.create(
         user = user,
         business=business,
+        parent_tax = tax,
         tax_type = tax_type,
         tax_rate = tax_rate,
     )
