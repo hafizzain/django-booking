@@ -145,7 +145,7 @@ class OrderStock(models.Model):
     location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='locations_order_stock')
     
     status= models.CharField(choices = STATUS_CHOICES, max_length =100, default='Placed')
-    rec_quantity= models.PositiveIntegerField(default=0)
+    rec_quantity= models.PositiveIntegerField(default=0, verbose_name= 'Received Quantity')
     
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
@@ -157,7 +157,7 @@ class OrderStock(models.Model):
     
 class OrderStockProduct(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
-    order= models.ForeignKey(OrderStock, on_delete=models.CASCADE , related_name='order_stock')
+    order = models.ForeignKey(OrderStock, on_delete=models.CASCADE , related_name='order_stock')
     
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_order_stock')
     quantity = models.PositiveIntegerField(default=0)

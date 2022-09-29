@@ -1078,8 +1078,9 @@ def create_attendence(request):
                     'response' : {
                     'message' : 'Business not found',
                     'error_message' : str(err),
-                }
-                }
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
             )
     try:
         employee_id=Employee.objects.get(id=employees)
@@ -1091,8 +1092,9 @@ def create_attendence(request):
                     'response' : {
                     'message' : 'Employee not found',
                     'error_message' : str(err),
-                }
-                }
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
             )
     attendence_employe=Attendance.objects.create(
         user=user,

@@ -674,28 +674,45 @@ def add_business_location(request):
     )
     if postal_code is not None:
         business_address.postal_code = postal_code
-        
     business_address.save()
-    data={}
-    if start_time or close_time is not None:
-        days = [
-            'Monday',
-            'Tuesday',
-            'Wednesday',
-            'Thursday',
-            'Friday',
-            'Saturday',
-            'Sunday',
-        ]
-        for day in days:
-            BusinessOpeningHour.objects.create(
-                    day = day,
-                    start_time = start_time,
-                    close_time = close_time,
-                    business_address = business_address,
-                    business = business
-                )
     
+    opening_day = request.data.get('open_day', None)    
+
+    # data={}
+    # if start_time or close_time is not None:
+    #     days = [
+    #         'Monday',
+    #         'Tuesday',
+    #         'Wednesday',
+    #         'Thursday',
+    #         'Friday',
+    #         'Saturday',
+    #         'Sunday',
+    #     ]
+    days = [
+        'nonday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday',
+        'saturday',
+        'sunday',
+    ]
+    for day in days:
+        bds_schedule = BusinessOpeningHour.objects.create(
+            business_address = business_address,
+            business = business,
+            day = day,
+        )
+        s_day = opening_day.get(day.lower(), None)
+        if s_day is not None:
+            bds_schedule.start_time = s_day.get('start_time', None)
+            bds_schedule.close_time = s_day.get('close_time', None)
+        else:
+            bds_schedule.is_closed = True
+
+        bds_schedule.save()
+      
             
     # serialized = OpeningHoursSerializer(busines_opening,  data=request.data)
     # if serialized.is_valid():

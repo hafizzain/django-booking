@@ -1,10 +1,13 @@
 
 
+from itertools import product
 from unicodedata import category
+from xml.parsers.expat import model
 from requests import request
 from rest_framework import serializers
 from Product.Constants.index import tenant_media_base_url
-from Product.models import Category, Brand, Product, ProductMedia, ProductStock
+from Product.models import (Category, Brand, Product, ProductMedia, 
+                            ProductStock, OrderStock , OrderStockProduct)
 from Business.models import BusinessVendor
 from django.conf import settings
 
@@ -18,8 +21,6 @@ class SaveFileSerializer(serializers.Serializer):
     class Meta:
         model = Product
         fields = "__all__"
-
-
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -174,3 +175,18 @@ class ProductSerializer(serializers.ModelSerializer):
             'brand', 
         ]
         read_only_fields = ['slug', 'id']
+class OrderProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderStockProduct
+        fields = '__all__'
+
+class OrderSerializer(serializers.ModelSerializer):
+    products = serializers.SerializerMethodField(read_only=True)
+    
+    def get_products(self, obj):
+        data = OrderStockProduct.objects.filter(order=obj)
+        return OrderProductSerializer(data, many=True).data
+    
+    class Meta:
+        model= OrderStock
+        fields=('id','business','vendor','location','status', 'rec_quantity','products')
