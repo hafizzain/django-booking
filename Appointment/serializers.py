@@ -1,5 +1,6 @@
 from pkgutil import read_code
 from pyexpat import model
+from re import A
 from rest_framework import serializers
 from Appointment.models import Appointment, AppointmentService
 from Client.serializers import ClientAppointmentSerializer
@@ -153,12 +154,13 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             is_active = True,
             is_deleted = False,
             is_blocked = False
-        ).values_list('id', 'appointment_time', 'duration')
+        ).values_list('id','appointment_time', 'duration', 'appointment_date')
         selected_ids = {}
 
         for appoint in appoint_services:
             app_time = appoint[1]
             app_duration = appoint[2]
+            app_date = appoint[3]
             
             app_date_time = f'2000-01-01 {app_time}'
 
@@ -172,7 +174,15 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             if current_time is None:
                 selected_ids[app_time] = []
             selected_ids[app_time].append(str(appoint[0]))
+            
+           #d = datetime.strptime("20.12.2016 09:38:42,76", "%d.%m.%Y %H:%M:%S,%f").strftime('%s.%f')
+            d = datetime.strptime(f{app_date} {app_time} , "%Y.%m.%d %H:%M:%S,%f").strftime('%s.%f')
+            d_in_ms = int(float(d)*1000)
+            print(app_date)
             print(c_end_time)
+            
+            print(app_time)
+            #if app_time 
 
 
         returned_list = []
