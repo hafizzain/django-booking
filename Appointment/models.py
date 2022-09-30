@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 import uuid
 from django.db import models
 
@@ -7,6 +8,7 @@ from django.utils.timezone import now
 from Service.models import Service
 from Client.models import Client
 from Employee.models import Employee
+from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 
 
 class Appointment(models.Model):
@@ -102,7 +104,23 @@ class AppointmentService(models.Model):
     created_at = models.DateTimeField(auto_now_add=now)
     
     def member_name(self):
-        return str(self.member.full_name)
+        try:
+            return str(self.member.full_name)
+        except:
+            return None
+
+    def appointment_end_time(self):
+        app_date_time = f'2000-01-01 {self.appointment_time}'
+
+        try:
+            duration = DURATION_CHOICES_DATA[self.duration]
+            app_date_time = datetime.fromisoformat(app_date_time)
+            datetime_duration = app_date_time + timedelta(minutes=duration)
+            datetime_duration = datetime_duration.strftime('%H:%M:%S')
+            return datetime_duration
+        except Exception as err:
+            return str(err)
+    
 
     def __str__(self):
         return str(self.id)

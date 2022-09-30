@@ -128,7 +128,13 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = AppointmentService
-        fields =['id','appointment_id','appointment_date','appointment_status', 'price','appointment_time', 'end_time','client_type','duration', 'currency','created_at','service', 'client']
+        fields =['id',
+        'appointment_id','appointment_date','appointment_status', 
+        'price',
+        'appointment_time', 
+        'end_time',
+        'client_type','duration', 'currency','created_at','service', 'client'
+        ]
 
 class AppoinmentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -154,55 +160,86 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             is_active = True,
             is_deleted = False,
             is_blocked = False
-        ).values_list('id','appointment_time', 'duration', 'appointment_date')
-        selected_ids = {}
+        )
+        selected_data = []
 
         for appoint in appoint_services:
-            app_time = appoint[1]
-            app_duration = appoint[2]
-            app_date = appoint[3]
+
+            app_id = appoint.id
+            appointment_time = appoint.appointment_time
+            app_duration = appoint.duration
+            app_date = appoint.appointment_date
             
-            app_date_time = f'2000-01-01 {app_time}'
+            app_date_time = f'2000-01-01 {appointment_time}'
 
             duration = DURATION_CHOICES_DATA[app_duration]
             app_date_time = datetime.fromisoformat(app_date_time)
             datetime_duration = app_date_time + timedelta(minutes=duration)
             datetime_duration = datetime_duration.strftime('%H:%M:%S')
-            c_end_time = datetime_duration # Calculated End Time
+            end_time = datetime_duration # Calculated End Time
 
-            current_time = selected_ids.get(app_time , None)
-            if current_time is None:
-                selected_ids[app_time] = []
-            selected_ids[app_time].append(str(appoint[0]))
-            
-           #d = datetime.strptime("20.12.2016 09:38:42,76", "%d.%m.%Y %H:%M:%S,%f").strftime('%s.%f')
-            # d = datetime.strptime(f{app_date} {app_time} , "%Y.%m.%d %H:%M:%S,%f").strftime('%s.%f')
-            # d_in_ms = int(float(d)*1000)
-            # print(app_date)
-            print(c_end_time)
-            
-            print(app_time)
-            #if app_time 
+            print(appointment_time.microsecond)
+            print(appointment_time)
+
+            find_values = []
+            new_start_time = None
+            new_end_time = None
+
+            for dt in selected_data:
+                if ((dt['range_start'] == appointment_time or str(dt['range_start']) == str(end_time)) and dt['date'] == app_date):
+                    find_values.append(dt)
+                else:
+                    new_start_time = appointment_time
+                
+                if str(dt['range_end']) == str(end_time) and dt['date'] == app_date:
+                    find_values.append(dt)
+                else:
+                    # new_end_time = end_time
+                    pass
+
+                if str(dt['range_end']) == str(appointment_time) and dt['date'] == app_date:
+                    find_values.append(dt)
+                    new_end_time = end_time
 
 
+            if len(find_values) > 0:
+                current_obj = find_values[0]
+                if new_start_time is not None:
+                    current_obj['range_start'] = new_start_time
+                if new_end_time is not None:
+                    current_obj['range_end'] = new_end_time
+
+                current_obj['ids'].append(app_id)
+            else:
+                selected_data.append({
+                    'date' : app_date,
+                    'range_start' : appointment_time,
+                    'range_end' : end_time,
+                    'ids' : [app_id]
+                })
+        
         returned_list = []
-        for selected_time in selected_ids.values():
-            loop_return = []
-            for id_ in selected_time:
-                app_service = AppointmentService.objects.get(id=id_)
+        for data in selected_data:
+            loop_return =[]
+            for id in data['ids']:
+                app_service = AppointmentService.objects.get(id=id)
                 serialized_service = AppointmentServiceSerializer(app_service)
                 loop_return.append(serialized_service.data)
-            
             returned_list.append(loop_return)
+            
+
+        # for selected_time in selected_ids.values():
+        #     loop_return = []
+        #     for id_ in selected_time:
+        #         app_service = AppointmentService.objects.get(id=id_)
+        #         serialized_service = AppointmentServiceSerializer(app_service)
+        #         loop_return.append(serialized_service.data)
+            
+        #     returned_list.append(loop_return)
             
         # serialized = AppointmentServiceSerializer(appoint_services, many=True)
         # returned_list.append(serialized.data)
-        return returned_list
-
-# {
-#     'time' : ['id' , 'id'],
-#     'diff' : ['id' , 'id'],
-# }
+        return selected_data
 
     def get_employee(self, obj):
         try:
