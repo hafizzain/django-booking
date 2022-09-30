@@ -25,7 +25,7 @@ class Service(models.Model):
     
     name = models.CharField(max_length=300, default='')
     treatment_type = models.CharField(default='test2', choices=TREATMENT_TYPES, max_length=20, null=True, blank=True)
-    service = models.ManyToManyField('Service', null=True, blank=True, related_name='package_services')
+    parrent_service = models.ManyToManyField('Service', null=True, blank=True, related_name='package_services')
     
     description = models.CharField(max_length=100, default='')
     employee = models.ManyToManyField(Employee, related_name='service_or_package_employe')

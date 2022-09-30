@@ -176,9 +176,9 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             selected_ids[app_time].append(str(appoint[0]))
             
            #d = datetime.strptime("20.12.2016 09:38:42,76", "%d.%m.%Y %H:%M:%S,%f").strftime('%s.%f')
-            d = datetime.strptime(f{app_date} {app_time} , "%Y.%m.%d %H:%M:%S,%f").strftime('%s.%f')
-            d_in_ms = int(float(d)*1000)
-            print(app_date)
+            # d = datetime.strptime(f{app_date} {app_time} , "%Y.%m.%d %H:%M:%S,%f").strftime('%s.%f')
+            # d_in_ms = int(float(d)*1000)
+            # print(app_date)
             print(c_end_time)
             
             print(app_time)

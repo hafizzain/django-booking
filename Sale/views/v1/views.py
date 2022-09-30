@@ -119,7 +119,7 @@ def create_service(request):
         enable_team_comissions =enable_team_comissions,
         enable_vouchers=enable_vouchers,
     )
-    
+    employees_error = []
     if is_package is not None:
         service_obj.is_package = True
         service_obj.treatment_type = treatment_type
@@ -134,14 +134,13 @@ def create_service(request):
         for ser in service:
             try:
                 service_id=Service.objects.get(id=ser)
-                print(service_id)
-                service_obj.service.add(service_id)
+                service_obj.parrent_service.add(service_id)
             except Exception as err:
                 employees_error.append(str(err))
 
     service_obj.save()
             
-    employees_error = []
+   
     if type(employee) == str:
         employee = json.loads(employee)
 
@@ -150,8 +149,7 @@ def create_service(request):
         
     for usr in employee:
             try:
-               employe = Employee.objects.get(id=usr)  
-               print(employe)
+               employe = Employee.objects.get(id=usr)
                service_obj.employee.add(employe)
             except Exception as err:
                 employees_error.append(str(err))
@@ -247,12 +245,12 @@ def update_service(request):
         status=status.HTTP_400_BAD_REQUEST
         )
     try:
-        service = Service.objects.get(id=id)
+        service_id = Service.objects.get(id=id)
     except Exception as err:
         return Response(
             {
                 'status' : False,
-                'status_code_text' : 'INVALID_VOUCHER_ID',
+                'status_code_text' : 'INVALID_SERVICE_ID',
                 'response' : {
                     'message' : 'Service Not Found',
                     'error_message' : str(err),
@@ -260,8 +258,42 @@ def update_service(request):
             },
                 status=status.HTTP_404_NOT_FOUND
         )
+    error = []
+    employee=request.data.get('employee', None)
+    service=request.data.get('service', None)
+    if service is not None:
+        if type(service) == str:
+            service = json.loads(service)
+        elif type(service) == list:
+            pass
+        service_id.parrent_service.clear()
+        for usr in service:
+            try:
+               service = Service.objects.get(id=usr)  
+               service_id.parrent_service.add(service)
+            except Exception as err:
+                error.append(str(err))
+    
         
-    serializer= ServiceSerializer(service, data=request.data, partial=True)
+    if employee is not None:
+        if type(employee) == str:
+            employee = json.loads(employee)
+        elif type(employee) == list:
+            pass
+        print(type(employee))
+        service_id.employee.clear()
+        for usr in employee:
+            try:
+                print(usr)
+                employe = Employee.objects.get(id=usr)
+                service_id.employee.add(employe)
+            except Exception as err:
+                error.append(str(err))
+                
+        service_id.save() 
+    
+        
+    serializer= ServiceSerializer(service_id, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
         return Response(
@@ -272,6 +304,7 @@ def update_service(request):
                     'message' : ' Service updated successfully',
                     'error_message' : None,
                     'service' : serializer.data
+                
                 }
             },
             status=status.HTTP_200_OK
