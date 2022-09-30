@@ -119,7 +119,7 @@ def get_calendar_appointment(request):
         is_active = True,
         is_blocked = False,
     ).order_by('-created_at')
-    serialized = EmployeeAppointmentSerializer(all_memebers, many=True)
+    serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request' : request})
 
     return Response(
         {

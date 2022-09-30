@@ -301,7 +301,8 @@ def create_employee(request):
     joining_date = request.data.get('joining_date', None)
     to_present = request.data.get('to_present', False)
     ending_date= request.data.get('ending_date',None)
-    
+    is_active = request.data.get('is_active',None)
+
    
     
     
@@ -313,6 +314,7 @@ def create_employee(request):
     end_time= request.data.get('end_time',None)
     start_time = request.data.get('start_time', None)
     working_days = request.data.get('working_days',None)
+    level = request.data.get('level',None)
     # services = request.data.get('services', None)
     
     # #EmployeePermissionSetting
@@ -341,7 +343,7 @@ def create_employee(request):
     city = request.data.get('city', None)
    
     if not all([
-         business_id, full_name ,employee_id, email, country, state, city ,gender  ,address , designation, income_type, salary ]): #or ( not to_present and ending_date is None):
+         business_id, full_name ,employee_id, email, country, state, city ,gender  ,address , designation, income_type, salary, level ]): #or ( not to_present and ending_date is None):
        return Response(
             {
                 'status' : False,
@@ -362,6 +364,7 @@ def create_employee(request):
                         'designation',
                         'income_type',
                         'salary',
+                        'level',
                     ]
                 }
             },
@@ -437,6 +440,10 @@ def create_employee(request):
         pass
     else:
         employee.to_present = True 
+    if is_active is not None:
+        employee.is_active =True
+    else:
+        employee.is_active = False 
     employee.save()
     data = {}
 
@@ -453,7 +460,7 @@ def create_employee(request):
 
     elif type(working_days) == list:
             pass
-
+        
     employee_p_info.monday = True if 'monday' in request.data else False
     employee_p_info.tuesday = True if 'tuesday' in request.data else False
     employee_p_info.wednesday = True if 'wednesday' in request.data else False
@@ -461,6 +468,7 @@ def create_employee(request):
     employee_p_info.friday = True if 'friday' in request.data else False
     employee_p_info.saturday = True if 'saturday' in request.data else False
     employee_p_info.sunday = True if 'sunday' in request.data else False
+    
         
     employee_p_info.save()
     
@@ -557,6 +565,7 @@ def delete_employee(request):
 def update_employee(request): 
     # sourcery skip: avoid-builtin-shadow
         id = request.data.get('id', None)
+        is_active = request.data.get('is_active' ,None)
         if id is None:
             return Response(
             {
@@ -592,7 +601,12 @@ def update_employee(request):
         image=request.data.get('image',None)
         if image is not None:
             employee.image=image
-            employee.save()
+            
+        if is_active is not None:
+            employee.is_active =True
+        else:
+            employee.is_active = False 
+        employee.save()
         serializer = EmployeSerializer(employee, data=request.data, partial=True, context={'request' : request})
         if serializer.is_valid():
            serializer.save()
@@ -1075,8 +1089,9 @@ def create_attendence(request):
                     'response' : {
                     'message' : 'Business not found',
                     'error_message' : str(err),
-                }
-                }
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
             )
     try:
         employee_id=Employee.objects.get(id=employees)
@@ -1088,8 +1103,9 @@ def create_attendence(request):
                     'response' : {
                     'message' : 'Employee not found',
                     'error_message' : str(err),
-                }
-                }
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
             )
     attendence_employe=Attendance.objects.create(
         user=user,

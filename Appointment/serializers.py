@@ -5,6 +5,8 @@ from Appointment.models import Appointment, AppointmentService
 from Employee.models import Employee
 from Service.models import Service
 from datetime import datetime, timedelta
+from Product.Constants.index import tenant_media_base_url
+
 
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 
@@ -20,6 +22,18 @@ class ServiceAppointmentSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'price')
 
 class EmployeAppoinmentSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request)
+                return f'{url}{obj.image}'
+            except:
+                return obj.image
+        return None
+    
     class Meta:
         model = Employee
         fields = ('id', 'full_name', 'image')
@@ -144,7 +158,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
 
     def get_employee(self, obj):
         try:
-            return EmployeAppoinmentSerializer(obj).data
+            return EmployeAppoinmentSerializer(obj, context=self.context ).data
         except:
             return None
 

@@ -15,9 +15,13 @@ from rest_framework.settings import api_settings
 
 from NStyle.Constants import StatusCodes
 
-from Product.models import Category, Brand , Product, ProductMedia, ProductStock
+from Product.models import ( Category, Brand , Product, ProductMedia, ProductStock
+                            , OrderStock, OrderStockProduct
+                           )
 from Business.models import Business, BusinessAddress, BusinessVendor
-from Product.serializers import CategorySerializer, BrandSerializer, ProductSerializer, ProductStockSerializer, ProductWithStockSerializer
+from Product.serializers import (CategorySerializer, BrandSerializer, ProductSerializer, ProductStockSerializer, ProductWithStockSerializer
+                                 ,OrderSerializer , OrderProductSerializer
+                                 )
 
 
 @api_view(['GET'])
@@ -1163,3 +1167,227 @@ def search_brand(request):
         },
         status=status.HTTP_200_OK
     )
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_orderstock(request):
+    user = request.user
+    business = request.data.get('business', None)
+    
+    vendor = request.data.get('vendor', None)
+    location = request.data.get('location',None)
+    orstock_status = request.data.get('status',None)
+    rec_quantity = request.data.get('rec_quantity',None)
+    
+    products = request.data.get('products', [])
+    #quantity = request.data.get('quantity',None)
+    
+    
+    if not all([business, orstock_status, vendor, location]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                          'orstock_status',
+                            ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+             business_id=Business.objects.get(id=business)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    try:
+        vendor_id=BusinessVendor.objects.get(id=vendor)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.VENDOR_NOT_FOUND_4019,
+                    'response' : {
+                    'message' : 'Vendor not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    try:
+        location_id=BusinessAddress.objects.get(id=location)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.LOCATION_NOT_FOUND_4017,
+                    'response' : {
+                    'message' : 'Location not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+    order = OrderStock.objects.create(
+        user=user,
+        business=business_id, 
+        vendor = vendor_id,
+        location= location_id,
+        status =orstock_status,
+        rec_quantity= rec_quantity
+    )
+    
+    if type(products) == str:
+        products = products.replace("'" , '"')
+        print(products)
+        products = json.loads(products)
+        pass
+    else:
+        pass
+    for product in products :
+        try:
+            pro = Product.objects.get(id=product['id'])
+        except Product.DoesNotExist:
+            None
+        OrderStockProduct.objects.create(
+            order = order,
+            product = pro,
+            quantity = product['quantity']
+        )
+    serializer = OrderSerializer(order)
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Order Stock Created Successfully!',
+                    'error_message' : None,
+                    'orderstock' : serializer.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        ) 
+ 
+ 
+ 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_orderstock(request):
+    order_stocks = OrderStock.objects.all().order_by('-created_at')
+    serialized = OrderSerializer(order_stocks, many=True, context={'request' : request})
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'All Order stocks!',
+                'error_message' : None,
+                'stocks' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+ 
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_orderstock(request):
+    order_id = request.data.get('order_id', None)
+    #products = request.data.get('products', [])
+    
+    if order_id is None:
+            return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'User id is required',
+                    'fields' : [
+                        'order_id',
+                    ]
+                }
+            },
+             status=status.HTTP_400_BAD_REQUEST
+           )
+        
+    try:
+        order_stock = OrderStock.objects.get(id=order_id)
+    except Exception as err:
+              return Response(
+             {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_ORDER_STOCK_ID_4038,
+                    'status_code_text' : 'INVALID_ORDER_STOCK_ID_4038',
+                        'response' : {
+                            'message' : 'Order Stock Not Found',
+                            'error_message' : str(err),
+                    }
+                },
+                   status=status.HTTP_404_NOT_FOUND
+              )
+    # if type(products) == str:
+    #     products = products.replace("'" , '"')
+    #     print(products)
+    #     products = json.loads(products)
+    # else:
+    #     pass
+    # for product in products :
+       
+    #     if product['edit'] == 'yes':
+    #         try:
+    #             print(product['id'])
+    #             id_dt = OrderStockProduct.objects.get(id=product['id'])
+    #             pro = Product.objects.get(id=product['product_id'])
+    #         except Product.DoesNotExist:
+    #             None
+            
+    #         product_serializer = OrderProductSerializer(id_dt, data=request.data , partial=True)
+       
+              
+    serializer = OrderSerializer(order_stock, data=request.data, partial=True, context={'request' : request})
+    if serializer.is_valid():
+           serializer.save()
+    else: 
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+                'response' : {
+                    'message' : 'Invialid Data',
+                    'error_message' : str(serializer.errors),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+        
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : ' OrderStock updated successfully',
+                    'error_message' : None,
+                    'stock' :serializer.data
+                }
+            },
+            status=status.HTTP_200_OK
+           )
+        
+    

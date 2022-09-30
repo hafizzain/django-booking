@@ -149,6 +149,7 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
             'postal_code',
             'website',
             'is_primary',
+            'banking',
             'start_time',
             'close_time',
         ]

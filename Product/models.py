@@ -127,3 +127,42 @@ class ProductStock(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+
+class OrderStock(models.Model):
+    STATUS_CHOICES =[
+        ('Placed', 'Placed'),
+        ('Delivered', 'Delivered'),
+        ('Partially_Received', 'Partially Received'),
+        ('Received', 'Received'),
+    ]
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_order_stock')
+    business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_order_stock')
+    
+    vendor = models.ForeignKey(BusinessVendor, on_delete=models.CASCADE, related_name='vendor_order_stock', default=None, null=True, blank=True)
+    location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='locations_order_stock')
+    
+    status= models.CharField(choices = STATUS_CHOICES, max_length =100, default='Placed')
+    rec_quantity= models.PositiveIntegerField(default=0, verbose_name= 'Received Quantity', null=True, blank=True)
+    
+    is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+
+
+    def __str__(self):
+        return str(self.id)
+    
+class OrderStockProduct(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    order = models.ForeignKey(OrderStock, on_delete=models.CASCADE , related_name='order_stock')
+    
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_order_stock')
+    quantity = models.PositiveIntegerField(default=0)
+    
+    def __str__(self):
+        return str(self.id)
+    
+    

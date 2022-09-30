@@ -90,10 +90,12 @@ class PromotionSerializer(serializers.ModelSerializer):
         fields = ['id', 'name','purchases' , 'promotion_type', 'product', 'service','discount','valid_til']
         
 class MembershipSerializer(serializers.ModelSerializer):
+    product = ProductSerializer()
+    service = ServiceSerializer()
     
     class Meta:
         model = Membership
-        fields = '__all__'
+        fields = ['id', 'name', 'membership','total_number','valid_for','validity','price','tax_rate','service','product']
 
 class VoucherSerializer(serializers.ModelSerializer):
     

@@ -71,6 +71,11 @@ class BusinessSocial(models.Model):
 
 
 class BusinessAddress(models.Model):
+    BANKING_CHOICE = [
+        ('Enable' , 'Enable'),
+        ('Disable' , 'Disable')
+    ]
+    
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_address')
@@ -92,7 +97,9 @@ class BusinessAddress(models.Model):
 
     mobile_number = models.CharField(default='', max_length=30)
     is_mobile_verified = models.BooleanField(default=False)
-
+    
+    banking = models.CharField(choices = BANKING_CHOICE , default = 'Disable' , max_length = 50)
+    
     is_primary = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
@@ -339,10 +346,10 @@ class BusinessTax(models.Model):
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_tax')
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_tax')
-
+    
     tax_type = models.CharField(choices=TAX_TYPES, default='Individual', max_length=20)
     name = models.CharField(default='', max_length=100)
-    parent_tax = models.ManyToManyField('BusinessTax', blank=True)
+    parent_tax = models.ManyToManyField('BusinessTax', blank=True,)
     tax_rate = models.PositiveIntegerField(default=0, null=True, blank=True)
     location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='locations_taxs')
 

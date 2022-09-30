@@ -574,6 +574,8 @@ def add_business_location(request):
     email= request.data.get('email',None)
     mobile_number = request.data.get('mobile_number', None)
     
+    banking = request.data.get('banking',None)
+    
     start_time = request.data.get('start_time', None)
     close_time = request.data.get('close_time', None)
 
@@ -664,6 +666,7 @@ def add_business_location(request):
         country=country,
         state=state,
         city=city,
+        banking = banking,
         is_primary = False,
         is_active = True,
         is_deleted = False,
@@ -671,28 +674,45 @@ def add_business_location(request):
     )
     if postal_code is not None:
         business_address.postal_code = postal_code
-        
     business_address.save()
-    data={}
-    if start_time or close_time is not None:
-        days = [
-            'Monday',
-            'Tuesday',
-            'Wednesday',
-            'Thursday',
-            'Friday',
-            'Saturday',
-            'Sunday',
-        ]
-        for day in days:
-            BusinessOpeningHour.objects.create(
-                    day = day,
-                    start_time = start_time,
-                    close_time = close_time,
-                    business_address = business_address,
-                    business = business
-                )
     
+    opening_day = request.data.get('open_day', None)    
+
+    # data={}
+    # if start_time or close_time is not None:
+    #     days = [
+    #         'Monday',
+    #         'Tuesday',
+    #         'Wednesday',
+    #         'Thursday',
+    #         'Friday',
+    #         'Saturday',
+    #         'Sunday',
+    #     ]
+    days = [
+        'nonday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday',
+        'saturday',
+        'sunday',
+    ]
+    for day in days:
+        bds_schedule = BusinessOpeningHour.objects.create(
+            business_address = business_address,
+            business = business,
+            day = day,
+        )
+        s_day = opening_day.get(day.lower(), None)
+        if s_day is not None:
+            bds_schedule.start_time = s_day.get('start_time', None)
+            bds_schedule.close_time = s_day.get('close_time', None)
+        else:
+            bds_schedule.is_closed = True
+
+        bds_schedule.save()
+      
             
     # serialized = OpeningHoursSerializer(busines_opening,  data=request.data)
     # if serialized.is_valid():
@@ -1828,6 +1848,8 @@ def add_business_tax(request):
     tax_ids = request.data.get('tax_ids', None)
     location = request.data.get('location', None)
     
+    tax_id = request.data.get('tax_id',None)
+    
     if business_id is None or (tax_type != 'Location' and name is None) or (tax_type == 'Group' and tax_ids is None) or (tax_type != 'Group' and tax_rate is None) or (tax_type == 'Location' and location is None ):
         return Response(
             {
@@ -1884,13 +1906,28 @@ def add_business_tax(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-
-    if tax_rate is None:
+        try:
+                tax = BusinessTax.objects.get(id=tax_id)
+        except Exception as err:
+                return Response(
+                        {
+                            'status' : False,
+                            'status_code' : StatusCodes.LOCATION_NOT_FOUND_4017,
+                            'status_code_text' : 'BUSINESSS_TAX_NOT_FOUND',
+                            'response' : {
+                                'message' : 'Business Tax Not Found',
+                                'error_message' : str(err),
+                            }
+                        },
+                        status=status.HTTP_404_NOT_FOUND
+                    )
+    if tax_rate is None:  
         tax_rate = 0
-
+        
     business_tax = BusinessTax.objects.create(
         user = user,
         business=business,
+        parent_tax = tax,
         tax_type = tax_type,
         tax_rate = tax_rate,
     )

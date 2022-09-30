@@ -34,7 +34,11 @@ urlpatterns = [
     #Export CSV files
     path('export_csv/', views.export_csv, name='export_csv'),
     path('import_product/', views.import_product, name='import_product'),
-    path('import_category/', views.import_category)
+    path('import_category/', views.import_category),
     # path('UploadFileView/', views.UploadFileView, )
-
+    
+    #Order Stocks
+    path('create_orderstock/', views.create_orderstock),
+    path('get_orderstock/', views.get_orderstock),
+    path('update_orderstock/', views.update_orderstock),
 ]
