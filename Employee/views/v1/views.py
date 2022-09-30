@@ -301,7 +301,8 @@ def create_employee(request):
     joining_date = request.data.get('joining_date', None)
     to_present = request.data.get('to_present', False)
     ending_date= request.data.get('ending_date',None)
-    
+    is_active = request.data.get('is_active',None)
+
    
     
     
@@ -439,6 +440,10 @@ def create_employee(request):
         pass
     else:
         employee.to_present = True 
+    if is_active is not None:
+        employee.is_active =True
+    else:
+        employee.is_active = False 
     employee.save()
     data = {}
 
@@ -560,6 +565,7 @@ def delete_employee(request):
 def update_employee(request): 
     # sourcery skip: avoid-builtin-shadow
         id = request.data.get('id', None)
+        is_active = request.data.get('is_active' ,None)
         if id is None:
             return Response(
             {
@@ -595,7 +601,12 @@ def update_employee(request):
         image=request.data.get('image',None)
         if image is not None:
             employee.image=image
-            employee.save()
+            
+        if is_active is not None:
+            employee.is_active =True
+        else:
+            employee.is_active = False 
+        employee.save()
         serializer = EmployeSerializer(employee, data=request.data, partial=True, context={'request' : request})
         if serializer.is_valid():
            serializer.save()

@@ -20,7 +20,7 @@ from Product.models import ( Category, Brand , Product, ProductMedia, ProductSto
                            )
 from Business.models import Business, BusinessAddress, BusinessVendor
 from Product.serializers import (CategorySerializer, BrandSerializer, ProductSerializer, ProductStockSerializer, ProductWithStockSerializer
-                                 ,OrderSerializer
+                                 ,OrderSerializer , OrderProductSerializer
                                  )
 
 
@@ -1307,6 +1307,7 @@ def get_orderstock(request):
 @permission_classes([IsAuthenticated])
 def update_orderstock(request):
     order_id = request.data.get('order_id', None)
+    #products = request.data.get('products', [])
     
     if order_id is None:
             return Response(
@@ -1340,4 +1341,53 @@ def update_orderstock(request):
                 },
                    status=status.HTTP_404_NOT_FOUND
               )
+    # if type(products) == str:
+    #     products = products.replace("'" , '"')
+    #     print(products)
+    #     products = json.loads(products)
+    # else:
+    #     pass
+    # for product in products :
+       
+    #     if product['edit'] == 'yes':
+    #         try:
+    #             print(product['id'])
+    #             id_dt = OrderStockProduct.objects.get(id=product['id'])
+    #             pro = Product.objects.get(id=product['product_id'])
+    #         except Product.DoesNotExist:
+    #             None
+            
+    #         product_serializer = OrderProductSerializer(id_dt, data=request.data , partial=True)
+       
+              
+    serializer = OrderSerializer(order_stock, data=request.data, partial=True, context={'request' : request})
+    if serializer.is_valid():
+           serializer.save()
+    else: 
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+                'response' : {
+                    'message' : 'Invialid Data',
+                    'error_message' : str(serializer.errors),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+        
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : ' OrderStock updated successfully',
+                    'error_message' : None,
+                    'stock' :serializer.data
+                }
+            },
+            status=status.HTTP_200_OK
+           )
+        
     

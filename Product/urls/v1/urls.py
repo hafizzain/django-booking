@@ -40,4 +40,5 @@ urlpatterns = [
     #Order Stocks
     path('create_orderstock/', views.create_orderstock),
     path('get_orderstock/', views.get_orderstock),
+    path('update_orderstock/', views.update_orderstock),
 ]
