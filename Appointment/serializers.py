@@ -2,6 +2,7 @@ from pkgutil import read_code
 from pyexpat import model
 from rest_framework import serializers
 from Appointment.models import Appointment, AppointmentService
+from Client.serializers import ClientAppointmentSerializer
 from Employee.models import Employee
 from Service.models import Service
 from datetime import datetime, timedelta
@@ -71,7 +72,7 @@ class TodayAppoinmentSerializer(serializers.ModelSerializer):
         fields = ('id', 'appointment_time', 'appointment_date', 'member' , 'service', 'end_time' )
         
 class AppointmentServiceSerializer(serializers.ModelSerializer):
-    member = serializers.SerializerMethodField(read_only=True)
+    client = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
     appointment_id= serializers.SerializerMethodField(read_only=True)
     client_type= serializers.SerializerMethodField(read_only=True)
@@ -118,15 +119,15 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
         except Exception:
             return None
     
-    def get_member(self, obj):
-        try:
-            return EmployeAppoinmentSerializer(obj.member).data
-        except Exception:
+    def get_client(self, obj):
+        if obj.appointment and obj.appointment.client:
+            return ClientAppointmentSerializer(obj.appointment.client).data
+        else:
             return None
     
     class Meta:
         model = AppointmentService
-        fields =['id','appointment_id','appointment_date','appointment_status', 'price','appointment_time', 'end_time','client_type','duration', 'currency','created_at','service', 'member']
+        fields =['id','appointment_id','appointment_date','appointment_status', 'price','appointment_time', 'end_time','client_type','duration', 'currency','created_at','service', 'client']
 
 class AppoinmentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -152,9 +153,46 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             is_active = True,
             is_deleted = False,
             is_blocked = False
-        )
-        serialized = AppointmentServiceSerializer(appoint_services, many=True)
-        return serialized.data
+        ).values_list('id', 'appointment_time', 'duration')
+        selected_ids = {}
+
+        for appoint in appoint_services:
+            app_time = appoint[1]
+            app_duration = appoint[2]
+            
+            app_date_time = f'2000-01-01 {app_time}'
+
+            duration = DURATION_CHOICES_DATA[app_duration]
+            app_date_time = datetime.fromisoformat(app_date_time)
+            datetime_duration = app_date_time + timedelta(minutes=duration)
+            datetime_duration = datetime_duration.strftime('%H:%M:%S')
+            c_end_time = datetime_duration # Calculated End Time
+
+            current_time = selected_ids.get(app_time , None)
+            if current_time is None:
+                selected_ids[app_time] = []
+            selected_ids[app_time].append(str(appoint[0]))
+            print(c_end_time)
+
+
+        returned_list = []
+        for selected_time in selected_ids.values():
+            loop_return = []
+            for id_ in selected_time:
+                app_service = AppointmentService.objects.get(id=id_)
+                serialized_service = AppointmentServiceSerializer(app_service)
+                loop_return.append(serialized_service.data)
+            
+            returned_list.append(loop_return)
+            
+        # serialized = AppointmentServiceSerializer(appoint_services, many=True)
+        # returned_list.append(serialized.data)
+        return returned_list
+
+# {
+#     'time' : ['id' , 'id'],
+#     'diff' : ['id' , 'id'],
+# }
 
     def get_employee(self, obj):
         try:

@@ -67,14 +67,14 @@ class AppointmentService(models.Model):
     ]
 
     DURATION_CHOICES = [
-        ('30 MIN', '30 MIN'), 
-        ('60 MIN', '60 MIN'),
-        ('90 MIN', '90 MIN'),
-        ('120 MIN', '120 MIN'),
-        ('150 MIN', '150 MIN'),
-        ('180 MIN', '180 MIN'),
-        ('210 MIN', '210 MIN'),
-        ('240 MIN', '240 MIN'),
+        ('30 Min', '30 Min'), 
+        ('60 Min', '60 Min'),
+        ('90 Min', '90 Min'),
+        ('120 Min', '120 Min'),
+        ('150 Min', '150 Min'),
+        ('180 Min', '180 Min'),
+        ('210 Min', '210 Min'),
+        ('240 Min', '240 Min'),
     ]
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     

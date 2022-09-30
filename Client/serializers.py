@@ -102,3 +102,10 @@ class VoucherSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vouchers
         fields = '__all__'
+
+
+class ClientAppointmentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Client
+        fields = ['id', 'full_name', 'image']
