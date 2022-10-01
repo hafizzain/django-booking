@@ -690,7 +690,7 @@ def add_business_location(request):
     #         'Sunday',
     #     ]
     days = [
-        'nonday',
+        'monday',
         'tuesday',
         'wednesday',
         'thursday',
