@@ -223,3 +223,29 @@ class CommissionSchemeSetting(models.Model):
     
     def __str__(self):
         return str(self.id)
+
+class Assets(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_assets')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_assets')
+    
+    name = models.CharField(max_length=300, default='')
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_assets')
+    given = models.DateField(verbose_name = 'given date')
+    return_date = models.DateField(null=True, blank=True, verbose_name = 'return date')
+    
+    
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=now)
+    
+    def __str__(self):
+        return str(self.id)
+    
+class UploadFile(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    
+    document = models.FileField()
+    
+    def __str__(self):
+        return str(self.id)
+    
