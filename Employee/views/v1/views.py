@@ -1,9 +1,10 @@
+from tkinter import N
 from django.shortcuts import render
 from Employee.models import( Employee , EmployeeProfessionalInfo ,
                         EmployeePermissionSetting,  EmployeeModulePermission
                         , EmployeeMarketingPermission , StaffGroup 
                         , StaffGroupModulePermission, Attendance
-                        ,Payroll, CommissionSchemeSetting
+                        ,Payroll, CommissionSchemeSetting, Asset, AssetDocument
                         )
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -13,6 +14,7 @@ from Employee.serializers import( EmployeSerializer , EmployeInformationsSeriali
                           ,  EmployeeMarketingSerializers, StaffGroupSerializers , 
                           StaffpermisionSerializers , AttendanceSerializers
                           ,PayrollSerializers,singleEmployeeSerializer , CommissionSerializer
+                          , AssetSerializer
                         
                           
                                  )
@@ -1540,6 +1542,233 @@ def update_commision(request):
         )
     
 
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# def create_staff_group(request):
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_asset(request):
+    user = request.user
+    business_id = request.data.get('business', None)
+    
+    name = request.data.get('name', None)
+    employee_id = request.data.get('employee', None)
+    given_date = request.data.get('given_date',None)
+    return_date = request.data.get('return_date',None)
+    
+    is_active= request.data.get('is_active' ,None)
+    document =request.FILES.getlist('document',  None)
+    
+    if not all([ business_id, name, employee_id, given_date, document ]):
+              return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                          'name',
+                          'employee',
+                          'given_date', 
+                          'document',
+                            ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        business=Business.objects.get(id=business_id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                }
+                }
+            )
+    if is_active is not None:
+        is_active = True
+    else: 
+        is_active = False
+        
+    try:
+        employee = Employee.objects.get(id=employee_id)
+    except Exception as err:
+        return Response(
+             {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
+                    'status_code_text' : 'INVALID_NOT_FOUND_EMPLOYEE_ID_4022',
+                          'response' : {
+                        'message' : 'Employee Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                   status=status.HTTP_404_NOT_FOUND
+              )
+    
+    asset= Asset.objects.create(
+        user= user,
+        business= business,
+        employee=employee,
+        name= name,
+        given_date = given_date,
+        return_date =return_date,
+        is_active =is_active
+    )
+    if document is not None:
+        for doc in document:
+            doc = AssetDocument.objects.create(
+                asset = asset,
+                document = doc
+            )
+    serializers= AssetSerializer(asset)
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Asset Created Successfully!',
+                    'error_message' : None,
+                    'asset' : serializers.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        ) 
+        
+        
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_asset(request):
+    all_asset= Asset.objects.all().order_by('created_at')
+    serialized = AssetSerializer(all_asset, many=True, context={'request' : request})
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Assets',
+                'error_message' : None,
+                'asset' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_asset(request):
+    asset_id = request.data.get('id', None)
+    if asset_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        asset = Asset.objects.get(id=asset_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Asset ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    asset.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Asset deleted successful',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_asset(request):
+    asset_id = request.data.get('id', None)
+    if asset_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+       
+    try:
+        asset = Asset.objects.get(id=asset_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Asset ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    serializer = AssetSerializer(asset, data=request.data, partial=True)
+    if not serializer.is_valid():
+        return Response(
+                {
+            'status' : False,
+            'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+            'response' : {
+                'message' : 'Asset Serializer Invalid',
+                'error_message' : str(err),
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+        )
+    serializer.save()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Update Asset Successfully',
+                'error_message' : None,
+                'asset' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+        )

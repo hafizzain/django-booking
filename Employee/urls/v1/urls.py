@@ -36,6 +36,9 @@ urlpatterns = [
     path('get_commission/', views.get_commission),
     path('update_commision/', views.update_commision),
     
-
-
+    #Create Asset
+    path('create_asset/', views.create_asset),
+    path('get_asset/', views.get_asset),
+    path('delete_asset/', views.delete_asset), 
+    path('update_asset/', views.update_asset), 
 ]

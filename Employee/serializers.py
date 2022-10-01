@@ -9,7 +9,7 @@ from .models import( Employee, EmployeeProfessionalInfo ,
                EmployeePermissionSetting, EmployeeModulePermission 
                , EmployeeMarketingPermission,
                StaffGroup, StaffGroupModulePermission, Attendance
-               ,Payroll , CommissionSchemeSetting
+               ,Payroll , CommissionSchemeSetting , Asset ,AssetDocument
 )
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -345,5 +345,36 @@ class CommissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommissionSchemeSetting
         fields = '__all__'
+      
+class AssetdocmemtSerializer(serializers.ModelSerializer):
+    document = serializers.SerializerMethodField()
+    
+    def get_document(self, obj):
+        try:
+            request = self.context["request"]
+            url = tenant_media_base_url(request)
+            return f'{url}{obj.document}'
+        except Exception as err:
+            print(err)
+            return None
+    
+    class Meta:
+        model = AssetDocument
+        fields= ['id', 'document']
         
+class AssetSerializer(serializers.ModelSerializer):
+    document = serializers.SerializerMethodField()
+    
+    def get_document(self, obj):
+        try:
+            doc = AssetDocument.objects.filter(asset=obj)
+            return AssetdocmemtSerializer(doc,many =True, context=self.context ).data
+        
+        except Exception as err:
+            print(err)
+            return None
+    
+    class Meta:
+        model = Asset
+        fields = ['id','name','employee','given_date','return_date', 'document']
 
