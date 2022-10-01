@@ -224,14 +224,14 @@ class CommissionSchemeSetting(models.Model):
     def __str__(self):
         return str(self.id)
 
-class Assets(models.Model):
+class Asset(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_assets')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_assets')
     
     name = models.CharField(max_length=300, default='')
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_assets')
-    given = models.DateField(verbose_name = 'given date')
+    given_date = models.DateField(verbose_name = 'given date')
     return_date = models.DateField(null=True, blank=True, verbose_name = 'return date')
     
     
@@ -241,10 +241,11 @@ class Assets(models.Model):
     def __str__(self):
         return str(self.id)
     
-class UploadFile(models.Model):
+class AssetDocument(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE , related_name='asset_documents')
     
-    document = models.FileField()
+    document = models.FileField(upload_to='employee/assets/documents/')
     
     def __str__(self):
         return str(self.id)
