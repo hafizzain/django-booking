@@ -676,7 +676,11 @@ def add_business_location(request):
         business_address.postal_code = postal_code
     business_address.save()
     
-    opening_day = request.data.get('open_day', None)    
+    opening_day = request.data.get('open_day', None)   
+    if type(opening_day) == str:
+        opening_day = json.loads(opening_day)
+    else:
+        pass  
 
     # data={}
     # if start_time or close_time is not None:

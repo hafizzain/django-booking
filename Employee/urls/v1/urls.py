@@ -41,4 +41,9 @@ urlpatterns = [
     path('get_asset/', views.get_asset),
     path('delete_asset/', views.delete_asset), 
     path('update_asset/', views.update_asset), 
+    
+    #Working Schedule
+    path('working_schedule/', views.working_schedule)
+    
+    
 ]
