@@ -14,7 +14,7 @@ from Employee.serializers import( EmployeSerializer , EmployeInformationsSeriali
                           ,  EmployeeMarketingSerializers, StaffGroupSerializers , 
                           StaffpermisionSerializers , AttendanceSerializers
                           ,PayrollSerializers,singleEmployeeSerializer , CommissionSerializer
-                          , AssetSerializer
+                          , AssetSerializer, WorkingScheduleSerializer
                         
                           
                                  )
@@ -200,7 +200,7 @@ def search_employee(request):
 @permission_classes([AllowAny])
 def get_Employees(request):
     all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
-    serialized = singleEmployeeSerializer(all_employe,  many=True, context={'request' : request} )
+    serialized = WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request} )
     return Response(
         {
             'status' : 200,
@@ -282,6 +282,27 @@ def get_single_employee(request):
     )
 
     
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def working_schedule(request):
+    data=[]
+    all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
+    serialized = WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request} )
+    data.append(serialized.data)
+   
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Employee',
+                'error_message' : None,
+                'employees' : data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -303,10 +324,7 @@ def create_employee(request):
     joining_date = request.data.get('joining_date', None)
     to_present = request.data.get('to_present', False)
     ending_date= request.data.get('ending_date',None)
-    is_active = request.data.get('is_active',None)
-
-   
-    
+    is_active = request.data.get('is_active',None)    
     
     #UserInformation
     designation = request.data.get('designation', None)
@@ -317,28 +335,7 @@ def create_employee(request):
     start_time = request.data.get('start_time', None)
     working_days = request.data.get('working_days',None)
     level = request.data.get('level',None)
-    # services = request.data.get('services', None)
-    
-    # #EmployeePermissionSetting
-    # allow_calendar_booking= request.data.get('allow_calendar_booking', False)
-    # access_calendar= request.data.get('access_calendar', False)
-    # change_calendar_color= request.data.get('change_calendar_color',False)
-    
-    
-    # #EmployeeModulePermission
-    # access_reports=request.data.get('access_reports', False)
-    # access_sales= request.data.get('access_sales', False)
-    # access_inventory= request.data.get('access_inventory' , False)
-    # access_expenses= request.data.get('access_expenses', False)
-    # access_products= request.data.get('access_products', False)
-    
-    # #EmployeeMarketingPermission
-    # access_voucher=request.data.get('access_voucher', False)
-    # access_member_discount= request.data.get('access_member_discount', False)
-    # access_invite_friend=request.data.get('access_invite_friend' , False)
-    # access_loyalty_points=request.data.get('access_loyalty_points' , False)
-    # access_gift_cards=request.data.get('access_gift_cards' , False)
-    
+    # services = request.data.get('services', None)   
      
     country = request.data.get('country', None)   
     state = request.data.get('state', None)         
