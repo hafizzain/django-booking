@@ -106,47 +106,47 @@ def create_tenant_account_type(tenant_user=None, tenant=None, account_type='ever
             account_type=account_type.capitalize()
         )
 
-def create_service_user(tenant=None, user = None, business=None):
-    if tenant is not None and user is not None and business is not None:
-        with tenant_context(tenant):
+# def create_service_user(tenant=None, user = None, business=None):
+#     if tenant is not None and user is not None and business is not None:
+#         with tenant_context(tenant):
 
-            service_list = [
-                {
-                    'name' : 'Car wash',
-                    'price' : 355
-                },
-                {
-                    'name' : 'Haircolor',
-                    'price' : 123
-                },
-                {
-                    'name' : 'Bridal Makeup',
-                    'price' : 87
-                },
-                {
-                    'name' : 'Menicure',
-                    'price' : 1997
-                },
-                {
-                    'name' : 'Pedicure',
-                    'price' : 9886
-                },
-                {
-                    'name' : 'Bike Service',
-                    'price' : 1223
-                },
-                {
-                    'name' : 'Bike Wash',
-                    'price' : 1124
-                },
-            ]
+#             service_list = [
+#                 {
+#                     'name' : 'Car wash',
+#                     'price' : 355
+#                 },
+#                 {
+#                     'name' : 'Haircolor',
+#                     'price' : 123
+#                 },
+#                 {
+#                     'name' : 'Bridal Makeup',
+#                     'price' : 87
+#                 },
+#                 {
+#                     'name' : 'Menicure',
+#                     'price' : 1997
+#                 },
+#                 {
+#                     'name' : 'Pedicure',
+#                     'price' : 9886
+#                 },
+#                 {
+#                     'name' : 'Bike Service',
+#                     'price' : 1223
+#                 },
+#                 {
+#                     'name' : 'Bike Wash',
+#                     'price' : 1124
+#                 },
+#             ]
 
-            for service in service_list :
-                test = Service.objects.create(
-                        user = user, 
-                        name=service['name'],
-                        price= service['price']
-                    )  
+#             for service in service_list :
+#                 test = Service.objects.create(
+#                         user = user, 
+#                         name=service['name'],
+#                         price= service['price']
+#                     )  
 
         
 def add_data_to_tenant_thread(tenant=None):
@@ -239,11 +239,11 @@ def create_tenant(request=None, user=None, data=None):
             except:
                 pass
             
-            try:
-                service_thrd = Thread(target=create_service_user, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
-                service_thrd.start()
-            except:
-                pass
+            # try:
+            #     service_thrd = Thread(target=create_service_user, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+            #     service_thrd.start()
+            # except:
+            #     pass
             
             try:
                 thrd = Thread(target=add_data_to_tenant_thread, kwargs={'tenant' : user_tenant})

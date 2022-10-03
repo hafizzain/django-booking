@@ -1194,7 +1194,7 @@ def create_orderstock(request):
                     'error_message' : 'All fields are required.',
                     'fields' : [
                           'business',
-                          'orstock_status',
+                          'status',
                             ]
                 }
             },
