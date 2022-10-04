@@ -1251,7 +1251,7 @@ def create_orderstock(request):
         status =orstock_status,
         rec_quantity= rec_quantity
     )
-    
+    print(type(products))
     if type(products) == str:
         products = products.replace("'" , '"')
         print(products)

@@ -46,4 +46,8 @@ urlpatterns = [
    path('get_vouchers/', views.get_vouchers),
    path('delete_vouchers/', views.delete_vouchers),
    path('update_vouchers/', views.update_vouchers),
+   
+   #Generate ID 
+   path('generate_id/', views.generate_id),
+   
 ]
