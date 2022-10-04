@@ -308,12 +308,12 @@ def generate_id(request):
     tenant_name = request.tenant_name
     tenant_name = tenant_name.split('-')
     tenant_name = [word[0] for word in tenant_name]
+    print(tenant_name)
     ''.join(tenant_name)
     count = Employee.objects.all().count()
     count += 1
-    print(tenant_name)
    
-    #tenant_name ='NS'
+    tenant_name ='NS'
     return_loop = True
     while return_loop:
         if 0 < count <= 9 : 
@@ -622,6 +622,8 @@ def update_employee(request):
     # sourcery skip: avoid-builtin-shadow
         id = request.data.get('id', None)
         is_active = request.data.get('is_active' ,None)
+        services_id = request.data.get('services', None)   
+
         if id is None:
             return Response(
             {
@@ -682,6 +684,21 @@ def update_employee(request):
         
 
         Employe_Informations= EmployeeProfessionalInfo.objects.get(employee=employee)
+        if type(services_id) == str:
+            services_id = json.loads(services_id)
+            print('str')
+
+        elif type(services_id) == list:
+            pass
+        
+        for ser in services_id:
+            
+            try:
+                service = Service.objects.get(id=ser)  
+                Employe_Informations.services.add(service)
+            except Exception as err:
+                print(str(err))
+        Employe_Informations.save()
         serializer_info= EmployeInformationsSerializer(Employe_Informations,  data= request.data, partial=True)
         if serializer_info.is_valid():
                 serializer_info.save()

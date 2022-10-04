@@ -146,6 +146,46 @@ def get_client(request):
     )
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def generate_id(request):
+    tenant_name = request.tenant_name
+    tenant_name = tenant_name.split('-')
+    tenant_name = [word[0] for word in tenant_name]
+    print(tenant_name)
+    ''.join(tenant_name)
+    count = Client.objects.all().count()
+    count += 1
+   
+    return_loop = True
+    while return_loop:
+        if 0 < count <= 9 : 
+            count = f'000{count}'
+        elif 9 < count <= 99 :
+            count = f'00{count}'
+        elif 99 < count <= 999:
+            count = f'0{count}'
+        new_id =f'{tenant_name}-CLI-{count}'
+        
+        try:
+            Client.objects.get(employee_id=new_id)
+            count += 1
+        except:
+            return_loop = False
+            break
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Generated ID',
+                'error_message' : None,
+                'id' : new_id
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_client(request):

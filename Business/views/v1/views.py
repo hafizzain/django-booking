@@ -789,7 +789,7 @@ def delete_location(request):
         )
     
     if business_address.user == user or business_address.business.user == user :
-        business_address.delete()
+        business_address.is_deleted = True
         return Response(
             {
                 'status' : True,

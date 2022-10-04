@@ -3,6 +3,7 @@ from genericpath import exists
 from pyexpat import model
 from Product.Constants.index import tenant_media_base_url
 from Utility.models import Country, State, City
+from Service.models import Service
 
 from rest_framework import serializers
 from .models import( Employee, EmployeeProfessionalInfo ,
@@ -11,6 +12,11 @@ from .models import( Employee, EmployeeProfessionalInfo ,
                StaffGroup, StaffGroupModulePermission, Attendance
                ,Payroll , CommissionSchemeSetting , Asset ,AssetDocument
 )
+
+class ServicesEmployeeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Service
+        fields=['id', 'name', 'location']
 
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
@@ -28,6 +34,11 @@ class CitySerializer(serializers.ModelSerializer):
         exclude = ['is_deleted', 'created_at', 'unique_code', 'key']
         
 class EmployeInformationsSerializer(serializers.ModelSerializer):
+    services = serializers.SerializerMethodField(read_only=True)
+    
+    def get_services(self, obj):
+        return ServicesEmployeeSerializer(obj.services).data
+    
     class Meta:
         model = EmployeeProfessionalInfo
         exclude = ['employee', 'id']
@@ -35,6 +46,7 @@ class EmployeInformationsSerializer(serializers.ModelSerializer):
         
 class EmployPermissionSerializer(serializers.ModelSerializer):
     class Meta:
+        
         model = EmployeePermissionSetting
         exclude = ['employee', 'created_at', 'id']
         

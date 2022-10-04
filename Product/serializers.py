@@ -189,13 +189,13 @@ class OrderProductSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField(read_only=True)
-    location = serializers.SerializerMethodField(read_only=True)
-    vendor = serializers.SerializerMethodField(read_only=True)
+    location_name = serializers.SerializerMethodField(read_only=True)
+    vendor_name = serializers.SerializerMethodField(read_only=True)
     
-    def get_vendor(self, obj):
+    def get_vendor_name(self, obj):
         return obj.vendor.vendor_name
         
-    def get_location(self, obj):
+    def get_location_name(self, obj):
         return obj.location.address_name
     
     def get_products(self, obj):
@@ -204,4 +204,4 @@ class OrderSerializer(serializers.ModelSerializer):
     
     class Meta:
         model= OrderStock
-        fields=('id','business','vendor','location','status', 'rec_quantity','products')
+        fields=('id','business','vendor','location','status', 'rec_quantity','vendor_name','location_name','products')
