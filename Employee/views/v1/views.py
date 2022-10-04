@@ -314,7 +314,7 @@ def generate_id(request):
     count += 1
     print(tenant_name)
    
-    tenant_name ='NS'
+    #tenant_name ='NS'
     return_loop = True
     while return_loop:
         if 0 < count <= 9 : 
@@ -331,19 +331,19 @@ def generate_id(request):
         except:
             return_loop = False
             break
-        return Response(
-            {
-                'status' : 200,
-                'status_code' : '200',
-                'response' : {
-                    'message' : 'Generated ID',
-                    'error_message' : None,
-                    'id' : id
-                }
-            },
-            status=status.HTTP_200_OK
-        )
-        
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Generated ID',
+                'error_message' : None,
+                'id' : new_id
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
