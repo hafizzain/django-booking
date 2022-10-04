@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from Sale.models import Service
+from Service.models import Service
 
 class ServiceSerializer(serializers.ModelSerializer):
     class Meta:

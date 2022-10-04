@@ -175,13 +175,28 @@ class ProductSerializer(serializers.ModelSerializer):
             'brand', 
         ]
         read_only_fields = ['slug', 'id']
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ('id', 'name')
+        
 class OrderProductSerializer(serializers.ModelSerializer):
+    product = ProductSerializer()
+
     class Meta:
         model = OrderStockProduct
-        fields = '__all__'
+        fields = ['id', 'order', 'quantity', 'product']
 
 class OrderSerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField(read_only=True)
+    location = serializers.SerializerMethodField(read_only=True)
+    vendor = serializers.SerializerMethodField(read_only=True)
+    
+    def get_vendor(self, obj):
+        return obj.vendor.vendor_name
+        
+    def get_location(self, obj):
+        return obj.location.address_name
     
     def get_products(self, obj):
         data = OrderStockProduct.objects.filter(order=obj)

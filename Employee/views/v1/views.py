@@ -17,6 +17,7 @@ from Employee.serializers import( EmployeSerializer , EmployeInformationsSeriali
                         
                           
                                  )
+from Service.models import Service
 from rest_framework import status
 from Business.models import Business
 from Utility.models import Country, State, City
@@ -146,8 +147,7 @@ def import_employee(request):
     file.delete()
     return Response({'Status' : 'Success'})
         
-            
-                                    
+
 # Create your views here.
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -199,7 +199,7 @@ def search_employee(request):
 @permission_classes([AllowAny])
 def get_Employees(request):
     all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
-    serialized = WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request} )
+    serialized = singleEmployeeSerializer(all_employe,  many=True, context={'request' : request} )
     return Response(
         {
             'status' : 200,
@@ -302,6 +302,47 @@ def working_schedule(request):
         status=status.HTTP_200_OK
     )
     
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def generate_id(request):
+    tenant_name = request.tenant_name
+    tenant_name = tenant_name.split('-')
+    tenant_name = [word[0] for word in tenant_name]
+    ''.join(tenant_name)
+    count = Employee.objects.all().count()
+    count += 1
+    print(tenant_name)
+   
+    #tenant_name ='NS'
+    return_loop = True
+    while return_loop:
+        if 0 < count <= 9 : 
+            count = f'000{count}'
+        elif 9 < count <= 99 :
+            count = f'00{count}'
+        elif 99 < count <= 999:
+            count = f'0{count}'
+        new_id =f'{tenant_name}-EMP-{count}'
+        
+        try:
+            Employee.objects.get(employee_id=new_id)
+            count += 1
+        except:
+            return_loop = False
+            break
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Generated ID',
+                'error_message' : None,
+                'id' : new_id
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -334,7 +375,11 @@ def create_employee(request):
     start_time = request.data.get('start_time', None)
     working_days = request.data.get('working_days',None)
     level = request.data.get('level',None)
-    # services = request.data.get('services', None)   
+    
+    start_time = request.data.get('start_time',None)
+    end_time = request.data.get('end_time',None)
+    
+    services_id = request.data.get('services', None)   
      
     country = request.data.get('country', None)   
     state = request.data.get('state', None)         
@@ -431,10 +476,8 @@ def create_employee(request):
         postal_code = postal_code,
         address=address,
         joining_date= joining_date,
-        is_active=True
     )
     if not to_present :
-        # employee.ending_date = ending_date
         pass
     else:
         employee.to_present = True 
@@ -447,18 +490,13 @@ def create_employee(request):
 
     errors =[]
 
-    employee_p_info = EmployeeProfessionalInfo.objects.create(employee=employee)
+    employee_p_info = EmployeeProfessionalInfo.objects.create(employee=employee, start_time = start_time , end_time = end_time, salary=salary, designation = designation)
     employee_mp = EmployeeModulePermission.objects.create(employee=employee)
     employee_p_setting = EmployeePermissionSetting.objects.create(employee = employee)
     employee_marketing = EmployeeMarketingPermission.objects.create(employee= employee)
     
-    if type(working_days) == str:
-            working_days = json.loads(working_days)
-            print('str')
-
-    elif type(working_days) == list:
-            pass
-        
+    ser_error=[] 
+    
     employee_p_info.monday = True if 'monday' in request.data else False
     employee_p_info.tuesday = True if 'tuesday' in request.data else False
     employee_p_info.wednesday = True if 'wednesday' in request.data else False
@@ -467,7 +505,27 @@ def create_employee(request):
     employee_p_info.saturday = True if 'saturday' in request.data else False
     employee_p_info.sunday = True if 'sunday' in request.data else False
     
+    if type(working_days) == str:
+            working_days = json.loads(working_days)
+
+    elif type(working_days) == list:
+            pass
+    if type(services_id) == str:
+            services_id = json.loads(services_id)
+            print('str')
+
+    elif type(services_id) == list:
+            pass
         
+    for ser in services_id:
+            
+            try:
+                service = Service.objects.get(id=ser)  
+                print(type(service))
+                print(service)
+                employee_p_info.services.add(service)
+            except Exception as err:
+                print(str(err))
     employee_p_info.save()
     
     serialized = EmployeInformationsSerializer(employee_p_info, data=request.data)
@@ -726,14 +784,14 @@ def update_employee(request):
             status=status.HTTP_200_OK
            )
 
-# @api_view(['GET'])
-# @permission_classes([AllowAny])
-# def delete_all_employees(request):
-#     all_employees = Employee.objects.all()
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def delete_all_employees(request):
+    all_employees = Employee.objects.all()
 
-#     for empl in all_employees:
-#         empl.delete()
-#     return Response({'deleted' : True})
+    for empl in all_employees:
+        empl.delete()
+    return Response({'deleted' : True})
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

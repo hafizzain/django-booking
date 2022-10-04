@@ -703,6 +703,7 @@ def add_business_location(request):
         'sunday',
     ]
     for day in days:
+        
         bds_schedule = BusinessOpeningHour.objects.create(
             business_address = business_address,
             business = business,
@@ -710,8 +711,11 @@ def add_business_location(request):
         )
         s_day = opening_day.get(day.lower(), None)
         if s_day is not None:
-            bds_schedule.start_time = s_day.get('start_time', None)
-            bds_schedule.close_time = s_day.get('close_time', None)
+            # bds_schedule.start_time = s_day.get('start_time', None)
+            # bds_schedule.close_time = s_day.get('close_time', None)
+            
+            bds_schedule.start_time = s_day['starting_time']
+            bds_schedule.close_time = s_day['end_time']
         else:
             bds_schedule.is_closed = True
 
@@ -855,6 +859,11 @@ def update_location(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    opening_day = request.data.get('open_day', None)   
+    if type(opening_day) == str:
+        opening_day = json.loads(opening_day)
+    else:
+        pass 
 
     user = request.user
     if business_address.user == user or business_address.business.user == user :
@@ -891,35 +900,61 @@ def update_location(request):
 
         business_address.save()
         
-        start_time = request.data.get('start_time', None)
-        close_time = request.data.get('close_time', None)
-        if start_time is not None and close_time is not None:
-            busineshour = BusinessOpeningHour.objects.filter(
-                    business_address = business_address
-                )
-            if len(busineshour) > 0:
-                for bhr in busineshour:
-                    bhr.start_time = start_time
-                    bhr.close_time = close_time
-                    bhr.save()
-            else:
-                days = [
-                    'Monday',
-                    'Tuesday',
-                    'Wednesday',
-                    'Thursday',
-                    'Friday',
-                    'Saturday',
-                    'Sunday',
-                ]
-                for day in days:
-                    BusinessOpeningHour.objects.create(
-                            day = day,
-                            start_time = start_time,
-                            close_time = close_time,
-                            business_address = business_address,
-                            business = business_address.business
-                        )
+    days = [
+        'monday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday',
+        'saturday',
+        'sunday',
+    ]
+    
+    for day in days:
+        try:
+            bds_schedule = BusinessOpeningHour.objects.get(business_address=business_address, day=day)
+    
+        except Exception as err:
+            pass
+        
+        s_day = opening_day.get(day.lower(), None)
+        if s_day is not None:
+            bds_schedule.start_time = s_day['starting_time']
+            bds_schedule.close_time = s_day['end_time']
+        else:
+            bds_schedule.is_closed = True
+
+        bds_schedule.save()
+        
+        # start_time = request.data.get('start_time', None)
+        # close_time = request.data.get('close_time', None)
+        # if start_time is not None and close_time is not None:
+        #     busineshour = BusinessOpeningHour.objects.filter(
+        #             business_address = business_address
+        #         )
+        #     if len(busineshour) > 0:
+        #         for bhr in busineshour:
+        #             bhr.start_time = start_time
+        #             bhr.close_time = close_time
+        #             bhr.save()
+        #     else:
+        #         days = [
+        #             'Monday',
+        #             'Tuesday',
+        #             'Wednesday',
+        #             'Thursday',
+        #             'Friday',
+        #             'Saturday',
+        #             'Sunday',
+        #         ]
+        #         for day in days:
+        #             BusinessOpeningHour.objects.create(
+        #                     day = day,
+        #                     start_time = start_time,
+        #                     close_time = close_time,
+        #                     business_address = business_address,
+        #                     business = business_address.business
+        #                 )
 
 
         serialized = BusinessAddress_GetSerializer(business_address)

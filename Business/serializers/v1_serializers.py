@@ -102,19 +102,19 @@ class OpeningHoursSerializer(serializers.ModelSerializer):
 
 class BusinessAddress_GetSerializer(serializers.ModelSerializer):
     #opening_hours= OpeningHoursSerializer(read_only=True)
-    # busines_location = serializers.SerializerMethodField(read_only=True)
-    
-    # def get_busines_location(self, obj):
-    #     try:
-    #         location = BusinessOpeningHour.objects.get(business_address=obj)
-    #         return OpeningHoursSerializer(location).data
-    #     except BusinessOpeningHour.DoesNotExist:
-    #         return None
-    
+    opening_hours = serializers.SerializerMethodField(read_only=True)
     start_time=  serializers.SerializerMethodField(read_only=True)
     close_time= serializers.SerializerMethodField(read_only=True)
     
-    
+    def get_opening_hours(self, obj):
+        try:
+            location = BusinessOpeningHour.objects.filter(business_address=obj)
+            #print(location)
+            return OpeningHoursSerializer(location, many=True).data
+        
+        except BusinessOpeningHour.DoesNotExist:
+            return None
+
     def get_start_time(self, obj):
         try:
             location = BusinessOpeningHour.objects.get(
@@ -152,6 +152,7 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
             'banking',
             'start_time',
             'close_time',
+            'opening_hours',
         ]
 
 class BusinessThemeSerializer(serializers.ModelSerializer):

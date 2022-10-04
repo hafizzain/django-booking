@@ -13,7 +13,7 @@ from django.shortcuts import render
 from rest_framework.response import Response
 
 
-from Sale.models import Service
+from Service.models import Service
 
 from Sale.serializers import ServiceSerializer
 

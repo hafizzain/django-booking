@@ -30,7 +30,7 @@ class CitySerializer(serializers.ModelSerializer):
 class EmployeInformationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployeeProfessionalInfo
-        exclude = ['employee', 'id', 'services']
+        exclude = ['employee', 'id']
         
         
 class EmployPermissionSerializer(serializers.ModelSerializer):
