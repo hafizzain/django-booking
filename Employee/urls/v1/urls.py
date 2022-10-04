@@ -12,7 +12,7 @@ urlpatterns = [
     path('search_employee/', views.search_employee),
     path('import_employee/', views.import_employee),
 
-    #path('delete_all_employees/', views.delete_all_employees),
+    path('delete_all_employees/', views.delete_all_employees),
     
 
     #Staff GROUP URLS 
@@ -43,7 +43,10 @@ urlpatterns = [
     path('update_asset/', views.update_asset), 
     
     #Working Schedule
-    path('working_schedule/', views.working_schedule)
+    path('working_schedule/', views.working_schedule),
+    
+    #Generate ID
+    path('generate_id/', views.generate_id)
     
     
 ]

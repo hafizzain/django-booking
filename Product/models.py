@@ -135,6 +135,7 @@ class OrderStock(models.Model):
         ('Delivered', 'Delivered'),
         ('Partially_Received', 'Partially Received'),
         ('Received', 'Received'),
+        ('Cancelled', 'Cancelled'),
     ]
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     

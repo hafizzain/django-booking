@@ -14,7 +14,7 @@ from rest_framework.response import Response
 
 from Employee.models import Employee
 from Business.models import BusinessAddress
-from Sale.models import Service
+from Service.models import Service
 
 from Sale.serializers import ServiceSerializer
 
@@ -125,18 +125,21 @@ def create_service(request):
         service_obj.treatment_type = treatment_type
         service_obj.save()
     else :
-        if type(service) == str:
-            service = json.loads(service)
-
-        elif type(service) == list:
+        if service is None:
             pass
+        else:
+            if type(service) == str:
+                service = json.loads(service)
+
+            elif type(service) == list:
+                pass
         
-        for ser in service:
-            try:
-                service_id=Service.objects.get(id=ser)
-                service_obj.parrent_service.add(service_id)
-            except Exception as err:
-                employees_error.append(str(err))
+            for ser in service:
+                try:
+                    service_id=Service.objects.get(id=ser)
+                    service_obj.parrent_service.add(service_id)
+                except Exception as err:
+                    employees_error.append(str(err))
 
     service_obj.save()
             
