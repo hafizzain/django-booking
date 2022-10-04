@@ -17,7 +17,7 @@ from django.db.models import Q
 from Client.models import Client
 from datetime import date
 
-from Appointment.models import Appointment, AppointmentService
+from Appointment.models import Appointment, AppointmentService, AppointmentNotes
 from Appointment.serializers import AppoinmentSerializer,SingleAppointmentSerializer ,BlockSerializer ,AllAppoinmentSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer
 
 
@@ -186,7 +186,8 @@ def delete_appointment(request):
         },
         status=status.HTTP_200_OK
     )
-
+    
+    
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_appointment(request):
@@ -194,6 +195,7 @@ def create_appointment(request):
     business_id = request.data.get('business', None)
     appointments = request.data.get('appointments', None)
     appointment_date = request.data.get('appointment_date', None)
+    text = request.data.get('text', None)
     #[business_id, member, appointment_date, appointment_time, duration
 
     client = request.data.get('client', None)
@@ -268,6 +270,7 @@ def create_appointment(request):
                 }
             }
         )
+    
             
     appointment = Appointment.objects.create(
             user = user,
@@ -286,8 +289,18 @@ def create_appointment(request):
 
     elif type(appointments) == list:
         pass
-
-
+    
+    if type(text) == str:
+        text = json.loads(text)
+    else:
+        pass
+    
+    for ind, value in enumerate(text):
+        print(value)
+        notes = AppointmentNotes.objects.create(
+            appointment=appointment,
+            text = value
+        )
     for appoinmnt in appointments:
         member = appoinmnt['member']
         service = appoinmnt['service']

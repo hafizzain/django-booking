@@ -1966,7 +1966,6 @@ def add_business_tax(request):
     business_tax = BusinessTax.objects.create(
         user = user,
         business=business,
-        parent_tax = tax,
         tax_type = tax_type,
         tax_rate = tax_rate,
     )
@@ -1974,6 +1973,7 @@ def add_business_tax(request):
         business_tax.name = name
     if tax_type == 'Location':
         business_tax.location = location
+        business_tax.parent_tax.add(tax)
     
     all_errors = []
     import json

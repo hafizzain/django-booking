@@ -14,5 +14,4 @@ urlpatterns = [
     
     path('create_blockTime/', views.create_blockTime),
     
-    
 ]
