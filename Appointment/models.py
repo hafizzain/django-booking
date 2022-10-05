@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import uuid
+from xml.parsers.expat import model
 from django.db import models
 
 from Authentication.models import User
@@ -122,6 +123,17 @@ class AppointmentService(models.Model):
             return str(err)
     
 
+    def __str__(self):
+        return str(self.id)
+
+
+class AppointmentNotes(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, related_name='appointment_notes')
+    
+    text = models.TextField(default='')
+    
     def __str__(self):
         return str(self.id)
 
