@@ -153,6 +153,7 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
             'start_time',
             'close_time',
             'opening_hours',
+            'is_deleted'
         ]
 
 class BusinessThemeSerializer(serializers.ModelSerializer):
