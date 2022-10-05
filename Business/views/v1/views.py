@@ -872,6 +872,7 @@ def update_location(request):
         business_address.postal_code = request.data.get('postal_code', business_address.postal_code)
         business_address.mobile_number= request.data.get('mobile_number', business_address.mobile_number)
         business_address.email= request.data.get('email', business_address.email)
+        business_address.banking= request.data.get('banking', business_address.banking)
              
         country = request.data.get('country', None)
         state = request.data.get('state', None)
@@ -919,7 +920,7 @@ def update_location(request):
         
         s_day = opening_day.get(day.lower(), None)
         if s_day is not None:
-            bds_schedule.start_time = s_day['starting_time']
+            bds_schedule.start_time = s_day['start_time']
             bds_schedule.close_time = s_day['end_time']
         else:
             bds_schedule.is_closed = True
@@ -1889,7 +1890,7 @@ def add_business_tax(request):
     
     tax_id = request.data.get('tax_id',None)
     
-    if business_id is None or (tax_type != 'Location' and name is None) or (tax_type == 'Group' and tax_ids is None) or (tax_type != 'Group' and tax_rate is None) or (tax_type == 'Location' and location is None ):
+    if business_id is None or (tax_type != 'Location' and name is None) or (tax_type == 'Group' and tax_ids is None)  or (tax_type == 'Location' and location is None ):
         return Response(
             {
                 'status' : False,
@@ -1902,7 +1903,8 @@ def add_business_tax(request):
                         'name',
                         'business',
                         'tax_type',
-                        'tax_rate',
+                        
+                        # 'tax_rate',
                         'tax_ids',
                         'location',
                     ]
@@ -1979,14 +1981,14 @@ def add_business_tax(request):
     import json
 
     if tax_type == 'Group':
-        all_errors.append({'type' : str(type(tax_ids))})
-        all_errors.append({'tax_ids' : tax_ids})
+        # all_errors.append({'type' : str(type(tax_ids))})
+        # all_errors.append({'tax_ids' : tax_ids})
         if type(tax_ids) == str :
             ids_data = json.loads(tax_ids)
         else:
             ids_data = tax_ids
         for id in ids_data:
-            all_errors.append(str(id))
+            #all_errors.append(str(id))
             try:
                 get_p_tax = BusinessTax.objects.get(id=id)
                 business_tax.parent_tax.add(get_p_tax)
@@ -2017,13 +2019,13 @@ def add_business_tax(request):
 def update_business_tax(request):
     tax_id = request.data.get('tax_id', None)
     business_id = request.data.get('business', None)
-    tax_type = request.data.get('tax_type', 'Individual')
+    tax_type = request.data.get('tax_type', None)
     name = request.data.get('name', None)
     tax_rate = request.data.get('tax_rate', None)
     tax_ids = request.data.get('tax_ids', None)
     location = request.data.get('location', None)
     
-    if business_id is None or (tax_type != 'Location' and name is None) or (tax_type == 'Group' and tax_ids is None) or (tax_type != 'Group' and tax_rate is None) or (tax_type == 'Location' and location is None ):
+    if business_id is None or (tax_type != 'Location' and name is None) or (tax_type == 'Group' and tax_ids is None) or (tax_type == 'Location' and location is None ):
         return Response(
             {
                 'status' : False,
@@ -2036,16 +2038,16 @@ def update_business_tax(request):
                         'name',
                         'business',
                         'tax_type',
-                        'tax_rate',
-                        'tax_ids',
-                        'location',
+                        #'tax_rate',
+                        #'tax_ids',
+                        #'location',
                     ]
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    if tax_type != 'Group':
+    if (tax_type != 'Group' and tax_type != 'Location'):
         tax_rate = int(tax_rate)
     user = request.user
 

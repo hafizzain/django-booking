@@ -261,16 +261,28 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField(read_only=True)
     
     def get_client(self, obj):
-        return obj.appointment.client.full_name
-    
+        try:
+            return obj.appointment.client.full_name
+        except Exception as err:
+            return None
+        
     def get_member(self, obj):
-        return obj.member.full_name
-
+        try:
+            return obj.member.full_name
+        except Exception as err:
+            return None
+        
     def get_service(self, obj):
-        return obj.service.name
+        try:
+            return obj.service.name
+        except Exception as err:
+            return None
             
     def get_price(self, obj):
-        return obj.service.price
+        try:
+            return obj.service.price
+        except Exception as err:
+            return None
     
     class Meta:
         model = AppointmentService

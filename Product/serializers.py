@@ -193,10 +193,16 @@ class OrderSerializer(serializers.ModelSerializer):
     vendor_name = serializers.SerializerMethodField(read_only=True)
     
     def get_vendor_name(self, obj):
-        return obj.vendor.vendor_name
-        
+        try:
+            return obj.vendor.vendor_name
+        except Exception as err:
+            return None
     def get_location_name(self, obj):
-        return obj.location.address_name
+        try:
+            return obj.location.address_name
+        except Exception as err:
+            return None
+    
     
     def get_products(self, obj):
         data = OrderStockProduct.objects.filter(order=obj)
