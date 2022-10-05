@@ -175,13 +175,13 @@ class ProductSerializer(serializers.ModelSerializer):
             'brand', 
         ]
         read_only_fields = ['slug', 'id']
-class ProductSerializer(serializers.ModelSerializer):
+class ProductOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ('id', 'name')
         
 class OrderProductSerializer(serializers.ModelSerializer):
-    product = ProductSerializer()
+    product = ProductOrderSerializer()
 
     class Meta:
         model = OrderStockProduct
