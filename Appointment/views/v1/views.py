@@ -352,9 +352,9 @@ def create_appointment(request):
             appointment_service.business_address = business_address
             appointment_service.save()
     
-    all_members = set(all_members)
+    #all_members = set(all_members)
     serialized = AppoinmentSerializer(appointment)
-    Add_appointment(name=client.full_name, email=client.email)
+    #Add_appointment()
     return Response(
             {
                 'status' : True,
