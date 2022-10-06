@@ -300,15 +300,18 @@ def create_appointment(request):
                 appointment=appointment,
                 text = value
             )
+    
+    all_members = []
     for appoinmnt in appointments:
         member = appoinmnt['member']
         service = appoinmnt['service']
         duration = appoinmnt['duration']
         date_time = appoinmnt['date_time']
-        tip = appoinmnt['tip']
+        # tip = appoinmnt['tip']
         
         try:
             member=Employee.objects.get(id=member)
+            all_members.append(str(member.id))
         except Exception as err:
             return Response(
             {
@@ -343,13 +346,15 @@ def create_appointment(request):
             appointment_date = appointment_date,
             service = service,
             member = member,
-            tip=tip,
+            # tip=tip,
         )
         if business_address_id is not None:
             appointment_service.business_address = business_address
             appointment_service.save()
     
+    all_members = set(all_members)
     serialized = AppoinmentSerializer(appointment)
+    Add_appointment(name=client.full_name, email=client.email)
     return Response(
             {
                 'status' : True,
