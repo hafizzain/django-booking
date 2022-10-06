@@ -71,6 +71,7 @@ class Business_GetSerializer(serializers.ModelSerializer):
             'postal_code',
             'week_start',
             'team_size',
+            'is_completed',
             'currency',
             'timezone',
             'time_format',

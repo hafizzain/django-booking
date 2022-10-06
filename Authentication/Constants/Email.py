@@ -14,6 +14,7 @@ def send_otp_to_email(user=None, ):
         return
 
     try:
+        print(user)
         user_otp = VerificationOTP.objects.get(user=user, code_for='Email')
     except Exception as err:
         print(err)

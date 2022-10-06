@@ -401,7 +401,19 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     friday =  serializers.SerializerMethodField(read_only=True)
     saturday =  serializers.SerializerMethodField(read_only=True)
     sunday =  serializers.SerializerMethodField(read_only=True)
+    image = serializers.SerializerMethodField()
 
+    
+    
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request)
+                return f'{url}{obj.image}'
+            except:
+                return obj.image
+        return None
     
     def get_start_time(self, obj):        
         try:
@@ -464,4 +476,4 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Employee
-        fields = ['id', 'full_name','start_time', 'end_time', 'monday','tuesday','wednesday','thursday','friday','saturday','sunday']
+        fields = ['id', 'full_name','image','start_time', 'end_time', 'monday','tuesday','wednesday','thursday','friday','saturday','sunday']
