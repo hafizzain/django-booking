@@ -350,12 +350,19 @@ def update_business_additional_information(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    is_completed = request.data.get('is_completed', None)
     
     team_size = request.data.get('team_size', business.team_size)
     how_find_us = request.data.get('how_find_us', business.how_find_us)
+    
     selected_softwares = request.data.get('selected_softwares', [])
     selected_types = request.data.get('selected_types', [])
-
+    
+    if is_completed is not None:
+        business.is_completed = True
+    else :
+        business.is_completed = False
+    
     business.team_size = team_size
     business.how_find_us = how_find_us
     business.save()
