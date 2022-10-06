@@ -45,7 +45,7 @@ class Appointment(models.Model):
     
     client_type= models.CharField(choices=TYPE_CHOICES, max_length=50, null=True, blank=True, )
     discount_type = models.CharField(max_length=50, choices= DISCOUNT_CHOICES, null=True, blank=True)
-    payment_method = models.CharField(max_length=100, choices= PAYMENT_CHOICES, default='')  
+    payment_method = models.CharField(max_length=100, choices= PAYMENT_CHOICES, default='', null=True, blank=True)  
 
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
@@ -132,7 +132,7 @@ class AppointmentNotes(models.Model):
     
     appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, related_name='appointment_notes')
     
-    text = models.TextField(default='')
+    text = models.TextField(default='', null=True, blank=True)
     
     def __str__(self):
         return str(self.id)

@@ -1,5 +1,6 @@
 from pickle import GET
 from django.shortcuts import render
+from Authentication.Constants.AddAppointment import Add_appointment
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -204,7 +205,7 @@ def create_appointment(request):
     payment_method = request.data.get('payment_method', None)
     discount_type = request.data.get('discount_type', None)
 
-    if not all([ client, client_type, appointments, appointment_date, business_id, payment_method  ]):
+    if not all([ client, client_type, appointment_date, business_id  ]):
          return Response(
             {
                 'status' : False,
@@ -220,7 +221,6 @@ def create_appointment(request):
                           'appointment_date', 
                           'business',
                           'appointments', 
-                          'payment_method',
                         ]
                 }
             },
@@ -294,13 +294,12 @@ def create_appointment(request):
         text = json.loads(text)
     else:
         pass
-    
-    for ind, value in enumerate(text):
-        print(value)
-        notes = AppointmentNotes.objects.create(
-            appointment=appointment,
-            text = value
-        )
+    if text is not None:
+        for ind, value in enumerate(text):
+            notes = AppointmentNotes.objects.create(
+                appointment=appointment,
+                text = value
+            )
     for appoinmnt in appointments:
         member = appoinmnt['member']
         service = appoinmnt['service']
@@ -362,8 +361,7 @@ def create_appointment(request):
                 }
             },
             status=status.HTTP_201_CREATED
-    ) 
- 
+    )
  
  
 @api_view(['PUT'])

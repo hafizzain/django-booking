@@ -5,7 +5,7 @@ from django.utils.html import strip_tags
 from django.conf import settings
 
 
-def Add_appointment():
+def Add_appointment(**kwargs):
     # if user is None:
     #     return
 
@@ -14,11 +14,16 @@ def Add_appointment():
     # except Exception as err:
     #     print(err)
     #     return
+    for key, value in kwargs.items():
+        print( key, value)
+        if key == 'email':
+            send = value
+            
     
     email_host = 'developeracount211@gmail.com'
-    send = 'abdullahajmal148@gmail.com'
+    print(send)
     
-    html_file = render_to_string("otp_email.html",) #{'user_name': user_otp.user.username,'otp': user_otp.code, 'email':user_otp.user.email})
+    html_file = render_to_string("AppointmentEmail/add_appointment.html") #{'user_name': user_otp.user.username,'otp': user_otp.code, 'email':user_otp.user.email})
     text_content = strip_tags(html_file)
     
     email = EmailMultiAlternatives(

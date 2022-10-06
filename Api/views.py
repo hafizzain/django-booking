@@ -41,5 +41,5 @@ def EmailTemplate(request):
              
    #           }
    
-   return render(request, "otp_email.html", context = {'user_name': 'Abdullah' , 'email': 'abc@user_otp.user.email',  'otp': '7891', })
+   return render(request, "AppointmentEmail/add_appointment.html", context = {'user_name': 'Abdullah' , 'email': 'abc@user_otp.user.email',  'otp': '7891', })
       
