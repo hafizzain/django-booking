@@ -1,5 +1,6 @@
 from pickle import GET
 from django.shortcuts import render
+from Authentication.Constants.AddAppointment import Add_appointment
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -204,7 +205,7 @@ def create_appointment(request):
     payment_method = request.data.get('payment_method', None)
     discount_type = request.data.get('discount_type', None)
 
-    if not all([ client, client_type, appointments, appointment_date, business_id, payment_method  ]):
+    if not all([ client, client_type, appointment_date, business_id  ]):
          return Response(
             {
                 'status' : False,
@@ -220,7 +221,6 @@ def create_appointment(request):
                           'appointment_date', 
                           'business',
                           'appointments', 
-                          'payment_method',
                         ]
                 }
             },
@@ -294,22 +294,24 @@ def create_appointment(request):
         text = json.loads(text)
     else:
         pass
+    if text is not None:
+        for ind, value in enumerate(text):
+            notes = AppointmentNotes.objects.create(
+                appointment=appointment,
+                text = value
+            )
     
-    for ind, value in enumerate(text):
-        print(value)
-        notes = AppointmentNotes.objects.create(
-            appointment=appointment,
-            text = value
-        )
+    all_members = []
     for appoinmnt in appointments:
         member = appoinmnt['member']
         service = appoinmnt['service']
         duration = appoinmnt['duration']
         date_time = appoinmnt['date_time']
-        tip = appoinmnt['tip']
+        # tip = appoinmnt['tip']
         
         try:
             member=Employee.objects.get(id=member)
+            all_members.append(str(member.id))
         except Exception as err:
             return Response(
             {
@@ -344,13 +346,15 @@ def create_appointment(request):
             appointment_date = appointment_date,
             service = service,
             member = member,
-            tip=tip,
+            # tip=tip,
         )
         if business_address_id is not None:
             appointment_service.business_address = business_address
             appointment_service.save()
     
+    all_members = set(all_members)
     serialized = AppoinmentSerializer(appointment)
+    Add_appointment(name=client.full_name, email=client.email)
     return Response(
             {
                 'status' : True,
@@ -362,8 +366,7 @@ def create_appointment(request):
                 }
             },
             status=status.HTTP_201_CREATED
-    ) 
- 
+    )
  
  
 @api_view(['PUT'])

@@ -350,12 +350,19 @@ def update_business_additional_information(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    is_completed = request.data.get('is_completed', None)
     
     team_size = request.data.get('team_size', business.team_size)
     how_find_us = request.data.get('how_find_us', business.how_find_us)
+    
     selected_softwares = request.data.get('selected_softwares', [])
     selected_types = request.data.get('selected_types', [])
-
+    
+    if is_completed is not None:
+        business.is_completed = True
+    else :
+        business.is_completed = False
+    
     business.team_size = team_size
     business.how_find_us = how_find_us
     business.save()
@@ -2024,6 +2031,7 @@ def update_business_tax(request):
     tax_rate = request.data.get('tax_rate', None)
     tax_ids = request.data.get('tax_ids', None)
     location = request.data.get('location', None)
+    parent_tax = request.data.get('parent_tax', None)
     
     if business_id is None or (tax_type != 'Location' and name is None) or (tax_type == 'Group' and tax_ids is None) or (tax_type == 'Location' and location is None ):
         return Response(
@@ -2083,6 +2091,22 @@ def update_business_tax(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
+        try:
+            tax = BusinessTax.objects.get(id=parent_tax)
+            print(tax)
+        except Exception as err:
+                return Response(
+                        {
+                            'status' : False,
+                            'status_code' : StatusCodes.LOCATION_NOT_FOUND_4017,
+                            'status_code_text' : 'BUSINESSS_TAX_NOT_FOUND',
+                            'response' : {
+                                'message' : 'Business Tax Not Found',
+                                'error_message' : str(err),
+                            }
+                        },
+                        status=status.HTTP_404_NOT_FOUND
+                    )
 
     if tax_rate is None:
         tax_rate = 0
@@ -2111,7 +2135,9 @@ def update_business_tax(request):
     if tax_type == 'Group' or tax_type == 'Individual':
         business_tax.name = name
     if tax_type == 'Location':
+        business_tax.parent_tax.clear()
         business_tax.location = location
+        business_tax.parent_tax.add(tax)
 
     if tax_type == 'Group':
         try:

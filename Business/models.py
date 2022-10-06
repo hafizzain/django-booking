@@ -45,11 +45,14 @@ class Business(models.Model):
     timezone = models.CharField(max_length=200, default='')
     time_format = models.CharField(max_length=300, default='')
     how_find_us = models.CharField(max_length=500, default='')
+    
+    is_completed = models.BooleanField(default=False, verbose_name = 'Business setting completed')
 
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
+    
 
     def __str__(self):
         return str(self.id)
