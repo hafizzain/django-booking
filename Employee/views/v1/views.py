@@ -519,7 +519,6 @@ def create_employee(request):
             pass
         
     for ser in services_id:
-            
             try:
                 service = Service.objects.get(id=ser)  
                 print(type(service))

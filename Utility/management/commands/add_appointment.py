@@ -1,3 +1,4 @@
+from threading import Thread
 from django.core.management.base import BaseCommand, CommandError
 from Appointment.models import Appointment, AppointmentService
 
@@ -12,8 +13,14 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         #user = User.objects.get(email='developeracount211@gmail.com')
         appointment=  Appointment.objects.all()[0]
-
-        Add_appointment(appointment = appointment)
+        
+        try:
+            thrd = Thread(target=Add_appointment, args=[appointment])
+            thrd.start()
+        except Exception as err:
+            pass
+        
+        #Add_appointment(appointment = appointment)
 
         self.stdout.write(self.style.SUCCESS(
             'Sent!'

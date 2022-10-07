@@ -70,7 +70,7 @@ class VendorSerializer(serializers.ModelSerializer):
 class ProductStockSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductStock
-        fields = ['id', 'sellable_quantity','consumable_quantity' , 'amount', 'unit' , 'alert_when_stock_becomes_lowest', 'is_active' ]
+        fields = ['id', 'sellable_quantity','consumable_quantity' , 'amount', 'unit' , 'alert_when_stock_becomes_lowest', 'sold_quantity','is_active' ]
 
 class ProductWithStockSerializer(serializers.ModelSerializer):
     stock = serializers.SerializerMethodField()
@@ -124,6 +124,7 @@ class ProductSerializer(serializers.ModelSerializer):
     media = serializers.SerializerMethodField()
     stocks = serializers.SerializerMethodField()
     cover_image = serializers.SerializerMethodField()
+    
 
     def get_cover_image(self, obj):
         cvr_img = ProductMedia.objects.filter(product=obj, is_cover=True, is_deleted=False).order_by('-created_at')
@@ -175,13 +176,13 @@ class ProductSerializer(serializers.ModelSerializer):
             'brand', 
         ]
         read_only_fields = ['slug', 'id']
-class ProductSerializer(serializers.ModelSerializer):
+class ProductOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ('id', 'name')
         
 class OrderProductSerializer(serializers.ModelSerializer):
-    product = ProductSerializer()
+    product = ProductOrderSerializer()
 
     class Meta:
         model = OrderStockProduct
