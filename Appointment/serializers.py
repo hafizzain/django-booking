@@ -239,7 +239,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             
         # serialized = AppointmentServiceSerializer(appoint_services, many=True)
         # returned_list.append(serialized.data)
-        return selected_data
+        return returned_list
 
     def get_employee(self, obj):
         try:
