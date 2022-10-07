@@ -17,6 +17,8 @@ import json
 from django.db.models import Q
 from Client.models import Client
 from datetime import date
+from threading import Thread
+
 
 from Appointment.models import Appointment, AppointmentService, AppointmentNotes
 from Appointment.serializers import AppoinmentSerializer,SingleAppointmentSerializer ,BlockSerializer ,AllAppoinmentSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer
@@ -295,10 +297,10 @@ def create_appointment(request):
     else:
         pass
     if text is not None:
-        for ind, value in enumerate(text):
-            notes = AppointmentNotes.objects.create(
+        for note in text:
+            AppointmentNotes.objects.create(
                 appointment=appointment,
-                text = value
+                text = note
             )
     
     all_members = []
@@ -351,10 +353,15 @@ def create_appointment(request):
         if business_address_id is not None:
             appointment_service.business_address = business_address
             appointment_service.save()
-    
-    #all_members = set(all_members)
     serialized = AppoinmentSerializer(appointment)
-    #Add_appointment()
+    
+    try:
+        thrd = Thread(target=Add_appointment, args=[appointment])
+        thrd.start()
+    except:
+            pass
+    
+    #Add_appointment(appointment)
     return Response(
             {
                 'status' : True,
@@ -373,6 +380,7 @@ def create_appointment(request):
 @permission_classes([IsAuthenticated])
 def update_appointment(request):
     appointment_service_id = request.data.get('id', None)
+    appointment_status = request.data.get('appointment_status', None)
     if appointment_service_id is None: 
        return Response(
             {
@@ -391,7 +399,7 @@ def update_appointment(request):
         )
           
     try:
-        service_appointment = Appointment.objects.get(id=appointment_service_id)
+        service_appointment = AppointmentService.objects.get(id=appointment_service_id)
     except Exception as err:
         return Response(
             {
@@ -412,13 +420,16 @@ def update_appointment(request):
             'status' : False,
             'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
             'response' : {
-                'message' : 'Attendence Serializer Invalid',
+                'message' : 'Appointment Serializer Invalid',
                 'error_message' : str(serializer.errors),
             }
         },
         status=status.HTTP_404_NOT_FOUND
         )
     serializer.save()
+    print(service_appointment)
+    #if appointment_status == 'Cancel':
+        
     return Response(
         {
             'status' : True,
@@ -432,6 +443,57 @@ def update_appointment(request):
         status=status.HTTP_200_OK
     )
     
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_appointment(request):
+    appointment_service_id = request.data.get('id', None)
+
+    if appointment_service_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        app_service = AppointmentService.objects.get(id=appointment_service_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Appointment Service Not Found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    app_service.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Appointment Service deleted successfully',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

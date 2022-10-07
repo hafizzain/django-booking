@@ -66,7 +66,8 @@ class AppointmentService(models.Model):
         ('Appointment_Booked',  'Appointment Booked'),
         ('Arrived', 'Arrived'),
         ('In Progress', 'In Progress'),
-        ('Done', 'Done')
+        ('Done', 'Done'),
+        ('Cancel', 'Cancel'),
     ]
 
     DURATION_CHOICES = [
