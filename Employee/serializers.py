@@ -34,10 +34,10 @@ class CitySerializer(serializers.ModelSerializer):
         exclude = ['is_deleted', 'created_at', 'unique_code', 'key']
         
 class EmployeInformationsSerializer(serializers.ModelSerializer):
-    services = serializers.SerializerMethodField(read_only=True)
+    # services = serializers.SerializerMethodField(read_only=True)
     
-    def get_services(self, obj):
-        return ServicesEmployeeSerializer(obj.services).data
+    # def get_services(self, obj):
+    #     return ServicesEmployeeSerializer(obj.services).data
     
     class Meta:
         model = EmployeeProfessionalInfo
@@ -70,6 +70,10 @@ class EmployeSerializer(serializers.ModelSerializer):
     country = serializers.SerializerMethodField(read_only=True)
     state = serializers.SerializerMethodField(read_only=True)
     city = serializers.SerializerMethodField(read_only=True)   
+    # services = serializers.SerializerMethodField(read_only=True)
+    
+    # def get_services(self, obj):
+    #     return ServicesEmployeeSerializer(obj.services).data
     
     def get_country(self, obj):
         try:
@@ -154,6 +158,7 @@ class EmployeSerializer(serializers.ModelSerializer):
                 'mobile_number', 
                 'image',
                 'dob', 
+                
                 'gender', 
                 'country',
                 'state',
