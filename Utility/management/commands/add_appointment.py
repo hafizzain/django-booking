@@ -11,7 +11,7 @@ class Command(BaseCommand):
     # Handle method to handle out the process of creating the admin user
     def handle(self, *args, **options):
         #user = User.objects.get(email='developeracount211@gmail.com')
-        appointment=  AppointmentService.objects.all()
+        appointment=  Appointment.objects.all()[0]
 
         Add_appointment(appointment = appointment)
 
