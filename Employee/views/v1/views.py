@@ -476,6 +476,7 @@ def create_employee(request):
         postal_code = postal_code,
         address=address,
         joining_date= joining_date,
+        ending_date=ending_date,
     )
     if not to_present :
         pass
@@ -689,14 +690,15 @@ def update_employee(request):
 
         elif type(services_id) == list:
             pass
-        
+        Employe_Informations.services.clear()
         for ser in services_id:
-            
             try:
-                service = Service.objects.get(id=ser)  
+                service = Service.objects.get(id=str(ser))  
                 Employe_Informations.services.add(service)
             except Exception as err:
                 print(str(err))
+                pass
+        
         Employe_Informations.save()
         serializer_info= EmployeInformationsSerializer(Employe_Informations,  data= request.data, partial=True)
         if serializer_info.is_valid():

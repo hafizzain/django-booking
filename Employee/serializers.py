@@ -34,10 +34,10 @@ class CitySerializer(serializers.ModelSerializer):
         exclude = ['is_deleted', 'created_at', 'unique_code', 'key']
         
 class EmployeInformationsSerializer(serializers.ModelSerializer):
-    # services = serializers.SerializerMethodField(read_only=True)
+    services = serializers.SerializerMethodField(read_only=True)
     
-    # def get_services(self, obj):
-    #     return ServicesEmployeeSerializer(obj.services).data
+    def get_services(self, obj):
+        return ServicesEmployeeSerializer(obj.services, many = True).data
     
     class Meta:
         model = EmployeeProfessionalInfo
