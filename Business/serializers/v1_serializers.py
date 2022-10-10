@@ -275,3 +275,9 @@ class BusinessVendorSerializer(serializers.ModelSerializer):
             'is_primary',
             'is_active',
         ]
+
+class BusiessAddressAppointmentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = BusinessAddress
+        fields = ['id', 'address_name']
