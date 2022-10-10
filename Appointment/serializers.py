@@ -292,7 +292,7 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
 class SingleAppointmentSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
     end_time = serializers.SerializerMethodField(read_only=True)
-    location =  BusiessAddressAppointmentSerializer(read_only=True)
+    business_address =  BusiessAddressAppointmentSerializer(read_only=True)
     service = ServiceAppointmentSerializer()
     currency = serializers.SerializerMethodField(read_only=True)
     booked_by = serializers.SerializerMethodField(read_only=True)
@@ -340,7 +340,7 @@ class SingleAppointmentSerializer(serializers.ModelSerializer):
         
     class Meta:
         model = AppointmentService
-        fields= ('id', 'location','client','service',
+        fields= ('id', 'business_address','client','service',
                  'appointment_time', 'end_time',
                  'appointment_status', 'currency', 'booked_by', 'booking_id', 'appointment_date', 'client_type'
             )
