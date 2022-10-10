@@ -3,6 +3,7 @@ from pyexpat import model
 from re import A
 from rest_framework import serializers
 from Appointment.models import Appointment, AppointmentService
+from Business.models import BusinessAddress
 from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer
 from Client.serializers import ClientAppointmentSerializer
 from Employee.models import Employee
@@ -292,7 +293,7 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
 class SingleAppointmentSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
     end_time = serializers.SerializerMethodField(read_only=True)
-    business_address =  BusiessAddressAppointmentSerializer(read_only=True)
+    location =  serializers.SerializerMethodField(read_only=True)
     service = ServiceAppointmentSerializer()
     currency = serializers.SerializerMethodField(read_only=True)
     booked_by = serializers.SerializerMethodField(read_only=True)
@@ -316,11 +317,12 @@ class SingleAppointmentSerializer(serializers.ModelSerializer):
     def get_currency(self, obj):
         return 'AED'
     
-    # def get_location(self, obj):
-    #     try:
-    #         return obj.business_address.address_name
-    #     except Exception as err:
-    #         None
+    def get_location(self, obj):
+        try:
+            app_location = BusinessAddress.objects.get(id=obj.business_address.id)
+            return BusiessAddressAppointmentSerializer(app_location).data
+        except Exception as err:
+            None
     
     def get_client(self, obj):
         return obj.appointment.client.full_name
@@ -340,7 +342,7 @@ class SingleAppointmentSerializer(serializers.ModelSerializer):
         
     class Meta:
         model = AppointmentService
-        fields= ('id', 'business_address','client','service',
+        fields= ('id', 'location','client','service',
                  'appointment_time', 'end_time',
                  'appointment_status', 'currency', 'booked_by', 'booking_id', 'appointment_date', 'client_type'
             )
