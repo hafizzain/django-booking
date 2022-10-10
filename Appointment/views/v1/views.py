@@ -365,7 +365,13 @@ def create_appointment(request):
     except Exception as err:
             pass
     
-    #Add_appointment(appointment)
+    all_memebers= Employee.objects.filter(
+        is_deleted = False,
+        is_active = True,
+        is_blocked = False,
+    ).order_by('-created_at')
+    serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request' : request})
+
     return Response(
             {
                 'status' : True,
@@ -373,7 +379,7 @@ def create_appointment(request):
                 'response' : {
                     'message' : 'Appointment Create!',
                     'error_message' : None,
-                    'appointment' : serialized.data,
+                    'appointments' : serialized.data,
                 }
             },
             status=status.HTTP_201_CREATED
