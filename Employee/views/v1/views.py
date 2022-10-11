@@ -491,7 +491,7 @@ def create_employee(request):
 
     errors =[]
 
-    employee_p_info = EmployeeProfessionalInfo.objects.create(employee=employee, start_time = start_time , end_time = end_time, salary=salary, designation = designation)
+    employee_p_info = EmployeeProfessionalInfo.objects.create(employee=employee, start_time = start_time , end_time = end_time, salary=salary, designation = designation , level=level )
     employee_mp = EmployeeModulePermission.objects.create(employee=employee)
     employee_p_setting = EmployeePermissionSetting.objects.create(employee = employee)
     employee_marketing = EmployeeMarketingPermission.objects.create(employee= employee)

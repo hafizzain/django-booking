@@ -285,6 +285,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
     salary = serializers.SerializerMethodField(read_only=True)
     income_type = serializers.SerializerMethodField(read_only=True)
     designation = serializers.SerializerMethodField(read_only=True)
+    level = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
     
     country_name = serializers.SerializerMethodField(read_only=True)
@@ -324,6 +325,12 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             return salary_info.salary
         except Exception:
             return None
+    def get_level(self, obj):
+        try:
+            level = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return level.level
+        except Exception:
+            return None
         
     def get_income_type(self, obj):        
         try:
@@ -354,6 +361,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'city_name',
             'income_type',
             'designation', 
+            'level',
             'employee_id'          
             ]   
         
