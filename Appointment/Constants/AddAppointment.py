@@ -22,7 +22,7 @@ def Add_appointment(appointment = None, tenant = None):
         try:
             appointment =  AppointmentService.objects.filter(appointment = appointment)
             if len(appointment) == 0 :
-                ExceptionRecord.objects.create(text='0 Records Founds Appointment services')
+                ExceptionRecord.objects.create(text='0 Records Founds Appointment services sending mails to appointment client and staffs')
                 return
                 
             for appo in appointment:
@@ -31,7 +31,6 @@ def Add_appointment(appointment = None, tenant = None):
                 ser_name = appo.service.name
                 dat = appo.appointment_date
                 mem_email = appo.member.email
-                ExceptionRecord.objects.create(text=mem_email)
                 mem_name = appo.member.full_name
                 mem_id= appo.member.employee_id
                 name = appo.appointment.client.full_name  
@@ -39,7 +38,6 @@ def Add_appointment(appointment = None, tenant = None):
                 html_file = render_to_string("AppointmentEmail/add_appointment.html", {'name': name,'email': email_c, 'ser_name':ser_name ,'t_name':mem_name , 'date':dat, 'mem_id':mem_id})
                 text_content = strip_tags(html_file)
                 
-                ExceptionRecord.objects.create(text=str(text_content))
                 email = EmailMultiAlternatives(
                     'Appointment Added',
                     text_content,
@@ -49,7 +47,6 @@ def Add_appointment(appointment = None, tenant = None):
                 )
                 email.attach_alternative(html_file, "text/html")
                 email.send()
-                ExceptionRecord.objects.create(text='Successfully sent')
         
         except Exception as err:
             ExceptionRecord.objects.create(
