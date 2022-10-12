@@ -7,12 +7,15 @@ from Appointment.models import Appointment, AppointmentService
 from django.conf import settings
 from datetime import datetime,date
 
+from Utility.models import ExceptionRecord
+
 
 def Add_appointment(appointment = None):
     if appointment is None:
-        return response({
-            'message': 'Appointment error'
-        })
+        ExceptionRecord.objects.create(
+            text='Appointment Is None'
+        )
+
     try:
         appointment =  AppointmentService.objects.filter(appointment = appointment)
         for appo in appointment:
@@ -39,8 +42,14 @@ def Add_appointment(appointment = None):
             email.send()
        
     except Exception as err:
+        ExceptionRecord.objects.create(
+            text=str(err)
+        )
         print(err)
-    name = appo.appointment.client.full_name  
+
+    name = appointment.client.full_name
+    email_c = appointment.client.email
+
     try:     
         html_file = render_to_string("AppointmentEmail/add_appointment.html", {'name': name,'t_name':name , 'ser_name':ser_name , 'date':dat, 'mem_id':mem_id})
         text_content = strip_tags(html_file)
@@ -55,4 +64,7 @@ def Add_appointment(appointment = None):
         email.attach_alternative(html_file, "text/html")
         email.send()
     except Exception as err:
+        ExceptionRecord.objects.create(
+            text=str(err)
+        )
         print(err)
