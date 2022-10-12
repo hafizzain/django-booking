@@ -70,7 +70,7 @@ class VendorSerializer(serializers.ModelSerializer):
 class ProductStockSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductStock
-        fields = ['id', 'sellable_quantity','consumable_quantity' , 'amount', 'unit' , 'alert_when_stock_becomes_lowest', 'sold_quantity','is_active' ]
+        fields = ['id', 'sellable_quantity','consumable_quantity' , 'amount', 'unit' , 'turnover','alert_when_stock_becomes_lowest', 'sold_quantity','is_active' ]
 
 class ProductWithStockSerializer(serializers.ModelSerializer):
     stock = serializers.SerializerMethodField()

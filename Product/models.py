@@ -102,6 +102,10 @@ class ProductMedia(models.Model):
 
 
 class ProductStock(models.Model):
+    TURN_CHOICES =[
+        ('Lowest', 'Lowest'),
+        ('Highest', 'Highest')
+    ]
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_product_stocks')
@@ -119,6 +123,8 @@ class ProductStock(models.Model):
     unit = models.PositiveIntegerField(default=0, verbose_name='Usage Unit', null=True, blank=True)
 
     alert_when_stock_becomes_lowest = models.BooleanField(default=None, null=True, blank=True)
+    
+    turnover = models.CharField(default='Highest', choices=TURN_CHOICES, max_length=40)
 
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)

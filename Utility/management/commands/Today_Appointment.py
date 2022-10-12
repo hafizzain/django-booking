@@ -5,23 +5,17 @@ from Appointment.models import Appointment, AppointmentService
 
 
 from Authentication.models import User
-from Appointment.Constants.AddAppointment import Add_appointment
+from Appointment.Constants.today_appointment import today_appointment
 
 
 class Command(BaseCommand):
     # Handle method to handle out the process of creating the admin user
     def handle(self, *args, **options):
-        #user = User.objects.get(email='developeracount211@gmail.com')
-        appointment=  Appointment.objects.all()[0]
         
         try:
-            thrd = Thread(target=Add_appointment, args=[appointment])
-            thrd.start()
+            today_appointment()
         except Exception as err:
-            pass
-        
-        
-        #Add_appointment(appointment = appointment)
+            print(err)
 
         self.stdout.write(self.style.SUCCESS(
             'Sent!'

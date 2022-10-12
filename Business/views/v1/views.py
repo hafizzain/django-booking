@@ -2533,7 +2533,12 @@ def update_business_vendor(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-        
+    phone_number=request.data.get('mobile_number',None)
+    if phone_number is not None:
+        vendor.mobile_number = phone_number
+    else :
+        vendor.mobile_number = None
+    vendor.save()
     serialized = BusinessVendorSerializer(vendor, data=request.data)
     if serialized.is_valid():
         serialized.save()

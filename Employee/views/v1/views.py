@@ -657,6 +657,11 @@ def update_employee(request):
               )
         data={}
         image=request.data.get('image',None)
+        phone_number=request.data.get('mobile_number',None)
+        if phone_number is not None:
+            employee.mobile_number = phone_number
+        else :
+            employee.mobile_number = None
         if image is not None:
             employee.image=image
             

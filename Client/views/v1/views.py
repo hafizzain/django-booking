@@ -341,6 +341,12 @@ def update_client(request):
                    status=status.HTTP_404_NOT_FOUND
               )
         image=request.data.get('image',None)
+        phone_number=request.data.get('mobile_number',None)
+        if phone_number is not None:
+            client.mobile_number = phone_number
+        else :
+            client.mobile_number = None
+        
         client.is_active = True  if request.data.get('image',None) is not None else False
 
         if image is not None:

@@ -67,6 +67,7 @@ SHARED_APPS = [
     'rest_framework.authtoken',
     "corsheaders",
     'geoip2',
+    'django_crontab',
 
     'Tenants.apps.TenantsConfig',
 ] +  NSTYLE_APPS
@@ -193,6 +194,11 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
+
+
+CRONJOBS = [
+    ('* * * * *', 'Apponitment.Constants.today_appointment.corn.today_appointment')
+]
 
 
 STATIC_URL = '/static/'

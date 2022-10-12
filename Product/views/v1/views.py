@@ -592,12 +592,13 @@ def add_product(request):
     medias = request.data.getlist('product_images', None)
 
     # Product Stock Details 
-    #quantity = request.data.get('quantity', None)
+    quantity = request.data.get('quantity', None)
     sellable_quantity = request.data.get('sellable_quantity', None)
     consumable_quantity = request.data.get('consumable_quantity',None)
     unit = request.data.get('unit', None)
     amount = request.data.get('amount', None)
     stock_status = request.data.get('stock_status', None)
+    turnover = request.data.get('turnover', None)
    
     alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', None)
    
@@ -735,12 +736,13 @@ def add_product(request):
         user = user,
         business = business,
         product = product ,
-        #quantity = quantity,
+        quantity = quantity,
         amount = amount,
         unit = unit,
         sellable_quantity=sellable_quantity,
         consumable_quantity =consumable_quantity,
         #available_quantity= quantity,
+        turnover = turnover,
         alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
         is_active = stock_status,
         )
