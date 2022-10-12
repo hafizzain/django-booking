@@ -442,7 +442,7 @@ def update_appointment(request):
     serializer.save()
     if appointment_status == 'Cancel':
         try:
-            thrd = Thread(target=cancel_appointment, args=[service_appointment])
+            thrd = Thread(target=cancel_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant} )
             thrd.start()
         except Exception as err:
             print(err)
@@ -450,7 +450,7 @@ def update_appointment(request):
         
     else:
         try:
-            thrd = Thread(target=reschedule_appointment, args=[service_appointment])
+            thrd = Thread(target=reschedule_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant})
             thrd.start()
         except Exception as err:
             print(err)

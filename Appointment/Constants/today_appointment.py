@@ -18,8 +18,6 @@ def send_appointment_to_business(busines_user):
 
     email = busines_user.user.email
     name = busines_user.user.full_name
-    print(email)
-    print(name)
     
     appointments =  AppointmentService.objects.filter(appointment_date = today)
     price_list=[]
@@ -57,4 +55,4 @@ def today_appointment():
             busines_user = Business.objects.all()
             if len(busines_user) > 0:
                 busines_user = busines_user[0]
-                send_appointment_to_business(busines_user)
+                send_appointment_to_business(busines_user)                  

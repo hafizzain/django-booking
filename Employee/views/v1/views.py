@@ -1116,7 +1116,7 @@ def update_staff_group(request):
 @permission_classes([AllowAny])
 def get_attendence(request):
     all_attendence= Attendance.objects.all()
-    serialized = AttendanceSerializers(all_attendence, many=True)
+    serialized = AttendanceSerializers(all_attendence, many=True, context={'request' : request})
     return Response(
         {
             'status' : 200,
@@ -1194,7 +1194,7 @@ def create_attendence(request):
         is_active=is_active,
     )
     
-    attendece_serializers=AttendanceSerializers(attendence_employe)
+    attendece_serializers=AttendanceSerializers(attendence_employe, context={'request' : request})
     
     return Response(
             {

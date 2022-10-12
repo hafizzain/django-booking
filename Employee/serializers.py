@@ -233,7 +233,15 @@ class StaffpermisionSerializers(serializers.ModelSerializer):
 #        fields ='__all__'
 
 class AttendanceSerializers(serializers.ModelSerializer):
-    employee= EmployeSerializer(read_only=True)
+    employee = serializers.SerializerMethodField()
+
+    #employee= EmployeSerializer(read_only=True)
+    def get_employee(self, obj):
+        try:
+            data = Employee.objects.get(id=obj.employee.id)
+            return EmployeSerializer( data, context=self.context).data
+        except Exception as err:
+            print(err)
     
     class Meta:
         model = Attendance
