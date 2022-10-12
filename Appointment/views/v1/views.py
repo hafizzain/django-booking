@@ -26,6 +26,7 @@ from threading import Thread
 
 from Appointment.models import Appointment, AppointmentService, AppointmentNotes
 from Appointment.serializers import AppoinmentSerializer,SingleAppointmentSerializer ,BlockSerializer ,AllAppoinmentSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer
+from Utility.models import ExceptionRecord
 
 
 @api_view(['GET'])
@@ -360,10 +361,12 @@ def create_appointment(request):
     serialized = AppoinmentSerializer(appointment)
     
     try:
-        thrd = Thread(target=Add_appointment, args=[appointment])
+        thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment' : appoinmnt})
         thrd.start()
     except Exception as err:
-            pass
+        ExceptionRecord.objects.create(
+            text=str(err)
+        )
     
     all_memebers= Employee.objects.filter(
         is_deleted = False,
