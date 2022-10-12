@@ -361,7 +361,7 @@ def create_appointment(request):
     serialized = AppoinmentSerializer(appointment)
     
     try:
-        thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment' : appoinmnt})
+        thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment' : appointment})
         thrd.start()
     except Exception as err:
         ExceptionRecord.objects.create(
