@@ -20,6 +20,52 @@ class BusinessTypeSerializer(serializers.ModelSerializer):
         model = BusinessType
         fields = ['id', 'name', 'image', 'slug']
 
+class BusinessGetSerializer(serializers.ModelSerializer):
+    website = serializers.SerializerMethodField()
+    facebook = serializers.SerializerMethodField()
+    instagram = serializers.SerializerMethodField()
+
+
+    def get_website(self, obj):
+        try:
+            social = BusinessSocial.objects.get(business=obj)
+            return social.website
+        except Exception as err:
+            print(err)
+            return None
+    
+    def get_facebook(self, obj):
+        try:
+            social = BusinessSocial.objects.get(business=obj)
+            return social.facebook
+        except:
+            return None
+
+    def get_instagram(self, obj):
+        try:
+            social = BusinessSocial.objects.get(business=obj)
+            return social.instagram
+        except:
+            return None
+
+    class Meta:
+        model = Business
+        fields = [
+            'id',
+            'business_name',
+            'postal_code',
+            'week_start',
+            'team_size',
+            'is_completed',
+            'currency',
+            'timezone',
+            'time_format',
+            'how_find_us',
+            'website',
+            'facebook',
+            'instagram',
+        ]
+
 
 class Business_GetSerializer(serializers.ModelSerializer):
     website = serializers.SerializerMethodField()

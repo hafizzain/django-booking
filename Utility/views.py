@@ -1,15 +1,55 @@
 
 
+from Business.models import Business
+from Business.serializers.v1_serializers import BusinessGetSerializer
+from Product.models import Product
+from Product.serializers import ProductSerializer
+from Tenants.models import Tenant
+
+from django_tenants.utils import tenant_context
+
+
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 
+
 from .serializers import SoftwareSerializer, CountrySerializer, StateSerializer, CitySerializer
 
 from .models import City, Software, Country, State
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_tenants(request):
+    data = []
+    businesses = []
+    tenants= Tenant.objects.all()
+    for tnt in tenants:
+        with tenant_context(tnt):
+            all_products = Product.objects.filter(is_deleted=False).order_by('-created_at')
+            serialized = ProductSerializer(all_products, many=True, context={'request' : request})
+            data.extend(serialized.data)
 
+            all_businesses = Business.objects.all()
+            b_serialized = BusinessGetSerializer(all_businesses , context={'request' : request})
+            businesses.append(b_serialized.data)
+            print(b_serialized.data)
+            
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'All Products and businesses in all tenants',
+                'error_message' : None,
+                'products' : data,
+                'businesses' : businesses,
+                
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
