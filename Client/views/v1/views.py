@@ -1,3 +1,5 @@
+from threading import Thread
+from Employee.Constants.Add_Employe import add_employee
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -290,6 +292,12 @@ def create_client(request):
         is_active = is_active
     )
     serialized= ClientSerializer(client, context={'request' : request})
+    template = 'Client'
+    try:
+        thrd = Thread(target=add_employee, args=[full_name, email , template, business.business_name,])
+        thrd.start()
+    except Exception as err:
+        pass
     return Response(
         {
             'status' : True,

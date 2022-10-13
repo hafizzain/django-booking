@@ -17,6 +17,8 @@ from Employee.serializers import( EmployeSerializer , EmployeInformationsSeriali
                         
                           
                                  )
+from threading import Thread
+from Employee.Constants.Add_Employe import add_employee
 from Service.models import Service
 from rest_framework import status
 from Business.models import Business
@@ -549,8 +551,16 @@ def create_employee(request):
         data.update(serialized.data)
     employee_serialized = EmployeSerializer(employee , context={'request' : request})
     data.update(employee_serialized.data)
-
-
+    template = 'Employee'
+    
+    #print(f'{full_name} {email} {business.business_name} {template}')
+    
+    try:
+        thrd = Thread(target=add_employee, args=[full_name, email , template, business.business_name,])
+        thrd.start()
+    except Exception as err:
+        pass
+    
     return Response(
         {
             'status' : True,

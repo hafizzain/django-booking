@@ -295,6 +295,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
     designation = serializers.SerializerMethodField(read_only=True)
     level = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
+    employee_info = serializers.SerializerMethodField(read_only=True)
     
     country_name = serializers.SerializerMethodField(read_only=True)
     state_name = serializers.SerializerMethodField(read_only=True)
@@ -354,6 +355,13 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
         except: 
             return None
         
+    def get_employee_info(self, obj):
+        try:
+            professional = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return EmployeInformationsSerializer(professional).data
+        except EmployeeProfessionalInfo.DoesNotExist:
+            return None
+        
     class Meta:
         model =Employee
         fields = [
@@ -370,7 +378,8 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'income_type',
             'designation', 
             'level',
-            'employee_id'          
+            'employee_id',
+            'employee_info'        
             ]   
         
 class CommissionSerializer(serializers.ModelSerializer):
