@@ -465,7 +465,7 @@ def update_appointment(request):
             'response' : {
                 'message' : 'Update Appointment Successfully',
                 'error_message' : None,
-                'StaffGroupUpdate' : serializer.data
+                'Appointment' : serializer.data
             }
         },
         status=status.HTTP_200_OK

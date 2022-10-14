@@ -49,24 +49,6 @@ class Employee(models.Model):
     def __str__(self):
         return str(self.id)
     
-    
-# class WorkingDays(models.Model):
-#     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
-#     #user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='working_days')
-#     #employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_professional_details')
-#     #business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_employees')
-
-#     monday = models.BooleanField(default=False)
-#     tuesday = models.BooleanField(default=False)
-#     wednesday = models.BooleanField(default=False)
-#     thursday = models.BooleanField(default=False)
-#     firday = models.BooleanField(default=False)
-#     saturday = models.BooleanField(default=False)
-#     sunday = models.BooleanField(default=False)
-    
-#     def __str__(self):
-#         return str(self.id)
-
 class EmployeeProfessionalInfo(models.Model):
     LEVEL_CHOICE =[
         ('Average', 'Average'),
@@ -82,9 +64,10 @@ class EmployeeProfessionalInfo(models.Model):
     designation = models.CharField(max_length=300, default='')
     income_type = models.CharField(choices=INCOME_TYPE_CHOICES, default='Hourly_Rate', max_length=30)
     salary = models.PositiveIntegerField(default=0)
-    services = models.ManyToManyField(Service, related_name='services_employee')
+    #services = models.ManyToManyField(Service, through='EmployeeSelectedService' , related_name='services_employee')
     
-    level= models.CharField(max_length=100, choices=LEVEL_CHOICE, default = 'Average', verbose_name = 'Employee Level')
+    
+    #level= models.CharField(max_length=100, choices=LEVEL_CHOICE, default = 'Average', verbose_name = 'Employee Level')
     
     #working_days = models.ManyToManyField(WorkingDays, related_name='days_employee')
     start_time = models.TimeField(null=True, blank=True)
@@ -102,6 +85,20 @@ class EmployeeProfessionalInfo(models.Model):
     def __str__(self):
         return str(self.id)
 
+class EmployeeSelectedService(models.Model):
+    LEVEL_CHOICE =[
+        ('Average', 'Average'),
+        ('Above_Averge', 'Above Average'),
+    ]
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='employee_service')
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_selected_service')
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    level= models.CharField(max_length=100, choices=LEVEL_CHOICE, default = 'Average', verbose_name = 'Employee Service Level')
+
+    def __str__(self):
+        return str(self.id)
+
+    
 
 class EmployeePermissionSetting(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)

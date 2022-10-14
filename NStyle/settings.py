@@ -197,7 +197,7 @@ USE_TZ = True
 
 
 CRONJOBS = [
-    ('* * * * *', 'Apponitment.Constants.today_appointment.corn.today_appointment')
+    ('* * * * *', 'Apponitment.Constants.today_appointment.today_appointment')
 ]
 
 

@@ -99,7 +99,7 @@ def get_single_client(request):
         )
         
     try:
-        client = Client.objects.get(id=client_id)
+        client = Client.objects.get(id=client_id, is_deleted=False, is_blocked=False)
     except Exception as err:
         return Response(
                 {
@@ -132,7 +132,7 @@ def get_single_client(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_client(request):
-    all_client=Client.objects.all().order_by('-created_at')
+    all_client=Client.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
     serialized = ClientSerializer(all_client, many=True,  context={'request' : request})
     return Response(
         {
@@ -428,7 +428,8 @@ def delete_client(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-    client.delete()
+    client.is_deleted = True
+    client.save()
     return Response(
         {
             'status' : True,

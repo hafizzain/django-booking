@@ -10,7 +10,7 @@ from .models import( Employee, EmployeeProfessionalInfo ,
                EmployeePermissionSetting, EmployeeModulePermission 
                , EmployeeMarketingPermission,
                StaffGroup, StaffGroupModulePermission, Attendance
-               ,Payroll , CommissionSchemeSetting , Asset ,AssetDocument
+               ,Payroll , CommissionSchemeSetting , Asset ,AssetDocument, EmployeeSelectedService
 )
 
 class ServicesEmployeeSerializer(serializers.ModelSerializer):
@@ -34,10 +34,10 @@ class CitySerializer(serializers.ModelSerializer):
         exclude = ['is_deleted', 'created_at', 'unique_code', 'key']
         
 class EmployeInformationsSerializer(serializers.ModelSerializer):
-    services = serializers.SerializerMethodField(read_only=True)
+    # services = serializers.SerializerMethodField(read_only=True)
     
-    def get_services(self, obj):
-        return ServicesEmployeeSerializer(obj.services, many = True).data
+    # def get_services(self, obj):
+    #     return ServicesEmployeeSerializer(obj.services, many = True).data
     
     class Meta:
         model = EmployeeProfessionalInfo
@@ -60,6 +60,11 @@ class EmployeeMarketingSerializers(serializers.ModelSerializer):
         model = EmployeeMarketingPermission
         exclude = ['employee', 'created_at', 'id']
         
+class EmployeeServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmployeeSelectedService
+        fields = '__all__'
+        
 class EmployeSerializer(serializers.ModelSerializer):
     employee_info = serializers.SerializerMethodField(read_only=True)
     permissions = serializers.SerializerMethodField(read_only=True)
@@ -70,11 +75,16 @@ class EmployeSerializer(serializers.ModelSerializer):
     country = serializers.SerializerMethodField(read_only=True)
     state = serializers.SerializerMethodField(read_only=True)
     city = serializers.SerializerMethodField(read_only=True)   
-    # services = serializers.SerializerMethodField(read_only=True)
+    services = serializers.SerializerMethodField(read_only=True)
     
-    # def get_services(self, obj):
-    #     return ServicesEmployeeSerializer(obj.services).data
-    
+    def get_services(self, obj):
+        try:
+            service = EmployeeSelectedService.objects.filter(employee=obj)
+            return EmployeeServiceSerializer(service, many = True).data
+            # return EmployeeServiceSerializer(obj.services).data
+        except Exception as err:
+            print(err)
+            None
     def get_country(self, obj):
         try:
             return CountrySerializer(obj.country).data
@@ -150,15 +160,13 @@ class EmployeSerializer(serializers.ModelSerializer):
         model = Employee
         fields = [
                 'id', 
-                'user',
-                'business',
                 'full_name',
                 'employee_id',
                 'email',
                 'mobile_number', 
                 'image',
                 'dob', 
-                
+                'services',
                 'gender', 
                 'country',
                 'state',
@@ -251,7 +259,7 @@ class AttendanceSerializers(serializers.ModelSerializer):
 class InformationPayrollSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployeeProfessionalInfo
-        exclude = ['employee', 'id', 'services', 'designation']
+        exclude = ['employee', 'id', 'designation']
         
 class EmployPayrollSerializers(serializers.ModelSerializer):
     salary = serializers.SerializerMethodField(read_only=True)

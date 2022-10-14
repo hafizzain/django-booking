@@ -3,7 +3,7 @@ from django.contrib import admin
 from .models import(CommissionSchemeSetting, Employee, EmployeeProfessionalInfo, EmployeePermissionSetting, EmployeeModulePermission, 
                     EmployeeMarketingPermission ,StaffGroup , 
                     StaffGroupModulePermission , Attendance , 
-                    Payroll, Asset, AssetDocument )
+                    Payroll, Asset, AssetDocument, EmployeeSelectedService )
 # Register your models here.
 
 @admin.register(Employee)
@@ -110,3 +110,4 @@ class CommissionSchemeSettingAdmin(admin.ModelAdmin):
     ]
 admin.site.register(Asset)
 admin.site.register(AssetDocument)
+admin.site.register(EmployeeSelectedService)

@@ -1,7 +1,8 @@
+from doctest import testfile
 from django.shortcuts import render
 from Employee.models import( Employee , EmployeeProfessionalInfo ,
                         EmployeePermissionSetting,  EmployeeModulePermission
-                        , EmployeeMarketingPermission , StaffGroup 
+                        , EmployeeMarketingPermission, EmployeeSelectedService , StaffGroup 
                         , StaffGroupModulePermission, Attendance
                         ,Payroll, CommissionSchemeSetting, Asset, AssetDocument
                         )
@@ -238,8 +239,8 @@ def get_single_employee(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    try:
-        employee_id = Employee.objects.get(id=employee_id)
+    try: 
+        employee_id = Employee.objects.get(id=employee_id, is_deleted=False)
     except Exception as err:
         return Response(
                 {
@@ -253,7 +254,7 @@ def get_single_employee(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-    seralized = EmployeSerializer(employee_id, context={'request' : request})
+    seralized = EmployeSerializer(employee_id,  context={'request' : request})
     data = dict()
     data.update(seralized.data)
     try:
@@ -266,7 +267,7 @@ def get_single_employee(request):
         data.update(data['marketing_permissions'])
         del data['marketing_permissions']
     except Exception as err:
-        print(err)
+        print(f'dict {err}')
         None
     return Response(
         {
@@ -493,7 +494,7 @@ def create_employee(request):
 
     errors =[]
 
-    employee_p_info = EmployeeProfessionalInfo.objects.create(employee=employee, start_time = start_time , end_time = end_time, salary=salary, designation = designation , level=level )
+    employee_p_info = EmployeeProfessionalInfo.objects.create(employee=employee, start_time = start_time , end_time = end_time, salary=salary, designation = designation )
     employee_mp = EmployeeModulePermission.objects.create(employee=employee)
     employee_p_setting = EmployeePermissionSetting.objects.create(employee = employee)
     employee_marketing = EmployeeMarketingPermission.objects.create(employee= employee)
@@ -513,21 +514,41 @@ def create_employee(request):
 
     elif type(working_days) == list:
             pass
-    if type(services_id) == str:
-            services_id = json.loads(services_id)
-            print('str')
+    # if type(services_id) == str:
+    #         services_id = json.loads(services_id)
+    #         print('str')
 
-    elif type(services_id) == list:
-            pass
+    # elif type(services_id) == list:
+    #         pass
         
-    for ser in services_id:
-            try:
-                service = Service.objects.get(id=ser)  
-                print(type(service))
-                print(service)
-                employee_p_info.services.add(service)
-            except Exception as err:
-                print(str(err))
+    # for ser in services_id:
+    #         try:
+    #             service = Service.objects.get(id=ser)  
+    #             employee_p_info.services.add(service)
+    #         except Exception as err:
+    #             print(str(err))
+            
+                
+    if type(services_id) == str:
+        services_id = services_id.replace("'" , '"')
+        services_id = json.loads(services_id)
+        pass
+    else:
+        pass
+    for services in services_id :
+        try:
+            if services['service'] is not None:
+                ser = Service.objects.get(id=services['service'])
+            
+                EmployeeSelectedService.objects.create(
+                    employee = employee,
+                    service = ser,
+                    level = services['level']
+                )
+        except Exception as error:
+            print(error)
+            None      
+                
     employee_p_info.save()
     
     serialized = EmployeInformationsSerializer(employee_p_info, data=request.data)
@@ -551,15 +572,14 @@ def create_employee(request):
         data.update(serialized.data)
     employee_serialized = EmployeSerializer(employee , context={'request' : request})
     data.update(employee_serialized.data)
+
     template = 'Employee'
-    
-    #print(f'{full_name} {email} {business.business_name} {template}')
-    
-    try:
-        thrd = Thread(target=add_employee, args=[full_name, email , template, business.business_name,])
-        thrd.start()
-    except Exception as err:
-        pass
+
+    # try:
+    #     thrd = Thread(target=add_employee, args=[full_name, email , template, business.business_name,])
+    #     thrd.start()
+    # except Exception as err:
+    #     pass
     
     return Response(
         {
@@ -611,15 +631,15 @@ def delete_employee(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    
-    employee.delete()
+    employee.is_deleted = True
+    employee.save()
     return Response(
         {
             'status' : True,
             'status_code' : 200,
             'status_code_text' : '200',
             'response' : {
-                'message' : 'Employee deleted successful',
+                'message' : 'Employee deleted successfully',
                 'error_message' : None
             }
         },
@@ -668,6 +688,8 @@ def update_employee(request):
         data={}
         image=request.data.get('image',None)
         phone_number=request.data.get('mobile_number',None)
+       
+        
         if phone_number is not None:
             employee.mobile_number = phone_number
         else :
@@ -699,20 +721,58 @@ def update_employee(request):
         
 
         Employe_Informations= EmployeeProfessionalInfo.objects.get(employee=employee)
+        
+        Employe_Informations.monday = True if 'monday' in request.data else False
+        Employe_Informations.tuesday = True if 'tuesday' in request.data else False
+        Employe_Informations.wednesday = True if 'wednesday' in request.data else False
+        Employe_Informations.thursday = True if 'thursday' in request.data else False
+        Employe_Informations.friday = True if 'friday' in request.data else False
+        Employe_Informations.saturday = True if 'saturday' in request.data else False
+        Employe_Informations.sunday = True if 'sunday' in request.data else False
+        
         if type(services_id) == str:
+            services_id = services_id.replace("'" , '"')
             services_id = json.loads(services_id)
-            print('str')
-
-        elif type(services_id) == list:
+        else:
             pass
-        Employe_Informations.services.clear()
-        for ser in services_id:
-            try:
-                service = Service.objects.get(id=str(ser))  
-                Employe_Informations.services.add(service)
-            except Exception as err:
-                print(str(err))
-                pass
+        for services in services_id :
+            #get('id', None)
+            print('Looop enter')
+            if services['id'] is not None:
+                try:
+                    print(services['id'])
+                    emp_service = EmployeeSelectedService.objects.get(id=services['id'])
+                
+                    if bool(services['is_deleted']) == True:
+                        try:
+                            emp_service.delete()
+                        
+                        except Exception as error:
+                            print(f'is_delete item {error}')
+                            None 
+                    ser = Service.objects.get(id=services['service'])
+                    emp_service.service = ser
+                    emp_service.level = services['level']
+                    
+                except Exception as error:
+                    print(f'EmployeeSelectedService item {error}')
+                    None  
+                    
+        # if type(services_id) == str:
+        #     services_id = json.loads(services_id)
+        #     print('str')
+
+        # elif type(services_id) == list:
+        
+        #     pass
+        # Employe_Informations.services.clear()
+        # for ser in services_id:
+        #     try:
+        #         service = Service.objects.get(id=str(ser))  
+        #         Employe_Informations.services.add(service)
+        #     except Exception as err:
+        #         print(str(err))
+        #         pass
         
         Employe_Informations.save()
         serializer_info= EmployeInformationsSerializer(Employe_Informations,  data= request.data, partial=True)
