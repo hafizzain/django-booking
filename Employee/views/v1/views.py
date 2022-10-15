@@ -377,7 +377,7 @@ def create_employee(request):
     end_time= request.data.get('end_time',None)
     start_time = request.data.get('start_time', None)
     working_days = request.data.get('working_days',None)
-    level = request.data.get('level',None)
+    #level = request.data.get('level',None)
     
     start_time = request.data.get('start_time',None)
     end_time = request.data.get('end_time',None)
@@ -389,7 +389,7 @@ def create_employee(request):
     city = request.data.get('city', None)
    
     if not all([
-         business_id, full_name ,employee_id, email, country, state, city ,gender  ,address , designation, income_type, salary, level ]): #or ( not to_present and ending_date is None):
+         business_id, full_name ,employee_id, email, country, state, city ,gender  ,address , designation, income_type, salary ]): #or ( not to_present and ending_date is None):
        return Response(
             {
                 'status' : False,
@@ -410,7 +410,6 @@ def create_employee(request):
                         'designation',
                         'income_type',
                         'salary',
-                        'level',
                     ]
                 }
             },
@@ -528,26 +527,29 @@ def create_employee(request):
     #         except Exception as err:
     #             print(str(err))
             
-                
+    print(type(services_id))
     if type(services_id) == str:
-        services_id = services_id.replace("'" , '"')
+        #services_id = services_id.replace("'" , '"')
         services_id = json.loads(services_id)
-        pass
+        print(services_id)
     else:
         pass
-    for services in services_id :
-        try:
-            if services['service'] is not None:
-                ser = Service.objects.get(id=services['service'])
-            
-                EmployeeSelectedService.objects.create(
-                    employee = employee,
-                    service = ser,
-                    level = services['level']
-                )
-        except Exception as error:
-            print(error)
-            None      
+    
+    if services_id is not None:
+        for services in services_id :
+            print(services['service'])
+            try:
+                if services['service'] is not None:
+                    ser = Service.objects.get(id=services['service'])
+                
+                    EmployeeSelectedService.objects.create(
+                        employee = employee,
+                        service = ser,
+                        level = services['level']
+                    )
+            except Exception as error:
+                print(error)
+                None      
                 
     employee_p_info.save()
     
@@ -736,16 +738,16 @@ def update_employee(request):
         else:
             pass
         for services in services_id :
+            print(services['level'])
             #get('id', None)
-            print('Looop enter')
             if services['id'] is not None:
-                try:
-                    print(services['id'])
+                try: 
                     emp_service = EmployeeSelectedService.objects.get(id=services['id'])
                 
-                    if bool(services['is_deleted']) == True:
+                    if services['is_deleted'] == 'True':
                         try:
                             emp_service.delete()
+                            continue
                         
                         except Exception as error:
                             print(f'is_delete item {error}')

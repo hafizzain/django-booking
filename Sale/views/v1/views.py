@@ -93,19 +93,19 @@ def create_service(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
     
-    try:
-        location=BusinessAddress.objects.get(id=location_id)
-    except Exception as err:
-            return Response(
-                {
-                    'status' : False,
-                    'status_code' : StatusCodes.LOCATION_NOT_FOUND_4017,
-                    'response' : {
-                    'message' : 'Location not found',
-                    'error_message' : str(err),
-                }
-                }
-            )
+    # try:
+    #     location=BusinessAddress.objects.get(id=location_id)
+    # except Exception as err:
+    #         return Response(
+    #             {
+    #                 'status' : False,
+    #                 'status_code' : StatusCodes.LOCATION_NOT_FOUND_4017,
+    #                 'response' : {
+    #                 'message' : 'Location not found',
+    #                 'error_message' : str(err),
+    #             }
+    #             }
+    #         )
     
     
     service_obj = Service.objects.create(
@@ -113,7 +113,7 @@ def create_service(request):
         business =business_id,
         name = name,
         description = description,
-        location=location,
+        #location=location,
         price=price,
         duration=duration,
         enable_team_comissions =enable_team_comissions,
@@ -156,6 +156,21 @@ def create_service(request):
                service_obj.employee.add(employe)
             except Exception as err:
                 employees_error.append(str(err))
+    
+    if type(location_id) == str:
+        location_id = json.loads(location_id)
+
+    elif type(location_id) == list:
+            pass
+        
+    for usr in location_id:
+            try:
+               location = BusinessAddress.objects.get(id=usr)
+               print(location)
+               service_obj.location = location
+            except Exception as err:
+                employees_error.append(str(err))
+    
     service_obj.save()
     payroll_serializers= ServiceSerializer(service_obj)
     

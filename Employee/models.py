@@ -50,10 +50,10 @@ class Employee(models.Model):
         return str(self.id)
     
 class EmployeeProfessionalInfo(models.Model):
-    LEVEL_CHOICE =[
-        ('Average', 'Average'),
-        ('Above_Averge', 'Above Average'),
-    ]
+    # LEVEL_CHOICE =[
+    #     ('Average', 'Average'),
+    #     ('Above_Averge', 'Above Average'),
+    # ]
     INCOME_TYPE_CHOICES = [
         ('Hourly_Rate', 'Hourly_Rate'),
         ('Daily_Income', 'Daily_Income'),

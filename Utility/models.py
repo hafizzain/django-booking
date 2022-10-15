@@ -1,10 +1,20 @@
+from cgitb import text
+from unittest.util import _MAX_LENGTH
 from uuid import uuid4
 from django.db import models
 from django.utils.timezone import now
 
+class GlobalPermissionChoices(models.Model):
+    id = models.UUIDField(default=uuid4, editable=False, unique=True, primary_key=True)
+    
+    text = models.CharField(max_length=1000, default='')
+    slug = models.CharField(max_length=1000, default='')
+    
+    def __str__(self):
+        return str(self.id)
+
 
 class Currency(models.Model):
-    id = models.UUIDField(default=uuid4, editable=False, unique=True, primary_key=True)
 
     name = models.CharField(default='', max_length=200)
     code = models.CharField(default='', max_length=20)

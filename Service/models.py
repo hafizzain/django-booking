@@ -1,3 +1,4 @@
+from email.policy import default
 from uuid import uuid4
 from django.db import models
 from django.utils.timezone import now
@@ -16,6 +17,27 @@ class Service(models.Model):
         ('180_Min' , '180 Min'),
         ('210_Min' , '210 Min'),
     ]
+    CLIENT_CAN_BOOK_CHOICES = [
+        ('Anytime', 'Anytime'),
+        ('5_Hours_Before', '5 Hours Before'),
+        ('12_Hours_Before', '12 Hours Before'),
+        ('24_Hours_Before', '24 Hours Before'),
+        ('36_Hours_Before', '36 Hours Before'),
+    ]
+    
+    TIME_SLOT_INTERVAL_CHOICES = [
+        ('30_Mins', '30 Mins'),
+        ('60_Mins', '60 Mins'),
+        ('90_Mins', '90 Mins'),
+        ('120_Mins', '120 Mins'),
+    ]
+    
+    CONTROLS_TIME_SLOT_CHOICES = [
+        ('Anytime_In_The_Future', 'Anytime In The Future'),
+        ('No_More_Than_1_Months_In_The_Future', 'No More Than 1 Months In The Future'),
+        ('No_More_Than_2_Months_In_The_Future', 'No More Than 2 Months In The Future'),
+        ('No_More_Than_3_Months_In_The_Future', 'No More Than 3 Months In The Future'),
+    ]
     
     TREATMENT_TYPES = [
         ('Hair_Color' , 'Hair Color'),
@@ -33,10 +55,17 @@ class Service(models.Model):
     employee = models.ManyToManyField('Employee.Employee', related_name='employee_services_or_packages')
     location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='address_services_or_packages')
     #duration = models.PositiveIntegerField(default=0, null=True, blank=True)
+    
     duration = models.CharField(max_length=50, null=True, blank=True, choices=DURATION_CHOICES )
     enable_team_comissions = models.BooleanField(default=True, null=True, blank=True, verbose_name='Enable Team Member Comission')
     enable_vouchers = models.BooleanField(default=False, null=True, blank=True)
     
+    #New Fields added 
+    controls_time_slot = models.CharField(choices=CONTROLS_TIME_SLOT_CHOICES, max_length=100, default='Anytime_In_The_Future')
+    initial_deposit =models.PositiveIntegerField(default=0)
+    client_can_book = models.CharField(choices=CLIENT_CAN_BOOK_CHOICES, max_length=100, default='Anytime')
+    controls_time_slot = models.CharField(choices=CONTROLS_TIME_SLOT_CHOICES, max_length=100, default='Anytime_In_The_Future')
+
     price = models.PositiveIntegerField(default=0)
     
     is_deleted = models.BooleanField(default=False)
