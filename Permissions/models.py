@@ -1,4 +1,3 @@
-from tabnanny import verbose
 from uuid import uuid4
 from django.db import models
 from django.utils.timezone import now
@@ -6,6 +5,7 @@ from django.utils.timezone import now
 
 from Authentication.models import User
 from Business.models import Business
+from Employee.models import Employee
 from Utility.models import Country, State, City
 from Service.models  import Service
 from Utility.models import GlobalPermissionChoices
@@ -13,6 +13,8 @@ from Utility.models import GlobalPermissionChoices
 
 class EmployePermission(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+
+    employee = models.OneToOneField(Employee, on_delete=models.CASCADE, related_name='employee_permissions')
     
     #Appointment Booking
     appointment = models.ManyToManyField(GlobalPermissionChoices, verbose_name ='Appointment')
