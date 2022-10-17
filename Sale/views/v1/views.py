@@ -1,3 +1,4 @@
+from ast import Str
 import imp
 from django.shortcuts import render
 
@@ -179,7 +180,7 @@ def create_service(request):
             try:
                location = BusinessAddress.objects.get(id=usr)
                print(location)
-               service_obj.location = location
+               service_obj.location.add(location)
             except Exception as err:
                 employees_error.append(str(err))
     
@@ -289,8 +290,23 @@ def update_service(request):
                 status=status.HTTP_404_NOT_FOUND
         )
     error = []
-    employee=request.data.get('employee', None)
+    employeeslist=request.data.get('employee', None)
     service=request.data.get('service', None)
+    location=request.data.get('location', None)
+    
+    if location is not None:
+        if type(location) == str:
+            location = json.loads(location)
+        elif type(location) == list:
+            pass
+        service_id.location.clear()
+        for loc in location:
+            try:
+               loca = BusinessAddress.objects.get(id=loc)  
+               service_id.location.add(loca)
+            except Exception as err:
+                error.append(str(err))
+    
     if service is not None:
         if type(service) == str:
             service = json.loads(service)
@@ -303,27 +319,32 @@ def update_service(request):
                service_id.parrent_service.add(service)
             except Exception as err:
                 error.append(str(err))
+                
+    # try:
+    #             test = '1689071a-1ddc-4191-95d5-16e16f2b2188'
+    #             employe = Employee.objects.get(id=test)
+    #             service_id.employee.add(employe)
+    # except Exception as err:
+    #             error.append(str(err))
     
-        
-    if employee is not None:
-        if type(employee) == str:
-            employee = json.loads(employee)
-        elif type(employee) == list:
+    
+    if employeeslist is not None:
+        if type(employeeslist) == str:
+            employeeslist = json.loads(employeeslist)
+        elif type(employeeslist) == list:
             pass
-        print(type(employee))
+        print(type(employeeslist))
         service_id.employee.clear()
-        for usr in employee:
+        for usr in employeeslist:
             try:
-                print(usr)
+               
                 employe = Employee.objects.get(id=usr)
                 service_id.employee.add(employe)
             except Exception as err:
                 error.append(str(err))
-                
-        service_id.save() 
+    service_id.save()
     
-        
-    serializer= ServiceSerializer(service_id, data=request.data, partial=True)
+    serializer= ServiceSerializer(service_id, context={'request' : request} , data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
         return Response(

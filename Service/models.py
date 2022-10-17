@@ -53,7 +53,7 @@ class Service(models.Model):
     parrent_service = models.ManyToManyField('Service', null=True, blank=True, related_name='parent_package_services')
     description = models.CharField(max_length=100, default='')
     employee = models.ManyToManyField('Employee.Employee', related_name='employee_services_or_packages')
-    location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='address_services_or_packages')
+    location = models.ManyToManyField(BusinessAddress, null=True, blank=True, related_name='address_services_or_packages')
     #duration = models.PositiveIntegerField(default=0, null=True, blank=True)
     
     duration = models.CharField(max_length=50, null=True, blank=True, choices=DURATION_CHOICES )

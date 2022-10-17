@@ -124,7 +124,7 @@ class ProductStock(models.Model):
 
     alert_when_stock_becomes_lowest = models.BooleanField(default=None, null=True, blank=True)
     
-    turnover = models.CharField(default='Highest', choices=TURN_CHOICES, max_length=40)
+    #turnover = models.CharField(default='Highest', choices=TURN_CHOICES, max_length=40)
 
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)

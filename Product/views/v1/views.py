@@ -598,7 +598,7 @@ def add_product(request):
     unit = request.data.get('unit', None)
     amount = request.data.get('amount', None)
     stock_status = request.data.get('stock_status', None)
-    turnover = request.data.get('turnover', None)
+    #turnover = request.data.get('turnover', None)
    
     alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', None)
    
@@ -742,7 +742,7 @@ def add_product(request):
         sellable_quantity=sellable_quantity,
         consumable_quantity =consumable_quantity,
         #available_quantity= quantity,
-        turnover = turnover,
+        #turnover = turnover,
         alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
         is_active = stock_status,
         )
