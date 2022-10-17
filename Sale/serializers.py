@@ -17,8 +17,9 @@ class LocationServiceSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
 class ServiceSerializer(serializers.ModelSerializer):
+    
     employee = EmployeeServiceSerializer(read_only=True)
-    location = LocationServiceSerializer(read_only=True)
+    #location = LocationServiceSerializer(read_only=True)
     class Meta:
         model = Service
         fields = ['id', 'name' , 'service_type', 'employee', 'parrent_service' , 'description', 'location']

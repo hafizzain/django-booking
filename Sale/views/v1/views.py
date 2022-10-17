@@ -289,7 +289,9 @@ def update_service(request):
             },
                 status=status.HTTP_404_NOT_FOUND
         )
+        
     error = []
+    
     employeeslist=request.data.get('employee', None)
     service=request.data.get('service', None)
     location=request.data.get('location', None)
@@ -306,6 +308,7 @@ def update_service(request):
                service_id.location.add(loca)
             except Exception as err:
                 error.append(str(err))
+    
     
     if service is not None:
         if type(service) == str:
@@ -354,6 +357,7 @@ def update_service(request):
                 'response' : {
                     'message' : ' Service updated successfully',
                     'error_message' : None,
+                    'error': error,
                     'service' : serializer.data
                 
                 }
