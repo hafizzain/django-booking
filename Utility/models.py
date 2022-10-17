@@ -1,23 +1,25 @@
-from cgitb import text
 from uuid import uuid4
 from django.db import models
 from django.utils.timezone import now
 
+
 class GlobalPermissionChoices(models.Model):
     id = models.UUIDField(default=uuid4, editable=False, unique=True, primary_key=True)
     
-    text = models.CharField(max_length=100, default='')
-    slug = models.CharField(max_length=100, default='')
-
-    # def save(self, obj):
-    #     self.slug = self.text.upper()
-    #     super()
+    
+    text = models.CharField(max_length=1000, default='')
+    slug = models.CharField(max_length=1000, default='')
+    
+    def save(self, *args, **kwargs):
+        self.slug = self.text.upper()
+        super(GlobalPermissionChoices, self).save(*args, **kwargs)
     
     def __str__(self):
         return str(self.id)
 
 
 class Currency(models.Model):
+    id = models.UUIDField(default=uuid4, editable=False, unique=True, primary_key=True)
 
     name = models.CharField(default='', max_length=200)
     code = models.CharField(default='', max_length=20)

@@ -55,6 +55,11 @@ def create_service(request):
     price = request.data.get('price', None)
     duration = request.data.get('duration', None)
     
+    controls_time_slot = request.data.get('controls_time_slot', None)
+    initial_deposit = request.data.get('initial_deposit', None)
+    client_can_book = request.data.get('client_can_book', None)
+    slot_availible_for_online = request.data.get('controls_time_slot', None)
+    
     enable_team_comissions = request.data.get('enable_team_comissions', None)
     enable_vouchers = request.data.get('enable_vouchers', None)
     is_package = request.data.get('is_package', None)
@@ -116,13 +121,20 @@ def create_service(request):
         #location=location,
         price=price,
         duration=duration,
+        
+        controls_time_slot=controls_time_slot,
+        initial_deposit=initial_deposit,
+        client_can_book=client_can_book,
+        slot_availible_for_online=slot_availible_for_online,
+        
         enable_team_comissions =enable_team_comissions,
         enable_vouchers=enable_vouchers,
+        
     )
     employees_error = []
     if is_package is not None:
         service_obj.is_package = True
-        service_obj.treatment_type = treatment_type
+        service_obj.service_type = treatment_type
         service_obj.save()
     else :
         if service is None:

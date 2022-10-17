@@ -736,7 +736,7 @@ def add_product(request):
         user = user,
         business = business,
         product = product ,
-        quantity = quantity,
+        #quantity = quantity,
         amount = amount,
         unit = unit,
         sellable_quantity=sellable_quantity,

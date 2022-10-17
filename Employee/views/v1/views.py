@@ -6,6 +6,7 @@ from Employee.models import( Employee , EmployeeProfessionalInfo ,
                         , StaffGroupModulePermission, Attendance
                         ,Payroll, CommissionSchemeSetting, Asset, AssetDocument
                         )
+from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSIONS_MODEL_FIELDS
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -30,6 +31,8 @@ import json
 from Utility.models import NstyleFile
 from django.db.models import Q
 import csv
+from Utility.models import GlobalPermissionChoices
+from Permissions.models import EmployePermission
 
 
 
@@ -494,9 +497,9 @@ def create_employee(request):
     errors =[]
 
     employee_p_info = EmployeeProfessionalInfo.objects.create(employee=employee, start_time = start_time , end_time = end_time, salary=salary, designation = designation )
-    employee_mp = EmployeeModulePermission.objects.create(employee=employee)
-    employee_p_setting = EmployeePermissionSetting.objects.create(employee = employee)
-    employee_marketing = EmployeeMarketingPermission.objects.create(employee= employee)
+    # employee_mp = EmployeeModulePermission.objects.create(employee=employee)
+    # employee_p_setting = EmployeePermissionSetting.objects.create(employee = employee)
+    # employee_marketing = EmployeeMarketingPermission.objects.create(employee= employee)
     
     ser_error=[] 
     
@@ -513,19 +516,6 @@ def create_employee(request):
 
     elif type(working_days) == list:
             pass
-    # if type(services_id) == str:
-    #         services_id = json.loads(services_id)
-    #         print('str')
-
-    # elif type(services_id) == list:
-    #         pass
-        
-    # for ser in services_id:
-    #         try:
-    #             service = Service.objects.get(id=ser)  
-    #             employee_p_info.services.add(service)
-    #         except Exception as err:
-    #             print(str(err))
             
     print(type(services_id))
     if type(services_id) == str:
@@ -557,23 +547,38 @@ def create_employee(request):
     if serialized.is_valid():
         serialized.save()
         data.update(serialized.data)
+    
+    empl_permission = EmployePermission.objects.create(employee=employee)
+    for permit in ALL_PERMISSIONS:
+        value = request.data.get(permit, None)
+        if value is not None:
+            if type(value) == str:
+                value = json.loads(value)
+            for opt in value:
+                try:
+                    option = GlobalPermissionChoices.objects.get(text=opt)
+                    PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
+                except:
+                    pass
 
-    serialized = EmployPermissionSerializer(employee_p_setting, data=request.data)
-    if serialized.is_valid():
-        serialized.save()
-        data.update(serialized.data)
+    empl_permission.save()
 
-    serialized = EmployeModulesSerializer(employee_mp, data=request.data)
-    if serialized.is_valid():
-        serialized.save()
-        data.update(serialized.data)
+    # serialized = EmployPermissionSerializer(employee_p_setting, data=request.data)
+    # if serialized.is_valid():
+    #     serialized.save()
+    #     data.update(serialized.data)
 
-    serialized = EmployeeMarketingSerializers(employee_marketing, data=request.data)
-    if serialized.is_valid():
-        serialized.save()
-        data.update(serialized.data)
-    employee_serialized = EmployeSerializer(employee , context={'request' : request})
-    data.update(employee_serialized.data)
+    # serialized = EmployeModulesSerializer(employee_mp, data=request.data)
+    # if serialized.is_valid():
+    #     serialized.save()
+    #     data.update(serialized.data)
+
+    # serialized = EmployeeMarketingSerializers(employee_marketing, data=request.data)
+    # if serialized.is_valid():
+    #     serialized.save()
+    #     data.update(serialized.data)
+    # employee_serialized = EmployeSerializer(employee , context={'request' : request})
+    # data.update(employee_serialized.data)
 
     template = 'Employee'
 

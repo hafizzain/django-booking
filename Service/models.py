@@ -49,7 +49,7 @@ class Service(models.Model):
 
     name = models.CharField(max_length=500, default='')
 
-    treatment_type = models.CharField(default='test2', choices=TREATMENT_TYPES, max_length=20, null=True, blank=True)
+    service_type = models.CharField(default='test2', choices=TREATMENT_TYPES, max_length=20, null=True, blank=True)
     parrent_service = models.ManyToManyField('Service', null=True, blank=True, related_name='parent_package_services')
     description = models.CharField(max_length=100, default='')
     employee = models.ManyToManyField('Employee.Employee', related_name='employee_services_or_packages')
@@ -64,7 +64,7 @@ class Service(models.Model):
     controls_time_slot = models.CharField(choices=CONTROLS_TIME_SLOT_CHOICES, max_length=100, default='Anytime_In_The_Future')
     initial_deposit =models.PositiveIntegerField(default=0)
     client_can_book = models.CharField(choices=CLIENT_CAN_BOOK_CHOICES, max_length=100, default='Anytime')
-    controls_time_slot = models.CharField(choices=CONTROLS_TIME_SLOT_CHOICES, max_length=100, default='Anytime_In_The_Future')
+    slot_availible_for_online = models.CharField(choices=CONTROLS_TIME_SLOT_CHOICES, max_length=100, default='Anytime_In_The_Future')
 
     price = models.PositiveIntegerField(default=0)
     

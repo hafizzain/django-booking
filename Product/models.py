@@ -115,7 +115,7 @@ class ProductStock(models.Model):
     sellable_quantity = models.IntegerField(validators=[MinValueValidator(0)],null=True, blank=True, default=0, verbose_name= 'Sellable Quantity')
     consumable_quantity = models.IntegerField(validators=[MinValueValidator(0)],null=True, blank=True, default=0, verbose_name= 'Consumable Quantity')
     
-    quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0, verbose_name='Total Quantity')
+    #quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0, verbose_name='Total Quantity')
     available_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
     sold_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
     
