@@ -577,8 +577,8 @@ def create_employee(request):
     # if serialized.is_valid():
     #     serialized.save()
     #     data.update(serialized.data)
-    # employee_serialized = EmployeSerializer(employee , context={'request' : request})
-    # data.update(employee_serialized.data)
+    employee_serialized = EmployeSerializer(employee , context={'request' : request})
+    data.update(employee_serialized.data)
 
     template = 'Employee'
 

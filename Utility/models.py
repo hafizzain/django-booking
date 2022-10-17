@@ -2,11 +2,14 @@ from uuid import uuid4
 from django.db import models
 from django.utils.timezone import now
 
+#from Employee.models import Employee
+
 
 class GlobalPermissionChoices(models.Model):
     id = models.UUIDField(default=uuid4, editable=False, unique=True, primary_key=True)
     
-    
+    #employee = models.ForeignKey('Employee.Employee', on_delete=models.CASCADE, related_name='employee_global_permission')
+        
     text = models.CharField(max_length=1000, default='')
     slug = models.CharField(max_length=1000, default='')
     
@@ -15,7 +18,7 @@ class GlobalPermissionChoices(models.Model):
         super(GlobalPermissionChoices, self).save(*args, **kwargs)
     
     def __str__(self):
-        return str(self.id)
+        return str(self.text)
 
 
 class Currency(models.Model):

@@ -2,8 +2,10 @@ from dataclasses import fields
 from genericpath import exists
 from pyexpat import model
 from Product.Constants.index import tenant_media_base_url
-from Utility.models import Country, State, City
+from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSIONS_MODEL_FIELDS
+from Utility.models import Country, GlobalPermissionChoices, State, City
 from Service.models import Service
+from Permissions.models import EmployePermission
 
 from rest_framework import serializers
 from .models import( Employee, EmployeeProfessionalInfo ,
@@ -65,11 +67,35 @@ class EmployeeServiceSerializer(serializers.ModelSerializer):
         model = EmployeeSelectedService
         fields = '__all__'
         
+class GlobalPermissionOptionSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = GlobalPermissionChoices
+        fields = ['text']
+
+class EmployeeGlobelPermission(serializers.ModelSerializer):
+    permissions = serializers.SerializerMethodField()
+    def get_permissions(self, obj):
+        returned_value = {}
+        for permit in ALL_PERMISSIONS:
+            returned_value[permit] = []
+            for opt in PERMISSIONS_MODEL_FIELDS[permit](obj).all():
+                returned_value[permit].append(opt.text)
+        return returned_value
+    
+    
+    class Meta:
+        model = EmployePermission
+        fields = ['permissions']
+        
 class EmployeSerializer(serializers.ModelSerializer):
     employee_info = serializers.SerializerMethodField(read_only=True)
-    permissions = serializers.SerializerMethodField(read_only=True)
-    module_permissions =serializers.SerializerMethodField(read_only=True)
-    marketing_permissions= serializers.SerializerMethodField(read_only=True)
+    # permissions = serializers.SerializerMethodField(read_only=True)
+    # module_permissions =serializers.SerializerMethodField(read_only=True)
+    # marketing_permissions= serializers.SerializerMethodField(read_only=True)
+    
+    # globel_permission= serializers.SerializerMethodField(read_only=True)
+    
     image = serializers.SerializerMethodField()
     
     country = serializers.SerializerMethodField(read_only=True)
@@ -130,27 +156,50 @@ class EmployeSerializer(serializers.ModelSerializer):
         except EmployeeProfessionalInfo.DoesNotExist:
             return None
     #EmployeePermission
+    # def get_permissions(self, obj):
+    #     try:
+    #         Permission= EmployeePermissionSetting.objects.get(employee=obj)
+    #         return EmployPermissionSerializer(Permission).data
+    #     except EmployeePermissionSetting.DoesNotExist:
+    #         return None
+    #EmployeeModulePermission 
+    # def get_module_permissions(self, obj):
+    #     try: 
+    #         ModulePermission= EmployeeModulePermission.objects.get(employee=obj)      
+    #         return EmployeModulesSerializer(ModulePermission).data
+    #     except EmployeeModulePermission.DoesNotExist:
+    #         return None
+    #EmployeeMarketingPermission
+    # def get_marketing_permissions(self, obj):
+    #     try:
+    #         MarketingPermission = EmployeeMarketingPermission.objects.get(employee=obj)
+    #         return EmployeeMarketingSerializers(MarketingPermission).data
+    #     except EmployeeMarketingPermission.DoesNotExist:
+    #         return None    
+    # def get_globel_permission(self, obj):
+    #     try:
+    #         permission = EmployePermission.objects.get(employee=obj)
+    #         return EmployeeGlobelPermission(permission).data
+    #     except EmployePermission.DoesNotExist:
+    #         return None 
+        
+     
+    permissions = serializers.SerializerMethodField()
+
     def get_permissions(self, obj):
         try:
-            Permission= EmployeePermissionSetting.objects.get(employee=obj)
-            
-            return EmployPermissionSerializer(Permission).data
-        except EmployeePermissionSetting.DoesNotExist:
-            return None
-    #EmployeeModulePermission 
-    def get_module_permissions(self, obj):
-        try: 
-            ModulePermission= EmployeeModulePermission.objects.get(employee=obj)      
-            return EmployeModulesSerializer(ModulePermission).data
-        except EmployeeModulePermission.DoesNotExist:
-            return None
-    #EmployeeMarketingPermission
-    def get_marketing_permissions(self, obj):
-        try:
-            MarketingPermission = EmployeeMarketingPermission.objects.get(employee=obj)
-            return EmployeeMarketingSerializers(MarketingPermission).data
-        except EmployeeMarketingPermission.DoesNotExist:
-            return None       
+            permission = EmployePermission.objects.get(employee=obj)
+        except:
+            return {}
+        else:
+            returned_value = {}
+            for permit in ALL_PERMISSIONS:
+                returned_value[permit] = []
+                for opt in PERMISSIONS_MODEL_FIELDS[permit](permission).all():
+                    returned_value[permit].append(opt.text)
+            return returned_value
+       
+           
     # def get(self, obj):
     #     return {
     #         "brand": "test",
@@ -178,9 +227,10 @@ class EmployeSerializer(serializers.ModelSerializer):
                 'ending_date',  
                 'is_active',
                 'employee_info',
+                # 'globel_permission',
                 'permissions',       
-                'module_permissions',
-                'marketing_permissions',
+                #'module_permissions',
+                #'marketing_permissions',
             ]
     # def to_representation(self, instace):
     #     permissions = self.get_permissions(instace)

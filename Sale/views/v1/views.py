@@ -137,7 +137,6 @@ def create_service(request):
         service_obj.is_package = True
         service_obj.service_type = treatment_type
         service_obj.save()
-    else :
         if service is None:
             pass
         else:

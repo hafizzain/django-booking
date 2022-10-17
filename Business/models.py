@@ -3,8 +3,6 @@ from django.utils.timezone import now
 from Authentication.models import User
 from Profile.models import Profile
 from Utility.models import Country, State, City, Software, Currency
-
-
 import uuid
 
 
