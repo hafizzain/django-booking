@@ -9,7 +9,7 @@ from Service.models import Service
 class EmployeeServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
-        fields = ('id', 'full_name')
+        fields = '__all__'
 
 class LocationServiceSerializer(serializers.ModelSerializer):
     class Meta:
@@ -18,7 +18,7 @@ class LocationServiceSerializer(serializers.ModelSerializer):
         
 class ServiceSerializer(serializers.ModelSerializer):
     
-    employee = EmployeeServiceSerializer(read_only=True)
+    employee = EmployeeServiceSerializer(read_only=True, many = True)
     #location = LocationServiceSerializer(read_only=True)
     class Meta:
         model = Service
