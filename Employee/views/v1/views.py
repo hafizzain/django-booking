@@ -260,18 +260,18 @@ def get_single_employee(request):
     seralized = EmployeSerializer(employee_id,  context={'request' : request})
     data = dict()
     data.update(seralized.data)
-    try:
-        data.update(data['permissions'])
-        del data['permissions']
-        data.update(data['module_permissions'])
-        del data['module_permissions']
-        data.update(data['employee_info'])
-        del data['employee_info']
-        data.update(data['marketing_permissions'])
-        del data['marketing_permissions']
-    except Exception as err:
-        print(f'dict {err}')
-        None
+    # try:
+    #     data.update(data['permissions'])
+    #     del data['permissions']
+    #     data.update(data['module_permissions'])
+    #     del data['module_permissions']
+    #     data.update(data['employee_info'])
+    #     del data['employee_info']
+    #     data.update(data['marketing_permissions'])
+    #     del data['marketing_permissions']
+    # except Exception as err:
+    #     print(f'dict {err}')
+    #     None
     return Response(
         {
             'status' : True,
@@ -582,11 +582,11 @@ def create_employee(request):
 
     template = 'Employee'
 
-    # try:
-    #     thrd = Thread(target=add_employee, args=[full_name, email , template, business.business_name,])
-    #     thrd.start()
-    # except Exception as err:
-    #     pass
+    try:
+        thrd = Thread(target=add_employee, args=[full_name, email , template, business.business_name,])
+        thrd.start()
+    except Exception as err:
+        pass
     
     return Response(
         {
