@@ -6,6 +6,7 @@ from Tenants.models import Tenant, Domain
 from Business.models import Business, BusinessType
 from Profile.models import Profile
 from Utility.Constants.add_data_db import add_business_types, add_countries, add_software_types, add_states, add_cities, add_currencies, add_languages
+from Utility.models import GlobalPermissionChoices
 
 from rest_framework.authtoken.models import Token
 from django.conf import  settings
@@ -109,15 +110,30 @@ def create_tenant_account_type(tenant_user=None, tenant=None, account_type='ever
 def create_global_permission(tenant=None, user = None, business=None):
      if tenant is not None and user is not None and business is not None:
         with tenant_context(tenant):
-            permission= [
-                {
-                    'text' : ''
-                },
-                {
-                    'text' : ''
-                },
-            ]
-
+            permission = [
+    
+                        "export",
+                        "edit",
+                        "invoice",
+                        'modify',
+                        'add',
+                        'delete',
+                        'email',
+                        'filter',
+                        'turnover',
+                        'import',
+                        'create',
+                        'order',
+                        'view',
+                        'modify',
+                        'cancel reschedule',
+                    ]
+            for per in permission:
+                GlobalPermissionChoices.objects.create(
+                    text = per,
+                    slug = per,
+                )
+                
 
 # def create_service_user(tenant=None, user = None, business=None):
 #     if tenant is not None and user is not None and business is not None:
