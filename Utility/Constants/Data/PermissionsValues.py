@@ -62,3 +62,4 @@ PERMISSIONS_MODEL_FIELDS = {
     'sale_report_membership' : lambda employee_permission : employee_permission.sale_report_membership,
     'sale_report_subscriptions' : lambda employee_permission : employee_permission.sale_report_subscriptions,
 }
+        

@@ -709,22 +709,22 @@ def update_employee(request):
         else:
             employee.is_active = False 
         employee.save()
-        serializer = EmployeSerializer(employee, data=request.data, partial=True, context={'request' : request})
-        if serializer.is_valid():
-           serializer.save()
-           data.update(serializer.data)
-        else: 
-             return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
-                'response' : {
-                    'message' : 'Invialid Data',
-                    'error_message' : str(serializer.errors),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
+        # serializer = EmployeSerializer(employee, data=request.data, partial=True, context={'request' : request})
+        # if serializer.is_valid():
+        #    serializer.save()
+        #    data.update(serializer.data)
+        # else: 
+        #      return Response(
+        #     {
+        #         'status' : False,
+        #         'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+        #         'response' : {
+        #             'message' : 'Invialid Data',
+        #             'error_message' : str(serializer.errors),
+        #         }
+        #     },
+        #     status=status.HTTP_404_NOT_FOUND
+        # )
         
 
         Employe_Informations= EmployeeProfessionalInfo.objects.get(employee=employee)
@@ -737,33 +737,34 @@ def update_employee(request):
         Employe_Informations.saturday = True if 'saturday' in request.data else False
         Employe_Informations.sunday = True if 'sunday' in request.data else False
         
-        if type(services_id) == str:
-            services_id = services_id.replace("'" , '"')
-            services_id = json.loads(services_id)
-        else:
-            pass
-        for services in services_id :
-            print(services['level'])
-            #get('id', None)
-            if services['id'] is not None:
-                try: 
-                    emp_service = EmployeeSelectedService.objects.get(id=services['id'])
-                
-                    if services['is_deleted'] == 'True':
-                        try:
-                            emp_service.delete()
-                            continue
-                        
-                        except Exception as error:
-                            print(f'is_delete item {error}')
-                            None 
-                    ser = Service.objects.get(id=services['service'])
-                    emp_service.service = ser
-                    emp_service.level = services['level']
+        if services_id is not None:
+            if type(services_id) == str:
+                services_id = services_id.replace("'" , '"')
+                services_id = json.loads(services_id)
+            else:
+                pass
+            for services in services_id :
+                print(services['level'])
+                #get('id', None)
+                if services['id'] is not None:
+                    try: 
+                        emp_service = EmployeeSelectedService.objects.get(id=services['id'])
                     
-                except Exception as error:
-                    print(f'EmployeeSelectedService item {error}')
-                    None  
+                        if services['is_deleted'] == 'True':
+                            try:
+                                emp_service.delete()
+                                continue
+                            
+                            except Exception as error:
+                                print(f'is_delete item {error}')
+                                None 
+                        ser = Service.objects.get(id=services['service'])
+                        emp_service.service = ser
+                        emp_service.level = services['level']
+                        
+                    except Exception as error:
+                        print(f'EmployeeSelectedService item {error}')
+                        None  
                     
         # if type(services_id) == str:
         #     services_id = json.loads(services_id)
@@ -785,7 +786,7 @@ def update_employee(request):
         serializer_info= EmployeInformationsSerializer(Employe_Informations,  data= request.data, partial=True)
         if serializer_info.is_valid():
                 serializer_info.save()
-                data.update(serializer_info.data)
+                #data.update(serializer_info.data)
         else:
          return Response(
             {
@@ -797,79 +798,113 @@ def update_employee(request):
                 }
             },
             status=status.HTTP_404_NOT_FOUND
-     )
+        )
          
-        ps_data = {}
-        ps_data['allow_calendar_booking'] = True if request.data.get('allow_calendar_booking', None) is not None else False
-        ps_data['access_calendar'] = True if request.data.get('access_calendar', None) is not None else False
-        ps_data['change_calendar_color'] = True if request.data.get('change_calendar_color', None) is not None else False
-
-        permission= EmployeePermissionSetting.objects.get(employee=employee)
-        serializer_permision= EmployPermissionSerializer(permission,  data=ps_data, partial=True)
-        if serializer_permision.is_valid():
-               serializer_permision.save()
-               data.update(serializer_permision.data)
-        else:
-                return Response(
-            {
-                'status' : False,
-                'status_code' :StatusCodes.INVALID_EMPLOYEE_PERMISSION_4027,
-                'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : str(serializer_permision.errors),
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-        md_data = {}
-        md_data['access_reports'] = True if request.data.get('access_reports', None) is not None else False
-        md_data['access_sales'] = True if request.data.get('access_sales', None) is not None else False
-        md_data['access_inventory'] = True if request.data.get('access_inventory', None) is not None else False
-        md_data['access_expenses'] = True if request.data.get('access_expenses', None) is not None else False
-        md_data['access_products'] = True if request.data.get('access_products', None) is not None else False
-    
-        Module_Permission= EmployeeModulePermission.objects.get(employee=employee)
-        serializer_Module = EmployeModulesSerializer(Module_Permission,  data=md_data, partial=True)
-        if serializer_Module.is_valid():
-               serializer_Module.save()
-               data.update(serializer_Module.data)
-               
-        else:
-                return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.INVALID_EMPLOYEE_PERMISSION_4027,
-                'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : str(serializer_Module.errors),
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-                
-        mp_data = {}
-        mp_data['access_voucher'] = True if request.data.get('access_voucher', None) is not None else False
-        mp_data['access_member_discount'] = True if request.data.get('access_member_discount', None) is not None else False
-        mp_data['access_invite_friend'] = True if request.data.get('access_invite_friend', None) is not None else False
-        mp_data['access_loyalty_points'] = True if request.data.get('access_loyalty_points', None) is not None else False
-        mp_data['access_gift_cards'] = True if request.data.get('access_gift_cards', None) is not None else False
+        empl_permission = EmployePermission.objects.get(employee=employee)
         
-        Marketing_Permission= EmployeeMarketingPermission.objects.get(employee=employee)
-        serializer_Marketing= EmployeeMarketingSerializers(Marketing_Permission,  data=mp_data, partial=True)
-        if serializer_Marketing.is_valid():
-                serializer_Marketing.save()
-                data.update(serializer_Marketing.data)
-        else:
-              return Response(
+        for permit in ALL_PERMISSIONS:
+            
+            value = request.data.get(permit, None)
+            PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
+            if value is not None:
+                if type(value) == str:
+                    value = json.loads(value)
+                    for opt in value:
+                        try:
+                            option = GlobalPermissionChoices.objects.get(text=opt)
+                            PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
+                        except:
+                            pass
+
+        empl_permission.save()
+        
+        # ps_data = {}
+        # ps_data['allow_calendar_booking'] = True if request.data.get('allow_calendar_booking', None) is not None else False
+        # ps_data['access_calendar'] = True if request.data.get('access_calendar', None) is not None else False
+        # ps_data['change_calendar_color'] = True if request.data.get('change_calendar_color', None) is not None else False
+
+        # permission= EmployeePermissionSetting.objects.get(employee=employee)
+        # serializer_permision= EmployPermissionSerializer(permission,  data=ps_data, partial=True)
+        # if serializer_permision.is_valid():
+        #        serializer_permision.save()
+        #        data.update(serializer_permision.data)
+        # else:
+        #         return Response(
+        #     {
+        #         'status' : False,
+        #         'status_code' :StatusCodes.INVALID_EMPLOYEE_PERMISSION_4027,
+        #         'response' : {
+        #             'message' : 'Invalid Data!',
+        #             'error_message' : str(serializer_permision.errors),
+        #         }
+        #     },
+        #     status=status.HTTP_400_BAD_REQUEST
+        # )
+        # md_data = {}
+        # md_data['access_reports'] = True if request.data.get('access_reports', None) is not None else False
+        # md_data['access_sales'] = True if request.data.get('access_sales', None) is not None else False
+        # md_data['access_inventory'] = True if request.data.get('access_inventory', None) is not None else False
+        # md_data['access_expenses'] = True if request.data.get('access_expenses', None) is not None else False
+        # md_data['access_products'] = True if request.data.get('access_products', None) is not None else False
+    
+        # Module_Permission= EmployeeModulePermission.objects.get(employee=employee)
+        # serializer_Module = EmployeModulesSerializer(Module_Permission,  data=md_data, partial=True)
+        # if serializer_Module.is_valid():
+        #        serializer_Module.save()
+        #        data.update(serializer_Module.data)
+               
+        # else:
+        #         return Response(
+        #     {
+        #         'status' : False,
+        #         'status_code' : StatusCodes.INVALID_EMPLOYEE_PERMISSION_4027,
+        #         'response' : {
+        #             'message' : 'Invalid Data!',
+        #             'error_message' : str(serializer_Module.errors),
+        #         }
+        #     },
+        #     status=status.HTTP_400_BAD_REQUEST
+        # )
+                
+        # mp_data = {}
+        # mp_data['access_voucher'] = True if request.data.get('access_voucher', None) is not None else False
+        # mp_data['access_member_discount'] = True if request.data.get('access_member_discount', None) is not None else False
+        # mp_data['access_invite_friend'] = True if request.data.get('access_invite_friend', None) is not None else False
+        # mp_data['access_loyalty_points'] = True if request.data.get('access_loyalty_points', None) is not None else False
+        # mp_data['access_gift_cards'] = True if request.data.get('access_gift_cards', None) is not None else False
+        
+        # Marketing_Permission= EmployeeMarketingPermission.objects.get(employee=employee)
+        # serializer_Marketing= EmployeeMarketingSerializers(Marketing_Permission,  data=mp_data, partial=True)
+        # if serializer_Marketing.is_valid():
+        #         serializer_Marketing.save()
+        #         data.update(serializer_Marketing.data)
+        # else:
+        #       return Response(
+        #     {
+        #         'status' : False,
+        #         'status_code' : StatusCodes.INVALID_EMPLOYEE_PERMISSION_4027,
+        #         'response' : {
+        #             'message' : 'Invalid Data!',
+        #             'error_message' : str(serializer_Marketing.errors),
+        #         }
+        #     },
+        #     status=status.HTTP_400_BAD_REQUEST
+        # )
+        serializer = EmployeSerializer(employee, data=request.data, partial=True, context={'request' : request})
+        if serializer.is_valid():
+           serializer.save()
+           #data.update(serializer.data)
+        else: 
+             return Response(
             {
                 'status' : False,
-                'status_code' : StatusCodes.INVALID_EMPLOYEE_PERMISSION_4027,
+                'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
                 'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : str(serializer_Marketing.errors),
+                    'message' : 'Invialid Data',
+                    'error_message' : str(serializer.errors),
                 }
             },
-            status=status.HTTP_400_BAD_REQUEST
+            status=status.HTTP_404_NOT_FOUND
         )
         return Response(
             {
@@ -878,7 +913,7 @@ def update_employee(request):
                 'response' : {
                     'message' : ' Employee updated successfully',
                     'error_message' : None,
-                    'Employee' : data
+                    'Employee' : serializer.data
                 }
             },
             status=status.HTTP_200_OK
