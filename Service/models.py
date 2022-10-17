@@ -61,7 +61,7 @@ class Service(models.Model):
     enable_vouchers = models.BooleanField(default=False, null=True, blank=True)
     
     #New Fields added 
-    controls_time_slot = models.CharField(choices=CONTROLS_TIME_SLOT_CHOICES, max_length=100, default='Anytime_In_The_Future')
+    controls_time_slot = models.CharField(choices=TIME_SLOT_INTERVAL_CHOICES, max_length=100, default='30_Mins')
     initial_deposit =models.PositiveIntegerField(default=0)
     client_can_book = models.CharField(choices=CLIENT_CAN_BOOK_CHOICES, max_length=100, default='Anytime')
     slot_availible_for_online = models.CharField(choices=CONTROLS_TIME_SLOT_CHOICES, max_length=100, default='Anytime_In_The_Future')
