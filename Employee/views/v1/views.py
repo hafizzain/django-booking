@@ -469,18 +469,19 @@ def create_employee(request):
     try:
         staff = StaffGroup.objects.get(id=staff_id)
     except Exception as err:
-        return Response(
-            {
-                'status' : True,
-                'status_code' : StatusCodes.INVALID_NOT_FOUND_StAFF_GROUP_ID_4023,
-                'status_code_text' :'INVALID_NOT_FOUND_StAFF_GROUP_ID_4023' ,
-                'response' : {
-                    'message' : 'Invalid Staff Group Id !',
-                    'error_message' : str(err),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
+        staff = None
+        # return Response(
+        #     {
+        #         'status' : True,
+        #         'status_code' : StatusCodes.INVALID_NOT_FOUND_StAFF_GROUP_ID_4023,
+        #         'status_code_text' :'INVALID_NOT_FOUND_StAFF_GROUP_ID_4023' ,
+        #         'response' : {
+        #             'message' : 'Invalid Staff Group Id !',
+        #             'error_message' : str(err),
+        #         }
+        #     },
+        #     status=status.HTTP_404_NOT_FOUND
+        # )
 
     employee= Employee.objects.create(
         user=user,
@@ -512,8 +513,12 @@ def create_employee(request):
     data = {}
 
     errors =[]
-    
-    staff.employees.add(employee)
+
+    if staff is not None:
+        try:
+            staff.employees.add(employee)
+        except:
+            pass
     
     employee_p_info = EmployeeProfessionalInfo.objects.create(employee=employee, start_time = start_time , end_time = end_time, salary=salary, designation = designation )
     # employee_mp = EmployeeModulePermission.objects.create(employee=employee)
