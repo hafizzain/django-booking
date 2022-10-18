@@ -19,7 +19,7 @@ from Business.models import Business, BusinessSocial, BusinessAddress, BusinessO
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
 from Tenants.models import Domain, Tenant
-from Utility.models import Country, Language, Software, State, City
+from Utility.models import Country, Currency, Language, Software, State, City
 from Utility.serializers import LanguageSerializer
 import json
 from django.db.models import Q
@@ -357,7 +357,14 @@ def update_business_additional_information(request):
     
     selected_softwares = request.data.get('selected_softwares', [])
     selected_types = request.data.get('selected_types', [])
+    currency_id = request.data.get('currency', None)
     
+    try:
+        currency= Currency.objects.get(id=currency_id)
+        business.currency = currency
+    except Exception as err:
+        print(str(err))
+        
     if is_completed is not None:
         business.is_completed = True
     else :

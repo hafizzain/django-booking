@@ -2,6 +2,10 @@
 
 
 from cmath import e
+from dataclasses import field
+from locale import currency
+from pyexpat import model
+from Utility.models import Currency
 from rest_framework import serializers
 
 from Business.models import BookingSetting, BusinessType, Business, BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BusinessPaymentMethod, BusinessTax, BusinessVendor,BusinessOpeningHour
@@ -75,15 +79,21 @@ class BusinessGetSerializer(serializers.ModelSerializer):
             'instagram',
             'business_types'
         ]
+class CurrencySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Currency
+        fields = '__all__'
 
 
 class Business_GetSerializer(serializers.ModelSerializer):
     website = serializers.SerializerMethodField()
     facebook = serializers.SerializerMethodField()
     instagram = serializers.SerializerMethodField()
+    currency =CurrencySerializer()
 
     logo = serializers.SerializerMethodField()
-
+    
+    
     def get_logo(self, obj):
         if obj.logo :
             try:
