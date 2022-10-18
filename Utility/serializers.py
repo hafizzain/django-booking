@@ -1,6 +1,6 @@
 
 
-from .models import Software, Country, State, City, Language
+from .models import Software, Country, State, City, Language, Currency
 from rest_framework import serializers
 
 class SoftwareSerializer(serializers.ModelSerializer):
@@ -8,6 +8,11 @@ class SoftwareSerializer(serializers.ModelSerializer):
         model = Software
         fields = ['id', 'name']
 
+class CurrencySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Currency
+        fields = ['id', 'name' , 'code' , 'symbol']
+        
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country

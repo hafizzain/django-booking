@@ -123,7 +123,8 @@ def add_currencies(tenant=None):
                 except:
                     crc_obj = Currency.objects.create(
                             name=i[0],
-                            code=i[1]
+                            code=i[1],
+                            symbol=i[2]
                         )
                     print(crc_obj)
 

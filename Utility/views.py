@@ -15,10 +15,31 @@ from rest_framework.permissions import AllowAny
 from rest_framework import status
 
 
-from .serializers import SoftwareSerializer, CountrySerializer, StateSerializer, CitySerializer
+from .serializers import CurrencySerializer, SoftwareSerializer, CountrySerializer, StateSerializer, CitySerializer
 
-from .models import City, Software, Country, State
+from .models import City, Software, Country, State, Currency
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_all_currencies(request):
+    currencies= Currency.objects.filter(is_deleted=False)
+    serialized = CurrencySerializer(currencies, many=True)
+    
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'All Currency',
+                'error_message' : None,
+                'currency' : serialized.data,
+                
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+    
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_tenants_product(request):
