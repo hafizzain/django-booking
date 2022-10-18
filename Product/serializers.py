@@ -88,10 +88,10 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
         return {
             'id' : stock.id,
             'available_stock' : stock.available_quantity,
-            'quantity' : stock.quantity,
+            'quantity' : stock.sellable_quantity,
             'sold_stock' : stock.sold_quantity,
             'price' : stock.product.sell_price,
-            'usage' : (int(stock.quantity) // int(stock.sold_quantity)) * 100 if stock.sold_quantity > 0 else 100,
+            'usage' : (int(stock.sellable_quantity) // int(stock.sold_quantity)) * 100 if stock.sold_quantity > 0 else 100,
             'status' : True if stock.available_quantity > 0 else False,
             'status_text' : 'In Stock' if stock.available_quantity > 0 else 'Out of stock',
             'sale_status' : 'High',

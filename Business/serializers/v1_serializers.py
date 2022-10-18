@@ -24,7 +24,16 @@ class BusinessGetSerializer(serializers.ModelSerializer):
     website = serializers.SerializerMethodField()
     facebook = serializers.SerializerMethodField()
     instagram = serializers.SerializerMethodField()
-
+    business_types = serializers.SerializerMethodField()
+    
+    def get_business_types(obj, self):
+        try:
+            print(obj)
+            obj_type = BusinessType.objects.get(id =obj)
+            return obj_type
+        except Exception as err:
+            #print(err)
+            return None
 
     def get_website(self, obj):
         try:
@@ -64,6 +73,7 @@ class BusinessGetSerializer(serializers.ModelSerializer):
             'website',
             'facebook',
             'instagram',
+            'business_types'
         ]
 
 
