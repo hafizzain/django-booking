@@ -1088,7 +1088,8 @@ def get_staff_group(request):
     all_staff_group= StaffGroup.objects.all().order_by('-created_at')
     serialized = StaffGroupSerializers(all_staff_group, many=True, context={'request' : request})
     
-    
+    data = serialized.data
+    data = [row.update(row['staff_permission']) for row in data]
     # data = {}
     # data.update(serialized.data)
     
