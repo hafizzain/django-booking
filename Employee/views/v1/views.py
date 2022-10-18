@@ -1107,7 +1107,7 @@ def get_staff_group(request):
             'response' : {
                 'message' : 'All Staff Group',
                 'error_message' : None,
-                'staff_group' : serialized.data
+                'staff_group' : data
             }
         },
         status=status.HTTP_200_OK
