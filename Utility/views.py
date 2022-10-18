@@ -21,7 +21,7 @@ from .models import City, Software, Country, State
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_tenants(request):
+def get_tenants_product(request):
     data = []
     businesses = []
     tenants= Tenant.objects.all()

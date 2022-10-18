@@ -997,15 +997,31 @@ def create_staff_group(request):
             is_active=is_active,
         
         )
+        
+        staff_permission = EmployePermission.objects.create(staffgroup=staff_group)
+        for permit in ALL_PERMISSIONS:
+            value = request.data.get(permit, None)
+            if value is not None:
+                if type(value) == str:
+                    value = json.loads(value)
+                for opt in value:
+                    try:
+                        option = GlobalPermissionChoices.objects.get(text=opt)
+                        PERMISSIONS_MODEL_FIELDS[permit](staff_permission).add(option)
+                    except:
+                        pass
+
+        staff_permission.save()
+        
         #StaffGroupModulePermission
-        staff_module_permission= StaffGroupModulePermission.objects.create(
-            staff_group=staff_group,
-            access_reports=access_reports,
-            access_sales=access_sales,
-            access_inventory=access_inventory,
-            access_expenses=access_expenses,
-            access_products=access_products,
-        )
+        # staff_module_permission= StaffGroupModulePermission.objects.create(
+        #     staff_group=staff_group,
+        #     access_reports=access_reports,
+        #     access_sales=access_sales,
+        #     access_inventory=access_inventory,
+        #     access_expenses=access_expenses,
+        #     access_products=access_products,
+        # )
         #staff_permission_serializers =  StaffpermisionSerializers(staff_module_permission)
         employees_error = []
        
@@ -1145,21 +1161,35 @@ def update_staff_group(request):
                 status=status.HTTP_404_NOT_FOUND
         )
     data={}
-    try:
-       staff_gp_permissions = StaffGroupModulePermission.objects.get(staff_group=staff_group)
-    except Exception as err:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.INVALID_EMPLOYEE_INFORMATION_4026,
-                'response' : {
-                    'message' : 'Invalid Data',
-                    'error_message' : str(err),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-     )
-    
+    # try:
+    #    staff_gp_permissions = StaffGroupModulePermission.objects.get(staff_group=staff_group)
+    # except Exception as err:
+    #     return Response(
+    #         {
+    #             'status' : False,
+    #             'status_code' : StatusCodes.INVALID_EMPLOYEE_INFORMATION_4026,
+    #             'response' : {
+    #                 'message' : 'Invalid Data',
+    #                 'error_message' : str(err),
+    #             }
+    #         },
+    #         status=status.HTTP_404_NOT_FOUND
+    #  )
+    staff_permission = EmployePermission.objects.get(staffgroup=staff_group)
+    for permit in ALL_PERMISSIONS:
+            value = request.data.get(permit, None)
+            PERMISSIONS_MODEL_FIELDS[permit](staff_permission).clear()
+            if value is not None:
+                if type(value) == str:
+                    value = json.loads(value)
+                for opt in value:
+                    try:
+                        option = GlobalPermissionChoices.objects.get(text=opt)
+                        PERMISSIONS_MODEL_FIELDS[permit](staff_permission).add(option)
+                    except:
+                        pass
+
+    staff_permission.save()
     employees=request.data.get('employees', None)
     if employees is not None:
         if type(employees) == str:
@@ -1176,26 +1206,26 @@ def update_staff_group(request):
                 employees_error.append(str(err))
         staff_group.save()    
         
-    permission_serializer =StaffpermisionSerializers(staff_gp_permissions, data=request.data, partial=True, context={'request' : request})
-    if permission_serializer.is_valid():
-        permission_serializer.save()
-        data.update(permission_serializer.data)
-    else:
-         return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.INVALID_EMPLOYEE_INFORMATION_4026,
-                'response' : {
-                    'message' : 'Invalid Data',
-                    'error_message' : str(permission_serializer.errors),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-     )
+    # permission_serializer =StaffpermisionSerializers(staff_gp_permissions, data=request.data, partial=True, context={'request' : request})
+    # if permission_serializer.is_valid():
+    #     permission_serializer.save()
+    #     data.update(permission_serializer.data)
+    # else:
+    #      return Response(
+    #         {
+    #             'status' : False,
+    #             'status_code' : StatusCodes.INVALID_EMPLOYEE_INFORMATION_4026,
+    #             'response' : {
+    #                 'message' : 'Invalid Data',
+    #                 'error_message' : str(permission_serializer.errors),
+    #             }
+    #         },
+    #         status=status.HTTP_404_NOT_FOUND
+    #  )
     serializer = StaffGroupSerializers(staff_group, data=request.data, partial=True, context={'request' : request})
     if serializer.is_valid():
         serializer.save()
-        data.update(serializer.data)
+        #data.update(serializer.data)
     else:
         return Response(
                 {
@@ -1217,7 +1247,7 @@ def update_staff_group(request):
             'response' : {
                 'message' : 'Update Staff Group Successfully',
                 'error_message' : None,
-                'StaffGroupUpdate' : data
+                'StaffGroupUpdate' : serializer.data
             }
         },
         status=status.HTTP_200_OK
