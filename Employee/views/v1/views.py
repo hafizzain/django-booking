@@ -260,18 +260,18 @@ def get_single_employee(request):
     seralized = EmployeSerializer(employee_id,  context={'request' : request})
     data = dict()
     data.update(seralized.data)
-    # try:
-    #     data.update(data['permissions'])
-    #     del data['permissions']
-    #     data.update(data['module_permissions'])
-    #     del data['module_permissions']
-    #     data.update(data['employee_info'])
-    #     del data['employee_info']
-    #     data.update(data['marketing_permissions'])
-    #     del data['marketing_permissions']
-    # except Exception as err:
-    #     print(f'dict {err}')
-    #     None
+    try:
+        data.update(data['permissions'])
+        del data['permissions']
+        # data.update(data['module_permissions'])
+        # del data['module_permissions']
+        # data.update(data['employee_info'])
+        # del data['employee_info']
+        # data.update(data['marketing_permissions'])
+        # del data['marketing_permissions']
+    except Exception as err:
+        print(f'dict {err}')
+        None
     return Response(
         {
             'status' : True,
@@ -380,6 +380,7 @@ def create_employee(request):
     end_time= request.data.get('end_time',None)
     start_time = request.data.get('start_time', None)
     working_days = request.data.get('working_days',None)
+    staff_id = request.data.get('staff_id', None)
     #level = request.data.get('level',None)
     
     start_time = request.data.get('start_time',None)
@@ -464,6 +465,22 @@ def create_employee(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+        
+    try:
+        staff = StaffGroup.objects.get(id=staff_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : True,
+                'status_code' : StatusCodes.INVALID_NOT_FOUND_StAFF_GROUP_ID_4023,
+                'status_code_text' :'INVALID_NOT_FOUND_StAFF_GROUP_ID_4023' ,
+                'response' : {
+                    'message' : 'Invalid Staff Group Id !',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
 
     employee= Employee.objects.create(
         user=user,
@@ -495,7 +512,9 @@ def create_employee(request):
     data = {}
 
     errors =[]
-
+    
+    staff.employees.add(employee)
+    
     employee_p_info = EmployeeProfessionalInfo.objects.create(employee=employee, start_time = start_time , end_time = end_time, salary=salary, designation = designation )
     # employee_mp = EmployeeModulePermission.objects.create(employee=employee)
     # employee_p_setting = EmployeePermissionSetting.objects.create(employee = employee)
@@ -785,8 +804,8 @@ def update_employee(request):
         Employe_Informations.save()
         serializer_info= EmployeInformationsSerializer(Employe_Informations,  data= request.data, partial=True)
         if serializer_info.is_valid():
-                serializer_info.save()
-                #data.update(serializer_info.data)
+            serializer_info.save()
+            data.update(serializer_info.data)
         else:
          return Response(
             {
@@ -1041,6 +1060,14 @@ def create_staff_group(request):
         staff_group.save()
         serialized = StaffGroupSerializers(staff_group, context={'request' : request})
        
+
+        data = dict()
+        data.update(serialized.data)
+        try:
+            data.update(data['staff_permission'])
+            del data['staff_permission']
+        except Exception as err:
+            print(err)
         return Response(
             {
                 'status' : True,
@@ -1048,7 +1075,7 @@ def create_staff_group(request):
                 'response' : {
                     'message' : 'Staff Group Create!',
                     'error_message' : None,
-                    'StaffGroup' : serialized.data,
+                    'StaffGroup' : data,
                     'staff_errors' : employees_error,
                 }
             },
@@ -1060,6 +1087,18 @@ def create_staff_group(request):
 def get_staff_group(request):
     all_staff_group= StaffGroup.objects.all().order_by('-created_at')
     serialized = StaffGroupSerializers(all_staff_group, many=True, context={'request' : request})
+    
+    
+    # data = {}
+    # data.update(serialized.data)
+    
+    # try:
+    #     data.update(data['staff_permission'])
+    #     del data['staff_permission']
+    # except Exception as err:
+    #     print(f'dict {err}')
+    #     None   
+         
     return Response(
         {
             'status' : 200,
@@ -1067,7 +1106,7 @@ def get_staff_group(request):
             'response' : {
                 'message' : 'All Staff Group',
                 'error_message' : None,
-                'employees' : serialized.data
+                'staff_group' : serialized.data
             }
         },
         status=status.HTTP_200_OK
