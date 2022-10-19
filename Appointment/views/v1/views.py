@@ -639,6 +639,7 @@ def create_blockTime(request):
             user = user,
             business = business,
             appointment_time=start_time,
+            duration = end_time, 
             appointment_date = date,
             member = member,
             destails = details,
