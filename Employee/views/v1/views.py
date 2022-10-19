@@ -542,17 +542,14 @@ def create_employee(request):
     elif type(working_days) == list:
             pass
             
-    print(type(services_id))
     if type(services_id) == str:
         #services_id = services_id.replace("'" , '"')
         services_id = json.loads(services_id)
-        print(services_id)
     else:
         pass
     
     if services_id is not None:
         for services in services_id :
-            print(services['service'])
             try:
                 if services['service'] is not None:
                     ser = Service.objects.get(id=services['service'])
@@ -718,6 +715,15 @@ def update_employee(request):
                 },
                    status=status.HTTP_404_NOT_FOUND
               )
+        try:
+            staff = StaffGroup.objects.get(id=staff_id)
+        except Exception as err:
+            taff = None
+        #staff = StaffGroup.objects.get(staff_id)
+        print(staff.employees.remove(employee))
+        
+      
+            
         data={}
         image=request.data.get('image',None)
         phone_number=request.data.get('mobile_number',None)
@@ -753,7 +759,6 @@ def update_employee(request):
             else:
                 pass
             for services in services_id :
-                print(services['level'])
                 #get('id', None)
                 if services['id'] is not None:
                     try: 

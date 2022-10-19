@@ -97,6 +97,14 @@ class EmployeSerializer(serializers.ModelSerializer):
     city = serializers.SerializerMethodField(read_only=True)   
     services = serializers.SerializerMethodField(read_only=True)
     
+    staff = serializers.SerializerMethodField(read_only=True)
+    
+    def get_staff(self, obj):
+        try:
+            staff = self.context["staff_id"]
+            return staff
+        except Exception as err:
+            print(err)
     
     
     def get_services(self, obj):
@@ -195,6 +203,7 @@ class EmployeSerializer(serializers.ModelSerializer):
                 'ending_date',  
                 'is_active',
                 'employee_info',
+                'staff',
                 # 'globel_permission',
                 'permissions',       
                 #'module_permissions',

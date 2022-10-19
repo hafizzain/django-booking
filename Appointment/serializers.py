@@ -314,9 +314,9 @@ class SingleAppointmentSerializer(serializers.ModelSerializer):
     
     def get_notes(self, obj):
         try:
-            note = AppointmentNotes.objects.get(appointment=obj.appointment)
+            note = AppointmentNotes.objects.filter(appointment=obj.appointment)
             print(note)
-            serializers = NoteSerializer(note)
+            serializers = NoteSerializer(note, many = True)
             return serializers.data
         except:
             return None
