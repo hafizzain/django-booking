@@ -1,9 +1,10 @@
+from dataclasses import field
 from getopt import error
 from pkgutil import read_code
 from pyexpat import model
 from re import A
 from rest_framework import serializers
-from Appointment.models import Appointment, AppointmentService
+from Appointment.models import Appointment, AppointmentNotes, AppointmentService
 from Business.models import BusinessAddress
 from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer
 from Client.serializers import ClientAppointmentSerializer
@@ -308,6 +309,17 @@ class SingleAppointmentSerializer(serializers.ModelSerializer):
     booked_by = serializers.SerializerMethodField(read_only=True)
     client_type = serializers.SerializerMethodField(read_only=True)
     booking_id = serializers.SerializerMethodField(read_only=True)
+    
+    notes = serializers.SerializerMethodField(read_only=True)
+    
+    def get_notes(self, obj):
+        try:
+            note = AppointmentNotes.objects.get(appointment=obj.appointment)
+            print(note)
+            serializers = NoteSerializer(note)
+            return serializers.data
+        except:
+            return None
 
     def get_booked_by(self, obj):
         return f'{obj.user.first_name} {obj.user.last_name}'
@@ -353,5 +365,31 @@ class SingleAppointmentSerializer(serializers.ModelSerializer):
         model = AppointmentService
         fields= ('id', 'location','client','service',
                  'appointment_time', 'end_time',
-                 'appointment_status', 'currency', 'booked_by', 'booking_id', 'appointment_date', 'client_type', 'duration'
+                 'appointment_status', 'currency', 'booked_by', 'booking_id', 'appointment_date', 'client_type', 'duration' , 'notes'
             )
+        
+
+class NoteSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = AppointmentNotes
+        fields = '__all__'
+    
+
+class SingleNoteSerializer(serializers.ModelSerializer):
+    
+    notes = serializers.SerializerMethodField(read_only=True)
+    
+    def get_notes(self, obj):
+        try:
+            note = AppointmentNotes.objects.get(appointment=obj)
+            print(note)
+            serializers = NoteSerializer(note)
+            return serializers.data
+        except:
+            return None
+            
+    
+    class Meta:
+        model = Appointment
+        fields = ['id', 'client', 'notes']

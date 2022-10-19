@@ -1,6 +1,8 @@
 from django.contrib import admin
-from Appointment.models import Appointment, AppointmentService
+from Appointment.models import Appointment, AppointmentService, AppointmentNotes
 
+
+admin.site.register(AppointmentNotes)
 @admin.register(Appointment)
 class AppointmentAdmin(admin.ModelAdmin):
 
