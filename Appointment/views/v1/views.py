@@ -141,59 +141,6 @@ def get_calendar_appointment(request):
         },
         status=status.HTTP_200_OK
     )
-
-
-# @api_view(['DELETE'])
-# @permission_classes([IsAuthenticated])
-# def delete_appointment(request):
-#     appointment_id = request.data.get('appointment_id', None)
-#     if appointment_id is None: 
-#        return Response(
-#             {
-#                 'status' : False,
-#                 'status_code' : StatusCodes.MISSING_FIELDS_4001,
-#                 'status_code_text' : 'MISSING_FIELDS_4001',
-#                 'response' : {
-#                     'message' : 'Invalid Data!',
-#                     'error_message' : 'fields are required.',
-#                     'fields' : [
-#                         'appointment_id'                         
-#                     ]
-#                 }
-#             },
-#             status=status.HTTP_400_BAD_REQUEST
-#         )
-          
-#     try:
-#         appointment = Appointment.objects.get(id=appointment_id)
-#     except Exception as err:
-#         return Response(
-#             {
-#                 'status' : False,
-#                 'status_code' : 404,
-#                 'status_code_text' : '404',
-#                 'response' : {
-#                     'message' : 'Invalid Appointment ID!',
-#                     'error_message' : str(err),
-#                 }
-#             },
-#             status=status.HTTP_404_NOT_FOUND
-#         )
-    
-#     appointment.delete()
-#     return Response(
-#         {
-#             'status' : True,
-#             'status_code' : 200,
-#             'status_code_text' : '200',
-#             'response' : {
-#                 'message' : 'Appointment deleted successfully',
-#                 'error_message' : None
-#             }
-#         },
-#         status=status.HTTP_200_OK
-#     )
-    
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

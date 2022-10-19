@@ -28,14 +28,16 @@ def Add_appointment(appointment = None, tenant = None):
             for appo in appointment:
                 
                 email_c =appo.appointment.client.email
+                name_c =appo.appointment.client.full_name
                 ser_name = appo.service.name
                 dat = appo.appointment_date
                 mem_email = appo.member.email
                 mem_name = appo.member.full_name
                 mem_id= appo.member.employee_id
+                client_type= appo.appointment.client_type
                 name = appo.appointment.client.full_name  
 
-                html_file = render_to_string("AppointmentEmail/add_appointment.html", {'name': name,'email': email_c, 'ser_name':ser_name ,'t_name':mem_name , 'date':dat, 'mem_id':mem_id})
+                html_file = render_to_string("AppointmentEmail/add_appointment.html", {'client': False, 'staff': True,'name': name,'email': email_c, 'ser_name':ser_name ,'t_name':mem_name , 'date':dat, 'mem_id':mem_id, 'client_type': client_type})
                 text_content = strip_tags(html_file)
                 
                 email = EmailMultiAlternatives(
@@ -54,11 +56,11 @@ def Add_appointment(appointment = None, tenant = None):
             )
             print(err)
 
-        name = appointment.client.full_name
-        email_c = appointment.client.email
+        #name = appointment.client.full_name
+        #email_c = appointment.client.email
 
         try:     
-            html_file = render_to_string("AppointmentEmail/add_appointment.html", {'name': name,'t_name':name , 'ser_name':ser_name , 'date':dat, 'mem_id':mem_id})
+            html_file = render_to_string("AppointmentEmail/add_appointment.html", {'client': True, 'staff': False,'name': name_c,'t_name':name , 'ser_name':ser_name , 'date':dat, 'mem_id':mem_id, 'client_type': client_type})
             text_content = strip_tags(html_file)
                 
             email = EmailMultiAlternatives(
