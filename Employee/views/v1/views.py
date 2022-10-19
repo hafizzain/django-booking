@@ -257,18 +257,16 @@ def get_single_employee(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-    seralized = EmployeSerializer(employee_id,  context={'request' : request})
+
+        staff = None
+    seralized = EmployeSerializer(employee_id,  context={'request' : request,})
+    
     data = dict()
     data.update(seralized.data)
     try:
         data.update(data['permissions'])
         del data['permissions']
-        # data.update(data['module_permissions'])
-        # del data['module_permissions']
-        # data.update(data['employee_info'])
-        # del data['employee_info']
-        # data.update(data['marketing_permissions'])
-        # del data['marketing_permissions']
+    
     except Exception as err:
         print(f'dict {err}')
         None
@@ -380,7 +378,7 @@ def create_employee(request):
     end_time= request.data.get('end_time',None)
     start_time = request.data.get('start_time', None)
     working_days = request.data.get('working_days',None)
-    staff_id = request.data.get('staff_id', None)
+    staff_id = request.data.get('staff_group', None)
     #level = request.data.get('level',None)
     
     start_time = request.data.get('start_time',None)
@@ -599,7 +597,7 @@ def create_employee(request):
     # if serialized.is_valid():
     #     serialized.save()
     #     data.update(serialized.data)
-    employee_serialized = EmployeSerializer(employee , context={'request' : request, 'staff_id':staff_id },)
+    employee_serialized = EmployeSerializer(employee , context={'request' : request, })
     data.update(employee_serialized.data)
 
     template = 'Employee'
@@ -682,7 +680,7 @@ def update_employee(request):
         id = request.data.get('id', None)
         is_active = request.data.get('is_active' ,None)
         services_id = request.data.get('services', None)   
-        staff_id = request.data.get('staff_id', None) 
+        staff_id = request.data.get('staff_group', None) 
 
         if id is None:
             return Response(
@@ -716,13 +714,27 @@ def update_employee(request):
                    status=status.HTTP_404_NOT_FOUND
               )
         try:
-            staff = StaffGroup.objects.get(id=staff_id)
+            staff = StaffGroup.objects.get(employees=id)
+            staff.employees.remove(employee)
+            staff.save()
         except Exception as err:
-            taff = None
-        #staff = StaffGroup.objects.get(staff_id)
-        print(staff.employees.remove(employee))
+            staff = None
+            print(err)
         
-      
+        try:
+            staff_add = StaffGroup.objects.get(id=staff_id)
+        
+        except Exception as err:
+            print(err)
+            staff_add = None
+        
+        if staff is not None:
+            try:
+                staff_add.employees.add(employee)
+                staff_add.save()
+            
+            except:
+                pass      
             
         data={}
         image=request.data.get('image',None)
@@ -832,7 +844,7 @@ def update_employee(request):
 
         empl_permission.save()
    
-        serializer = EmployeSerializer(employee, data=request.data, partial=True, context={'request' : request})
+        serializer = EmployeSerializer(employee, data=request.data, partial=True, context={'request' : request,})
         if serializer.is_valid():
            serializer.save()
            #data.update(serializer.data)
@@ -1012,7 +1024,14 @@ def get_staff_group(request):
     serialized = StaffGroupSerializers(all_staff_group, many=True, context={'request' : request})
     
     data = serialized.data
-    # data = [row.update(row['staff_permission']) for row in data]
+    # new_data = []
+    # for row in data:
+    #     let_obj = {}
+    #     let_obj.update(row)
+    #     let_obj.update(row['staff_permission'])
+    #     del let_obj['staff_permission']
+    #     new_data.append(let_obj)
+    
     # data = {}
     # data.update(serialized.data)
     

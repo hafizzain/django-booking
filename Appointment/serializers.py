@@ -12,6 +12,8 @@ from Employee.models import Employee
 from Service.models import Service
 from datetime import datetime, timedelta
 from Product.Constants.index import tenant_media_base_url
+from django.db.models import Q
+
 
 
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
@@ -144,7 +146,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
         'price',
         'appointment_time', 
         'end_time',
-        'client_type','duration', 'currency','created_at','service', 'client','location', 'is_blocked'
+        'client_type','duration', 'currency','created_at','service', 'client','location', 'is_blocked' ,'destails' 
         ]
 
 class AppoinmentSerializer(serializers.ModelSerializer):
@@ -158,7 +160,7 @@ class BlockSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class EmployeeAppointmentSerializer(serializers.ModelSerializer):
+class EmployeeAppointmentSerializer(serializers.ModelSerializer):    
     employee = serializers.SerializerMethodField()
     appointments = serializers.SerializerMethodField()
 
@@ -167,13 +169,13 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
 
     def get_appointments(self, obj):
         appoint_services = AppointmentService.objects.filter(
-            member=obj,
-            is_active = True,
-            is_deleted = False,
+            Q(member=obj)|
+            Q(is_active = True)|
+            Q(is_deleted = False)
             #is_blocked = False
-        )
+        ).exclude(appointment_status = 'Cancel')
         selected_data = []
-
+        
         for appoint in appoint_services:
 
             app_id = appoint.id

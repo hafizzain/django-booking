@@ -16,7 +16,7 @@ class EmployeeAdmin(admin.ModelAdmin):
         'mobile_number',
         'is_email_verified',
         'is_mobile_verified',
-        'dob',
+        'is_deleted',
         'gender',
         'joining_date',
         'to_present',
