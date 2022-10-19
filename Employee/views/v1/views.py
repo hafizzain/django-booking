@@ -777,13 +777,14 @@ def update_employee(request):
                         emp_service = EmployeeSelectedService.objects.get(id=services['id'])
                         is_deleted = services.get('is_deleted', None)
                     
-                        if is_deleted:
+                        if is_deleted is not None:
                             emp_service.delete()
                             continue
 
                         ser = Service.objects.get(id=services['service'])
                         emp_service.service = ser
                         emp_service.level = services['level']
+                        emp_service.save()
                         
                     except Exception as error:
                         print(f'EmployeeSelectedService item {error}')
