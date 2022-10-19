@@ -775,22 +775,18 @@ def update_employee(request):
                 if services['id'] is not None:
                     try: 
                         emp_service = EmployeeSelectedService.objects.get(id=services['id'])
+                        is_deleted = services.get('is_deleted', None)
                     
-                        if services['is_deleted'] == 'True':
-                            try:
-                                emp_service.delete()
-                                continue
-                            
-                            except Exception as error:
-                                print(f'is_delete item {error}')
-                                None 
+                        if is_deleted:
+                            emp_service.delete()
+                            continue
+
                         ser = Service.objects.get(id=services['service'])
                         emp_service.service = ser
                         emp_service.level = services['level']
                         
                     except Exception as error:
                         print(f'EmployeeSelectedService item {error}')
-                        None  
                     
         # if type(services_id) == str:
         #     services_id = json.loads(services_id)
