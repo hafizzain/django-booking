@@ -28,6 +28,58 @@ from Appointment.models import Appointment, AppointmentService, AppointmentNotes
 from Appointment.serializers import AppoinmentSerializer,SingleAppointmentSerializer ,BlockSerializer ,AllAppoinmentSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer
 from Utility.models import ExceptionRecord
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_single_appointment(request):
+    appointment_id = request.GET.get('appointment_id', None)
+    
+    if not all([appointment_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Appointment id is required',
+                    'fields' : [
+                        'appointment_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+        
+    try:
+        appointment = Appointment.objects.get(id=appointment_id, is_deleted=False )
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_APPOINMENT_ID_4038,
+                    'status_code_text' : 'INVALID_APPOINMENT_ID_4038',
+                    'response' : {
+                        'message' : 'Appointment Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+    serialized = SingleAppointmentSerializer(appointment)
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Single Appointment',
+                'error_message' : None,
+                'appointment' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -126,7 +178,7 @@ def get_calendar_appointment(request):
     all_memebers= Employee.objects.filter(
         is_deleted = False,
         is_active = True,
-        is_blocked = False,
+        #is_blocked = False,
     ).order_by('-created_at')
     serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request' : request})
 

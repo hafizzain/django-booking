@@ -53,7 +53,11 @@ class Appointment(models.Model):
 
 
     def business_name(self):
-        return str(self.business.business_name)
+        try:
+            return str(self.business.business_name)
+
+        except:
+            return ''
 
 
     def __str__(self):

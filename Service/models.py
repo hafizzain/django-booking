@@ -47,11 +47,11 @@ class Service(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_services_or_packages')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_services_or_packages', null=True, blank=True)
 
-    name = models.CharField(max_length=500, default='')
+    name = models.CharField(max_length=100, default='')
 
     service_type = models.CharField(default='test2', choices=TREATMENT_TYPES, max_length=20, null=True, blank=True)
     parrent_service = models.ManyToManyField('Service', null=True, blank=True, related_name='parent_package_services')
-    description = models.CharField(max_length=100, default='')
+    description = models.CharField(max_length=255, default='')
     employee = models.ManyToManyField('Employee.Employee', related_name='employee_services_or_packages')
     location = models.ManyToManyField(BusinessAddress, null=True, blank=True, related_name='address_services_or_packages')
     #duration = models.PositiveIntegerField(default=0, null=True, blank=True)

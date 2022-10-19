@@ -1,3 +1,4 @@
+from getopt import error
 from pkgutil import read_code
 from pyexpat import model
 from re import A
@@ -82,6 +83,13 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     end_time = serializers.SerializerMethodField(read_only=True)
     price = serializers.SerializerMethodField(read_only=True)
     currency = serializers.SerializerMethodField(read_only=True)
+    location = serializers.SerializerMethodField(read_only=True)
+    
+    def get_location(self, obj):
+        try:
+            return obj.appointment.business_address.address
+        except Exception as err:
+            print(err)      
 
     def get_currency(self, obj):
         return 'AED'
@@ -135,7 +143,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
         'price',
         'appointment_time', 
         'end_time',
-        'client_type','duration', 'currency','created_at','service', 'client'
+        'client_type','duration', 'currency','created_at','service', 'client','location', 'is_blocked'
         ]
 
 class AppoinmentSerializer(serializers.ModelSerializer):
@@ -161,7 +169,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             member=obj,
             is_active = True,
             is_deleted = False,
-            is_blocked = False
+            #is_blocked = False
         )
         selected_data = []
 
@@ -289,6 +297,7 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentService
         fields= ('id', 'service', 'member', 'price', 'client')
+        
         
 class SingleAppointmentSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
