@@ -780,18 +780,24 @@ def update_employee(request):
                         if is_deleted is not None:
                             emp_service.delete()
                             continue
+
+                        ser = Service.objects.get(id=services['service'])
+                        emp_service.service = ser
+                        emp_service.level = services['level']
+                        emp_service.save()
                     except Exception as error:
                         print(f'EmployeeSelectedService item {error}')
                     
                 else:
+                    ser = Service.objects.get(id=services['service'])
+
                     emp_service = EmployeeSelectedService.objects.create(
-                        employee=employee
+                        employee=employee,
+                        service=ser,
+                        level=services['level']
                     )
 
-                ser = Service.objects.get(id=services['service'])
-                emp_service.service = ser
-                emp_service.level = services['level']
-                emp_service.save()
+                
                         
                    
         # if type(services_id) == str:
