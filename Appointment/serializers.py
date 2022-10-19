@@ -169,9 +169,9 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
 
     def get_appointments(self, obj):
         appoint_services = AppointmentService.objects.filter(
-            Q(member=obj)|
-            Q(is_active = True)|
-            Q(is_deleted = False)
+            member=obj,
+            is_active = True,
+            is_deleted = False
             #is_blocked = False
         ).exclude(appointment_status = 'Cancel')
         selected_data = []
