@@ -152,6 +152,8 @@ class AppointmentCheckout(models.Model):
     payment_method = models.CharField(max_length=100, choices= PAYMENT_CHOICES, default='', null=True, blank=True)  
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='checkout_service_appointments', null=True, blank=True)
     member = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='checkout_member_appointments', null=True, blank=True)
+    business_address = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='appointment_address_checkout')
+
     
     tip = models.PositiveIntegerField(default=0, null=True, blank=True)
     gst = models.PositiveIntegerField(default=0, null=True, blank=True)

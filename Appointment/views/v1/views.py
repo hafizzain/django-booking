@@ -566,6 +566,7 @@ def create_checkout(request):
     payment_method = request.data.get('payment_method', None)
     service = request.data.get('service', None)
     member = request.data.get('member', None)
+    business_address = request.data.get('business_address', None)
     
     tip = request.data.get('tip', None)
     gst = request.data.get('gst', None)
@@ -637,6 +638,10 @@ def create_checkout(request):
         #     },
         #     status=status.HTTP_404_NOT_FOUND
         # )
+    try:
+        business_address=BusinessAddress.objects.get(id=business_address)
+    except Exception as err:
+        business_address = None
     
     checkout =AppointmentCheckout.objects.create(
         appointment = appointments,
@@ -644,6 +649,7 @@ def create_checkout(request):
         payment_method =payment_method,
         service= services,
         member=members,
+        business_address=business_address,
         tip = tip,
         gst = gst,
         service_price =service_price,
