@@ -728,7 +728,7 @@ def update_employee(request):
             print(err)
             staff_add = None
         
-        if staff is not None:
+        if staff_add is not None:
             try:
                 staff_add.employees.add(employee)
                 staff_add.save()
