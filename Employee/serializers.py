@@ -561,7 +561,4 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         fields = ['id', 'full_name','image','start_time', 'end_time', 'monday','tuesday','wednesday','thursday','friday','saturday','sunday']
 
 
-class CheckoutSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AppointmentCheckout
-        fields = '__all__'
+
