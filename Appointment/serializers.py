@@ -4,7 +4,7 @@ from pkgutil import read_code
 from pyexpat import model
 from re import A
 from rest_framework import serializers
-from Appointment.models import Appointment, AppointmentNotes, AppointmentService
+from Appointment.models import Appointment, AppointmentCheckout, AppointmentNotes, AppointmentService
 from Business.models import BusinessAddress
 from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer
 from Client.serializers import ClientAppointmentSerializer
@@ -367,7 +367,7 @@ class SingleAppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentService
         fields= ('id', 'location','client','service',
-                 'appointment_time', 'end_time',
+                 'appointment_time', 'end_time', 'member',
                  'appointment_status', 'currency', 'booked_by', 'booking_id', 'appointment_date', 'client_type', 'duration' , 'notes'
             )
         
@@ -396,3 +396,8 @@ class SingleNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
         fields = ['id', 'client', 'notes']
+        
+class CheckoutSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AppointmentCheckout
+        exclude = ['created_at', 'id' ,'is_deleted', 'is_active']

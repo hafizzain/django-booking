@@ -4,7 +4,6 @@ from django.shortcuts import render
 from Appointment.Constants.Reschedule import reschedule_appointment
 from Appointment.Constants.AddAppointment import Add_appointment
 from Appointment.Constants.cancelappointment import cancel_appointment
-from Employee.serializers import CheckoutSerializer
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -26,7 +25,7 @@ from threading import Thread
 
 
 from Appointment.models import Appointment, AppointmentService, AppointmentNotes , AppointmentCheckout
-from Appointment.serializers import  AppoinmentSerializer,SingleAppointmentSerializer ,BlockSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer
+from Appointment.serializers import  CheckoutSerializer, AppoinmentSerializer,SingleAppointmentSerializer ,BlockSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer
 from Utility.models import ExceptionRecord
 
 @api_view(['GET'])

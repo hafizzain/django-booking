@@ -369,7 +369,7 @@ def update_client(request):
                 'status' : True,
                 'status_code' : 200,
                 'response' : {
-                    'message' : 'Update Client Successfully',
+                    'message' : 'Client Updated Successfully!',
                     'error_message' : None,
                     'client' : serialized.data
                 }

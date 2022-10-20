@@ -960,21 +960,6 @@ def create_staff_group(request):
         
         )
         
-        staff_permission = EmployePermission.objects.create(staffgroup=staff_group)
-        for permit in ALL_PERMISSIONS:
-            value = request.data.get(permit, None)
-            if value is not None:
-                if type(value) == str:
-                    value = json.loads(value)
-                for opt in value:
-                    try:
-                        option = GlobalPermissionChoices.objects.get(text=opt)
-                        PERMISSIONS_MODEL_FIELDS[permit](staff_permission).add(option)
-                    except:
-                        pass
-
-        staff_permission.save()
-        
         #StaffGroupModulePermission
         # staff_module_permission= StaffGroupModulePermission.objects.create(
         #     staff_group=staff_group,
@@ -1000,8 +985,35 @@ def create_staff_group(request):
                staff_group.employees.add(employe)
             except Exception as err:
                 employees_error.append(str(err))
+                
+        staff_permission = EmployePermission.objects.create(staffgroup=staff_group)
+        for permit in ALL_PERMISSIONS:
+            value = request.data.get(permit, None)
+            if value is not None:
+                if type(value) == str:
+                    value = json.loads(value)
+                for opt in value:
+                    try:
+                        option = GlobalPermissionChoices.objects.get(text=opt)
+                    except:
+                        pass
+                    else:
+                        PERMISSIONS_MODEL_FIELDS[permit](staff_permission).add(option)
+
+                        for empl in staff_group.employees.all():
+                            try:
+                                staff_group_employee_prmit = EmployePermission.objects.get(employee=empl.id)
+                            except:
+                                continue
+                            else:
+                                PERMISSIONS_MODEL_FIELDS[permit](staff_group_employee_prmit).add(option)
+                                staff_group_employee_prmit.save()
+
+        staff_permission.save()
+        
         staff_group.save()
         serialized = StaffGroupSerializers(staff_group, context={'request' : request})
+       
        
 
         data = dict()
@@ -1151,35 +1163,7 @@ def update_staff_group(request):
                 status=status.HTTP_404_NOT_FOUND
         )
     data={}
-    # try:
-    #    staff_gp_permissions = StaffGroupModulePermission.objects.get(staff_group=staff_group)
-    # except Exception as err:
-    #     return Response(
-    #         {
-    #             'status' : False,
-    #             'status_code' : StatusCodes.INVALID_EMPLOYEE_INFORMATION_4026,
-    #             'response' : {
-    #                 'message' : 'Invalid Data',
-    #                 'error_message' : str(err),
-    #             }
-    #         },
-    #         status=status.HTTP_404_NOT_FOUND
-    #  )
-    staff_permission = EmployePermission.objects.get(staffgroup=staff_group)
-    for permit in ALL_PERMISSIONS:
-            value = request.data.get(permit, None)
-            PERMISSIONS_MODEL_FIELDS[permit](staff_permission).clear()
-            if value is not None:
-                if type(value) == str:
-                    value = json.loads(value)
-                for opt in value:
-                    try:
-                        option = GlobalPermissionChoices.objects.get(text=opt)
-                        PERMISSIONS_MODEL_FIELDS[permit](staff_permission).add(option)
-                    except:
-                        pass
 
-    staff_permission.save()
     employees=request.data.get('employees', None)
     if employees is not None:
         if type(employees) == str:
@@ -1194,7 +1178,33 @@ def update_staff_group(request):
                staff_group.employees.add(employe)
             except Exception as err:
                 employees_error.append(str(err))
-        staff_group.save()    
+        staff_group.save()  
+        
+    staff_permission = EmployePermission.objects.get(staffgroup=staff_group)
+    for permit in ALL_PERMISSIONS:
+            value = request.data.get(permit, None)
+            PERMISSIONS_MODEL_FIELDS[permit](staff_permission).clear()
+            if value is not None:
+                if type(value) == str:
+                    value = json.loads(value)
+                for opt in value:
+                    try:
+                        option = GlobalPermissionChoices.objects.get(text=opt)
+                    except:
+                        pass
+                    else:
+                        PERMISSIONS_MODEL_FIELDS[permit](staff_permission).add(option)
+
+                        for empl in staff_group.employees.all():
+                            try:
+                                staff_group_employee_prmit = EmployePermission.objects.get(employee=empl.id)
+                            except:
+                                continue
+                            else:
+                                PERMISSIONS_MODEL_FIELDS[permit](staff_group_employee_prmit).add(option)
+                                staff_group_employee_prmit.save()
+
+    staff_permission.save()  
         
     # permission_serializer =StaffpermisionSerializers(staff_gp_permissions, data=request.data, partial=True, context={'request' : request})
     # if permission_serializer.is_valid():
