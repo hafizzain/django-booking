@@ -658,6 +658,14 @@ def delete_employee(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+        
+    try:
+        staff_group = StaffGroup.objects.get(employees = employee)
+        staff_group.employees.remove(employee)
+        staff_group.save()
+    except:
+        pass
+    
     employee.is_deleted = True
     employee.save()
     return Response(
