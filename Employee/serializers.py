@@ -1,6 +1,7 @@
 from dataclasses import fields
 from genericpath import exists
 from pyexpat import model
+from Appointment.models import AppointmentCheckout
 from Product.Constants.index import tenant_media_base_url
 from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSIONS_MODEL_FIELDS
 from Utility.models import Country, GlobalPermissionChoices, State, City
@@ -558,3 +559,9 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ['id', 'full_name','image','start_time', 'end_time', 'monday','tuesday','wednesday','thursday','friday','saturday','sunday']
+
+
+class CheckoutSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AppointmentCheckout
+        fields = '__all__'

@@ -14,6 +14,9 @@ urlpatterns = [
     path('delete_appointment/', views.delete_appointment),
     path('update_appointment/', views.update_appointment),
     
+    #block time
     path('create_blockTime/', views.create_blockTime),
     
+    #checkout
+    path('create_checkout/', views.create_checkout)
 ]

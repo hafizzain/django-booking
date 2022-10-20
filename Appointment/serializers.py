@@ -173,7 +173,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             is_active = True,
             is_deleted = False
             #is_blocked = False
-        ).exclude(appointment_status = 'Cancel')
+        ).exclude(appointment_status = 'Cancel' , appointment_status = 'Done' , appointment_status = 'Paid')
         selected_data = []
         
         for appoint in appoint_services:
