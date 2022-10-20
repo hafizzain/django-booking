@@ -772,26 +772,34 @@ def update_employee(request):
                 pass
             for services in services_id :
                 #get('id', None)
-                if services['id'] is not None:
+                s_service_id = services.get('id', None)
+                if s_service_id is not None:
                     try: 
                         emp_service = EmployeeSelectedService.objects.get(id=services['id'])
-                    
-                        if services['is_deleted'] == 'True':
-                            try:
-                                emp_service.delete()
-                                continue
-                            
-                            except Exception as error:
-                                print(f'is_delete item {error}')
-                                None 
+                        is_deleted = services.get('is_deleted', None)
+                        if is_deleted is not None:
+                            emp_service.delete()
+                            continue
+
                         ser = Service.objects.get(id=services['service'])
                         emp_service.service = ser
                         emp_service.level = services['level']
-                        
+                        emp_service.save()
                     except Exception as error:
                         print(f'EmployeeSelectedService item {error}')
-                        None  
                     
+                else:
+                    ser = Service.objects.get(id=services['service'])
+
+                    emp_service = EmployeeSelectedService.objects.create(
+                        employee=employee,
+                        service=ser,
+                        level=services['level']
+                    )
+
+                
+                        
+                   
         # if type(services_id) == str:
         #     services_id = json.loads(services_id)
         #     print('str')
