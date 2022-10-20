@@ -126,9 +126,8 @@ def get_calendar_appointment(request):
     all_memebers= Employee.objects.filter(
         is_deleted = False,
         is_active = True,
-        
-        #is_blocked = False,
     ).order_by('-created_at')
+    print(all_memebers)
     serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request' : request})
 
     return Response(

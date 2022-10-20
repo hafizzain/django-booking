@@ -168,12 +168,13 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
         return None
 
     def get_appointments(self, obj):
+        excluded_list = ['Cancel', 'Done', 'Paid']
         appoint_services = AppointmentService.objects.filter(
             member=obj,
             is_active = True,
             is_deleted = False
             #is_blocked = False
-        ).exclude(appointment_status = 'Cancel' , appointment_status = 'Done' , appointment_status = 'Paid')
+        ).exclude(appointment_status__in=excluded_list)
         selected_data = []
         
         for appoint in appoint_services:
