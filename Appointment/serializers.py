@@ -192,8 +192,8 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             datetime_duration = datetime_duration.strftime('%H:%M:%S')
             end_time = datetime_duration # Calculated End Time
 
-            print(appointment_time.microsecond)
-            print(appointment_time)
+            #print(appointment_time.microsecond)
+            #print(appointment_time)
 
             find_values = []
             new_start_time = None

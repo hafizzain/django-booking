@@ -98,6 +98,14 @@ class EmployeSerializer(serializers.ModelSerializer):
     city = serializers.SerializerMethodField(read_only=True)   
     services = serializers.SerializerMethodField(read_only=True)
     
+    monday =  serializers.SerializerMethodField(read_only=True)
+    tuesday =  serializers.SerializerMethodField(read_only=True)
+    wednesday =  serializers.SerializerMethodField(read_only=True)
+    thursday =  serializers.SerializerMethodField(read_only=True)
+    friday =  serializers.SerializerMethodField(read_only=True)
+    saturday =  serializers.SerializerMethodField(read_only=True)
+    sunday =  serializers.SerializerMethodField(read_only=True)
+    
     staff_group = serializers.SerializerMethodField(read_only=True)
     
     def get_staff_group(self, obj):
@@ -188,13 +196,51 @@ class EmployeSerializer(serializers.ModelSerializer):
                 for opt in PERMISSIONS_MODEL_FIELDS[permit](permission).all():
                     returned_value[permit].append(opt.text)
             return returned_value
-       
-           
-    # def get(self, obj):
-    #     return {
-    #         "brand": "test",
-    #         "model": "test2",
-    #     }
+
+    def get_monday(self, obj):
+        try:
+            day = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return day.monday
+        except Exception as err:
+            return None
+    def get_tuesday(self, obj):
+        try:
+            day = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return day.tuesday
+        except Exception as err:
+            return None
+    def get_wednesday(self, obj):
+        try:
+            day = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return day.wednesday
+        except Exception as err:
+            print(err)
+            return None 
+    def get_thursday(self, obj):
+        try:
+            day = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return day.thursday
+        except Exception as err:
+            return None       
+    def get_friday(self, obj):
+        try:
+            day = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return day.friday
+        except Exception as err:
+            return None       
+    def get_saturday(self, obj):
+        try:
+            day = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return day.saturday
+        except Exception as err:
+            return None       
+    def get_sunday(self, obj):
+        try:
+            day = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return day.sunday
+        except Exception as err:
+            return None    
+  
     class Meta:
         model = Employee
         fields = [
@@ -219,7 +265,7 @@ class EmployeSerializer(serializers.ModelSerializer):
                 'employee_info',
                 'staff_group',
                 # 'globel_permission',
-                'permissions',       
+                'permissions' , 'monday','tuesday','wednesday','thursday','friday','saturday','sunday'    
                 #'module_permissions',
                 #'marketing_permissions',
             ]
@@ -431,7 +477,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'designation', 
             'level',
             'employee_id',
-            'employee_info'        
+            'employee_info',      
             ]   
         
 class CommissionSerializer(serializers.ModelSerializer):
@@ -476,6 +522,7 @@ class AssetSerializer(serializers.ModelSerializer):
 class WorkingScheduleSerializer(serializers.ModelSerializer):
     start_time = serializers.SerializerMethodField(read_only=True)
     end_time = serializers.SerializerMethodField(read_only=True)
+    
     monday =  serializers.SerializerMethodField(read_only=True)
     tuesday =  serializers.SerializerMethodField(read_only=True)
     wednesday =  serializers.SerializerMethodField(read_only=True)
@@ -483,6 +530,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     friday =  serializers.SerializerMethodField(read_only=True)
     saturday =  serializers.SerializerMethodField(read_only=True)
     sunday =  serializers.SerializerMethodField(read_only=True)
+    
     image = serializers.SerializerMethodField()
 
     
@@ -515,14 +563,12 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
             day = EmployeeProfessionalInfo.objects.get(employee=obj)
             return day.monday
         except Exception as err:
-            print(err)
             return None
     def get_tuesday(self, obj):
         try:
             day = EmployeeProfessionalInfo.objects.get(employee=obj)
             return day.tuesday
         except Exception as err:
-            print(err)
             return None
     def get_wednesday(self, obj):
         try:

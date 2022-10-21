@@ -540,15 +540,19 @@ def create_blockTime(request):
             is_blocked = True,
         )
     
-    serialized = BlockSerializer(block_time)
+    all_members =Employee.objects.filter(is_deleted=False)
+    
+    serialized = EmployeeAppointmentSerializer(all_members, many=True, context={'request' : request})
+
+    #serialized = BlockSerializer(block_time)
     return Response(
             {
                 'status' : True,
                 'status_code' : 201,
                 'response' : {
-                    'message' : 'Appointment Create!',
+                    'message' : 'BlockTime Create!',
                     'error_message' : None,
-                    'appointment' : serialized.data,
+                    'appointments' : serialized.data,
                 }
             },
             status=status.HTTP_201_CREATED
