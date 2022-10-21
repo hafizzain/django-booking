@@ -52,6 +52,7 @@ NSTYLE_APPS = [
     'Appointment.apps.AppointmentConfig',
     'Sale.apps.SaleConfig',
     'Permissions.apps.PermissionsConfig',
+    'Order.apps.OrderConfig',
 ]
 
 

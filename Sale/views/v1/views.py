@@ -17,7 +17,10 @@ from Employee.models import Employee, EmployeeSelectedService
 from Business.models import BusinessAddress
 from Service.models import Service
 
+from Product.models import Product
+
 from Sale.serializers import ServiceSerializer
+
 
 
 @api_view(['GET'])
@@ -346,20 +349,17 @@ def update_service(request):
             pass
         print(type(employeeslist))
         service_id.employee.clear()
-        for usr in employeeslist:
+        all_pending_services = EmployeeSelectedService.objects.filter(service=service_id).exclude(employee__in=employeeslist)
+        for empl_service in all_pending_services:
+            empl_service.delete()
+            
+        for empl_id in employeeslist:
             try:
-               
                 employe = Employee.objects.get(id=usr)
-                
-                # employe_service = EmployeeSelectedService.objects.get(employee = employe)
-                # try:
-                #     employe_service.employee.remove(employe)
-                #     employe_service.save()
-                # except EmployeeSelectedService.DoesNotExist:
-                #     employe_service = EmployeeSelectedService.objects.create(
-                #         service = service_id,
-                #         employee = employe
-                #    )
+                employe_service, created = EmployeeSelectedService.objects.get_or_create(
+                    service = service_id,
+                    employee = employe
+                )
                     
                 service_id.employee.add(employe)
             except Exception as err:
@@ -396,3 +396,8 @@ def update_service(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+        
+# @api_view(['GET'])
+# @permission_classes([AllowAny])
+# def get_sale_product(request):
+#     product = Product.objects.all()
