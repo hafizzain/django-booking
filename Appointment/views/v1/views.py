@@ -558,6 +558,88 @@ def create_blockTime(request):
             status=status.HTTP_201_CREATED
     ) 
 
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_blocktime(request):
+    block_id = request.data.get('id', None)
+    if block_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+       
+    try:
+        block = AppointmentService.objects.get(id=block_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid BlockTime ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+        
+    serializer = UpdateAppointmentSerializer(block , data=request.data, partial=True)
+    if not serializer.is_valid():
+        return Response(
+                {
+            'status' : False,
+            'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+            'response' : {
+                'message' : 'Block Serializer Invalid',
+                'error_message' : str(serializer.errors),
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+        )
+    serializer.save()
+    all_members =Employee.objects.filter(is_deleted=False, is_active = True).order_by('-created_at')
+
+    serialized = EmployeeAppointmentSerializer(all_members, many=True, context={'request' : request})
+
+    # if not serialized.is_valid():
+    #     return Response(
+    #             {
+    #         'status' : False,
+    #         'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+    #         'response' : {
+    #             'message' : 'Block Serializer Invalid',
+    #             'error_message' : str(err),
+    #         }
+    #     },
+    #     status=status.HTTP_404_NOT_FOUND
+    #     )
+    # serialized.save()
+    
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Update BlockTime Successfully',
+                'error_message' : None,
+                'asset' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+        )
+
 
 
 @api_view(['POST'])
@@ -673,3 +755,32 @@ def create_checkout(request):
             },
             status=status.HTTP_201_CREATED
     ) 
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def service_appointment_count(request):
+    services = Service.objects.all()
+    return_data =[]
+    for ser in services:
+        app_service = AppointmentService.objects.filter(service = ser)
+        count = app_service.count()
+        data = {
+            # 'id' : str(ser.id),
+            'name' : str(ser.name),
+            'count' : count
+        }
+        return_data.append(data)
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Appointment Checkout Create!',
+                    'error_message' : None,
+                    'data' : return_data,
+                    
+                }
+            },
+            status=status.HTTP_201_CREATED
+    ) 
+    

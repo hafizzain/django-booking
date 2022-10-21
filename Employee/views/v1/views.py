@@ -661,9 +661,9 @@ def delete_employee(request):
         
     try:
         staff_group = StaffGroup.objects.get(employees = employee)
-        print(staff_group)
+        #print(staff_group)
         staff_group.employees.remove(employee)
-        print(staff_group.employees.remove(employee))
+        #print(staff_group.employees.remove(employee))
         staff_group.save()
     except:
         pass

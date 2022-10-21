@@ -38,10 +38,17 @@ class Service(models.Model):
         ('No_More_Than_2_Months_In_The_Future', 'No More Than 2 Months In The Future'),
         ('No_More_Than_3_Months_In_The_Future', 'No More Than 3 Months In The Future'),
     ]
-    
+
     TREATMENT_TYPES = [
-        ('Hair_Color' , 'Hair Color'),
-        ('test2' , 'test2'),
+        ('Waxing' , 'Waxing'),
+        ('Tanning' , 'Tanning'),
+        ('Massages' , 'Massages'),
+        ('Makeup' , 'Makeup'),
+        ('Hair_Services' , 'Hair Services'),
+        ('Nail_Treatments' , 'Nail Treatments'),
+        ('Hand_&_Feet_Treatment' , 'Hand & Feet Treatment'),
+        ('Facials_and_Skin_Care_Treatments' , 'Hand & Feet Treatment'),
+        
     ]
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_services_or_packages')
@@ -49,7 +56,7 @@ class Service(models.Model):
 
     name = models.CharField(max_length=100, default='')
 
-    service_type = models.CharField(default='test2', choices=TREATMENT_TYPES, max_length=20, null=True, blank=True)
+    service_type = models.CharField(default='test2', choices=TREATMENT_TYPES, max_length=50, null=True, blank=True)
     parrent_service = models.ManyToManyField('Service', null=True, blank=True, related_name='parent_package_services')
     description = models.CharField(max_length=255, default='')
     employee = models.ManyToManyField('Employee.Employee', related_name='employee_services_or_packages')

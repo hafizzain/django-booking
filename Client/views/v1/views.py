@@ -427,7 +427,11 @@ def delete_client(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    
+    client_staff = ClientGroup.objects.filter(client = client)
+    for cl_grp in client_staff:
+        cl_grp.client.remove(client)
+        cl_grp.save()
+            
     client.is_deleted = True
     client.save()
     return Response(
