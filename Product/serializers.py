@@ -100,7 +100,7 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
         
         return {            
             'id' : stock.id,
-            'available_stock' : available_quantity,
+            'available_stock' : int(available_quantity[0]),
             'quantity' : stock.sellable_quantity,
             'sold_stock' : stock.sold_quantity,
             'price' : stock.product.sell_price,
