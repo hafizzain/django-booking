@@ -85,15 +85,28 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
 
     def get_stock(self, obj):
         stock = ProductStock.objects.filter(product=obj, is_deleted=False)[0]
-        return {
+        total_qant = 0
+        if stock.product.product_type == 'SELABLE':
+            total_qant = stock.sellable_quantity 
+        elif stock.product.product_type == 'COMSUME' :
+            total_qant =    stock.sellable_quantity
+        else:
+            total_qant = stock.sellable_quantity + stock.sellable_quantity
+
+        available_quantity = total_qant -  stock.sold_quantity,
+        
+        #print(type(available_quantity))
+        #print(int(available_quantity[0]))
+        
+        return {            
             'id' : stock.id,
-            #'available_stock' : stock.product.product_type == 'SELABLE' if  seleavlaksfd :  stock.product.product_type == 'COMSUME' ? comsumeable : comsumeable+ seleavlaksfd  ,
+            'available_stock' : available_quantity,
             'quantity' : stock.sellable_quantity,
             'sold_stock' : stock.sold_quantity,
             'price' : stock.product.sell_price,
-            'usage' : (int(stock.sellable_quantity) // int(stock.sold_quantity)) * 100 if stock.sold_quantity > 0 else 100,
-            'status' : True if stock.available_quantity > 0 else False,
-            'status_text' : 'In Stock' if stock.available_quantity > 0 else 'Out of stock',
+            'usage' : (int(total_qant) // int(stock.sold_quantity)) * 100 if stock.sold_quantity > 0 else 100,
+            'status' : True if int(available_quantity[0]) > 0 else False,
+            'status_text' : 'In Stock' if int(available_quantity[0]) > 0 else 'Out of stock',
             'sale_status' : 'High',
             'turnover' : 'Highest',
         }
