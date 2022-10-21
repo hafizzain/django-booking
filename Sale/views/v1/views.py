@@ -350,6 +350,10 @@ def update_service(request):
             try:
                
                 employe = Employee.objects.get(id=usr)
+                
+                employe_service = EmployeeSelectedService.objects.get(employee = employe)
+                employe_service.employee
+                
                 service_id.employee.add(employe)
             except Exception as err:
                 error.append(str(err))
