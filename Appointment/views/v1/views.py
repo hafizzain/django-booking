@@ -540,7 +540,7 @@ def create_blockTime(request):
             is_blocked = True,
         )
     
-    all_members =Employee.objects.filter(is_deleted=False)
+    all_members =Employee.objects.filter(is_deleted=False, is_active = True).order_by('-created_at')
     
     serialized = EmployeeAppointmentSerializer(all_members, many=True, context={'request' : request})
 
