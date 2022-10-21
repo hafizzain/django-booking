@@ -346,17 +346,20 @@ def update_service(request):
             pass
         print(type(employeeslist))
         service_id.employee.clear()
-        all_pending_services = EmployeeSelectedService.objects.filter(service=service_id).exclude(employee__in=employeeslist)
-        for empl_service in all_pending_services:
-            empl_service.delete()
-            
-        for empl_id in employeeslist:
+        for usr in employeeslist:
             try:
+               
                 employe = Employee.objects.get(id=usr)
-                employe_service, created = EmployeeSelectedService.objects.get_or_create(
-                    service = service_id,
-                    employee = employe
-                )
+                
+                # employe_service = EmployeeSelectedService.objects.get(employee = employe)
+                # try:
+                #     employe_service.employee.remove(employe)
+                #     employe_service.save()
+                # except EmployeeSelectedService.DoesNotExist:
+                #     employe_service = EmployeeSelectedService.objects.create(
+                #         service = service_id,
+                #         employee = employe
+                #    )
                     
                 service_id.employee.add(employe)
             except Exception as err:
