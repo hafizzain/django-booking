@@ -640,6 +640,8 @@ def update_blocktime(request):
         status=status.HTTP_200_OK
         )
 
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_checkout(request):
@@ -753,3 +755,32 @@ def create_checkout(request):
             },
             status=status.HTTP_201_CREATED
     ) 
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def service_appointment_count(request):
+    services = Service.objects.all()
+    return_data =[]
+    for ser in services:
+        app_service = AppointmentService.objects.filter(service = ser)
+        count = app_service.count()
+        data = {
+            # 'id' : str(ser.id),
+            'name' : str(ser.name),
+            'count' : count
+        }
+        return_data.append(data)
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Appointment Checkout Create!',
+                    'error_message' : None,
+                    'data' : return_data,
+                    
+                }
+            },
+            status=status.HTTP_201_CREATED
+    ) 
+    

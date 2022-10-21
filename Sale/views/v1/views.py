@@ -13,7 +13,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from Employee.models import Employee
+from Employee.models import Employee, EmployeeSelectedService
 from Business.models import BusinessAddress
 from Service.models import Service
 
@@ -164,10 +164,14 @@ def create_service(request):
         
     for usr in employee:
             try:
-               employe = Employee.objects.get(id=usr)
-               service_obj.employee.add(employe)
-            except Exception as err:
+                employe = Employee.objects.get(id=usr)
+                employe_service = EmployeeSelectedService.objects.create(
+                   service = service_obj,
+                   employee = employe
+                   )
+            except:
                 employees_error.append(str(err))
+                pass
     
     if type(location_id) == str:
         location_id = json.loads(location_id)
@@ -182,8 +186,13 @@ def create_service(request):
                service_obj.location.add(location)
             except Exception as err:
                 employees_error.append(str(err))
-    
+    employe_service.save()
     service_obj.save()
+    
+    
+    
+    
+    
     payroll_serializers= ServiceSerializer(service_obj)
     
     return Response(
