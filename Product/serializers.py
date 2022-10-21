@@ -108,7 +108,7 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
             'status' : True if int(available_quantity[0]) > 0 else False,
             'status_text' : 'In Stock' if int(available_quantity[0]) > 0 else 'Out of stock',
             'sale_status' : 'High',
-            'turnover' : 'Highest',
+            'turnover' : 'Highest' if int(available_quantity[0]) > 0 else 'Lowest' ,
         }
         
 
