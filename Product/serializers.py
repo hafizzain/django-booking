@@ -87,7 +87,7 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
         stock = ProductStock.objects.filter(product=obj, is_deleted=False)[0]
         return {
             'id' : stock.id,
-            'available_stock' : stock.available_quantity,
+            #'available_stock' : stock.product.product_type == 'SELABLE' if  seleavlaksfd :  stock.product.product_type == 'COMSUME' ? comsumeable : comsumeable+ seleavlaksfd  ,
             'quantity' : stock.sellable_quantity,
             'sold_stock' : stock.sold_quantity,
             'price' : stock.product.sell_price,

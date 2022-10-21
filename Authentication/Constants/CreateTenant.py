@@ -3,7 +3,7 @@
 
 from Authentication.Constants.Domain import ssl_sub_domain
 from Tenants.models import Tenant, Domain
-from Business.models import Business, BusinessType
+from Business.models import Business, BusinessPaymentMethod, BusinessType
 from Profile.models import Profile
 from Utility.Constants.add_data_db import add_business_types, add_countries, add_software_types, add_states, add_cities, add_currencies, add_languages
 from Utility.models import GlobalPermissionChoices
@@ -132,6 +132,26 @@ def create_global_permission(tenant=None, user = None, business=None):
                 GlobalPermissionChoices.objects.create(
                     text = per,
                     slug = per,
+                )
+
+def default_payment_method(tenant=None, user = None, business=None):
+    if tenant is not None and user is not None and business is not None:
+        with tenant_context(tenant):
+            payment_method= [
+    
+                        "Cash",
+                        "Mastercard",
+                        "Visa",
+                        'Paypal',
+                        'GooglePay',
+                        'ApplePay',
+                    ]
+            for pay in payment_method:
+                BusinessPaymentMethod.objects.create(
+                    user = user,
+                    business = business,
+                    method_type = pay,
+                   
                 )
                 
 
@@ -276,6 +296,12 @@ def create_tenant(request=None, user=None, data=None):
             try:
                 service_thrd = Thread(target=create_global_permission, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
                 service_thrd.start()
+            except:
+                pass
+            
+            try:
+                payment_thrd = Thread(target=default_payment_method, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+                payment_thrd.start()
             except:
                 pass
             
