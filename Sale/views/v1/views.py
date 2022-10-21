@@ -59,7 +59,7 @@ def create_service(request):
     controls_time_slot = request.data.get('controls_time_slot', None)
     initial_deposit = request.data.get('initial_deposit', None)
     client_can_book = request.data.get('client_can_book', None)
-    slot_availible_for_online = request.data.get('controls_time_slot', None)
+    slot_availible_for_online = request.data.get('slot_availible_for_online', None)
     
     enable_team_comissions = request.data.get('enable_team_comissions', None)
     enable_vouchers = request.data.get('enable_vouchers', None)
@@ -351,12 +351,16 @@ def update_service(request):
                
                 employe = Employee.objects.get(id=usr)
                 
-                employe_service = EmployeeSelectedService.objects.get(employee = employe)
+                # employe_service = EmployeeSelectedService.objects.get(employee = employe)
                 # try:
-                #     employe_service.employee
+                #     employe_service.employee.remove(employe)
+                #     employe_service.save()
                 # except EmployeeSelectedService.DoesNotExist:
+                #     employe_service = EmployeeSelectedService.objects.create(
+                #         service = service_id,
+                #         employee = employe
+                #    )
                     
-                
                 service_id.employee.add(employe)
             except Exception as err:
                 error.append(str(err))
