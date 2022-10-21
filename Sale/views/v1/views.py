@@ -352,7 +352,10 @@ def update_service(request):
                 employe = Employee.objects.get(id=usr)
                 
                 employe_service = EmployeeSelectedService.objects.get(employee = employe)
-                employe_service.employee
+                # try:
+                #     employe_service.employee
+                # except EmployeeSelectedService.DoesNotExist:
+                    
                 
                 service_id.employee.add(employe)
             except Exception as err:
