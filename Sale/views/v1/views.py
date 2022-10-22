@@ -485,28 +485,30 @@ def create_sale_order(request):
     member_id = request.data.get('member', None)
     location_id = request.data.get('location', None)
     payment_type = request.data.get('payment_type', None)
-    client_type = request.data.get('client_type', None)
+    client_type = request.data.get('selection_type', None)
+    ids = request.data.get('ids', None)
     
-    product_id = request.data.get('product', None)
+    
+    #product_id = request.data.get('product', None)
     
     #Order Service
-    service_id = request.data.get('service', None)
+    #service_id = request.data.get('service', None)
     duration = request.data.get('duration', None)
     
     #Order Membership
-    membership_id = request.data.get('membership', None)
+    #membership_id = request.data.get('membership', None)
     start_date = request.data.get('start_date', None)
     end_date = request.data.get('end_date', None)
     
     #Order Voucher
-    voucher_id = request.data.get('voucher', None)
+    #voucher_id = request.data.get('voucher', None)
      
     tip = request.data.get('tip', None)
     total_price = request.data.get('total_price', None)
     
     errors = []
     
-    if not all([client_id, member_id ]):
+    if not all([client_id, member_id , client_type, location_id]):
         return Response(
             {
                 'status' : False,
@@ -518,6 +520,8 @@ def create_sale_order(request):
                     'fields' : [
                           'client',
                           'member', 
+                          'selection_type',
+                          'location'
                             ]
                 }
             },
@@ -569,15 +573,14 @@ def create_sale_order(request):
         #     },
         #     status=status.HTTP_400_BAD_REQUEST
         # )
+    if type(ids) == str:
+        ids = json.loads(ids)
+
+    elif type(ids) == list:
+            pass
     if sale_type == 'PRODUCT':
         
-        if type(product_id) == str:
-            product_id = json.loads(product_id)
-
-        elif type(product_id) == list:
-            pass
-        
-        for pro in product_id:
+        for pro in ids:
         
             try:
                 product = Product.objects.get(id = pro)
@@ -644,13 +647,13 @@ def create_sale_order(request):
     
     elif sale_type == 'SERVICE':
         
-        if type(service_id) == str:
-            service_id = json.loads(service_id)
+        # if type(service_id) == str:
+        #     service_id = json.loads(service_id)
 
-        elif type(service_id) == list:
-            pass
+        # elif type(service_id) == list:
+        #     pass
         
-        for servics in service_id:
+        for servics in ids:
             try:
                 service = Service.objects.get(id = servics)
                 service_order = ServiceOrder.objects.create(
@@ -696,13 +699,13 @@ def create_sale_order(request):
         )
         
     elif sale_type == 'MEMBERSHIP':
-        if type(membership_id) == str:
-            membership_id = json.loads(membership_id)
+        # if type(membership_id) == str:
+        #     membership_id = json.loads(membership_id)
 
-        elif type(membership_id) == list:
-            pass
+        # elif type(membership_id) == list:
+        #     pass
         
-        for membership in membership_id:
+        for membership in ids:
             try:
                 membership = Membership.objects.get(id = membership)
                 membership_order = MemberShipOrder.objects.create(
@@ -750,14 +753,13 @@ def create_sale_order(request):
         )
         
     elif sale_type == 'VOUCHER':
-        
-        if type(voucher_id) == str:
-            voucher_id = json.loads(voucher_id)
+        # if type(voucher_id) == str:
+        #     voucher_id = json.loads(voucher_id)
 
-        elif type(voucher_id) == list:
-            pass
+        # elif type(voucher_id) == list:
+        #     pass
         
-        for vouchers in voucher_id:  
+        for vouchers in ids:  
             try:
                 voucher = Vouchers.objects.get(id = vouchers)
                 voucher_order =VoucherOrder.objects.create(
