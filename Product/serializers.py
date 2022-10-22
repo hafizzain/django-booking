@@ -91,7 +91,7 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
         elif stock.product.product_type == 'COMSUME' :
             total_qant =    stock.sellable_quantity
         else:
-            total_qant = stock.sellable_quantity + stock.sellable_quantity
+            total_qant = int(stock.sellable_quantity) + int(stock.sellable_quantity)
 
         available_quantity = total_qant -  stock.sold_quantity,
         
