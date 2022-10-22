@@ -64,7 +64,7 @@ def Add_appointment(appointment = None, tenant = None):
             text_content = strip_tags(html_file)
                 
             email = EmailMultiAlternatives(
-                    'Appointment Added',
+                    'Appointment Booked',
                     text_content,
                     settings.EMAIL_HOST_USER,
                     to = [email_c],
