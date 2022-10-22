@@ -596,6 +596,7 @@ def add_product(request):
     sellable_quantity = request.data.get('sellable_quantity', None)
     consumable_quantity = request.data.get('consumable_quantity',None)
     unit = request.data.get('unit', None)
+    product_unit = request.data.get('product_unit', None)
     amount = request.data.get('amount', None)
     stock_status = request.data.get('stock_status', None)
     #turnover = request.data.get('turnover', None)
@@ -739,6 +740,7 @@ def add_product(request):
         #quantity = quantity,
         amount = amount,
         unit = unit,
+        product_unit= product_unit,
         sellable_quantity=sellable_quantity,
         consumable_quantity =consumable_quantity,
         #available_quantity= quantity,

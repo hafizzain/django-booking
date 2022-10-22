@@ -36,6 +36,10 @@ class Order(models.Model):
     PAYMENT_TYPE=[
         ('Cash', 'Cash'),
         ('Voucher', 'Voucher'),
+        ('SplitBill', 'SplitBill'),
+        ('MasterCard', 'MasterCard'),
+        ('Other', 'Other'),
+        
     ]
 
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True,)
