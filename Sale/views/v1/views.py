@@ -174,6 +174,7 @@ def create_service(request):
                    service = service_obj,
                    employee = employe
                    )
+                service_obj.employee.add(employe)
             except:
                 employees_error.append(str(err))
                 pass
