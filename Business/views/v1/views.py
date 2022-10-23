@@ -935,7 +935,7 @@ def update_location(request):
         s_day = opening_day.get(day.lower(), None)
         if s_day is not None:
             bds_schedule.start_time = s_day['start_time']
-            bds_schedule.close_time = s_day['end_time']
+            bds_schedule.close_time = s_day['close_time']
         else:
             bds_schedule.is_closed = True
 
