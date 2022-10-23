@@ -352,13 +352,13 @@ def update_service(request):
             
         for empl_id in employeeslist:
             try:
-                employe = Employee.objects.get(id=usr)
+                employe = Employee.objects.get(id=empl_id)
                 employe_service, created = EmployeeSelectedService.objects.get_or_create(
                     service = service_id,
                     employee = employe
                 )
                     
-                service_id.employee.add(empl_id)
+                service_id.employee.add(employe)
             except Exception as err:
                 error.append(str(err))
     service_id.save()
