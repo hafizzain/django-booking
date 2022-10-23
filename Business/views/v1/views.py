@@ -728,7 +728,7 @@ def add_business_location(request):
             # bds_schedule.start_time = s_day.get('start_time', None)
             # bds_schedule.close_time = s_day.get('close_time', None)
             
-            bds_schedule.start_time = s_day['starting_time']
+            bds_schedule.start_time = s_day['start_time']
             bds_schedule.close_time = s_day['end_time']
         else:
             bds_schedule.is_closed = True
