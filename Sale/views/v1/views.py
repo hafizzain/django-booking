@@ -479,13 +479,13 @@ def get_voucher_orders(request):
 def create_sale_order(request):
     user = request.user
     
-    sale_type = request.data.get('sale_type', None)
+    sale_type = request.data.get('selection_type', None)
     client_id = request.data.get('client', None)
     sale_status = request.data.get('status', None)
     member_id = request.data.get('member', None)
     location_id = request.data.get('location', None)
     payment_type = request.data.get('payment_type', None)
-    client_type = request.data.get('selection_type', None)
+    client_type = request.data.get('client_type', None)
     ids = request.data.get('ids', None)
     
     
@@ -812,7 +812,7 @@ def create_sale_order(request):
                 'status_code_text' : 'MISSING_FIELDS_4001',
                 'response' : {
                     'message' : 'Invalid Data!',
-                    'error_message' : 'sale_type fields missing choice one',
+                    'error_message' : 'selection_type fields missing choice one',
                     'fields' : [
                           'PRODUCT',
                           'SERVICE', 

@@ -780,7 +780,7 @@ def update_employee(request):
                 services_id = json.loads(services_id)
             else:
                 pass
-            for services in services_id :
+            for services in services_id:
                 #get('id', None)
                 s_service_id = services.get('id', None)
                 if s_service_id is not None:
