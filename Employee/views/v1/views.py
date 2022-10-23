@@ -846,7 +846,7 @@ def update_employee(request):
         serializer = EmployeSerializer(employee, data=request.data, partial=True, context={'request' : request,})
         if serializer.is_valid():
            serializer.save()
-           #data.update(serializer.data)
+           data.update(serializer.data)
         else: 
              return Response(
             {
@@ -866,7 +866,7 @@ def update_employee(request):
                 'response' : {
                     'message' : ' Employee updated successfully',
                     'error_message' : None,
-                    'Employee' : serializer.data
+                    'Employee' : data
                 }
             },
             status=status.HTTP_200_OK
