@@ -337,20 +337,14 @@ def update_service(request):
                service_id.parrent_service.add(service)
             except Exception as err:
                 error.append(str(err))
-                
-    # try:
-    #             test = '1689071a-1ddc-4191-95d5-16e16f2b2188'
-    #             employe = Employee.objects.get(id=test)
-    #             service_id.employee.add(employe)
-    # except Exception as err:
-    #             error.append(str(err))
-    
     
     if employeeslist is not None:
+        
         if type(employeeslist) == str:
             employeeslist = json.loads(employeeslist)
         elif type(employeeslist) == list:
             pass
+        
         print(type(employeeslist))
         service_id.employee.clear()
         all_pending_services = EmployeeSelectedService.objects.filter(service=service_id).exclude(employee__in=employeeslist)
@@ -365,7 +359,7 @@ def update_service(request):
                     employee = employe
                 )
                     
-                service_id.employee.add(employe)
+                service_id.employee.add(empl_id)
             except Exception as err:
                 error.append(str(err))
     service_id.save()
