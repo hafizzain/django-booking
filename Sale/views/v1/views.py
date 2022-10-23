@@ -609,7 +609,7 @@ def create_sale_order(request):
                     user = user,
                     client = client,
                     product = product,
-                    status = sale_status,
+                    #status = sale_status,
                     member = member,
                     location = business_address,
                     tip = tip,
