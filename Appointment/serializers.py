@@ -273,6 +273,24 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
     service = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)
     price = serializers.SerializerMethodField(read_only=True)
+    booked_by = serializers.SerializerMethodField(read_only=True)
+    booking_id = serializers.SerializerMethodField(read_only=True)
+    appointment_type = serializers.SerializerMethodField(read_only=True)
+    
+    def get_appointment_type(self, obj):
+        try:
+            return obj.appointment.client_type
+        except Exception as err:
+            return None
+            
+    
+    def get_booked_by(self, obj):
+        return f'{obj.user.first_name} {obj.user.last_name}'
+    
+    def get_booking_id(self, obj):
+        id = str(obj.id).split('-')[0:2]
+        id = ''.join(id)
+        return id
     
     def get_client(self, obj):
         try:
@@ -300,7 +318,7 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = AppointmentService
-        fields= ('id', 'service', 'member', 'price', 'client')
+        fields= ('id', 'service', 'member', 'price', 'client', 'appointment_date', 'appointment_time', 'booked_by' , 'booking_id', 'appointment_type')
         
         
 class SingleAppointmentSerializer(serializers.ModelSerializer):

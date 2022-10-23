@@ -394,6 +394,39 @@ def update_service(request):
             status=status.HTTP_404_NOT_FOUND
         )
         
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_all_sale_orders(request):
+    data=[]
+    product_order = ProductOrder.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = ProductOrderSerializer(product_order,  many=True)
+    data.append(serialized.data)
+    
+    service_orders = ServiceOrder.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = ServiceOrderSerializer(service_orders,  many=True)
+    data.append(serialized.data)
+    
+    membership_order = MemberShipOrder.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = MemberShipOrderSerializer(membership_order,  many=True)
+    data.append(serialized.data)
+    
+    voucher_orders = VoucherOrder.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = VoucherOrderSerializer(voucher_orders,  many=True)
+    data.append(serialized.data)
+    
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Sale Orders',
+                'error_message' : None,
+                'sales' : data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+        
         
 @api_view(['GET'])
 @permission_classes([AllowAny])
