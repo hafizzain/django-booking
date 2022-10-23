@@ -804,6 +804,7 @@ def delete_location(request):
     
     if business_address.user == user or business_address.business.user == user :
         business_address.is_deleted = True
+        business_address.save()
         return Response(
             {
                 'status' : True,

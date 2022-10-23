@@ -25,7 +25,6 @@ from Product.models import Product
 from Sale.serializers import MemberShipOrderSerializer, ProductOrderSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
 
 
-
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_service(request):
@@ -580,21 +579,21 @@ def create_sale_order(request):
             try:
                 product = Product.objects.get(id = pro)
                 product_stock = product.product_stock.all().first()
-                print(product_stock)
-                if product_stock.available_quantity == 0:
+                available = product_stock.consumable_quantity + product_stock.sellable_quantity
+                print(available)
+                if available  == 0:
                     return Response(
                     {
                         'status' : False,
                         #'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
                         'response' : {
-                        'message' : 'product_stock  not Avaiable',
+                        'message' : 'consumable_quantity and sellable_quantity not Avaiable',
                         'error_message' : "available_quantity",
                         }
                     },
                 status=status.HTTP_400_BAD_REQUEST
-                )
-                    
-                product_stock.available_quantity -=1
+                )                    
+                #product_stock.available_quantity -=1
                     
                 product_stock.sold_quantity += 1
                 print(product_stock)
