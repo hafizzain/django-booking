@@ -579,7 +579,7 @@ def create_sale_order(request):
             try:
                 product = Product.objects.get(id = pro)
                 product_stock = product.product_stock.all().first()
-                available = product_stock.consumable_quantity + product_stock.sellable_quantity
+                available = int(product_stock.consumable_quantity) + int(product_stock.sellable_quantity)
                 print(available)
                 if available  == 0:
                     return Response(
