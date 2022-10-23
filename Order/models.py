@@ -58,7 +58,7 @@ class Order(models.Model):
     total_price = models.PositiveBigIntegerField(default = 0)
     
     
-    status =  models.CharField(choices=status_choice, max_length=100, default='')
+    status =  models.CharField(choices=status_choice, max_length=100, default='Active')
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
