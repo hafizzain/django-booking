@@ -1,3 +1,4 @@
+from datetime import timedelta
 import imp
 import re
 from django.shortcuts import render
@@ -336,20 +337,14 @@ def update_service(request):
                service_id.parrent_service.add(service)
             except Exception as err:
                 error.append(str(err))
-                
-    # try:
-    #             test = '1689071a-1ddc-4191-95d5-16e16f2b2188'
-    #             employe = Employee.objects.get(id=test)
-    #             service_id.employee.add(employe)
-    # except Exception as err:
-    #             error.append(str(err))
-    
     
     if employeeslist is not None:
+        
         if type(employeeslist) == str:
             employeeslist = json.loads(employeeslist)
         elif type(employeeslist) == list:
             pass
+        
         print(type(employeeslist))
         service_id.employee.clear()
         all_pending_services = EmployeeSelectedService.objects.filter(service=service_id).exclude(employee__in=employeeslist)
@@ -364,7 +359,7 @@ def update_service(request):
                     employee = employe
                 )
                     
-                service_id.employee.add(employe)
+                service_id.employee.add(empl_id)
             except Exception as err:
                 error.append(str(err))
     service_id.save()
@@ -608,7 +603,7 @@ def create_sale_order(request):
                     user = user,
                     client = client,
                     product = product,
-                    status = sale_status,
+                    #status = sale_status,
                     member = member,
                     location = business_address,
                     tip = tip,
@@ -624,7 +619,7 @@ def create_sale_order(request):
                         'status' : False,
                         'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
                         'response' : {
-                        'message' : 'Product not found',
+                        'message' : 'Something Went Wrong',
                         'error_message' : str(err),
                     }
                 },
@@ -656,10 +651,12 @@ def create_sale_order(request):
         for servics in ids:
             try:
                 service = Service.objects.get(id = servics)
+                dur = service.duration
+                
                 service_order = ServiceOrder.objects.create(
                     user = user,
                     service = service,
-                    duration= duration,
+                    duration= dur,
                     
                     client = client,
                     member = member,
@@ -708,13 +705,16 @@ def create_sale_order(request):
         for membership in ids:
             try:
                 membership = Membership.objects.get(id = membership)
+                end_date_cal = membership.created_at +  timedelta(days=membership.validity)
+                start_date_cal = membership.created_at
+                
                 membership_order = MemberShipOrder.objects.create(
                     user= user,
                     
                     membership = membership,
-                    start_date = start_date,
-                    end_date = end_date,
-                    status = sale_status,
+                    start_date = start_date_cal,
+                    end_date = end_date_cal,
+                    #status = sale_status,
                     
                     client = client,
                     member = member,
@@ -761,14 +761,17 @@ def create_sale_order(request):
         
         for vouchers in ids:  
             try:
-                voucher = Vouchers.objects.get(id = vouchers)
+                voucher = Vouchers.objects.get(id = str(vouchers))
+                end_date_cal = voucher.created_at +  timedelta(days=voucher.validity)
+                start_date_cal = voucher.created_at
+                
                 voucher_order =VoucherOrder.objects.create(
                     user = user,
                     
                     voucher = voucher,
-                    start_date = start_date,
-                    end_date = end_date,
-                    status = sale_status,
+                    start_date = start_date_cal,
+                    end_date = end_date_cal,
+                    #status = sale_status,
                     
                     client = client,
                     member = member,
