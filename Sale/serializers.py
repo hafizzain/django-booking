@@ -51,6 +51,13 @@ class ProductOrderSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
     member  = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)
+    product_name  = serializers.SerializerMethodField(read_only=True)
+    
+    def get_product_name(self, obj):
+        try:
+            return obj.product.name
+        except Exception as err:
+            return None
     
     def get_location(self, obj):
         try:
@@ -72,7 +79,7 @@ class ProductOrderSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ProductOrder
-        fields = ['id', 'client','status','created_at', 'location', 'member', 'tip', 'total_price' , 'payment_type' ]
+        fields = ['id', 'client','status','created_at', 'location', 'member', 'tip', 'total_price' , 'payment_type', 'product_name', 'gst' ]
    
         
 class ServiceOrderSerializer(serializers.ModelSerializer):
