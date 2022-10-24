@@ -17,5 +17,6 @@ urlpatterns = [
     path('get_voucher_orders/', views.get_voucher_orders),
     
     path('get_all_sale_orders/', views.get_all_sale_orders),
+    path('get_total_revenue/', views.get_total_revenue),
     
 ]
