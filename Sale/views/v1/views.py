@@ -1,12 +1,14 @@
 from datetime import timedelta
+from http import client
 import imp
 import re
 from django.shortcuts import render
 
 from rest_framework import status
+from Appointment.models import Appointment, AppointmentCheckout, AppointmentService
 from Business.models import Business
 from Client.models import Client, Membership, Vouchers
-from Order.models import MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
+from Order.models import MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
 from Utility.models import Country, State, City
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
@@ -21,6 +23,7 @@ from Business.models import BusinessAddress
 from Service.models import Service
 
 from Product.models import Product
+from django.db.models import Avg, Count, Min, Sum
 
 from Sale.serializers import MemberShipOrderSerializer, ProductOrderSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
 
@@ -499,7 +502,35 @@ def get_voucher_orders(request):
         status=status.HTTP_200_OK
     )
     
-
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_total_revenue(request):
+    
+    total = 0
+    orders_price = Order.objects.filter(is_deleted=False)
+    for order in orders_price:
+        if order.total_price is not  None:
+            total += order.total_price
+    #orders_price = Order.objects.aggregate(Total= Sum('total_price'))
+    
+    price = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Paid')
+    for order in price:
+        if order.total_price is not None:
+            total += order.total_price
+    
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Total Revenue',
+                'error_message' : None,
+                'revenue' : total,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_sale_order(request):
@@ -617,7 +648,7 @@ def create_sale_order(request):
                 
                 if product_stock.consumable_quantity is not None:
                     available = product_stock.consumable_quantity
-                    
+
                 if product_stock.sellable_quantity is not None:
                     available += product_stock.sellable_quantity
                      

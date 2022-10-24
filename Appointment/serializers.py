@@ -282,9 +282,10 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
         if obj.appointment_status == 'Appointment_Booked' or  obj.appointment_status ==  'Arrived'  or obj.appointment_status == 'In Progress' :
             return 'Upcomming'
         
-        elif obj.appointment_status == 'Paid' or obj.appointment_status == 'Done': 
+        if obj.appointment_status == 'Paid' or obj.appointment_status == 'Done': 
             return 'Completed'
-        else:
+        
+        if obj.appointment_status == 'Cancel':
             return 'Cancelled'
             
     def get_appointment_type(self, obj):
