@@ -174,7 +174,7 @@ def create_service(request):
                    service = service_obj,
                    employee = employe
                    )
-                service_obj.employee.add(employe)
+                #service_obj.employee.add(employe)
             except:
                 employees_error.append(str(err))
                 pass
@@ -198,8 +198,7 @@ def create_service(request):
     
     
     
-    
-    payroll_serializers= ServiceSerializer(service_obj)
+    service_serializers= ServiceSerializer(service_obj)
     
     return Response(
             {
@@ -209,7 +208,7 @@ def create_service(request):
                     'message' : 'Service Created Successfully!',
                     'error_message' : None,
                     'employee_error' : employees_error,
-                    'service' : payroll_serializers.data,
+                    'service' : service_serializers.data,
                     
                 }
             },
@@ -345,7 +344,7 @@ def update_service(request):
             pass
         
         print(type(employeeslist))
-        service_id.employee.clear()
+       # service_id.employee.clear()
         all_pending_services = EmployeeSelectedService.objects.filter(service=service_id).exclude(employee__in=employeeslist)
         for empl_service in all_pending_services:
             empl_service.delete()
@@ -358,10 +357,10 @@ def update_service(request):
                     employee = employe
                 )
                     
-                service_id.employee.add(employe)
+                #service_id.employee.add(employe)
             except Exception as err:
                 error.append(str(err))
-    service_id.save()
+    #service_id.save()
     
     serializer= ServiceSerializer(service_id, context={'request' : request} , data=request.data, partial=True)
     if serializer.is_valid():
@@ -613,14 +612,18 @@ def create_sale_order(request):
                 product = Product.objects.get(id = pro)
                 product_stock = product.product_stock.all().first()
                 available = 0
+                print(product_stock.consumable_quantity)
+                print(product_stock.sellable_quantity)
+                
                 if product_stock.consumable_quantity is not None:
                     available = product_stock.consumable_quantity
-                elif product_stock.sellable_quantity is not None:
+                    
+                if product_stock.sellable_quantity is not None:
                     available += product_stock.sellable_quantity
                      
                 #available = int(product_stock.consumable_quantity) + int(product_stock.sellable_quantity)
                 
-                #print(available)
+                print(available)
                 if available  == 0:
                     return Response(
                     {

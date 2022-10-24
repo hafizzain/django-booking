@@ -28,6 +28,12 @@ class Order(models.Model):
         ('Expired', 'Expired'),
         ('Active', 'Active'),        
     ]
+    # SALE_CHOICE=[
+    #     ('Product', 'Product'),
+    #     ('Service', 'Incompleted'),
+    #     ('Expired', 'Expired'),
+    #     ('Active', 'Active'),        
+    # ]
     
     CLIENT_TYPE=[
         ('Walk_in', 'Walk-in'),
@@ -51,6 +57,7 @@ class Order(models.Model):
     duration = models.CharField(max_length=50, choices=DURATION_CHOICES , default = '' )
     client_type = models.CharField(choices = CLIENT_TYPE, max_length=50 , default = '' )
     payment_type = models.CharField(choices = PAYMENT_TYPE, max_length=50 , default = '' )
+    #sale_type = models.CharField(choices = SALE_CHOICE, max_length=50 , default = '' )
     
     current_price =models.PositiveBigIntegerField(default = 0)
     tip =models.PositiveBigIntegerField(default = 0)
