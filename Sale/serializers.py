@@ -33,9 +33,14 @@ class ServiceSearchSerializer(serializers.ModelSerializer):
         fields = ['id','name']
 
 class EmployeeSelectedServiceSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField(read_only=True)
+    
+    def get_full_name(self, obj):
+        return obj.employee.full_name
+    
     class Meta:
         model = EmployeeSelectedService
-        fields = '__all__'
+        fields = ['id', 'service', 'employee', 'level', 'full_name']
 
 class LocationServiceSerializer(serializers.ModelSerializer):
     class Meta:
@@ -53,6 +58,7 @@ class ServiceSerializer(serializers.ModelSerializer):
         
     
     def get_location(self, obj):
+        #loc = BusinessAddress.objects.filter(is_deleted = False)
         return LocationServiceSerializer(obj.location, many = True).data
     
     #employee = EmployeeServiceSerializer(read_only=True, many = True)

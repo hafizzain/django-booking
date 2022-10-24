@@ -276,14 +276,23 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
     booked_by = serializers.SerializerMethodField(read_only=True)
     booking_id = serializers.SerializerMethodField(read_only=True)
     appointment_type = serializers.SerializerMethodField(read_only=True)
+    appointment_status = serializers.SerializerMethodField(read_only=True)
     
+    def get_appointment_status(self, obj):
+        if obj.appointment_status == 'Appointment_Booked' or  obj.appointment_status ==  'Arrived'  or obj.appointment_status == 'In Progress' :
+            return 'Upcomming'
+        
+        elif obj.appointment_status == 'Paid' or obj.appointment_status == 'Done': 
+            return 'Completed'
+        else:
+            return 'Cancelled'
+            
     def get_appointment_type(self, obj):
         try:
             return obj.appointment.client_type
         except Exception as err:
             return None
             
-    
     def get_booked_by(self, obj):
         return f'{obj.user.first_name} {obj.user.last_name}'
     
