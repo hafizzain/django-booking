@@ -318,7 +318,7 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = AppointmentService
-        fields= ('id', 'service', 'member', 'price', 'client', 'appointment_date', 'appointment_time', 'booked_by' , 'booking_id', 'appointment_type')
+        fields= ('id', 'service', 'member', 'price', 'client', 'appointment_date', 'appointment_time', 'booked_by' , 'booking_id', 'appointment_type', 'appointment_status')
         
         
 class SingleAppointmentSerializer(serializers.ModelSerializer):
