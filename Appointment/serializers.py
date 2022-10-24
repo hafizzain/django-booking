@@ -279,7 +279,7 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
     appointment_status = serializers.SerializerMethodField(read_only=True)
     
     def get_appointment_status(self, obj):
-        if obj.appointment_status == 'Appointment_Booked' or  obj.appointment_status ==  'Arrived'  or obj.appointment_status == 'In Progress' :
+        if obj.appointment_status == 'Appointment Booked' or  obj.appointment_status ==  'Arrived'  or obj.appointment_status == 'In Progress' :
             return 'Upcomming'
         
         if obj.appointment_status == 'Paid' or obj.appointment_status == 'Done': 
