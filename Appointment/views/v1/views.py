@@ -260,7 +260,7 @@ def create_appointment(request):
         service = appoinmnt['service']
         duration = appoinmnt['duration']
         date_time = appoinmnt['date_time']
-        fav = appoinmnt['favourite']
+        fav = appoinmnt.get('favourite', None)
         # tip = appoinmnt['tip']
         
         try:
