@@ -39,7 +39,7 @@ class Employee(models.Model):
     joining_date = models.DateField(null=True, blank=True)
     to_present = models.BooleanField(default=False)
     ending_date = models.DateField(null=True, blank=True)
-
+        
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)

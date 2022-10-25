@@ -92,8 +92,6 @@ class ProductOrderSerializer(serializers.ModelSerializer):
     product_name  = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
     
-    
-    
     def get_order_type(self, obj):
         return 'Product'
     

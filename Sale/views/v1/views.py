@@ -9,6 +9,7 @@ from Appointment.models import Appointment, AppointmentCheckout, AppointmentServ
 from Business.models import Business
 from Client.models import Client, Membership, Vouchers
 from Order.models import MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
+from Sale.Constants.Custom_pag import CustomPagination
 from Utility.models import Country, State, City
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
@@ -27,6 +28,24 @@ from django.db.models import Avg, Count, Min, Sum
 
 from Sale.serializers import MemberShipOrderSerializer, ProductOrderSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
 
+
+# @api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+# def get_my_apply_on_jobs(request):
+#     try:
+#         profile = Profile.objects.get(user=request.user, is_deleted=False, user__is_active=True)
+#     except Exception as e:
+#         return Response({"success": False, 'response': {'message': str(e)}},
+#                         status=status.HTTP_404_NOT_FOUND)
+
+#     apply_jobs = list(JobApply.objects.filter(profile=profile, is_deleted=False).values_list('job__id', flat=True))
+
+#     jobapply = Job.objects.filter(id__in=apply_jobs, is_deleted=False)
+#     paginator = CustomPagination()
+#     paginator.page_size = 10
+#     result_page = paginator.paginate_queryset(jobapply, request)
+#     serializer = GetJobSerializer(result_page, many=True)
+#     return paginator.get_paginated_response(serializer.data)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -54,7 +73,7 @@ def create_service(request):
     business = request.data.get('business', None)
     
     name = request.data.get('name', None)
-    treatment_type = request.data.get('treatment_type',None)
+    treatment_type = request.data.get('service_type',None)
     service = request.data.get('service', None)
     
     description = request.data.get('description',None)
@@ -130,6 +149,7 @@ def create_service(request):
         #location=location,
         price=price,
         duration=duration,
+        service_type = treatment_type,
         
         controls_time_slot=controls_time_slot,
         initial_deposit=initial_deposit,
@@ -143,7 +163,7 @@ def create_service(request):
     employees_error = []
     if is_package is not None:
         service_obj.is_package = True
-        service_obj.service_type = treatment_type
+        #service_obj.service_type = treatment_type
         service_obj.save()
         if service is None:
             pass
@@ -399,6 +419,14 @@ def update_service(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_all_sale_orders(request):
+    
+    # #pagination
+    
+    # paginator = CustomPagination()
+    # paginator.page_size = 1
+    # result_page = paginator.paginate_queryset(product_order, request)
+    # serialized = ProductOrderSerializer(result_page,  many=True)
+    
     data=[]
     product_order = ProductOrder.objects.filter(is_deleted=False).order_by('-created_at')
     serialized = ProductOrderSerializer(product_order,  many=True)
@@ -434,6 +462,7 @@ def get_all_sale_orders(request):
 @permission_classes([AllowAny])
 def get_product_orders(request):
     product_order = ProductOrder.objects.filter(is_deleted=False).order_by('-created_at')
+    
     serialized = ProductOrderSerializer(product_order,  many=True)
     return Response(
         {

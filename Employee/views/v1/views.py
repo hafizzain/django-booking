@@ -1,4 +1,5 @@
 from doctest import testfile
+from turtle import circle
 from django.shortcuts import render
 from Employee.models import( Employee , EmployeeProfessionalInfo ,
                         EmployeePermissionSetting,  EmployeeModulePermission
@@ -391,7 +392,7 @@ def create_employee(request):
     city = request.data.get('city', None)
    
     if not all([
-         business_id, full_name ,employee_id, email, country, state, city ,gender  ,address , designation, income_type, salary ]): #or ( not to_present and ending_date is None):
+         business_id, full_name ,employee_id, email, country, gender  ,address , designation, income_type, salary ]): #or ( not to_present and ending_date is None):
        return Response(
             {
                 'status' : False,
@@ -407,7 +408,6 @@ def create_employee(request):
                         'email',
                         'gender', 
                         'country',
-                        'state',  
                         'address' ,
                         'designation',
                         'income_type',
@@ -446,10 +446,10 @@ def create_employee(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    
+        
     try:
         country = Country.objects.get(id=country)
-        state= State.objects.get(id=state)
-        city = City.objects.get(id=city)
     except Exception as err:
         return Response(
             {
@@ -464,6 +464,14 @@ def create_employee(request):
             status=status.HTTP_404_NOT_FOUND
         )
         
+    try:
+        state= State.objects.get(id=state)
+    except:
+        state = None
+    try:
+        city= City.objects.get(id=city)
+    except:
+        city = None
     try:
         staff = StaffGroup.objects.get(id=staff_id)
     except Exception as err:
