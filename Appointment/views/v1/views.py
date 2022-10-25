@@ -260,6 +260,7 @@ def create_appointment(request):
         service = appoinmnt['service']
         duration = appoinmnt['duration']
         date_time = appoinmnt['date_time']
+        fav = appoinmnt['favourite']
         # tip = appoinmnt['tip']
         
         try:
@@ -289,7 +290,7 @@ def create_appointment(request):
                 }
             }
         )
-        
+            
         appointment_service = AppointmentService.objects.create(
             user = user,
             business = business,
@@ -301,6 +302,10 @@ def create_appointment(request):
             member = member,
             # tip=tip,
         )
+        if fav is not None:
+            appointment_service.is_favourite = True
+            appointment_service.save()
+            
         if business_address_id is not None:
             appointment_service.business_address = business_address
             appointment_service.save()

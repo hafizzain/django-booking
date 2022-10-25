@@ -94,7 +94,8 @@ class AppointmentService(models.Model):
 
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='serivce_appointments', null=True, blank=True)
     member = models.ForeignKey(Employee, on_delete=models.SET_NULL, related_name='member_appointments', null=True, blank=True)
-    
+    is_favourite = models.BooleanField(default = False)
+        
     appointment_date = models.DateField()
     appointment_time = models.TimeField()
 
@@ -104,7 +105,8 @@ class AppointmentService(models.Model):
     
     end_time = models.TimeField(null=True, blank=True)
     destails = models.CharField(max_length=255, null=True, blank=True)
-
+    
+    
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)

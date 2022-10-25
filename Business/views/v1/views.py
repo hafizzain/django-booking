@@ -916,31 +916,33 @@ def update_location(request):
 
         business_address.save()
         
-    days = [
-        'monday',
-        'tuesday',
-        'wednesday',
-        'thursday',
-        'friday',
-        'saturday',
-        'sunday',
-    ]
-    
-    for day in days:
-        try:
-            bds_schedule = BusinessOpeningHour.objects.get(business_address=business_address, day=day)
-    
-        except Exception as err:
-            pass
+        days = [
+            'monday',
+            'tuesday',
+            'wednesday',
+            'thursday',
+            'friday',
+            'saturday',
+            'sunday',
+        ]
         
-        s_day = opening_day.get(day.lower(), None)
-        if s_day is not None:
-            bds_schedule.start_time = s_day['start_time']
-            bds_schedule.close_time = s_day['end_time']
-        else:
-            bds_schedule.is_closed = True
+        for day in days:
+            try:
+                bds_schedule = BusinessOpeningHour.objects.get(business_address=business_address, day=day)
+        
+            except Exception as err:
+                pass
+            
+            print(day)
+            s_day = opening_day.get(day.lower(), None)
+            print(s_day)
+            if s_day is not None:
+                bds_schedule.start_time = s_day['start_time']
+                bds_schedule.close_time = s_day['end_time']
+            else:
+                bds_schedule.is_closed = True
 
-        bds_schedule.save()
+            bds_schedule.save()
         
         # start_time = request.data.get('start_time', None)
         # close_time = request.data.get('close_time', None)
