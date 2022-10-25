@@ -187,6 +187,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'vendor',
             'category',
             'brand', 
+            'created_at',
         ]
         read_only_fields = ['slug', 'id']
 class ProductOrderSerializer(serializers.ModelSerializer):

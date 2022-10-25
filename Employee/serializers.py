@@ -477,7 +477,8 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'designation', 
             'level',
             'employee_id',
-            'employee_info',      
+            'employee_info',  
+            'created_at'    
             ]   
         
 class CommissionSerializer(serializers.ModelSerializer):
