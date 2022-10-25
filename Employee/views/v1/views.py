@@ -1,5 +1,3 @@
-from doctest import testfile
-from turtle import circle
 from django.shortcuts import render
 from Employee.models import( Employee , EmployeeProfessionalInfo ,
                         EmployeePermissionSetting,  EmployeeModulePermission
