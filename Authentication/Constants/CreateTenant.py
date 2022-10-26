@@ -126,7 +126,8 @@ def create_global_permission(tenant=None, user = None, business=None):
                         'order',
                         'view',
                         'modify',
-                        'cancel reschedule',
+                        'cancel',
+                        'reschedule',
                     ]
             for per in permission:
                 GlobalPermissionChoices.objects.create(

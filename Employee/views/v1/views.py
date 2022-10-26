@@ -558,7 +558,7 @@ def create_employee(request):
                 if services['service'] is not None:
                     ser = Service.objects.get(id=services['service'])
                 
-                    EmployeeSelectedService.objects.create(
+                    EmployeeSelectedService.objects.get_or_create(
                         employee = employee,
                         service = ser,
                         level = services['level']
