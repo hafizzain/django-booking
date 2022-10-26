@@ -1374,6 +1374,7 @@ def create_attendence(request):
     employees = request.data.get('employees', None)
     is_active= request.data.get('is_active' , False)
     in_time= request.data.get('in_time', None)
+    out_time= request.data.get('out_time', None)
     
     if not all([ business, employees , in_time  ]):
          return Response(
@@ -1426,6 +1427,7 @@ def create_attendence(request):
         business= business_id,
         employee=employee_id,
         in_time= in_time,
+        out_time = out_time,
         is_active=is_active,
     )
     
@@ -1438,7 +1440,7 @@ def create_attendence(request):
                 'response' : {
                     'message' : 'Attendence Created Successfully!',
                     'error_message' : None,
-                    'StaffGroup' : attendece_serializers.data,
+                    'attendence' : attendece_serializers.data,
                 }
             },
             status=status.HTTP_201_CREATED
