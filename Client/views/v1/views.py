@@ -1871,12 +1871,12 @@ def create_vouchers(request):
     value = request.data.get('value', None)
     voucher_type= request.data.get('voucher_type', None)
     
-    valid_for = request.data.get('valid_for', None)
+    #valid_for = request.data.get('valid_for', None)
     validity= request.data.get('validity', None)
     
     sales = request.data.get('sales', None)
     price = request.data.get('price', None)
-    if not all([business_id , name , value ,valid_for,sales, price, voucher_type, validity]):
+    if not all([business_id , name , value ,sales, price, voucher_type, validity]):
         return Response(
             {
                 'status' : False,
@@ -1890,7 +1890,6 @@ def create_vouchers(request):
                           'name',
                           'value',
                           'voucher_type' ,
-                          'valid_for', 
                           'sales',
                           'price', 
                           'validity',
@@ -1925,7 +1924,7 @@ def create_vouchers(request):
         name = name,
         value = value,
         voucher_type=voucher_type,
-        valid_for = valid_for,
+        #valid_for = valid_for,
         sales = sales,
         price = price,    
         validity=validity 

@@ -38,7 +38,7 @@ def Add_appointment(appointment = None, tenant = None):
                 name = appo.appointment.client.full_name  
                 
                 try:     
-                    html_file = render_to_string("AppointmentEmail/email_for_client_appointment.html", {'client': True, 'staff': False,'name': mem_name,'t_name':mem_name , 'ser_name':ser_name , 'date':dat, 'mem_id':mem_id, 'client_type': client_type})
+                    html_file = render_to_string("AppointmentEmail/email_for_client_appointment.html", {'client': True, 'staff': False,'name': name_c,'t_name':mem_name , 'ser_name':ser_name , 'date':dat, 'mem_id':mem_id, 'client_type': client_type})
                     text_content = strip_tags(html_file)
                         
                     email = EmailMultiAlternatives(
