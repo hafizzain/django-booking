@@ -153,6 +153,49 @@ def import_employee(request):
     return Response({'Status' : 'Success'})
         
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def import_attendance(request):
+    attendence_csv = request.data.get('file', None)
+    business_id = request.data.get('business', None)
+    user= request.user
+    
+
+    file = NstyleFile.objects.create(
+        file = attendence_csv
+    )
+    with open( file.file.path , 'r', encoding='utf-8') as imp_file:
+        for index, row in enumerate(imp_file):
+            if index == 0:
+                continue
+            
+            row = row.split(',')
+            row = row
+            if len(row) < 5:
+                print(len(row))
+                continue
+                #pass
+            emp_name= row[0].strip('"')
+            
+        try: 
+            employee_name = Employee.objects.get(full_name=emp_name, is_deleted=False)
+        except Exception as err:
+            return Response(
+                    {
+                        'status' : False,
+                        'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                        'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                        'response' : {
+                            'message' : 'Employee Not Found',
+                            'error_message' : str(err),
+                        }
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        
+            
+
+
 # Create your views here.
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -283,6 +326,59 @@ def get_single_employee(request):
         status=status.HTTP_200_OK
     )
 
+ 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def single_employee_schedule(request): 
+    employee_id = request.GET.get('employee_id', None)
+
+    if not all([employee_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Employee id are required',
+                    'fields' : [
+                        'employee_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try: 
+        employee_id = Employee.objects.get(id=employee_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                    'response' : {
+                        'message' : 'Employee Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    serializer = WorkingScheduleSerializer(employee_id)
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Single Employee',
+                'error_message' : None,
+                'employee' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+    
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -1278,6 +1374,7 @@ def create_attendence(request):
     employees = request.data.get('employees', None)
     is_active= request.data.get('is_active' , False)
     in_time= request.data.get('in_time', None)
+    out_time= request.data.get('out_time', None)
     
     if not all([ business, employees , in_time  ]):
          return Response(
@@ -1330,6 +1427,7 @@ def create_attendence(request):
         business= business_id,
         employee=employee_id,
         in_time= in_time,
+        out_time = out_time,
         is_active=is_active,
     )
     
@@ -1342,7 +1440,7 @@ def create_attendence(request):
                 'response' : {
                     'message' : 'Attendence Created Successfully!',
                     'error_message' : None,
-                    'StaffGroup' : attendece_serializers.data,
+                    'attendence' : attendece_serializers.data,
                 }
             },
             status=status.HTTP_201_CREATED

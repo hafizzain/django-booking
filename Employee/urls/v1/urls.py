@@ -44,6 +44,7 @@ urlpatterns = [
     
     #Working Schedule
     path('working_schedule/', views.working_schedule),
+    path('single_employee_schedule/', views.single_employee_schedule),
     
     #Generate ID
     path('generate_id/', views.generate_id)

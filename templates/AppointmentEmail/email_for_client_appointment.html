@@ -206,24 +206,23 @@
                       </tr>
                     </thead>
                     <tbody>
-                      {% for appo in appointment %}
                       <tr>
                         <td
                           style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">
-                          {{appo.member.full_name}}</td>
+                          {{name}}</td>
                         <td
                           style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">
-                          {{appo.service.name}}</td>
+                          {{ser_name}}</td>
                         <td
                           style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">
-                          {{appo.appointment.client_type}}</td>
+                          {{client_type}}</td>
                         <td
                           style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">
-                          {{appo.appointment_date}}</td>
+                          {{date}}</td>
 
                       </tr>
 
-                      {% endfor %}
+
                     </tbody>
                   </table>
 

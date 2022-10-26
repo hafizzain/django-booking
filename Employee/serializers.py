@@ -344,7 +344,7 @@ class AttendanceSerializers(serializers.ModelSerializer):
     class Meta:
         model = Attendance
         
-        fields = ['id','user','business','employee','in_time','out_time','is_active','employee']
+        fields = ['id','user','business','employee','in_time','out_time','is_active','created_at','employee']
         
 class InformationPayrollSerializer(serializers.ModelSerializer):
     class Meta:
@@ -477,7 +477,8 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'designation', 
             'level',
             'employee_id',
-            'employee_info',      
+            'employee_info',  
+            'created_at'    
             ]   
         
 class CommissionSerializer(serializers.ModelSerializer):

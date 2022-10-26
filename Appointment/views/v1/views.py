@@ -1,4 +1,3 @@
-from pickle import GET
 from django.shortcuts import render
 
 from Appointment.Constants.Reschedule import reschedule_appointment
@@ -339,7 +338,6 @@ def create_appointment(request):
             status=status.HTTP_201_CREATED
     )
  
- 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_appointment(request):
@@ -644,8 +642,6 @@ def update_blocktime(request):
         },
         status=status.HTTP_200_OK
         )
-
-
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
