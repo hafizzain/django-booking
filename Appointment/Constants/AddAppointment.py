@@ -36,20 +36,21 @@ def Add_appointment(appointment = None, tenant = None):
                 mem_id= appo.member.employee_id
                 client_type= appo.appointment.client_type
                 name = appo.appointment.client.full_name  
-
-                html_file = render_to_string("AppointmentEmail/add_appointment.html", {'client': False, 'staff': True,'name': name,'email': email_c, 'ser_name':ser_name ,'t_name':mem_name , 'date':dat, 'mem_id':mem_id, 'client_type': client_type})
-                text_content = strip_tags(html_file)
                 
-                email = EmailMultiAlternatives(
-                    'Appointment Added',
-                    text_content,
-                    settings.EMAIL_HOST_USER,
-                    to = [mem_email],
+        #{'client': False, 'staff': True,'name': name,'email': email_c, 'ser_name':ser_name ,'t_name':mem_name , 'date':dat, 'mem_id':mem_id, 'client_type': client_type}
+            html_file = render_to_string("AppointmentEmail/add_appointment.html",{'client': False, 'appointment' : appointment,'staff': True,'t_name':mem_name} )
+            text_content = strip_tags(html_file)
+            
+            email = EmailMultiAlternatives(
+                'Appointment Added',
+                text_content,
+                settings.EMAIL_HOST_USER,
+                to = [mem_email],
+            )
                 
-                )
-                email.attach_alternative(html_file, "text/html")
-                email.send()
-        
+            email.attach_alternative(html_file, "text/html")
+            email.send()
+    
         except Exception as err:
             ExceptionRecord.objects.create(
                 text=str(err)
@@ -60,7 +61,7 @@ def Add_appointment(appointment = None, tenant = None):
         #email_c = appointment.client.email
 
         try:     
-            html_file = render_to_string("AppointmentEmail/add_appointment.html", {'client': True, 'staff': False,'name': name_c,'t_name':name , 'ser_name':ser_name , 'date':dat, 'mem_id':mem_id, 'client_type': client_type})
+            html_file = render_to_string("AppointmentEmail/email_for_client_appointment.html", {'client': False, 'staff': True,'name': name_c,'t_name':name , 'ser_name':ser_name , 'date':dat, 'mem_id':mem_id, 'client_type': client_type})
             text_content = strip_tags(html_file)
                 
             email = EmailMultiAlternatives(
@@ -76,4 +77,3 @@ def Add_appointment(appointment = None, tenant = None):
             ExceptionRecord.objects.create(
                 text=str(err)
             )
-            print(err)
