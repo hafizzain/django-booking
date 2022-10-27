@@ -151,6 +151,20 @@ class Vouchers(models.Model):
         ('Product' , 'Product'),
         ('Service' , 'Service'),
     ]
+    VALIDITY_DAY=[
+        ('7 Days' , '7 Days'),
+        ('14 Days' , '14 Days'),
+        ('1 Month' ,  '1 Months'),
+        ('2 Months' , '2 Months'),
+        ('3 Months' , '3 Months'),
+        ('4 Months' , '4 Months'),
+        ('6 Months' , '6 Months'),
+        ('8 Months' , '8 Months'),
+        ('1 Years' , '1 Years'),
+        ('18 Months' , '18 Months'),
+        ('2 Years' , '2 Years'),
+        ('5 Years' , '5 Years'),
+    ]
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_voucher', verbose_name='Creator ( User )')
@@ -163,11 +177,12 @@ class Vouchers(models.Model):
     # service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_voucher')
     # product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_voucher')
     
-    valid_for = models.CharField(choices=VALIDITY_CHOICE, default='Months' , verbose_name='Validity for Days or Months', max_length=20)
+    #valid_for = models.CharField(choices=VALIDITY_CHOICE, default='Months' , verbose_name='Validity for Days or Months', max_length=20)
 
     # days = models.PositiveIntegerField(default=0, verbose_name='No. of Days', null=True, blank=True)
     # months = models.PositiveIntegerField(default=0, verbose_name='No. of Months', null=True, blank=True)
-    validity = models.PositiveIntegerField(default=0, verbose_name='No of Days/Month')
+    #validity = models.PositiveIntegerField(default=0, verbose_name='No of Days/Month')
+    validity = models.CharField(choices=VALIDITY_DAY, default='7 Days' ,verbose_name='No of Days/Month', max_length = 100)
     
     
     sales = models.PositiveIntegerField(default=0)

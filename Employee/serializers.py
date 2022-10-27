@@ -605,7 +605,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Employee
-        fields = ['id', 'full_name','image','start_time', 'end_time', 'monday','tuesday','wednesday','thursday','friday','saturday','sunday']
+        fields = ['id', 'full_name','image','start_time', 'end_time', 'monday','tuesday','wednesday','thursday','friday','saturday','sunday','created_at']
 
 
 

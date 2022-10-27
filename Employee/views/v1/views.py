@@ -1,3 +1,4 @@
+from time import strptime
 from django.shortcuts import render
 from Employee.models import( Employee , EmployeeProfessionalInfo ,
                         EmployeePermissionSetting,  EmployeeModulePermission
@@ -22,7 +23,7 @@ from threading import Thread
 from Employee.Constants.Add_Employe import add_employee
 from Service.models import Service
 from rest_framework import status
-from Business.models import Business
+from Business.models import Business, BusinessAddress
 from Utility.models import Country, State, City
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
@@ -160,7 +161,20 @@ def import_attendance(request):
     business_id = request.data.get('business', None)
     user= request.user
     
-
+    try:
+        business=Business.objects.get(id=business_id)
+    except Exception as err:
+        return Response(
+            {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                }
+            }
+    
+        )
     file = NstyleFile.objects.create(
         file = attendence_csv
     )
@@ -171,16 +185,28 @@ def import_attendance(request):
             
             row = row.split(',')
             row = row
-            if len(row) < 5:
-                print(len(row))
+            if len(row) < 4:
                 continue
                 #pass
             emp_name= row[0].strip('"')
+            # if emp_name == '':
+            #     return Response(
+            #         {
+            #             'status' : False,
+            #             'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+            #             'status_code_text' : 'INVALID_EMPLOYEE_4025',
+            #             'response' : {
+            #                 'message' : 'Employee Not Found',
+            #                 'error_message' : 'Error' ,
+            #             }
+            #         },
+            #         status=status.HTTP_404_NOT_FOUND
+            #     )
             
-        try: 
-            employee_name = Employee.objects.get(full_name=emp_name, is_deleted=False)
-        except Exception as err:
-            return Response(
+            try: 
+                employee_id = Employee.objects.filter(full_name=emp_name, is_deleted=False).first()
+            except Exception as err:
+                return Response(
                     {
                         'status' : False,
                         'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
@@ -192,9 +218,38 @@ def import_attendance(request):
                     },
                     status=status.HTTP_404_NOT_FOUND
                 )
-        
+            in_time = row[1].strip('"')
+            out_time = row[2].strip('"')
+            status_att = row[3].strip('"')
             
+            create_attendence = Attendance.objects.create(
+                user = user,
+                business = business,
+                employee = employee_id,
+                in_time = in_time,
+                out_time = out_time,
+                #is_active = status_att,
+                
+            )
+            if status_att.strip() ==  'Active':
+                create_attendence.is_active =True
+                create_attendence.save()
+            else :
+                create_attendence.is_active = False
+                create_attendence.save()
+            # if out_time == strptime('%H:%M:%S') :
+            #     print('enter')
+            #     create_attendence.out_time =out_time
+            #     create_attendence.save()
+            # else:
+            #     create_attendence.out_time =None
+            #     create_attendence.save()
 
+            #print(f'Added Product {create_attendence} ... {employee_id} ')
+
+    file.delete()
+    return Response({'Status' : 'Success'})
+        
 
 # Create your views here.
 @api_view(['GET'])
@@ -383,10 +438,8 @@ def single_employee_schedule(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def working_schedule(request):
-    data=[]
     all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
     serialized = WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request} )
-    data.append(serialized.data)
    
     return Response(
         {
@@ -395,7 +448,7 @@ def working_schedule(request):
             'response' : {
                 'message' : 'All Employee',
                 'error_message' : None,
-                'employees' : data
+                'employees' : serialized.data
             }
         },
         status=status.HTTP_200_OK

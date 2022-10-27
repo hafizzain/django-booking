@@ -854,17 +854,31 @@ def create_sale_order(request):
             status=status.HTTP_201_CREATED
         )
         
-    elif sale_type == 'VOUCHER':
-        # if type(voucher_id) == str:
-        #     voucher_id = json.loads(voucher_id)
-
-        # elif type(voucher_id) == list:
-        #     pass
-        
+    elif sale_type == 'VOUCHER':  
+              
         for vouchers in ids:  
             try:
+                days = 0
                 voucher = Vouchers.objects.get(id = str(vouchers))
-                end_date_cal = voucher.created_at +  timedelta(days=voucher.validity)
+                test = voucher.validity.split(" ")[1]
+                
+                if test == 'Days':
+                    day = voucher.validity.split(" ")[0]
+                    day = int(day)
+                    days = day  
+                    
+                elif test == 'Months':
+                    day = voucher.validity.split(" ")[0]
+                    data = int(day)
+                    days = data *  30
+                    
+                                        
+                elif test == 'Years':
+                    day = voucher.validity.split(" ")[0]
+                    day = int(day)
+                    days = day * 360
+                print(days)
+                end_date_cal = voucher.created_at +  timedelta(days=days)
                 start_date_cal = voucher.created_at
                 
                 voucher_order =VoucherOrder.objects.create(
