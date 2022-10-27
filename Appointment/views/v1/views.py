@@ -18,7 +18,7 @@ from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
 from django.db.models import Q
-from Client.models import Client
+from Client.models import Client, Membership, Promotion, Rewards, Vouchers
 from datetime import date
 from threading import Thread
 
@@ -260,8 +260,32 @@ def create_appointment(request):
         duration = appoinmnt['duration']
         date_time = appoinmnt['date_time']
         fav = appoinmnt.get('favourite', None)
+        
+        voucher_id = appoinmnt.get('voucher', None)
+        reward_id = appoinmnt.get('reward', None)
+        membership_id = appoinmnt.get('membership', None)
+        promotion_id = appoinmnt.get('promotion', None)
         # tip = appoinmnt['tip']
         
+        try:
+            voucher = Vouchers.objects.get(id = voucher_id )
+        except:
+            voucher = None
+            
+        try:
+            reward = Rewards.objects.get(id = reward_id )
+        except:
+            reward = None
+        try:
+            membership = Membership.objects.get(id = membership_id )
+        except:
+            membership = None
+        
+        try:
+            promotion = Promotion.objects.get(id = promotion_id )
+        except:
+            promotion = None
+            
         try:
             member=Employee.objects.get(id=member)
             all_members.append(str(member.id))
@@ -299,6 +323,11 @@ def create_appointment(request):
             appointment_date = appointment_date,
             service = service,
             member = member,
+            
+            voucher = voucher,
+            reward = reward,
+            membership = membership,
+            promotion = promotion
             # tip=tip,
         )
         if fav is not None:

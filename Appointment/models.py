@@ -7,7 +7,7 @@ from Authentication.models import User
 from Business.models import Business, BusinessAddress
 from django.utils.timezone import now
 from Service.models import Service
-from Client.models import Client
+from Client.models import Client, Membership, Promotion, Rewards, Vouchers
 from Employee.models import Employee
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 
@@ -156,6 +156,10 @@ class AppointmentCheckout(models.Model):
     member = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='checkout_member_appointments', null=True, blank=True)
     business_address = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='appointment_address_checkout')
 
+    voucher =models.ForeignKey(Vouchers, on_delete=models.CASCADE, related_name='checkout_voucher_appointments', null=True, blank=True) 
+    promotion =models.ForeignKey(Promotion, on_delete=models.CASCADE, related_name='checkout_promotion_appointments', null=True, blank=True) 
+    membership =models.ForeignKey(Membership, on_delete=models.CASCADE, related_name='checkout_membership_appointments', null=True, blank=True) 
+    rewards =models.ForeignKey(Rewards, on_delete=models.CASCADE, related_name='checkout_reward_appointments', null=True, blank=True) 
     
     tip = models.PositiveIntegerField(default=0, null=True, blank=True)
     gst = models.PositiveIntegerField(default=0, null=True, blank=True)

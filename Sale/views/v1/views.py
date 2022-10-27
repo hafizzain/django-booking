@@ -854,7 +854,8 @@ def create_sale_order(request):
             status=status.HTTP_201_CREATED
         )
         
-    elif sale_type == 'VOUCHER':        
+    elif sale_type == 'VOUCHER':  
+              
         for vouchers in ids:  
             try:
                 days = 0
@@ -876,9 +877,6 @@ def create_sale_order(request):
                     day = voucher.validity.split(" ")[0]
                     day = int(day)
                     days = day * 360
-                    
-                    
-
                 print(days)
                 end_date_cal = voucher.created_at +  timedelta(days=days)
                 start_date_cal = voucher.created_at
