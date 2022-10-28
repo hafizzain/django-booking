@@ -64,9 +64,18 @@ class EmployeeMarketingSerializers(serializers.ModelSerializer):
         exclude = ['employee', 'created_at', 'id']
         
 class EmployeeServiceSerializer(serializers.ModelSerializer):
+    service_name = serializers.SerializerMethodField()
+    
+    def get_service_name(self, obj):
+        try:
+            name = Service.objects.get(id = obj.service.id)
+            return name.name
+        except Exception as err:
+            print(err)
+            return None
     class Meta:
         model = EmployeeSelectedService
-        fields = '__all__'
+        fields = ['employee','level', 'service', 'id', 'service_name']
         
 class GlobalPermissionOptionSerializer(serializers.ModelSerializer):
     
@@ -354,6 +363,8 @@ class InformationPayrollSerializer(serializers.ModelSerializer):
 class EmployPayrollSerializers(serializers.ModelSerializer):
     salary = serializers.SerializerMethodField(read_only=True)
     income_type = serializers.SerializerMethodField(read_only=True)
+    start_time = serializers.SerializerMethodField(read_only=True)
+    end_time = serializers.SerializerMethodField(read_only=True)
     
     def get_salary(self, obj):
         try:
@@ -368,13 +379,29 @@ class EmployPayrollSerializers(serializers.ModelSerializer):
             return income_info.income_type 
         except: 
             return None
+        
+    def get_start_time(self, obj):
+        try:
+            start_time = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return start_time.start_time 
+        except: 
+            return None
+    def get_end_time(self, obj):
+        try:
+            end_time = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return end_time.end_time 
+        except: 
+            return None
     
     class Meta:
         model= Employee
         fields = [
            'id',
             'income_type',
-            'salary'
+            'salary',
+            'start_time',
+            'end_time',
+            
          ]        
 class PayrollSerializers(serializers.ModelSerializer):
     employee = EmployPayrollSerializers(read_only=True)
