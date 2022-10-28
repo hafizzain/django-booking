@@ -398,6 +398,16 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
     country_name = serializers.SerializerMethodField(read_only=True)
     state_name = serializers.SerializerMethodField(read_only=True)
     city_name = serializers.SerializerMethodField(read_only=True)   
+    services = serializers.SerializerMethodField(read_only=True)
+
+    def get_services(self, obj):
+        try:
+            service = EmployeeSelectedService.objects.filter(employee=obj)
+            return EmployeeServiceSerializer(service, many = True).data
+            # return EmployeeServiceSerializer(obj.services).data
+        except Exception as err:
+            print(err)
+            None
     
     def get_country_name(self, obj):
         try:
@@ -478,6 +488,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'level',
             'employee_id',
             'employee_info',  
+            'services',
             'created_at'    
             ]   
         

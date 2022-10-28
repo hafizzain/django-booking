@@ -3,7 +3,7 @@ from uuid import uuid4
 from django.db import models
 from Authentication.models import User
 from Business.models import BusinessAddress
-from Client.models import Client, Membership, Vouchers
+from Client.models import Client, Membership, Promotion, Rewards, Vouchers
 from django.utils.timezone import now
 from Employee.models import Employee
 from Product.models import Product
@@ -58,6 +58,11 @@ class Order(models.Model):
     client_type = models.CharField(choices = CLIENT_TYPE, max_length=50 , default = '' )
     payment_type = models.CharField(choices = PAYMENT_TYPE, max_length=50 , default = '' )
     #sale_type = models.CharField(choices = SALE_CHOICE, max_length=50 , default = '' )
+    
+    #voucher =models.ForeignKey(Vouchers, on_delete=models.CASCADE, related_name='checkout_voucher_orders', null=True, blank=True) 
+    promotion =models.ForeignKey(Promotion, on_delete=models.CASCADE, related_name='checkout_promotion_orders', null=True, blank=True) 
+    #membership =models.ForeignKey(Membership, on_delete=models.CASCADE, related_name='checkout_membership_orders', null=True, blank=True) 
+    rewards =models.ForeignKey(Rewards, on_delete=models.CASCADE, related_name='checkout_reward_orders', null=True, blank=True) 
     
     current_price =models.PositiveBigIntegerField(default = 0)
     tip =models.PositiveBigIntegerField(default = 0)

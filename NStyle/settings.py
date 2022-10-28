@@ -53,6 +53,7 @@ NSTYLE_APPS = [
     'Sale.apps.SaleConfig',
     'Permissions.apps.PermissionsConfig',
     'Order.apps.OrderConfig',
+    'Dashboard.apps.DashboardConfig',
 ]
 
 

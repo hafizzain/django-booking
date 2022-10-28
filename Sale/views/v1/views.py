@@ -712,8 +712,6 @@ def create_sale_order(request):
                     total_price = total_price, 
                     payment_type= payment_type,
                     client_type = client_type,
-                    
-                    
                 )
             except Exception as err:
                 return Response(
