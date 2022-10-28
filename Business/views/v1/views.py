@@ -409,11 +409,8 @@ def update_business_additional_information(request):
             status=status.HTTP_200_OK
         )
 
-    
-
 # business_types
 # software_used
-
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -2278,8 +2275,6 @@ def get_business_taxes(request):
             status=status.HTTP_200_OK
         )
 
-    
-
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_business_tax(request):
@@ -2330,9 +2325,6 @@ def delete_business_tax(request):
             },
             status=status.HTTP_200_OK
         )
-
-    
-
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -2602,8 +2594,7 @@ def delete_business_vendor(request):
             },
             status=status.HTTP_200_OK
         )
-    
-    
+        
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def search_business_vendor(request):
@@ -2646,4 +2637,4 @@ def search_business_vendor(request):
         },
         status=status.HTTP_200_OK
     )
-
+    

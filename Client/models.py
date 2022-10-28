@@ -3,7 +3,7 @@ from django.db import models
 
 from uuid import uuid4
 from Authentication.models import User
-from Business.models import Business
+from Business.models import Business, BusinessAddress
 
 from Utility.models import Country, State, City
 from django.utils.timezone import now
@@ -21,6 +21,8 @@ class Client(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='client')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_client')
+    
+    #business_addess = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE,  null=True, blank=True,  related_name='business_addess_client')
 
     full_name = models.CharField(max_length=300, default='')
     image = models.ImageField(upload_to='client/client_images/', null=True, blank=True)
