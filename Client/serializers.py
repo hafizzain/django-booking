@@ -51,7 +51,7 @@ class ClientSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Client
-        fields =['id','full_name','image','client_id','email','mobile_number','dob','postal_code','address','gender','card_number','country','city','state', 'is_active', 'country_obj']
+        fields =['id','full_name','image','client_id','email','mobile_number','dob','postal_code','address','gender','card_number','country','city','state', 'is_active', 'country_obj', 'created_at']
         
         
 class ClientGroupSerializer(serializers.ModelSerializer):

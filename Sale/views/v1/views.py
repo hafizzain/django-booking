@@ -10,6 +10,7 @@ from Business.models import Business
 from Client.models import Client, Membership, Vouchers
 from Order.models import MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
 from Sale.Constants.Custom_pag import CustomPagination
+from Utility.Constants.Data.months import MONTHS
 from Utility.models import Country, State, City
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
@@ -25,6 +26,7 @@ from Service.models import Service
 
 from Product.models import Product
 from django.db.models import Avg, Count, Min, Sum
+
 
 from Sale.serializers import MemberShipOrderSerializer, ProductOrderSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
 
@@ -534,16 +536,35 @@ def get_voucher_orders(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_total_revenue(request):
+    data = {}
+    appointment = AppointmentCheckout.objects.filter(is_deleted=False)
     
+    for ind, value in enumerate(MONTHS):
+        print(f"index{ind+1} ..value{value} ")
+        data[ind] = {}
+        data[ind]['value'] = value
+
+        # for app in appointment:
+        
+        #     create_at = str(app.created_at)
+        #     if (create_at.split(" ")[0] == date ):
+        #         appointments_count +=1
+        #         if app.total_price is not None:
+        #             total_revenue += app.total_price
+    print(data)
     total = 0
+    appointmemnt_sale = 0
+    order_sale = 0
     orders_price = Order.objects.filter(is_deleted=False)
     for order in orders_price:
+        order_sale +=1
         if order.total_price is not  None:
             total += order.total_price
     #orders_price = Order.objects.aggregate(Total= Sum('total_price'))
     
     price = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Paid')
     for order in price:
+        appointmemnt_sale +=1
         if order.total_price is not None:
             total += order.total_price
     
@@ -555,6 +576,8 @@ def get_total_revenue(request):
                 'message' : 'Total Revenue',
                 'error_message' : None,
                 'revenue' : total,
+                'sale': order_sale,
+                'appointment_sale': appointmemnt_sale,
             }
         },
         status=status.HTTP_200_OK
@@ -672,18 +695,17 @@ def create_sale_order(request):
                 product = Product.objects.get(id = pro)
                 product_stock = product.product_stock.all().first()
                 available = 0
-                print(product_stock.consumable_quantity)
-                print(product_stock.sellable_quantity)
+                # print(product_stock.consumable_quantity)
+                # print(product_stock.sellable_quantity)
                 
                 if product_stock.consumable_quantity is not None:
-                    available = product_stock.consumable_quantity
+                    available += int(product_stock.consumable_quantity)
 
                 if product_stock.sellable_quantity is not None:
                     available += product_stock.sellable_quantity
                      
                 #available = int(product_stock.consumable_quantity) + int(product_stock.sellable_quantity)
                 
-                print(available)
                 if available  == 0:
                     return Response(
                     {
@@ -713,6 +735,8 @@ def create_sale_order(request):
                     payment_type= payment_type,
                     client_type = client_type,
                 )
+                product_order.sold_quantity =  product_stock.sold_quantity
+                product_order.save()
             except Exception as err:
                 return Response(
                     {

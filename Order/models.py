@@ -68,6 +68,7 @@ class Order(models.Model):
     tip =models.PositiveBigIntegerField(default = 0)
     gst = models.PositiveBigIntegerField(default = 0)
     total_price = models.PositiveBigIntegerField(default = 0)
+    sold_quantity = models.PositiveBigIntegerField(default = 0,)
     
     
     status =  models.CharField(choices=status_choice, max_length=100, default='Active')

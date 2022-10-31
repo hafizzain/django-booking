@@ -6,6 +6,7 @@ from Client.models import Client, Membership
 from Employee.models import Employee, EmployeeSelectedService
 from Business.models import BusinessAddress
 from Order.models import MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
+from Product.models import ProductStock
 
 from Service.models import Service
 
@@ -91,6 +92,14 @@ class ProductOrderSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
     product_name  = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
+    #item_sold = serializers.SerializerMethodField(read_only=True)
+    
+    # def get_item_sold(self, obj):
+    #     try:
+    #         product_stck =ProductStock.objects.get(product = obj)
+    #         return product_stck.sold_quantity
+    #     except Exception as err:
+    #         print(err)
     
     def get_order_type(self, obj):
         return 'Product'
@@ -124,7 +133,7 @@ class ProductOrderSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ProductOrder
-        fields = ['id', 'client','status','created_at', 'location', 'member', 'tip', 'total_price' , 'payment_type', 'product_name', 'gst', 'order_type' ]
+        fields = ['id', 'client','status','created_at', 'location', 'member', 'tip', 'total_price' , 'payment_type', 'product_name', 'gst', 'order_type', 'sold_quantity' ]
    
         
 class ServiceOrderSerializer(serializers.ModelSerializer):
