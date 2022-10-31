@@ -555,7 +555,7 @@ class AssetSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Asset
-        fields = ['id','name','employee','given_date','return_date', 'document']
+        fields = ['id','name','employee','given_date','return_date', 'document', 'created_at', 'is_active']
 
 
 class WorkingScheduleSerializer(serializers.ModelSerializer):

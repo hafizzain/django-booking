@@ -34,9 +34,6 @@ class Brand(models.Model):
         return str(self.id)
 
 
-
-    
-
 class Product(models.Model):
     PRODUCT_TYPE_CHOICES = [
         ('Sellable', 'Sellable'),

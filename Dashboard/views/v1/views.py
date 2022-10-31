@@ -5,6 +5,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from Appointment.models import AppointmentCheckout
+from Client.models import Client
 from NStyle.Constants import StatusCodes
 from Business.models import Business, BusinessAddress
 
@@ -67,3 +68,43 @@ def get_busines_client_appointment(request):
         status=status.HTTP_200_OK
     )
     
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_dashboard_day_wise(request):
+    #date = request.GET.get('date', None)
+    date = '2022-10-22'
+    
+    total_revenue = 0
+    appointments_count = 0
+    total_client = 0
+    
+    appointment = AppointmentCheckout.objects.filter(is_deleted=False)
+    for app in appointment:
+        
+        create_at = str(app.created_at)
+        if (create_at.split(" ")[0] == date ):
+            appointments_count +=1
+            if app.total_price is not None:
+                total_revenue += app.total_price
+        
+    client = Client.objects.filter(is_deleted=False)
+    for cl in client:
+        create_at = str(cl.created_at)
+        if (create_at.split(" ")[0] == date ):
+            total_client +=1
+    
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Total Revenue',
+                'error_message' : None,
+                'revenue' : total_revenue,
+                'appointments_count': appointments_count,
+                'total_client': total_client,
+        
+            }
+        },
+        status=status.HTTP_200_OK
+    )
