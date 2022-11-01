@@ -104,8 +104,6 @@ class Subscription(models.Model):
 
     def __str__(self):
         return str(self.id)
-    
-
 
 class Promotion(models.Model):
     VALIDITY_DAY=[
@@ -146,7 +144,7 @@ class Promotion(models.Model):
 
     discount = models.PositiveIntegerField(default=0)
     
-    valid_til= models.CharField(choices=VALIDITY_DAY, default='7 Days' ,verbose_name='No of Days/Month', max_length = 100)
+    valid_til= models.CharField(choices=VALIDITY_DAY, default='7 Days', null = True, blank=  True ,verbose_name='No of Days/Month', max_length = 100)
 
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -155,8 +153,6 @@ class Promotion(models.Model):
 
     def __str__(self):
         return str(self.id)
-    
-
 
 class Vouchers(models.Model):
     VALIDITY_CHOICE = [
@@ -251,32 +247,33 @@ class Membership(models.Model):
         ('Days' , 'Days'),
         ('Months' , 'Months'),
     ]
+    DISCOUNT_CHOICE = [
+        ('Unlimited' , 'Unlimited'),
+        ('Limited' , 'Limited'),
+    ]
 
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_memberships')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_memberships')
     
     name =  models.CharField(max_length=100, default='')
+    description =  models.CharField(max_length=300, null=True, blank=True)
     membership = models.CharField(default='Product', choices=MEMBERSHIP_CHOICES, max_length=30, verbose_name = 'Membership_type')
     
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_memberships')
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_memberships')
     
-    #description =  models.CharField(max_length=300, null=True, blank=True)
-    #session = models.PositiveIntegerField(default=0)
+    percentage = models.PositiveIntegerField(default=0)
     
     total_number = models.PositiveIntegerField(default=0, null=True, blank=True)
     valid_for = models.CharField(choices=VALIDITY_CHOICE, default='Months' , verbose_name='Validity for Days or Months', max_length=20)
-
-    # days = models.PositiveIntegerField(default=0, verbose_name='No. of Days', null=True, blank=True)
-    # months = models.PositiveIntegerField(default=0, verbose_name='No. of Months', null=True, blank=True)
+    discount = models.CharField(choices=DISCOUNT_CHOICE, default='Unlimited' , verbose_name='Discount Limit', max_length=20)
+    
     validity = models.PositiveIntegerField(default=0, verbose_name='No. of Validity Days/Month', null=True, blank=True)
 
     price = models.PositiveIntegerField(default=0)
     tax_rate = models.PositiveIntegerField(default=0)
 
-    
-    
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
