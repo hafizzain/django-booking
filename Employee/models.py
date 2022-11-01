@@ -4,7 +4,7 @@ from django.utils.timezone import now
 
 
 from Authentication.models import User
-from Business.models import Business
+from Business.models import Business, BusinessAddress
 from Utility.models import Country, State, City
 from Service.models  import Service
 
@@ -32,7 +32,8 @@ class Employee(models.Model):
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True, blank=True, related_name='country_employees')
     state = models.ForeignKey(State, on_delete=models.SET_NULL, null=True, blank=True, related_name='state_employees')
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, related_name='city_employees')
-
+    location = models.ManyToManyField(BusinessAddress, related_name='location_employee')
+    
     postal_code = models.CharField(max_length=20, null=True, blank=True)
     address = models.TextField(default='')
 
@@ -70,6 +71,7 @@ class EmployeeProfessionalInfo(models.Model):
     #level= models.CharField(max_length=100, choices=LEVEL_CHOICE, default = 'Average', verbose_name = 'Employee Level')
     
     #working_days = models.ManyToManyField(WorkingDays, related_name='days_employee')
+    
     start_time = models.TimeField(null=True, blank=True)
     end_time = models.TimeField(null=True, blank=True)
     

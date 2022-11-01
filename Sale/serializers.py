@@ -6,6 +6,7 @@ from Client.models import Client, Membership
 from Employee.models import Employee, EmployeeSelectedService
 from Business.models import BusinessAddress
 from Order.models import MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
+from Product.Constants.index import tenant_media_base_url
 from Product.models import ProductStock
 
 from Service.models import Service
@@ -22,10 +23,20 @@ class ClientSerializer(serializers.ModelSerializer):
         fields = ['id','full_name']
         
 class MemberSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
     
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request)
+                return f'{url}{obj.image}'
+            except:
+                return obj.image
+        return None
     class Meta:
         model = Employee
-        fields = ['id','full_name']
+        fields = ['id','full_name', 'image' ]
         
 class ServiceSearchSerializer(serializers.ModelSerializer):
     
@@ -119,7 +130,7 @@ class ProductOrderSerializer(serializers.ModelSerializer):
     
     def get_member(self, obj):
         try:
-            serializers = MemberSerializer(obj.member).data
+            serializers = MemberSerializer(obj.member, context=self.context).data
             return serializers
         except Exception as err:
             return None
@@ -163,7 +174,7 @@ class ServiceOrderSerializer(serializers.ModelSerializer):
     
     def get_member(self, obj):
         try:
-            serializers = MemberSerializer(obj.member).data
+            serializers = MemberSerializer(obj.member, context=self.context).data
             return serializers
         except Exception as err:
             return None
@@ -182,7 +193,7 @@ class ServiceOrderSerializer(serializers.ModelSerializer):
             return None
     class Meta:
         model = ServiceOrder
-        fields = ['id', 'client', 'service','created_at' ,'user', 'duration', 'location', 'member', 'total_price', 'payment_type','tip','gst', 'order_type']
+        fields = ['id', 'client', 'service','created_at' ,'user', 'duration', 'location', 'member', 'total_price', 'payment_type','tip','gst', 'order_type','created_at']
         
 class MemberShipOrderSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)

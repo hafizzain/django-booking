@@ -465,7 +465,7 @@ def get_all_sale_orders(request):
 def get_product_orders(request):
     product_order = ProductOrder.objects.filter(is_deleted=False).order_by('-created_at')
     
-    serialized = ProductOrderSerializer(product_order,  many=True)
+    serialized = ProductOrderSerializer(product_order,  many=True,  context={'request' : request, })
     return Response(
         {
             'status' : 200,
@@ -501,7 +501,7 @@ def get_membership_orders(request):
 @permission_classes([AllowAny])
 def get_service_orders(request):
     service_orders = ServiceOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = ServiceOrderSerializer(service_orders,  many=True)
+    serialized = ServiceOrderSerializer(service_orders,  many=True, context={'request' : request, })
     return Response(
         {
             'status' : 200,
