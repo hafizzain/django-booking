@@ -1,4 +1,5 @@
 from email.policy import default
+from pyexpat import model
 from uuid import uuid4
 from django.db import models
 from django.utils.timezone import now
@@ -83,6 +84,23 @@ class Service(models.Model):
     
     is_package = models.BooleanField(default=False, )
 
+
+    def __str__(self):
+        return str(self.id)
+    
+class ServiceGroup(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_servicesgroup')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_servicesgroup', null=True, blank=True)
+    
+    name = models.CharField(max_length=100, default='')
+    services = models.ManyToManyField(Service, null=True, blank=True, related_name='servicegroup_services')
+
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    is_blocked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+    
 
     def __str__(self):
         return str(self.id)
