@@ -182,7 +182,7 @@ def import_attendance(request):
         for index, row in enumerate(imp_file):
             if index == 0:
                 continue
-            
+            #row =  row.replace("'", '"')
             row = row.split(',')
             row = row
             if len(row) < 4:

@@ -536,13 +536,159 @@ def get_voucher_orders(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_total_revenue(request):
-    data = {}
-    appointment = AppointmentCheckout.objects.filter(is_deleted=False)
+    data = {  
+    'appointments_jan' : 0,
+    'appointments_feb' : 0,
+    'appointments_mar' : 0,
+    'appointments_apr' : 0,
+    'appointments_may' : 0,
+    'appointments_jun' : 0,
+    'appointments_july' : 0,
+    'appointments_aug' : 0,
+    'appointments_sep' : 0,
+    'appointments_oct' : 0,
+    'appointments_nov' : 0,
+    'appointments_dec' : 0,
     
-    for ind, value in enumerate(MONTHS):
-        print(f"index{ind+1} ..value{value} ")
-        data[ind] = {}
-        data[ind]['value'] = value
+    'sale_jan' : 0,
+    'sale_feb' : 0,
+    'sale_mar' : 0,
+    'sale_apr' : 0,
+    'sale_may' : 0,
+    'sale_jun' : 0,
+    'sale_july' : 0,
+    'sale_aug' : 0,
+    'sale_sep' : 0,
+    'sale_oct' : 0,
+    'sale_nov' : 0,
+    'sale_dec' : 0,
+    }
+    appointment = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Paid')
+    for ind, value in enumerate(appointment):
+        create_at = str(value.created_at)
+        
+        matching = int(create_at.split(" ")[0].split("-")[1])
+        if( matching == 0 ):
+            
+            data['appointments_jan'] +=1
+            MONTHS[0]['appointments'] = data['appointments_jan']
+            
+        if( matching == 1 ):
+            
+            data['appointments_feb'] +=1
+            MONTHS[1]['appointments'] = data['appointments_feb']
+            
+        if( matching == 2 ):
+           
+            data['appointments_mar'] +=1
+            MONTHS[2]['appointments'] = data['appointments_mar']
+            
+        if( matching == 3 ):
+            
+            data['appointments_apr'] +=1
+            MONTHS[3]['appointments'] = data['appointments_apr']
+            
+        if( matching == 4 ):
+            
+            data['appointments_may'] +=1
+            MONTHS[4]['appointments'] = data['appointments_may']
+            
+        if( matching == 5 ):
+            
+            data['appointments_jun'] +=1
+            MONTHS[5]['appointments'] = data['appointments_jun']
+        if( matching == 6 ):
+            
+            data['appointments_july'] +=1
+            MONTHS[6]['appointments'] = data['appointments_july']
+            
+        if( matching == 7 ):
+            
+            data['appointments_aug'] +=1
+            MONTHS[7]['appointments'] = data['appointments_aug']
+        if( matching == 8 ):
+            
+            data['appointments_sep'] +=1
+            MONTHS[8]['appointments'] = data['appointments_sep']
+        if( matching == 9 ):
+            
+            data['appointments_oct'] +=1
+            MONTHS[9]['appointments'] = data['appointments_oct']
+        if( matching == 10 ):
+            
+            data['appointments_nov'] +=1
+            MONTHS[10]['appointments'] = data['appointments_nov']
+        if( matching == 11 ):
+            
+            data['appointments_dec'] +=1
+            MONTHS[11]['appointments'] = data['appointments_dec']
+               
+    orders = Order.objects.filter(is_deleted=False)
+    for order in orders:
+        if( matching == 0 ):
+            
+            data['sale_jan'] +=1
+            MONTHS[0]['sales'] = data['sale_jan']
+            
+        if( matching == 1 ):
+            
+            data['sale_feb'] +=1
+            MONTHS[1]['sales'] = data['sale_feb']
+            
+        if( matching == 2 ):
+           
+            data['sale_mar'] +=1
+            MONTHS[2]['sales'] = data['sale_mar']
+            
+        if( matching == 3 ):
+            
+            data['sale_apr'] +=1
+            MONTHS[3]['sales'] = data['sale_apr']
+            
+        if( matching == 4 ):
+            
+            data['sale_may'] +=1
+            MONTHS[4]['sales'] = data['sale_may']
+            
+        if( matching == 5 ):
+            
+            data['sale_jun'] +=1
+            MONTHS[5]['sales'] = data['sale_jun']
+        if( matching == 6 ):
+            
+            data['sale_july'] +=1
+            MONTHS[6]['sales'] = data['sale_july']
+            
+        if( matching == 7 ):
+            
+            data['sale_aug'] +=1
+            MONTHS[7]['sales'] = data['sale_aug']
+        if( matching == 8 ):
+            
+            data['sale_sep'] +=1
+            MONTHS[8]['sales'] = data['sale_sep']
+        if( matching == 9 ):
+            
+            data['sale_oct'] +=1
+            MONTHS[9]['sales'] = data['sale_oct']
+        if( matching == 10 ):
+            
+            data['sale_nov'] +=1
+            MONTHS[10]['sales'] = data['sale_nov']
+        if( matching == 11 ):
+            
+            data['sale_dec'] +=1
+            MONTHS[11]['sales'] = data['sale_dec']
+        
+            
+            # if value.total_price is not None:
+            #     print('test')
+            #     total += value.total_price
+            # MONTHS[10]['price'] = total
+            
+        
+        # data[ind] = {}
+        # data[ind]['value'] = value
 
         # for app in appointment:
         
@@ -551,7 +697,7 @@ def get_total_revenue(request):
         #         appointments_count +=1
         #         if app.total_price is not None:
         #             total_revenue += app.total_price
-    print(data)
+    print(MONTHS)
     total = 0
     appointmemnt_sale = 0
     order_sale = 0
@@ -578,6 +724,7 @@ def get_total_revenue(request):
                 'revenue' : total,
                 'sale': order_sale,
                 'appointment_sale': appointmemnt_sale,
+                'dashboard': MONTHS
             }
         },
         status=status.HTTP_200_OK

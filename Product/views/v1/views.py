@@ -67,8 +67,7 @@ def import_product(request):
                 continue
             name= row[0].strip('"')
             cost_price= row[1].strip('"')
-            print(cost_price)
-            print(type(cost_price))
+            
             full_price= row[2].strip('"')
             sell_price= row[3].strip('"')
             quantity= row[4].strip('"')
