@@ -19,7 +19,7 @@ from Business.models import Business, BusinessSocial, BusinessAddress, BusinessO
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
 from Tenants.models import Domain, Tenant
-from Utility.models import Country, Currency, Language, Software, State, City
+from Utility.models import Country, Currency, Language, NstyleFile, Software, State, City
 from Utility.serializers import LanguageSerializer
 import json
 from django.db.models import Q
@@ -2325,6 +2325,70 @@ def delete_business_tax(request):
             },
             status=status.HTTP_200_OK
         )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def import_business_vendor(request):
+    business_id = request.data.get('business', None)
+    user= request.user
+    
+    try:
+        business=Business.objects.get(id=business_id)
+    except Exception as err:
+        return Response(
+            {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                }
+            }
+    
+        )
+    vendor_csv = request.data.get('file', None)
+
+
+    file = NstyleFile.objects.create(
+        file = vendor_csv
+    )
+    with open( file.file.path , 'r', encoding='utf-8') as imp_file:
+        for index, row in enumerate(imp_file):
+            if index == 0:
+                continue
+            row = row.split(',')
+            row = row
+            
+            if len(row) < 5:
+                continue
+            vendor_name = row[0].strip('"')
+            email = row[1].strip('"')
+            address = row[2].strip('"')
+            status_ven = row[3].strip('"')
+            gstin = row[4].strip('"')
+            
+            create_vendor = BusinessVendor.objects.create(
+                user = user,
+                business = business,
+                vendor_name =vendor_name,
+                address =  address,
+                gstin =gstin,
+                email = email,
+                #is_active = status
+            )
+            if status_ven.strip() ==  'Active':
+                create_vendor.is_active =True
+                create_vendor.save()
+            else :
+                create_vendor.is_active = False
+                create_vendor.save()
+                
+            print(f'Added Vendor {create_vendor} ... {vendor_name} ')
+                
+    file.delete()
+    return Response({'Status' : 'Success'})
+            
 
 @api_view(['GET'])
 @permission_classes([AllowAny])

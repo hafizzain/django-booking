@@ -108,6 +108,20 @@ class Subscription(models.Model):
 
 
 class Promotion(models.Model):
+    VALIDITY_DAY=[
+        ('7 Days' , '7 Days'),
+        ('14 Days' , '14 Days'),
+        ('1 Month' ,  '1 Months'),
+        ('2 Months' , '2 Months'),
+        ('3 Months' , '3 Months'),
+        ('4 Months' , '4 Months'),
+        ('6 Months' , '6 Months'),
+        ('8 Months' , '8 Months'),
+        ('1 Years' , '1 Years'),
+        ('18 Months' , '18 Months'),
+        ('2 Years' , '2 Years'),
+        ('5 Years' , '5 Years'),
+    ]
     PROMOTION_TYPES = [
         ('Product' , 'Product'),
         ('Service' , 'Service'),
@@ -132,7 +146,7 @@ class Promotion(models.Model):
 
     discount = models.PositiveIntegerField(default=0)
     
-    valid_til= models.DateField(null=True, blank=True)
+    valid_til= models.CharField(choices=VALIDITY_DAY, default='7 Days' ,verbose_name='No of Days/Month', max_length = 100)
 
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)

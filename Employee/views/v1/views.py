@@ -182,7 +182,7 @@ def import_attendance(request):
         for index, row in enumerate(imp_file):
             if index == 0:
                 continue
-            
+            #row =  row.replace("'", '"')
             row = row.split(',')
             row = row
             if len(row) < 4:
@@ -534,6 +534,7 @@ def create_employee(request):
     
     services_id = request.data.get('services', None)   
      
+    location = request.data.get('location', None)
     country = request.data.get('country', None)   
     state = request.data.get('state', None)         
     city = request.data.get('city', None)
@@ -577,7 +578,7 @@ def create_employee(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    
+    employees_error = []
     try:
         business=Business.objects.get(id=business_id)
     except Exception as err:
@@ -737,6 +738,21 @@ def create_employee(request):
                     pass
 
     empl_permission.save()
+    
+    
+    if type(location) == str:
+            location = json.loads(location)
+
+    elif type(location) == list:
+            pass
+        
+    for loc in location:
+        try:
+            location_id = BusinessAddress.objects.get(id=loc)  
+            print(location_id)
+            employee.location.add(location_id)
+        except Exception as err:
+            employees_error.append(str(err))
 
     # serialized = EmployPermissionSerializer(employee_p_setting, data=request.data)
     # if serialized.is_valid():
@@ -768,8 +784,9 @@ def create_employee(request):
             'status' : True,
             'status_code' : 201,
             'response' : {
-                'message' : 'Employees Added!',
+                'message' : 'Employee Added Successfully!',
                 'error_message' : None,
+                'employee_error':employees_error,
                 'employees' : data
             }
         },

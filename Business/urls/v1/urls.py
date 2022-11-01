@@ -58,5 +58,6 @@ urlpatterns = [
     path('update_business_vendor/', views.update_business_vendor),
     path('delete_business_vendor/', views.delete_business_vendor),
     path('search_business_vendor/', views.search_business_vendor),
+    path('import_business_vendor/', views.import_business_vendor),
     
 ]

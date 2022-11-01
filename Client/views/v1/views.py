@@ -1281,9 +1281,9 @@ def create_promotion(request):
     product_id = request.data.get('product', None)
     
     discount = request.data.get('discount', None)
-    duration = request.data.get('duration', None)
+    valid_till = request.data.get('valid_till', None)
     
-    if not all([business, name,promotion_type,purchases, duration, discount]):
+    if not all([business, name,promotion_type,purchases, valid_till, discount]):
         return Response(
             {
                 'status' : False,
@@ -1300,7 +1300,7 @@ def create_promotion(request):
                           'discount_product',
                           'discount_service', 
                           'discount', 
-                          'duration', 
+                          'valid_till', 
 
                             ]
                 }
@@ -1327,7 +1327,7 @@ def create_promotion(request):
         promotion_type = promotion_type,
         purchases = purchases,
         discount = discount,
-        valid_til = duration,
+        valid_til = valid_till,
         name = name,
     )
     if promotion_type == 'Product':
@@ -1372,7 +1372,7 @@ def create_promotion(request):
                 'status' : True,
                 'status_code' : 201,
                 'response' : {
-                    'message' : 'Promotion Create!',
+                    'message' : 'Promotion Created Successfully!',
                     'error_message' : None,
                     'promotion' : serialized.data,
                 }
