@@ -9,7 +9,7 @@ from Order.models import MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrd
 from Product.Constants.index import tenant_media_base_url
 from Product.models import ProductStock
 
-from Service.models import Service
+from Service.models import Service, ServiceGroup
 
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -63,6 +63,14 @@ class LocationServiceSerializer(serializers.ModelSerializer):
 class ServiceSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
     employees = serializers.SerializerMethodField(read_only=True)
+    service_group = serializers.SerializerMethodField(read_only=True)
+    
+    def get_service_group(self, obj):
+        try:
+            group = ServiceGroup.objects.get(services = obj)
+            return ServiceSearchSerializer(group).data
+        except Exception as err:
+            print(str(err))
     
     def get_employees(self, obj):
         emp = EmployeeSelectedService.objects.filter(service = obj) 
@@ -93,7 +101,8 @@ class ServiceSerializer(serializers.ModelSerializer):
             'client_can_book',
             'slot_availible_for_online',
             'price',
-            'is_package'
+            'is_package',
+            'service_group',
             ]
         
         
@@ -278,3 +287,9 @@ class VoucherOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = VoucherOrder
         fields =['id', 'voucher', 'client' , 'location' , 'member' ,'start_date', 'end_date','status', 'total_price', 'payment_type' , 'order_type']
+    
+class ServiceGroupSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = ServiceGroup
+        fields = '__all__'

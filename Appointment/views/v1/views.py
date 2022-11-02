@@ -19,7 +19,7 @@ from NStyle.Constants import StatusCodes
 import json
 from django.db.models import Q
 from Client.models import Client, Membership, Promotion, Rewards, Vouchers
-from datetime import date
+from datetime import date, timedelta
 from threading import Thread
 
 
@@ -433,8 +433,6 @@ def update_appointment(request):
         except Exception as err:
             print(err)
             pass
-    
-        
         
     return Response(
         {
@@ -509,12 +507,12 @@ def create_blockTime(request):
     
     date = request.data.get('date', None)
     start_time = request.data.get('start_time', None)
-    end_time = request.data.get('end_time',None)
+    duration = request.data.get('duration',None)
     
     member = request.data.get('member',None)
     details = request.data.get('details', None)
     
-    if not all([business_id, date, start_time, end_time , member]):
+    if not all([business_id, date, start_time, duration , member]):
         return Response(
             {
                 'status' : False,
@@ -527,7 +525,7 @@ def create_blockTime(request):
                           'business_id',
                           'date',
                           'start_time', 
-                          'end_time', 
+                          'duration', 
                           'member',
                         ]
                 }
@@ -565,7 +563,7 @@ def create_blockTime(request):
             user = user,
             business = business,
             appointment_time=start_time,
-            duration = end_time, 
+            duration = duration, 
             appointment_date = date,
             member = member,
             destails = details,
@@ -593,6 +591,76 @@ def create_blockTime(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_blocktime(request):
+    block_id = request.data.get('id', None)
+    end_time = request.data.get('end_time', None)
+    start_time = request.data.get('start_time', None)
+    if block_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+       
+    try:
+        block = AppointmentService.objects.get(id=block_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid BlockTime ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    # end = start_time + timedelta(minutes=23)
+    # print(F"{end} -- {end_time}")
+    serializer = UpdateAppointmentSerializer(block , data=request.data, partial=True)
+    if not serializer.is_valid():
+        return Response(
+                {
+            'status' : False,
+            'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+            'response' : {
+                'message' : 'Block Serializer Invalid',
+                'error_message' : str(serializer.errors),
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+        )
+    serializer.save()
+    all_members =Employee.objects.filter(is_deleted=False, is_active = True).order_by('-created_at')
+
+    serialized = EmployeeAppointmentSerializer(all_members, many=True, context={'request' : request})
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Update BlockTime Successfully',
+                'error_message' : None,
+                'asset' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+        )
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_block_time(request):
     block_id = request.data.get('id', None)
     if block_id is None: 
        return Response(
@@ -626,52 +694,20 @@ def update_blocktime(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-        
-    serializer = UpdateAppointmentSerializer(block , data=request.data, partial=True)
-    if not serializer.is_valid():
-        return Response(
-                {
-            'status' : False,
-            'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
-            'response' : {
-                'message' : 'Block Serializer Invalid',
-                'error_message' : str(serializer.errors),
-            }
-        },
-        status=status.HTTP_404_NOT_FOUND
-        )
-    serializer.save()
-    all_members =Employee.objects.filter(is_deleted=False, is_active = True).order_by('-created_at')
-
-    serialized = EmployeeAppointmentSerializer(all_members, many=True, context={'request' : request})
-
-    # if not serialized.is_valid():
-    #     return Response(
-    #             {
-    #         'status' : False,
-    #         'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
-    #         'response' : {
-    #             'message' : 'Block Serializer Invalid',
-    #             'error_message' : str(err),
-    #         }
-    #     },
-    #     status=status.HTTP_404_NOT_FOUND
-    #     )
-    # serialized.save()
-    
+    block.delete()
     return Response(
         {
             'status' : True,
             'status_code' : 200,
+            'status_code_text' : '200',
             'response' : {
-                'message' : 'Update BlockTime Successfully',
+                'message' : 'Delete BlockTime Successfully',
                 'error_message' : None,
-                'asset' : serialized.data
             }
         },
         status=status.HTTP_200_OK
         )
-
+    
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_checkout(request):
