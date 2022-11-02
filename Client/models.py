@@ -267,18 +267,18 @@ class Membership(models.Model):
     
     name =  models.CharField(max_length=100, default='')
     description =  models.CharField(max_length=300, null=True, blank=True)
-    membership = models.CharField(default='Product', choices=MEMBERSHIP_CHOICES, max_length=30, verbose_name = 'Membership_type')
+    #membership = models.CharField(default='Product', choices=MEMBERSHIP_CHOICES, max_length=30, verbose_name = 'Membership_type')
     
     # service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_memberships')
     # product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_memberships')
     
     percentage = models.PositiveIntegerField(default=0)
     
-    total_number = models.PositiveIntegerField(default=0, null=True, blank=True)
+    #total_number = models.PositiveIntegerField(default=0, null=True, blank=True)
     valid_for = models.CharField(choices=VALIDITY_CHOICE, default='7 Days' , verbose_name='Validity for Days or Months', max_length=20)
     discount = models.CharField(choices=DISCOUNT_CHOICE, default='Unlimited' , verbose_name='Discount Limit', max_length=20)
     
-    validity = models.PositiveIntegerField(default=0, verbose_name='No. of Validity Days/Month', null=True, blank=True)
+    #validity = models.PositiveIntegerField(default=0, verbose_name='No. of Validity Days/Month', null=True, blank=True)
     
     color =  models.CharField(max_length=100, default='')
     term_condition =  models.CharField(max_length=300, null=True, blank=True)
@@ -305,7 +305,6 @@ class DiscountMembership(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     
     membership = models.ForeignKey(Membership, on_delete=models.CASCADE, related_name='membership_discountmembership')
-    
     discount = models.CharField(choices=DURATION_CHOICE, default='7 Days' , verbose_name='Duration', max_length=50)
     percentage = models.PositiveIntegerField(default=0)
 
