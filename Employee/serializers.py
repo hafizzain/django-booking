@@ -273,6 +273,7 @@ class EmployeSerializer(serializers.ModelSerializer):
                 'is_active',
                 'employee_info',
                 'staff_group',
+                'location',
                 # 'globel_permission',
                 'permissions' , 'monday','tuesday','wednesday','thursday','friday','saturday','sunday'    
                 #'module_permissions',

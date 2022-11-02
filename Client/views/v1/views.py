@@ -525,7 +525,7 @@ def create_client_group(request):
     )
     client_error = []
     if type(client) == str:
-            client = json.loads(client)
+        client = json.loads(client)
 
     elif type(client) == list:
             pass
@@ -536,8 +536,9 @@ def create_client_group(request):
                client_group.client.add(employe)
             except Exception as err:
                 client_error.append(str(err))
-            client_group.save()
-            serialized=ClientGroupSerializer(client_group, context={'request' : request})
+                
+    client_group.save()
+    serialized=ClientGroupSerializer(client_group, context={'request' : request})
        
     return Response(
             {
@@ -1561,12 +1562,13 @@ def create_memberships(request):
     user = request.user
     business = request.data.get('business', None)
     name = request.data.get('name', None)
-    #description = request.data.get('description', None)
+    description = request.data.get('description', None)
     service = request.data.get('service', None)
     product = request.data.get('product',None)
     membership_type = request.data.get('membership_type',None)
     total_number = request.data.get('total_number',None)
-    #session = request.data.get('session', None)
+    
+    percentage = request.data.get('session', None)
     valid_for = request.data.get('valid_for', None)
     validity = request.data.get('validity', None)
     #months = request.data.get('months',None)

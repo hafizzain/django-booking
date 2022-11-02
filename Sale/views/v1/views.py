@@ -22,13 +22,13 @@ from rest_framework.response import Response
 
 from Employee.models import Employee, EmployeeSelectedService
 from Business.models import BusinessAddress
-from Service.models import Service
+from Service.models import Service, ServiceGroup
 
 from Product.models import Product
 from django.db.models import Avg, Count, Min, Sum
 
 
-from Sale.serializers import MemberShipOrderSerializer, ProductOrderSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
+from Sale.serializers import MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
 
 
 # @api_view(['GET'])
@@ -75,7 +75,7 @@ def create_service(request):
     business = request.data.get('business', None)
     
     name = request.data.get('name', None)
-    treatment_type = request.data.get('service_type',None)
+    staffgroup_id = request.data.get('staffgroup_id',None)
     service = request.data.get('service', None)
     
     description = request.data.get('description',None)
@@ -151,8 +151,7 @@ def create_service(request):
         #location=location,
         price=price,
         duration=duration,
-        service_type = treatment_type,
-        
+        #service_type = treatment_type,
         controls_time_slot=controls_time_slot,
         initial_deposit=initial_deposit,
         client_can_book=client_can_book,
@@ -220,8 +219,11 @@ def create_service(request):
     employe_service.save()
     service_obj.save()
     
-    
-    
+    try:
+        service_group = ServiceGroup.objects.get(id = staffgroup_id)
+        service_group.services.add(service_obj)
+    except Exception as err:
+        employees_error.append(str(err))
     
     service_serializers= ServiceSerializer(service_obj)
     
@@ -239,9 +241,7 @@ def create_service(request):
             },
             status=status.HTTP_201_CREATED
         ) 
-    
-    
-    
+      
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_service(request):
@@ -417,7 +417,238 @@ def update_service(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+   
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_servicegroup(request):
+    user = request.user
+    
+    business = request.data.get('business', None)
+    name = request.data.get('name', None)
+    service = request.data.get('service', None)
+    is_status = request.data.get('status', None)
+    
+    servicegroup_error = []
+    if not all([business, name,service]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                          'name',
+                          'service'
+                          
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        business_id=Business.objects.get(id=business)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    service_group = ServiceGroup.objects.create(
+        user = user,
+        business = business_id,
+        name = name,
+    )
+    if is_status is not None:
+        service_group.is_active = True
+    else:
+        service_group.is_active = False
         
+    if type(service) == str:
+        service = json.loads(service)
+    elif type(service) == list:
+            pass
+        
+    for ser in service:
+        try:
+            services = Service.objects.get(id=ser)  
+            service_group.services.add(services)
+        except Exception as err:
+            servicegroup_error.append(str(err))
+    service_group.save()
+    serialized=ServiceGroupSerializer(service_group, context={'request' : request})
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Service Group Created!',
+                    'error_message' : None,
+                    'service_group' : serialized.data,
+                    'servicegroup_errors' : servicegroup_error,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+ 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_servicegroup(request):
+    service_group = ServiceGroup.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = ServiceGroupSerializer(service_group,  many=True, context={'request' : request})
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Service Group',
+                'error_message' : None,
+                'sales' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+     
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_servicegroup(request):
+    service_id = request.data.get('id', None)
+    if id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+       
+    try:
+        service = ServiceGroup.objects.get(id=service_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Service ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    service.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'ServiceGroup deleted successfully',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+       
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_servicegroup(request):
+    error = []
+    service=request.data.get('service', None)
+    id = request.data.get('id', None)
+    if id is None: 
+        return Response(
+        {
+            'status' : False,
+            'status_code' : StatusCodes.MISSING_FIELDS_4001,
+            'status_code_text' : 'MISSING_FIELDS_4001',
+            'response' : {
+                'message' : 'Invalid Data!',
+                'error_message' : 'Service ID are required.',
+                'fields' : [
+                    'id'                         
+                ]
+            }
+        },
+        status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        service_id = ServiceGroup.objects.get(id=id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code_text' : 'INVALID_SERVICE_ID',
+                'response' : {
+                    'message' : 'ServiceGroup Not Found',
+                    'error_message' : str(err),
+                }
+            },
+                status=status.HTTP_404_NOT_FOUND
+        )
+    if service is not None:
+        if type(service) == str:
+            service = json.loads(service)
+        elif type(service) == list:
+            pass
+        service_id.services.clear()
+        for ser in service:
+            try:
+               service = ServiceGroup.objects.get(id=ser)  
+               service_id.services.add(service)
+            except Exception as err:
+                error.append(str(err))
+    service_id.save()
+    
+    serializer= ServiceGroupSerializer(service_id, context={'request' : request} , data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : ' ServiceGroup updated successfully',
+                    'error_message' : None,
+                    'error': error,
+                    'service' : serializer.data
+                
+                }
+            },
+            status=status.HTTP_200_OK
+           )
+    
+    else: 
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+                'response' : {
+                    'message' : 'Invialid Data',
+                    'error_message' : str(serializer.errors),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_all_sale_orders(request):
@@ -431,19 +662,19 @@ def get_all_sale_orders(request):
     
     data=[]
     product_order = ProductOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = ProductOrderSerializer(product_order,  many=True)
+    serialized = ProductOrderSerializer(product_order,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
     service_orders = ServiceOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = ServiceOrderSerializer(service_orders,  many=True)
+    serialized = ServiceOrderSerializer(service_orders,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
     membership_order = MemberShipOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = MemberShipOrderSerializer(membership_order,  many=True)
+    serialized = MemberShipOrderSerializer(membership_order,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
     voucher_orders = VoucherOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = VoucherOrderSerializer(voucher_orders,  many=True)
+    serialized = VoucherOrderSerializer(voucher_orders,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
     return Response(
@@ -458,8 +689,7 @@ def get_all_sale_orders(request):
         },
         status=status.HTTP_200_OK
     )
-        
-        
+    
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_product_orders(request):
