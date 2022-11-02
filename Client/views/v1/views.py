@@ -9,7 +9,7 @@ from Service.models import Service
 from Business.models import Business
 from Product.models import Product
 from Utility.models import Country, State, City
-from Client.models import Client, ClientGroup, Subscription , Rewards , Promotion , Membership , Vouchers
+from Client.models import Client, ClientGroup, DiscountMembership, Subscription , Rewards , Promotion , Membership , Vouchers
 from Client.serializers import ClientSerializer, ClientGroupSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer
 from Utility.models import NstyleFile
 
@@ -525,7 +525,7 @@ def create_client_group(request):
     )
     client_error = []
     if type(client) == str:
-            client = json.loads(client)
+        client = json.loads(client)
 
     elif type(client) == list:
             pass
@@ -536,8 +536,9 @@ def create_client_group(request):
                client_group.client.add(employe)
             except Exception as err:
                 client_error.append(str(err))
-            client_group.save()
-            serialized=ClientGroupSerializer(client_group, context={'request' : request})
+                
+    client_group.save()
+    serialized=ClientGroupSerializer(client_group, context={'request' : request})
        
     return Response(
             {
@@ -1561,20 +1562,26 @@ def create_memberships(request):
     user = request.user
     business = request.data.get('business', None)
     name = request.data.get('name', None)
-    #description = request.data.get('description', None)
-    service = request.data.get('service', None)
-    product = request.data.get('product',None)
-    membership_type = request.data.get('membership_type',None)
-    total_number = request.data.get('total_number',None)
-    #session = request.data.get('session', None)
+    
+    description = request.data.get('description', None)
+    terms_condition = request.data.get('term_condition', None)
+    
+    color = request.data.get('color', None)
+    
+    services = request.data.get('services', None)
+    products = request.data.get('products',None)
+    
+    #membership_type = request.data.get('membership_type',None)
+    #total_number = request.data.get('total_number',None)
+    
+    #percentage = request.data.get('session', None)
     valid_for = request.data.get('valid_for', None)
-    validity = request.data.get('validity', None)
+    #validity = request.data.get('validity', None)
     #months = request.data.get('months',None)
     price = request.data.get('price',None)
     tax_rate = request.data.get('tax_rate',None)
-    #color = request.data.get('color', None)
     
-    if not all([business, name , validity, valid_for, price, tax_rate]):
+    if not all([business, name , valid_for, price, ]):
         return Response(
             {
                 'status' : False,
@@ -1591,7 +1598,7 @@ def create_memberships(request):
                           'price',
                           'tax_rate'
 
-                            ]
+                    ]
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
@@ -1611,18 +1618,55 @@ def create_memberships(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
             
-    membership_cr = Membership(
+    membership_cr = Membership.objects.create(
         user = user,
         business=business, 
         name= name,
-        membership=membership_type,
+        #membership=membership_type,
         valid_for = valid_for,
-        validity = validity,
+        #validity = validity,
         price = price,
-        tax_rate= tax_rate,
-        total_number=total_number
+        tax_rate = tax_rate,
+        #total_number = total_number,
+        
+        #New Require
+        description =description,
+        color = color,
+        term_condition=terms_condition,
+        
     )
-    if membership_type == 'Product':
+    for ser in services:
+        discount = ser['discount']
+        percentage = ser['percentage']
+        servic = ser['service']
+        
+        try:
+            service_id=Service.objects.get(id=servic)
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
+                    'response' : {
+                    'message' : 'Service not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        services_obj = DiscountMembership.objects.create(
+            membership = membership_cr,
+            discount =discount,
+            percentage =percentage,
+            service = service_id
+        )
+    
+    for pro in products:
+        
+        discount = pro['discount']
+        percentage = pro['percentage']
+        product = pro['product']
+        
         try:
             product_id=Product.objects.get(id=product)
         except Exception as err:
@@ -1637,39 +1681,13 @@ def create_memberships(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+        services_obj = DiscountMembership.objects.create(
+            membership = membership_cr,
+            discount =discount,
+            percentage =percentage,
+            product = product_id,
+        )
             
-        membership_cr.product = product_id
-        membership_cr.save()
-            
-    elif membership_type == 'Service':
-        try:
-            service_id=Service.objects.get(id=service)
-        except Exception as err:
-            return Response(
-                {
-                    'status' : False,
-                    'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
-                    'response' : {
-                    'message' : 'Service not found',
-                    'error_message' : str(err),
-                    }
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        membership_cr.service = service_id
-        membership_cr.save()
-    else :
-        return Response(
-                {
-                    'status' : False,
-                    'response' : {
-                    'message' : 'Invalid Memberdhip Type',
-                    'error_message' : 'Membership Type',
-                    }
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-    
     serialized = MembershipSerializer(membership_cr)
        
     return Response(

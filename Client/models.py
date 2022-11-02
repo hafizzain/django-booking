@@ -11,7 +11,6 @@ from Product.models import Product
 from Service.models import Service
 import uuid
 
-
 class Client(models.Model):
     GENDER_CHOICES = [
         ('Male' , 'Male'),
@@ -244,8 +243,18 @@ class Membership(models.Model):
         ('Service' , 'Service'),
     ]
     VALIDITY_CHOICE = [
-        ('Days' , 'Days'),
-        ('Months' , 'Months'),
+        ('7 Days' , '7 Days'),
+        ('14 Days' , '14 Days'),
+        ('1 Month' ,  '1 Months'),
+        ('2 Months' , '2 Months'),
+        ('3 Months' , '3 Months'),
+        ('4 Months' , '4 Months'),
+        ('6 Months' , '6 Months'),
+        ('8 Months' , '8 Months'),
+        ('1 Years' , '1 Years'),
+        ('18 Months' , '18 Months'),
+        ('2 Years' , '2 Years'),
+        ('5 Years' , '5 Years'),
     ]
     DISCOUNT_CHOICE = [
         ('Unlimited' , 'Unlimited'),
@@ -258,19 +267,23 @@ class Membership(models.Model):
     
     name =  models.CharField(max_length=100, default='')
     description =  models.CharField(max_length=300, null=True, blank=True)
-    membership = models.CharField(default='Product', choices=MEMBERSHIP_CHOICES, max_length=30, verbose_name = 'Membership_type')
+    #membership = models.CharField(default='Product', choices=MEMBERSHIP_CHOICES, max_length=30, verbose_name = 'Membership_type')
     
-    service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_memberships')
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_memberships')
+    # service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_memberships')
+    # product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_memberships')
     
     percentage = models.PositiveIntegerField(default=0)
     
-    total_number = models.PositiveIntegerField(default=0, null=True, blank=True)
-    valid_for = models.CharField(choices=VALIDITY_CHOICE, default='Months' , verbose_name='Validity for Days or Months', max_length=20)
+    #total_number = models.PositiveIntegerField(default=0, null=True, blank=True)
+    valid_for = models.CharField(choices=VALIDITY_CHOICE, default='7 Days' , verbose_name='Validity for Days or Months', max_length=20)
     discount = models.CharField(choices=DISCOUNT_CHOICE, default='Unlimited' , verbose_name='Discount Limit', max_length=20)
     
-    validity = models.PositiveIntegerField(default=0, verbose_name='No. of Validity Days/Month', null=True, blank=True)
+    #validity = models.PositiveIntegerField(default=0, verbose_name='No. of Validity Days/Month', null=True, blank=True)
+    
+    color =  models.CharField(max_length=100, default='')
+    term_condition =  models.CharField(max_length=300, null=True, blank=True)
 
+    
     price = models.PositiveIntegerField(default=0)
     tax_rate = models.PositiveIntegerField(default=0)
 
@@ -280,5 +293,23 @@ class Membership(models.Model):
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(null=True, blank=True)
 
+    def __str__(self):
+        return str(self.id)
+    
+class DiscountMembership(models.Model):
+    DURATION_CHOICE=[
+        ('7 Days', '7 Days'),
+        ('14 Days', '14 Days'),
+        ('1 Month', '1 Month'),
+    ]
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    
+    membership = models.ForeignKey(Membership, on_delete=models.CASCADE, related_name='membership_discountmembership')
+    discount = models.CharField(choices=DURATION_CHOICE, default='7 Days' , verbose_name='Duration', max_length=50)
+    percentage = models.PositiveIntegerField(default=0)
+
+    service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_memberships')
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_memberships')
+    
     def __str__(self):
         return str(self.id)

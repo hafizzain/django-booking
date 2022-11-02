@@ -19,4 +19,11 @@ urlpatterns = [
     path('get_all_sale_orders/', views.get_all_sale_orders),
     path('get_total_revenue/', views.get_total_revenue),
     
+    #Service Group
+    path('create_servicegroup/', views.create_servicegroup),
+    path('get_servicegroup/', views.get_servicegroup),
+    path('delete_servicegroup/', views.delete_servicegroup),
+    path('update_servicegroup/', views.update_servicegroup),
+
+    
 ]

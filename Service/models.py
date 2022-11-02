@@ -58,6 +58,8 @@ class Service(models.Model):
     name = models.CharField(max_length=100, default='')
 
     service_type = models.CharField(choices=TREATMENT_TYPES, max_length=50, null=True, blank=True)
+    
+    #servicegroup = models.ForeignKey("ServiceGroup", on_delete=models.SET_NULL, related_name='service_servicegroup', null=True, blank=True)
     parrent_service = models.ManyToManyField('Service', null=True, blank=True, related_name='parent_package_services')
     description = models.CharField(max_length=255, default='')
     #employee = models.ManyToManyField('Employee.Employee', related_name='employee_services_or_packages')
