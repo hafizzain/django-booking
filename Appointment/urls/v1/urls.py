@@ -19,7 +19,7 @@ urlpatterns = [
     #block time
     path('create_blockTime/', views.create_blockTime),
     path('update_block_time/', views.update_blocktime),
-    path('delete_block_time/', views.update_blocktime),
+    path('delete_block_time/', views.delete_block_time),
     
     #checkout
     path('create_checkout/', views.create_checkout)
