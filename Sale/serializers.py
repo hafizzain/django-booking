@@ -290,6 +290,16 @@ class VoucherOrderSerializer(serializers.ModelSerializer):
     
 class ServiceGroupSerializer(serializers.ModelSerializer):
     
+    services  = serializers.SerializerMethodField(read_only=True)
+    
+    def get_services(self, obj):
+        try:
+            all_service = obj.services.all()
+            #ser = Service.objects.get(id = obj.services)
+            return ServiceSearchSerializer(all_service, many = True).data
+        except Exception as err:
+            print(str(err))
+    
     class Meta:
         model = ServiceGroup
-        fields = '__all__'
+        fields = ['id', 'business', 'name', 'services']
