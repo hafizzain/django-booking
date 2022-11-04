@@ -589,6 +589,8 @@ def add_product(request):
     sku = request.data.get('sku', None)
     is_active = request.data.get('is_active', True)
     medias = request.data.getlist('product_images', None)
+    
+    location = request.data.get('location', None)
 
     # Product Stock Details 
     quantity = request.data.get('quantity', None)
@@ -598,10 +600,12 @@ def add_product(request):
     product_unit = request.data.get('product_unit', None)
     amount = request.data.get('amount', None)
     stock_status = request.data.get('stock_status', None)
+
     #turnover = request.data.get('turnover', None)
    
     alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', None)
-   
+    
+    product_error = []
 
     if not all([name,medias, brand_id, category_id, cost_price, full_price, sell_price, sku,  stock_status ]):
         return Response(
@@ -721,6 +725,19 @@ def add_product(request):
         is_active=True,
         published = True,
     )
+    if type(location) == str:
+            location = json.loads(location)
+
+    elif type(location) == list:
+            pass
+        
+    for loc in location:
+        try:
+            location_id = BusinessAddress.objects.get(id=loc)  
+            print(location_id)
+            product.location.add(location_id)
+        except Exception as err:
+            product_error.append(str(err))
 
 
     for img in medias:
@@ -757,6 +774,7 @@ def add_product(request):
             'response' : {
                 'message' : 'Product Added!',
                 'error_message' : None,
+                'errors': product_error,
                 'product' : serialized.data
             }
         },
@@ -770,6 +788,7 @@ def update_product(request):
     vendor_id = request.data.get('vendor', None)
     category_id = request.data.get('category', None)
     brand_id = request.data.get('brand', None)
+    location = request.data.get('location', None)
 
     if not all([product_id, category_id, brand_id]):
         return Response(
@@ -851,6 +870,17 @@ def update_product(request):
     
     data={}
     
+    if type(location) == str:
+            location = json.loads(location)
+            
+    product.location.clear()
+    for loc in location:
+        try:
+            address=  BusinessAddress.objects.get(id = str(loc))
+            product.location.add(address)
+        except Exception as err:
+            print(err)
+            
     stock=ProductStock.objects.get(product=product)
     serialized= ProductStockSerializer(stock, data=request.data, partial=True)
     if serialized.is_valid():

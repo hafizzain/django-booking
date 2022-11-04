@@ -670,7 +670,7 @@ def get_all_sale_orders(request):
     data.extend(serialized.data)
     
     membership_order = MemberShipOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = MemberShipOrderSerializer(membership_order,  many=True, context={'request' : request})
+    serialized = MemberShipOrderSerializer(membership_order,  many=True, context={'request' : request} )
     data.extend(serialized.data)
     
     voucher_orders = VoucherOrder.objects.filter(is_deleted=False).order_by('-created_at')

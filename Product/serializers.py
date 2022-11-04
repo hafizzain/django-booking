@@ -8,7 +8,7 @@ from rest_framework import serializers
 from Product.Constants.index import tenant_media_base_url
 from Product.models import (Category, Brand, Product, ProductMedia, 
                             ProductStock, OrderStock , OrderStockProduct)
-from Business.models import BusinessVendor
+from Business.models import BusinessAddress, BusinessVendor
 from django.conf import settings
 
 
@@ -16,6 +16,11 @@ from django.conf import settings
 class FileUploadSerializer(serializers.Serializer):
     file = serializers.FileField()
     
+class LocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessAddress
+        fields = ['id', 'address_name']
+
 class SaveFileSerializer(serializers.Serializer):
     
     class Meta:
@@ -138,7 +143,18 @@ class ProductSerializer(serializers.ModelSerializer):
     stocks = serializers.SerializerMethodField()
     cover_image = serializers.SerializerMethodField()
     
+    location = serializers.SerializerMethodField()
+    
+    def get_location(self, obj):
+        try:
+            all_location = obj.location.all()
+            return LocationSerializer(all_location, many = True).data
+            # return EmployeeServiceSerializer(obj.services).data
+        except Exception as err:
+            print(err)
+            None
 
+    
     def get_cover_image(self, obj):
         cvr_img = ProductMedia.objects.filter(product=obj, is_cover=True, is_deleted=False).order_by('-created_at')
         try:
@@ -188,6 +204,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'category',
             'brand', 
             'created_at',
+            'location'
         ]
         read_only_fields = ['slug', 'id']
 class ProductOrderSerializer(serializers.ModelSerializer):

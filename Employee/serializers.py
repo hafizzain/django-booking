@@ -2,6 +2,7 @@ from dataclasses import fields
 from genericpath import exists
 from pyexpat import model
 from Appointment.models import AppointmentCheckout
+from Business.models import BusinessAddress
 from Product.Constants.index import tenant_media_base_url
 from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSIONS_MODEL_FIELDS
 from Utility.models import Country, GlobalPermissionChoices, State, City
@@ -35,6 +36,12 @@ class CitySerializer(serializers.ModelSerializer):
     class Meta:
         model = City
         exclude = ['is_deleted', 'created_at', 'unique_code', 'key']
+ 
+class LocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessAddress
+        fields = ['id', 'address_name']
+     
         
 class EmployeInformationsSerializer(serializers.ModelSerializer):
     # services = serializers.SerializerMethodField(read_only=True)
@@ -116,16 +123,23 @@ class EmployeSerializer(serializers.ModelSerializer):
     sunday =  serializers.SerializerMethodField(read_only=True)
     
     staff_group = serializers.SerializerMethodField(read_only=True)
+    location = serializers.SerializerMethodField(read_only=True)
+
+    def get_location(self, obj):
+        try:
+            #loc = BusinessAddress.objects.filter(id=obj.location.id)
+            all_location = obj.location.all()
+            return LocationSerializer(all_location, many = True).data
+            # return EmployeeServiceSerializer(obj.services).data
+        except Exception as err:
+            print(err)
+            None
     
     def get_staff_group(self, obj):
         try:
             staff = StaffGroup.objects.get(employees = obj)
-            print(staff)
             return str(staff.id)
             
-            #return StaffGroupSerializers(staff).data 
-            #
-            print(staff)
         except Exception as err:
             print(err)
     
@@ -291,8 +305,7 @@ class EmployeSerializer(serializers.ModelSerializer):
     #         permissions: permissions
     #     }
 
-        
-        
+
 
 class StaffGroupSerializers(serializers.ModelSerializer):
 
@@ -338,7 +351,6 @@ class StaffpermisionSerializers(serializers.ModelSerializer):
     class Meta:
         model = StaffGroupModulePermission
         exclude = ['id']
-#        fields ='__all__'
 
 class AttendanceSerializers(serializers.ModelSerializer):
     employee = serializers.SerializerMethodField()
@@ -402,8 +414,10 @@ class EmployPayrollSerializers(serializers.ModelSerializer):
             'salary',
             'start_time',
             'end_time',
+            'employee_id',
             
          ]        
+
 class PayrollSerializers(serializers.ModelSerializer):
     employee = EmployPayrollSerializers(read_only=True)
     class Meta:
@@ -415,6 +429,7 @@ class PayrollSerializers(serializers.ModelSerializer):
             #'employee',
             'employee'
             ]
+
 class singleEmployeeSerializer(serializers.ModelSerializer):
     salary = serializers.SerializerMethodField(read_only=True)
     income_type = serializers.SerializerMethodField(read_only=True)
@@ -427,6 +442,19 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
     state_name = serializers.SerializerMethodField(read_only=True)
     city_name = serializers.SerializerMethodField(read_only=True)   
     services = serializers.SerializerMethodField(read_only=True)
+    
+    #location = LocationSerializer(read_only=True) 
+    
+    location = serializers.SerializerMethodField()
+    
+    def get_location(self, obj):
+        try:
+            all_location = obj.location.all()
+            return LocationSerializer(all_location, many = True).data
+            # return EmployeeServiceSerializer(obj.services).data
+        except Exception as err:
+            print(err)
+            None
 
     def get_services(self, obj):
         try:
@@ -517,7 +545,8 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'employee_id',
             'employee_info',  
             'services',
-            'created_at'    
+            'created_at' ,
+            'location',   
             ]   
         
 class CommissionSerializer(serializers.ModelSerializer):

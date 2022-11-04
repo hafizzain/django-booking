@@ -1580,6 +1580,7 @@ def create_memberships(request):
     #months = request.data.get('months',None)
     price = request.data.get('price',None)
     tax_rate = request.data.get('tax_rate',None)
+    discount = request.data.get('discount',None)
     
     if not all([business, name , valid_for, price, ]):
         return Response(
@@ -1630,9 +1631,10 @@ def create_memberships(request):
         #total_number = total_number,
         
         #New Require
-        description =description,
+        description = description,
         color = color,
-        term_condition=terms_condition,
+        term_condition = terms_condition,
+        #discount = discount,
         
     )
     for ser in services:
