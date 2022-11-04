@@ -863,6 +863,7 @@ def update_employee(request):
         is_active = request.data.get('is_active' ,None)
         services_id = request.data.get('services', None)   
         staff_id = request.data.get('staff_group', None) 
+        location = request.data.get('location', None) 
 
         if id is None:
             return Response(
@@ -1014,7 +1015,18 @@ def update_employee(request):
                             pass
 
         empl_permission.save()
-   
+        
+        if type(location) == str:
+            location = json.loads(location)
+            
+        employee.location.clear()
+        for loc in location:
+            try:
+                address=  BusinessAddress.objects.get(id = str(loc))
+                employee.location.add(address)
+            except Exception as err:
+                print(err)
+
         serializer = EmployeSerializer(employee, data=request.data, partial=True, context={'request' : request,})
         if serializer.is_valid():
            serializer.save()

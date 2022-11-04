@@ -774,9 +774,10 @@ def create_checkout(request):
         #     status=status.HTTP_404_NOT_FOUND
         # )
     try:
-        appointments = AppointmentService.objects.get(id=appointment)
+        appointments = Appointment.objects.get(id=service_appointment.appointment.id)
     except Exception as err:
         appointments = None
+    print(appointments)
         # return Response(
         #     {
         #         'status' : False,
@@ -807,6 +808,8 @@ def create_checkout(request):
         total_price =total_price,
         
     )
+    checkout.business_address = service_appointment.business_address
+    checkout.save()
     
     serialized = CheckoutSerializer(checkout)
     return Response(
@@ -814,7 +817,7 @@ def create_checkout(request):
                 'status' : True,
                 'status_code' : 201,
                 'response' : {
-                    'message' : 'Appointment Checkout Create!',
+                    'message' : 'Appointment Checkout Created!',
                     'error_message' : None,
                     'checkout' : serialized.data,
                 }

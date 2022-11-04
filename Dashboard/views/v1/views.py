@@ -12,7 +12,7 @@ from Business.models import Business, BusinessAddress
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_busines_client_appointment(request):
-    business_id = request.data.get('location', None)
+    business_id = request.GET.get('location', None)
     
     if business_id is None:
         return Response(
@@ -30,45 +30,35 @@ def get_busines_client_appointment(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    try:
-        business_address = BusinessAddress.objects.get(id=business_id)
-    except Exception as err:
-            return Response(
-            {
-                    'status' : False,
-                    # 'error_message' : str(err),
-                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
-                    'response' : {
-                    'message' : 'Business not found',
-                }
-            }
-        )
+    revenue = 0
+    appointment = 0
+    # try:
+    #     business_address = BusinessAddress.objects.get(id=business_id)
+    # except Exception as err:
+    #         return Response(
+    #         {
+    #                 'status' : False,
+    #                 # 'error_message' : str(err),
+    #                 'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+    #                 'response' : {
+    #                 'message' : 'Business not found',
+    #             }
+    #         }
+    #     )
+    
+    #client_count = Client.objects.filter(client_appointments__business_address__id = business_id).prefetch_related('client_appointments__business_address')
+    client_count = Client.objects.prefetch_related('client_appointments__business_address').filter(client_appointments__business_address__id = business_id).count()
+ 
+    # checkouts = AppointmentCheckout.objects.filter(business_address__id = business_id).values_list('total_price', flat=True)
+    # check = [int(ck) for ck in checkouts]
+    # checkouts = sum(check)
+    checkouts = AppointmentCheckout.objects.filter(business_address__id = business_id)
+    for check in checkouts:
+        appointment +=1
+        if check.total_price is not None:
+            revenue += check.total_price
         
-    #orders_price = Order.objects.aggregate(Total= Sum('total_price'))
-    # total_revenue = 0
-    # appointments_count = 0
-    # client_count = 0
-    
-    client_count = Client.objects.filter(client_appointments__business_address = business_address).count()
-    # counts = Client.objects.all()
-    # for c in counts:
-    #     print(c)
-        # for p in c.client_appointments.all():
-            # print(p.business_address)
-            
-    checkouts = AppointmentCheckout.objects.filter(business_address = business_address).values_list('total_price', flat=True)
-    # checkouts = [int(ck) for ck in checkouts]
-    checkouts = sum(checkouts)
-    # for order in appointment:
-        # print(order.appointment.business_address)
-        # appointments_count +=1
-        # if order.total_price is not None:
-        #     total_revenue += order.total_price
-        # appointments = Appointment.objects.filter(id = order.appointment.id)
-        # for ie in appointments:
-            
-        #     print(f"{ie},, test")
-    
+ 
     return Response(
         {
             'status' : 200,
@@ -76,9 +66,9 @@ def get_busines_client_appointment(request):
             'response' : {
                 'message' : 'Total Revenue',
                 'error_message' : None,
-                'revenue' : checkouts,
-                # 'appointments_count': 'appointment',
+                'revenue' : revenue,
                 'client_count': client_count,
+                'appointments_count': appointment,
             }
         },
         status=status.HTTP_200_OK
