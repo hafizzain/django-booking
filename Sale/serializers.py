@@ -208,22 +208,22 @@ class MemberShipOrderSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
     member  = serializers.SerializerMethodField(read_only=True)
     membership  = serializers.SerializerMethodField(read_only=True)
-    location = serializers.SerializerMethodField(read_only=True)
+    #location = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
     
     def get_order_type(self, obj):
         return 'Membership'
     
-    def get_location(self, obj):
-        try:
-            serializers = LocationSerializer(obj.location).data
-            return serializers
-        except Exception as err:
-            return None
+    # def get_location(self, obj):
+    #     try:
+    #         serializers = LocationSerializer(obj.location).data
+    #         return serializers
+    #     except Exception as err:
+    #         return None
     
     def get_member(self, obj):
         try:
-            serializers = MemberSerializer(obj.member).data
+            serializers = MemberSerializer(obj.member,context=self.context ).data
             return serializers
         except Exception as err:
             return None
@@ -240,11 +240,11 @@ class MemberShipOrderSerializer(serializers.ModelSerializer):
             return obj.membership.name
         except Exception as err:
             return None
-    
+    # ,'location' ,'start_date', 'end_date','status', 'total_price', 'payment_type', 'order_type'
     
     class Meta:
         model = MemberShipOrder
-        fields =['id', 'membership', 'client' ,'location' ,'member' ,'start_date', 'end_date','status', 'total_price', 'payment_type', 'order_type' ]
+        fields =['id', 'membership','order_type' ,'client','member','location' ,'start_date', 'end_date','status', 'total_price', 'payment_type' ]
         
 class VoucherOrderSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
@@ -265,7 +265,7 @@ class VoucherOrderSerializer(serializers.ModelSerializer):
     
     def get_member(self, obj):
         try:
-            serializers = MemberSerializer(obj.member).data
+            serializers = MemberSerializer(obj.member, context=self.context).data
             return serializers
         except Exception as err:
             return None
