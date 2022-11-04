@@ -433,8 +433,7 @@ def single_employee_schedule(request):
         status=status.HTTP_200_OK
     )
     
-    
-    
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def working_schedule(request):

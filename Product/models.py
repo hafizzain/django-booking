@@ -46,7 +46,8 @@ class Product(models.Model):
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_products')
     vendor = models.ForeignKey(BusinessVendor, on_delete=models.CASCADE, related_name='vendor_products', default=None, null=True, blank=True)
     
-    
+    location = models.ManyToManyField(BusinessAddress, related_name='location_product')
+
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='category_products')
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True, related_name='brand_products')
     product_type = models.CharField(default='Sellable', choices=PRODUCT_TYPE_CHOICES, max_length=20)
