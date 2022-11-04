@@ -83,7 +83,7 @@ def get_single_appointments(request):
 @permission_classes([AllowAny])
 def get_today_appointments(request):
     today = date.today()
-    today_appointment = AppointmentService.objects.filter(appointment_date__icontains = today )
+    today_appointment = AppointmentService.objects.filter(appointment_date__icontains = today, is_blocked=False )
     serialize = TodayAppoinmentSerializer(today_appointment, many=True)
     return Response(
         {

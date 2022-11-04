@@ -402,6 +402,7 @@ class EmployPayrollSerializers(serializers.ModelSerializer):
             'salary',
             'start_time',
             'end_time',
+            'employee_id',
             
          ]        
 class PayrollSerializers(serializers.ModelSerializer):
