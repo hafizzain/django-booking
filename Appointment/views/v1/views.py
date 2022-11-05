@@ -828,10 +828,15 @@ def create_checkout(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def service_appointment_count(request):
+    address = request.GET.get('address', None)
+    try:
+        adds = BusinessAddress.objects.get(id = address)
+    except Exception as err:
+        print(err)
     services = Service.objects.all()
     return_data =[]
     for ser in services:
-        app_service = AppointmentService.objects.filter(service = ser)
+        app_service = AppointmentService.objects.filter(service = ser, business_address =adds )
         count = app_service.count()
         data = {
             # 'id' : str(ser.id),

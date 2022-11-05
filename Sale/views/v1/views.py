@@ -855,6 +855,9 @@ def get_total_revenue(request):
                
     orders = Order.objects.filter(is_deleted=False)
     for order in orders:
+        create_at = str(order.created_at)
+        
+        matching = int(create_at.split(" ")[0].split("-")[1])
         if( matching == 0 ):
             
             data['sale_jan'] +=1
@@ -927,7 +930,6 @@ def get_total_revenue(request):
         #         appointments_count +=1
         #         if app.total_price is not None:
         #             total_revenue += app.total_price
-    print(MONTHS)
     total = 0
     appointmemnt_sale = 0
     order_sale = 0

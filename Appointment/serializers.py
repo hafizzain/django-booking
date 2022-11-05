@@ -23,6 +23,11 @@ class UpdateAppointmentSerializer(serializers.ModelSerializer):
         model = AppointmentService
         fields = '__all__'
 
+class LocationSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = BusinessAddress
+        fields = ('id', 'address_name')
 
 class ServiceAppointmentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -50,6 +55,14 @@ class TodayAppoinmentSerializer(serializers.ModelSerializer):
     member = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
     end_time = serializers.SerializerMethodField(read_only=True)
+    location = serializers.SerializerMethodField(read_only=True)
+    
+    def get_location(self, obj):
+        try:
+            loc = BusinessAddress.objects.get(id = obj.business_address.id)
+            return LocationSerializer(loc).data
+        except Exception as err:
+            print(err)      
     
     def get_member(self, obj):
         try: 
@@ -76,7 +89,8 @@ class TodayAppoinmentSerializer(serializers.ModelSerializer):
             return None
     class Meta:
         model = AppointmentService
-        fields = ('id', 'appointment_time', 'appointment_date', 'member' , 'service', 'end_time' )
+        fields = ('id', 'appointment_time', 'appointment_date',
+                  'member' , 'service', 'end_time', 'location' )
         
 class AppointmentServiceSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
@@ -277,6 +291,14 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
     booking_id = serializers.SerializerMethodField(read_only=True)
     appointment_type = serializers.SerializerMethodField(read_only=True)
     appointment_status = serializers.SerializerMethodField(read_only=True)
+    location = serializers.SerializerMethodField(read_only=True)
+    
+    def get_location(self, obj):
+        try:
+            loc = BusinessAddress.objects.get(id = obj.business_address.id)
+            return LocationSerializer(loc).data
+        except Exception as err:
+            print(err)      
     
     def get_appointment_status(self, obj):
         if obj.appointment_status == 'Appointment Booked' or  obj.appointment_status ==  'Arrived'  or obj.appointment_status == 'In Progress' :
@@ -328,7 +350,10 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = AppointmentService
-        fields= ('id', 'service', 'member', 'price', 'client', 'appointment_date', 'appointment_time', 'booked_by' , 'booking_id', 'appointment_type', 'appointment_status')
+        fields= ('id', 'service', 'member', 'price', 'client', 
+                 'appointment_date', 'appointment_time', 
+                 'booked_by' , 'booking_id', 'appointment_type',
+                 'appointment_status', 'location')
         
         
 class SingleAppointmentSerializer(serializers.ModelSerializer):
