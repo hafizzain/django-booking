@@ -832,6 +832,7 @@ def service_appointment_count(request):
     try:
         adds = BusinessAddress.objects.get(id = address)
     except Exception as err:
+        adds = None
         print(err)
     services = Service.objects.all()
     return_data =[]
