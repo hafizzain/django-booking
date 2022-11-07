@@ -535,6 +535,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'email',
             'gender',
             'address', 
+            'mobile_number',
             'full_name',
             'country_name',
             'state_name',

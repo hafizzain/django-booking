@@ -10,6 +10,7 @@ from rest_framework.response import Response
 
 from rest_framework import status
 from Business.models import Business , BusinessAddress
+from datetime import datetime
 
 #from Service.models import Service
 from Service.models import Service
@@ -829,6 +830,11 @@ def create_checkout(request):
 @permission_classes([AllowAny])
 def service_appointment_count(request):
     address = request.GET.get('address', None)
+    duration = request.GET.get('duration', None) 
+    
+    today = datetime.today()
+    day = today - timedelta(days=int(duration))
+    
     try:
         adds = BusinessAddress.objects.get(id = address)
     except Exception as err:
@@ -837,7 +843,7 @@ def service_appointment_count(request):
     services = Service.objects.all()
     return_data =[]
     for ser in services:
-        app_service = AppointmentService.objects.filter(service = ser, business_address =adds )
+        app_service = AppointmentService.objects.filter(service = ser, business_address =adds , created_at__gte = day )
         count = app_service.count()
         data = {
             # 'id' : str(ser.id),

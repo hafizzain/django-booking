@@ -531,11 +531,11 @@ def create_client_group(request):
             pass
         
     for usr in client:
-            try:
-               employe = Client.objects.get(id=usr)  
-               client_group.client.add(employe)
-            except Exception as err:
-                client_error.append(str(err))
+        try:
+            employe = Client.objects.get(id=usr)  
+            client_group.client.add(employe)
+        except Exception as err:
+            client_error.append(str(err))
                 
     client_group.save()
     serialized=ClientGroupSerializer(client_group, context={'request' : request})
