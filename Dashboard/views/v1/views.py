@@ -9,10 +9,17 @@ from Client.models import Client
 from NStyle.Constants import StatusCodes
 from Business.models import Business, BusinessAddress
 
+from datetime import datetime
+from datetime import timedelta
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_busines_client_appointment(request):
     business_id = request.GET.get('location', None)
+    duration = request.GET.get('duration', None) 
+    
+    today = datetime.today()
+    day = today - timedelta(days=int(duration))
     
     if business_id is None:
         return Response(
@@ -32,33 +39,19 @@ def get_busines_client_appointment(request):
         )
     revenue = 0
     appointment = 0
-    # try:
-    #     business_address = BusinessAddress.objects.get(id=business_id)
-    # except Exception as err:
-    #         return Response(
-    #         {
-    #                 'status' : False,
-    #                 # 'error_message' : str(err),
-    #                 'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
-    #                 'response' : {
-    #                 'message' : 'Business not found',
-    #             }
-    #         }
-    #     )
-    
+        
     #client_count = Client.objects.filter(client_appointments__business_address__id = business_id).prefetch_related('client_appointments__business_address')
     client_count = Client.objects.prefetch_related('client_appointments__business_address').filter(client_appointments__business_address__id = business_id).count()
  
     # checkouts = AppointmentCheckout.objects.filter(business_address__id = business_id).values_list('total_price', flat=True)
     # check = [int(ck) for ck in checkouts]
     # checkouts = sum(check)
-    checkouts = AppointmentCheckout.objects.filter(business_address__id = business_id)
+    checkouts = AppointmentCheckout.objects.filter(business_address__id = business_id, created_at__gte = day)
     for check in checkouts:
         appointment +=1
         if check.total_price is not None:
             revenue += check.total_price
-        
- 
+
     return Response(
         {
             'status' : 200,

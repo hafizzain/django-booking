@@ -353,7 +353,7 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
         fields= ('id', 'service', 'member', 'price', 'client', 
                  'appointment_date', 'appointment_time', 
                  'booked_by' , 'booking_id', 'appointment_type',
-                 'appointment_status', 'location')
+                 'appointment_status', 'location', 'created_at')
         
         
 class SingleAppointmentSerializer(serializers.ModelSerializer):

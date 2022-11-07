@@ -54,6 +54,7 @@ NSTYLE_APPS = [
     'Permissions.apps.PermissionsConfig',
     'Order.apps.OrderConfig',
     'Dashboard.apps.DashboardConfig',
+    'CRM.apps.CrmConfig',
 ]
 
 
