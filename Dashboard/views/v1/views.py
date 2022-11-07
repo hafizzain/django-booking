@@ -18,9 +18,6 @@ def get_busines_client_appointment(request):
     business_id = request.GET.get('location', None)
     duration = request.GET.get('duration', None) 
     
-    today = datetime.today()
-    day = today - timedelta(days=int(duration))
-    
     if business_id is None:
         return Response(
             {
@@ -46,7 +43,12 @@ def get_busines_client_appointment(request):
     # checkouts = AppointmentCheckout.objects.filter(business_address__id = business_id).values_list('total_price', flat=True)
     # check = [int(ck) for ck in checkouts]
     # checkouts = sum(check)
-    checkouts = AppointmentCheckout.objects.filter(business_address__id = business_id, created_at__gte = day)
+    if duration is not None:
+        today = datetime.today()
+        day = today - timedelta(days=int(duration))
+        checkouts = AppointmentCheckout.objects.filter(business_address__id = business_id, created_at__gte = day)
+    else:
+        checkouts = AppointmentCheckout.objects.filter(business_address__id = business_id)
     for check in checkouts:
         appointment +=1
         if check.total_price is not None:

@@ -10,6 +10,8 @@ from Product.models import Product
 from Service.models import Service
 
 # Create your models here.
+# class checkOrder(models.Model):
+#     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True,)
 
 
 class Order(models.Model):    
