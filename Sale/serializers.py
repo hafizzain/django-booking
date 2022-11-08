@@ -86,7 +86,8 @@ class ServiceSerializer(serializers.ModelSerializer):
             group = ServiceGroup.objects.get(services = obj)
             return ServiceSearchSerializer(group).data
         except Exception as err:
-            print(str(err))
+            pass
+            #print(str(err))
     
     def get_employees(self, obj):
         emp = EmployeeSelectedService.objects.filter(service = obj) 
