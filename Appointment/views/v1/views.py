@@ -325,10 +325,10 @@ def create_appointment(request):
             service = service,
             member = member,
             
-            voucher = voucher,
-            reward = reward,
-            membership = membership,
-            promotion = promotion
+            # voucher = voucher,
+            # reward = reward,
+            # membership = membership,
+            # promotion = promotion
             # tip=tip,
         )
         if fav is not None:
