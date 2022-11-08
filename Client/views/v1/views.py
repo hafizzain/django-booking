@@ -1637,54 +1637,69 @@ def create_memberships(request):
         #discount = discount,
         
     )
-    for ser in services:
-        percentage = ser['percentage']
-        servic = ser['service']
-        
-        try:
-            service_id=Service.objects.get(id=servic)
-        except Exception as err:
-            return Response(
-                {
-                    'status' : False,
-                    'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
-                    'response' : {
-                    'message' : 'Service not found',
-                    'error_message' : str(err),
-                    }
-                },
-                status=status.HTTP_400_BAD_REQUEST
+    if services is not None:
+        if type(services) == str:
+            services = services.replace("'" , '"')
+            services = json.loads(services)
+        else:
+            pass
+        for ser in services:
+            percentage = ser['percentage']
+            duration = ser['duration']
+            servic = ser['service']
+            
+            try:
+                service_id=Service.objects.get(id=servic)
+            except Exception as err:
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
+                        'response' : {
+                        'message' : 'Service not found',
+                        'error_message' : str(err),
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            services_obj = DiscountMembership.objects.create(
+                membership = membership_cr,
+                percentage =percentage,
+                duration =duration,
+                service = service_id
             )
-        services_obj = DiscountMembership.objects.create(
-            membership = membership_cr,
-            percentage =percentage,
-            service = service_id
-        )
-    
-    for pro in products:
-        
-        percentage = pro['percentage']
-        product = pro['product']
-        
-        try:
-            product_id=Product.objects.get(id=product)
-        except Exception as err:
-            return Response(
-                {
-                    'status' : False,
-                    'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
-                    'response' : {
-                    'message' : 'Product not found',
-                    'error_message' : str(err),
-                    }
-                },
-                status=status.HTTP_400_BAD_REQUEST
+    if products is not None:
+        if type(products) == str:
+            products = products.replace("'" , '"')
+            products = json.loads(products)
+        else:
+            pass
+        for pro in products:
+            
+            percentage = pro['percentage']
+            product = pro['product']
+            duration = ser['duration']
+            
+            try:
+                product_id=Product.objects.get(id=product)
+            except Exception as err:
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
+                        'response' : {
+                        'message' : 'Product not found',
+                        'error_message' : str(err),
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            services_obj = DiscountMembership.objects.create(
+                membership = membership_cr,
+                percentage =percentage,
+                product = product_id,
+                duration =duration,
             )
-        services_obj = DiscountMembership.objects.create(
-            membership = membership_cr,
-            percentage =percentage,
-            product = product_id,
-        )
             
     serialized = MembershipSerializer(membership_cr)
        
