@@ -104,22 +104,20 @@ class ServiceSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'name' , 
-            'service_type', 
+            'service_availible',
             'employees', 
             'parrent_service' , 
             'description', 
             'location',
-            'duration',
-            'enable_team_comissions',
-            'enable_vouchers',
             'controls_time_slot',
             'initial_deposit',
             'client_can_book',
             'slot_availible_for_online',
-            'price',
             'is_package',
             'service_group',
             'priceservice',
+            'enable_team_comissions',
+            'enable_vouchers',
             ]
         
         
