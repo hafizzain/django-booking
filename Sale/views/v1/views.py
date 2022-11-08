@@ -223,17 +223,26 @@ def create_service(request):
         service_group.save()
 
     except Exception as err:
-        employees_error.append(str(err))    
-    for ser in priceservice:
-        
-        duration = ser['duration']
-        price = ser['price']
-        
-        price_service = PriceService.objects.create(
-            service = service_obj ,
-            duration = duration,
-            price = price,
-        )
+        employees_error.append(str(err))  
+          
+    if priceservice is not None:
+        if type(priceservice) == str:
+            priceservice = priceservice.replace("'" , '"')
+            priceservice = json.loads(priceservice)
+        else:
+            pass
+        for ser in priceservice:
+            try:
+                duration = ser['duration']
+                price = ser['price']
+                
+                price_service = PriceService.objects.create(
+                    service = service_obj ,
+                    duration = duration,
+                    price = price,
+                )
+            except Exception as err:
+                employees_error.append(str(err))
         
     
     service_serializers= ServiceSerializer(service_obj)
@@ -308,6 +317,7 @@ def delete_service(request):
 @permission_classes([IsAuthenticated])
 def update_service(request):
     id = request.data.get('id', None)
+    priceservice = request.data.get('priceservice', None)
     if id is None: 
         return Response(
         {
@@ -397,6 +407,40 @@ def update_service(request):
             except Exception as err:
                 error.append(str(err))
     #service_id.save()
+    
+    if priceservice is not None:
+        if type(priceservice) == str:
+            priceservice = priceservice.replace("'" , '"')
+            priceservice = json.loads(priceservice)
+        else:
+            pass
+        for ser in priceservice:
+            s_service_id = ser.get('id', None)
+            if s_service_id is not None:
+                try: 
+                    price_service = PriceService.objects.get(id=ser['id'])
+                    is_deleted = ser.get('is_deleted', None)
+                    if is_deleted is not None:
+                        price_service.delete()
+                        continue
+                    servic = Service.objects.get(id=ser['service'])
+                    price_service.service = servic
+                    price_service.duration = ser['duration']
+                    price_service.price = ser['price']
+                    price_service.save()
+                    
+                except Exception as err:
+                    error.append(str(err))
+                    print(err)
+            else:
+                ser = Service.objects.get(id=ser['service'])
+
+                emp_service = EmployeeSelectedService.objects.create(
+                    service=service_id,
+                    duration = ser['duration'],
+                    price=ser['price']
+                )
+    
     
     serializer= ServiceSerializer(service_id, context={'request' : request} , data=request.data, partial=True)
     if serializer.is_valid():
