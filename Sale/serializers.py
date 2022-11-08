@@ -5,11 +5,17 @@ from Client.models import Client, Membership
 
 from Employee.models import Employee, EmployeeSelectedService
 from Business.models import BusinessAddress
-from Order.models import MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
+from Order.models import Checkout, MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
 from Product.Constants.index import tenant_media_base_url
 from Product.models import ProductStock
 
-from Service.models import Service, ServiceGroup
+from Service.models import PriceService, Service, ServiceGroup
+
+class PriceServiceSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = PriceService
+        fields = '__all__'
+        
 
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -65,6 +71,16 @@ class ServiceSerializer(serializers.ModelSerializer):
     employees = serializers.SerializerMethodField(read_only=True)
     service_group = serializers.SerializerMethodField(read_only=True)
     
+    priceservice = serializers.SerializerMethodField(read_only=True)
+    
+    def get_priceservice(self, obj):
+        try:
+            ser = PriceService.objects.filter(service = obj)
+            return PriceServiceSerializers(ser, many = True).data
+        except Exception as err:
+            print(err)
+            
+    
     def get_service_group(self, obj):
         try:
             group = ServiceGroup.objects.get(services = obj)
@@ -103,6 +119,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             'price',
             'is_package',
             'service_group',
+            'priceservice',
             ]
         
         
@@ -303,3 +320,27 @@ class ServiceGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceGroup
         fields = ['id', 'business', 'name', 'services']
+        
+class CheckoutSerializer(serializers.ModelSerializer):
+    product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
+    service  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
+    
+    def get_product(self, obj):
+        try:
+            check = ProductOrder.objects.filter(checkout =  obj)
+            #all_service = obj.product.all()
+            return ProductOrderSerializer(check, many = True , context=self.context ).data
+        except Exception as err:
+            print(str(err))
+            
+    def get_service(self, obj):
+        try:
+            check = ServiceOrder.objects.filter(checkout =  obj)
+            #all_service = obj.product.all()
+            return ProductOrderSerializer(check, many = True , context=self.context ).data
+        except Exception as err:
+            print(str(err))
+    
+    class Meta:
+        model = Checkout
+        fields = ['id', 'product', 'service']
