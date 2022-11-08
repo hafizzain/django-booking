@@ -258,7 +258,7 @@ class Membership(models.Model):
     ]
     DISCOUNT_CHOICE = [
         ('Unlimited' , 'Unlimited'),
-        ('Limited' , 'Limited'),
+        ('Free' , 'Free'),
     ]
 
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
