@@ -1638,7 +1638,6 @@ def create_memberships(request):
         
     )
     for ser in services:
-        discount = ser['discount']
         percentage = ser['percentage']
         servic = ser['service']
         
@@ -1658,14 +1657,12 @@ def create_memberships(request):
             )
         services_obj = DiscountMembership.objects.create(
             membership = membership_cr,
-            discount =discount,
             percentage =percentage,
             service = service_id
         )
     
     for pro in products:
         
-        discount = pro['discount']
         percentage = pro['percentage']
         product = pro['product']
         
@@ -1685,7 +1682,6 @@ def create_memberships(request):
             )
         services_obj = DiscountMembership.objects.create(
             membership = membership_cr,
-            discount =discount,
             percentage =percentage,
             product = product_id,
         )
