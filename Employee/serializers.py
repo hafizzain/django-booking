@@ -560,6 +560,7 @@ class AssetdocmemtSerializer(serializers.ModelSerializer):
     document = serializers.SerializerMethodField()
     
     def get_document(self, obj):
+        print("gvb", obj)
         try:
             request = self.context["request"]
             url = tenant_media_base_url(request)

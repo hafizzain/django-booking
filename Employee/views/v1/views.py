@@ -2020,7 +2020,7 @@ def create_asset(request):
                 asset = asset,
                 document = doc
             )
-    serializers= AssetSerializer(asset)
+    serializers= AssetSerializer(asset, context={'request' : request})
     
     return Response(
             {
@@ -2141,7 +2141,7 @@ def update_asset(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    serializer = AssetSerializer(asset, data=request.data, partial=True)
+    serializer = AssetSerializer(asset, data=request.data, partial=True, context={'request' : request})
     if not serializer.is_valid():
         return Response(
                 {

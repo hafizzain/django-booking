@@ -82,6 +82,8 @@ def create_service(request):
     employee = request.data.get('employee', None)
     location_id = request.data.get('location', None)
     
+    service_availible = request.data.get('service_availible', None)
+    
     priceservice = request.data.get('priceservice', None)
         
     controls_time_slot = request.data.get('controls_time_slot', None)
@@ -147,6 +149,7 @@ def create_service(request):
         business =business_id,
         name = name,
         description = description,
+        service_availible = service_availible,
         #location=location,
         #service_type = treatment_type,
         controls_time_slot=controls_time_slot,
