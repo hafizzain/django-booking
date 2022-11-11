@@ -1141,7 +1141,7 @@ def create_sale_order(request):
                 # print(product_stock.sellable_quantity)
                 
                 if product_stock.consumable_quantity is not None:
-                    available += int(product_stock.consumable_quantity)
+                    available += product_stock.consumable_quantity
 
                 if product_stock.sellable_quantity is not None:
                     available += product_stock.sellable_quantity
@@ -1258,7 +1258,7 @@ def create_sale_order(request):
             #for membership in ids:
             try:
                 membership = Membership.objects.get(id = service_id)
-                end_date_cal = membership.created_at +  timedelta(days=membership.validity)
+                end_date_cal = membership.created_at +  timedelta(days=membership.valid_for.split(" ")[1])
                 start_date_cal = membership.created_at
                 
                 membership_order = MemberShipOrder.objects.create(

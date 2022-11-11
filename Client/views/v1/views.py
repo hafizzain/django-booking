@@ -1634,7 +1634,8 @@ def create_memberships(request):
         description = description,
         color = color,
         term_condition = terms_condition,
-        #discount = discount,
+        
+        discount = discount,
         
     )
     if services is not None:
@@ -1678,7 +1679,7 @@ def create_memberships(request):
             
             percentage = pro['percentage']
             product = pro['product']
-            duration = ser['duration']
+            duration = pro['duration']
             
             try:
                 product_id=Product.objects.get(id=product)
