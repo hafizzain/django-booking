@@ -120,7 +120,7 @@ class ProductStock(models.Model):
     
     amount = models.PositiveIntegerField(default=0, verbose_name='Usage Amount', null=True, blank=True)
     unit = models.PositiveIntegerField(default=0, verbose_name='Usage Unit', null=True, blank=True)
-    product_unit = models.PositiveIntegerField(default=0, verbose_name='Product Unit', null=True, blank=True)
+    product_unit = models.CharField(max_length=50, null=True, blank=True, verbose_name='Product Unit') 
 
     alert_when_stock_becomes_lowest = models.BooleanField(default=None, null=True, blank=True)
     
