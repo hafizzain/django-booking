@@ -1130,69 +1130,68 @@ def create_sale_order(request):
     for id in ids:
         sale_type = id['service_type']
         service_id = id['id']
+        
         if sale_type == 'PRODUCT':
-            
-            for pro in ids:
-            
-                try:
-                    product = Product.objects.get(id = service_id)
-                    product_stock = product.product_stock.all().first()
-                    available = 0
-                    # print(product_stock.consumable_quantity)
-                    # print(product_stock.sellable_quantity)
-                    
-                    if product_stock.consumable_quantity is not None:
-                        available += int(product_stock.consumable_quantity)
+            #for pro in ids:
+            try:
+                product = Product.objects.get(id = service_id)
+                product_stock = product.product_stock.all().first()
+                available = 0
+                # print(product_stock.consumable_quantity)
+                # print(product_stock.sellable_quantity)
+                
+                if product_stock.consumable_quantity is not None:
+                    available += int(product_stock.consumable_quantity)
 
-                    if product_stock.sellable_quantity is not None:
-                        available += product_stock.sellable_quantity
-                        
-                    #available = int(product_stock.consumable_quantity) + int(product_stock.sellable_quantity)
+                if product_stock.sellable_quantity is not None:
+                    available += product_stock.sellable_quantity
                     
-                    if available  == 0:
-                        return Response(
-                        {
-                            'status' : False,
-                            #'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
-                            'response' : {
-                            'message' : 'consumable_quantity and sellable_quantity not Avaiable',
-                            'error_message' : "available_quantity",
-                            }
-                        },
-                    status=status.HTTP_400_BAD_REQUEST
-                    )                    
-                    #product_stock.available_quantity -=1
-                        
-                    product_stock.sold_quantity += 1
-                    #print(product_stock)
-                    product_stock.save()
-                    product_order = ProductOrder.objects.create(
-                        user = user,
-                        client = client,
-                        product = product,
-                        #status = sale_status,
-                        checkout = checkout,
-                        member = member,
-                        location = business_address,
-                        tip = tip,
-                        total_price = total_price, 
-                        payment_type= payment_type,
-                        client_type = client_type,
-                    )
-                    product_order.sold_quantity =  product_stock.sold_quantity
-                    product_order.save()
-                except Exception as err:
+                #available = int(product_stock.consumable_quantity) + int(product_stock.sellable_quantity)
+                
+                if available  == 0:
                     return Response(
-                        {
-                            'status' : False,
-                            'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
-                            'response' : {
-                            'message' : 'Something Went Wrong',
-                            'error_message' : str(err),
+                    {
+                        'status' : False,
+                        #'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
+                        'response' : {
+                        'message' : 'consumable_quantity and sellable_quantity not Avaiable',
+                        'error_message' : "available_quantity",
                         }
                     },
-                    status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST
+                )                    
+                #product_stock.available_quantity -=1
+                    
+                product_stock.sold_quantity += 1
+                #print(product_stock)
+                product_stock.save()
+                product_order = ProductOrder.objects.create(
+                    user = user,
+                    client = client,
+                    product = product,
+                    #status = sale_status,
+                    checkout = checkout,
+                    member = member,
+                    location = business_address,
+                    tip = tip,
+                    total_price = total_price, 
+                    payment_type= payment_type,
+                    client_type = client_type,
                 )
+                product_order.sold_quantity =  product_stock.sold_quantity
+                product_order.save()
+            except Exception as err:
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
+                        'response' : {
+                        'message' : 'Something Went Wrong',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
                         
         elif sale_type == 'SERVICE':
             
@@ -1202,38 +1201,38 @@ def create_sale_order(request):
             # elif type(service_id) == list:
             #     pass
             
-            for servics in ids:
-                try:
-                    service = Service.objects.get(id = service_id)
-                    dur = service.duration
+           # for servics in ids:
+            try:
+                service = Service.objects.get(id = service_id)
+                dur = service.duration
+                
+                service_order = ServiceOrder.objects.create(
+                    user = user,
+                    service = service,
+                    duration= dur,
                     
-                    service_order = ServiceOrder.objects.create(
-                        user = user,
-                        service = service,
-                        duration= dur,
-                        
-                        client = client,
-                        member = member,
-                        location = business_address,
-                        tip = tip,
-                        total_price = total_price, 
-                        payment_type=payment_type,
-                        client_type = client_type
+                    client = client,
+                    member = member,
+                    location = business_address,
+                    tip = tip,
+                    total_price = total_price, 
+                    payment_type=payment_type,
+                    client_type = client_type
 
-                        
-                    )
-                except Exception as err:
-                    return Response(
-                        {
-                            'status' : False,
-                            'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
-                            'response' : {
-                            'message' : 'Service not found',
-                            'error_message' : str(err),
-                        }
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
+                    
                 )
+            except Exception as err:
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
+                        'response' : {
+                        'message' : 'Service not found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
             
             # serialized = ServiceOrderSerializer(service_order)
             # return Response(
@@ -1256,96 +1255,96 @@ def create_sale_order(request):
             # elif type(membership_id) == list:
             #     pass
             
-            for membership in ids:
-                try:
-                    membership = Membership.objects.get(id = service_id)
-                    end_date_cal = membership.created_at +  timedelta(days=membership.validity)
-                    start_date_cal = membership.created_at
+            #for membership in ids:
+            try:
+                membership = Membership.objects.get(id = service_id)
+                end_date_cal = membership.created_at +  timedelta(days=membership.validity)
+                start_date_cal = membership.created_at
+                
+                membership_order = MemberShipOrder.objects.create(
+                    user= user,
                     
-                    membership_order = MemberShipOrder.objects.create(
-                        user= user,
-                        
-                        membership = membership,
-                        start_date = start_date_cal,
-                        end_date = end_date_cal,
-                        #status = sale_status,
-                        
-                        client = client,
-                        member = member,
-                        tip = tip,
-                        total_price = total_price, 
-                        payment_type =payment_type,
-                        client_type = client_type
+                    membership = membership,
+                    start_date = start_date_cal,
+                    end_date = end_date_cal,
+                    #status = sale_status,
+                    
+                    client = client,
+                    member = member,
+                    tip = tip,
+                    total_price = total_price, 
+                    payment_type =payment_type,
+                    client_type = client_type
 
-                    )
-                except Exception as err:
-                    return Response(
+                )
+            except Exception as err:
+                return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_MEMBERSHIP_ID_4040,
+                    'response' : {
+                    'message' : 'Membership not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+            
+        elif sale_type == 'VOUCHER':  
+              
+            #for vouchers in ids:  
+            try:
+                days = 0
+                voucher = Vouchers.objects.get(id = service_id)#str(vouchers))
+                test = voucher.validity.split(" ")[1]
+                
+                if test == 'Days':
+                    day = voucher.validity.split(" ")[0]
+                    day = int(day)
+                    days = day  
+                    
+                elif test == 'Months':
+                    day = voucher.validity.split(" ")[0]
+                    data = int(day)
+                    days = data *  30
+                    
+                                        
+                elif test == 'Years':
+                    day = voucher.validity.split(" ")[0]
+                    day = int(day)
+                    days = day * 360
+                print(days)
+                end_date_cal = voucher.created_at +  timedelta(days=days)
+                start_date_cal = voucher.created_at
+                
+                voucher_order =VoucherOrder.objects.create(
+                    user = user,
+                    
+                    voucher = voucher,
+                    start_date = start_date_cal,
+                    end_date = end_date_cal,
+                    #status = sale_status,
+                    
+                    client = client,
+                    member = member,
+                    tip = tip,
+                    total_price = total_price, 
+                    payment_type =payment_type,
+                    client_type = client_type
+
+                )
+            except Exception as err:
+                return Response(
                     {
                         'status' : False,
-                        'status_code' : StatusCodes.INVALID_MEMBERSHIP_ID_4040,
+                        'status_code' : StatusCodes.INVALID_VOUCHER_ID_4041,
                         'response' : {
-                        'message' : 'Membership not found',
+                        'message' : 'Voucher not found',
                         'error_message' : str(err),
                     }
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-            
-        elif sale_type == 'VOUCHER':  
-              
-            for vouchers in ids:  
-                try:
-                    days = 0
-                    voucher = Vouchers.objects.get(id = service_id)#str(vouchers))
-                    test = voucher.validity.split(" ")[1]
-                    
-                    if test == 'Days':
-                        day = voucher.validity.split(" ")[0]
-                        day = int(day)
-                        days = day  
-                        
-                    elif test == 'Months':
-                        day = voucher.validity.split(" ")[0]
-                        data = int(day)
-                        days = data *  30
-                        
-                                            
-                    elif test == 'Years':
-                        day = voucher.validity.split(" ")[0]
-                        day = int(day)
-                        days = day * 360
-                    print(days)
-                    end_date_cal = voucher.created_at +  timedelta(days=days)
-                    start_date_cal = voucher.created_at
-                    
-                    voucher_order =VoucherOrder.objects.create(
-                        user = user,
-                        
-                        voucher = voucher,
-                        start_date = start_date_cal,
-                        end_date = end_date_cal,
-                        #status = sale_status,
-                        
-                        client = client,
-                        member = member,
-                        tip = tip,
-                        total_price = total_price, 
-                        payment_type =payment_type,
-                        client_type = client_type
-
-                    )
-                except Exception as err:
-                    return Response(
-                        {
-                            'status' : False,
-                            'status_code' : StatusCodes.INVALID_VOUCHER_ID_4041,
-                            'response' : {
-                            'message' : 'Voucher not found',
-                            'error_message' : str(err),
-                        }
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                )
         # else:
         #     return Response(
         #     {
