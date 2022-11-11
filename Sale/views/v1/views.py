@@ -1128,7 +1128,7 @@ def create_sale_order(request):
         
     )
     for id in ids:
-        sale_type = id['service_type']
+        sale_type = id['selection_type']
         service_id = id['id']
         
         if sale_type == 'PRODUCT':
