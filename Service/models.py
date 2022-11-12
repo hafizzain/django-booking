@@ -116,14 +116,13 @@ class ServiceGroup(models.Model):
     
 class PriceService(models.Model):
     DURATION_CHOICES = [
-        ('30 Min', '30 Min'), 
-        ('60 Min', '60 Min'),
-        ('90 Min', '90 Min'),
-        ('120 Min', '120 Min'),
-        ('150 Min', '150 Min'),
-        ('180 Min', '180 Min'),
-        ('210 Min', '210 Min'),
-        ('240 Min', '240 Min'),
+        ('30_Min' , '30 Min'),
+        ('60_Min' , '60 Min'),
+        ('90_Min' , '90 Min'),
+        ('120_Min' , '120 Min'),
+        ('150_Min' , '150 Min'),
+        ('180_Min' , '180 Min'),
+        ('210_Min' , '210 Min'),
     ]
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     
