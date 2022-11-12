@@ -437,13 +437,16 @@ def update_service(request):
                     error.append(str(err))
                     print(err)
             else:
-                #ser = Service.objects.get(id=service_id)
-
-                emp_service = EmployeeSelectedService.objects.create(
-                    service=service_id,
-                    duration = ser['duration'],
-                    price=ser['price']
-                )
+                #
+                try:
+                    ser = Service.objects.get(id=id)
+                    emp_service = EmployeeSelectedService.objects.create(
+                        service=service_id,
+                        duration = ser['duration'],
+                        price=ser['price']
+                    )
+                except Exception as err:
+                    error.append(err)
     
     
     serializer= ServiceSerializer(service_id, context={'request' : request} , data=request.data, partial=True)
