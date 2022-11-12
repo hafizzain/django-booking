@@ -440,8 +440,8 @@ def update_service(request):
                 #
                 try:
                     ser = Service.objects.get(id=id)
-                    emp_service = EmployeeSelectedService.objects.create(
-                        service=service_id,
+                    EmployeeSelectedService.objects.create(
+                        service=ser,
                         duration = ser['duration'],
                         price=ser['price']
                     )
