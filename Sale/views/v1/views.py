@@ -1260,7 +1260,7 @@ def create_sale_order(request):
             try:
                 membership = Membership.objects.get(id = service_id)
                 validity = membership.valid_for.split(" ")[0]
-                end_date_cal = membership.created_at +  timedelta(days= )
+                end_date_cal = membership.created_at +  timedelta(days= validity)
                 start_date_cal = membership.created_at
                 
                 membership_order = MemberShipOrder.objects.create(
