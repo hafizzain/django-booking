@@ -99,12 +99,12 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
             else:
                 total_qant = int(stock.sellable_quantity) + int(stock.consumable_quantity)
 
-            available_quantity = total_qant -  stock.sold_quantity,
+            
         except Exception as err:
             print(err)
         #print(type(available_quantity))
         #print(int(available_quantity[0]))
-        
+        available_quantity = total_qant -  stock.sold_quantity,
         return {            
             'id' : stock.id,
             'available_stock' : int(available_quantity[0]),
