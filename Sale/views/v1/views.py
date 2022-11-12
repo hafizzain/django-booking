@@ -419,7 +419,9 @@ def update_service(request):
             pass
         for ser in priceservice:
             s_service_id = ser.get('id', None)
-            service_id_price = ser.get('service', None)
+            #service_id_price = ser.get('service', None)
+            duration = ser.get('duration', None)
+            price = ser.get('price', None)
             if s_service_id is not None:
                 try: 
                     price_service = PriceService.objects.get(id=ser['id'])
@@ -441,8 +443,8 @@ def update_service(request):
                 ser = Service.objects.get(id=id)
                 PriceService.objects.create(
                     service=ser,
-                    duration = ser['duration'],
-                    price=ser['price']
+                    duration = duration,
+                    price=price
                 )
 
     
