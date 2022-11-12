@@ -419,6 +419,7 @@ def update_service(request):
             pass
         for ser in priceservice:
             s_service_id = ser.get('id', None)
+            service_id = ser.get('service', None)
             if s_service_id is not None:
                 try: 
                     price_service = PriceService.objects.get(id=ser['id'])
@@ -436,10 +437,10 @@ def update_service(request):
                     error.append(str(err))
                     print(err)
             else:
-                ser = Service.objects.get(id=ser['service'])
+                ser = Service.objects.get(id=service_id)
 
                 emp_service = EmployeeSelectedService.objects.create(
-                    service=service_id,
+                    service=ser,
                     duration = ser['duration'],
                     price=ser['price']
                 )
@@ -1259,7 +1260,7 @@ def create_sale_order(request):
             try:
                 membership = Membership.objects.get(id = service_id)
                 validity = membership.valid_for.split(" ")[0]
-                end_date_cal = membership.created_at +  timedelta(days= validity)
+                end_date_cal = membership.created_at +  timedelta(days= )
                 start_date_cal = membership.created_at
                 
                 membership_order = MemberShipOrder.objects.create(
