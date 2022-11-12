@@ -258,7 +258,7 @@ class Membership(models.Model):
     ]
     DISCOUNT_CHOICE = [
         ('Unlimited' , 'Unlimited'),
-        ('Limited' , 'Limited'),
+        ('Free' , 'Free'),
     ]
 
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
@@ -305,7 +305,7 @@ class DiscountMembership(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     
     membership = models.ForeignKey(Membership, on_delete=models.CASCADE, related_name='membership_discountmembership')
-    discount = models.CharField(choices=DURATION_CHOICE, default='7 Days' , verbose_name='Duration', max_length=50)
+    duration = models.CharField(choices=DURATION_CHOICE, default='7 Days' , verbose_name='Duration', max_length=50)
     percentage = models.PositiveIntegerField(default=0)
 
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_memberships')

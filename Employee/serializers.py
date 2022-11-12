@@ -202,7 +202,7 @@ class EmployeSerializer(serializers.ModelSerializer):
         try:
             professional = EmployeeProfessionalInfo.objects.get(employee=obj)
             return EmployeInformationsSerializer(professional).data
-        except EmployeeProfessionalInfo.DoesNotExist:
+        except Exception as err:
             return None
      
     permissions = serializers.SerializerMethodField()
@@ -571,9 +571,27 @@ class AssetdocmemtSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssetDocument
         fields= ['id', 'document']
-        
+
+class EmployeeNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = [
+                'id', 
+                'full_name',
+                'employee_id',
+        ]
+       
 class AssetSerializer(serializers.ModelSerializer):
     document = serializers.SerializerMethodField()
+    employee = serializers.SerializerMethodField()
+    
+    def get_employee(self, obj):
+        try:
+            emp = Employee.objects.get(id = str(obj.employee))
+            print(emp)
+            return EmployeeNameSerializer(emp).data
+        except Exception as err:
+            print(err)
     
     def get_document(self, obj):
         try:

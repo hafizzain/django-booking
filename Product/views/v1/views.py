@@ -961,6 +961,7 @@ def delete_product(request):
         )
     try:
         product = Product.objects.get(id=product_id, is_deleted=False)
+        #product_stock = ProductStock.objects.get(product = product , is_deleted=False )
     except Exception as err:
         return Response(
             {
@@ -975,7 +976,10 @@ def delete_product(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    product.is_deleted = True
+    #product.is_deleted = True
+    #product_stock.is_deleted = True
+    #product.save()
+    product.delete()
     return Response(
         {
             'status' : True,

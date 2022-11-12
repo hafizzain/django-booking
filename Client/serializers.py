@@ -5,7 +5,7 @@ from Product.models import Product
 from Service.models import Service
 from Utility.models import Country, State, City
 
-from Client.models import Client, ClientGroup, Subscription, Promotion , Rewards , Membership, Vouchers
+from Client.models import Client, ClientGroup, DiscountMembership, Subscription, Promotion , Rewards , Membership, Vouchers
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -88,14 +88,25 @@ class PromotionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Promotion
         fields = ['id', 'name','purchases' , 'promotion_type', 'product', 'service','discount','valid_til']
+
+class DiscountMembershipSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = DiscountMembership
+        fields = '__all__'
         
 class MembershipSerializer(serializers.ModelSerializer):
-    product = ProductSerializer()
-    service = ServiceSerializer()
+    discount_membership = serializers.SerializerMethodField()
     
+    def get_discount_membership(self, obj):
+        try:
+            pro = DiscountMembership.objects.filter(membership = obj)
+            return DiscountMembershipSerializers(pro, many= True).data
+        except Exception as err:
+            print(err)
+            
     class Meta:
         model = Membership
-        fields = ['id', 'name', 'membership','total_number','valid_for','validity','price','tax_rate','service','product']
+        fields = ['id', 'name','valid_for','discount','price','tax_rate','discount_membership']
 
 class VoucherSerializer(serializers.ModelSerializer):
     

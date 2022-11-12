@@ -91,18 +91,20 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
     def get_stock(self, obj):
         stock = ProductStock.objects.filter(product=obj, is_deleted=False)[0]
         total_qant = 0
-        if stock.product.product_type == 'SELABLE':
-            total_qant = stock.sellable_quantity 
-        elif stock.product.product_type == 'COMSUME' :
-            total_qant =    stock.sellable_quantity
-        else:
-            total_qant = int(stock.sellable_quantity) + int(stock.sellable_quantity)
+        try:
+            if stock.product.product_type == 'SELABLE':
+                total_qant = stock.sellable_quantity 
+            elif stock.product.product_type == 'COMSUME' :
+                total_qant = stock.consumable_quantity
+            else:
+                total_qant = int(stock.sellable_quantity) + int(stock.consumable_quantity)
 
-        available_quantity = total_qant -  stock.sold_quantity,
-        
+            
+        except Exception as err:
+            print(err)
         #print(type(available_quantity))
         #print(int(available_quantity[0]))
-        
+        available_quantity = total_qant -  stock.sold_quantity,
         return {            
             'id' : stock.id,
             'available_stock' : int(available_quantity[0]),
