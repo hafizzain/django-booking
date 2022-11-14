@@ -104,7 +104,9 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     
     def get_location(self, obj):
         try:
-            return obj.appointment.business_address.address
+            loc = BusinessAddress.objects.get(id =  str(obj.business_address) )
+            return LocationSerializer(loc, ).data
+           # return obj.appointment.business_address.address
         except Exception as err:
             print(err)      
 

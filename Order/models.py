@@ -105,6 +105,8 @@ class Order(models.Model):
     #membership =models.ForeignKey(Membership, on_delete=models.CASCADE, related_name='checkout_membership_orders', null=True, blank=True) 
     rewards =models.ForeignKey(Rewards, on_delete=models.CASCADE, related_name='checkout_reward_orders', null=True, blank=True) 
     
+    quantity = models.PositiveBigIntegerField(default= 0)
+    
     current_price =models.PositiveBigIntegerField(default = 0)
     tip =models.PositiveBigIntegerField(default = 0)
     gst = models.PositiveBigIntegerField(default = 0)

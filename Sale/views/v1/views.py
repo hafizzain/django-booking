@@ -1134,6 +1134,7 @@ def create_sale_order(request):
     for id in ids:
         sale_type = id['selection_type']
         service_id = id['id']
+        quantity = id['quantity']
         
         if sale_type == 'PRODUCT':
             #for pro in ids:
@@ -1181,6 +1182,7 @@ def create_sale_order(request):
                     total_price = total_price, 
                     payment_type= payment_type,
                     client_type = client_type,
+                    quantity = quantity,
                 )
                 product_order.sold_quantity =  product_stock.sold_quantity
                 product_order.save()
@@ -1221,7 +1223,8 @@ def create_sale_order(request):
                     tip = tip,
                     total_price = total_price, 
                     payment_type=payment_type,
-                    client_type = client_type
+                    client_type = client_type,
+                    quantity = quantity,
 
                     
                 )
@@ -1279,8 +1282,8 @@ def create_sale_order(request):
                     tip = tip,
                     total_price = total_price, 
                     payment_type =payment_type,
-                    client_type = client_type
-
+                    client_type = client_type,
+                    quantity = quantity,
                 )
             except Exception as err:
                 return Response(
@@ -1335,7 +1338,8 @@ def create_sale_order(request):
                     tip = tip,
                     total_price = total_price, 
                     payment_type =payment_type,
-                    client_type = client_type
+                    client_type = client_type,
+                    quantity = quantity,
 
                 )
             except Exception as err:
