@@ -158,7 +158,7 @@ def create_appointment(request):
     payment_method = request.data.get('payment_method', None)
     discount_type = request.data.get('discount_type', None)
 
-    if not all([ client, client_type, appointment_date, business_id  ]):
+    if not all([ client_type, appointment_date, business_id  ]):
          return Response(
             {
                 'status' : False,
@@ -168,7 +168,7 @@ def create_appointment(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'All fields are required.',
                     'fields' : [
-                          'client',
+                         # 'client',
                           'client_type',
                           'member', 
                           'appointment_date', 
@@ -213,16 +213,17 @@ def create_appointment(request):
     try:
         client = Client.objects.get(id=client)
     except Exception as err:
-        return Response(
-            {
-                    'status' : False,
-                    'status_code' : StatusCodes.INVALID_CLIENT_4032,
-                    'response' : {
-                    'message' : 'Client not found',
-                    'error_message' : str(err),
-                }
-            }
-        )
+        client = None
+        # return Response(
+        #     {
+        #             'status' : False,
+        #             'status_code' : StatusCodes.INVALID_CLIENT_4032,
+        #             'response' : {
+        #             'message' : 'Client not found',
+        #             'error_message' : str(err),
+        #         }
+        #     }
+        # )
     
             
     appointment = Appointment.objects.create(
