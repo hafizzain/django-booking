@@ -169,7 +169,7 @@ class ProductOrderSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ProductOrder
-        fields = ['id', 'client','status','created_at', 'location', 'member', 'tip', 'total_price' , 'payment_type', 'product_name', 'gst', 'order_type', 'sold_quantity' ]
+        fields = ['id', 'client','quantity','status','created_at', 'location', 'member', 'tip', 'total_price' , 'payment_type', 'product_name', 'gst', 'order_type', 'sold_quantity' ]
    
         
 class ServiceOrderSerializer(serializers.ModelSerializer):
@@ -218,7 +218,7 @@ class ServiceOrderSerializer(serializers.ModelSerializer):
             return None
     class Meta:
         model = ServiceOrder
-        fields = ['id', 'client', 'service','created_at' ,'user', 'duration', 'location', 'member', 'total_price', 'payment_type','tip','gst', 'order_type','created_at']
+        fields = ['id', 'client','quantity', 'service','created_at' ,'user', 'duration', 'location', 'member', 'total_price', 'payment_type','tip','gst', 'order_type','created_at']
         
 class MemberShipOrderSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
@@ -322,7 +322,7 @@ class ServiceGroupSerializer(serializers.ModelSerializer):
         
 class CheckoutSerializer(serializers.ModelSerializer):
     product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
-    service  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
+    service  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
     
     def get_product(self, obj):
         try:
@@ -336,7 +336,7 @@ class CheckoutSerializer(serializers.ModelSerializer):
         try:
             check = ServiceOrder.objects.filter(checkout =  obj)
             #all_service = obj.product.all()
-            return ProductOrderSerializer(check, many = True , context=self.context ).data
+            return ServiceOrderSerializer(check, many = True , context=self.context ).data
         except Exception as err:
             print(str(err))
     
