@@ -8,7 +8,7 @@ from django.db.models import Q
 from Service.models import Service
 from Business.models import Business
 from Product.models import Product
-from Utility.models import Country, State, City
+from Utility.models import Country, Language, State, City
 from Client.models import Client, ClientGroup, DiscountMembership, Subscription , Rewards , Promotion , Membership , Vouchers
 from Client.serializers import ClientSerializer, ClientGroupSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer
 from Utility.models import NstyleFile
@@ -204,6 +204,10 @@ def create_client(request):
     dob= request.data.get('dob', None)
     gender = request.data.get('gender' , 'Male')
     
+    about_us = request.data.get('about_us' , 'Male')
+    marketing = request.data.get('marketing' , 'Male')
+    customer_note = request.data.get('customer_note' , 'Male')
+    
     postal_code= request.data.get('postal_code' , None)
     address= request.data.get('address' , None)
     card_number= request.data.get('card_number' , None)
@@ -212,8 +216,9 @@ def create_client(request):
     city= request.data.get('city', None)
     state= request.data.get('state', None)
     country= request.data.get('country', None)
+    languages= request.data.get('language', None)
     
-    if not all([business_id, client_id, full_name , email ,gender  ,address ]):
+    if not all([business_id, client_id, full_name , email ,gender  ,address, customer_note ]):
         return Response(
             {
                 'status' : False,
@@ -231,6 +236,7 @@ def create_client(request):
                         'postal_code', 
                         'address' ,
                         'is_active',
+                        'customer_note'
                     ]
                 }
             },
@@ -251,7 +257,7 @@ def create_client(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-
+    
     try:
         if country is not None:
             country = Country.objects.get(id=country)
@@ -272,6 +278,10 @@ def create_client(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    if languages is not None:
+        language_id = Language.objects.get(id=languages)
+    else:
+        language_id = None
         
     client=Client.objects.create(
         user=user,
@@ -289,7 +299,14 @@ def create_client(request):
         city = city,
         postal_code= postal_code,
         card_number= card_number,
-        is_active = is_active
+        is_active = is_active,
+        
+        #New requirement
+        customer_note = customer_note, 
+        language = language_id,
+        about_us =  about_us,
+        
+        
     )
     serialized= ClientSerializer(client, context={'request' : request})
     template = 'Client'
@@ -1890,9 +1907,7 @@ def update_memberships(request):
         },
         status=status.HTTP_200_OK
         )
-    
-
-    
+       
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_vouchers(request):

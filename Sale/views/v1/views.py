@@ -1210,12 +1210,12 @@ def create_sale_order(request):
            # for servics in ids:
             try:
                 service = Service.objects.get(id = service_id)
-                dur = service.duration
+                #dur = service.duration
                 
                 service_order = ServiceOrder.objects.create(
                     user = user,
                     service = service,
-                    duration= dur,
+                    #duration= dur,
                     
                     client = client,
                     member = member,

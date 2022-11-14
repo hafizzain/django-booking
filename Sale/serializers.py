@@ -120,8 +120,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             'enable_team_comissions',
             'enable_vouchers',
             ]
-        
-        
+               
 class ProductOrderSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
     member  = serializers.SerializerMethodField(read_only=True)
@@ -170,8 +169,7 @@ class ProductOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductOrder
         fields = ['id', 'client','quantity','status','created_at', 'location', 'member', 'tip', 'total_price' , 'payment_type', 'product_name', 'gst', 'order_type', 'sold_quantity' ]
-   
-        
+          
 class ServiceOrderSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
