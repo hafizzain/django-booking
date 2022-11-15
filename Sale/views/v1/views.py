@@ -1070,7 +1070,7 @@ def create_sale_order(request):
     
     errors = []
     
-    if not all([client_id, member_id , client_type, location_id]):
+    if not all([member_id , client_type, location_id]):
         return Response(
             {
                 'status' : False,
@@ -1080,7 +1080,6 @@ def create_sale_order(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'All fields are required.',
                     'fields' : [
-                          'client',
                           'member', 
                           'selection_type',
                           'location'
@@ -1226,6 +1225,7 @@ def create_sale_order(request):
                     user = user,
                     service = service,
                     duration= dur,
+                    checkout = checkout,
                     
                     client = client,
                     member = member,
@@ -1286,7 +1286,7 @@ def create_sale_order(request):
                     start_date = start_date_cal,
                     end_date = end_date_cal,
                     #status = sale_status,
-                    
+                    checkout = checkout,
                     client = client,
                     member = member,
                     tip = tip,
@@ -1342,7 +1342,7 @@ def create_sale_order(request):
                     start_date = start_date_cal,
                     end_date = end_date_cal,
                     #status = sale_status,
-                    
+                    checkout = checkout,
                     client = client,
                     member = member,
                     tip = tip,
