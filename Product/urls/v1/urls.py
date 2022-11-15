@@ -16,6 +16,7 @@ urlpatterns = [
     path('update_brand/', views.update_brand),
     path('delete_brand/', views.delete_brand),
     path('search_brand/', views.search_brand),
+    path('import_brand/', views.import_brand),
     
 
     # Products Paths 

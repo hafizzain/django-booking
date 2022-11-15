@@ -45,7 +45,37 @@ def export_csv(request):
             )
         return response
 
-
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def import_brand(request):
+    brand_csv = request.data.get('file', None)
+    user= request.user
+    
+    file = NstyleFile.objects.create(
+        file = brand_csv
+    )
+    with open( file.file.path , 'r', encoding='utf-8') as imp_file:
+        for index, row in enumerate(imp_file):
+            if index == 0:
+                continue
+            row = row.split(',')
+            row = row
+            
+            if len(row) < 3:
+                continue
+            name =  row[0].strip('"')
+            website =  row[1].strip('"')
+            description =  row[2].strip('"')
+            brand = Brand.objects.create(
+                #user = user,
+                name=name,
+                description=description,
+                website=website,
+            )
+            
+    file.delete()
+    return Response({'Status' : 'Success'})
+    
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def import_product(request):
@@ -54,7 +84,8 @@ def import_product(request):
 
     file = NstyleFile.objects.create(
         file = product_csv
-    )
+    )           
+    
     #print(file.file.path)
     with open( file.file.path , 'r', encoding='utf-8') as imp_file:
         for index, row in enumerate(imp_file):

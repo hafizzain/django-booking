@@ -373,7 +373,6 @@ def update_service(request):
             except Exception as err:
                 error.append(str(err))
     
-    
     if service is not None:
         if type(service) == str:
             service = json.loads(service)
@@ -413,8 +412,9 @@ def update_service(request):
                 error.append(str(err))
     #service_id.save()
     try:
+        print(staffgroup_id)
         service_group = ServiceGroup.objects.get(id = staffgroup_id)
-        service_group.services.add(service_group)
+        service_group.services.add(service_id)
         service_group.save()
 
     except Exception as err:
