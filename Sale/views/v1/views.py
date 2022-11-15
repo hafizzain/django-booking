@@ -1219,12 +1219,13 @@ def create_sale_order(request):
            # for servics in ids:
             try:
                 service = Service.objects.get(id = service_id)
-                #dur = service.duration
+                service_price = PriceService.objects.filter(service = service_id).first()
+                dur = service_price.duration
                 
                 service_order = ServiceOrder.objects.create(
                     user = user,
                     service = service,
-                    #duration= dur,
+                    duration= dur,
                     
                     client = client,
                     member = member,
