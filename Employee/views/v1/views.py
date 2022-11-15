@@ -464,7 +464,7 @@ def generate_id(request):
     count = Employee.objects.all().count()
     count += 1
    
-    tenant_name ='NS'
+    #tenant_name ='NS'
     return_loop = True
     while return_loop:
         if 0 < count <= 9 : 

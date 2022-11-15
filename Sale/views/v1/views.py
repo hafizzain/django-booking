@@ -323,6 +323,10 @@ def update_service(request):
     priceservice = request.data.get('priceservice', None)
     staffgroup_id = request.data.get('staffgroup_id',None)
     
+    employeeslist=request.data.get('employee', None)
+    service=request.data.get('service', None)
+    location=request.data.get('location', None)
+    
     if id is None: 
         return Response(
         {
@@ -356,9 +360,7 @@ def update_service(request):
         
     error = []
     
-    employeeslist=request.data.get('employee', None)
-    service=request.data.get('service', None)
-    location=request.data.get('location', None)
+    
     
     if location is not None:
         if type(location) == str:

@@ -72,6 +72,14 @@ class ServiceSerializer(serializers.ModelSerializer):
     service_group = serializers.SerializerMethodField(read_only=True)
     
     priceservice = serializers.SerializerMethodField(read_only=True)
+    price = serializers.SerializerMethodField(read_only=True)
+    
+    def get_price(self, obj):
+        try:
+            ser = PriceService.objects.filter(service = obj).first()
+            return ser.price
+        except Exception as err:
+            print(err)
     
     def get_priceservice(self, obj):
         try:
@@ -109,6 +117,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             'employees', 
             'parrent_service' , 
             'description', 
+            'price',
             'location',
             'controls_time_slot',
             'initial_deposit',
