@@ -2109,6 +2109,7 @@ def delete_asset(request):
 @permission_classes([IsAuthenticated])
 def update_asset(request):
     asset_id = request.data.get('id', None)
+    staff_id = request.data.get('staff_id', None)
     if asset_id is None: 
        return Response(
             {
@@ -2125,7 +2126,6 @@ def update_asset(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-       
     try:
         asset = Asset.objects.get(id=asset_id)
     except Exception as err:
@@ -2141,6 +2141,12 @@ def update_asset(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    if staff_id is not None:
+        try:
+            emp = Employee.objects.get(id=staff_id)
+            asset.employee = emp
+        except Exception as err:
+            pass
     serializer = AssetSerializer(asset, data=request.data, partial=True, context={'request' : request})
     if not serializer.is_valid():
         return Response(

@@ -332,9 +332,9 @@ class CheckoutSerializer(serializers.ModelSerializer):
             
     def get_service(self, obj):
         try:
-            check = ServiceOrder.objects.filter(checkout =  obj)
+            service = ServiceOrder.objects.filter(checkout =  obj)
             #all_service = obj.product.all()
-            return ServiceOrderSerializer(check, many = True , context=self.context ).data
+            return ServiceOrderSerializer(service, many = True , context=self.context ).data
         except Exception as err:
             print(str(err))
     

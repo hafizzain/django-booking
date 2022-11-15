@@ -321,6 +321,8 @@ def delete_service(request):
 def update_service(request):
     id = request.data.get('id', None)
     priceservice = request.data.get('priceservice', None)
+    staffgroup_id = request.data.get('staffgroup_id',None)
+    
     if id is None: 
         return Response(
         {
@@ -410,6 +412,13 @@ def update_service(request):
             except Exception as err:
                 error.append(str(err))
     #service_id.save()
+    try:
+        service_group = ServiceGroup.objects.get(id = staffgroup_id)
+        service_group.services.add(service_group)
+        service_group.save()
+
+    except Exception as err:
+        error.append(str(err)) 
     
     if priceservice is not None:
         if type(priceservice) == str:
@@ -447,8 +456,6 @@ def update_service(request):
                     price=price
                 )
 
-    
-    
     serializer= ServiceSerializer(service_id, context={'request' : request} , data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
