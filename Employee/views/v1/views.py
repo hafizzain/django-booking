@@ -1023,6 +1023,7 @@ def update_employee(request):
         empl_permission.save()
         
         try:
+            employee.location.clear()
             address=  BusinessAddress.objects.get(id = str(location))
             employee.location.add(address)
         except Exception as err:
