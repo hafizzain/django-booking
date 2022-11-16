@@ -1109,24 +1109,12 @@ def create_sale_order(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    if client_id is not None:
-        try:
-            client = Client.objects.get(id = client_id)
-        except Exception as err:
-            return Response(
-            {
-                    'status' : False,
-                    'status_code' : StatusCodes.INVALID_CLIENT_4032,
-                    'response' : {
-                    'message' : 'Client not found',
-                    'error_message' : str(err),
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    else:
+        
+    try:
+        client = Client.objects.get(id = client_id)
+    except Exception as err:
         client =  None
-       
+        
         
     try:
         member=Employee.objects.get(id = member_id)
