@@ -610,6 +610,21 @@ def create_employee(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    try:
+        location_id = BusinessAddress.objects.get(id=location)
+    except Exception as err:
+        return Response(
+            {
+                'status' : True,
+                'status_code' : StatusCodes.LOCATION_NOT_FOUND_4017,
+                'status_code_text' :'LOCATION_NOT_FOUND_4017' ,
+                'response' : {
+                    'message' : 'Invalid location not found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
         
     try:
         state= State.objects.get(id=state)
@@ -647,6 +662,7 @@ def create_employee(request):
         dob=dob,
         gender= gender,
         country= country,
+        location_employe = location_id,
         state = state,
         city = city,
         postal_code = postal_code,
@@ -739,19 +755,19 @@ def create_employee(request):
     empl_permission.save()
     
     
-    if type(location) == str:
-            location = json.loads(location)
+    # if type(location) == str:
+    #         location = json.loads(location)
 
-    elif type(location) == list:
-            pass
+    # elif type(location) == list:
+    #         pass
         
-    for loc in location:
-        try:
-            location_id = BusinessAddress.objects.get(id=loc)  
-            print(location_id)
-            employee.location.add(location_id)
-        except Exception as err:
-            employees_error.append(str(err))
+    # for loc in location:
+    #     try:
+    #         location_id = BusinessAddress.objects.get(id=loc)  
+    #         print(location_id)
+    #         employee.location.add(location_id)
+    #     except Exception as err:
+    #         employees_error.append(str(err))
 
     # serialized = EmployPermissionSerializer(employee_p_setting, data=request.data)
     # if serialized.is_valid():

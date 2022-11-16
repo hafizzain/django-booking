@@ -32,7 +32,7 @@ class Employee(models.Model):
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True, blank=True, related_name='country_employees')
     state = models.ForeignKey(State, on_delete=models.SET_NULL, null=True, blank=True, related_name='state_employees')
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, related_name='city_employees')
-    location = models.ManyToManyField(BusinessAddress, related_name='location_employee')
+    location_employe = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True ,related_name='location_employee')
     
     postal_code = models.CharField(max_length=20, null=True, blank=True)
     address = models.TextField(default='')

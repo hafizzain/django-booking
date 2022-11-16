@@ -24,6 +24,10 @@ urlpatterns = [
     path('get_servicegroup/', views.get_servicegroup),
     path('delete_servicegroup/', views.delete_servicegroup),
     path('update_servicegroup/', views.update_servicegroup),
+    
+    #CheckOut
+    path('get_sale_checkout/', views.get_sale_checkout),
+    
 
     
 ]

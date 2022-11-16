@@ -1035,6 +1035,27 @@ def get_total_revenue(request):
         },
         status=status.HTTP_200_OK
     )
+ 
+ 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_sale_checkout(request): 
+    checkout =Checkout.objects.all()
+    serialized = CheckoutSerializer(checkout, many = True, context = {'request' : request, })
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Product Order Sale Created!',
+                    'error_message' : None,
+                    'sale' : serialized.data
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+    
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -1168,7 +1189,7 @@ def create_sale_order(request):
                         #'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
                         'response' : {
                         'message' : 'consumable_quantity and sellable_quantity not Avaiable',
-                        'error_message' : "available_quantity",
+                        'error_message' : "available_quantity", 
                         }
                     },
                 status=status.HTTP_400_BAD_REQUEST
