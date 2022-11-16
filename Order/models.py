@@ -89,7 +89,7 @@ class Order(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True,)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_sale_order', null=True, blank=True)
     
-    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client_orders')
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client_orders', null=True, blank=True)
     location = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, related_name='location_orders', null=True, blank=True)
     member = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='member_orders', null=True, blank=True)
     
