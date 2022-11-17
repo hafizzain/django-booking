@@ -59,10 +59,17 @@ class MemberSerializer(serializers.ModelSerializer):
         fields = ['id','full_name', 'image' ]
         
 class ServiceSearchSerializer(serializers.ModelSerializer):
+    priceservice = serializers.SerializerMethodField(read_only=True)
     
+    def get_priceservice(self, obj):
+        try:
+            ser = PriceService.objects.filter(service = obj)
+            return PriceServiceSerializers(ser, many = True).data
+        except Exception as err:
+            pass
     class Meta:
         model = Service
-        fields = ['id','name', 'location']
+        fields = ['id','name', 'location', 'priceservice']
 
 class EmployeeSelectedServiceSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField(read_only=True)
