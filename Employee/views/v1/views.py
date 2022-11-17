@@ -870,7 +870,9 @@ def update_employee(request):
         services_id = request.data.get('services', None)   
         staff_id = request.data.get('staff_group', None) 
         location = request.data.get('location', None) 
-
+        
+        Errors = []
+        
         if id is None:
             return Response(
             {
@@ -1003,24 +1005,26 @@ def update_employee(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-         
-        empl_permission = EmployePermission.objects.get(employee=employee)
-        
-        for permit in ALL_PERMISSIONS:
+        try:
+            empl_permission = EmployePermission.objects.get(employee=employee)
             
-            value = request.data.get(permit, None)
-            PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
-            if value is not None:
-                if type(value) == str:
-                    value = json.loads(value)
-                    for opt in value:
-                        try:
-                            option = GlobalPermissionChoices.objects.get(text=opt)
-                            PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
-                        except:
-                            pass
+            for permit in ALL_PERMISSIONS:
+                
+                value = request.data.get(permit, None)
+                PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
+                if value is not None:
+                    if type(value) == str:
+                        value = json.loads(value)
+                        for opt in value:
+                            try:
+                                option = GlobalPermissionChoices.objects.get(text=opt)
+                                PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
+                            except:
+                                pass
 
-        empl_permission.save()
+            empl_permission.save()
+        except Exception as err:
+            Errors.append(err)
         
         try:
             employee.location.clear()
