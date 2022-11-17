@@ -683,7 +683,7 @@ def update_servicegroup(request):
         service_id.services.clear()
         for ser in service:
             try:
-               service = ServiceGroup.objects.get(id=ser)  
+               service = Service.objects.get(id=ser)  
                service_id.services.add(service)
             except Exception as err:
                 error.append(str(err))
