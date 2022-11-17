@@ -2124,6 +2124,9 @@ def delete_asset(request):
 def update_asset(request):
     asset_id = request.data.get('id', None)
     staff_id = request.data.get('staff_id', None)
+    document = request.data.get('document', None)
+    is_active = request.data.get('is_active', None)
+    
     if asset_id is None: 
        return Response(
             {
@@ -2155,12 +2158,29 @@ def update_asset(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    
     if staff_id is not None:
         try:
             emp = Employee.objects.get(id=staff_id)
             asset.employee = emp
         except Exception as err:
             pass
+    if is_active is not None:
+        asset.is_active = True
+    else:
+        asset.is_active = False
+    try:
+        doc = AssetDocument.objects.get(asset=asset)
+        doc.delete()
+    except:
+        pass
+    
+    if document is not None:
+        for doc in document:
+            doc = AssetDocument.objects.create(
+                asset = asset,
+                document = doc
+            )
     serializer = AssetSerializer(asset, data=request.data, partial=True, context={'request' : request})
     if not serializer.is_valid():
         return Response(
