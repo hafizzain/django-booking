@@ -14,7 +14,7 @@ from datetime import datetime
 
 #from Service.models import Service
 from Service.models import Service
-from Employee.models import Employee
+from Employee.models import Employee, EmployeeSelectedService
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
@@ -25,7 +25,7 @@ from threading import Thread
 
 
 from Appointment.models import Appointment, AppointmentService, AppointmentNotes , AppointmentCheckout
-from Appointment.serializers import  CheckoutSerializer, AppoinmentSerializer,SingleAppointmentSerializer ,BlockSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer
+from Appointment.serializers import  CheckoutSerializer, AppoinmentSerializer, ServiceEmployeeSerializer,SingleAppointmentSerializer ,BlockSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer
 from Utility.models import ExceptionRecord
 
 @api_view(['GET'])
@@ -869,3 +869,51 @@ def service_appointment_count(request):
             status=status.HTTP_201_CREATED
     ) 
     
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_service_employee(request):
+    address = request.GET.get('service', None)
+    data = {}
+    employee_ids = []
+    if address is None :
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'address id is required',
+                    'fields' : [
+                        'address',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    Employee =  EmployeeSelectedService.objects.filter(service = address)
+    serializer =  ServiceEmployeeSerializer(Employee, many = True)
+    data =serializer.data
+    lenfg = len(data)
+    for i in data:
+        employee_ids.append(i['employee'])
+    
+    #test = data['employee']
+    print(lenfg)
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Appointment Checkout Create!',
+                    'error_message' : None,
+                    'data' : employee_ids,
+                    
+                }
+            },
+            status=status.HTTP_201_CREATED
+    ) 
+   
+        

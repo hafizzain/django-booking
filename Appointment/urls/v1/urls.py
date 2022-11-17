@@ -22,5 +22,8 @@ urlpatterns = [
     path('delete_block_time/', views.delete_block_time),
     
     #checkout
-    path('create_checkout/', views.create_checkout)
+    path('create_checkout/', views.create_checkout),
+    
+    #Service Employee
+    path('get_service_employee/', views.get_service_employee)
 ]

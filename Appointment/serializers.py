@@ -8,7 +8,7 @@ from Appointment.models import Appointment, AppointmentCheckout, AppointmentNote
 from Business.models import BusinessAddress
 from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer
 from Client.serializers import ClientAppointmentSerializer
-from Employee.models import Employee
+from Employee.models import Employee, EmployeeSelectedService
 from Service.models import Service
 from datetime import datetime, timedelta
 from Product.Constants.index import tenant_media_base_url
@@ -456,3 +456,9 @@ class CheckoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentCheckout
         exclude = ['created_at', 'id' ,'is_deleted', 'is_active']
+        
+
+class ServiceEmployeeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmployeeSelectedService
+        fields = ('id','employee')
