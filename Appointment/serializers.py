@@ -32,7 +32,7 @@ class ServiceSaleSerializer(serializers.ModelSerializer):
     price_service = serializers.SerializerMethodField(read_only=True)
     
     def get_price_service(self, obj):
-        price = PriceService.objects.filter(service = obj)
+        price = PriceService.objects.filter(service = str(obj))
         return PriceServiceSaleSerializer(price, many = True).data
     class Meta:
         model = Service
@@ -485,14 +485,14 @@ class CheckoutSerializer(serializers.ModelSerializer):
     
     def get_service(self, obj):
         try:
-            price = Service.objects.get(id  = obj.service)
+            price = Service.objects.get(id  = obj.service.id)
             return ServiceSaleSerializer(price).data
         except Exception as err:
             print(err)
             
     def get_member(self, obj):
         try:
-            emp = Employee.objects.get(id  = obj.member)
+            emp = Employee.objects.get(id  = obj.member.id)
             return MemberSaleSerializer(emp).data
         except Exception as err:
             print(err)
