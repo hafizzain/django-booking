@@ -11,6 +11,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from Business.models import Business , BusinessAddress
 from datetime import datetime
+from Order.models import Checkout, MemberShipOrder, ProductOrder, VoucherOrder
+from Sale.serializers import MemberShipOrderSerializer, ProductOrderSerializer, VoucherOrderSerializer
 
 #from Service.models import Service
 from Service.models import Service
@@ -896,12 +898,10 @@ def get_service_employee(request):
     Employee =  EmployeeSelectedService.objects.filter(service = address)
     serializer =  ServiceEmployeeSerializer(Employee, many = True)
     data =serializer.data
-    lenfg = len(data)
     for i in data:
         employee_ids.append(i['employee'])
     
     #test = data['employee']
-    print(lenfg)
     return Response(
             {
                 'status' : True,
@@ -916,4 +916,57 @@ def get_service_employee(request):
             status=status.HTTP_201_CREATED
     ) 
    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_client_sale(request):
+    client = request.GET.get('client', None)
+    data = []
+    employee_ids = []
+    if client is None :
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'client id is required',
+                    'fields' : [
+                        'client',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
         
+    product_order = ProductOrder.objects.filter(checkout__client = client)
+    product = ProductOrderSerializer(product_order,  many=True,  context={'request' : request, })
+    
+    voucher_order = VoucherOrder.objects.filter(checkout__client = client)
+    voucher = VoucherOrderSerializer(voucher_order,  many=True,  context={'request' : request, })
+    data.extend(voucher.data)
+    
+    membership_order = MemberShipOrder.objects.filter(checkout__client = client)
+    membership = MemberShipOrderSerializer(membership_order,  many=True,  context={'request' : request, })
+    data.extend(membership.data)
+    
+    appointment_checkout = AppointmentCheckout.objects.filter(appointment__client = client)
+    serialized = CheckoutSerializer(appointment_checkout, many = True)
+    
+    #test = checkout.count()
+    #serialized = CheckoutSerializer(checkout, many = True, context = {'request' : request})
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Client Order Sales!',
+                    'error_message' : None,
+                    'product' : product.data,
+                    'voucher' : data,
+                    'appointment' : serialized.data
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )

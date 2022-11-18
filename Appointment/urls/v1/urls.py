@@ -25,5 +25,9 @@ urlpatterns = [
     path('create_checkout/', views.create_checkout),
     
     #Service Employee
-    path('get_service_employee/', views.get_service_employee)
+    path('get_service_employee/', views.get_service_employee),
+    
+    #Search by client 
+    path('get_client_sale/', views.get_client_sale),
+
 ]
