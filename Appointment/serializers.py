@@ -480,6 +480,7 @@ class AppointmentServiceSeriailzer(serializers.ModelSerializer):
         
 class CheckoutSerializer(serializers.ModelSerializer):
     appointment_service_status = serializers.SerializerMethodField(read_only=True)
+    appointment_service_duration = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
     member = serializers.SerializerMethodField(read_only=True)
     
@@ -499,14 +500,21 @@ class CheckoutSerializer(serializers.ModelSerializer):
     
     def get_appointment_service_status(self, obj):
         try:
-            service = AppointmentService.objects.get(id = obj.appointment_service )
+            service = AppointmentService.objects.get(id = obj.appointment_service.id )
             return service.appointment_status
+        except Exception as err:
+            print(err)   
+            
+    def get_appointment_service_duration(self, obj):
+        try:
+            service = AppointmentService.objects.get(id = obj.appointment_service.id )
+            return service.duration
         except Exception as err:
             print(err)   
     
     class Meta:
         model = AppointmentCheckout
-        fields = ['id', 'appointment', 'appointment_service_status', 'service','member',
+        fields = ['id', 'appointment', 'appointment_service_status', 'service','member','created_at','appointment_service_duration',
                 'payment_method','business_address', 'voucher','promotion',
                 'membership','rewards','tip','gst', 'service_price', 'total_price']
         #exclude = ['id' ,'is_deleted', 'is_active']
