@@ -159,6 +159,8 @@ class ProductOrderSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
     product_name  = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
+    product_details  = serializers.SerializerMethodField(read_only=True)
+
     #item_sold = serializers.SerializerMethodField(read_only=True)
     
     # def get_item_sold(self, obj):
@@ -167,6 +169,11 @@ class ProductOrderSerializer(serializers.ModelSerializer):
     #         return product_stck.sold_quantity
     #     except Exception as err:
     #         print(err)
+    def get_product_details(self, obj):
+        try:
+            return obj.product.description
+        except Exception as err:
+            return None
     
     def get_order_type(self, obj):
         return 'Product'
@@ -200,7 +207,9 @@ class ProductOrderSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ProductOrder
-        fields = ['id', 'client','quantity','status','created_at', 'location', 'member', 'tip', 'total_price' , 'payment_type', 'product_name', 'gst', 'order_type', 'sold_quantity' ]
+        fields = ['id', 'client','quantity','status','created_at', 
+                  'location', 'member', 'tip', 'total_price' , 'payment_type',
+                  'product_name', 'gst', 'order_type', 'sold_quantity','product_details' ]
           
 class ServiceOrderSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)

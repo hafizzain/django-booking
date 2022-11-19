@@ -27,7 +27,7 @@ from threading import Thread
 
 
 from Appointment.models import Appointment, AppointmentService, AppointmentNotes , AppointmentCheckout
-from Appointment.serializers import  CheckoutSerializer, AppoinmentSerializer, ServiceEmployeeSerializer,SingleAppointmentSerializer ,BlockSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer
+from Appointment.serializers import  CheckoutSerializer, AppoinmentSerializer, ServiceClientSaleSerializer, ServiceEmployeeSerializer,SingleAppointmentSerializer ,BlockSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer
 from Utility.models import ExceptionRecord
 
 @api_view(['GET'])
@@ -950,8 +950,11 @@ def get_client_sale(request):
     membership = MemberShipOrderSerializer(membership_order,  many=True,  context={'request' : request, })
     data.extend(membership.data)
     
-    appointment_checkout = AppointmentCheckout.objects.filter(appointment__client = client)
-    serialized = CheckoutSerializer(appointment_checkout, many = True)
+    # appointment_checkout = AppointmentCheckout.objects.filter(appointment__client = client)
+    # serialized = CheckoutSerializer(appointment_checkout, many = True)
+    
+    appointment_checkout = AppointmentService.objects.filter(appointment__client = client)
+    serialized = ServiceClientSaleSerializer(appointment_checkout, many = True)
     
     #test = checkout.count()
     #serialized = CheckoutSerializer(checkout, many = True, context = {'request' : request})

@@ -424,7 +424,10 @@ class SingleAppointmentSerializer(serializers.ModelSerializer):
             None
     
     def get_client(self, obj):
-        return obj.appointment.client.full_name
+        try:
+            return obj.appointment.client.full_name
+        except Exception as err:
+            pass
     
     def get_end_time(self, obj):
         app_date_time = f'2000-01-01 {obj.appointment_time}'
@@ -477,6 +480,31 @@ class AppointmentServiceSeriailzer(serializers.ModelSerializer):
         model = AppointmentService
         fields = 'appointment_status', 
         
+class ServiceClientSaleSerializer(serializers.ModelSerializer):
+    service = serializers.SerializerMethodField(read_only=True)
+    booked_by = serializers.SerializerMethodField(read_only=True)
+    member = serializers.SerializerMethodField(read_only=True)
+    
+    def get_member(self, obj):
+        try:
+            emp = Employee.objects.get(id  = obj.member.id)
+            return MemberSaleSerializer(emp).data
+        except Exception as err:
+            print(err)
+    
+    def get_booked_by(self, obj):
+        return f'{obj.user.first_name} {obj.user.last_name}'
+    
+    def get_service(self, obj):
+        try:
+            price = Service.objects.get(id  = obj.service.id)
+            return price.name
+            #return ServiceSaleSerializer(price).data
+        except Exception as err:
+            print(err)
+    class Meta:
+        model = AppointmentService
+        fields = ['id','service', 'created_at','booked_by','duration','appointment_status','member']
         
 class CheckoutSerializer(serializers.ModelSerializer):
     appointment_service_status = serializers.SerializerMethodField(read_only=True)
