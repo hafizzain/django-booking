@@ -103,6 +103,8 @@ class AppointmentService(models.Model):
     appointment_status = models.CharField(choices=BOOKED_CHOICES, max_length=100, default='Appointment Booked')
     tip = models.PositiveIntegerField(default=0, null=True, blank=True)
     
+    price = models.PositiveIntegerField(default=0, null=True, blank=True)
+    
     end_time = models.TimeField(null=True, blank=True)
     destails = models.CharField(max_length=255, null=True, blank=True)
     

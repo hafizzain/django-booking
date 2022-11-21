@@ -262,6 +262,7 @@ def create_appointment(request):
         member = appoinmnt['member']
         service = appoinmnt['service']
         duration = appoinmnt['duration']
+        price = appoinmnt['price']
         date_time = appoinmnt['date_time']
         fav = appoinmnt.get('favourite', None)
         
@@ -327,7 +328,7 @@ def create_appointment(request):
             appointment_date = appointment_date,
             service = service,
             member = member,
-            
+            price = price,
             # voucher = voucher,
             # reward = reward,
             # membership = membership,
