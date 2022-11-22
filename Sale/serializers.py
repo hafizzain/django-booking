@@ -69,7 +69,7 @@ class ServiceSearchSerializer(serializers.ModelSerializer):
             pass
     class Meta:
         model = Service
-        fields = ['id','name', 'location', 'priceservice']
+        fields = ['id','name', 'location', 'client_can_book', 'priceservice']
 
 class EmployeeSelectedServiceSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField(read_only=True)
