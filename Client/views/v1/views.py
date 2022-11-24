@@ -218,7 +218,7 @@ def create_client(request):
     country= request.data.get('country', None)
     languages= request.data.get('language', None)
     
-    if not all([business_id, client_id, full_name , email ,gender  ,address, customer_note ]):
+    if not all([business_id, client_id, full_name ,gender , customer_note , languages]):
         return Response(
             {
                 'status' : False,
@@ -231,11 +231,8 @@ def create_client(request):
                         'business_id',
                         'client_id',
                         'full_name',
-                        'email',
                         'gender', 
-                        'postal_code', 
-                        'address' ,
-                        'is_active',
+                        'languages',
                         'customer_note'
                     ]
                 }
@@ -281,7 +278,17 @@ def create_client(request):
     if languages is not None:
         language_id = Language.objects.get(id=languages)
     else:
-        language_id = None
+        return Response(
+            {
+                'status' : True,
+                'status_code_text' :'languages_NOT_FOUND' ,
+                'response' : {
+                    'message' : 'Languages not found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
         
     client=Client.objects.create(
         user=user,
