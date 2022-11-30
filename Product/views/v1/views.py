@@ -780,21 +780,34 @@ def add_product(request):
             is_cover = True
         )
     
-    product_stock= ProductStock.objects.create(
-        user = user,
-        business = business,
-        product = product ,
-        #quantity = quantity,
-        amount = amount,
-        unit = unit,
-        product_unit= product_unit,
-        sellable_quantity=sellable_quantity,
-        consumable_quantity =consumable_quantity,
-        #available_quantity= quantity,
-        #turnover = turnover,
-        alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
-        is_active = stock_status,
-        )
+    location_quantities = request.data.get('location_quantities', None)
+    if location_quantities is not None:
+        if type(location_quantities) == str:
+            location_quantities = json.loads(location_quantities)
+        
+        for loc_quan in location_quantities:
+            location_id = loc_quan.get('id', None)
+            current_stock = loc_quan.get('current_stock', None)
+            low_stock = loc_quan.get('low_stock', None)
+            reoreder_quantity = loc_quan.get('reoreder_quantity', None)
+
+            if all([location_id, current_stock, low_stock, reoreder_quantity]):
+                try:
+                    loc = BusinessAddress.objects.get(id = location_id)
+                except:
+                    pass
+                else:
+                    product_stock = ProductStock.objects.create(
+                        user = user,
+                        business = business,
+                        product = product,
+                        location = loc,
+                        available_quantity = current_stock,
+                        low_stock = low_stock, 
+                        reorder_quantity = reoreder_quantity,
+                        alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
+                        is_active = stock_status,
+                    )
     
 
     serialized = ProductSerializer(product, context={'request' : request})
