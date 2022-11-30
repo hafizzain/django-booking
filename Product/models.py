@@ -172,4 +172,14 @@ class OrderStockProduct(models.Model):
     def __str__(self):
         return str(self.id)
     
+
+class ProductConsumption(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='consumptions')
+
+    location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='consumption_locations')
+    quantity = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return str(self.id)
     
