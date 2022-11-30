@@ -621,15 +621,15 @@ def add_product(request):
     is_active = request.data.get('is_active', True)
     medias = request.data.getlist('product_images', None)
     
-    location = request.data.get('location', None)
+    # location = request.data.get('location', None)
 
     # Product Stock Details 
-    quantity = request.data.get('quantity', None)
-    sellable_quantity = request.data.get('sellable_quantity', None)
-    consumable_quantity = request.data.get('consumable_quantity',None)
-    unit = request.data.get('unit', None)
-    product_unit = request.data.get('product_unit', None)
-    amount = request.data.get('amount', None)
+    # quantity = request.data.get('quantity', None)
+    # sellable_quantity = request.data.get('sellable_quantity', None)
+    # consumable_quantity = request.data.get('consumable_quantity',None)
+    # unit = request.data.get('unit', None)
+    # product_unit = request.data.get('product_unit', None)
+    # amount = request.data.get('amount', None)
     stock_status = request.data.get('stock_status', None)
 
     #turnover = request.data.get('turnover', None)
@@ -704,36 +704,36 @@ def add_product(request):
                 status=status.HTTP_404_NOT_FOUND
             )
     try:
-            category_id = Category.objects.get(id=category_id, is_active=True)
+        category_id = Category.objects.get(id=category_id, is_active=True)
     except Exception as err:
-            return Response(
-                {
-                    'status' : False,
-                    'status_code' : StatusCodes.INVALID_CATEGORY_BRAND_4020,
-                    'status_code_text' : 'INVALID_CATEGORY_BRAND_4020',
-                    'response' : {
-                        'message' : 'Category or Brand Not Found',
-                        'error_message' : str(err),
-                    }
-                },
-                status=status.HTTP_404_NOT_FOUND
-            )
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_CATEGORY_BRAND_4020,
+                'status_code_text' : 'INVALID_CATEGORY_BRAND_4020',
+                'response' : {
+                    'message' : 'Category or Brand Not Found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
             
     try:
-            brand_id = Brand.objects.get(id=brand_id, is_active=True)
+        brand_id = Brand.objects.get(id=brand_id, is_active=True)
     except Exception as err:
-            return Response(
-                {
-                    'status' : False,
-                    'status_code' : StatusCodes.INVALID_CATEGORY_BRAND_4020,
-                    'status_code_text' : 'INVALID_CATEGORY_BRAND_4020',
-                    'response' : {
-                        'message' : 'Category or Brand Not Found',
-                        'error_message' : str(err),
-                    }
-                },
-                status=status.HTTP_404_NOT_FOUND
-            )
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_CATEGORY_BRAND_4020,
+                'status_code_text' : 'INVALID_CATEGORY_BRAND_4020',
+                'response' : {
+                    'message' : 'Category or Brand Not Found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
     
     product = Product.objects.create(
         user = user,
@@ -756,19 +756,19 @@ def add_product(request):
         is_active=True,
         published = True,
     )
-    if type(location) == str:
-            location = json.loads(location)
+    # if type(location) == str:
+    #         location = json.loads(location)
 
-    elif type(location) == list:
-            pass
+    # elif type(location) == list:
+    #         pass
         
-    for loc in location:
-        try:
-            location_id = BusinessAddress.objects.get(id=loc)  
-            print(location_id)
-            product.location.add(location_id)
-        except Exception as err:
-            product_error.append(str(err))
+    # for loc in location:
+    #     try:
+    #         location_id = BusinessAddress.objects.get(id=loc)  
+    #         print(location_id)
+    #         product.location.add(location_id)
+    #     except Exception as err:
+    #         product_error.append(str(err))
 
 
     for img in medias:
