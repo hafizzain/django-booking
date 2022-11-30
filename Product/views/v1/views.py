@@ -1,6 +1,6 @@
 from cmath import cos
 from django.http import HttpResponse
-from Utility.models import NstyleFile
+from Utility.models import NstyleFile, ExceptionRecord
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -783,7 +783,9 @@ def add_product(request):
     location_quantities = request.data.get('location_quantities', None)
     if location_quantities is not None:
         if type(location_quantities) == str:
+            ExceptionRecord.objects.create(is_resolved = True, text='Location Quantities was string and gonna convert')
             location_quantities = json.loads(location_quantities)
+            ExceptionRecord.objects.create(is_resolved = True, text='Converted')
         
         for loc_quan in location_quantities:
             location_id = loc_quan.get('id', None)
@@ -794,7 +796,9 @@ def add_product(request):
             if all([location_id, current_stock, low_stock, reoreder_quantity]):
                 try:
                     loc = BusinessAddress.objects.get(id = location_id)
-                except:
+                except Exception as err:
+                    ExceptionRecord.objects.create(text=str(err))
+    
                     pass
                 else:
                     product_stock = ProductStock.objects.create(
@@ -808,6 +812,13 @@ def add_product(request):
                         alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
                         is_active = stock_status,
                     )
+                    ExceptionRecord.objects.create(is_resolved = True, text='Created')
+
+            else:
+                ExceptionRecord.objects.create(text=f'fields not all {location_id}, {current_stock}, {low_stock}, {reoreder_quantity}')
+
+    else:
+        ExceptionRecord.objects.create(text='No Location Quantities Find')
     
 
     serialized = ProductSerializer(product, context={'request' : request})
