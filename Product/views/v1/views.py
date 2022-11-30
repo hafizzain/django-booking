@@ -20,7 +20,7 @@ from Product.models import ( Category, Brand , Product, ProductMedia, ProductSto
                            )
 from Business.models import Business, BusinessAddress, BusinessVendor
 from Product.serializers import (CategorySerializer, BrandSerializer, ProductSerializer, ProductStockSerializer, ProductWithStockSerializer
-                                 ,OrderSerializer , OrderProductSerializer
+                                 ,OrderSerializer , OrderProductSerializer, ProductConsumptionSerializer
                                  )
 
 
@@ -1576,7 +1576,30 @@ def add_product_cunsumption(request):
         location = location,
         quantity = quantity
     )
+
+    serialized = ProductConsumptionSerializer(cunsumption_obj)
+
     
+
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 201,
+            'response' : {
+                'message' : 'Product Consumption Created successfully',
+                'error_message' : None,
+                'product_consumption' : serialized.data
+            }
+        },
+        status=status.HTTP_201_CREATED
+    )
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_product_cunsumptions(request):
+    
+    product_consumptions = ProductConsumption.objects.all()
+    serialized = ProductConsumptionSerializer(product_consumptions, many=True)
 
     return Response(
         {
@@ -1585,6 +1608,7 @@ def add_product_cunsumption(request):
             'response' : {
                 'message' : 'Product Consumption Created successfully',
                 'error_message' : None,
+                'product_consumptions' : serialized.data
             }
         },
         status=status.HTTP_200_OK
