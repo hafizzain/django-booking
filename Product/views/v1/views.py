@@ -16,7 +16,7 @@ from rest_framework.settings import api_settings
 from NStyle.Constants import StatusCodes
 
 from Product.models import ( Category, Brand , Product, ProductMedia, ProductStock
-                            , OrderStock, OrderStockProduct
+                            , OrderStock, OrderStockProduct, ProductConsumption
                            )
 from Business.models import Business, BusinessAddress, BusinessVendor
 from Product.serializers import (CategorySerializer, BrandSerializer, ProductSerializer, ProductStockSerializer, ProductWithStockSerializer
@@ -1503,6 +1503,87 @@ def delete_orderstock(request):
             'status_code' : 200,
             'response' : {
                 'message' : 'Order Stock deleted!',
+                'error_message' : None,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_product_cunsumption(request):
+    
+    product_id = request.data.get('product', None)
+    location_id = request.data.get('location', None)
+    quantity = request.data.get('quantity', None)
+
+    if not all([product_id, location_id, quantity]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'product',
+                        'location',
+                        'quantity',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        product = Product.objects.get(id=product_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Product Not found',
+                    'error_message' : str(err),
+                    
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    try:
+        location = BusinessAddress.objects.get(id=location_id)
+    except:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Location Not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    cunsumption_obj = ProductConsumption.objects.create(
+        user = request.user,
+        product = product,
+        location = location,
+        quantity = quantity
+    )
+    
+
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Product Consumption Created successfully',
                 'error_message' : None,
             }
         },

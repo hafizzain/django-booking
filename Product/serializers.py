@@ -7,7 +7,7 @@ from requests import request
 from rest_framework import serializers
 from Product.Constants.index import tenant_media_base_url
 from Product.models import (Category, Brand, Product, ProductMedia, 
-                            ProductStock, OrderStock , OrderStockProduct)
+                            ProductStock, OrderStock , OrderStockProduct, ProductConsumption)
 from Business.models import BusinessAddress, BusinessVendor
 from django.conf import settings
 
@@ -245,3 +245,9 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model= OrderStock
         fields=('id','business','vendor','location','status', 'rec_quantity','vendor_name','location_name','products')
+
+
+class ProductConsumptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductConsumption
+        fields = ['id', 'location', 'product', 'quantity']
