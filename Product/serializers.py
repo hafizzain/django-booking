@@ -1,9 +1,5 @@
 
 
-from itertools import product
-from unicodedata import category
-from xml.parsers.expat import model
-from requests import request
 from rest_framework import serializers
 from Product.Constants.index import tenant_media_base_url
 from Product.models import (Category, Brand, Product, ProductMedia, 
