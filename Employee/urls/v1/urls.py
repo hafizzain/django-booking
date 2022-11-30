@@ -50,5 +50,4 @@ urlpatterns = [
     #Generate ID
     path('generate_id/', views.generate_id)
     
-    
 ]

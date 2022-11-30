@@ -321,6 +321,12 @@ def delete_service(request):
 def update_service(request):
     id = request.data.get('id', None)
     priceservice = request.data.get('priceservice', None)
+    staffgroup_id = request.data.get('staffgroup_id',None)
+    
+    employeeslist=request.data.get('employee', None)
+    service=request.data.get('service', None)
+    location=request.data.get('location', None)
+    
     if id is None: 
         return Response(
         {
@@ -354,9 +360,7 @@ def update_service(request):
         
     error = []
     
-    employeeslist=request.data.get('employee', None)
-    service=request.data.get('service', None)
-    location=request.data.get('location', None)
+    
     
     if location is not None:
         if type(location) == str:
@@ -370,7 +374,6 @@ def update_service(request):
                service_id.location.add(loca)
             except Exception as err:
                 error.append(str(err))
-    
     
     if service is not None:
         if type(service) == str:
@@ -410,6 +413,14 @@ def update_service(request):
             except Exception as err:
                 error.append(str(err))
     #service_id.save()
+    try:
+        print(staffgroup_id)
+        service_group = ServiceGroup.objects.get(id = staffgroup_id)
+        service_group.services.add(service_id)
+        service_group.save()
+
+    except Exception as err:
+        error.append(str(err)) 
     
     if priceservice is not None:
         if type(priceservice) == str:
@@ -447,8 +458,6 @@ def update_service(request):
                     price=price
                 )
 
-    
-    
     serializer= ServiceSerializer(service_id, context={'request' : request} , data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
@@ -674,7 +683,7 @@ def update_servicegroup(request):
         service_id.services.clear()
         for ser in service:
             try:
-               service = ServiceGroup.objects.get(id=ser)  
+               service = Service.objects.get(id=ser)  
                service_id.services.add(service)
             except Exception as err:
                 error.append(str(err))
@@ -778,7 +787,7 @@ def get_product_orders(request):
 @permission_classes([AllowAny])
 def get_membership_orders(request):
     membership_order = MemberShipOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = MemberShipOrderSerializer(membership_order,  many=True)
+    serialized = MemberShipOrderSerializer(membership_order,  many=True, context={'request' : request, })
     return Response(
         {
             'status' : 200,
@@ -814,7 +823,7 @@ def get_service_orders(request):
 @permission_classes([AllowAny])
 def get_voucher_orders(request):
     voucher_orders = VoucherOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = VoucherOrderSerializer(voucher_orders,  many=True)
+    serialized = VoucherOrderSerializer(voucher_orders,  many=True, context={'request' : request, })
     return Response(
         {
             'status' : 200,
@@ -1026,6 +1035,27 @@ def get_total_revenue(request):
         },
         status=status.HTTP_200_OK
     )
+ 
+ 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_sale_checkout(request): 
+    checkout =Checkout.objects.all()
+    serialized = CheckoutSerializer(checkout, many = True, context = {'request' : request, })
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Product Order Sale Created!',
+                    'error_message' : None,
+                    'sale' : serialized.data
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+    
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -1061,7 +1091,7 @@ def create_sale_order(request):
     
     errors = []
     
-    if not all([client_id, member_id , client_type, location_id]):
+    if not all([member_id , client_type, location_id]):
         return Response(
             {
                 'status' : False,
@@ -1071,7 +1101,6 @@ def create_sale_order(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'All fields are required.',
                     'fields' : [
-                          'client',
                           'member', 
                           'selection_type',
                           'location'
@@ -1080,20 +1109,12 @@ def create_sale_order(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+        
     try:
         client = Client.objects.get(id = client_id)
     except Exception as err:
-        return Response(
-            {
-                    'status' : False,
-                    'status_code' : StatusCodes.INVALID_CLIENT_4032,
-                    'response' : {
-                    'message' : 'Client not found',
-                    'error_message' : str(err),
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        client =  None
+        
         
     try:
         member=Employee.objects.get(id = member_id)
@@ -1134,6 +1155,7 @@ def create_sale_order(request):
     for id in ids:
         sale_type = id['selection_type']
         service_id = id['id']
+        quantity = id['quantity']
         
         if sale_type == 'PRODUCT':
             #for pro in ids:
@@ -1159,7 +1181,7 @@ def create_sale_order(request):
                         #'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
                         'response' : {
                         'message' : 'consumable_quantity and sellable_quantity not Avaiable',
-                        'error_message' : "available_quantity",
+                        'error_message' : "available_quantity", 
                         }
                     },
                 status=status.HTTP_400_BAD_REQUEST
@@ -1181,6 +1203,7 @@ def create_sale_order(request):
                     total_price = total_price, 
                     payment_type= payment_type,
                     client_type = client_type,
+                    quantity = quantity,
                 )
                 product_order.sold_quantity =  product_stock.sold_quantity
                 product_order.save()
@@ -1208,12 +1231,14 @@ def create_sale_order(request):
            # for servics in ids:
             try:
                 service = Service.objects.get(id = service_id)
-                dur = service.duration
+                service_price = PriceService.objects.filter(service = service_id).first()
+                dur = service_price.duration
                 
                 service_order = ServiceOrder.objects.create(
                     user = user,
                     service = service,
                     duration= dur,
+                    checkout = checkout,
                     
                     client = client,
                     member = member,
@@ -1221,7 +1246,8 @@ def create_sale_order(request):
                     tip = tip,
                     total_price = total_price, 
                     payment_type=payment_type,
-                    client_type = client_type
+                    client_type = client_type,
+                    quantity = quantity,
 
                     
                 )
@@ -1262,7 +1288,7 @@ def create_sale_order(request):
             #for membership in ids:
             try:
                 membership = Membership.objects.get(id = service_id)
-                validity = membership.valid_for.split(" ")[0]
+                validity = int(membership.valid_for.split(" ")[0])
                 end_date_cal = membership.created_at +  timedelta(days= validity)
                 start_date_cal = membership.created_at
                 
@@ -1273,14 +1299,14 @@ def create_sale_order(request):
                     start_date = start_date_cal,
                     end_date = end_date_cal,
                     #status = sale_status,
-                    
+                    checkout = checkout,
                     client = client,
                     member = member,
                     tip = tip,
                     total_price = total_price, 
                     payment_type =payment_type,
-                    client_type = client_type
-
+                    client_type = client_type,
+                    quantity = quantity,
                 )
             except Exception as err:
                 return Response(
@@ -1329,13 +1355,14 @@ def create_sale_order(request):
                     start_date = start_date_cal,
                     end_date = end_date_cal,
                     #status = sale_status,
-                    
+                    checkout = checkout,
                     client = client,
                     member = member,
                     tip = tip,
                     total_price = total_price, 
                     payment_type =payment_type,
-                    client_type = client_type
+                    client_type = client_type,
+                    quantity = quantity,
 
                 )
             except Exception as err:

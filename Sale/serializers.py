@@ -16,7 +16,21 @@ class PriceServiceSerializers(serializers.ModelSerializer):
         model = PriceService
         fields = '__all__'
         
-
+class ServiceGroupSerializer(serializers.ModelSerializer):
+    
+    services  = serializers.SerializerMethodField(read_only=True)
+    
+    def get_services(self, obj):
+        try:
+            all_service = obj.services.all()
+            #ser = Service.objects.get(id = obj.services)
+            return ServiceSearchSerializer(all_service, many = True).data
+        except Exception as err:
+            print(str(err))
+    
+    class Meta:
+        model = ServiceGroup
+        fields = ['id', 'business', 'name', 'services']
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessAddress
@@ -45,10 +59,17 @@ class MemberSerializer(serializers.ModelSerializer):
         fields = ['id','full_name', 'image' ]
         
 class ServiceSearchSerializer(serializers.ModelSerializer):
+    priceservice = serializers.SerializerMethodField(read_only=True)
     
+    def get_priceservice(self, obj):
+        try:
+            ser = PriceService.objects.filter(service = obj)
+            return PriceServiceSerializers(ser, many = True).data
+        except Exception as err:
+            pass
     class Meta:
         model = Service
-        fields = ['id','name']
+        fields = ['id','name', 'location', 'client_can_book', 'priceservice']
 
 class EmployeeSelectedServiceSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField(read_only=True)
@@ -72,22 +93,32 @@ class ServiceSerializer(serializers.ModelSerializer):
     service_group = serializers.SerializerMethodField(read_only=True)
     
     priceservice = serializers.SerializerMethodField(read_only=True)
+    price = serializers.SerializerMethodField(read_only=True)
+    
+    def get_price(self, obj):
+        try:
+            ser = PriceService.objects.filter(service = obj).first()
+            return ser.price
+        except Exception as err:
+            pass
+            #print(err)
     
     def get_priceservice(self, obj):
         try:
             ser = PriceService.objects.filter(service = obj)
             return PriceServiceSerializers(ser, many = True).data
         except Exception as err:
-            print(err)
+            pass
             
     
     def get_service_group(self, obj):
         try:
-            group = ServiceGroup.objects.get(services = obj)
-            return ServiceSearchSerializer(group).data
+            group = ServiceGroup.objects.filter(services = obj)
+            return ServiceGroupSerializer(group, many = True ).data
         except Exception as err:
+            print(str(err))
             pass
-            #print(str(err))
+            
     
     def get_employees(self, obj):
         emp = EmployeeSelectedService.objects.filter(service = obj) 
@@ -109,6 +140,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             'employees', 
             'parrent_service' , 
             'description', 
+            'price',
             'location',
             'controls_time_slot',
             'initial_deposit',
@@ -120,14 +152,15 @@ class ServiceSerializer(serializers.ModelSerializer):
             'enable_team_comissions',
             'enable_vouchers',
             ]
-        
-        
+               
 class ProductOrderSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
     member  = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)
     product_name  = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
+    product_details  = serializers.SerializerMethodField(read_only=True)
+
     #item_sold = serializers.SerializerMethodField(read_only=True)
     
     # def get_item_sold(self, obj):
@@ -136,6 +169,11 @@ class ProductOrderSerializer(serializers.ModelSerializer):
     #         return product_stck.sold_quantity
     #     except Exception as err:
     #         print(err)
+    def get_product_details(self, obj):
+        try:
+            return obj.product.description
+        except Exception as err:
+            return None
     
     def get_order_type(self, obj):
         return 'Product'
@@ -169,9 +207,10 @@ class ProductOrderSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ProductOrder
-        fields = ['id', 'client','status','created_at', 'location', 'member', 'tip', 'total_price' , 'payment_type', 'product_name', 'gst', 'order_type', 'sold_quantity' ]
-   
-        
+        fields = ['id', 'client','quantity','status','created_at', 
+                  'location', 'member', 'tip', 'total_price' , 'payment_type',
+                  'product_name', 'gst', 'order_type', 'sold_quantity','product_details' ]
+          
 class ServiceOrderSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
@@ -218,7 +257,7 @@ class ServiceOrderSerializer(serializers.ModelSerializer):
             return None
     class Meta:
         model = ServiceOrder
-        fields = ['id', 'client', 'service','created_at' ,'user', 'duration', 'location', 'member', 'total_price', 'payment_type','tip','gst', 'order_type','created_at']
+        fields = ['id', 'client','quantity', 'service','created_at' ,'user', 'duration', 'location', 'member', 'total_price', 'payment_type','tip','gst', 'order_type','created_at']
         
 class MemberShipOrderSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
@@ -304,26 +343,29 @@ class VoucherOrderSerializer(serializers.ModelSerializer):
         model = VoucherOrder
         fields =['id', 'voucher', 'client' , 'location' , 'member' ,'start_date', 'end_date','status', 'total_price', 'payment_type' , 'order_type']
     
-class ServiceGroupSerializer(serializers.ModelSerializer):
-    
-    services  = serializers.SerializerMethodField(read_only=True)
-    
-    def get_services(self, obj):
-        try:
-            all_service = obj.services.all()
-            #ser = Service.objects.get(id = obj.services)
-            return ServiceSearchSerializer(all_service, many = True).data
-        except Exception as err:
-            print(str(err))
-    
-    class Meta:
-        model = ServiceGroup
-        fields = ['id', 'business', 'name', 'services']
+
         
 class CheckoutSerializer(serializers.ModelSerializer):
     product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
-    service  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
+    service  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
+    membership  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
+    voucher  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
     
+    def get_membership(self, obj):
+        try:
+            check = MemberShipOrder.objects.filter(checkout =  obj)
+            #all_service = obj.product.all()
+            return MemberShipOrderSerializer(check, many = True , context=self.context ).data
+        except Exception as err:
+            print(str(err))
+            
+    def get_voucher(self, obj):
+        try:
+            check = VoucherOrder.objects.filter(checkout =  obj)
+            #all_service = obj.product.all()
+            return VoucherOrderSerializer(check, many = True , context=self.context ).data
+        except Exception as err:
+            print(str(err))
     def get_product(self, obj):
         try:
             check = ProductOrder.objects.filter(checkout =  obj)
@@ -334,12 +376,12 @@ class CheckoutSerializer(serializers.ModelSerializer):
             
     def get_service(self, obj):
         try:
-            check = ServiceOrder.objects.filter(checkout =  obj)
+            service = ServiceOrder.objects.filter(checkout =  obj)
             #all_service = obj.product.all()
-            return ProductOrderSerializer(check, many = True , context=self.context ).data
+            return ServiceOrderSerializer(service, many = True , context=self.context ).data
         except Exception as err:
             print(str(err))
     
     class Meta:
         model = Checkout
-        fields = ['id', 'product', 'service']
+        fields = ['id', 'product', 'service', 'membership', 'voucher']

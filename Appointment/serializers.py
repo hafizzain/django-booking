@@ -8,8 +8,8 @@ from Appointment.models import Appointment, AppointmentCheckout, AppointmentNote
 from Business.models import BusinessAddress
 from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer
 from Client.serializers import ClientAppointmentSerializer
-from Employee.models import Employee
-from Service.models import Service
+from Employee.models import Employee, EmployeeSelectedService
+from Service.models import PriceService, Service
 from datetime import datetime, timedelta
 from Product.Constants.index import tenant_media_base_url
 from django.db.models import Q
@@ -17,6 +17,26 @@ from django.db.models import Q
 
 
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
+
+class PriceServiceSaleSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = PriceService
+        fields = ['id','service', 'duration', 'price']
+
+class MemberSaleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = ['id', 'full_name']
+class ServiceSaleSerializer(serializers.ModelSerializer):
+    price_service = serializers.SerializerMethodField(read_only=True)
+    
+    def get_price_service(self, obj):
+        price = PriceService.objects.filter(service = str(obj))
+        return PriceServiceSaleSerializer(price, many = True).data
+    class Meta:
+        model = Service
+        fields = ['id', 'name', 'price_service']
 
 class UpdateAppointmentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -104,7 +124,9 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     
     def get_location(self, obj):
         try:
-            return obj.appointment.business_address.address
+            loc = BusinessAddress.objects.get(id =  str(obj.business_address) )
+            return LocationSerializer(loc, ).data
+           # return obj.appointment.business_address.address
         except Exception as err:
             print(err)      
 
@@ -402,7 +424,10 @@ class SingleAppointmentSerializer(serializers.ModelSerializer):
             None
     
     def get_client(self, obj):
-        return obj.appointment.client.full_name
+        try:
+            return obj.appointment.client.full_name
+        except Exception as err:
+            pass
     
     def get_end_time(self, obj):
         app_date_time = f'2000-01-01 {obj.appointment_time}'
@@ -420,7 +445,7 @@ class SingleAppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentService
         fields= ('id', 'location','client','service',
-                 'appointment_time', 'end_time', 'member',
+                 'appointment_time', 'end_time', 'member','price',
                  'appointment_status', 'currency', 'booked_by', 'booking_id', 'appointment_date', 'client_type', 'duration' , 'notes', 'is_favourite'
             )
         
@@ -449,8 +474,81 @@ class SingleNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
         fields = ['id', 'client', 'notes']
+  
+class AppointmentServiceSeriailzer(serializers.ModelSerializer):
+    class Meta:
+        model = AppointmentService
+        fields = 'appointment_status', 
+        
+class ServiceClientSaleSerializer(serializers.ModelSerializer):
+    service = serializers.SerializerMethodField(read_only=True)
+    booked_by = serializers.SerializerMethodField(read_only=True)
+    member = serializers.SerializerMethodField(read_only=True)
+    
+    def get_member(self, obj):
+        try:
+            emp = Employee.objects.get(id  = obj.member.id)
+            return MemberSaleSerializer(emp).data
+        except Exception as err:
+            print(err)
+    
+    def get_booked_by(self, obj):
+        return f'{obj.user.first_name} {obj.user.last_name}'
+    
+    def get_service(self, obj):
+        try:
+            price = Service.objects.get(id  = obj.service.id)
+            return price.name
+            #return ServiceSaleSerializer(price).data
+        except Exception as err:
+            print(err)
+    class Meta:
+        model = AppointmentService
+        fields = ['id','service', 'created_at','booked_by','duration','price','appointment_status','member']
         
 class CheckoutSerializer(serializers.ModelSerializer):
+    appointment_service_status = serializers.SerializerMethodField(read_only=True)
+    appointment_service_duration = serializers.SerializerMethodField(read_only=True)
+    service = serializers.SerializerMethodField(read_only=True)
+    member = serializers.SerializerMethodField(read_only=True)
+    
+    def get_service(self, obj):
+        try:
+            price = Service.objects.get(id  = obj.service.id)
+            return ServiceSaleSerializer(price).data
+        except Exception as err:
+            print(err)
+            
+    def get_member(self, obj):
+        try:
+            emp = Employee.objects.get(id  = obj.member.id)
+            return MemberSaleSerializer(emp).data
+        except Exception as err:
+            print(err)
+    
+    def get_appointment_service_status(self, obj):
+        try:
+            service = AppointmentService.objects.get(id = obj.appointment_service.id )
+            return service.appointment_status
+        except Exception as err:
+            print(err)   
+            
+    def get_appointment_service_duration(self, obj):
+        try:
+            service = AppointmentService.objects.get(id = obj.appointment_service.id )
+            return service.duration
+        except Exception as err:
+            print(err)   
+    
     class Meta:
         model = AppointmentCheckout
-        exclude = ['created_at', 'id' ,'is_deleted', 'is_active']
+        fields = ['id', 'appointment', 'appointment_service_status', 'service','member','created_at','appointment_service_duration',
+                'payment_method','business_address', 'voucher','promotion',
+                'membership','rewards','tip','gst', 'service_price', 'total_price']
+        #exclude = ['id' ,'is_deleted', 'is_active']
+        
+
+class ServiceEmployeeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmployeeSelectedService
+        fields = ('id','employee')

@@ -5,7 +5,7 @@ from uuid import uuid4
 from Authentication.models import User
 from Business.models import Business, BusinessAddress
 
-from Utility.models import Country, State, City
+from Utility.models import Country, Language, State, City
 from django.utils.timezone import now
 from Product.models import Product
 from Service.models import Service
@@ -16,6 +16,19 @@ class Client(models.Model):
         ('Male' , 'Male'),
         ('Female' , 'Female'),
         ('Others' , 'Others'),
+    ]
+    MARKETING_CHOICES = [
+        ('opt_in' , 'opt_in'),
+        ('opt_out' , 'opt_out'),
+    ]
+    ABOUT_CHOICES = [
+        ('Facebook' , 'Facebook'),
+        ('Instagram' , 'Instagram'),
+        ('Twitter' , 'Twitter'),
+        ('Whatsapp' , 'Whatsapp'),
+        ('Community' , 'Community'),
+        ('Media_Ads' , 'Media Ads'),
+        ('Friends' , 'Friends'),
     ]
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='client')
@@ -30,18 +43,24 @@ class Client(models.Model):
     mobile_number = models.CharField(max_length=30, null=True, blank=True)
     is_email_verified = models.BooleanField(default=False)
     is_mobile_verified = models.BooleanField(default=False)
-
+    
     dob = models.DateField(verbose_name='Date of Birth', null=True, blank=True)
     gender = models.CharField(choices=GENDER_CHOICES, default='Male', max_length=20)
 
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True, blank=True, related_name='country_clients')
     state = models.ForeignKey(State, on_delete=models.SET_NULL, null=True, blank=True, related_name='state_clients')
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, related_name='city_clients')
-
+    
+    language = models.ForeignKey(Language, on_delete=models.SET_NULL, related_name='language_clients', null=True, blank=True, max_length=100)
+    
+    about_us = models.CharField(choices=ABOUT_CHOICES, default='Community', max_length=100)
+    marketing = models.CharField(choices=MARKETING_CHOICES, default='opt_in', max_length=50)
+    customer_note = models.CharField(max_length=255, null=True, blank=True, verbose_name= 'Customer Note')
+    
     postal_code = models.CharField(max_length=20, null=True, blank=True)
     address = models.TextField(default='')
     card_number = models.CharField(max_length=30, null=True, blank=True)
-
+    
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)

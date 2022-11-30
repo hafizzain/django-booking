@@ -11,10 +11,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from Business.models import Business , BusinessAddress
 from datetime import datetime
+from Order.models import Checkout, MemberShipOrder, ProductOrder, VoucherOrder
+from Sale.serializers import MemberShipOrderSerializer, ProductOrderSerializer, VoucherOrderSerializer
 
 #from Service.models import Service
 from Service.models import Service
-from Employee.models import Employee
+from Employee.models import Employee, EmployeeSelectedService
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
@@ -25,7 +27,7 @@ from threading import Thread
 
 
 from Appointment.models import Appointment, AppointmentService, AppointmentNotes , AppointmentCheckout
-from Appointment.serializers import  CheckoutSerializer, AppoinmentSerializer,SingleAppointmentSerializer ,BlockSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer
+from Appointment.serializers import  CheckoutSerializer, AppoinmentSerializer, ServiceClientSaleSerializer, ServiceEmployeeSerializer,SingleAppointmentSerializer ,BlockSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer
 from Utility.models import ExceptionRecord
 
 @api_view(['GET'])
@@ -158,7 +160,7 @@ def create_appointment(request):
     payment_method = request.data.get('payment_method', None)
     discount_type = request.data.get('discount_type', None)
 
-    if not all([ client, client_type, appointment_date, business_id  ]):
+    if not all([ client_type, appointment_date, business_id  ]):
          return Response(
             {
                 'status' : False,
@@ -168,7 +170,7 @@ def create_appointment(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'All fields are required.',
                     'fields' : [
-                          'client',
+                         # 'client',
                           'client_type',
                           'member', 
                           'appointment_date', 
@@ -213,16 +215,17 @@ def create_appointment(request):
     try:
         client = Client.objects.get(id=client)
     except Exception as err:
-        return Response(
-            {
-                    'status' : False,
-                    'status_code' : StatusCodes.INVALID_CLIENT_4032,
-                    'response' : {
-                    'message' : 'Client not found',
-                    'error_message' : str(err),
-                }
-            }
-        )
+        client = None
+        # return Response(
+        #     {
+        #             'status' : False,
+        #             'status_code' : StatusCodes.INVALID_CLIENT_4032,
+        #             'response' : {
+        #             'message' : 'Client not found',
+        #             'error_message' : str(err),
+        #         }
+        #     }
+        # )
     
             
     appointment = Appointment.objects.create(
@@ -259,6 +262,7 @@ def create_appointment(request):
         member = appoinmnt['member']
         service = appoinmnt['service']
         duration = appoinmnt['duration']
+        price = appoinmnt['price']
         date_time = appoinmnt['date_time']
         fav = appoinmnt.get('favourite', None)
         
@@ -324,7 +328,7 @@ def create_appointment(request):
             appointment_date = appointment_date,
             service = service,
             member = member,
-            
+            price = price,
             # voucher = voucher,
             # reward = reward,
             # membership = membership,
@@ -868,3 +872,105 @@ def service_appointment_count(request):
             status=status.HTTP_201_CREATED
     ) 
     
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_service_employee(request):
+    address = request.GET.get('service', None)
+    data = {}
+    employee_ids = []
+    if address is None :
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'address id is required',
+                    'fields' : [
+                        'address',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    Employee =  EmployeeSelectedService.objects.filter(service = address)
+    serializer =  ServiceEmployeeSerializer(Employee, many = True)
+    data =serializer.data
+    for i in data:
+        employee_ids.append(i['employee'])
+    
+    #test = data['employee']
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Appointment Checkout Create!',
+                    'error_message' : None,
+                    'data' : employee_ids,
+                    
+                }
+            },
+            status=status.HTTP_201_CREATED
+    ) 
+   
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_client_sale(request):
+    client = request.GET.get('client', None)
+    data = []
+    employee_ids = []
+    if client is None :
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'client id is required',
+                    'fields' : [
+                        'client',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+        
+    product_order = ProductOrder.objects.filter(checkout__client = client)
+    product = ProductOrderSerializer(product_order,  many=True,  context={'request' : request, })
+    
+    voucher_order = VoucherOrder.objects.filter(checkout__client = client)
+    voucher = VoucherOrderSerializer(voucher_order,  many=True,  context={'request' : request, })
+    data.extend(voucher.data)
+    
+    membership_order = MemberShipOrder.objects.filter(checkout__client = client)
+    membership = MemberShipOrderSerializer(membership_order,  many=True,  context={'request' : request, })
+    data.extend(membership.data)
+    
+    # appointment_checkout = AppointmentCheckout.objects.filter(appointment__client = client)
+    # serialized = CheckoutSerializer(appointment_checkout, many = True)
+    
+    appointment_checkout = AppointmentService.objects.filter(appointment__client = client)
+    serialized = ServiceClientSaleSerializer(appointment_checkout, many = True)
+    
+    #test = checkout.count()
+    #serialized = CheckoutSerializer(checkout, many = True, context = {'request' : request})
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Client Order Sales!',
+                    'error_message' : None,
+                    'product' : product.data,
+                    'voucher' : data,
+                    'appointment' : serialized.data
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )

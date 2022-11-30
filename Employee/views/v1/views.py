@@ -464,7 +464,7 @@ def generate_id(request):
     count = Employee.objects.all().count()
     count += 1
    
-    tenant_name ='NS'
+    #tenant_name ='NS'
     return_loop = True
     while return_loop:
         if 0 < count <= 9 : 
@@ -738,20 +738,27 @@ def create_employee(request):
 
     empl_permission.save()
     
-    
-    if type(location) == str:
-            location = json.loads(location)
-
-    elif type(location) == list:
-            pass
-        
-    for loc in location:
-        try:
-            location_id = BusinessAddress.objects.get(id=loc)  
-            print(location_id)
-            employee.location.add(location_id)
-        except Exception as err:
+    try:
+        print(location)
+        location_id = BusinessAddress.objects.get(id=str(location))  
+        print(location_id)
+        employee.location.add(location_id)
+    except Exception as err:
             employees_error.append(str(err))
+    
+    # if type(location) == str:
+    #         location = json.loads(location)
+
+    # elif type(location) == list:
+    #         pass
+        
+    # for loc in location:
+    #     try:
+    #         location_id = BusinessAddress.objects.get(id=loc)  
+    #         print(location_id)
+    #         employee.location.add(location_id)
+    #     except Exception as err:
+    #         employees_error.append(str(err))
 
     # serialized = EmployPermissionSerializer(employee_p_setting, data=request.data)
     # if serialized.is_valid():
@@ -863,7 +870,9 @@ def update_employee(request):
         services_id = request.data.get('services', None)   
         staff_id = request.data.get('staff_group', None) 
         location = request.data.get('location', None) 
-
+        
+        Errors = []
+        
         if id is None:
             return Response(
             {
@@ -996,35 +1005,44 @@ def update_employee(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-         
-        empl_permission = EmployePermission.objects.get(employee=employee)
-        
-        for permit in ALL_PERMISSIONS:
+        try:
+            empl_permission = EmployePermission.objects.get(employee=employee)
             
-            value = request.data.get(permit, None)
-            PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
-            if value is not None:
-                if type(value) == str:
-                    value = json.loads(value)
-                    for opt in value:
-                        try:
-                            option = GlobalPermissionChoices.objects.get(text=opt)
-                            PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
-                        except:
-                            pass
+            for permit in ALL_PERMISSIONS:
+                
+                value = request.data.get(permit, None)
+                PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
+                if value is not None:
+                    if type(value) == str:
+                        value = json.loads(value)
+                        for opt in value:
+                            try:
+                                option = GlobalPermissionChoices.objects.get(text=opt)
+                                PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
+                            except:
+                                pass
 
-        empl_permission.save()
+            empl_permission.save()
+        except Exception as err:
+            Errors.append(err)
         
-        if type(location) == str:
-            location = json.loads(location)
+        try:
+            employee.location.clear()
+            address=  BusinessAddress.objects.get(id = str(location))
+            employee.location.add(address)
+        except Exception as err:
+            print(err)
+        
+        # if type(location) == str:
+        #     location = json.loads(location)
             
-        employee.location.clear()
-        for loc in location:
-            try:
-                address=  BusinessAddress.objects.get(id = str(loc))
-                employee.location.add(address)
-            except Exception as err:
-                print(err)
+        # employee.location.clear()
+        # for loc in location:
+        #     try:
+        #         address=  BusinessAddress.objects.get(id = str(loc))
+        #         employee.location.add(address)
+        #     except Exception as err:
+        #         print(err)
 
         serializer = EmployeSerializer(employee, data=request.data, partial=True, context={'request' : request,})
         if serializer.is_valid():
@@ -2109,6 +2127,10 @@ def delete_asset(request):
 @permission_classes([IsAuthenticated])
 def update_asset(request):
     asset_id = request.data.get('id', None)
+    staff_id = request.data.get('staff_id', None)
+    document = request.data.get('document', None)
+    is_active = request.data.get('is_active', None)
+    
     if asset_id is None: 
        return Response(
             {
@@ -2125,7 +2147,6 @@ def update_asset(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-       
     try:
         asset = Asset.objects.get(id=asset_id)
     except Exception as err:
@@ -2141,6 +2162,29 @@ def update_asset(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    
+    if staff_id is not None:
+        try:
+            emp = Employee.objects.get(id=staff_id)
+            asset.employee = emp
+        except Exception as err:
+            pass
+    if is_active is not None:
+        asset.is_active = True
+    else:
+        asset.is_active = False
+    try:
+        doc = AssetDocument.objects.get(asset=asset)
+        doc.delete()
+    except:
+        pass
+    
+    if document is not None:
+        for doc in document:
+            doc = AssetDocument.objects.create(
+                asset = asset,
+                document = doc
+            )
     serializer = AssetSerializer(asset, data=request.data, partial=True, context={'request' : request})
     if not serializer.is_valid():
         return Response(
