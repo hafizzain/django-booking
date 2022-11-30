@@ -791,9 +791,9 @@ def add_product(request):
             location_id = loc_quan.get('id', None)
             current_stock = loc_quan.get('current_stock', None)
             low_stock = loc_quan.get('low_stock', None)
-            reoreder_quantity = loc_quan.get('reoreder_quantity', None)
+            reorder_quantity = loc_quan.get('reorder_quantity', None)
 
-            if all([location_id, current_stock, low_stock, reoreder_quantity]):
+            if all([location_id, current_stock, low_stock, reorder_quantity]):
                 try:
                     loc = BusinessAddress.objects.get(id = location_id)
                 except Exception as err:
@@ -808,14 +808,14 @@ def add_product(request):
                         location = loc,
                         available_quantity = current_stock,
                         low_stock = low_stock, 
-                        reorder_quantity = reoreder_quantity,
+                        reorder_quantity = reorder_quantity,
                         alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
                         is_active = stock_status,
                     )
                     ExceptionRecord.objects.create(is_resolved = True, text='Created')
 
             else:
-                ExceptionRecord.objects.create(text=f'fields not all {location_id}, {current_stock}, {low_stock}, {reoreder_quantity}')
+                ExceptionRecord.objects.create(text=f'fields not all {location_id}, {current_stock}, {low_stock}, {reorder_quantity}')
 
     else:
         ExceptionRecord.objects.create(text='No Location Quantities Find')
