@@ -1780,7 +1780,7 @@ def get_product_consumptions(request):
         status=status.HTTP_200_OK
     )
 
-@api_view(['PUT'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_product_stock_transfer(request):
     
