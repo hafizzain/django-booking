@@ -296,7 +296,6 @@ def create_client(request):
         full_name = full_name,
         image= image,
         client_id=client_id,
-        email= email,
         mobile_number=mobile_number,
         dob=dob,
         address=address,
@@ -312,9 +311,11 @@ def create_client(request):
         customer_note = customer_note, 
         language = language_id,
         about_us =  about_us,
-        
-        
     )
+    if email is not None:
+        client.email = email
+        client.save()
+
     serialized= ClientSerializer(client, context={'request' : request})
     template = 'Client'
     try:
