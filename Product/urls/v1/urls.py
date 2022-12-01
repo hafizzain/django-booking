@@ -49,4 +49,6 @@ urlpatterns = [
     path('get_product_consumptions/', views.get_product_consumptions),
     path('update_product_consumptions/', views.update_product_consumptions),
     
+
+    path('add_product_stock_transfer/', views.add_product_stock_transfer),
 ]

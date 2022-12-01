@@ -16,11 +16,11 @@ from rest_framework.settings import api_settings
 from NStyle.Constants import StatusCodes
 
 from Product.models import ( Category, Brand , Product, ProductMedia, ProductStock
-                            , OrderStock, OrderStockProduct, ProductConsumption
+                            , OrderStock, OrderStockProduct, ProductConsumption, ProductStockTransfer
                            )
 from Business.models import Business, BusinessAddress, BusinessVendor
 from Product.serializers import (CategorySerializer, BrandSerializer, ProductSerializer, ProductStockSerializer, ProductWithStockSerializer
-                                 ,OrderSerializer , OrderProductSerializer, ProductConsumptionSerializer
+                                 ,OrderSerializer , OrderProductSerializer, ProductConsumptionSerializer, ProductStockTransferSerializer
                                  )
 
 
@@ -1778,4 +1778,90 @@ def get_product_consumptions(request):
             }
         },
         status=status.HTTP_200_OK
+    )
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def add_product_stock_transfer(request):
+    
+    product_id = request.data.get('product', None)
+    from_location_id = request.data.get('from_location', None)
+    to_location_id = request.data.get('to_location', None)
+    quantity = request.data.get('quantity', None)
+
+    if not all([product_id, from_location_id, to_location_id, quantity]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'product',
+                        'from_location',
+                        'to_location',
+                        'quantity',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        product = Product.objects.get(id=product_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Product Not found',
+                    'error_message' : str(err),
+                    
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    try:
+        from_location = BusinessAddress.objects.get(id=from_location_id)
+        to_location = BusinessAddress.objects.get(id=to_location_id)
+    except:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Location Not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    cunsumption_obj = ProductStockTransfer.objects.create(
+        user = request.user,
+        product = product,
+        from_location = from_location,
+        to_location = to_location,
+        quantity = quantity
+    )
+
+    serialized = ProductStockTransferSerializer(cunsumption_obj)
+
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 201,
+            'response' : {
+                'message' : 'Product Stock Transfer Created successfully',
+                'error_message' : None,
+                'product_stock_transfer' : serialized.data
+            }
+        },
+        status=status.HTTP_201_CREATED
     )

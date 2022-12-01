@@ -3,7 +3,7 @@
 from rest_framework import serializers
 from Product.Constants.index import tenant_media_base_url
 from Product.models import (Category, Brand, Product, ProductMedia, 
-                            ProductStock, OrderStock , OrderStockProduct, ProductConsumption)
+                            ProductStock, OrderStock , OrderStockProduct, ProductConsumption, ProductStockTransfer)
 from Business.models import BusinessAddress, BusinessVendor
 from django.conf import settings
 from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer
@@ -263,3 +263,13 @@ class ProductConsumptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductConsumption
         fields = ['id', 'location', 'product', 'quantity']
+
+
+class ProductStockTransferSerializer(serializers.ModelSerializer):
+
+    product = ProductOrderSerializer()
+    from_location = BusiessAddressAppointmentSerializer()
+    to_location = BusiessAddressAppointmentSerializer()
+    class Meta:
+        model = ProductStockTransfer
+        fields = ['id', 'from_location', 'to_location', 'product', 'quantity']
