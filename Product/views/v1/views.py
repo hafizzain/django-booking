@@ -1618,6 +1618,104 @@ def add_product_consumption(request):
         status=status.HTTP_201_CREATED
     )
 
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_product_consumptions(request):
+    
+    consumption_id = request.data.get('consumption_id', None)
+
+    if not all([consumption_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'consumption_id',
+                        'location',
+                        'quantity',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        product_con = ProductConsumption.objects.get(id=consumption_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Product Comsumption Not found',
+                    'error_message' : str(err),
+                    
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    product_id = request.data.get('product', product_con.product.id)
+    location_id = request.data.get('location', product_con.location.id)
+    quantity = request.data.get('quantity', product_con.quantity)
+
+    try:
+        product = Product.objects.get(id=product_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Product Not found',
+                    'error_message' : str(err),
+                    
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    try:
+        location = BusinessAddress.objects.get(id=location_id)
+    except:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Location Not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    product_con.product = product
+    product_con.location = location
+    product_con.quantity = quantity
+    product_con.save()
+
+    serialized = ProductConsumptionSerializer(product_con)
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Product Consumption Updated successfully',
+                'error_message' : None,
+                'product_consumption' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_product_consumptions(request):
