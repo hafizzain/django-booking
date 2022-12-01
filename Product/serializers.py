@@ -69,9 +69,15 @@ class VendorSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ProductStockSerializer(serializers.ModelSerializer):
+    current_stock = serializers.SerializerMethodField()
+
+    def get_current_stock(self, obj):
+        return obj.available_quantity
+
+        
     class Meta:
         model = ProductStock
-        fields = ['id', 'location', 'available_quantity', 'sold_quantity', 'sellable_quantity','consumable_quantity' , 'amount', 'unit' ,'alert_when_stock_becomes_lowest', 'sold_quantity','is_active' ]
+        fields = ['id', 'location', 'low_stock', 'current_stock',  'reorder_quantity', 'available_quantity', 'sold_quantity', 'sellable_quantity','consumable_quantity' , 'amount', 'unit' ,'alert_when_stock_becomes_lowest', 'sold_quantity','is_active' ]
 
 class ProductWithStockSerializer(serializers.ModelSerializer):
     stock = serializers.SerializerMethodField()
@@ -139,6 +145,7 @@ class ProductSerializer(serializers.ModelSerializer):
     
     media = serializers.SerializerMethodField()
     stocks = serializers.SerializerMethodField()
+    location_quantities = serializers.SerializerMethodField()
     cover_image = serializers.SerializerMethodField()
     
     location = serializers.SerializerMethodField()
@@ -177,6 +184,10 @@ class ProductSerializer(serializers.ModelSerializer):
         all_stocks = ProductStock.objects.filter(product=obj, is_deleted=False)
         return ProductStockSerializer(all_stocks, many=True).data
 
+    def get_location_quantities(self, obj):
+        all_stocks = ProductStock.objects.filter(product=obj, is_deleted=False)
+        return ProductStockSerializer(all_stocks, many=True).data
+
 
     class Meta:
         model = Product
@@ -198,6 +209,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'media',
             'cover_image',
             'stocks',
+            'location_quantities',
             'vendor',
             'category',
             'brand', 
