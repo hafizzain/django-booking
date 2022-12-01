@@ -45,7 +45,7 @@ urlpatterns = [
     path('delete_orderstock/', views.delete_orderstock),
 
 
-    path('add_product_cunsumption/', views.add_product_cunsumption),
-    path('get_product_cunsumptions/', views.get_product_cunsumptions)
+    path('add_product_consumption/', views.add_product_consumption),
+    path('get_product_consumptions/', views.get_product_consumptions)
     
 ]

@@ -1536,7 +1536,7 @@ def delete_orderstock(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def add_product_cunsumption(request):
+def add_product_consumption(request):
     
     product_id = request.data.get('product', None)
     location_id = request.data.get('location', None)
@@ -1620,7 +1620,7 @@ def add_product_cunsumption(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_product_cunsumptions(request):
+def get_product_consumptions(request):
     
     product_consumptions = ProductConsumption.objects.all()
     serialized = ProductConsumptionSerializer(product_consumptions, many=True)
