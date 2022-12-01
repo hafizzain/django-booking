@@ -298,7 +298,6 @@ def create_client(request):
         client_id=client_id,
         mobile_number=mobile_number,
         dob=dob,
-        address=address,
         gender= gender,
         country= country,
         state = state,
@@ -306,15 +305,20 @@ def create_client(request):
         postal_code= postal_code,
         card_number= card_number,
         is_active = is_active,
-        
+
         #New requirement
         customer_note = customer_note, 
         language = language_id,
         about_us =  about_us,
     )
+
+    if address is not None:
+        client.address = address
+
     if email is not None:
         client.email = email
-        client.save()
+
+    client.save()
 
     serialized= ClientSerializer(client, context={'request' : request})
     template = 'Client'
