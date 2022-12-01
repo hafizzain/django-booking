@@ -936,11 +936,54 @@ def update_product(request):
         except Exception as err:
             print(err)
             
-    stock=ProductStock.objects.get(product=product)
-    serialized= ProductStockSerializer(stock, data=request.data, partial=True)
-    if serialized.is_valid():
-        serialized.save()
-        data.update(serialized.data)
+    all_stocks = ProductStock.objects.filter(product=product)
+    for stk in all_stocks:
+        stk.delete()
+
+    location_quantities = request.data.get('location_quantities', None)
+    if location_quantities is not None:
+        if type(location_quantities) == str:
+            ExceptionRecord.objects.create(is_resolved = True, text='Location Quantities was string and gonna convert')
+            location_quantities = json.loads(location_quantities)
+            ExceptionRecord.objects.create(is_resolved = True, text='Converted')
+        
+        for loc_quan in location_quantities:
+            location_id = loc_quan.get('id', None)
+            current_stock = loc_quan.get('current_stock', None)
+            low_stock = loc_quan.get('low_stock', None)
+            reorder_quantity = loc_quan.get('reorder_quantity', None)
+
+            if all([location_id, current_stock, low_stock, reorder_quantity]):
+                try:
+                    loc = BusinessAddress.objects.get(id = location_id)
+                except Exception as err:
+                    ExceptionRecord.objects.create(text=str(err))
+    
+                    pass
+                else:
+                    product_stock = ProductStock.objects.create(
+                        user = request.user,
+                        business = product.business,
+                        product = product,
+                        location = loc,
+                        available_quantity = current_stock,
+                        low_stock = low_stock, 
+                        reorder_quantity = reorder_quantity,
+                        alert_when_stock_becomes_lowest = True,
+                        is_active = True
+                    )
+                    ExceptionRecord.objects.create(is_resolved = True, text='Created')
+
+            else:
+                ExceptionRecord.objects.create(text=f'fields not all {location_id}, {current_stock}, {low_stock}, {reorder_quantity}')
+
+    else:
+        ExceptionRecord.objects.create(text='No Location Quantities Find')
+    
+    # serialized= ProductStockSerializer(stock, data=request.data, partial=True)
+    # if serialized.is_valid():
+    #     serialized.save()
+    #     data.update(serialized.data)
         
     
     serialized = ProductSerializer(product, data=request.data, partial=True, context={'request':request})
@@ -1635,6 +1678,7 @@ def update_product_consumptions(request):
                     'error_message' : 'All fields are required.',
                     'fields' : [
                         'consumption_id',
+                        'product',
                         'location',
                         'quantity',
                     ]

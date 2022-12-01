@@ -145,8 +145,8 @@ class ProductSerializer(serializers.ModelSerializer):
     vendor= VendorSerializer(read_only=True)
     
     media = serializers.SerializerMethodField()
-    stocks = serializers.SerializerMethodField()
-    location_quantities = serializers.SerializerMethodField()
+    stocks = serializers.SerializerMethodField(read_only=True)
+    location_quantities = serializers.SerializerMethodField(read_only=True)
     cover_image = serializers.SerializerMethodField()
     
     location = serializers.SerializerMethodField()
