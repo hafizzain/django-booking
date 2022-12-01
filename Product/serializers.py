@@ -258,8 +258,8 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class ProductConsumptionSerializer(serializers.ModelSerializer):
 
-    product = ProductOrderSerializer(readonly=True)
-    location = BusiessAddressAppointmentSerializer(readonly=True)
+    product = ProductOrderSerializer()
+    location = BusiessAddressAppointmentSerializer()
     class Meta:
         model = ProductConsumption
         fields = ['id', 'location', 'product', 'quantity']
