@@ -6,6 +6,7 @@ from Product.models import (Category, Brand, Product, ProductMedia,
                             ProductStock, OrderStock , OrderStockProduct, ProductConsumption)
 from Business.models import BusinessAddress, BusinessVendor
 from django.conf import settings
+from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer
 
 
 
@@ -74,7 +75,7 @@ class ProductStockSerializer(serializers.ModelSerializer):
     def get_current_stock(self, obj):
         return obj.available_quantity
 
-        
+
     class Meta:
         model = ProductStock
         fields = ['id', 'location', 'low_stock', 'current_stock',  'reorder_quantity', 'available_quantity', 'sold_quantity', 'sellable_quantity','consumable_quantity' , 'amount', 'unit' ,'alert_when_stock_becomes_lowest', 'sold_quantity','is_active' ]
@@ -256,6 +257,9 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class ProductConsumptionSerializer(serializers.ModelSerializer):
+
+    product = ProductOrderSerializer(readonly=True)
+    location = BusiessAddressAppointmentSerializer(readonly=True)
     class Meta:
         model = ProductConsumption
         fields = ['id', 'location', 'product', 'quantity']
