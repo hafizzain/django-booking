@@ -36,7 +36,7 @@ class ServiceGroupSerializer(serializers.ModelSerializer):
         model = ServiceGroup
         fields = ['id', 'business', 'name', 'services', 'status']
 
-        
+
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessAddress
@@ -75,7 +75,7 @@ class ServiceSearchSerializer(serializers.ModelSerializer):
             pass
     class Meta:
         model = Service
-        fields = ['id','name', 'location', 'client_can_book', 'priceservice']
+        fields = ['id','name', 'location', 'client_can_book', 'priceservice', 'slot_availible_for_online']
 
 class EmployeeSelectedServiceSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField(read_only=True)
