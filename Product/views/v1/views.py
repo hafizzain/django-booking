@@ -1881,7 +1881,7 @@ def add_product_stock_transfer(request):
     try:
         from_location = BusinessAddress.objects.get(id=from_location_id)
         to_location = BusinessAddress.objects.get(id=to_location_id)
-    except:
+    except Exception as err:
         return Response(
             {
                 'status' : False,
@@ -1923,16 +1923,65 @@ def add_product_stock_transfer(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_product_stock_transfers(request):
-    cunsumption_obj = ProductStockTransfer.objects.all()
-    serialized = ProductStockTransferSerializer(cunsumption_obj, many=True)
+    stock_tranfers = ProductStockTransfer.objects.all()
+    serialized = ProductStockTransferSerializer(stock_tranfers, many=True)
     return Response(
         {
             'status' : True,
-            'status_code' : 201,
+            'status_code' : 200,
             'response' : {
                 'message' : 'Product Stock Transfers',
                 'error_message' : None,
                 'product_stock_transfers' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_product_stock_transfer(request):
+    stock_t_id = request.data.get('id', None)
+    if not all([stock_t_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        stock_transfer = ProductStockTransfer.objects.get(id=stock_t_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Product Stock Transfer Not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    else:
+        stock_transfer.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Product Stock Transfer Deleted',
+                'error_message' : None,
             }
         },
         status=status.HTTP_200_OK
