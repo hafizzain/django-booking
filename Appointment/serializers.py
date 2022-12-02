@@ -135,7 +135,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     
     def get_price(self, obj):
         try:
-            return obj.service.price
+            return obj.price
         except Exception as err:
             None
         
