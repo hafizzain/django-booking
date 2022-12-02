@@ -1917,3 +1917,23 @@ def add_product_stock_transfer(request):
         },
         status=status.HTTP_201_CREATED
     )
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_product_stock_transfers(request):
+    cunsumption_obj = ProductStockTransfer.objects.all()
+    serialized = ProductStockTransferSerializer(cunsumption_obj, many=True)
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 201,
+            'response' : {
+                'message' : 'Product Stock Transfers',
+                'error_message' : None,
+                'product_stock_transfers' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
