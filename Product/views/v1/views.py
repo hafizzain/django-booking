@@ -1923,7 +1923,7 @@ def add_product_stock_transfer(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_product_stock_transfers(request):
-    stock_tranfers = ProductStockTransfer.objects.all()
+    stock_tranfers = ProductStockTransfer.objects.filter(is_deleted=False)
     serialized = ProductStockTransferSerializer(stock_tranfers, many=True)
     return Response(
         {
@@ -1959,7 +1959,7 @@ def delete_product_stock_transfer(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     try:
-        stock_transfer = ProductStockTransfer.objects.get(id=stock_t_id)
+        stock_transfer = ProductStockTransfer.objects.get(id=stock_t_id, is_deleted=False)
     except Exception as err:
         return Response(
             {
@@ -1974,7 +1974,8 @@ def delete_product_stock_transfer(request):
             status=status.HTTP_404_NOT_FOUND
         )
     else:
-        stock_transfer.delete()
+        stock_transfer.is_deleted = True
+        stock_transfer.save()
     return Response(
         {
             'status' : True,
@@ -1986,3 +1987,98 @@ def delete_product_stock_transfer(request):
         },
         status=status.HTTP_200_OK
     )
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_product_stock_transfer(request):
+    stock_t_id = request.data.get('id', None)
+    if not all([stock_t_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        stock_transfer = ProductStockTransfer.objects.get(id=stock_t_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Product Stock Transfer Not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    else:
+        product_id = request.data.get('product', stock_transfer.product.id)
+        from_location_id = request.data.get('from_location',  stock_transfer.from_location.id)
+        to_location_id = request.data.get('to_location',  stock_transfer.to_location.id)
+        quantity = request.data.get('quantity',  stock_transfer.quantity)
+        try:
+            product = Product.objects.get(id=product_id)
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 404,
+                    'status_code_text' : 'OBJECT_NOT_FOUND',
+                    'response' : {
+                        'message' : 'Product Not found',
+                        'error_message' : str(err),
+                        
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        try:
+            from_location = BusinessAddress.objects.get(id=from_location_id)
+            to_location = BusinessAddress.objects.get(id=to_location_id)
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 404,
+                    'status_code_text' : 'OBJECT_NOT_FOUND',
+                    'response' : {
+                        'message' : 'Location Not found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        stock_transfer.product = product,
+        stock_transfer.from_location = from_location,
+        stock_transfer.to_location = to_location,
+        stock_transfer.quantity = quantity
+        stock_transfer.save()
+
+        serialized = ProductStockTransferSerializer(stock_transfer)
+
+        return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Product Stock Transfer Updated',
+                    'error_message' : None,
+                    'stock_transfer' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )

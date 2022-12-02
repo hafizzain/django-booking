@@ -54,4 +54,5 @@ urlpatterns = [
     path('add_product_stock_transfer/', views.add_product_stock_transfer),
     path('get_product_stock_transfers/', views.get_product_stock_transfers),
     path('delete_product_stock_transfer/', views.delete_product_stock_transfer),
+    path('update_product_stock_transfer/', views.update_product_stock_transfer),
 ]

@@ -196,6 +196,7 @@ class ProductStockTransfer(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='products_stock_transfers')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='users_stock_tranfers')
 
+    is_deleted = models.BooleanField(default=False)
 
     from_location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='from_location_stock_transfers')
     to_location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='to_location_stock_transfers')
