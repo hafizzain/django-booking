@@ -19,6 +19,10 @@ class PriceServiceSerializers(serializers.ModelSerializer):
 class ServiceGroupSerializer(serializers.ModelSerializer):
     
     services  = serializers.SerializerMethodField(read_only=True)
+    status  = serializers.SerializerMethodField(read_only=True)
+
+    def get_status(self, obj):
+        return obj.is_active
     
     def get_services(self, obj):
         try:
@@ -30,7 +34,9 @@ class ServiceGroupSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ServiceGroup
-        fields = ['id', 'business', 'name', 'services']
+        fields = ['id', 'business', 'name', 'services', 'status']
+
+        
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessAddress
