@@ -415,6 +415,11 @@ def update_service(request):
     #service_id.save()
     try:
         print(staffgroup_id)
+        all_prev_ser_grops = ServiceGroup.objects.filter(services=service_id)
+        for i in all_prev_ser_grops:
+            i.services.remove(service_id)
+            i.save()
+
         service_group = ServiceGroup.objects.get(id = staffgroup_id)
         service_group.services.add(service_id)
         service_group.save()
