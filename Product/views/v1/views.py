@@ -1688,7 +1688,7 @@ def update_product_consumptions(request):
         )
     
     try:
-        product_con = ProductConsumption.objects.get(id=consumption_id)
+        product_con = ProductConsumption.objects.get(id=consumption_id, is_deleted=False)
     except Exception as err:
         return Response(
             {
@@ -1760,11 +1760,63 @@ def update_product_consumptions(request):
         status=status.HTTP_200_OK
     )
 
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_product_consumptions(request):
+    consumption_id = request.data.get('consumption_id')
+    if consumption_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'consumption_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        consumption = ProductConsumption.objects.get(id=consumption_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Product Consumption Not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    else:
+        consumption.is_deleted = True
+        consumption.save()
+        return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Product Consumption Deleted successfully',
+                    'error_message' : None,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_product_consumptions(request):
     
-    product_consumptions = ProductConsumption.objects.all()
+    product_consumptions = ProductConsumption.objects.filter(is_deleted=False)
     serialized = ProductConsumptionSerializer(product_consumptions, many=True)
 
     return Response(
