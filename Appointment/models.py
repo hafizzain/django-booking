@@ -106,7 +106,7 @@ class AppointmentService(models.Model):
     price = models.PositiveIntegerField(default=0, null=True, blank=True)
     
     end_time = models.TimeField(null=True, blank=True)
-    destails = models.CharField(max_length=255, null=True, blank=True)
+    details = models.CharField(max_length=255, null=True, blank=True)
     
     
     is_active = models.BooleanField(default=True)

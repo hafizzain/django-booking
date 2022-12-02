@@ -571,7 +571,7 @@ def create_blockTime(request):
             duration = duration, 
             appointment_date = date,
             member = member,
-            destails = details,
+            details = details,
             is_blocked = True,
         )
     
