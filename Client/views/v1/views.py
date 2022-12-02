@@ -388,12 +388,18 @@ def update_client(request):
 
         if image is not None:
             client.image=image
+        
+        postal_code = request.data.get('postal_code' , None)
+        if postal_code is None:
+            client.postal_code = ''
 
         client.save()
+        
         serialized= ClientSerializer(client, data=request.data, partial=True, context={'request' : request})
         if serialized.is_valid():
-           serialized.save()
-           return Response(
+            serialized.save()
+            
+            return Response(
             {
                 'status' : True,
                 'status_code' : 200,
