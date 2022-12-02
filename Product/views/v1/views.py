@@ -2062,9 +2062,9 @@ def update_product_stock_transfer(request):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-        stock_transfer.product = product,
-        stock_transfer.from_location = from_location,
-        stock_transfer.to_location = to_location,
+        stock_transfer.product = product
+        stock_transfer.from_location = from_location
+        stock_transfer.to_location = to_location
         stock_transfer.quantity = quantity
         stock_transfer.save()
 
