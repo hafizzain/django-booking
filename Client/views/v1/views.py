@@ -204,9 +204,9 @@ def create_client(request):
     dob= request.data.get('dob', None)
     gender = request.data.get('gender' , 'Male')
     
-    about_us = request.data.get('about_us' , 'Male')
-    marketing = request.data.get('marketing' , 'Male')
-    customer_note = request.data.get('customer_note' , 'Male')
+    about_us = request.data.get('about_us' , 'Community')
+    marketing = request.data.get('marketing' , 'opt_in')
+    customer_note = request.data.get('customer_note' , '')
     
     postal_code= request.data.get('postal_code' , None)
     address= request.data.get('address' , None)

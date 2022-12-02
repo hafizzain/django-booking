@@ -538,10 +538,10 @@ def create_servicegroup(request):
         business = business_id,
         name = name,
     )
-    if is_status is not None:
-        service_group.is_active = True
-    else:
+    if is_status is None:
         service_group.is_active = False
+    else:
+        service_group.is_active = True
         
     if type(service) == str:
         service = json.loads(service)
