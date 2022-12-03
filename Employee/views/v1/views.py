@@ -2174,8 +2174,9 @@ def update_asset(request):
     else:
         asset.is_active = False
     try:
-        doc = AssetDocument.objects.get(asset=asset)
-        doc.delete()
+        docs = AssetDocument.objects.filter(asset=asset)
+        for d in docs:
+            d.delete()
     except:
         pass
     
