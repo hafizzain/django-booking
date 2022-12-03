@@ -2173,14 +2173,15 @@ def update_asset(request):
         asset.is_active = True
     else:
         asset.is_active = False
-    try:
-        docs = AssetDocument.objects.filter(asset=asset)
-        for d in docs:
-            d.delete()
-    except:
-        pass
+
     
     if document is not None:
+        try:
+            docs = AssetDocument.objects.filter(asset=asset)
+            for d in docs:
+                d.delete()
+        except:
+            pass
         # for doc in document:
         doc = AssetDocument.objects.create(
             asset = asset,
