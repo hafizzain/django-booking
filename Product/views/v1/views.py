@@ -1310,7 +1310,8 @@ def create_orderstock(request):
     business = request.data.get('business', None)
     
     vendor = request.data.get('vendor', None)
-    location = request.data.get('location',None)
+    from_location = request.data.get('from_location',None)
+    to_location = request.data.get('to_location',None)
     orstock_status = request.data.get('status',None)
     rec_quantity = request.data.get('rec_quantity',None)
     
@@ -1318,7 +1319,7 @@ def create_orderstock(request):
     #quantity = request.data.get('quantity',None)
     
     
-    if not all([business, orstock_status, vendor, location]):
+    if not all([business, orstock_status, vendor, from_location, to_location]):
         return Response(
             {
                 'status' : False,
@@ -1336,7 +1337,7 @@ def create_orderstock(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     try:
-             business_id=Business.objects.get(id=business)
+        business_id=Business.objects.get(id=business)
     except Exception as err:
             return Response(
                 {
@@ -1364,7 +1365,8 @@ def create_orderstock(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
     try:
-        location_id=BusinessAddress.objects.get(id=location)
+        from_location = BusinessAddress.objects.get(id=from_location)
+        to_location = BusinessAddress.objects.get(id=to_location)
     except Exception as err:
             return Response(
                 {
@@ -1382,7 +1384,8 @@ def create_orderstock(request):
         user=user,
         business=business_id, 
         vendor = vendor_id,
-        location= location_id,
+        from_location= from_location,
+        to_location= to_location,
         status =orstock_status,
         rec_quantity= rec_quantity
     )

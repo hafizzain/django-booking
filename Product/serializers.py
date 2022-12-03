@@ -242,7 +242,7 @@ class OrderSerializer(serializers.ModelSerializer):
             return None
     def get_location_name(self, obj):
         try:
-            return obj.location.address_name
+            return obj.from_location.address_name
         except Exception as err:
             return None
     
@@ -253,7 +253,7 @@ class OrderSerializer(serializers.ModelSerializer):
     
     class Meta:
         model= OrderStock
-        fields=('id','business','vendor','location','status', 'rec_quantity','vendor_name','location_name','products')
+        fields=('id','business','vendor','to_location', 'from_location', 'status', 'rec_quantity','vendor_name','location_name','products')
 
 
 class ProductConsumptionSerializer(serializers.ModelSerializer):

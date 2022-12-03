@@ -153,7 +153,8 @@ class OrderStock(models.Model):
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_order_stock')
     
     vendor = models.ForeignKey(BusinessVendor, on_delete=models.CASCADE, related_name='vendor_order_stock', default=None, null=True, blank=True)
-    location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='locations_order_stock')
+    from_location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='from_locations_order_stock')
+    to_location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='to_locations_order_stock')
     
     status= models.CharField(choices = STATUS_CHOICES, max_length =100, default='Placed')
     rec_quantity= models.PositiveIntegerField(default=0, verbose_name= 'Received Quantity', null=True, blank=True)
