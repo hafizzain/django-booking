@@ -2180,11 +2180,11 @@ def update_asset(request):
         pass
     
     if document is not None:
-        for doc in document:
-            doc = AssetDocument.objects.create(
-                asset = asset,
-                document = doc
-            )
+        # for doc in document:
+        doc = AssetDocument.objects.create(
+            asset = asset,
+            document = document
+        )
     serializer = AssetSerializer(asset, data=request.data, partial=True, context={'request' : request})
     if not serializer.is_valid():
         return Response(
