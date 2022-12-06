@@ -53,7 +53,7 @@ from Sale.serializers import CheckoutSerializer, MemberShipOrderSerializer, Prod
 @permission_classes([AllowAny])
 def get_service(request):
     service= Service.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
-    serialized = ServiceSerializer(service,  many=True, )
+    serialized = ServiceSerializer(service,  many=True, context={'request' : request} )
     return Response(
         {
             'status' : 200,
@@ -248,7 +248,7 @@ def create_service(request):
                 employees_error.append(str(err))
         
     
-    service_serializers= ServiceSerializer(service_obj)
+    service_serializers= ServiceSerializer(service_obj, context={'request' : request})
     
     return Response(
             {
@@ -503,6 +503,7 @@ def create_servicegroup(request):
     name = request.data.get('name', None)
     service = request.data.get('service', None)
     is_status = request.data.get('status', None)
+    allow_client_to_select_team_member = request.data.get('allow_client_to_select_team_member', None)
     
     servicegroup_error = []
     if not all([business, name,service]):
@@ -547,6 +548,11 @@ def create_servicegroup(request):
         service_group.is_active = False
     else:
         service_group.is_active = True
+        
+    if allow_client_to_select_team_member is None:
+        service_group.allow_client_to_select_team_member = False
+    else:
+        service_group.allow_client_to_select_team_member = True
         
     if type(service) == str:
         service = json.loads(service)
@@ -650,6 +656,10 @@ def update_servicegroup(request):
     error = []
     service=request.data.get('service', None)
     id = request.data.get('id', None)
+    
+    is_status = request.data.get('status', None)
+    allow_client_to_select_team_member = request.data.get('allow_client_to_select_team_member', None)
+    
     if id is None: 
         return Response(
         {
@@ -680,6 +690,17 @@ def update_servicegroup(request):
             },
                 status=status.HTTP_404_NOT_FOUND
         )
+        
+    if is_status is None:
+        service_id.is_active = False
+    else:
+        service_id.is_active = True
+        
+    if allow_client_to_select_team_member is None:
+        service_id.allow_client_to_select_team_member = False
+    else:
+        service_id.allow_client_to_select_team_member = True
+        
     if service is not None:
         if type(service) == str:
             service = json.loads(service)

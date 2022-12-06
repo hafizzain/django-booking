@@ -34,7 +34,7 @@ class ServiceGroupSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ServiceGroup
-        fields = ['id', 'business', 'name', 'services', 'status']
+        fields = ['id', 'business', 'name', 'services', 'status', 'allow_client_to_select_team_member']
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -79,13 +79,38 @@ class ServiceSearchSerializer(serializers.ModelSerializer):
 
 class EmployeeSelectedServiceSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField(read_only=True)
+    image = serializers.SerializerMethodField()
     
     def get_full_name(self, obj):
         return obj.employee.full_name
     
+    def get_image(self, obj):
+        try:
+            request = self.context["request"]
+            url = tenant_media_base_url(request)
+            img = Employee.objects.get(id = obj.employee.id)
+            return f'{url}{img.image}'
+        except Exception as err:
+            print(str(err))
+        # try:    
+        #     print(obj.employee.image)
+        #     if obj.employee.image:
+        #         try:
+        #             print('test')
+        #             request = self.context["request"]
+        #             url = tenant_media_base_url(request)
+        #             return f'{url}{obj.employee.image}'
+        #         except Exception as err:
+        #             print(err)
+        #             return obj.employee.image
+                    
+        #     return None
+        # except Exception as err:
+        #     print(err)
+    
     class Meta:
         model = EmployeeSelectedService
-        fields = ['id', 'service', 'employee', 'level', 'full_name']
+        fields = ['id', 'service', 'employee', 'level', 'full_name', 'image']
 
 class LocationServiceSerializer(serializers.ModelSerializer):
     class Meta:
@@ -128,7 +153,7 @@ class ServiceSerializer(serializers.ModelSerializer):
     
     def get_employees(self, obj):
         emp = EmployeeSelectedService.objects.filter(service = obj) 
-        return EmployeeSelectedServiceSerializer(emp, many = True).data
+        return EmployeeSelectedServiceSerializer(emp, many = True, context=self.context).data
         
     
     def get_location(self, obj):

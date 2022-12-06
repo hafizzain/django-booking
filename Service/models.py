@@ -104,7 +104,8 @@ class ServiceGroup(models.Model):
     
     name = models.CharField(max_length=100, default='')
     services = models.ManyToManyField(Service, null=True, blank=True, related_name='servicegroup_services')
-
+    
+    allow_client_to_select_team_member = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_blocked = models.BooleanField(default=False)
