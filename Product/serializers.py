@@ -71,10 +71,20 @@ class VendorSerializer(serializers.ModelSerializer):
 
 class ProductStockSerializer(serializers.ModelSerializer):
     current_stock = serializers.SerializerMethodField()
+    location = serializers.SerializerMethodField()
+    
+    def get_location(self, obj):
+        try:
+            loc = BusinessAddress.objects.get(id = obj.location)
+            #all_location = obj.location.all()
+            return LocationSerializer(loc).data
+            # return EmployeeServiceSerializer(obj.services).data
+        except Exception as err:
+            print(err)
+            None
 
     def get_current_stock(self, obj):
         return obj.available_quantity
-
 
     class Meta:
         model = ProductStock

@@ -1,6 +1,7 @@
 from dataclasses import field
 from pyexpat import model
 from rest_framework import serializers
+from Appointment.models import AppointmentCheckout
 from Client.models import Client, Membership
 
 from Employee.models import Employee, EmployeeSelectedService
@@ -416,3 +417,41 @@ class CheckoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Checkout
         fields = ['id', 'product', 'service', 'membership', 'voucher']
+        
+        
+class AppointmentCheckoutSerializer(serializers.ModelSerializer):
+    location = serializers.SerializerMethodField(read_only=True)
+    client = serializers.SerializerMethodField(read_only=True)
+    order_type  = serializers.SerializerMethodField(read_only=True)
+    member  = serializers.SerializerMethodField(read_only=True)
+    
+    def get_order_type(self, obj):
+        return 'Appointment'
+    
+    def get_client(self, obj):
+        try:
+            cli = f"{obj.appointment.client.full_name}"
+            return cli
+
+        except Exception as err:
+            print(err)
+            
+    def get_member(self, obj):
+        try:
+            cli = f"{obj.appointment_service.member.full_name}"
+            return cli
+
+        except Exception as err:
+            print(err)
+    
+    def get_location(self, obj):
+        try:
+            serializers = LocationSerializer(obj.business_address).data
+            return serializers
+        
+        except Exception as err:
+            return None
+    class Meta:
+        model = AppointmentCheckout
+        fields = ('__all__')
+        #exclude = ('is_deleted')

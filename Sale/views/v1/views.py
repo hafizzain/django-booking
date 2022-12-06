@@ -28,7 +28,7 @@ from Product.models import Product
 from django.db.models import Avg, Count, Min, Sum
 
 
-from Sale.serializers import CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
+from Sale.serializers import AppointmentCheckoutSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
 
 
 # @api_view(['GET'])
@@ -761,6 +761,7 @@ def get_all_sale_orders(request):
     # checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
     # serialized = CheckoutSerializer(checkout_order,  many=True, context={'request' : request})
     # data.extend(serialized.data)
+    
     product_order = ProductOrder.objects.filter(is_deleted=False).order_by('-created_at')
     serialized = ProductOrderSerializer(product_order,  many=True, context={'request' : request})
     data.extend(serialized.data)
@@ -775,6 +776,10 @@ def get_all_sale_orders(request):
     
     voucher_orders = VoucherOrder.objects.filter(is_deleted=False).order_by('-created_at')
     serialized = VoucherOrderSerializer(voucher_orders,  many=True, context={'request' : request})
+    data.extend(serialized.data)
+    
+    appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')
+    serialized = AppointmentCheckoutSerializer(appointment_checkout, many = True)
     data.extend(serialized.data)
     
     return Response(
