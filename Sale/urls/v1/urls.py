@@ -27,7 +27,4 @@ urlpatterns = [
     
     #CheckOut
     path('get_sale_checkout/', views.get_sale_checkout),
-    
-
-    
 ]

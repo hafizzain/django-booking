@@ -75,8 +75,9 @@ class ProductStockSerializer(serializers.ModelSerializer):
     
     def get_location(self, obj):
         try:
-            loc = BusinessAddress.objects.get(id = obj.location)
-            #all_location = obj.location.all()
+            print(obj.location)
+            loc = BusinessAddress.objects.get(id = str(obj.location))
+            #loc = obj.location.all()
             return LocationSerializer(loc).data
             # return EmployeeServiceSerializer(obj.services).data
         except Exception as err:
