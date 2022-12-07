@@ -1419,7 +1419,6 @@ def create_orderstock(request):
         status =orstock_status,
         rec_quantity= rec_quantity
     )
-    print(type(products))
     if type(products) == str:
         products = products.replace("'" , '"')
         print(products)
@@ -1476,7 +1475,7 @@ def get_orderstock(request):
 def update_orderstock(request):
     order_id = request.data.get('order_id', None)
     products = request.data.get('products', None)
-    
+    error = []
     if order_id is None:
             return Response(
             {
@@ -1509,36 +1508,27 @@ def update_orderstock(request):
                 },
                    status=status.HTTP_404_NOT_FOUND
               )
-    # if products is not None:
-    #     if type(products) == str:
-    #         products = location.replace("'" , '"')
-    #         products = json.loads(products)
-    #     print(products)
-    #     for loc in products:
-    #         deallocation_id = loc.get('id', None)
-    #         location_id= loc['location_id']
-    #         quantity_am= loc['qty']
-            
-    #         if deallocation_id is not None:
-    #             try:
-    #                 deallocation = DailyDealSeat.objects.get(id  = deallocation_id )
-    #                 is_deleted = loc.get('is_delete', None)
-    #                 print(is_deleted)
-    #                 if bool(is_deleted) == True:
-    #                     deallocation.delete()
-    #                     continue
-    #             except Exception as err:
-    #                 error.append(err)
-    #         else:
-    #             try:
-    #                 pro = Product.objects.get(id=product['id'])
-    #             except Product.DoesNotExist:
-    #                 None
-    #             OrderStockProduct.objects.create(
-    #                 order = order_stock,
-    #                 product = pro,
-    #                 quantity = product['quantity']
-    #             )            
+    if products is not None:
+        if type(products) == str:
+            products = products.replace("'" , '"')
+            products = json.loads(products)
+
+        for pro in products:
+            product_id = pro.get('id', None)
+            quantity = pro['quantity']
+                        
+            if product_id is not None:
+                try:
+                    pro_stock = OrderStockProduct.objects.get(id=product_id)
+                    is_deleted = pro.get('isDelete', None)
+                    if bool(is_deleted) == True:
+                        pro_stock.delete()
+                        continue
+                    else:
+                        pro_stock.quantity = quantity
+                        pro_stock.save()
+                except Exception as err:
+                    error.append(err)      
     
     # if type(products) == str:
     #     products = products.replace("'" , '"')
