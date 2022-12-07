@@ -345,7 +345,7 @@ class MemberShipOrderSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = MemberShipOrder
-        fields =['id', 'membership','order_type' ,'client','member','quantity',
+        fields =['id', 'membership','order_type' ,'client','member','quantity'
                  ,'location' ,'start_date', 'end_date','status', 'total_price', 
                  'payment_type','membership_price' ]
         
