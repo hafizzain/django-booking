@@ -1573,7 +1573,8 @@ def update_orderstock(request):
                 'response' : {
                     'message' : ' OrderStock updated successfully',
                     'error_message' : None,
-                    'stock' :serializer.data
+                    'stock' :serializer.data,
+                    'Error':error
                 }
             },
             status=status.HTTP_200_OK
