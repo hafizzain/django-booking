@@ -758,25 +758,25 @@ def get_all_sale_orders(request):
     # serialized = ProductOrderSerializer(result_page,  many=True)
     
     data=[]
-    # checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
-    # serialized = CheckoutSerializer(checkout_order,  many=True, context={'request' : request})
+    checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = CheckoutSerializer(checkout_order,  many=True, context={'request' : request})
+    data.extend(serialized.data)
+    
+    # product_order = ProductOrder.objects.filter(is_deleted=False).order_by('-created_at')
+    # serialized = ProductOrderSerializer(product_order,  many=True, context={'request' : request})
     # data.extend(serialized.data)
     
-    product_order = ProductOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = ProductOrderSerializer(product_order,  many=True, context={'request' : request})
-    data.extend(serialized.data)
+    # service_orders = ServiceOrder.objects.filter(is_deleted=False).order_by('-created_at')
+    # serialized = ServiceOrderSerializer(service_orders,  many=True, context={'request' : request})
+    # data.extend(serialized.data)
     
-    service_orders = ServiceOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = ServiceOrderSerializer(service_orders,  many=True, context={'request' : request})
-    data.extend(serialized.data)
+    # membership_order = MemberShipOrder.objects.filter(is_deleted=False).order_by('-created_at')
+    # serialized = MemberShipOrderSerializer(membership_order,  many=True, context={'request' : request} )
+    # data.extend(serialized.data)
     
-    membership_order = MemberShipOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = MemberShipOrderSerializer(membership_order,  many=True, context={'request' : request} )
-    data.extend(serialized.data)
-    
-    voucher_orders = VoucherOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = VoucherOrderSerializer(voucher_orders,  many=True, context={'request' : request})
-    data.extend(serialized.data)
+    # voucher_orders = VoucherOrder.objects.filter(is_deleted=False).order_by('-created_at')
+    # serialized = VoucherOrderSerializer(voucher_orders,  many=True, context={'request' : request})
+    # data.extend(serialized.data)
     
     appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')
     serialized = AppointmentCheckoutSerializer(appointment_checkout, many = True)

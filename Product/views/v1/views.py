@@ -1544,7 +1544,7 @@ def delete_orderstock(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'All fields are required.',
                     'fields' : [
-                        'product',
+                        'id',
                     ]
                 }
             },
