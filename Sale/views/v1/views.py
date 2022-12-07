@@ -48,7 +48,7 @@ from Sale.serializers import AppointmentCheckoutSerializer, CheckoutSerializer, 
 #     result_page = paginator.paginate_queryset(jobapply, request)
 #     serializer = GetJobSerializer(result_page, many=True)
 #     return paginator.get_paginated_response(serializer.data)
-
+    
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_service(request):
@@ -1145,8 +1145,7 @@ def create_sale_order(request):
         client = Client.objects.get(id = client_id)
     except Exception as err:
         client =  None
-        
-        
+                
     try:
         member=Employee.objects.get(id = member_id)
     except Exception as err:
@@ -1192,18 +1191,22 @@ def create_sale_order(request):
             #for pro in ids:
             try:
                 product = Product.objects.get(id = service_id)
-                product_stock = product.product_stock.all().first()
+                product_stock = product.product_stock.all()#.first()
                 available = 0
                 # print(product_stock.consumable_quantity)
                 # print(product_stock.sellable_quantity)
                 
-                if product_stock.consumable_quantity is not None:
-                    available += product_stock.consumable_quantity
+                # if product_stock.consumable_quantity is not None:
+                #     available += product_stock.consumable_quantity
 
-                if product_stock.sellable_quantity is not None:
-                    available += product_stock.sellable_quantity
+                # if product_stock.sellable_quantity is not None:
+                #     available += product_stock.sellable_quantity
                     
                 #available = int(product_stock.consumable_quantity) + int(product_stock.sellable_quantity)
+                
+                for i in product_stock:
+                    if business_address == str(i.location):
+                       available += i.available_quantity
                 
                 if available  == 0:
                     return Response(

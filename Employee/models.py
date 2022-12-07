@@ -210,9 +210,22 @@ class Payroll(models.Model):
 
 
 class CommissionSchemeSetting(models.Model):
+    CATEGORY_CHOICES =[
+        ('Service', 'Service'),
+        ('Retail', 'Retail'),
+        ('Both', 'Both'),
+    ]
+    
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_commission_setting')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_commission_setting')
+    
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_commissioin', null=True, blank=True)
+    from_value = models.PositiveIntegerField(default=0, null=True, blank=True)
+    to_value = models.PositiveIntegerField(default=0, null=True, blank=True)
+    percentage = models.PositiveIntegerField(default=0, null=True, blank=True)
+    
+    duration = models.CharField(choices=CATEGORY_CHOICES, max_length=50, default='Service',)
     
     sale_price_before_discount = models.BooleanField(default=True)
     sale_price_including_tax = models.BooleanField(default=True)

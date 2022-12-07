@@ -23,6 +23,36 @@ from Product.serializers import (CategorySerializer, BrandSerializer, ProductSer
                                  ,OrderSerializer , OrderProductSerializer, ProductConsumptionSerializer, ProductStockTransferSerializer
                                  )
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_test_api(request):
+    service_id = "ed9b3e32-4f1f-469a-a065-ea9805ee0edc"
+    location = "fef70b9b-c42d-4b3e-bf54-f4d1b5513f6b"
+    product = Product.objects.get(id = service_id)
+    product_stock = product.product_stock.all()#.first()
+    available = 0
+    for i in product_stock:
+        print(location, i.location)
+        if location == str(i.location):
+            print(i.available_quantity)
+    #data = product_stock.available_quantity
+    data = 1
+    print(data)
+    
+    
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Service',
+                'error_message' : None,
+                'service' : data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -1445,7 +1475,7 @@ def get_orderstock(request):
 @permission_classes([IsAuthenticated])
 def update_orderstock(request):
     order_id = request.data.get('order_id', None)
-    #products = request.data.get('products', [])
+    products = request.data.get('products', None)
     
     if order_id is None:
             return Response(
@@ -1479,6 +1509,37 @@ def update_orderstock(request):
                 },
                    status=status.HTTP_404_NOT_FOUND
               )
+    # if products is not None:
+    #     if type(products) == str:
+    #         products = location.replace("'" , '"')
+    #         products = json.loads(products)
+    #     print(products)
+    #     for loc in products:
+    #         deallocation_id = loc.get('id', None)
+    #         location_id= loc['location_id']
+    #         quantity_am= loc['qty']
+            
+    #         if deallocation_id is not None:
+    #             try:
+    #                 deallocation = DailyDealSeat.objects.get(id  = deallocation_id )
+    #                 is_deleted = loc.get('is_delete', None)
+    #                 print(is_deleted)
+    #                 if bool(is_deleted) == True:
+    #                     deallocation.delete()
+    #                     continue
+    #             except Exception as err:
+    #                 error.append(err)
+    #         else:
+    #             try:
+    #                 pro = Product.objects.get(id=product['id'])
+    #             except Product.DoesNotExist:
+    #                 None
+    #             OrderStockProduct.objects.create(
+    #                 order = order_stock,
+    #                 product = pro,
+    #                 quantity = product['quantity']
+    #             )            
+    
     # if type(products) == str:
     #     products = products.replace("'" , '"')
     #     print(products)
