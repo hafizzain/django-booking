@@ -407,8 +407,7 @@ class CheckoutSerializer(serializers.ModelSerializer):
             return serializers
         except Exception as err:
             return None
-    
-    
+        
     def get_membership(self, obj):
         try:
             check = MemberShipOrder.objects.filter(checkout =  obj)
@@ -442,7 +441,8 @@ class CheckoutSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Checkout
-        fields = ['id', 'product', 'service', 'membership', 'voucher','client','location','member']
+        fields = ['id', 'product', 'service', 'membership',
+                  'voucher','client','location','member','created_at','payment_type', 'tip']
         
         
 class AppointmentCheckoutSerializer(serializers.ModelSerializer):

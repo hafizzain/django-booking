@@ -38,7 +38,9 @@ class Checkout(models.Model):
     member = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='member_checkout_orders')
     client_type = models.CharField(choices = CLIENT_TYPE, max_length=50 , default = '' )
     payment_type = models.CharField(choices = PAYMENT_TYPE, max_length=50 , default = '' )
-
+    
+    tip = models.PositiveBigIntegerField(default = 0)
+    
     status =  models.CharField(choices=status_choice, max_length=100, default='Active')
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)

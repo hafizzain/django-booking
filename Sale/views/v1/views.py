@@ -1180,8 +1180,8 @@ def create_sale_order(request):
         location = business_address,
         member = member ,
         client_type = client_type,
-        payment_type = payment_type
-        
+        payment_type = payment_type,
+        tip = tip
     )
     for id in ids:
         sale_type = id['selection_type']
