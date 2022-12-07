@@ -386,7 +386,7 @@ class VoucherOrderSerializer(serializers.ModelSerializer):
             return None
     def get_voucher_price(self, obj):
         try:
-            return obj.voucher.name
+            return obj.voucher.price
         except Exception as err:
             return None
     
