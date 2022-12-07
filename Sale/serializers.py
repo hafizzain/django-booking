@@ -383,6 +383,32 @@ class CheckoutSerializer(serializers.ModelSerializer):
     membership  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
     voucher  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
     
+    client = serializers.SerializerMethodField(read_only=True)
+    member  = serializers.SerializerMethodField(read_only=True)
+    location = serializers.SerializerMethodField(read_only=True)
+    
+    def get_client(self, obj):
+        try:
+            serializers = ClientSerializer(obj.client).data
+            return serializers
+        except Exception as err:
+            return None
+        
+    def get_member(self, obj):
+        try:
+            serializers = MemberSerializer(obj.member,context=self.context ).data
+            return serializers
+        except Exception as err:
+            return None
+    
+    def get_location(self, obj):
+        try:
+            serializers = LocationSerializer(obj.location).data
+            return serializers
+        except Exception as err:
+            return None
+    
+    
     def get_membership(self, obj):
         try:
             check = MemberShipOrder.objects.filter(checkout =  obj)
@@ -416,7 +442,7 @@ class CheckoutSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Checkout
-        fields = ['id', 'product', 'service', 'membership', 'voucher']
+        fields = ['id', 'product', 'service', 'membership', 'voucher','client','location','member']
         
         
 class AppointmentCheckoutSerializer(serializers.ModelSerializer):
