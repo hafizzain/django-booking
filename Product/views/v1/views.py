@@ -1521,7 +1521,7 @@ def update_orderstock(request):
                 )        
             if product_id is not None:
                 try:
-                    pro_stock = OrderStockProduct.objects.get(id=str(product_id))
+                    pro_stock = OrderStockProduct.objects.get(id=product_id)
                     is_deleted = pro.get('isDelete', None)
                     if bool(is_deleted) == True:
                         pro_stock.delete()
