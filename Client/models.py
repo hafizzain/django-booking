@@ -1,3 +1,6 @@
+from datetime import timezone
+from datetime import datetime
+
 from itertools import count
 from django.db import models
 
@@ -329,6 +332,33 @@ class DiscountMembership(models.Model):
 
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_memberships')
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_memberships')
+    
+    def __str__(self):
+        return str(self.id)
+#now = datetime.now()
+class LoyaltyPoints(models.Model):
+    
+    LOYALTY_CHOICE = [
+        ('Service', 'Service'),
+        ('Retail', 'Retail'),
+        ('Both', 'Both'),
+        
+    ]
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='user_loyalty', verbose_name='Creator ( User )')
+    business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_loyalty')
+    
+    name = models.CharField(max_length=100, default='')
+    loyaltytype = models.CharField(choices=LOYALTY_CHOICE, default='Service' , verbose_name='Loyalty Type', max_length=50)
+    amount_spend = models.PositiveIntegerField(default=0, null=True, blank=True)
+    number_points = models.PositiveIntegerField(default=0, null=True, blank=True)
+    earn_points = models.PositiveIntegerField(default=0, null=True, blank=True)
+    total_earn_from_points = models.PositiveIntegerField(default=0, null=True, blank=True)
+    
+    is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now, null=True) #null = True, default= datetime.now() )
     
     def __str__(self):
         return str(self.id)

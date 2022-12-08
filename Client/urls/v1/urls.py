@@ -50,4 +50,8 @@ urlpatterns = [
    #Generate ID 
    path('generate_id/', views.generate_id),
    
+   #Loyalty Points
+   path('create_loyalty/', views.create_loyalty),
+   path('get_loyalty/', views.get_loyalty),
+   path('delete_loyalty/', views.delete_loyalty),
 ]

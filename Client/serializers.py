@@ -5,7 +5,7 @@ from Product.models import Product
 from Service.models import Service
 from Utility.models import Country, State, City
 
-from Client.models import Client, ClientGroup, DiscountMembership, Subscription, Promotion , Rewards , Membership, Vouchers
+from Client.models import Client, ClientGroup, DiscountMembership, LoyaltyPoints, Subscription, Promotion , Rewards , Membership, Vouchers
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -123,3 +123,9 @@ class ClientAppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
         fields = ['id', 'full_name', 'image']
+        
+class LoyaltyPointsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = LoyaltyPoints
+        fields = '__all__'
