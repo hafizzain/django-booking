@@ -758,9 +758,9 @@ def get_all_sale_orders(request):
     # serialized = ProductOrderSerializer(result_page,  many=True)
     
     data=[]
-    checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = CheckoutSerializer(checkout_order,  many=True, context={'request' : request})
-    data.extend(serialized.data)
+    # checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
+    # serialized = CheckoutSerializer(checkout_order,  many=True, context={'request' : request})
+    # data.extend(serialized.data)
     
     # product_order = ProductOrder.objects.filter(is_deleted=False).order_by('-created_at')
     # serialized = ProductOrderSerializer(product_order,  many=True, context={'request' : request})

@@ -474,7 +474,16 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
     member  = serializers.SerializerMethodField(read_only=True)
+    service  = serializers.SerializerMethodField(read_only=True)
     
+    def get_service(self, obj):
+        try:
+            cli = f"{obj.service.name}"
+            return cli
+
+        except Exception as err:
+            print(err)
+            
     def get_order_type(self, obj):
         return 'Appointment'
     
