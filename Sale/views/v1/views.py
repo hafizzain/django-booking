@@ -11,7 +11,7 @@ from Client.models import Client, Membership, Vouchers
 from Order.models import Checkout, MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
 from Sale.Constants.Custom_pag import CustomPagination
 from Utility.Constants.Data.months import MONTHS
-from Utility.models import Country, State, City
+from Utility.models import Country, ExceptionRecord, State, City
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
@@ -1207,6 +1207,15 @@ def create_sale_order(request):
                 for i in product_stock:
                     if business_address == str(i.location):
                        available += i.available_quantity
+                       ExceptionRecord.objects.create(
+                            text = f"aviable quantity location {str(i.location)}"
+                    ) 
+                       ExceptionRecord.objects.create(
+                            text = f"business_address {business_address}"
+                    ) 
+                       ExceptionRecord.objects.create(
+                            text = f"qunatity {i.available_quantity}"
+                    ) 
                 
                 if available  == 0:
                     return Response(
