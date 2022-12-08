@@ -54,4 +54,5 @@ urlpatterns = [
    path('create_loyalty/', views.create_loyalty),
    path('get_loyalty/', views.get_loyalty),
    path('delete_loyalty/', views.delete_loyalty),
+   path('update_loyalty/', views.update_loyalty),
 ]

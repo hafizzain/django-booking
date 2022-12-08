@@ -1813,6 +1813,89 @@ def create_payroll(request):
             status=status.HTTP_201_CREATED
         ) 
     
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_commission(request):
+    user = request.user
+    business_id = request.data.get('business', None)
+    
+    employee = request.data.get('employee', None)
+    from_value = request.data.get('from_value', None)
+    to_value = request.data.get('to_value', None)
+    percentage = request.data.get('percentage', None)
+    
+    duration = request.data.get('duration', None)
+    
+    if not all([business_id,employee ]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                          'employee'
+                            ]
+                    }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        business=Business.objects.get(id=business_id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    try:
+        employee_id=Employee.objects.get(id=employee)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'response' : {
+                    'message' : 'Employee not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    
+    commission_setting =CommissionSchemeSetting.objects.create(
+        user = user,
+        business = business ,
+        employee = employee_id,
+        from_value = from_value,
+        to_value =to_value,
+        percentage =percentage,
+        duration =duration,
+    )
+    serializers= CommissionSerializer(commission_setting, context={'request' : request})
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Commission Created Successfully!',
+                    'error_message' : None,
+                    'asset' : serializers.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        ) 
+    
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
