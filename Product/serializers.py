@@ -285,15 +285,15 @@ class ProductStockTransferSerializer(serializers.ModelSerializer):
     from_location = BusiessAddressAppointmentSerializer()
     to_location = BusiessAddressAppointmentSerializer()
     
-    transfer_quantity = serializers.SerializerMethodField(read_only=True)
+    # transfer_quantity = serializers.SerializerMethodField(read_only=True)
     
-    def get_transfer_quantity(self, obj):
-        try:
-            return Sum(ProductStockTransfer.objects.filter(product = obj.product).values_list('quantity'))
-        except Exception as err:
-            ExceptionRecord.objects.create(
-                text = f"Product quantity issue {str(err)}"
-            ) 
+    # def get_transfer_quantity(self, obj):
+    #     try:
+    #         return Sum(ProductStockTransfer.objects.filter(product = obj.product).values_list('quantity'))
+    #     except Exception as err:
+    #         ExceptionRecord.objects.create(
+    #             text = f"Product quantity issue {str(err)}"
+    #         ) 
     class Meta:
         model = ProductStockTransfer
-        fields = ['id', 'from_location', 'to_location', 'product', 'quantity', 'transfer_quantity']
+        fields = ['id', 'from_location', 'to_location', 'product', 'quantity']
