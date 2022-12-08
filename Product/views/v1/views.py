@@ -1421,7 +1421,6 @@ def create_orderstock(request):
     )
     if type(products) == str:
         products = products.replace("'" , '"')
-        print(products)
         products = json.loads(products)
         pass
     else:
@@ -1514,17 +1513,21 @@ def update_orderstock(request):
             products = json.loads(products)
 
         for pro in products:
-            product_id = pro.get('id', None)
+            id = pro.get('id', None)
+            product_id = pro.get('product_id', None)
             is_deleted = pro.get('isDeleted', None)
             quantity = pro['quantity']
             ExceptionRecord.objects.create(
                     text = is_deleted 
                 )        
-            if product_id is not None:
+            if id is not None:
                 try:
-                    pro_stock = OrderStockProduct.objects.get(id=product_id)
-                    if bool(is_deleted) == True:
+                    pro_stock = OrderStockProduct.objects.get(id=id)
+                    if is_deleted == True:
                         pro_stock.delete()
+                        ExceptionRecord.objects.create(
+                            text = "is_deleted" 
+                    ) 
                         continue
                     else:
                         pro_stock.quantity = quantity
@@ -1533,7 +1536,17 @@ def update_orderstock(request):
                     ExceptionRecord.objects.create(
                        text = str(err) 
                     )
-                    error.append(str(err))      
+                    error.append(str(err))     
+            else:
+                try:
+                    pro = Product.objects.get(id=product_id)
+                except Product.DoesNotExist:
+                    None
+                OrderStockProduct.objects.create(
+                    order = order_stock,
+                    product = pro,
+                    quantity = quantity
+                )
     
     # if type(products) == str:
     #     products = products.replace("'" , '"')
