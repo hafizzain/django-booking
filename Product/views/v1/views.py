@@ -1515,10 +1515,10 @@ def update_orderstock(request):
 
         for pro in products:
             product_id = pro.get('id', None)
-            is_deleted = pro.get('isDelete', None)
+            is_deleted = pro.get('isDeleted', None)
             quantity = pro['quantity']
             ExceptionRecord.objects.create(
-                       text = is_deleted 
+                    text = is_deleted 
                 )        
             if product_id is not None:
                 try:
