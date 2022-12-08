@@ -1191,8 +1191,9 @@ def create_sale_order(request):
             #for pro in ids:
             try:
                 product = Product.objects.get(id = service_id)
-                product_stock = product.product_stock.all()#.first()
-                available = 0
+                # product_stock = product.product_stock.all()#.first()
+                # available = 0
+                
                 # print(product_stock.consumable_quantity)
                 # print(product_stock.sellable_quantity)
                 
@@ -1204,36 +1205,37 @@ def create_sale_order(request):
                     
                 #available = int(product_stock.consumable_quantity) + int(product_stock.sellable_quantity)
                 
-                for i in product_stock:
-                    if business_address == str(i.location):
-                       available += i.available_quantity
-                       ExceptionRecord.objects.create(
-                            text = f"aviable quantity location {str(i.location)}"
-                    ) 
-                       ExceptionRecord.objects.create(
-                            text = f"business_address {business_address}"
-                    ) 
-                       ExceptionRecord.objects.create(
-                            text = f"qunatity {i.available_quantity}"
-                    ) 
+                # for i in product_stock:
+                #     if business_address == str(i.location):
+                #        available += i.available_quantity
+                #        ExceptionRecord.objects.create(
+                #             text = f"aviable quantity location {str(i.location)}"
+                #     ) 
+                #        ExceptionRecord.objects.create(
+                #             text = f"business_address {business_address}"
+                #     ) 
+                #        ExceptionRecord.objects.create(
+                #             text = f"qunatity {i.available_quantity}"
+                #     ) 
                 
-                if available  == 0:
-                    return Response(
-                    {
-                        'status' : False,
-                        #'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
-                        'response' : {
-                        'message' : 'consumable_quantity and sellable_quantity not Avaiable',
-                        'error_message' : "available_quantity", 
-                        }
-                    },
-                status=status.HTTP_400_BAD_REQUEST
-                )                    
+                # if available  == 0:
+                #     return Response(
+                #     {
+                #         'status' : False,
+                #         #'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
+                #         'response' : {
+                #         'message' : 'consumable_quantity and sellable_quantity not Avaiable',
+                #         'error_message' : "available_quantity", 
+                #         }
+                #     },
+                # status=status.HTTP_400_BAD_REQUEST
+                # )                    
+                
                 #product_stock.available_quantity -=1
                     
-                product_stock.sold_quantity += 1
-                #print(product_stock)
-                product_stock.save()
+                # product_stock.sold_quantity += 1
+                # product_stock.save()
+
                 product_order = ProductOrder.objects.create(
                     user = user,
                     client = client,
@@ -1248,7 +1250,7 @@ def create_sale_order(request):
                     client_type = client_type,
                     quantity = quantity,
                 )
-                product_order.sold_quantity =  product_stock.sold_quantity
+                product_order.sold_quantity += 1 # product_stock.sold_quantity
                 product_order.save()
             except Exception as err:
                 return Response(

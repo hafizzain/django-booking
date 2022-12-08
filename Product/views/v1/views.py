@@ -1516,11 +1516,17 @@ def update_orderstock(request):
             id = pro.get('id', None)
             product_id = pro.get('product_id', None)
             is_deleted = pro.get('isDeleted', None)
+            ExceptionRecord.objects.create(
+                            text = is_deleted
+                    ) 
+            ExceptionRecord.objects.create(
+                            text = str(pro)
+                    ) 
             quantity = pro['quantity']     
             if id is not None:
                 try:
                     pro_stock = OrderStockProduct.objects.get(id=id)
-                    if bool(is_deleted) == True:
+                    if is_deleted == 'True':
                         pro_stock.delete()
                         ExceptionRecord.objects.create(
                             text = "is_deleted" 
