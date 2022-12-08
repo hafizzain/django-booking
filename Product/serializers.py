@@ -8,6 +8,9 @@ from Business.models import BusinessAddress, BusinessVendor
 from django.conf import settings
 from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer
 
+from Utility.models import  ExceptionRecord
+from django.db.models import Avg, Count, Min, Sum
+
 
 
 class FileUploadSerializer(serializers.Serializer):
@@ -281,6 +284,16 @@ class ProductStockTransferSerializer(serializers.ModelSerializer):
     product = ProductOrderSerializer()
     from_location = BusiessAddressAppointmentSerializer()
     to_location = BusiessAddressAppointmentSerializer()
+    
+    transfer_quantity = serializers.SerializerMethodField(read_only=True)
+    
+    def get_transfer_quantity(self, obj):
+        try:
+            return Sum(ProductStockTransfer.objects.filter(product = obj.product).values_list('quantity'))
+        except Exception as err:
+            ExceptionRecord.objects.create(
+                text = f"Product quantity issue {str(err)}"
+            ) 
     class Meta:
         model = ProductStockTransfer
-        fields = ['id', 'from_location', 'to_location', 'product', 'quantity']
+        fields = ['id', 'from_location', 'to_location', 'product', 'quantity', 'transfer_quantity']
