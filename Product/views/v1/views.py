@@ -1454,7 +1454,7 @@ def create_orderstock(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_orderstock(request):
-    order_stocks = OrderStock.objects.filter(is_deleted = False, order_stock__product__is_deleted=False).order_by('-created_at')
+    order_stocks = OrderStock.objects.filter(is_deleted = False, order_stock__product__is_deleted=False).order_by('-created_at').distinct()
     serialized = OrderSerializer(order_stocks, many=True, context={'request' : request})
     return Response(
         {
