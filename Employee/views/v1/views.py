@@ -1824,7 +1824,7 @@ def create_commission(request):
     to_value = request.data.get('to_value', None)
     percentage = request.data.get('percentage', None)
     
-    duration = request.data.get('duration', None)
+    category_com = request.data.get('category_choice', None)
     
     if not all([business_id,employee ]):
         return Response(
@@ -1879,7 +1879,7 @@ def create_commission(request):
         from_value = from_value,
         to_value =to_value,
         percentage =percentage,
-        duration =duration,
+        category_com =category_com,
     )
     serializers= CommissionSerializer(commission_setting, context={'request' : request})
     
@@ -1899,44 +1899,45 @@ def create_commission(request):
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_commission (request):
-    business = request.GET.get('business', None)
-    if business is None:
-       return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.MISSING_FIELDS_4001,
-                'status_code_text' : 'MISSING_FIELDS_4001',
-                'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : 'fields are required.',
-                    'fields' : [
-                        'business',
-                    ]
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
+def get_commission(request): 
+    # business = request.GET.get('business', None)
+    # if business is None:
+    #    return Response(
+    #         {
+    #             'status' : False,
+    #             'status_code' : StatusCodes.MISSING_FIELDS_4001,
+    #             'status_code_text' : 'MISSING_FIELDS_4001',
+    #             'response' : {
+    #                 'message' : 'Invalid Data!',
+    #                 'error_message' : 'fields are required.',
+    #                 'fields' : [
+    #                     'business',
+    #                 ]
+    #             }
+    #         },
+    #         status=status.HTTP_400_BAD_REQUEST
+    #     )
        
-    try:
-             business=Business.objects.get(id=business)
-    except Exception as err:
-            return Response(
-                {
-                    'status' : False,
-                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
-                    'response' : {
-                    'message' : 'Business not found',
-                    'error_message' : str(err),
-                    }
-                }
-            )
+    # try:
+    #     business=Business.objects.get(id=business)
+    # except Exception as err:
+    #     return Response(
+    #         {
+    #                 'status' : False,
+    #                 'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+    #                 'response' : {
+    #                 'message' : 'Business not found',
+    #                 'error_message' : str(err),
+    #             }
+    #         }
+    #     )
        
-    commission , created =  CommissionSchemeSetting.objects.get_or_create(
-        business=business,
-        user=business.user,
-        )
-    serializer = CommissionSerializer(commission)
+    # commission , created =  CommissionSchemeSetting.objects.get_or_create(
+    #     business=business,
+    #     user=business.user,
+    #     )
+    commission = CommissionSchemeSetting.objects.all().order_by('-created_at')   
+    serializer = CommissionSerializer(commission, many = True)
     
     return Response(
         {
@@ -1951,6 +1952,57 @@ def get_commission (request):
         status=status.HTTP_200_OK
     )
    
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_commission(request):
+    commission_id = request.data.get('id', None)
+    if commission_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        commission = CommissionSchemeSetting.objects.get(id=commission_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Commission ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    commission.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Commission deleted successful',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def update_commision(request):
