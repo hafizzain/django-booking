@@ -1528,7 +1528,10 @@ def update_orderstock(request):
                         pro_stock.quantity = quantity
                         pro_stock.save()
                 except Exception as err:
-                    error.append(err)      
+                    ExceptionRecord.objects.create(
+                       text = str(err) 
+                    )
+                    error.append(str(err))      
     
     # if type(products) == str:
     #     products = products.replace("'" , '"')
@@ -1574,7 +1577,7 @@ def update_orderstock(request):
                     'message' : ' OrderStock updated successfully',
                     'error_message' : None,
                     'stock' :serializer.data,
-                    'Error':error
+                    'Error':error,
                 }
             },
             status=status.HTTP_200_OK
