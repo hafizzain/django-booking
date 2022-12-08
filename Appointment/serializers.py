@@ -504,7 +504,8 @@ class ServiceClientSaleSerializer(serializers.ModelSerializer):
             print(err)
     class Meta:
         model = AppointmentService
-        fields = ['id','service', 'created_at','booked_by','duration','price','appointment_status','member']
+        fields = ['id','service', 'created_at','booked_by','duration',
+                  'price','appointment_status','member', 'is_favourite']
         
 class CheckoutSerializer(serializers.ModelSerializer):
     appointment_service_status = serializers.SerializerMethodField(read_only=True)
