@@ -2065,7 +2065,7 @@ def delete_commission(request):
         status=status.HTTP_200_OK
     )
 
-@api_view(['POST'])
+@api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_commision(request):
     commission_id = request.data.get('commission_id', None)
@@ -2112,6 +2112,38 @@ def update_commision(request):
         to_value = service_comission['to_value'] #ser.get('to_value', None)
         commission_per = service_comission['commission_percentage'] #ser.get('commission', None)
         id = service_comission['id'] #ser.get('commission', None)
+        
+        try:
+            category = CategoryCommission.objects.get(id  = id)
+            category.from_value = from_value
+            category.to_value = to_value
+            category.commission_percentage = commission_per
+            category.save()
+            
+        except Exception as err:
+            print(err)
+            
+    if product_comission is not None:
+        from_value = product_comission['from_value'] #ser.get('from_value', None)
+        to_value = product_comission['to_value'] #ser.get('to_value', None)
+        commission_per = product_comission['commission_percentage'] #ser.get('commission', None)
+        id = product_comission['id'] #ser.get('commission', None)
+        
+        try:
+            category = CategoryCommission.objects.get(id  = id)
+            category.from_value = from_value
+            category.to_value = to_value
+            category.commission_percentage = commission_per
+            category.save()
+            
+        except Exception as err:
+            print(err)
+            
+    if voucher_comission is not None:
+        from_value = voucher_comission['from_value'] #ser.get('from_value', None)
+        to_value = voucher_comission['to_value'] #ser.get('to_value', None)
+        commission_per = voucher_comission['commission_percentage'] #ser.get('commission', None)
+        id = voucher_comission['id'] #ser.get('commission', None)
         
         try:
             category = CategoryCommission.objects.get(id  = id)
