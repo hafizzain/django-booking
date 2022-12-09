@@ -1891,9 +1891,9 @@ def create_commission(request):
             pass
         
         for ser in service_comission:
-            from_value = ser.get('from_value', None)
-            to_value = ser.get('to_value', None)
-            commission_per = ser.get('commission', None)
+            from_value = ser['from_value'] #ser.get('from_value', None)
+            to_value = ser['to_value'] #ser.get('to_value', None)
+            commission_per = ser['commission'] #ser.get('commission', None)
             
             CategoryCommission.objects.create(
                commission =  commission_setting,
@@ -1914,9 +1914,9 @@ def create_commission(request):
             pass
         
         for ser in product_comission:
-            from_value = ser.get('from_value', None)
-            to_value = ser.get('to_value', None)
-            commission_per = ser.get('commission', None)
+            from_value = ser['from_value'] #ser.get('from_value', None)
+            to_value = ser['to_value'] #ser.get('to_value', None)
+            commission_per = ser['commission'] #ser.get('commission', None)
             
             CategoryCommission.objects.create(
                commission =  commission_setting,
@@ -1935,9 +1935,9 @@ def create_commission(request):
             pass
         
         for ser in voucher_comission:
-            from_value = ser.get('from_value', None)
-            to_value = ser.get('to_value', None)
-            commission_per = ser.get('commission', None)
+            from_value = ser['from_value'] #ser.get('from_value', None)
+            to_value = ser['to_value'] #ser.get('to_value', None)
+            commission_per = ser['commission'] #ser.get('commission', None)
             
             CategoryCommission.objects.create(
                commission =  commission_setting,
