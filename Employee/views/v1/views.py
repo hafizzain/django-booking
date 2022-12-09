@@ -2070,6 +2070,8 @@ def delete_commission(request):
 def update_commision(request):
     commission_id = request.data.get('id', None)
     
+    employee = request.data.get('employee', None)
+    
     service_comission = request.data.get('service_comission', None)
     product_comission = request.data.get('product_comission', None)
     voucher_comission = request.data.get('voucher_comission', None)
@@ -2155,7 +2157,8 @@ def update_commision(request):
         except Exception as err:
             print(err)
         
-    
+    commission.employee = employee
+    commission.save()
         
     serializer = CommissionSerializer(commission, data=request.data, partial=True,  context={'request' : request})
     if not serializer.is_valid():
