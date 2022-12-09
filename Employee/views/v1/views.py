@@ -1894,14 +1894,13 @@ def create_commission(request):
             from_value = ser.get('from_value', None)
             to_value = ser.get('to_value', None)
             commission_per = ser.get('commission', None)
-            category_comission = ser.get('category_comission', None)
             
             CategoryCommission.objects.create(
                commission =  commission_setting,
                from_value =from_value,
                to_value = to_value,
                commission_percentage = commission_per,
-               category_comission = category_comission,
+               category_comission = 'category_comission',
                
                
             )
@@ -1918,14 +1917,13 @@ def create_commission(request):
             from_value = ser.get('from_value', None)
             to_value = ser.get('to_value', None)
             commission_per = ser.get('commission', None)
-            category_comission = ser.get('category_comission', None)
             
             CategoryCommission.objects.create(
                commission =  commission_setting,
                from_value =from_value,
                to_value = to_value,
                commission_percentage = commission_per,
-               category_comission = category_comission,
+               category_comission = 'product_comission',
             )
             
     if voucher_comission is not None:
@@ -1940,14 +1938,13 @@ def create_commission(request):
             from_value = ser.get('from_value', None)
             to_value = ser.get('to_value', None)
             commission_per = ser.get('commission', None)
-            category_comission = ser.get('category_comission', None)
             
             CategoryCommission.objects.create(
                commission =  commission_setting,
                from_value =from_value,
                to_value = to_value,
                commission_percentage = commission_per,
-               category_comission = category_comission,
+               category_comission = 'voucher_comission',
             )
             
             
