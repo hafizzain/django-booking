@@ -1883,69 +1883,64 @@ def create_commission(request):
     )
     
     if service_comission is not None:
-        if type(service_comission) == str:
-            service_comission = service_comission.replace("'" , '"')
-            service_comission = json.loads(service_comission)
-
-        elif type(service_comission) == list:
-            pass
+        from_value = service_comission['from_value'] #ser.get('from_value', None)
+        to_value = service_comission['to_value'] #ser.get('to_value', None)
+        commission_per = service_comission['commission_percentage'] #ser.get('commission', None)
         
-        for ser in service_comission:
-            from_value = ser['from_value'] #ser.get('from_value', None)
-            to_value = ser['to_value'] #ser.get('to_value', None)
-            commission_per = ser['commission'] #ser.get('commission', None)
-            
-            CategoryCommission.objects.create(
-               commission =  commission_setting,
-               from_value =from_value,
-               to_value = to_value,
-               commission_percentage = commission_per,
-               category_comission = 'category_comission',
-               
-               
-            )
-            
+        CategoryCommission.objects.create(
+            commission =  commission_setting,
+            from_value =from_value,
+            to_value = to_value,
+            commission_percentage = commission_per,
+            category_comission = 'category_comission',
+        )
     if product_comission is not None:
-        if type(product_comission) == str:
-            product_comission = product_comission.replace("'" , '"')
-            product_comission = json.loads(product_comission)
-
-        elif type(product_comission) == list:
-            pass
+        from_value = service_comission['from_value'] #ser.get('from_value', None)
+        to_value = service_comission['to_value'] #ser.get('to_value', None)
+        commission_per = service_comission['commission_percentage'] #ser.get('commission', None)
         
-        for ser in product_comission:
-            from_value = ser['from_value'] #ser.get('from_value', None)
-            to_value = ser['to_value'] #ser.get('to_value', None)
-            commission_per = ser['commission'] #ser.get('commission', None)
-            
-            CategoryCommission.objects.create(
-               commission =  commission_setting,
-               from_value =from_value,
-               to_value = to_value,
-               commission_percentage = commission_per,
-               category_comission = 'product_comission',
-            )
-            
+        CategoryCommission.objects.create(
+            commission =  commission_setting,
+            from_value =from_value,
+            to_value = to_value,
+            commission_percentage = commission_per,
+            category_comission = 'product_comission',
+        )
+        
     if voucher_comission is not None:
-        if type(voucher_comission) == str:
-            voucher_comission = voucher_comission.replace("'" , '"')
-            voucher_comission = json.loads(voucher_comission)
-
-        elif type(voucher_comission) == list:
-            pass
+        from_value = service_comission['from_value'] #ser.get('from_value', None)
+        to_value = service_comission['to_value'] #ser.get('to_value', None)
+        commission_per = service_comission['commission_percentage'] #ser.get('commission', None)
         
-        for ser in voucher_comission:
-            from_value = ser['from_value'] #ser.get('from_value', None)
-            to_value = ser['to_value'] #ser.get('to_value', None)
-            commission_per = ser['commission'] #ser.get('commission', None)
+        CategoryCommission.objects.create(
+            commission =  commission_setting,
+            from_value =from_value,
+            to_value = to_value,
+            commission_percentage = commission_per,
+            category_comission = 'voucher_comission',
+        )
+        
+        # if type(service_comission) == str:
+        #     service_comission = service_comission.replace("'" , '"')
+        #     service_comission = json.loads(service_comission)
+
+        # elif type(service_comission) == list:
+        #     pass
+        
+        # for ser in service_comission:
+        #     from_value = ser['from_value'] #ser.get('from_value', None)
+        #     to_value = ser['to_value'] #ser.get('to_value', None)
+        #     commission_per = ser['commission'] #ser.get('commission', None)
             
-            CategoryCommission.objects.create(
-               commission =  commission_setting,
-               from_value =from_value,
-               to_value = to_value,
-               commission_percentage = commission_per,
-               category_comission = 'voucher_comission',
-            )
+        #     CategoryCommission.objects.create(
+        #        commission =  commission_setting,
+        #        from_value =from_value,
+        #        to_value = to_value,
+        #        commission_percentage = commission_per,
+        #        category_comission = 'category_comission',
+               
+               
+        #     )
             
             
     serializers= CommissionSerializer(commission_setting, context={'request' : request})
