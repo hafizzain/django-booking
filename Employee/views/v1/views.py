@@ -2157,7 +2157,7 @@ def update_commision(request):
         
     
         
-    serializer = CommissionSerializer(commission, data=request.data, partial=True)
+    serializer = CommissionSerializer(commission, data=request.data, partial=True,  context={'request' : request})
     if not serializer.is_valid():
         return Response(
                 {
