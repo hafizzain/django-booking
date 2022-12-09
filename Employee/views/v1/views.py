@@ -1881,6 +1881,7 @@ def create_commission(request):
         employee = employee_id,
         commission_cycle = commission_cycle,
     )
+    
     if service_comission is not None:
         if type(service_comission) == str:
             service_comission = service_comission.replace("'" , '"')
@@ -1893,12 +1894,15 @@ def create_commission(request):
             from_value = ser.get('from_value', None)
             to_value = ser.get('to_value', None)
             commission_per = ser.get('commission', None)
+            category_comission = ser.get('category_comission', None)
             
             CategoryCommission.objects.create(
                commission =  commission_setting,
                from_value =from_value,
                to_value = to_value,
-               commission_percentage = commission_per
+               commission_percentage = commission_per,
+               category_comission = category_comission,
+               
                
             )
             
@@ -1914,12 +1918,14 @@ def create_commission(request):
             from_value = ser.get('from_value', None)
             to_value = ser.get('to_value', None)
             commission_per = ser.get('commission', None)
+            category_comission = ser.get('category_comission', None)
             
             CategoryCommission.objects.create(
                commission =  commission_setting,
                from_value =from_value,
                to_value = to_value,
-               commission_percentage = commission_per
+               commission_percentage = commission_per,
+               category_comission = category_comission,
             )
             
     if voucher_comission is not None:
@@ -1934,12 +1940,14 @@ def create_commission(request):
             from_value = ser.get('from_value', None)
             to_value = ser.get('to_value', None)
             commission_per = ser.get('commission', None)
+            category_comission = ser.get('category_comission', None)
             
             CategoryCommission.objects.create(
                commission =  commission_setting,
                from_value =from_value,
                to_value = to_value,
-               commission_percentage = commission_per
+               commission_percentage = commission_per,
+               category_comission = category_comission,
             )
             
             

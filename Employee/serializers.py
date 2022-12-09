@@ -562,7 +562,7 @@ class CommissionSerializer(serializers.ModelSerializer):
     
     def get_category_comission(self, obj):
         category = CategoryCommission.objects.filter(commission = obj)
-        return CategoryCommissionSerializer(category, many = True)
+        return CategoryCommissionSerializer(category, many = True).data
     class Meta:
         model = CommissionSchemeSetting
         fields = '__all__'

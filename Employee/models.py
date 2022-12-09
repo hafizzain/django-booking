@@ -233,7 +233,7 @@ class CommissionSchemeSetting(models.Model):
     to_value = models.PositiveIntegerField(default=0, null=True, blank=True)
     percentage = models.PositiveIntegerField(default=0, null=True, blank=True)
     
-    commission_cycle = models.CharField(choices=COMMISSION_CHOICES, max_length=50, default='Service',)
+    commission_cycle = models.CharField(choices=COMMISSION_CHOICES, max_length=50, default='Every day',)
     
     sale_price_before_discount = models.BooleanField(default=True)
     sale_price_including_tax = models.BooleanField(default=True)
