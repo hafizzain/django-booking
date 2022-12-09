@@ -2156,9 +2156,23 @@ def update_commision(request):
             
         except Exception as err:
             print(err)
-        
-    commission.employee = employee
-    commission.save()
+    
+    try:
+        employee_id=Employee.objects.get(id=employee)
+        commission.employee = employee_id
+        commission.save()
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'response' : {
+                    'message' : 'Employee not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
     serializer = CommissionSerializer(commission, data=request.data, partial=True,  context={'request' : request})
     if not serializer.is_valid():
