@@ -307,6 +307,14 @@ class EmployeSerializer(serializers.ModelSerializer):
     #     }
 
 
+class EmployeeNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = [
+                'id', 
+                'full_name',
+                'employee_id',
+        ]
 
 class StaffGroupSerializers(serializers.ModelSerializer):
 
@@ -555,17 +563,30 @@ class CategoryCommissionSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = CategoryCommission
-        fields = '__all__'
+        #fields = '__all__'
+        exclude = ('id','created_at' )
      
 class CommissionSerializer(serializers.ModelSerializer):
     category_comission = serializers.SerializerMethodField()
+    employee = serializers.SerializerMethodField()
+    
+    def get_employee(self,obj):
+        try:
+            emp = Employee.objects.get(id = str(obj.employee))
+            return EmployeeNameSerializer(emp).data
+        except Exception as err:
+            print(err)
+            
     
     def get_category_comission(self, obj):
         category = CategoryCommission.objects.filter(commission = obj)
         return CategoryCommissionSerializer(category, many = True).data
     class Meta:
         model = CommissionSchemeSetting
-        fields = '__all__'
+        #fields = '__all__'
+        exclude = ('sale_price_before_discount','created_at' ,'from_value','to_value','percentage','user',
+                   'sale_price_including_tax','service_price_before_membership_discount')
+        
 class VacationSerializer(serializers.ModelSerializer):
     
     class Meta:
@@ -587,15 +608,6 @@ class AssetdocmemtSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssetDocument
         fields= ['id', 'document']
-
-class EmployeeNameSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Employee
-        fields = [
-                'id', 
-                'full_name',
-                'employee_id',
-        ]
        
 class AssetSerializer(serializers.ModelSerializer):
     document = serializers.SerializerMethodField()

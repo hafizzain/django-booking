@@ -1892,7 +1892,7 @@ def create_commission(request):
             from_value =from_value,
             to_value = to_value,
             commission_percentage = commission_per,
-            category_comission = 'category_comission',
+            category_comission = 'Service',
         )
     if product_comission is not None:
         from_value = product_comission['from_value'] #ser.get('from_value', None)
@@ -1904,7 +1904,7 @@ def create_commission(request):
             from_value = from_value,
             to_value = to_value,
             commission_percentage = commission_per,
-            category_comission = 'product_comission',
+            category_comission = 'Retail',
         )
         
     if voucher_comission is not None:
@@ -1917,7 +1917,7 @@ def create_commission(request):
             from_value = from_value,
             to_value = to_value,
             commission_percentage = commission_per,
-            category_comission = 'voucher_comission',
+            category_comission = 'Both',
         )
         
         # if type(service_comission) == str:

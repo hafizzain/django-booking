@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .models import(CommissionSchemeSetting, Employee, EmployeeProfessionalInfo, EmployeePermissionSetting, EmployeeModulePermission, 
-                    EmployeeMarketingPermission ,StaffGroup , 
+                    EmployeeMarketingPermission ,StaffGroup , CategoryCommission,
                     StaffGroupModulePermission , Attendance , 
                     Payroll, Asset, AssetDocument, EmployeeSelectedService )
 # Register your models here.
