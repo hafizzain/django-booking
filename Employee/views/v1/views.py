@@ -1999,7 +1999,7 @@ def get_commission(request):
     #     user=business.user,
     #     )
     commission = CommissionSchemeSetting.objects.all().order_by('-created_at')   
-    serializer = CommissionSerializer(commission, many = True)
+    serializer = CommissionSerializer(commission, many = True, context={'request' : request})
     
     return Response(
         {
