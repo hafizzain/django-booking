@@ -1895,26 +1895,26 @@ def create_commission(request):
             category_comission = 'category_comission',
         )
     if product_comission is not None:
-        from_value = service_comission['from_value'] #ser.get('from_value', None)
-        to_value = service_comission['to_value'] #ser.get('to_value', None)
-        commission_per = service_comission['commission_percentage'] #ser.get('commission', None)
+        from_value = product_comission['from_value'] #ser.get('from_value', None)
+        to_value = product_comission['to_value'] #ser.get('to_value', None)
+        commission_per = product_comission['commission_percentage'] #ser.get('commission', None)
         
         CategoryCommission.objects.create(
             commission =  commission_setting,
-            from_value =from_value,
+            from_value = from_value,
             to_value = to_value,
             commission_percentage = commission_per,
             category_comission = 'product_comission',
         )
         
     if voucher_comission is not None:
-        from_value = service_comission['from_value'] #ser.get('from_value', None)
-        to_value = service_comission['to_value'] #ser.get('to_value', None)
-        commission_per = service_comission['commission_percentage'] #ser.get('commission', None)
+        from_value = voucher_comission['from_value'] #ser.get('from_value', None)
+        to_value = voucher_comission['to_value'] #ser.get('to_value', None)
+        commission_per = voucher_comission['commission_percentage'] #ser.get('commission', None)
         
         CategoryCommission.objects.create(
             commission =  commission_setting,
-            from_value =from_value,
+            from_value = from_value,
             to_value = to_value,
             commission_percentage = commission_per,
             category_comission = 'voucher_comission',
