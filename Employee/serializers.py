@@ -575,8 +575,7 @@ class CategoryCommissionSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = CategoryCommission
-        #fields = '__all__'
-        exclude = ('created_at' )
+        fields = '__all__'
      
 class CommissionSerializer(serializers.ModelSerializer):
     category_comission = serializers.SerializerMethodField()
