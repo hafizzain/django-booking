@@ -2068,7 +2068,7 @@ def delete_commission(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_commision(request):
-    commission_id = request.data.get('commission_id', None)
+    commission_id = request.data.get('id', None)
     
     service_comission = request.data.get('service_comission', None)
     product_comission = request.data.get('product_comission', None)
