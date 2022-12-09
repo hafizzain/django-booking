@@ -14,7 +14,8 @@ from .models import( Employee, EmployeeProfessionalInfo ,
                EmployeePermissionSetting, EmployeeModulePermission 
                , EmployeeMarketingPermission,
                StaffGroup, StaffGroupModulePermission, Attendance
-               ,Payroll , CommissionSchemeSetting , Asset ,AssetDocument, EmployeeSelectedService
+               ,Payroll , CommissionSchemeSetting , Asset ,AssetDocument,
+               EmployeeSelectedService, Vacation ,CategoryCommission
 )
 
 class ServicesEmployeeSerializer(serializers.ModelSerializer):
@@ -549,11 +550,26 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'created_at' ,
             'location',   
             ]   
-        
-class CommissionSerializer(serializers.ModelSerializer):
+
+class CategoryCommissionSerializer(serializers.ModelSerializer):
     
     class Meta:
+        model = CategoryCommission
+        fields = '__all__'
+     
+class CommissionSerializer(serializers.ModelSerializer):
+    category_comission = serializers.SerializerMethodField()
+    
+    def get_category_comission(self, obj):
+        category = CategoryCommission.objects.filter(commission = obj)
+        return CategoryCommissionSerializer(category, many = True)
+    class Meta:
         model = CommissionSchemeSetting
+        fields = '__all__'
+class VacationSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Vacation
         fields = '__all__'
       
 class AssetdocmemtSerializer(serializers.ModelSerializer):

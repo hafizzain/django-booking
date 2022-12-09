@@ -50,6 +50,12 @@ urlpatterns = [
     path('single_employee_schedule/', views.single_employee_schedule),
     
     #Generate ID
-    path('generate_id/', views.generate_id)
+    path('generate_id/', views.generate_id),
+    
+    #Vacations For Employee
+    path('create_vacation/', views.create_vacation),
+    path('get_vacation/', views.get_vacation),
+    path('delete_vacation/', views.delete_vacation),
+    path('update_vacation/', views.update_vacation),
     
 ]

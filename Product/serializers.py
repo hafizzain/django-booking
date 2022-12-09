@@ -92,13 +92,25 @@ class ProductStockSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductStock
-        fields = ['id', 'location', 'low_stock', 'current_stock',  'reorder_quantity', 'available_quantity', 'sold_quantity', 'sellable_quantity','consumable_quantity' , 'amount', 'unit' ,'alert_when_stock_becomes_lowest', 'sold_quantity','is_active' ]
+        fields = ['id', 'location', 'low_stock', 'current_stock', 
+                  'reorder_quantity', 'available_quantity', 'sold_quantity',
+                  'sellable_quantity','consumable_quantity' , 'amount', 'unit' ,
+                  'alert_when_stock_becomes_lowest', 'sold_quantity','is_active' ]
 
 class ProductWithStockSerializer(serializers.ModelSerializer):
     stock = serializers.SerializerMethodField()
     category= CategorySerializer(read_only=True)
     brand = serializers.SerializerMethodField()
     vendor= VendorSerializer(read_only=True)
+    #transfer_quantity = serializers.SerializerMethodField(read_only=True)
+    
+    # def get_transfer_quantity(self, obj):
+    #     try:
+    #         return Sum(ProductStockTransfer.objects.filter(product = obj.product).values_list('quantity'))
+    #     except Exception as err:
+    #         ExceptionRecord.objects.create(
+    #             text = f"Product quantity issue {str(err)}"
+    #         ) 
 
 
     def get_brand(self, obj):
@@ -267,7 +279,8 @@ class OrderSerializer(serializers.ModelSerializer):
     
     class Meta:
         model= OrderStock
-        fields=('id','business','vendor','to_location', 'from_location', 'status', 'rec_quantity','vendor_name','location_name','products')
+        fields=('id','business','vendor','to_location','from_location',
+                'status', 'rec_quantity','vendor_name','location_name','products')
 
 
 class ProductConsumptionSerializer(serializers.ModelSerializer):
@@ -277,7 +290,7 @@ class ProductConsumptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductConsumption
         fields = ['id', 'location', 'product', 'quantity']
-
+                            
 
 class ProductStockTransferSerializer(serializers.ModelSerializer):
 

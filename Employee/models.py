@@ -212,10 +212,16 @@ class Payroll(models.Model):
 
 
 class CommissionSchemeSetting(models.Model):
-    CATEGORY_CHOICES =[
-        ('Service', 'Service'),
-        ('Retail', 'Retail'),
-        ('Both', 'Both'),
+    COMMISSION_CHOICES =[
+        ('Every day', 'Every day'),
+        ('Every week', 'Every week'),
+        ('Every 2 week', 'Every 2 week'),
+        ('Every 4 week', 'Every 4 week'),
+        ('Every month', 'Every month'),
+        ('Every quarter', 'Every quarter'),
+        ('Every 6 months', 'Every 6 months'),
+        ('Every year', 'Every year'),
+
     ]
     
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
@@ -227,12 +233,33 @@ class CommissionSchemeSetting(models.Model):
     to_value = models.PositiveIntegerField(default=0, null=True, blank=True)
     percentage = models.PositiveIntegerField(default=0, null=True, blank=True)
     
-    category_com = models.CharField(choices=CATEGORY_CHOICES, max_length=50, default='Service',)
+    commission_cycle = models.CharField(choices=COMMISSION_CHOICES, max_length=50, default='Service',)
     
     sale_price_before_discount = models.BooleanField(default=True)
     sale_price_including_tax = models.BooleanField(default=True)
     service_price_before_membership_discount = models.BooleanField(default=False)
 
+    created_at = models.DateTimeField(auto_now_add=now)
+    
+    def __str__(self):
+        return str(self.id)
+
+class CategoryCommission(models.Model):
+    CATEGORY_CHOICES =[
+        ('Service', 'Service'),
+        ('Retail', 'Retail'),
+        ('Both', 'Both'),
+    ]
+    
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    commission = models.ForeignKey(CommissionSchemeSetting, on_delete=models.CASCADE, related_name='categorycommission_commission')
+    
+    from_value = models.PositiveIntegerField(default=0, null=True, blank=True)
+    to_value = models.PositiveIntegerField(default=0, null=True, blank=True)
+    commission_percentage = models.PositiveIntegerField(default=0, null=True, blank=True)
+    
+    category_comission = models.CharField(choices=CATEGORY_CHOICES, max_length=50, default='Service',)
+    
     created_at = models.DateTimeField(auto_now_add=now)
     
     def __str__(self):
@@ -264,3 +291,20 @@ class AssetDocument(models.Model):
     def __str__(self):
         return str(self.id)
     
+class Vacation(models.Model):
+    
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null = True, related_name='user_vacation')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, null = True , related_name='business_vacation')
+    
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_vacation')
+    
+    from_date = models.DateField(verbose_name = 'From Date', null=True)
+    to_date = models.DateField(verbose_name = 'To Date', null=True)
+    note = models.CharField(max_length=300, default='')
+    
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=now)
+    
+    def __str__(self):
+        return str(self.id)

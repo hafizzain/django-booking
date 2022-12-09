@@ -26,20 +26,22 @@ from Product.serializers import (CategorySerializer, BrandSerializer, ProductSer
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_test_api(request):
-    service_id = "ed9b3e32-4f1f-469a-a065-ea9805ee0edc"
-    location = "fef70b9b-c42d-4b3e-bf54-f4d1b5513f6b"
-    product = Product.objects.get(id = service_id)
-    product_stock = product.product_stock.all()#.first()
-    available = 0
-    for i in product_stock:
-        print(location, i.location)
-        if location == str(i.location):
-            print(i.available_quantity)
-    #data = product_stock.available_quantity
-    data = 1
-    print(data)
-    
-    
+    # service_id = "ed9b3e32-4f1f-469a-a065-ea9805ee0edc"
+    # location = "fef70b9b-c42d-4b3e-bf54-f4d1b5513f6b"
+    # product = Product.objects.get(id = service_id)
+    # product_stock = product.product_stock.all()#.first()
+    # available = 0
+    # for i in product_stock:
+    #     print(location, i.location)
+    #     if location == str(i.location):
+    #         print(i.available_quantity)
+    # #data = product_stock.available_quantity
+    # data = 1
+    # print(data)
+    product = Product.objects.all()
+    # for i in product:
+    #     data =  ProductStockTransfer.objects.filter(product = i).aggregate(Sum('quantity'))
+    data = 'test'
     return Response(
         {
             'status' : 200,

@@ -1,10 +1,10 @@
 from time import strptime
 from django.shortcuts import render
-from Employee.models import( Employee , EmployeeProfessionalInfo ,
+from Employee.models import( CategoryCommission, Employee , EmployeeProfessionalInfo ,
                         EmployeePermissionSetting,  EmployeeModulePermission
                         , EmployeeMarketingPermission, EmployeeSelectedService , StaffGroup 
                         , StaffGroupModulePermission, Attendance
-                        ,Payroll, CommissionSchemeSetting, Asset, AssetDocument
+                        ,Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation
                         )
 from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSIONS_MODEL_FIELDS
 from rest_framework.decorators import api_view, permission_classes
@@ -14,7 +14,7 @@ from Employee.serializers import( EmployeSerializer , EmployeInformationsSeriali
                           , EmployPermissionSerializer,  EmployeModulesSerializer
                           ,  EmployeeMarketingSerializers, StaffGroupSerializers , 
                           StaffpermisionSerializers , AttendanceSerializers
-                          ,PayrollSerializers,singleEmployeeSerializer , CommissionSerializer
+                          ,PayrollSerializers, VacationSerializer,singleEmployeeSerializer , CommissionSerializer
                           , AssetSerializer, WorkingScheduleSerializer
                         
                           
@@ -1823,11 +1823,11 @@ def create_commission(request):
     business_id = request.data.get('business', None)
     
     employee = request.data.get('employee', None)
-    from_value = request.data.get('from_value', None)
-    to_value = request.data.get('to_value', None)
-    percentage = request.data.get('percentage', None)
+    commission_cycle = request.data.get('commission_cycle', None)
     
-    category_com = request.data.get('category_choice', None)
+    service_comission = request.data.get('service_comission', None)
+    product_comission = request.data.get('product_comission', None)
+    voucher_comission = request.data.get('voucher_comission', None)
     
     if not all([business_id,employee ]):
         return Response(
@@ -1879,11 +1879,70 @@ def create_commission(request):
         user = user,
         business = business ,
         employee = employee_id,
-        from_value = from_value,
-        to_value =to_value,
-        percentage =percentage,
-        category_com =category_com,
+        commission_cycle = commission_cycle,
     )
+    if service_comission is not None:
+        if type(service_comission) == str:
+            service_comission = service_comission.replace("'" , '"')
+            service_comission = json.loads(service_comission)
+
+        elif type(service_comission) == list:
+            pass
+        
+        for ser in service_comission:
+            from_value = ser.get('from_value', None)
+            to_value = ser.get('to_value', None)
+            commission_per = ser.get('commission', None)
+            
+            CategoryCommission.objects.create(
+               commission =  commission_setting,
+               from_value =from_value,
+               to_value = to_value,
+               commission_percentage = commission_per
+               
+            )
+            
+    if product_comission is not None:
+        if type(product_comission) == str:
+            product_comission = product_comission.replace("'" , '"')
+            product_comission = json.loads(product_comission)
+
+        elif type(product_comission) == list:
+            pass
+        
+        for ser in product_comission:
+            from_value = ser.get('from_value', None)
+            to_value = ser.get('to_value', None)
+            commission_per = ser.get('commission', None)
+            
+            CategoryCommission.objects.create(
+               commission =  commission_setting,
+               from_value =from_value,
+               to_value = to_value,
+               commission_percentage = commission_per
+            )
+            
+    if voucher_comission is not None:
+        if type(voucher_comission) == str:
+            voucher_comission = voucher_comission.replace("'" , '"')
+            voucher_comission = json.loads(voucher_comission)
+
+        elif type(voucher_comission) == list:
+            pass
+        
+        for ser in voucher_comission:
+            from_value = ser.get('from_value', None)
+            to_value = ser.get('to_value', None)
+            commission_per = ser.get('commission', None)
+            
+            CategoryCommission.objects.create(
+               commission =  commission_setting,
+               from_value =from_value,
+               to_value = to_value,
+               commission_percentage = commission_per
+            )
+            
+            
     serializers= CommissionSerializer(commission_setting, context={'request' : request})
     
     return Response(
@@ -1893,7 +1952,7 @@ def create_commission(request):
                 'response' : {
                     'message' : 'Commission Created Successfully!',
                     'error_message' : None,
-                    'asset' : serializers.data,
+                    'commission' : serializers.data,
                 }
             },
             status=status.HTTP_201_CREATED
@@ -1999,7 +2058,7 @@ def delete_commission(request):
             'status_code' : 200,
             'status_code_text' : '200',
             'response' : {
-                'message' : 'Commission deleted successful',
+                'message' : 'Commission deleted successfully',
                 'error_message' : None
             }
         },
@@ -2347,6 +2406,221 @@ def update_asset(request):
                 'message' : 'Update Asset Successfully',
                 'error_message' : None,
                 'asset' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+        )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_vacation(request):
+    user = request.user
+    business_id = request.data.get('business', None)
+    
+    employee = request.data.get('employee', None)
+    from_date = request.data.get('from_date', None)
+    to_date = request.data.get('to_date', None)
+    note = request.data.get('note', None)
+    
+    if not all([business_id,employee ]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                          'employee'
+                            ]
+                    }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        business = Business.objects.get(id=business_id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    try:
+        employee_id=Employee.objects.get(id=employee)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'response' : {
+                    'message' : 'Employee not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    vacation = Vacation.objects.create(
+        user = user,
+        business = business ,
+        employee = employee_id,
+        
+        from_date =from_date,
+        to_date = to_date,
+        note = note,
+    )
+    
+    serializers= VacationSerializer(vacation, context={'request' : request})
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Vacation Created Successfully!',
+                    'error_message' : None,
+                    'vacation' : serializers.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        ) 
+    
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_vacation(request):
+    vacation = Vacation.objects.all().order_by('-created_at')   
+    serializer = VacationSerializer(vacation, many = True)
+    
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Vacation',
+                'error_message' : None,
+                'vacation' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_vacation(request):
+    vacation_id = request.data.get('id', None)
+    if vacation_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        vacation = Vacation.objects.get(id=vacation_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Vacation ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    vacation.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Vacation deleted successfully',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_vacation(request):
+    vacation_id = request.data.get('vacation_id', None)
+    
+    if vacation_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'vacation_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+        
+    try:
+        vacation = Vacation.objects.get(id = vacation_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code_text' : 'INVALID_VACATION_ID',
+                'response' : {
+                    'message' : 'Vacation Not Found',
+                    'error_message' : str(err),
+                }
+            },
+                status=status.HTTP_404_NOT_FOUND
+        )
+    serializer = VacationSerializer(vacation, data=request.data, partial=True)
+    if not serializer.is_valid():
+        return Response(
+                {
+            'status' : False,
+            'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+            'response' : {
+                'message' : 'Vacation Serializer Invalid',
+                'error_message' : str(err),
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+        )
+    serializer.save()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Vacation Update Successfully',
+                'error_message' : None,
+                'commission' : serializer.data
             }
         },
         status=status.HTTP_200_OK
