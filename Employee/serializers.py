@@ -308,12 +308,24 @@ class EmployeSerializer(serializers.ModelSerializer):
 
 
 class EmployeeNameSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField(read_only=True)
+    
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request)
+                return f'{url}{obj.image}'
+            except:
+                return obj.image
+        return None
     class Meta:
         model = Employee
         fields = [
                 'id', 
                 'full_name',
                 'employee_id',
+                'image',
         ]
 
 class StaffGroupSerializers(serializers.ModelSerializer):
@@ -564,7 +576,7 @@ class CategoryCommissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = CategoryCommission
         #fields = '__all__'
-        exclude = ('id','created_at' )
+        exclude = ('created_at' )
      
 class CommissionSerializer(serializers.ModelSerializer):
     category_comission = serializers.SerializerMethodField()
@@ -573,7 +585,7 @@ class CommissionSerializer(serializers.ModelSerializer):
     def get_employee(self,obj):
         try:
             emp = Employee.objects.get(id = str(obj.employee))
-            return EmployeeNameSerializer(emp).data
+            return EmployeeNameSerializer(emp, context=self.context).data
         except Exception as err:
             print(err)
             

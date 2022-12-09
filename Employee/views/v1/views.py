@@ -2070,9 +2070,9 @@ def delete_commission(request):
 def update_commision(request):
     commission_id = request.data.get('commission_id', None)
     
-    service_price_before_membership_discount= request.data.get('service_price_before_membership_discount',None)
-    sale_price_including_tax= request.data.get('sale_price_including_tax',None)
-    sale_price_before_discount= request.data.get('sale_price_before_discount' , None)
+    service_comission = request.data.get('service_comission', None)
+    product_comission = request.data.get('product_comission', None)
+    voucher_comission = request.data.get('voucher_comission', None)
     
     if commission_id is None:
         return Response(
@@ -2106,23 +2106,24 @@ def update_commision(request):
             },
                 status=status.HTTP_404_NOT_FOUND
         )
-    if sale_price_before_discount is not None:
-        sale_price_before_discount = True
-    else:
-        sale_price_before_discount = False
-    if sale_price_including_tax is not None:
-        sale_price_including_tax = True
-    else:
-        sale_price_including_tax = False
-    if service_price_before_membership_discount is not None:
-        service_price_before_membership_discount= True
-    else:
-        service_price_before_membership_discount= False
+    
+    if service_comission is not None:
+        from_value = service_comission['from_value'] #ser.get('from_value', None)
+        to_value = service_comission['to_value'] #ser.get('to_value', None)
+        commission_per = service_comission['commission_percentage'] #ser.get('commission', None)
+        id = service_comission['id'] #ser.get('commission', None)
         
-    commission.sale_price_including_tax=sale_price_including_tax
-    commission.service_price_before_membership_discount=service_price_before_membership_discount
-    commission.sale_price_before_discount=sale_price_before_discount
-    commission.save()
+        try:
+            category = CategoryCommission.objects.get(id  = id)
+            category.from_value = from_value
+            category.to_value = to_value
+            category.commission_percentage = commission_per
+            category.save()
+            
+        except Exception as err:
+            print(err)
+        
+    
         
     serializer = CommissionSerializer(commission, data=request.data, partial=True)
     if not serializer.is_valid():
