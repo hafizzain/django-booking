@@ -2670,7 +2670,7 @@ def update_vacation(request):
             'response' : {
                 'message' : 'Vacation Update Successfully',
                 'error_message' : None,
-                'commission' : serializer.data
+                'vacation' : serializer.data
             }
         },
         status=status.HTTP_200_OK
