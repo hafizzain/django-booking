@@ -2613,7 +2613,7 @@ def delete_vacation(request):
         status=status.HTTP_200_OK
     )
     
-@api_view(['POST'])
+@api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_vacation(request):
     vacation_id = request.data.get('vacation_id', None)
