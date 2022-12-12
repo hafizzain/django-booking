@@ -2617,6 +2617,7 @@ def delete_vacation(request):
 @permission_classes([IsAuthenticated])
 def update_vacation(request):
     vacation_id = request.data.get('vacation_id', None)
+    employee = request.data.get('employee', None)
     
     if vacation_id is None:
         return Response(
@@ -2649,6 +2650,14 @@ def update_vacation(request):
             },
                 status=status.HTTP_404_NOT_FOUND
         )
+    
+    if employee is not None:
+        try:
+            emp = Employee.objects.get(id=employee)
+            vacation.employee = emp
+        except Exception as err:
+            pass
+    vacation.save()
     serializer = VacationSerializer(vacation, data=request.data, partial=True,context={'request' : request})
     if not serializer.is_valid():
         return Response(

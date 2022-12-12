@@ -329,7 +329,8 @@ class BusinessTaxSerializer(serializers.ModelSerializer):
     location = BusinessAddress_GetSerializer()
     class Meta:
         model = BusinessTax
-        fields = ['id', 'name', 'parent_tax', 'tax_rate', 'location', 'tax_type', 'is_active']
+        fields = ['id', 'name', 'parent_tax',
+                  'tax_rate', 'location', 'tax_type', 'is_active']
 
 
 class BusinessVendorSerializer(serializers.ModelSerializer):
