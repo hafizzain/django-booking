@@ -310,15 +310,15 @@ class PaymentMethodSerializer(serializers.ModelSerializer):
         fields = ['id', 'method_type', 'is_active']
 
 class ParentBusinessTaxSerializer(serializers.ModelSerializer):
-    parent_tax = serializers.SerializerMethodField(read_only=True)
+    # parent_tax = serializers.SerializerMethodField(read_only=True)
     
-    def get_parent_tax(self, obj):
-        try:
-            tax = obj.parent_tax.all()
-            # ser = BusinessTax.objects.filter(service = obj).first()
-            return tax.tax_rate
-        except Exception as err:
-            pass
+    # def get_parent_tax(self, obj):
+    #     try:
+    #         tax = obj.parent_tax.all()
+    #         # ser = BusinessTax.objects.filter(service = obj).first()
+    #         return tax.tax_rate
+    #     except Exception as err:
+    #         pass
     class Meta:
         model = BusinessTax
         fields = ['id', 'name', 'parent_tax', 'tax_rate', 'location', 'tax_type', 'is_active']
