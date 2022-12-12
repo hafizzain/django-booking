@@ -308,6 +308,11 @@ class PaymentMethodSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessPaymentMethod
         fields = ['id', 'method_type', 'is_active']
+        
+class ParentBusinessTax_RateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessTax
+        fields = ['id', 'name', 'parent_tax', 'tax_rate', 'tax_type', 'is_active']
 
 class ParentBusinessTaxSerializer(serializers.ModelSerializer):
     # parent_tax = serializers.SerializerMethodField(read_only=True)
@@ -319,6 +324,8 @@ class ParentBusinessTaxSerializer(serializers.ModelSerializer):
     #         return tax.tax_rate
     #     except Exception as err:
     #         pass
+    parent_tax = ParentBusinessTax_RateSerializer(many=True, read_only=True)
+
     class Meta:
         model = BusinessTax
         fields = ['id', 'name', 'parent_tax', 'tax_rate', 'location', 'tax_type', 'is_active']
