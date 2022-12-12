@@ -309,6 +309,14 @@ class EmployeSerializer(serializers.ModelSerializer):
 
 class EmployeeNameSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
+    designation = serializers.SerializerMethodField(read_only=True)
+    
+    def get_designation(self, obj):        
+        try:
+            designation = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return designation.designation 
+        except: 
+            return None
     
     def get_image(self, obj):
         if obj.image:
@@ -326,6 +334,7 @@ class EmployeeNameSerializer(serializers.ModelSerializer):
                 'full_name',
                 'employee_id',
                 'image',
+                'designation'
         ]
 
 class StaffGroupSerializers(serializers.ModelSerializer):
@@ -599,7 +608,14 @@ class CommissionSerializer(serializers.ModelSerializer):
                    'sale_price_including_tax','service_price_before_membership_discount')
         
 class VacationSerializer(serializers.ModelSerializer):
+    employee = serializers.SerializerMethodField()
     
+    def get_employee(self,obj):
+        try:
+            emp = Employee.objects.get(id = str(obj.employee))
+            return EmployeeNameSerializer(emp, context=self.context).data
+        except Exception as err:
+            print(err)
     class Meta:
         model = Vacation
         fields = '__all__'

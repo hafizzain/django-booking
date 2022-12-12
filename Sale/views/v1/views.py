@@ -157,10 +157,17 @@ def create_service(request):
         client_can_book=client_can_book,
         slot_availible_for_online=slot_availible_for_online,
         
-        enable_team_comissions =enable_team_comissions,
+        #enable_team_comissions =enable_team_comissions,
         enable_vouchers=enable_vouchers,
         
     )
+    if enable_team_comissions is not None:
+        service_obj.enable_team_comissions = True
+    else:
+        service_obj.enable_team_comissions = False
+        
+    service_obj.save()
+    
     employees_error = []
     if is_package is not None:
         service_obj.is_package = True

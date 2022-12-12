@@ -2548,7 +2548,7 @@ def create_vacation(request):
 @permission_classes([AllowAny])
 def get_vacation(request):
     vacation = Vacation.objects.all().order_by('-created_at')   
-    serializer = VacationSerializer(vacation, many = True)
+    serializer = VacationSerializer(vacation, many = True,context={'request' : request})
     
     return Response(
         {
@@ -2649,7 +2649,7 @@ def update_vacation(request):
             },
                 status=status.HTTP_404_NOT_FOUND
         )
-    serializer = VacationSerializer(vacation, data=request.data, partial=True)
+    serializer = VacationSerializer(vacation, data=request.data, partial=True,context={'request' : request})
     if not serializer.is_valid():
         return Response(
                 {
