@@ -259,6 +259,7 @@ class OrderProductSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField(read_only=True)
     location_name = serializers.SerializerMethodField(read_only=True)
+    to_location_name = serializers.SerializerMethodField(read_only=True)
     vendor_name = serializers.SerializerMethodField(read_only=True)
     
     def get_vendor_name(self, obj):
@@ -271,6 +272,12 @@ class OrderSerializer(serializers.ModelSerializer):
             return obj.from_location.address_name
         except Exception as err:
             return None
+        
+    def get_to_location_name(self, obj):
+        try:
+            return obj.to_location.address_name
+        except Exception as err:
+            return None
     
     
     def get_products(self, obj):
@@ -279,7 +286,7 @@ class OrderSerializer(serializers.ModelSerializer):
     
     class Meta:
         model= OrderStock
-        fields=('id','business','vendor','to_location','from_location',
+        fields=('id','business','vendor','to_location','from_location','to_location_name',
                 'status', 'rec_quantity','vendor_name','location_name','products')
 
 
