@@ -270,7 +270,7 @@ def create_storetarget(request):
             
         )
         if is_primary is not None:
-            tier_store.is_primary = is_primary
+            tier_store.is_primary = True
         else:
             tier_store.is_primary = False
         tier_store.save()
