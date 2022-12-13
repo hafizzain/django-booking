@@ -55,6 +55,7 @@ NSTYLE_APPS = [
     'Order.apps.OrderConfig',
     'Dashboard.apps.DashboardConfig',
     'CRM.apps.CrmConfig',
+    'TragetControl.apps.TragetcontrolConfig',
 ]
 
 
