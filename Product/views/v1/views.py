@@ -1969,6 +1969,13 @@ def add_product_stock_transfer(request):
         to_location = to_location,
         quantity = quantity
     )
+    try:
+        added = ProductStock.objects.get(product__id=product_id, product__location = from_location_id )
+        print(added)
+    except Exception as err:
+        print(err)
+    
+    
 
     serialized = ProductStockTransferSerializer(cunsumption_obj)
 

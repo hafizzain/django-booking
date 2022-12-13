@@ -247,6 +247,7 @@ def create_storetarget(request):
     )
     
     if type(store_tier) == str:
+        store_tier = store_tier.replace("'" , '"')
         store_tier = json.loads(store_tier)
 
     elif type(store_tier) == list:

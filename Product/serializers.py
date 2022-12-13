@@ -93,7 +93,7 @@ class ProductStockSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductStock
         fields = ['id', 'location', 'low_stock', 'current_stock', 
-                  'reorder_quantity', 'available_quantity', 'sold_quantity',
+                  'reorder_quantity', 'available_quantity',
                   'sellable_quantity','consumable_quantity' , 'amount', 'unit' ,
                   'alert_when_stock_becomes_lowest', 'sold_quantity','is_active' ]
 
@@ -163,7 +163,15 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id']
         
+class ProductStockTransferlocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductStockTransfer
+        fields = '__all__'
         
+class ProductConsumptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductConsumption
+        fields = '__all__'
 
 class ProductSerializer(serializers.ModelSerializer):
     brand=BrandSerializer(read_only=True)
@@ -174,8 +182,21 @@ class ProductSerializer(serializers.ModelSerializer):
     stocks = serializers.SerializerMethodField(read_only=True)
     location_quantities = serializers.SerializerMethodField(read_only=True)
     cover_image = serializers.SerializerMethodField()
+    consumed = serializers.SerializerMethodField()
+    stocktransfer = serializers.SerializerMethodField()
     
     location = serializers.SerializerMethodField()
+    
+    def get_stocktransfer(self, obj):
+        
+            stocktransfer = ProductStockTransfer.objects.filter(product = obj)
+            return ProductStockTransferlocationSerializer( stocktransfer, many = True).data
+        
+    def get_consumed(self, obj):
+        
+            comsumption = ProductConsumption.objects.filter(product = obj)
+            return ProductConsumptionSerializer( comsumption, many = True).data
+
     
     def get_location(self, obj):
         try:
@@ -241,6 +262,8 @@ class ProductSerializer(serializers.ModelSerializer):
             'category',
             'brand', 
             'created_at',
+            'consumed',
+            'stocktransfer',
             'location'
         ]
         read_only_fields = ['slug', 'id']
