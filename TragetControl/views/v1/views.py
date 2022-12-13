@@ -6,12 +6,31 @@ from NStyle.Constants import StatusCodes
 from rest_framework import status
 from Business.models import Business
 from TragetControl.models import StaffTarget
+from TragetControl.serializers import StaffTargetSerializers
 
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_stafftarget(request):
+    staff_target = StaffTarget.objects.all().order_by('-created_at')   
+    serializer = StaffTargetSerializers(staff_target, many = True,context={'request' : request})
+    
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Staff Target',
+                'error_message' : None,
+                'stafftarget' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def import_employee(request):
+def create_stafftarget(request):
     user= request.user
     business = request.data.get('business', None)
     employee = request.data.get('employee', None)
@@ -76,5 +95,70 @@ def import_employee(request):
         month = month,
         service_target = service_target,
         retail_target = retail_target,
+    )
+    
+    serializers= StaffTargetSerializers(staff_target, context={'request' : request})
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Staff Target Created Successfully!',
+                    'error_message' : None,
+                    'stafftarget' : serializers.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        ) 
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_stafftarget(request):
+    stafftarget_id = request.data.get('id', None)
+    if stafftarget_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        staff_target = StaffTarget.objects.get(id=stafftarget_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Staff Target ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    staff_target.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Staff Target delete successfully',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
     )
     
