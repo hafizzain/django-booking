@@ -61,11 +61,11 @@ class TierStoreTargetSerializers(serializers.ModelSerializer):
         fields = '__all__'
 class StoreTargetSerializers(serializers.ModelSerializer):
     tier = serializers.SerializerMethodField()
-    location_name = serializers.SerializerMethodField()
+    location = serializers.SerializerMethodField()
     
     def get_location(self, obj):
         try:
-            loc = BusinessAddress.objects.get(id = obj.location)
+            loc = BusinessAddress.objects.get(id = str(obj.location))
             return BusinessAddressSerializers(loc).data
         except Exception as err:
             print(err)
