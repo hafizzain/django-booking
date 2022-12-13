@@ -11,6 +11,7 @@ urlpatterns = [
     #Store Target
     path('get_storetarget/', views.get_storetarget),
     path('create_storetarget/', views.create_storetarget),
+    path('delete_storetarget/', views.delete_storetarget),
 
     
 
