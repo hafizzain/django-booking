@@ -280,10 +280,10 @@ def create_storetarget(request):
     
     return Response(
         {
-            'status' : 201,
+            'status' : True,
             'status_code' : '201',
             'response' : {
-                'message' : 'All Store Target',
+                'message' : 'Store Target Successfully!',
                 'error_message' : None,
                 'storetarget' : serializer.data
             }

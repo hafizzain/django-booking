@@ -6,8 +6,9 @@ from django.utils.timezone import now
 from Authentication.models import User
 from Business.models import Business, BusinessAddress
 from Employee.models import Employee
+from Product.models import Brand
 from Utility.models import Country, State, City
-from Service.models  import Service
+from Service.models  import Service, ServiceGroup
 
 class StaffTarget(models.Model):
     MONTH_CHOICE =[
@@ -86,5 +87,60 @@ class TierStoreTarget(models.Model):
     def __str__(self):
         return str(self.id)
     
+class ServiceTarget(models.Model):
+    MONTH_CHOICE =[
+        ('January', 'January'),
+        ('February', 'February'),
+        ('March', 'March'),
+        ('April', 'April'),
+        ('May', 'May'),
+        ('June', 'June'),
+        ('July', 'July'),
+        ('August', 'August'),
+        ('September', 'September'),
+        ('October', 'October'),
+        ('November', 'November'),
+        ('December', 'December'),
+    ]
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_servicetarget')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_servicetarget')
+    
+    location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, related_name='location_servicetarget')
+    service_group = models.ForeignKey(ServiceGroup, on_delete=models.SET_NULL, null=True, related_name='servicegroup_servicetarget')
+    
+    month = models.CharField(choices=MONTH_CHOICE, max_length=100, default='January')
 
+    service_target = models.PositiveIntegerField(default=0)
+    
+    def __str__(self):
+        return str(self.id)
+    
+class RetailTarget(models.Model):
+    MONTH_CHOICE =[
+        ('January', 'January'),
+        ('February', 'February'),
+        ('March', 'March'),
+        ('April', 'April'),
+        ('May', 'May'),
+        ('June', 'June'),
+        ('July', 'July'),
+        ('August', 'August'),
+        ('September', 'September'),
+        ('October', 'October'),
+        ('November', 'November'),
+        ('December', 'December'),
+    ]
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_retailtarget')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_retailtarget')
+    
+    location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, related_name='location_retailtarget')
+    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, related_name='brand_retailtarget')
+    
+    month = models.CharField(choices=MONTH_CHOICE, max_length=100, default='January')
 
+    brand_target = models.PositiveIntegerField(default=0)
+    
+    def __str__(self):
+        return str(self.id)

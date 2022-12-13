@@ -102,6 +102,7 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
     category= CategorySerializer(read_only=True)
     brand = serializers.SerializerMethodField()
     vendor= VendorSerializer(read_only=True)
+    stocktransfer = serializers.SerializerMethodField()
     #transfer_quantity = serializers.SerializerMethodField(read_only=True)
     
     # def get_transfer_quantity(self, obj):
@@ -111,8 +112,11 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
     #         ExceptionRecord.objects.create(
     #             text = f"Product quantity issue {str(err)}"
     #         ) 
-
-
+    
+    def get_stocktransfer(self, obj):
+            stocktransfer = ProductStockTransfer.objects.filter(product = obj)
+            return ProductStockTransferlocationSerializer( stocktransfer, many = True).data
+    
     def get_brand(self, obj):
         brand = BrandSerializer(obj.brand, read_only=True, context=self.context)
         return brand.data
@@ -160,6 +164,8 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
             'brand', 
             'vendor',
             'stock',
+            'stocktransfer',
+            
         ]
         read_only_fields = ['id']
         

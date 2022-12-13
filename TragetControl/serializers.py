@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from Business.models import BusinessAddress
 from Employee.models import Employee, EmployeeProfessionalInfo
 from Product.Constants.index import tenant_media_base_url
 
@@ -47,6 +48,12 @@ class StaffTargetSerializers(serializers.ModelSerializer):
         model = StaffTarget
         fields = '__all__'
 
+class BusinessAddressSerializers(serializers.ModelSerializer):
+    
+    class Meta:
+        model = BusinessAddress
+        fields = ['id', 'address_name' ]
+
 class TierStoreTargetSerializers(serializers.ModelSerializer):
     
     class Meta:
@@ -54,6 +61,14 @@ class TierStoreTargetSerializers(serializers.ModelSerializer):
         fields = '__all__'
 class StoreTargetSerializers(serializers.ModelSerializer):
     tier = serializers.SerializerMethodField()
+    location_name = serializers.SerializerMethodField()
+    
+    def get_location(self, obj):
+        try:
+            loc = BusinessAddress.objects.get(id = obj.location)
+            return BusinessAddressSerializers(loc).data
+        except Exception as err:
+            print(err)
     
     def get_tier(self,obj):
         try:
