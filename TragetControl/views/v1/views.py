@@ -167,7 +167,7 @@ def delete_stafftarget(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_storetarget(request):
-    store_target = StoreTarget.objects.all().order_by('-created_at')   
+    store_target = StoreTarget.objects.all().order_by('-created_at').distinct()
     serializer = StoreTargetSerializers(store_target, many = True,context={'request' : request})
     
     return Response(
@@ -280,15 +280,15 @@ def create_storetarget(request):
     
     return Response(
         {
-            'status' : 200,
-            'status_code' : '200',
+            'status' : 201,
+            'status_code' : '201',
             'response' : {
                 'message' : 'All Store Target',
                 'error_message' : None,
                 'storetarget' : serializer.data
             }
         },
-        status=status.HTTP_200_OK
+        status=status.HTTP_201_CREATED
     ) 
 
 
