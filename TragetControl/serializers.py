@@ -57,7 +57,7 @@ class StoreTargetSerializers(serializers.ModelSerializer):
     
     def get_tier(self,obj):
         try:
-            tier = TierStoreTarget.objects.filter(id = obj.storetarget , is_primary = True )
+            tier = TierStoreTarget.objects.filter(storetarget = obj, is_primary = True )
             return TierStoreTargetSerializers(tier,many = True ,context=self.context).data
         except Exception as err:
             print(err)

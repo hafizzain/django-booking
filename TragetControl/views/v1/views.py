@@ -203,10 +203,7 @@ def create_storetarget(request):
                     'error_message' : 'All fields are required.',
                     'fields' : [
                           'business',
-                          'employee',
-                          'month', 
-                          'service_target',
-                          'retail_target',
+                          'location',
                             ]
                 }
             },
@@ -254,6 +251,7 @@ def create_storetarget(request):
 
     elif type(store_tier) == list:
         pass
+    
     for tier in store_tier:
         month = tier.get('month', None)
         service_target = tier.get('service_target', None)
