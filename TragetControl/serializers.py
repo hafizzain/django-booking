@@ -2,7 +2,7 @@ from rest_framework import serializers
 from Employee.models import Employee, EmployeeProfessionalInfo
 from Product.Constants.index import tenant_media_base_url
 
-from TragetControl.models import StaffTarget
+from TragetControl.models import StaffTarget, StoreTarget, TierStoreTarget
 
 
 class EmployeeNameSerializer(serializers.ModelSerializer):
@@ -45,4 +45,23 @@ class StaffTargetSerializers(serializers.ModelSerializer):
             print(err)
     class Meta:
         model = StaffTarget
+        fields = '__all__'
+
+class TierStoreTargetSerializers(serializers.ModelSerializer):
+    
+    class Meta:
+        model = TierStoreTarget
+        fields = '__all__'
+class StoreTargetSerializers(serializers.ModelSerializer):
+    tier = serializers.SerializerMethodField()
+    
+    def get_tier(self,obj):
+        try:
+            tier = TierStoreTarget.objects.filter(id = obj.storetarget , is_primary = True )
+            return TierStoreTargetSerializers(tier,many = True ,context=self.context).data
+        except Exception as err:
+            print(err)
+    
+    class Meta:
+        model = StoreTarget
         fields = '__all__'
