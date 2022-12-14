@@ -165,6 +165,7 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
             'vendor',
             'stock',
             'stocktransfer',
+            'location'
             
         ]
         read_only_fields = ['id']
