@@ -19,5 +19,6 @@ urlpatterns = [
     path('create_servicetarget/', views.create_servicetarget),
     path('get_servicetarget/', views.get_servicetarget),
     path('delete_servicetarget/', views.delete_servicetarget),
+    path('update_servicetarget/', views.update_servicetarget),
 
 ]

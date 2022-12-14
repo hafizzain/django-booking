@@ -207,7 +207,7 @@ def update_stafftarget(request):
             'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
             'response' : {
                 'message' : 'Staff Target Serializer Invalid',
-                'error_message' : str(err),
+                'error_message' : 'Error on update staff Target',
             }
         },
         status=status.HTTP_404_NOT_FOUND
@@ -635,3 +635,52 @@ def delete_servicetarget(request):
         },
         status=status.HTTP_200_OK
     )
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def update_servicetarget(request):
+    servicetarget_id = request.data.get('id', None)
+    if servicetarget_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        service_target = ServiceTarget.objects.get(id=servicetarget_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Service Target ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    serializers= ServiceTargetSerializers(service_target,data=request.data, partial=True, context={'request' : request} )
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Service Target Created Successfully!',
+                    'error_message' : None,
+                    'servicetarget' : serializers.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        ) 
