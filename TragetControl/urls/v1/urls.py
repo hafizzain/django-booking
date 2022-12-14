@@ -12,7 +12,10 @@ urlpatterns = [
     path('get_storetarget/', views.get_storetarget),
     path('create_storetarget/', views.create_storetarget),
     path('delete_storetarget/', views.delete_storetarget),
-
+    path('delete_storetarget/', views.update_storetarget),
     
+    #Service Target
+    path('create_servicetarget/', views.create_servicetarget),
+    path('get_servicetarget/', views.get_servicetarget),
 
 ]

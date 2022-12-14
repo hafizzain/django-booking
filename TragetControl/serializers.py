@@ -3,7 +3,7 @@ from Business.models import BusinessAddress
 from Employee.models import Employee, EmployeeProfessionalInfo
 from Product.Constants.index import tenant_media_base_url
 
-from TragetControl.models import StaffTarget, StoreTarget, TierStoreTarget
+from TragetControl.models import ServiceTarget, StaffTarget, StoreTarget, TierStoreTarget
 
 
 class EmployeeNameSerializer(serializers.ModelSerializer):
@@ -79,4 +79,10 @@ class StoreTargetSerializers(serializers.ModelSerializer):
     
     class Meta:
         model = StoreTarget
+        fields = '__all__'
+        
+class ServiceTargetSerializers(serializers.ModelSerializer):
+    
+    class Meta:
+        model = ServiceTarget
         fields = '__all__'
