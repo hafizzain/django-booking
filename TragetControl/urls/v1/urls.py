@@ -28,4 +28,5 @@ urlpatterns = [
     path('get_retailtarget/', views.get_retailtarget),
     path('delete_retailtarget/', views.delete_retailtarget),
     path('update_retailtarget/', views.update_retailtarget),
+    path('copy_retailtarget/', views.copy_retailtarget),
 ]

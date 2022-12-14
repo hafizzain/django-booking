@@ -88,8 +88,8 @@ class ProductStockSerializer(serializers.ModelSerializer):
             
     def get_status_text(self, obj):
         try:
-            quantity = obj.available_quantity - obj.sold_quantity
-            return 'In Stock' if int(quantity) > 0 else 'Out of stock'
+            #quantity = obj.available_quantity - obj.sold_quantity
+            return 'Highest' if int(obj.sold_quantity) > 50 else 'Lowest'
         except Exception as err:
             print(err)
             

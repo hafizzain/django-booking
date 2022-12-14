@@ -1723,12 +1723,25 @@ def add_product_consumption(request):
     )
     try:
         consumed = ProductStock.objects.get(product__id=product_id, location = location_id )
-        sold = consumed.available_quantity - int(quantity)
-        consumed.available_quantity = sold
-        consumed.sold_quantity += int(quantity)
-        
-        consumed.save()
-        
+        if consumed.available_quantity > int(quantity):
+            sold = consumed.available_quantity - int(quantity)
+            consumed.available_quantity = sold
+            consumed.sold_quantity += int(quantity)
+            consumed.save()
+        else:
+            return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'available_quantity_less_then',
+                'response' : {
+                    'message' : 'Available_quantity less then quantity',
+                    'error_message' : 'Quantity Error',
+                    
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
     except Exception as err:
         ExceptionRecord.objects.create(
             is_resolved = True, 
@@ -1837,7 +1850,34 @@ def update_product_consumptions(request):
     product_con.location = location
     product_con.quantity = quantity
     product_con.save()
-
+    
+    try:
+        consumed = ProductStock.objects.get(product__id=product, location = location )
+        if consumed.available_quantity > int(quantity):
+            sold = consumed.available_quantity - int(quantity)
+            consumed.available_quantity = sold
+            consumed.sold_quantity += int(quantity)
+            consumed.save()
+        else:
+            return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'available_quantity_less_then',
+                'response' : {
+                    'message' : 'Available_quantity less then quantity',
+                    'error_message' : 'Quantity Error',
+                    
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as err:
+        ExceptionRecord.objects.create(
+            is_resolved = True, 
+            text= str(err)
+        )
+    
     serialized = ProductConsumptionSerializer(product_con)
     return Response(
         {

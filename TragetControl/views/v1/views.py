@@ -1194,7 +1194,7 @@ def update_retailtarget(request):
             'status' : False,
             'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
             'response' : {
-                'message' : 'Staff Target Serializer Invalid',
+                'message' : 'Retail Target Serializer Invalid',
                 'error_message' : 'Error on update Retail Target',
             }
         },
@@ -1208,8 +1208,102 @@ def update_retailtarget(request):
             'response' : {
                 'message' : 'Update Retail Target Successfully',
                 'error_message' : None,
-                'stafftarget' : serializer.data
+                'retailtarget' : serializer.data
             }
         },
         status=status.HTTP_200_OK
         )
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def copy_retailtarget(request):
+    user = request.user
+    from_month = request.data.get('from_month', None)
+    to_month = request.data.get('to_month', None)
+    
+    if not all([from_month, to_month]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'from_month',
+                        'to_month',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        ) 
+    retail_target_id = RetailTarget.objects.filter(month__icontains = from_month)
+    for retail in retail_target_id:
+        try:
+            business_id=Business.objects.get(id=str(retail.business))
+        except Exception as err:
+            return Response(
+                    {
+                        'status' : False,
+                        'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                        'response' : {
+                        'message' : 'Business not found',
+                        'error_message' : str(err),
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        try:
+            location_id = BusinessAddress.objects.get( id = str(retail.location))
+        except:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 404,
+                    'status_code_text' : 'OBJECT_NOT_FOUND',
+                    'response' : {
+                        'message' : 'Location Not found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        try:
+            brand_id = Brand.objects.get( id = str(retail.brand))
+        except:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 404,
+                    'status_code_text' : 'OBJECT_NOT_FOUND',
+                    'response' : {
+                        'message' : 'Brand Not found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        retail = RetailTarget.objects.create(
+            user = user,
+            business = business_id,
+            location = location_id,
+            brand = brand_id,
+            month =to_month,
+            brand_target = retail.brand_target,
+        )
+    retail_target = RetailTarget.objects.all().order_by('-created_at').distinct()
+    serializer = RetailTargetSerializers(retail_target, many = True,context={'request' : request})
+    
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Retail Target',
+                'error_message' : None,
+                'retailtarget' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+    ) 
