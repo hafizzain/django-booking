@@ -26,6 +26,8 @@ from Product.serializers import (CategorySerializer, BrandSerializer, ProductSer
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_test_api(request):
+    product_id = request.data.get('product_id', None)
+    from_location_id = request.data.get('from_location_id', None)
     # service_id = "ed9b3e32-4f1f-469a-a065-ea9805ee0edc"
     # location = "fef70b9b-c42d-4b3e-bf54-f4d1b5513f6b"
     # product = Product.objects.get(id = service_id)
@@ -41,6 +43,15 @@ def get_test_api(request):
     product = Product.objects.all()
     # for i in product:
     #     data =  ProductStockTransfer.objects.filter(product = i).aggregate(Sum('quantity'))
+    try:
+        added = ProductStock.objects.get(product__id=product_id, location = from_location_id )
+        sold = added.available_quantity - 3
+        added.available_quantity = sold
+        added.save()
+        print(sold)
+        print(added.available_quantity)
+    except Exception as err:
+        print(err)
     data = 'test'
     return Response(
         {
@@ -1970,8 +1981,16 @@ def add_product_stock_transfer(request):
         quantity = quantity
     )
     try:
-        added = ProductStock.objects.get(product__id=product_id, product__location = from_location_id )
-        print(added)
+        transfer = ProductStock.objects.get(product__id=product_id, location = from_location_id )
+        sold = transfer.available_quantity - int(quantity)
+        transfer.available_quantity = sold
+        transfer.save()
+        
+        transfer = ProductStock.objects.get(product__id=product_id, location = to_location_id )
+        sold = transfer.available_quantity + int(quantity)
+        transfer.available_quantity = sold
+        transfer.save()
+        
     except Exception as err:
         print(err)
     
