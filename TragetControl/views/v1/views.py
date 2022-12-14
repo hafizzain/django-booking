@@ -518,7 +518,7 @@ def update_storetarget(request):
             tier_store.is_primary = False
         tier_store.save()
     
-    serializer = StoreTargetSerializers(staff_target, data=request.data, partial=True, context={'request' : request})
+    serializer = StoreTargetSerializers(staff_target, context={'request' : request})
     
     return Response(
         {
