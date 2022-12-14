@@ -2,6 +2,7 @@ from rest_framework import serializers
 from Business.models import BusinessAddress
 from Employee.models import Employee, EmployeeProfessionalInfo
 from Product.Constants.index import tenant_media_base_url
+from Service.models import ServiceGroup
 
 from TragetControl.models import ServiceTarget, StaffTarget, StoreTarget, TierStoreTarget
 
@@ -48,6 +49,12 @@ class StaffTargetSerializers(serializers.ModelSerializer):
         model = StaffTarget
         fields = '__all__'
 
+class ServiceGroupSerializers(serializers.ModelSerializer):
+    
+    class Meta:
+        model = ServiceGroup
+        fields = ['id', 'name' ]
+
 class BusinessAddressSerializers(serializers.ModelSerializer):
     
     class Meta:
@@ -83,6 +90,23 @@ class StoreTargetSerializers(serializers.ModelSerializer):
         
 class ServiceTargetSerializers(serializers.ModelSerializer):
     
+    location = serializers.SerializerMethodField()
+    service_group = serializers.SerializerMethodField()
+    
+    def get_location(self, obj):
+        try:
+            loc = BusinessAddress.objects.get(id = str(obj.location))
+            return BusinessAddressSerializers(loc).data
+        except Exception as err:
+            print(err)
+            
+    def get_service_group(self, obj):
+        try:
+            loc = ServiceGroup.objects.get(id = str(obj.service_group))
+            return ServiceGroupSerializers(loc).data
+        except Exception as err:
+            print(err)
+    
     class Meta:
         model = ServiceTarget
-        fields = '__all__'
+        fields = ['id', 'location', 'service_group', 'month','service_target']

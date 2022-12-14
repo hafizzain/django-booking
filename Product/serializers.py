@@ -75,6 +75,30 @@ class VendorSerializer(serializers.ModelSerializer):
 class ProductStockSerializer(serializers.ModelSerializer):
     current_stock = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField()
+    turnover = serializers.SerializerMethodField()
+    status_text = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+    
+    def get_turnover(self, obj):
+        try:
+            quantity = obj.available_quantity - obj.sold_quantity
+            return 'Highest' if int(quantity) > 0 else 'Lowest' 
+        except Exception as err:
+            print(err)
+            
+    def get_status_text(self, obj):
+        try:
+            quantity = obj.available_quantity - obj.sold_quantity
+            return 'In Stock' if int(quantity) > 0 else 'Out of stock'
+        except Exception as err:
+            print(err)
+            
+    def get_status(self, obj):
+        try:
+            quantity = obj.available_quantity - obj.sold_quantity
+            return 'True' if int(quantity) > 0 else 'False'
+        except Exception as err:
+            print(err)
     
     def get_location(self, obj):
         try:
@@ -95,7 +119,7 @@ class ProductStockSerializer(serializers.ModelSerializer):
         fields = ['id', 'location', 'low_stock', 'current_stock', 
                   'reorder_quantity', 'available_quantity',
                   'sellable_quantity','consumable_quantity' , 'amount', 'unit' ,
-                  'alert_when_stock_becomes_lowest', 'sold_quantity','is_active' ]
+                  'alert_when_stock_becomes_lowest', 'sold_quantity','turnover','status_text','status','is_active' ]
 
 class ProductWithStockSerializer(serializers.ModelSerializer):
     stock = serializers.SerializerMethodField()
@@ -122,34 +146,36 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
         return brand.data
 
     def get_stock(self, obj):
-        stock = ProductStock.objects.filter(product=obj, is_deleted=False)[0]
-        total_qant = 0
-        try:
-            if stock.product.product_type == 'SELABLE':
-                total_qant = stock.sellable_quantity 
-            elif stock.product.product_type == 'COMSUME' :
-                total_qant = stock.consumable_quantity
-            else:
-                total_qant = int(stock.sellable_quantity) + int(stock.consumable_quantity)
+        stock = ProductStock.objects.filter(product=obj, is_deleted=False)#[0]
+        return ProductStockSerializer(stock, many = True).data
+        
+        # total_qant = 0
+        # try:
+        #     if stock.product.product_type == 'SELABLE':
+        #         total_qant = stock.sellable_quantity 
+        #     elif stock.product.product_type == 'COMSUME' :
+        #         total_qant = stock.consumable_quantity
+        #     else:
+        #         total_qant = int(stock.sellable_quantity) + int(stock.consumable_quantity)
 
             
-        except Exception as err:
-            print(err)
-        #print(type(available_quantity))
-        #print(int(available_quantity[0]))
-        available_quantity = total_qant -  stock.sold_quantity,
-        return {            
-            'id' : stock.id,
-            'available_stock' : int(available_quantity[0]),
-            'quantity' : stock.sellable_quantity,
-            'sold_stock' : stock.sold_quantity,
-            'price' : stock.product.sell_price,
-            'usage' : (int(total_qant) // int(stock.sold_quantity)) * 100 if stock.sold_quantity > 0 else 100,
-            'status' : True if int(available_quantity[0]) > 0 else False,
-            'status_text' : 'In Stock' if int(available_quantity[0]) > 0 else 'Out of stock',
-            'sale_status' : 'High',
-            'turnover' : 'Highest' if int(available_quantity[0]) > 0 else 'Lowest' ,
-        }
+        # except Exception as err:
+        #     print(err)
+        # #print(type(available_quantity))
+        # #print(int(available_quantity[0]))
+        # available_quantity = total_qant -  stock.sold_quantity,
+        # return {            
+        #     'id' : stock.id,
+        #     'available_stock' : int(available_quantity[0]),
+        #     'quantity' : stock.sellable_quantity,
+        #     'sold_stock' : stock.sold_quantity,
+        #     'price' : stock.product.sell_price,
+        #     'usage' : (int(total_qant) // int(stock.sold_quantity)) * 100 if stock.sold_quantity > 0 else 100,
+        #     'status' : True if int(available_quantity[0]) > 0 else False,
+        #     'status_text' : 'In Stock' if int(available_quantity[0]) > 0 else 'Out of stock',
+        #     'sale_status' : 'High',
+        #     'turnover' : 'Highest' if int(available_quantity[0]) > 0 else 'Lowest' ,
+        # }
         
 
     class Meta:

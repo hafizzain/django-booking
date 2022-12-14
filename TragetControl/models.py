@@ -113,6 +113,9 @@ class ServiceTarget(models.Model):
 
     service_target = models.PositiveIntegerField(default=0)
     
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(null=True, auto_now_add=now) 
+    
     def __str__(self):
         return str(self.id)
     
@@ -141,6 +144,9 @@ class RetailTarget(models.Model):
     month = models.CharField(choices=MONTH_CHOICE, max_length=100, default='January')
 
     brand_target = models.PositiveIntegerField(default=0)
+    
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=now, null= True) 
     
     def __str__(self):
         return str(self.id)

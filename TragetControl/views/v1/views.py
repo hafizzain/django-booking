@@ -6,6 +6,7 @@ from Employee.models import Employee, StaffGroup
 from NStyle.Constants import StatusCodes
 from rest_framework import status
 from Business.models import Business, BusinessAddress
+from Service.models import ServiceGroup
 from TragetControl.models import ServiceTarget, StaffTarget, StoreTarget, TierStoreTarget
 from TragetControl.serializers import ServiceTargetSerializers, StaffTargetSerializers, StoreTargetSerializers
 
@@ -162,6 +163,68 @@ def delete_stafftarget(request):
         },
         status=status.HTTP_200_OK
     )
+    
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_stafftarget(request):
+    stafftarget_id = request.data.get('id', None)
+    if stafftarget_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        staff_target = StaffTarget.objects.get(id=stafftarget_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Staff Target ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    serializer = StaffTargetSerializers(staff_target, data=request.data, partial=True, context={'request' : request})
+    if not serializer.is_valid():
+        return Response(
+                {
+            'status' : False,
+            'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+            'response' : {
+                'message' : 'Staff Target Serializer Invalid',
+                'error_message' : str(err),
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+        )
+    serializer.save()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Update Satff Target Successfully',
+                'error_message' : None,
+                'asset' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+        )
     
     
 @api_view(['GET'])
@@ -464,7 +527,7 @@ def create_servicetarget(request):
         )
     
     try:
-        service_group = StaffGroup.objects.get(id=service_group)
+        service_group_id = ServiceGroup.objects.get(id=service_group)
     except Exception as err:
         return Response(
             {
@@ -472,7 +535,7 @@ def create_servicetarget(request):
                 'status_code' : 404,
                 'status_code_text' : '404',
                 'response' : {
-                    'message' : 'Invalid Employee ID!',
+                    'message' : 'Invalid Service group ID!',
                     'error_message' : str(err),
                 }
             },
@@ -485,7 +548,7 @@ def create_servicetarget(request):
         location = location_id,
         month = month,
         service_target = service_target,
-        service_group = service_group,
+        service_group = service_group_id,
     )
     
     serializers= ServiceTargetSerializers(service_target, context={'request' : request})
@@ -522,3 +585,53 @@ def get_servicetarget(request):
         },
         status=status.HTTP_200_OK
     ) 
+    
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_servicetarget(request):
+    servicetarget_id = request.data.get('id', None)
+    if servicetarget_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        service_target = ServiceTarget.objects.get(id=servicetarget_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Service Target ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    service_target.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Service Target deleted successfully',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
