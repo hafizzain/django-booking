@@ -874,17 +874,17 @@ def update_servicetarget(request):
         )
     serializers.save()
     return Response(
-            {
-                'status' : True,
-                'status_code' : 201,
-                'response' : {
-                    'message' : 'Service Target Updated Successfully!',
-                    'error_message' : None,
-                    'servicetarget' : serializers.data,
-                }
-            },
-            status=status.HTTP_201_CREATED
-        ) 
+        {
+            'status' : True,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Store Target updated Successfully!',
+                'error_message' : None,
+                'servicetarget' : serializers.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )    
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -1156,6 +1156,8 @@ def delete_retailtarget(request):
 @permission_classes([IsAuthenticated])
 def update_retailtarget(request):
     retailtarget_id = request.data.get('id', None)
+    brand = request.data.get('brand', None)
+    
     if retailtarget_id is None: 
        return Response(
             {
@@ -1182,6 +1184,23 @@ def update_retailtarget(request):
                 'status_code_text' : '404',
                 'response' : {
                     'message' : 'Invalid Retail Target ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    try:
+        brand_id = Brand.objects.get( id = brand)
+        retail_target.brand = brand_id
+        retail_target.save()
+    except:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Brand Not found',
                     'error_message' : str(err),
                 }
             },

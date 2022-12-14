@@ -2036,10 +2036,11 @@ def add_product_stock_transfer(request):
     )
     try:
         transfer = ProductStock.objects.get(product__id=product_id, location = from_location_id )
-        sold = transfer.available_quantity - int(quantity)
-        transfer.available_quantity = sold
-        transfer.sold_quantity += int(quantity)
-        transfer.save()
+        if transfer.available_quantity > int(quantity):
+            sold = transfer.available_quantity - int(quantity)
+            transfer.available_quantity = sold
+            transfer.sold_quantity += int(quantity)
+            transfer.save()
         
         transfer = ProductStock.objects.get(product__id=product_id, location = to_location_id )
         sold = transfer.available_quantity + int(quantity)
