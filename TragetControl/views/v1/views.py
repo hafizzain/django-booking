@@ -572,9 +572,9 @@ def update_storetarget(request):
                 tierstore.membership_target = membership_target
                 
                 if bool(is_primary) == True:
-                    tier_store.is_primary = True
+                    tierstore.is_primary = True
                 else:
-                    tier_store.is_primary = False 
+                    tierstore.is_primary = False 
                 
                 tierstore.save()
             except Exception as err:
@@ -583,7 +583,7 @@ def update_storetarget(request):
                 )
             
         else:
-            tier_store =  TierStoreTarget.objects.create(
+            tier =  TierStoreTarget.objects.create(
                 storetarget = staff_target,
                 month = month,
                 service_target = service_target,
@@ -593,10 +593,10 @@ def update_storetarget(request):
                 
             )
             if is_primary is not None:
-                tier_store.is_primary = True
+                tier.is_primary = True
             else:
-                tier_store.is_primary = False
-            tier_store.save()
+                tier.is_primary = False
+            tier.save()
     
     serializer = StoreTargetSerializers(staff_target, context={'request' : request})
     
