@@ -9,7 +9,8 @@ from Business.models import Business, BusinessAddress
 from Product.models import Brand
 from Service.models import ServiceGroup
 from TragetControl.models import RetailTarget, ServiceTarget, StaffTarget, StoreTarget, TierStoreTarget
-from TragetControl.serializers import RetailTargetSerializers, ServiceTargetSerializers, StaffTargetSerializers, StoreTargetSerializers
+from TragetControl.serializers import GETStoreTargetSerializers, RetailTargetSerializers, ServiceTargetSerializers, StaffTargetSerializers, StoreTargetSerializers
+from Utility.models import ExceptionRecord
 
 
 @api_view(['GET'])
@@ -232,7 +233,7 @@ def update_stafftarget(request):
 @permission_classes([AllowAny])
 def get_storetarget(request):
     store_target = StoreTarget.objects.all().order_by('-created_at').distinct()
-    serializer = StoreTargetSerializers(store_target, many = True,context={'request' : request})
+    serializer = GETStoreTargetSerializers(store_target, many = True,context={'request' : request})
     
     return Response(
         {
@@ -433,7 +434,24 @@ def update_storetarget(request):
         is_primary = tier.get('is_primary', None)
         
         if id is not None:
-            TierStoreTarget.objects.get(id = id)
+            try:
+                tierstore = TierStoreTarget.objects.get(id = id)
+                tierstore.month = month
+                tierstore.service_target = service_target
+                tierstore.retail_target = retail_target
+                tierstore.voucher_target = voucher_target
+                tierstore.membership_target = membership_target
+                
+                if bool(is_primary) == True:
+                    tier_store.is_primary = True
+                else:
+                    tier_store.is_primary = False 
+                
+                tierstore.save()
+            except Exception as err:
+                ExceptionRecord.objects.create(
+                    text = f"Update tier store target {str(err)}"
+                )
             
         
         tier_store =  TierStoreTarget.objects.create(

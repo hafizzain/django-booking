@@ -73,7 +73,8 @@ class TierStoreTargetSerializers(serializers.ModelSerializer):
     class Meta:
         model = TierStoreTarget
         fields = '__all__'
-class StoreTargetSerializers(serializers.ModelSerializer):
+        
+class GETStoreTargetSerializers(serializers.ModelSerializer):
     tier = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField()
     
@@ -87,6 +88,27 @@ class StoreTargetSerializers(serializers.ModelSerializer):
     def get_tier(self,obj):
         try:
             tier = TierStoreTarget.objects.filter(storetarget = obj, is_primary = True )
+            return TierStoreTargetSerializers(tier,many = True ,context=self.context).data
+        except Exception as err:
+            print(err)
+    
+    class Meta:
+        model = StoreTarget
+        fields = '__all__'
+class StoreTargetSerializers(serializers.ModelSerializer):
+    tier = serializers.SerializerMethodField()
+    location = serializers.SerializerMethodField()
+    
+    def get_location(self, obj):
+        try:
+            loc = BusinessAddress.objects.get(id = str(obj.location))
+            return BusinessAddressSerializers(loc).data
+        except Exception as err:
+            print(err)
+    
+    def get_tier(self,obj):
+        try:
+            tier = TierStoreTarget.objects.filter(storetarget = obj)
             return TierStoreTargetSerializers(tier,many = True ,context=self.context).data
         except Exception as err:
             print(err)
