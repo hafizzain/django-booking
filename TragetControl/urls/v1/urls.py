@@ -24,4 +24,6 @@ urlpatterns = [
     #Retail Target
     path('create_retailtarget/', views.create_retailtarget),
     path('get_retailtarget/', views.get_retailtarget),
+    path('delete_retailtarget/', views.delete_retailtarget),
+    path('update_retailtarget/', views.update_retailtarget),
 ]

@@ -637,7 +637,7 @@ def delete_servicetarget(request):
         status=status.HTTP_200_OK
     )
 
-@api_view(['DELETE'])
+@api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_servicetarget(request):
     servicetarget_id = request.data.get('id', None)
@@ -802,3 +802,115 @@ def get_retailtarget(request):
         },
         status=status.HTTP_200_OK
     ) 
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_retailtarget(request):
+    retailtarget_id = request.data.get('id', None)
+    if retailtarget_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        retail_target = RetailTarget.objects.get(id=retailtarget_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Retail Target ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    retail_target.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Retail Target delete successfully',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_retailtarget(request):
+    retailtarget_id = request.data.get('id', None)
+    if retailtarget_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        retail_target = RetailTarget.objects.get(id=retailtarget_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Retail Target ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    serializer = RetailTargetSerializers(retail_target, data=request.data, partial=True, context={'request' : request})
+    if not serializer.is_valid():
+        return Response(
+                {
+            'status' : False,
+            'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+            'response' : {
+                'message' : 'Staff Target Serializer Invalid',
+                'error_message' : 'Error on update Retail Target',
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+        )
+    serializer.save()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Update Retail Target Successfully',
+                'error_message' : None,
+                'stafftarget' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+        )

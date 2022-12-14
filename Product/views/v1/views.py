@@ -1721,6 +1721,18 @@ def add_product_consumption(request):
         location = location,
         quantity = quantity
     )
+    try:
+        consumed = ProductStock.objects.get(product__id=product_id, location = location_id )
+        sold = consumed.available_quantity - int(quantity)
+        consumed.available_quantity = sold
+        consumed.save()
+        
+    except Exception as err:
+        ExceptionRecord.objects.create(
+            is_resolved = True, 
+            text= str(err)
+        )
+    
 
     serialized = ProductConsumptionSerializer(cunsumption_obj)
 
