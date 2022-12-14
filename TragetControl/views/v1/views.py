@@ -582,21 +582,21 @@ def update_storetarget(request):
                     text = f"Update tier store target {str(err)}"
                 )
             
-        
-        tier_store =  TierStoreTarget.objects.create(
-            storetarget = staff_target,
-            month = month,
-            service_target = service_target,
-            retail_target = retail_target,
-            voucher_target = voucher_target,
-            membership_target = membership_target,
-            
-        )
-        if is_primary is not None:
-            tier_store.is_primary = True
         else:
-            tier_store.is_primary = False
-        tier_store.save()
+            tier_store =  TierStoreTarget.objects.create(
+                storetarget = staff_target,
+                month = month,
+                service_target = service_target,
+                retail_target = retail_target,
+                voucher_target = voucher_target,
+                membership_target = membership_target,
+                
+            )
+            if is_primary is not None:
+                tier_store.is_primary = True
+            else:
+                tier_store.is_primary = False
+            tier_store.save()
     
     serializer = StoreTargetSerializers(staff_target, context={'request' : request})
     
@@ -878,7 +878,7 @@ def update_servicetarget(request):
             'status' : True,
             'status_code' : '200',
             'response' : {
-                'message' : 'Store Target updated Successfully!',
+                'message' : 'Service Target updated Successfully!',
                 'error_message' : None,
                 'servicetarget' : serializers.data
             }
