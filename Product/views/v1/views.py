@@ -1725,7 +1725,7 @@ def add_product_consumption(request):
         consumed = ProductStock.objects.get(product__id=product_id, location = location_id )
         sold = consumed.available_quantity - int(quantity)
         consumed.available_quantity = sold
-        consumed.sold_quantity = sold
+        consumed.sold_quantity += int(quantity)
         
         consumed.save()
         
@@ -1998,6 +1998,7 @@ def add_product_stock_transfer(request):
         transfer = ProductStock.objects.get(product__id=product_id, location = from_location_id )
         sold = transfer.available_quantity - int(quantity)
         transfer.available_quantity = sold
+        transfer.sold_quantity += int(quantity)
         transfer.save()
         
         transfer = ProductStock.objects.get(product__id=product_id, location = to_location_id )
