@@ -1992,7 +1992,10 @@ def add_product_stock_transfer(request):
         transfer.save()
         
     except Exception as err:
-        print(err)
+        ExceptionRecord.objects.create(
+            is_resolved = True, 
+            text= str(err)
+        )
     
     
 
