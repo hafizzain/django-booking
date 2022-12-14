@@ -8,6 +8,7 @@ urlpatterns = [
     path('create_stafftarget/', views.create_stafftarget),
     path('delete_stafftarget/', views.delete_stafftarget),
     path('update_stafftarget/', views.update_stafftarget),
+    path('copy_stafftarget/', views.copy_stafftarget),
     
     #Store Target
     path('get_storetarget/', views.get_storetarget),
@@ -20,6 +21,7 @@ urlpatterns = [
     path('get_servicetarget/', views.get_servicetarget),
     path('delete_servicetarget/', views.delete_servicetarget),
     path('update_servicetarget/', views.update_servicetarget),
+    path('copy_servicetarget/', views.copy_servicetarget),
     
     #Retail Target
     path('create_retailtarget/', views.create_retailtarget),

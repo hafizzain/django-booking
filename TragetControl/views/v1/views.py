@@ -228,6 +228,86 @@ def update_stafftarget(request):
         status=status.HTTP_200_OK
         )
     
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def copy_stafftarget(request):
+    user = request.user
+    from_month = request.data.get('from_month', None)
+    to_month = request.data.get('to_month', None)
+    
+    if not all([from_month, to_month]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'from_month',
+                        'to_month',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        ) 
+    staff_target = StaffTarget.objects.filter(month__icontains = from_month)
+    for staff in staff_target:
+        
+        try:
+            business_id=Business.objects.get(id=str(staff.business))
+        except Exception as err:
+            return Response(
+                    {
+                        'status' : False,
+                        'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                        'response' : {
+                        'message' : 'Business not found',
+                        'error_message' : str(err),
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        try:
+            employee_id=Employee.objects.get(id=str(staff.employee))
+        except Exception as err:
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                        'response' : {
+                        'message' : 'Employee not found',
+                        'error_message' : str(err),
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+        staff_target = StaffTarget.objects.create(
+                user = staff.user,
+                business = business_id,
+                employee = employee_id,
+                month = to_month,
+                service_target = staff.service_target,
+                retail_target = staff.retail_target,
+        )
+    staff_target = StaffTarget.objects.all().order_by('-created_at')   
+    serializer = StaffTargetSerializers(staff_target, many = True,context={'request' : request})
+    
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Staff Target',
+                'error_message' : None,
+                'stafftarget' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -634,7 +714,6 @@ def create_servicetarget(request):
             status=status.HTTP_201_CREATED
         ) 
 
-
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_servicetarget(request):
@@ -806,7 +885,106 @@ def update_servicetarget(request):
             },
             status=status.HTTP_201_CREATED
         ) 
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def copy_servicetarget(request):
+    user = request.user
+    from_month = request.data.get('from_month', None)
+    to_month = request.data.get('to_month', None)
+    print(to_month)
     
+    if not all([from_month, to_month]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'from_month',
+                        'to_month',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        ) 
+    service_target_id = ServiceTarget.objects.filter(month__icontains = from_month)
+    for service in service_target_id:
+        
+        try:
+            business_id=Business.objects.get(id=str(service.business))
+        except Exception as err:
+            return Response(
+                    {
+                        'status' : False,
+                        'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                        'response' : {
+                        'message' : 'Business not found',
+                        'error_message' : str(err),
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        try:
+            location_id = BusinessAddress.objects.get( id = str(service.location))
+        except:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 404,
+                    'status_code_text' : 'OBJECT_NOT_FOUND',
+                    'response' : {
+                        'message' : 'Location Not found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        try:
+            service_group_id = ServiceGroup.objects.get(id= str(service.service_group))
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 404,
+                    'status_code_text' : '404',
+                    'response' : {
+                        'message' : 'Invalid Service group ID!',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        ServiceTarget.objects.create(
+            user = user,
+            business = business_id,
+            location = location_id,
+            service_group = service_group_id,
+            month = to_month,
+            service_target = service.service_target,
+            
+        )
+    service_target = ServiceTarget.objects.all().order_by('-created_at').distinct()
+    serializer = ServiceTargetSerializers(service_target, many = True,context={'request' : request})
+    
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Service Target',
+                'error_message' : None,
+                'servicetarget' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+    ) 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_retailtarget(request):
@@ -899,7 +1077,7 @@ def create_retailtarget(request):
                 'response' : {
                     'message' : 'Retail Target Created Successfully!',
                     'error_message' : None,
-                    'servicetarget' : serializers.data,
+                    'retailtarget' : serializers.data,
                 }
             },
             status=status.HTTP_201_CREATED
