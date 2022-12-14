@@ -641,6 +641,10 @@ def delete_servicetarget(request):
 @permission_classes([IsAuthenticated])
 def update_servicetarget(request):
     servicetarget_id = request.data.get('id', None)
+    location = request.data.get('location', None)
+    
+    service_group = request.data.get('service_group', None)
+    
     if servicetarget_id is None: 
        return Response(
             {
@@ -667,6 +671,43 @@ def update_servicetarget(request):
                 'status_code_text' : '404',
                 'response' : {
                     'message' : 'Invalid Service Target ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    try:
+        location_id = BusinessAddress.objects.get( id = location)
+        service_target.location = location_id
+        service_target.save()
+        
+    except:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Location Not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    try:
+        service_group_id = ServiceGroup.objects.get(id=service_group)
+        service_target.service_group = service_group_id
+        service_target.save()
+        
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Service group ID!',
                     'error_message' : str(err),
                 }
             },
