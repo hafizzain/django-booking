@@ -1725,6 +1725,8 @@ def add_product_consumption(request):
         consumed = ProductStock.objects.get(product__id=product_id, location = location_id )
         sold = consumed.available_quantity - int(quantity)
         consumed.available_quantity = sold
+        consumed.sold_quantity = sold
+        
         consumed.save()
         
     except Exception as err:

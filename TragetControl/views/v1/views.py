@@ -673,6 +673,19 @@ def update_servicetarget(request):
             status=status.HTTP_404_NOT_FOUND
         )
     serializers= ServiceTargetSerializers(service_target,data=request.data, partial=True, context={'request' : request} )
+    if not serializers.is_valid():
+        return Response(
+                {
+            'status' : False,
+            'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+            'response' : {
+                'message' : 'Service Target Serializer Invalid',
+                'error_message' : 'Error on update Service Target',
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+        )
+    serializers.save()
     return Response(
             {
                 'status' : True,

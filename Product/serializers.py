@@ -127,6 +127,13 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
     brand = serializers.SerializerMethodField()
     vendor= VendorSerializer(read_only=True)
     stocktransfer = serializers.SerializerMethodField()
+    consumed = serializers.SerializerMethodField()
+    
+    def get_consumed(self, obj):
+        
+            comsumption = ProductConsumption.objects.filter(product = obj)
+            return ProductConsumptionSerializer( comsumption, many = True).data
+    
     #transfer_quantity = serializers.SerializerMethodField(read_only=True)
     
     # def get_transfer_quantity(self, obj):
@@ -191,7 +198,8 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
             'vendor',
             'stock',
             'stocktransfer',
-            'location'
+            'location',
+            'consumed',
             
         ]
         read_only_fields = ['id']
