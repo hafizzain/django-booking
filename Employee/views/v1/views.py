@@ -2618,6 +2618,7 @@ def delete_vacation(request):
 def update_vacation(request):
     vacation_id = request.data.get('vacation_id', None)
     employee = request.data.get('employee', None)
+    note = request.data.get('note', None)
     
     if vacation_id is None:
         return Response(
@@ -2657,6 +2658,9 @@ def update_vacation(request):
             vacation.employee = emp
         except Exception as err:
             pass
+    if note is not None:
+        vacation.note = note
+        
     vacation.save()
     serializer = VacationSerializer(vacation, data=request.data, partial=True,context={'request' : request})
     if not serializer.is_valid():
