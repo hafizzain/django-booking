@@ -6,9 +6,10 @@ from Employee.models import Employee, StaffGroup
 from NStyle.Constants import StatusCodes
 from rest_framework import status
 from Business.models import Business, BusinessAddress
+from Product.models import Brand
 from Service.models import ServiceGroup
-from TragetControl.models import ServiceTarget, StaffTarget, StoreTarget, TierStoreTarget
-from TragetControl.serializers import ServiceTargetSerializers, StaffTargetSerializers, StoreTargetSerializers
+from TragetControl.models import RetailTarget, ServiceTarget, StaffTarget, StoreTarget, TierStoreTarget
+from TragetControl.serializers import RetailTargetSerializers, ServiceTargetSerializers, StaffTargetSerializers, StoreTargetSerializers
 
 
 @api_view(['GET'])
@@ -220,7 +221,7 @@ def update_stafftarget(request):
             'response' : {
                 'message' : 'Update Satff Target Successfully',
                 'error_message' : None,
-                'asset' : serializer.data
+                'stafftarget' : serializer.data
             }
         },
         status=status.HTTP_200_OK
@@ -677,10 +678,127 @@ def update_servicetarget(request):
                 'status' : True,
                 'status_code' : 201,
                 'response' : {
-                    'message' : 'Service Target Created Successfully!',
+                    'message' : 'Service Target Updated Successfully!',
                     'error_message' : None,
                     'servicetarget' : serializers.data,
                 }
             },
             status=status.HTTP_201_CREATED
         ) 
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_retailtarget(request):
+    user= request.user
+    business = request.data.get('business', None)
+    location = request.data.get('location', None)
+    
+    brand = request.data.get('brand', None)
+    month = request.data.get('month', None)
+    brand_target = request.data.get('brand_target', None)
+    
+    if not all([business, month, brand, brand_target]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                          'employee',
+                          'month', 
+                          'retail_target',
+                            ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        business_id=Business.objects.get(id=business)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    try:
+        location_id = BusinessAddress.objects.get( id = location)
+    except:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Location Not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    try:
+        brand_id = Brand.objects.get( id = brand)
+    except:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Brand Not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    retail = RetailTarget.objects.create(
+        user = user,
+        business = business_id,
+        location = location_id,
+        brand = brand_id,
+        month =month,
+        brand_target = brand_target,
+    )
+    
+    serializers= RetailTargetSerializers(retail, context={'request' : request})
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Retail Target Created Successfully!',
+                    'error_message' : None,
+                    'servicetarget' : serializers.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        ) 
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_retailtarget(request):
+    retail_target = RetailTarget.objects.all().order_by('-created_at').distinct()
+    serializer = RetailTargetSerializers(retail_target, many = True,context={'request' : request})
+    
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Service Target',
+                'error_message' : None,
+                'retailtarget' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+    ) 

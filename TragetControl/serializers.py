@@ -2,9 +2,10 @@ from rest_framework import serializers
 from Business.models import BusinessAddress
 from Employee.models import Employee, EmployeeProfessionalInfo
 from Product.Constants.index import tenant_media_base_url
+from Product.models import Brand
 from Service.models import ServiceGroup
 
-from TragetControl.models import ServiceTarget, StaffTarget, StoreTarget, TierStoreTarget
+from TragetControl.models import ServiceTarget, StaffTarget, StoreTarget, TierStoreTarget , RetailTarget
 
 
 class EmployeeNameSerializer(serializers.ModelSerializer):
@@ -61,6 +62,12 @@ class BusinessAddressSerializers(serializers.ModelSerializer):
         model = BusinessAddress
         fields = ['id', 'address_name' ]
 
+class BrandSerializers(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Brand
+        fields = ['id', 'name' ]
+
 class TierStoreTargetSerializers(serializers.ModelSerializer):
     
     class Meta:
@@ -87,7 +94,30 @@ class StoreTargetSerializers(serializers.ModelSerializer):
     class Meta:
         model = StoreTarget
         fields = '__all__'
-        
+
+class RetailTargetSerializers(serializers.ModelSerializer):
+    
+    location = serializers.SerializerMethodField()
+    brand = serializers.SerializerMethodField()
+    
+    def get_location(self, obj):
+        try:
+            loc = BusinessAddress.objects.get(id = str(obj.location))
+            return BusinessAddressSerializers(loc).data
+        except Exception as err:
+            print(err)
+            
+    def get_brand(self, obj):
+        try:
+            brand = Brand.objects.get(id = str(obj.brand))
+            return BrandSerializers(brand).data
+        except Exception as err:
+            print(err)
+    
+    class Meta:
+        model = RetailTarget
+        fields = ['id', 'location', 'brand', 'month','brand_target']
+    
 class ServiceTargetSerializers(serializers.ModelSerializer):
     
     location = serializers.SerializerMethodField()

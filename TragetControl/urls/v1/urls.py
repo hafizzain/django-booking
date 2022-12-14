@@ -20,5 +20,8 @@ urlpatterns = [
     path('get_servicetarget/', views.get_servicetarget),
     path('delete_servicetarget/', views.delete_servicetarget),
     path('update_servicetarget/', views.update_servicetarget),
-
+    
+    #Retail Target
+    path('create_retailtarget/', views.create_retailtarget),
+    path('get_retailtarget/', views.get_retailtarget),
 ]
