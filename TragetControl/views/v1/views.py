@@ -416,6 +416,55 @@ def update_storetarget(request):
     location = request.data.get('location', None)
     store_tier = request.data.get('store_tier', None)
     
+    if store_target is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        ) 
+    try:
+        staff_target = StoreTarget.objects.get(id= store_target)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Store Target ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    try:
+        location_id = BusinessAddress.objects.get( id = location)
+        staff_target.location = location_id
+        staff_target.save()
+    except:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Location Not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
     if type(store_tier) == str:
         store_tier = store_tier.replace("'" , '"')
         store_tier = json.loads(store_tier)
@@ -455,7 +504,7 @@ def update_storetarget(request):
             
         
         tier_store =  TierStoreTarget.objects.create(
-            storetarget = store_target,
+            storetarget = staff_target,
             month = month,
             service_target = service_target,
             retail_target = retail_target,
@@ -469,19 +518,19 @@ def update_storetarget(request):
             tier_store.is_primary = False
         tier_store.save()
     
-    serializer = StoreTargetSerializers(store_target, context={'request' : request})
+    serializer = StoreTargetSerializers(staff_target, data=request.data, partial=True, context={'request' : request})
     
     return Response(
         {
             'status' : True,
-            'status_code' : '201',
+            'status_code' : '200',
             'response' : {
-                'message' : 'Store Target Successfully!',
+                'message' : 'Store Target updated Successfully!',
                 'error_message' : None,
                 'storetarget' : serializer.data
             }
         },
-        status=status.HTTP_201_CREATED
+        status=status.HTTP_200_OK
     )    
     
 @api_view(['POST'])

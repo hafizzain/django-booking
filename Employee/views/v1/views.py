@@ -2666,7 +2666,7 @@ def update_vacation(request):
             'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
             'response' : {
                 'message' : 'Vacation Serializer Invalid',
-                'error_message' : str(err),
+                'error_message' : serializer.errors,
             }
         },
         status=status.HTTP_404_NOT_FOUND
