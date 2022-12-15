@@ -301,7 +301,7 @@ def copy_stafftarget(request):
             'status' : 200,
             'status_code' : '200',
             'response' : {
-                'message' : 'All Staff Target',
+                'message' : 'Target copied successfully',
                 'error_message' : None,
                 'stafftarget' : serializer.data
             }
@@ -977,7 +977,7 @@ def copy_servicetarget(request):
             'status' : 200,
             'status_code' : '200',
             'response' : {
-                'message' : 'All Service Target',
+                'message' : 'Target copied successfully',
                 'error_message' : None,
                 'servicetarget' : serializer.data
             }
@@ -1319,7 +1319,7 @@ def copy_retailtarget(request):
             'status' : 200,
             'status_code' : '200',
             'response' : {
-                'message' : 'All Retail Target',
+                'message' : 'Target copied successfully',
                 'error_message' : None,
                 'retailtarget' : serializer.data
             }
