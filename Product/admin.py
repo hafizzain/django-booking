@@ -10,3 +10,11 @@ admin.site.register(ProductStock)
 admin.site.register(OrderStock)
 admin.site.register(OrderStockProduct)
 admin.site.register(ProductConsumption)
+@admin.register(ProductStock)
+class ProductStockpAdmin(admin.ModelAdmin):
+    list_display= [
+                'id', 
+                'product',
+                'location', 
+                'available_quantity',
+                   ]

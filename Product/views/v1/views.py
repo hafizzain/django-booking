@@ -2041,16 +2041,21 @@ def add_product_stock_transfer(request):
             transfer.available_quantity = sold
             transfer.sold_quantity += int(quantity)
             transfer.save()
-        
-        transfer = ProductStock.objects.get(product__id=product_id, location = to_location_id )
-        sold = transfer.available_quantity + int(quantity)
-        transfer.available_quantity = sold
-        transfer.save()
+        try :
+            transfer = ProductStock.objects.get(product__id=product_id, location = to_location_id )
+            sold = transfer.available_quantity + int(quantity)
+            transfer.available_quantity = sold
+            transfer.save()
+        except Exception as err:
+            ExceptionRecord.objects.create(
+            is_resolved = True, 
+            text= f'transfer id to location {str(err)}'
+        )
         
     except Exception as err:
         ExceptionRecord.objects.create(
             is_resolved = True, 
-            text= str(err)
+            text= f'transfer id from location {str(err)}'
         )
     
     
@@ -2075,7 +2080,7 @@ def add_product_stock_transfer(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_product_stock_transfers(request):
-    stock_tranfers = ProductStockTransfer.objects.filter(is_deleted=False)
+    stock_tranfers = ProductStockTransfer.objects.filter(is_deleted=False).order_by('-created_at').distinct()
     serialized = ProductStockTransferSerializer(stock_tranfers, many=True)
     return Response(
         {
