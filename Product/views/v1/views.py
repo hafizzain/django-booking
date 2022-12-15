@@ -41,15 +41,18 @@ def get_test_api(request):
     # data = 1
     # print(data)
     product = Product.objects.all()
-    # for i in product:
-    #     data =  ProductStockTransfer.objects.filter(product = i).aggregate(Sum('quantity'))
+    for i in product:
+        print(i)
+        #data =  ProductStockTransfer.objects.filter(product = i).aggregate(Sum('quantity'))
+    print(product_id, from_location_id)
     try:
-        added = ProductStock.objects.get(product__id=product_id, location = from_location_id )
-        sold = added.available_quantity - 3
-        added.available_quantity = sold
-        added.save()
-        print(sold)
-        print(added.available_quantity)
+        added = ProductStock.objects.get(product__id=product_id, location = str(from_location_id) )
+        print(added)
+        # sold = added.available_quantity - 3
+        # added.available_quantity = sold
+        # added.save()
+        # print(sold)
+        # print(added.available_quantity)
     except Exception as err:
         print(err)
     data = 'test'
@@ -2035,21 +2038,21 @@ def add_product_stock_transfer(request):
         quantity = quantity
     )
     try:
-        transfer = ProductStock.objects.get(product__id=product_id, location = from_location_id )
+        transfer = ProductStock.objects.get(product__id=product, location = from_location )
         if transfer.available_quantity >= int(quantity):
             sold = transfer.available_quantity - int(quantity)
             transfer.available_quantity = sold
             transfer.sold_quantity += int(quantity)
             transfer.save()
         try :
-            transfer = ProductStock.objects.get(product__id=product_id, location = to_location_id )
+            transfer = ProductStock.objects.get(product__id=product, location = to_location )
             sold = transfer.available_quantity + int(quantity)
             transfer.available_quantity = sold
             transfer.save()
         except Exception as err:
             ExceptionRecord.objects.create(
             is_resolved = True, 
-            text= f'transfer id to location {str(err)}'
+            text= f'transfer added id to location {str(err)}'
         )
         
     except Exception as err:

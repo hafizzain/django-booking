@@ -1116,7 +1116,7 @@ def get_location_tax(request):
                 'status' : True,
                 'status_code' : 201,
                 'response' : {
-                    'message' : 'Product Order Sale Created!',
+                    'message' : 'All Business Tax!',
                     'error_message' : None,
                     'tax' : serialized.data
                 }
