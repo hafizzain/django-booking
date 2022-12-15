@@ -74,7 +74,7 @@ class EmployeeProfessionalInfo(models.Model):
     
     start_time = models.TimeField(null=True, blank=True)
     end_time = models.TimeField(null=True, blank=True)
-    maximum_discount = models.PositiveIntegerField(default=0)
+    maximum_discount = models.PositiveIntegerField(default=0, null=True, blank=True)
     
     
     monday = models.BooleanField(default=False)

@@ -467,7 +467,11 @@ class CheckoutSerializer(serializers.ModelSerializer):
         model = Checkout
         fields = ['id', 'product', 'service', 'membership',
                   'voucher','client','location','member','created_at','payment_type', 'tip']
-        
+  
+class ParentBusinessTaxSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessTax
+        fields = ['id', 'name', 'parent_tax', 'tax_rate', 'location', 'tax_type', 'is_active']      
         
 class AppointmentCheckoutSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
@@ -515,6 +519,7 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
         fields = ('__all__')
         #exclude = ('is_deleted')
 class BusinessTaxSerializer(serializers.ModelSerializer):
+    parent_tax = ParentBusinessTaxSerializer(many=True, read_only=True)
     
     class Meta:
         model = BusinessTax

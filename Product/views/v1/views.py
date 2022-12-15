@@ -2037,10 +2037,6 @@ def add_product_stock_transfer(request):
         to_location = to_location,
         quantity = quantity
     )
-    ExceptionRecord.objects.create(
-            is_resolved = True, 
-            text= f'product id {product}'
-        )
     try:
         transfer = ProductStock.objects.get(product__id=product.id, location = from_location )
         if transfer.available_quantity >= int(quantity):
@@ -2049,14 +2045,14 @@ def add_product_stock_transfer(request):
             transfer.sold_quantity += int(quantity)
             transfer.save()
         try :
-            transfer = ProductStock.objects.get(product__id=product, location = to_location )
+            transfer = ProductStock.objects.get(product__id=product.id, location = to_location )
             sold = transfer.available_quantity + int(quantity)
             transfer.available_quantity = sold
             transfer.save()
         except Exception as err:
             ExceptionRecord.objects.create(
             is_resolved = True, 
-            text= f'transfer added id to location {str(err)}'
+            text= f'added id to location {str(err)}'
         )
         
     except Exception as err:
