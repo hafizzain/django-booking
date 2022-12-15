@@ -24,7 +24,7 @@ from Employee.models import Employee, EmployeeSelectedService
 from Business.models import BusinessAddress
 from Service.models import PriceService, Service, ServiceGroup
 
-from Product.models import Product
+from Product.models import Product, ProductStock
 from django.db.models import Avg, Count, Min, Sum
 
 
@@ -1198,6 +1198,14 @@ def create_sale_order(request):
             #for pro in ids:
             try:
                 product = Product.objects.get(id = service_id)
+                
+                transfer = ProductStock.objects.get(product__id=product, location = business_address )
+                if transfer.available_quantity > int(quantity):
+                    sold = transfer.available_quantity - int(quantity)
+                    transfer.available_quantity = sold
+                    transfer.sold_quantity += int(quantity)
+                    transfer.save()
+                
                 # product_stock = product.product_stock.all()#.first()
                 # available = 0
                 
