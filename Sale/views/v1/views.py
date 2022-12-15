@@ -1199,12 +1199,17 @@ def create_sale_order(request):
             try:
                 product = Product.objects.get(id = service_id)
                 
-                transfer = ProductStock.objects.get(product__id=product, location = business_address )
-                if transfer.available_quantity > int(quantity):
-                    sold = transfer.available_quantity - int(quantity)
-                    transfer.available_quantity = sold
-                    transfer.sold_quantity += int(quantity)
-                    transfer.save()
+                ExceptionRecord.objects.create(
+                    is_resolved = True, 
+                    text= f'product id in sale {product}'
+                )
+                
+                # transfer = ProductStock.objects.get(product__id=product, location = business_address )
+                # if transfer.available_quantity > int(quantity):
+                #     sold = transfer.available_quantity - int(quantity)
+                #     transfer.available_quantity = sold
+                #     transfer.sold_quantity += int(quantity)
+                #     transfer.save()
                 
                 # product_stock = product.product_stock.all()#.first()
                 # available = 0

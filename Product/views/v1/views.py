@@ -1729,10 +1729,6 @@ def add_product_consumption(request):
             consumed.sold_quantity += int(quantity)
             consumed.save()
         else:
-            ExceptionRecord.objects.create(
-            is_resolved = True, 
-            text= f'{consumed.available_quantity} qunatity {int(quantity)}'
-        )
             return Response(
             {
                 'status' : False,
