@@ -113,7 +113,7 @@ class ProductStockSerializer(serializers.ModelSerializer):
 
     def get_current_stock(self, obj):
         try:
-            return obj.obj.available_quantity - obj.sold_quantity
+            return obj.available_quantity - obj.sold_quantity
         except Exception as err:
             ExceptionRecord.objects.create(
             is_resolved = True, 
