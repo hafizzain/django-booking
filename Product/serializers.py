@@ -112,7 +112,7 @@ class ProductStockSerializer(serializers.ModelSerializer):
             None
 
     def get_current_stock(self, obj):
-        return obj.available_quantity
+        return obj.obj.available_quantity - obj.sold_quantity
 
     class Meta:
         model = ProductStock

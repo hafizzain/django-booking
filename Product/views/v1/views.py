@@ -1723,7 +1723,7 @@ def add_product_consumption(request):
     )
     try:
         consumed = ProductStock.objects.get(product__id=product_id, location = location_id )
-        if consumed.available_quantity > int(quantity):
+        if consumed.available_quantity >= int(quantity):
             sold = consumed.available_quantity - int(quantity)
             consumed.available_quantity = sold
             consumed.sold_quantity += int(quantity)
