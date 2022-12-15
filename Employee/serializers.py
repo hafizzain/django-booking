@@ -305,11 +305,20 @@ class EmployeSerializer(serializers.ModelSerializer):
     #         "nme": instace.full_name,
     #         permissions: permissions
     #     }
-
-
 class EmployeeNameSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
     designation = serializers.SerializerMethodField(read_only=True)
+    location = serializers.SerializerMethodField(read_only=True)
+    
+    def get_location(self, obj):
+        loc = obj.location.all()
+        return LocationSerializer(loc, many =True ).data
+        # try:
+        #     loc = BusinessAddress.objects.get(id = str(obj.location))
+        #     return LocationSerializer(loc).data
+        # except Exception as err:
+        #     print(err)
+        #     None
     
     def get_designation(self, obj):        
         try:
@@ -334,7 +343,8 @@ class EmployeeNameSerializer(serializers.ModelSerializer):
                 'full_name',
                 'employee_id',
                 'image',
-                'designation'
+                'designation',
+                'location',
         ]
 
 class StaffGroupSerializers(serializers.ModelSerializer):
