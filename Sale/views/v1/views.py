@@ -1077,7 +1077,7 @@ def get_total_revenue(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_location_tax(request):
-    location_id = request.data.get('location_id', None)
+    location_id = request.GET.get('location_id', None)
     if location_id is None:
         return Response(
             {
