@@ -27,4 +27,8 @@ urlpatterns = [
     
     #CheckOut
     path('get_sale_checkout/', views.get_sale_checkout),
+    
+    #Location tax by id
+    path('get_location_tax/', views.get_location_tax),
+    
 ]

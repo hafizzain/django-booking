@@ -5,7 +5,7 @@ from Appointment.models import AppointmentCheckout
 from Client.models import Client, Membership
 
 from Employee.models import Employee, EmployeeSelectedService
-from Business.models import BusinessAddress
+from Business.models import BusinessAddress, BusinessTax
 from Order.models import Checkout, MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
 from Product.Constants.index import tenant_media_base_url
 from Product.models import ProductStock
@@ -514,3 +514,23 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
         model = AppointmentCheckout
         fields = ('__all__')
         #exclude = ('is_deleted')
+class BusinessTaxSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = BusinessTax
+        #fields = '__all__'
+        exclude = ('created_at','user')
+    
+class BusinessAddressSerializer(serializers.ModelSerializer):
+    tax = serializers.SerializerMethodField(read_only=True)
+    
+    def get_tax(self, obj):
+        try:
+            tax = BusinessTax.objects.get(location = obj)
+            return BusinessTaxSerializer(tax).data
+        except Exception as err:
+            print(err)
+            
+    class Meta:
+        model = BusinessAddress
+        fields = ['id', 'address_name','tax']
