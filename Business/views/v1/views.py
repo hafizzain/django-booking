@@ -548,7 +548,7 @@ def get_business_locations(request, business_id):
         is_deleted=False,
         is_closed=False,
         is_active=True
-    ).order_by('-created_at')
+    ).order_by('-created_at').distinct()
     data = []
     if len(business_addresses) > 0:
         serialized = BusinessAddress_GetSerializer(business_addresses, many=True)

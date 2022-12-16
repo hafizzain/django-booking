@@ -308,3 +308,48 @@ class Vacation(models.Model):
     
     def __str__(self):
         return str(self.id)
+    
+# class EmployeDailySchedule(models.Model):
+#     DAYS_CHOICE =[
+#         ('Monday', 'Monday'),
+#         ('Tuesday', 'Tuesday'),
+#         ('Wednesday', 'Wednesday'),
+#         ('Thursday', 'Thursday'),
+#         ('Friday', 'Friday'),
+#         ('Saturday', 'Saturday'),
+#         ('Sunday', 'Sunday'),
+#     ]
+    
+#     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, null = True, related_name='user_employedailyschedule')
+#     business = models.ForeignKey(Business, on_delete=models.CASCADE, null = True , related_name='business_employedailyschedule')
+    
+#     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_employedailyschedule')
+#     today_date = models.DateField(verbose_name = 'Today Date', null=True)
+    
+#     is_leave = models.BooleanField(default=True)
+#     is_off = models.BooleanField(default=True)
+    
+    
+    
+#     is_active = models.BooleanField(default=True)
+#     created_at = models.DateTimeField(auto_now_add=now)
+#     updated_at = models.DateTimeField(auto_now_add=now)
+    
+#     def __str__(self):
+#         return str(self.id)
+    
+# class EmployeDailyShift(models.Model):
+#     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, null = True, related_name='user_employedailyshift')
+#     business = models.ForeignKey(Business, on_delete=models.CASCADE, null = True , related_name='business_employedailyshift')
+    
+#     dailyschedule = models.ForeignKey(EmployeDailySchedule, on_delete=models.CASCADE, related_name='dailyschedule_employedailyshift')
+#     start_time = models.TimeField(null=True, blank=True)
+#     end_time = models.TimeField(null=True, blank=True)
+    
+#     is_active = models.BooleanField(default=True)
+#     created_at = models.DateTimeField(auto_now_add=now)
+    
+#     def __str__(self):
+#         return str(self.id)
