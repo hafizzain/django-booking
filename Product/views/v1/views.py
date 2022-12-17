@@ -1661,7 +1661,7 @@ def delete_orderstock(request):
 @permission_classes([IsAuthenticated])
 def update_orderstockproduct(request):
     user = request.user
-    stockproduct_id = request.data.get('order_id', None)
+    stockproduct_id = request.data.get('stockproduct_id', None)
     error = []
     if stockproduct_id is None:
             return Response(
