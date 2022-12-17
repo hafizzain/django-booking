@@ -58,4 +58,7 @@ urlpatterns = [
     path('delete_vacation/', views.delete_vacation),
     path('update_vacation/', views.update_vacation),
     
+    #Working Schecule for Employee
+    path('update_vacation/', views.update_vacation),
+
 ]
