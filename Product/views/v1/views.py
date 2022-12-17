@@ -1657,6 +1657,74 @@ def delete_orderstock(request):
         status=status.HTTP_200_OK
     )
 
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_orderstockproduct(request):
+    user = request.user
+    stockproduct_id = request.data.get('order_id', None)
+    error = []
+    if stockproduct_id is None:
+            return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'User id is required',
+                    'fields' : [
+                        'order_id',
+                    ]
+                }
+            },
+             status=status.HTTP_400_BAD_REQUEST
+           )
+        
+    try:
+        order_stock = OrderStockProduct.objects.get(id=stockproduct_id)
+    except Exception as err:
+              return Response(
+             {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_ORDER_STOCK_ID_4038,
+                    'status_code_text' : 'INVALID_ORDER_STOCK_ID_4038',
+                        'response' : {
+                            'message' : 'Order Stock Product Not Found',
+                            'error_message' : str(err),
+                    }
+                },
+                   status=status.HTTP_404_NOT_FOUND
+              )
+    serializer = OrderProductSerializer(order_stock, data=request.data, partial=True, context={'request' : request})
+    if serializer.is_valid():
+           serializer.save()
+    else: 
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+                'response' : {
+                    'message' : 'Invialid Data',
+                    'error_message' : str(serializer.errors),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+        
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : ' OrderStockProduct updated successfully',
+                    'error_message' : None,
+                    'stock' :serializer.data,
+                    'Error':error,
+                }
+            },
+            status=status.HTTP_200_OK
+           )
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -1894,7 +1962,6 @@ def update_product_consumptions(request):
         },
         status=status.HTTP_200_OK
     )
-
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])

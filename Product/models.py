@@ -168,10 +168,18 @@ class OrderStock(models.Model):
         return str(self.id)
     
 class OrderStockProduct(models.Model):
+    STATUS_CHOICES =[
+        ('Placed', 'Placed'),
+        ('Delivered', 'Delivered'),
+        ('Partially_Received', 'Partially Received'),
+        ('Received', 'Received'),
+        ('Cancelled', 'Cancelled'),
+    ]
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     order = models.ForeignKey(OrderStock, on_delete=models.CASCADE , related_name='order_stock')
     
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_order_stock')
+    status = models.CharField(choices = STATUS_CHOICES, max_length =100, default='Placed')
     quantity = models.PositiveIntegerField(default=0)
     
     def __str__(self):

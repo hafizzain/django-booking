@@ -586,6 +586,7 @@ def add_business_location(request):
     mobile_number = request.data.get('mobile_number', None)
     
     banking = request.data.get('banking',None)
+    currency = request.data.get('currency',None)
     
     start_time = request.data.get('start_time', None)
     close_time = request.data.get('close_time', None)
@@ -647,6 +648,8 @@ def add_business_location(request):
         )
     
     try:
+        if currency is not None:
+            currency_id = Currency.objects.get( id = currency, is_deleted=False, is_active=True )
         if country is not None:
             country = Country.objects.get( id=country, is_deleted=False, is_active=True )
         if state is not None:
@@ -675,6 +678,7 @@ def add_business_location(request):
         email= email,
         mobile_number=mobile_number,
         country=country,
+        currency = currency_id,
         state=state,
         city=city,
         banking = banking,

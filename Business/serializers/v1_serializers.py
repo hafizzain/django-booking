@@ -209,6 +209,7 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
             'country',
             'state',
             'city',
+            'currency',
             'email',
             'mobile_number',
             'address',
