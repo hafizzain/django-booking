@@ -893,8 +893,14 @@ def update_location(request):
         country = request.data.get('country', None)
         state = request.data.get('state', None)
         city = request.data.get('city', None)
+        currency = request.data.get('currency', None)
 
         try:
+            if currency is not None:
+                currency_id = Currency.objects.get( id = currency, is_deleted=False, is_active=True )
+                business_address.currency = currency_id
+                business_address.save()
+                
             if country is not None:
                 country = Country.objects.get( id=country, is_deleted=False, is_active=True )
             if state is not None:

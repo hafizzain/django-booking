@@ -327,6 +327,9 @@ class Vacation(models.Model):
 #     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_employedailyschedule')
 #     today_date = models.DateField(verbose_name = 'Today Date', null=True)
     
+#     start_time = models.TimeField(null=True, blank=True)
+#     end_time = models.TimeField(null=True, blank=True)
+    
 #     is_leave = models.BooleanField(default=True)
 #     is_off = models.BooleanField(default=True)
     
