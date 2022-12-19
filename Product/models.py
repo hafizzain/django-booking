@@ -157,7 +157,7 @@ class OrderStock(models.Model):
     to_location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='to_locations_order_stock')
     
     status= models.CharField(choices = STATUS_CHOICES, max_length =100, default='Placed')
-    rec_quantity= models.PositiveIntegerField(default=0, verbose_name= 'Received Quantity', null=True, blank=True)
+#    rec_quantity= models.PositiveIntegerField(default=0, verbose_name= 'Received Quantity', null=True, blank=True)
     
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
@@ -180,6 +180,8 @@ class OrderStockProduct(models.Model):
     
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_order_stock')
     status = models.CharField(choices = STATUS_CHOICES, max_length =100, default='Placed')
+    note = models.TextField(default='', null=True, blank=True)
+    rec_quantity= models.PositiveIntegerField(default=0, verbose_name= 'Received Quantity', null=True, blank=True)
     quantity = models.PositiveIntegerField(default=0)
     
     def __str__(self):

@@ -181,7 +181,8 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
     
     def get_currency(self, obj):
         try:
-            currency = Currency.objects.get(id=obj.currency)
+            print(obj.currency)
+            currency = Currency.objects.get(id=obj.currency.id)
             #print(location)
             return CurrencySerializer(currency).data
         

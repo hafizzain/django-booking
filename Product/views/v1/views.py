@@ -1662,6 +1662,8 @@ def delete_orderstock(request):
 def update_orderstockproduct(request):
     user = request.user
     stockproduct_id = request.data.get('stockproduct_id', None)
+    note = request.data.get('note', None)
+    rec_quantity = request.data.get('rec_quantity', None)
     error = []
     if stockproduct_id is None:
             return Response(
@@ -1695,6 +1697,13 @@ def update_orderstockproduct(request):
                 },
                    status=status.HTTP_404_NOT_FOUND
               )
+    if note is not None:
+        order_stock.note = note
+        order_stock.save()
+    if rec_quantity is not None:
+        order_stock.rec_quantity = rec_quantity
+        order_stock.save()
+    
     serializer = OrderProductSerializer(order_stock, data=request.data, partial=True, context={'request' : request})
     if serializer.is_valid():
            serializer.save()
