@@ -10,7 +10,7 @@ from Service.models import Service
 from Permissions.models import EmployePermission
 
 from rest_framework import serializers
-from .models import( Employee, EmployeeProfessionalInfo ,
+from .models import( EmployeDailySchedule, Employee, EmployeeProfessionalInfo ,
                EmployeePermissionSetting, EmployeeModulePermission 
                , EmployeeMarketingPermission,
                StaffGroup, StaffGroupModulePermission, Attendance
@@ -54,6 +54,20 @@ class EmployeInformationsSerializer(serializers.ModelSerializer):
         model = EmployeeProfessionalInfo
         exclude = ['employee', 'id']
         
+        
+class ScheduleSerializer(serializers.ModelSerializer):
+    employee = serializers.SerializerMethodField(read_only=True)
+    
+    def get_employee(self, obj):
+        try:
+            data = Employee.objects.get(id = str(obj.employee))
+            return EmployeeNameSerializer(data).data
+        except Exception as err:
+            print(err)
+         
+    class Meta:
+        model = EmployeDailySchedule
+        fields = '__all__'        
         
 class EmployPermissionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -125,7 +139,16 @@ class EmployeSerializer(serializers.ModelSerializer):
     
     staff_group = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
+    schedule = serializers.SerializerMethodField(read_only=True)
 
+    def get_schedule(self, obj):
+        try:
+            all_schedule = EmployeDailySchedule.objects.filter(employee = obj)
+            return ScheduleSerializer(all_schedule, many = True).data
+        except Exception as err:
+            print(err)
+            None
+            
     def get_location(self, obj):
         try:
             #loc = BusinessAddress.objects.filter(id=obj.location.id)
@@ -759,5 +782,17 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         model = Employee
         fields = ['id', 'full_name','image','start_time', 'end_time', 'monday','tuesday','wednesday','thursday','friday','saturday','sunday','created_at']
 
-
+class ScheduleSerializer(serializers.ModelSerializer):
+    employee = serializers.SerializerMethodField(read_only=True)
+    
+    def get_employee(self, obj):
+        try:
+            data = Employee.objects.get(id = str(obj.employee))
+            return EmployeeNameSerializer(data).data
+        except Exception as err:
+            print(err)
+         
+    class Meta:
+        model = EmployeDailySchedule
+        fields = '__all__'
 

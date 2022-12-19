@@ -59,6 +59,9 @@ urlpatterns = [
     path('update_vacation/', views.update_vacation),
     
     #Working Schecule for Employee
-    path('update_vacation/', views.update_vacation),
+    path('create_workingschedule/', views.create_workingschedule),
+    path('get_workingschedule/', views.get_workingschedule),
+    path('delete_asset/', views.delete_asset), 
+
 
 ]

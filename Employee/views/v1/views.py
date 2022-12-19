@@ -1,6 +1,6 @@
 from time import strptime
 from django.shortcuts import render
-from Employee.models import( CategoryCommission, Employee , EmployeeProfessionalInfo ,
+from Employee.models import( CategoryCommission, EmployeDailySchedule, Employee , EmployeeProfessionalInfo ,
                         EmployeePermissionSetting,  EmployeeModulePermission
                         , EmployeeMarketingPermission, EmployeeSelectedService , StaffGroup 
                         , StaffGroupModulePermission, Attendance
@@ -12,7 +12,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from Employee.serializers import( EmployeSerializer , EmployeInformationsSerializer
                           , EmployPermissionSerializer,  EmployeModulesSerializer
-                          ,  EmployeeMarketingSerializers, StaffGroupSerializers , 
+                          ,  EmployeeMarketingSerializers, ScheduleSerializer, StaffGroupSerializers , 
                           StaffpermisionSerializers , AttendanceSerializers
                           ,PayrollSerializers, VacationSerializer,singleEmployeeSerializer , CommissionSerializer
                           , AssetSerializer, WorkingScheduleSerializer
@@ -697,6 +697,13 @@ def create_employee(request):
 
     elif type(working_days) == list:
             pass
+    for days in working_days:
+        EmployeDailySchedule.objects.create(
+            user=user,
+            business=business,
+            employee = employee,
+            day = days,
+        )
             
     if type(services_id) == str:
         #services_id = services_id.replace("'" , '"')
@@ -868,213 +875,215 @@ def delete_employee(request):
 @permission_classes([IsAuthenticated])
 def update_employee(request): 
     # sourcery skip: avoid-builtin-shadow
-        id = request.data.get('id', None)
-        is_active = request.data.get('is_active' ,None)
-        services_id = request.data.get('services', None)   
-        staff_id = request.data.get('staff_group', None) 
-        location = request.data.get('location', None) 
-        
-        Errors = []
-        
-        if id is None:
+    id = request.data.get('id', None)
+    is_active = request.data.get('is_active' ,None)
+    services_id = request.data.get('services', None)   
+    staff_id = request.data.get('staff_group', None) 
+    location = request.data.get('location', None) 
+    working_days = request.data.get('working_days',None)
+
+    
+    Errors = []
+    
+    if id is None:
+        return Response(
+        {
+            'status' : False,
+            'status_code' : StatusCodes.MISSING_FIELDS_4001,
+            'status_code_text' : 'MISSING_FIELDS_4001',
+            'response' : {
+                'message' : 'Invalid Data!',
+                'error_message' : 'User id is required',
+                'fields' : [
+                    'id',
+                ]
+            }
+        },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        employee = Employee.objects.get(id=id)
+    except Exception as err:
             return Response(
             {
                 'status' : False,
-                'status_code' : StatusCodes.MISSING_FIELDS_4001,
-                'status_code_text' : 'MISSING_FIELDS_4001',
-                'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : 'User id is required',
-                    'fields' : [
-                        'id',
-                    ]
+                'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
+                'status_code_text' : 'INVALID_NOT_FOUND_EMPLOYEE_ID_4022',
+                        'response' : {
+                    'message' : 'Employee Not Found',
+                    'error_message' : str(err),
                 }
             },
-             status=status.HTTP_400_BAD_REQUEST
-           )
+                status=status.HTTP_404_NOT_FOUND
+            )
+    try:
+        staff = StaffGroup.objects.get(employees=id)
+        staff.employees.remove(employee)
+        staff.save()
+    except Exception as err:
+        staff = None
+        print(err)
+    
+    try:
+        staff_add = StaffGroup.objects.get(id=staff_id)
+    
+    except Exception as err:
+        print(err)
+        staff_add = None
+    
+    if staff_add is not None:
         try:
-            employee = Employee.objects.get(id=id)
-        except Exception as err:
-              return Response(
-             {
-                    'status' : False,
-                    'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
-                    'status_code_text' : 'INVALID_NOT_FOUND_EMPLOYEE_ID_4022',
-                          'response' : {
-                        'message' : 'Employee Not Found',
-                        'error_message' : str(err),
-                    }
-                },
-                   status=status.HTTP_404_NOT_FOUND
-              )
-        try:
-            staff = StaffGroup.objects.get(employees=id)
-            staff.employees.remove(employee)
-            staff.save()
-        except Exception as err:
-            staff = None
-            print(err)
+            staff_add.employees.add(employee)
+            staff_add.save()
         
-        try:
-            staff_add = StaffGroup.objects.get(id=staff_id)
+        except:
+            pass      
         
-        except Exception as err:
-            print(err)
-            staff_add = None
+    data={}
+    image=request.data.get('image',None)
+    phone_number=request.data.get('mobile_number',None)
+    
+    
+    if phone_number is not None:
+        employee.mobile_number = phone_number
+    else :
+        employee.mobile_number = None
+    if image is not None:
+        employee.image=image
         
-        if staff_add is not None:
-            try:
-                staff_add.employees.add(employee)
-                staff_add.save()
-            
-            except:
-                pass      
-            
-        data={}
-        image=request.data.get('image',None)
-        phone_number=request.data.get('mobile_number',None)
-       
-        
-        if phone_number is not None:
-            employee.mobile_number = phone_number
-        else :
-            employee.mobile_number = None
-        if image is not None:
-            employee.image=image
-            
-        if is_active is not None:
-            employee.is_active =True
-        else:
-            employee.is_active = False 
-        employee.save()
- 
-        Employe_Informations= EmployeeProfessionalInfo.objects.get(employee=employee)
-        
-        Employe_Informations.monday = True if 'monday' in request.data else False
-        Employe_Informations.tuesday = True if 'tuesday' in request.data else False
-        Employe_Informations.wednesday = True if 'wednesday' in request.data else False
-        Employe_Informations.thursday = True if 'thursday' in request.data else False
-        Employe_Informations.friday = True if 'friday' in request.data else False
-        Employe_Informations.saturday = True if 'saturday' in request.data else False
-        Employe_Informations.sunday = True if 'sunday' in request.data else False
-        
-        if services_id is not None:
-            if type(services_id) == str:
-                services_id = services_id.replace("'" , '"')
-                services_id = json.loads(services_id)
-            else:
-                pass
-            for services in services_id:
-                #get('id', None)
-                s_service_id = services.get('id', None)
-                if s_service_id is not None:
-                    try: 
-                        emp_service = EmployeeSelectedService.objects.get(id=services['id'])
-                        is_deleted = services.get('is_deleted', None)
-                        if is_deleted is not None:
-                            emp_service.delete()
-                            continue
+    if is_active is not None:
+        employee.is_active =True
+    else:
+        employee.is_active = False 
+    employee.save()
 
-                        ser = Service.objects.get(id=services['service'])
-                        emp_service.service = ser
-                        emp_service.level = services['level']
-                        emp_service.save()
-                    except Exception as error:
-                        print(f'EmployeeSelectedService item {error}')
-                    
-                else:
+    Employe_Informations= EmployeeProfessionalInfo.objects.get(employee=employee)
+    
+    Employe_Informations.monday = True if 'monday' in request.data else False
+    Employe_Informations.tuesday = True if 'tuesday' in request.data else False
+    Employe_Informations.wednesday = True if 'wednesday' in request.data else False
+    Employe_Informations.thursday = True if 'thursday' in request.data else False
+    Employe_Informations.friday = True if 'friday' in request.data else False
+    Employe_Informations.saturday = True if 'saturday' in request.data else False
+    Employe_Informations.sunday = True if 'sunday' in request.data else False
+    
+    if services_id is not None:
+        if type(services_id) == str:
+            services_id = services_id.replace("'" , '"')
+            services_id = json.loads(services_id)
+        else:
+            pass
+        for services in services_id:
+            #get('id', None)
+            s_service_id = services.get('id', None)
+            if s_service_id is not None:
+                try: 
+                    emp_service = EmployeeSelectedService.objects.get(id=services['id'])
+                    is_deleted = services.get('is_deleted', None)
+                    if is_deleted is not None:
+                        emp_service.delete()
+                        continue
+
                     ser = Service.objects.get(id=services['service'])
-
-                    emp_service = EmployeeSelectedService.objects.create(
-                        employee=employee,
-                        service=ser,
-                        level=services['level']
-                    )
-                            
-        Employe_Informations.save()
-        serializer_info= EmployeInformationsSerializer(Employe_Informations,  data= request.data, partial=True)
-        if serializer_info.is_valid():
-            serializer_info.save()
-            data.update(serializer_info.data)
-        else:
-         return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.INVALID_EMPLOYEE_INFORMATION_4026,
-                'response' : {
-                    'message' : 'Invalid Data',
-                    'error_message' : str(serializer_info.errors),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
-        try:
-            empl_permission = EmployePermission.objects.get(employee=employee)
-            
-            for permit in ALL_PERMISSIONS:
+                    emp_service.service = ser
+                    emp_service.level = services['level']
+                    emp_service.save()
+                except Exception as error:
+                    print(f'EmployeeSelectedService item {error}')
                 
-                value = request.data.get(permit, None)
-                PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
-                if value is not None:
-                    if type(value) == str:
-                        value = json.loads(value)
-                        for opt in value:
-                            try:
-                                option = GlobalPermissionChoices.objects.get(text=opt)
-                                PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
-                            except:
-                                pass
+            else:
+                ser = Service.objects.get(id=services['service'])
 
-            empl_permission.save()
-        except Exception as err:
-            Errors.append(err)
-        
-        try:
-            employee.location.clear()
-            address=  BusinessAddress.objects.get(id = str(location))
-            employee.location.add(address)
-        except Exception as err:
-            print(err)
-        
-        # if type(location) == str:
-        #     location = json.loads(location)
-            
-        # employee.location.clear()
-        # for loc in location:
-        #     try:
-        #         address=  BusinessAddress.objects.get(id = str(loc))
-        #         employee.location.add(address)
-        #     except Exception as err:
-        #         print(err)
-
-        serializer = EmployeSerializer(employee, data=request.data, partial=True, context={'request' : request,})
-        if serializer.is_valid():
-           serializer.save()
-           data.update(serializer.data)
-        else: 
-             return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
-                'response' : {
-                    'message' : 'Invialid Data',
-                    'error_message' : str(serializer.errors),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
+                emp_service = EmployeeSelectedService.objects.create(
+                    employee=employee,
+                    service=ser,
+                    level=services['level']
+                )
+                        
+    Employe_Informations.save()
+    serializer_info= EmployeInformationsSerializer(Employe_Informations,  data= request.data, partial=True)
+    if serializer_info.is_valid():
+        serializer_info.save()
+        data.update(serializer_info.data)
+    else:
         return Response(
-            {
-                'status' : True,
-                'status_code' : 200,
-                'response' : {
-                    'message' : ' Employee updated successfully',
-                    'error_message' : None,
-                    'Employee' : data
-                }
-            },
-            status=status.HTTP_200_OK
-           )
+        {
+            'status' : False,
+            'status_code' : StatusCodes.INVALID_EMPLOYEE_INFORMATION_4026,
+            'response' : {
+                'message' : 'Invalid Data',
+                'error_message' : str(serializer_info.errors),
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+    )
+    try:
+        empl_permission = EmployePermission.objects.get(employee=employee)
+        
+        for permit in ALL_PERMISSIONS:
+            
+            value = request.data.get(permit, None)
+            PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
+            if value is not None:
+                if type(value) == str:
+                    value = json.loads(value)
+                    for opt in value:
+                        try:
+                            option = GlobalPermissionChoices.objects.get(text=opt)
+                            PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
+                        except:
+                            pass
+
+        empl_permission.save()
+    except Exception as err:
+        Errors.append(err)
+    
+    try:
+        employee.location.clear()
+        address=  BusinessAddress.objects.get(id = str(location))
+        employee.location.add(address)
+    except Exception as err:
+        print(err)
+    
+    # if type(location) == str:
+    #     location = json.loads(location)
+        
+    # employee.location.clear()
+    # for loc in location:
+    #     try:
+    #         address=  BusinessAddress.objects.get(id = str(loc))
+    #         employee.location.add(address)
+    #     except Exception as err:
+    #         print(err)
+
+    serializer = EmployeSerializer(employee, data=request.data, partial=True, context={'request' : request,})
+    if serializer.is_valid():
+        serializer.save()
+        data.update(serializer.data)
+    else: 
+            return Response(
+        {
+            'status' : False,
+            'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+            'response' : {
+                'message' : 'Invialid Data',
+                'error_message' : str(serializer.errors),
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+    )
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : ' Employee updated successfully',
+                'error_message' : None,
+                'Employee' : data
+            }
+        },
+        status=status.HTTP_200_OK
+        )
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -2689,6 +2698,244 @@ def update_vacation(request):
         status=status.HTTP_200_OK
         )
     
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# def create_working(request):
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_workingschedule(request):
+    user = request.user
+    business_id = request.data.get('business', None)
+    
+    employee = request.data.get('employee', None)
+    day = request.data.get('day', None)
+    
+    start_time = request.data.get('start_time', None)
+    end_time = request.data.get('end_time', None)
+    
+    start_time_shift = request.data.get('start_time_shift', None)
+    end_time_shift = request.data.get('end_time_shift', None)
+    
+    is_leave = request.data.get('is_leave', None)
+    is_off = request.data.get('is_off', None)
+    
+    if not all([business_id,employee ]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                          'employee'
+                            ]
+                    }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        business = Business.objects.get(id=business_id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    try:
+        employee_id=Employee.objects.get(id=employee)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'response' : {
+                    'message' : 'Employee not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+    working_schedule = EmployeDailySchedule.objects.create(
+        user = user,
+        business = business ,
+        employee = employee_id,
+        day = day,
+        start_time = start_time,
+        end_time = end_time,
+        start_time_shift = start_time_shift,
+        end_time_shift = end_time_shift,
+        
+    )
+    
+    if is_leave is not None:
+        working_schedule.is_leave = True
+    else:
+        working_schedule.is_leave = False
+    if is_off is not None:
+        working_schedule.is_off = True
+    else:
+        working_schedule.is_off = False
+        
+    serializers= ScheduleSerializer(working_schedule, context={'request' : request})
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Working Schedule Created Successfully!',
+                    'error_message' : None,
+                    'schedule' : serializers.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        ) 
+    
+        
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_workingschedule(request):
+    all_employe= EmployeDailySchedule.objects.all().order_by('created_at')
+    serialized = ScheduleSerializer(all_employe, many=True, context={'request' : request})
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Schedule',
+                'error_message' : None,
+                'schedule' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_workingschedule(request):
+    schedule_id = request.data.get('id', None)
+    if schedule_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        schedule = EmployeDailySchedule.objects.get(id=schedule_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Schedule ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    schedule.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Schedule deleted successfully',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )  
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_workingschedule(request): 
+    schedule_id = request.data.get('schedule_id', None)
+    employee = request.data.get('employee', None)
+    
+    if schedule_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'schedule_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+        
+    try:
+        schedule = EmployeDailySchedule.objects.get(id = schedule_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code_text' : 'INVALID_SCHEDULE_ID',
+                'response' : {
+                    'message' : 'Schedule Not Found',
+                    'error_message' : str(err),
+                }
+            },
+                status=status.HTTP_404_NOT_FOUND
+        )
+    
+    if employee is not None:
+        try:
+            emp = Employee.objects.get(id=employee)
+            schedule.employee = emp
+        except Exception as err:
+            pass
+        
+    schedule.save()
+    serializer = ScheduleSerializer(schedule, data=request.data, partial=True,context={'request' : request})
+    if not serializer.is_valid():
+        return Response(
+                {
+            'status' : False,
+            'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+            'response' : {
+                'message' : 'Schedule Serializer Invalid',
+                'error_message' : serializer.errors,
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+        )
+    serializer.save()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Schedule Updated Successfully',
+                'error_message' : None,
+                'schedule' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+        )
