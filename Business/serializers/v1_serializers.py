@@ -166,12 +166,27 @@ class OpeningHoursSerializer(serializers.ModelSerializer):
     class Meta:
         model= BusinessOpeningHour
         fields= '__all__'
+class CurrencySerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model= Currency
+        fields= '__all__'
 
 class BusinessAddress_GetSerializer(serializers.ModelSerializer):
     #opening_hours= OpeningHoursSerializer(read_only=True)
     opening_hours = serializers.SerializerMethodField(read_only=True)
     start_time=  serializers.SerializerMethodField(read_only=True)
     close_time= serializers.SerializerMethodField(read_only=True)
+    currency = serializers.SerializerMethodField(read_only=True)
+    
+    def get_currency(self, obj):
+        try:
+            currency = Currency.objects.get(id=obj.currency)
+            #print(location)
+            return CurrencySerializer(currency).data
+        
+        except Exception as err:
+            print(err)
     
     def get_opening_hours(self, obj):
         try:
