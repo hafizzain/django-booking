@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import(CommissionSchemeSetting, Employee, EmployeeProfessionalInfo, EmployeePermissionSetting, EmployeeModulePermission, 
+from .models import(CommissionSchemeSetting, EmployeDailySchedule, Employee, EmployeeProfessionalInfo, EmployeePermissionSetting, EmployeeModulePermission, 
                     EmployeeMarketingPermission ,StaffGroup , CategoryCommission,
                     StaffGroupModulePermission , Attendance , 
                     Payroll, Asset, AssetDocument, EmployeeSelectedService )
@@ -111,3 +111,4 @@ class CommissionSchemeSettingAdmin(admin.ModelAdmin):
 admin.site.register(Asset)
 admin.site.register(AssetDocument)
 admin.site.register(EmployeeSelectedService)
+admin.site.register(EmployeDailySchedule)
