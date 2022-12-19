@@ -358,7 +358,7 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model= OrderStock
         fields=('id','business','vendor','to_location','from_location','to_location_name',
-                'status', 'rec_quantity','vendor_name','location_name','products')
+                'status','vendor_name','location_name','products')
 
 
 class ProductConsumptionSerializer(serializers.ModelSerializer):
