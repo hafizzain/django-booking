@@ -60,7 +60,8 @@ urlpatterns = [
     
     #Working Schecule for Employee
     path('create_workingschedule/', views.create_workingschedule),
-    path('get_workingschedule/', views.get_workingschedule),
+   # path('get_workingschedule/', views.get_workingschedule),
+    path('get_workingschedule/', views.working_schedule),
     path('delete_workingschedule/', views.delete_workingschedule), 
     path('update_workingschedule/', views.update_workingschedule), 
 
