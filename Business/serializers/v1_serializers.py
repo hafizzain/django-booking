@@ -5,7 +5,7 @@ from cmath import e
 from dataclasses import field
 from locale import currency
 from pyexpat import model
-from Utility.models import Currency
+from Utility.models import Currency, State, Country,City
 from rest_framework import serializers
 
 from Business.models import BookingSetting, BusinessAddressMedia, BusinessType, Business, BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BusinessPaymentMethod, BusinessTax, BusinessVendor,BusinessOpeningHour
@@ -13,6 +13,21 @@ from Authentication.serializers import UserSerializer
 from django.conf import settings
 
 from Product.Constants.index  import tenant_media_base_url
+
+class CountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        exclude = ['is_deleted', 'created_at', 'unique_code', 'key']
+    
+class StateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = State
+        exclude = ['is_deleted', 'created_at', 'unique_code', 'key']
+        
+class CitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        exclude = ['is_deleted', 'created_at', 'unique_code', 'key']
 
 class BusinessTypeSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
@@ -185,6 +200,27 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
     close_time= serializers.SerializerMethodField(read_only=True)
     currency = serializers.SerializerMethodField(read_only=True)
     images = serializers.SerializerMethodField(read_only=True)
+    
+    country = serializers.SerializerMethodField(read_only=True)
+    state = serializers.SerializerMethodField(read_only=True)
+    city = serializers.SerializerMethodField(read_only=True)
+    
+    def get_country(self, obj):
+        try:
+            return CountrySerializer(obj.country).data
+        except Country.DoesNotExist:
+            return None
+    def get_state(self, obj):
+        try:
+            return StateSerializer(obj.state).data
+        except State.DoesNotExist:
+            return None
+    
+    def get_city(self, obj):
+        try:
+            return CitySerializer(obj.city).data
+        except City.DoesNotExist:
+            return None    
     
     def get_images(self, obj):
         try:
