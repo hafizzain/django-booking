@@ -1251,17 +1251,21 @@ def create_sale_order(request):
             try:
                 product = Product.objects.get(id = service_id)
                 
+                transfer = ProductStock.objects.get(product__id=product, location = business_address )
+                
                 ExceptionRecord.objects.create(
                     is_resolved = True, 
-                    text= f'product id in sale {product}'
+                    text= f'product id in sale {product} location {business_address} transfer {transfer}'
                 )
                 
-                # transfer = ProductStock.objects.get(product__id=product, location = business_address )
-                # if transfer.available_quantity > int(quantity):
-                #     sold = transfer.available_quantity - int(quantity)
-                #     transfer.available_quantity = sold
-                #     transfer.sold_quantity += int(quantity)
-                #     transfer.save()
+                
+                if transfer.available_quantity > int(quantity):
+                    sold = transfer.available_quantity - int(quantity)
+                    transfer.available_quantity = sold
+                    transfer.sold_quantity += int(quantity)
+                    transfer.save()
+                else:
+                    errors.append('Available quantity issue')
                 
                 # product_stock = product.product_stock.all()#.first()
                 # available = 0
@@ -1522,7 +1526,7 @@ def create_sale_order(request):
                 'response' : {
                     'message' : 'Product Order Sale Created!',
                     'error_message' : None,
-                    'sale' : serialized.data
+                    'sale' : serialized.data,
                 }
             },
             status=status.HTTP_201_CREATED
