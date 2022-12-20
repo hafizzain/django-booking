@@ -522,14 +522,14 @@ def create_employee(request):
     income_type = request.data.get('income_type', 'Hourly_Rate')
     salary = request.data.get('salary', None) 
     
-    end_time= request.data.get('end_time',None)
-    start_time = request.data.get('start_time', None)
+    #end_time= request.data.get('end_time',None)
+    #start_time = request.data.get('start_time', None)
     working_days = request.data.get('working_days',None)
     staff_id = request.data.get('staff_group', None)
     #level = request.data.get('level',None)
     
-    start_time = request.data.get('start_time',None)
-    end_time = request.data.get('end_time',None)
+    #start_time = request.data.get('start_time',None)
+    #end_time = request.data.get('end_time',None)
     maximum_discount = request.data.get('maximum_discount',None)
     
     services_id = request.data.get('services', None)   
@@ -676,7 +676,8 @@ def create_employee(request):
             pass
     
     employee_p_info = EmployeeProfessionalInfo.objects.create(employee=employee,
-            start_time = start_time , end_time = end_time, maximum_discount = maximum_discount,
+           # start_time = start_time , end_time = end_time, 
+            maximum_discount = maximum_discount,
             salary=salary, designation = designation )
     # employee_mp = EmployeeModulePermission.objects.create(employee=employee)
     # employee_p_setting = EmployeePermissionSetting.objects.create(employee = employee)

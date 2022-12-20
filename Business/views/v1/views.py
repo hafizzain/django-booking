@@ -9,7 +9,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
-from Business.models import BusinessType
+from Business.models import BusinessAddressMedia, BusinessType
 from Business.serializers.v1_serializers import OpeningHoursSerializer,AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer
 
 from NStyle.Constants import StatusCodes
@@ -889,11 +889,21 @@ def update_location(request):
         business_address.mobile_number= request.data.get('mobile_number', business_address.mobile_number)
         business_address.email= request.data.get('email', business_address.email)
         business_address.banking= request.data.get('banking', business_address.banking)
+        business_address.service_avaiable= request.data.get('service_avaiable', business_address.service_avaiable)
+        business_address.location_name= request.data.get('location_name', business_address.location_name)
              
         country = request.data.get('country', None)
         state = request.data.get('state', None)
         city = request.data.get('city', None)
         currency = request.data.get('currency', None)
+        images = request.data.get('images', None)
+        
+        if images is not None:
+            images = BusinessAddressMedia.objects.create(
+                business = business_address.business,
+                business_address = business_address,
+                image = images
+            )
 
         try:
             if currency is not None:
@@ -942,7 +952,6 @@ def update_location(request):
             
             print(day)
             s_day = opening_day.get(day.lower(), None)
-            print(s_day)
             if s_day is not None:
                 bds_schedule.start_time = s_day['start_time']
                 bds_schedule.close_time = s_day['end_time']

@@ -8,7 +8,7 @@ from pyexpat import model
 from Utility.models import Currency
 from rest_framework import serializers
 
-from Business.models import BookingSetting, BusinessType, Business, BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BusinessPaymentMethod, BusinessTax, BusinessVendor,BusinessOpeningHour
+from Business.models import BookingSetting, BusinessAddressMedia, BusinessType, Business, BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BusinessPaymentMethod, BusinessTax, BusinessVendor,BusinessOpeningHour
 from Authentication.serializers import UserSerializer
 from django.conf import settings
 
@@ -161,6 +161,12 @@ class Business_PutSerializer(serializers.ModelSerializer):
         ]
 
 
+class BusinessAddressMediaSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model= BusinessAddressMedia
+        fields= '__all__'
+        
 class OpeningHoursSerializer(serializers.ModelSerializer):
     
     class Meta:
@@ -178,12 +184,18 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
     start_time=  serializers.SerializerMethodField(read_only=True)
     close_time= serializers.SerializerMethodField(read_only=True)
     currency = serializers.SerializerMethodField(read_only=True)
+    images = serializers.SerializerMethodField(read_only=True)
     
+    def get_images(self, obj):
+        try:
+            image = BusinessAddressMedia.objects.get(business_address = obj)
+            return BusinessAddressMediaSerializer(image).data
+        except Exception as err:
+            print(err)
+            
     def get_currency(self, obj):
         try:
-            print(obj.currency)
             currency = Currency.objects.get(id=obj.currency.id)
-            #print(location)
             return CurrencySerializer(currency).data
         
         except Exception as err:
@@ -192,7 +204,6 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
     def get_opening_hours(self, obj):
         try:
             location = BusinessOpeningHour.objects.filter(business_address=obj)
-            #print(location)
             return OpeningHoursSerializer(location, many=True).data
         
         except BusinessOpeningHour.DoesNotExist:
@@ -236,6 +247,9 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
             'banking',
             'start_time',
             'close_time',
+            'service_avaiable',
+            'location_name',
+            'images',
             'opening_hours',
             'is_deleted'
         ]

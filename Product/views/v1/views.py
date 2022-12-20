@@ -1664,6 +1664,8 @@ def update_orderstockproduct(request):
     stockproduct_id = request.data.get('stockproduct_id', None)
     note = request.data.get('note', None)
     rec_quantity = request.data.get('rec_quantity', None)
+    product_id = request.data.get('product_id', None)
+    to_location = request.data.get('to_location', None)
     error = []
     if stockproduct_id is None:
             return Response(
@@ -1703,6 +1705,51 @@ def update_orderstockproduct(request):
     if rec_quantity is not None:
         order_stock.rec_quantity = rec_quantity
         order_stock.save()
+    
+    try:
+        product = Product.objects.get(id=product_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Product Not found',
+                    'error_message' : str(err),
+                    
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    try:
+        location = BusinessAddress.objects.get(id=to_location)
+    except:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Location Not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    
+    try:
+        added_product = ProductStock.objects.get(product__id=product, location = location )
+        added_product.available_quantity += rec_quantity
+        added_product.save()
+        
+    except Exception as err:
+        ExceptionRecord.objects.create(
+            is_resolved = True, 
+            text= f'Issue raised in orderstockproduct quantity {str(err)}'
+        )
     
     serializer = OrderProductSerializer(order_stock, data=request.data, partial=True, context={'request' : request})
     if serializer.is_valid():
@@ -1802,7 +1849,7 @@ def add_product_consumption(request):
         quantity = quantity
     )
     try:
-        consumed = ProductStock.objects.get(product__id=product_id, location = location_id )
+        consumed = ProductStock.objects.get(product__id=product, location = location )
         if consumed.available_quantity >= int(quantity):
             sold = consumed.available_quantity - int(quantity)
             consumed.available_quantity = sold
