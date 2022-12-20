@@ -897,6 +897,13 @@ def update_location(request):
         city = request.data.get('city', None)
         currency = request.data.get('currency', None)
         images = request.data.get('images', None)
+        is_publish = request.data.get('is_publish', None)
+        
+        if is_publish is not None:
+            business_address.is_publish = True
+        else:
+            business_address.is_publish = True
+            
         
         if images is not None:
             images = BusinessAddressMedia.objects.create(
