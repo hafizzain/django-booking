@@ -316,6 +316,15 @@ class ProductSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['slug', 'id']
 class ProductOrderSerializer(serializers.ModelSerializer):
+    avaiable = serializers.SerializerMethodField()
+    
+    def get_avaiable(self, obj):
+        try:
+            quantity = ProductStock.objects.filter(product = obj)
+            return ProductStockSerializer(quantity, many = True).data
+        except Exception as err:
+            print(err)
+            
     class Meta:
         model = Product
         fields = '__all__'
@@ -358,7 +367,7 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model= OrderStock
         fields=('id','business','vendor','to_location','from_location','to_location_name',
-                'status','vendor_name','location_name','products')
+                'status','vendor_name','location_name','products', 'created_at')
 
 
 class ProductConsumptionSerializer(serializers.ModelSerializer):
