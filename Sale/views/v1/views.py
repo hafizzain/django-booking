@@ -1251,21 +1251,29 @@ def create_sale_order(request):
             try:
                 product = Product.objects.get(id = service_id)
                 
-                transfer = ProductStock.objects.get(product__id=product, location = business_address )
-                
                 ExceptionRecord.objects.create(
-                    is_resolved = True, 
-                    text= f'product id in sale {product} location {business_address} transfer {transfer}'
-                )
+                        is_resolved = True, 
+                        text= f'product id in sale test {product} location {business_address} '
+                    )
+                try:
+                    transfer = ProductStock.objects.get(product__id=product, location = business_address )
+                    
+                    ExceptionRecord.objects.create(
+                        is_resolved = True, 
+                        text= f'product id in sale {product} location {business_address} transfer {transfer}'
+                    )
+                    
+                    
+                    if transfer.available_quantity > int(quantity):
+                        sold = transfer.available_quantity - int(quantity)
+                        transfer.available_quantity = sold
+                        transfer.sold_quantity += int(quantity)
+                        transfer.save()
+                    else:
+                        errors.append('Available quantity issue')
                 
-                
-                if transfer.available_quantity > int(quantity):
-                    sold = transfer.available_quantity - int(quantity)
-                    transfer.available_quantity = sold
-                    transfer.sold_quantity += int(quantity)
-                    transfer.save()
-                else:
-                    errors.append('Available quantity issue')
+                except Exception as err:
+                    errors.append(str(err))
                 
                 # product_stock = product.product_stock.all()#.first()
                 # available = 0
@@ -1525,7 +1533,7 @@ def create_sale_order(request):
                 'status_code' : 201,
                 'response' : {
                     'message' : 'Product Order Sale Created!',
-                    'error_message' : None,
+                    'error_message' : errors,
                     'sale' : serialized.data,
                 }
             },
