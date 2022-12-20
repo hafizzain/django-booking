@@ -1256,7 +1256,7 @@ def create_sale_order(request):
                         text= f'product id in sale test {product} location {business_address} '
                     )
                 try:
-                    transfer = ProductStock.objects.get(product__id=product, location = business_address )
+                    transfer = ProductStock.objects.get(product__id=product.id, location = business_address.id )
                     
                     ExceptionRecord.objects.create(
                         is_resolved = True, 
