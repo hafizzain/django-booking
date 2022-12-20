@@ -318,7 +318,7 @@ class ProductSerializer(serializers.ModelSerializer):
 class ProductOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ('id', 'name')
+        fields = '__all__'
         
 class OrderProductSerializer(serializers.ModelSerializer):
     product = ProductOrderSerializer()
