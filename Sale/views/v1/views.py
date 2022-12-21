@@ -746,7 +746,7 @@ def update_servicegroup(request):
                 'status' : False,
                 'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
                 'response' : {
-                    'message' : 'Invialid Data',
+                    'message' : 'Invalid Data',
                     'error_message' : str(serializer.errors),
                 }
             },
@@ -1250,19 +1250,9 @@ def create_sale_order(request):
             #for pro in ids:
             try:
                 product = Product.objects.get(id = service_id)
-                
-                ExceptionRecord.objects.create(
-                        is_resolved = True, 
-                        text= f'product id in sale test {product} location {business_address} '
-                    )
+
                 try:
-                    transfer = ProductStock.objects.get(product__id=product.id, location = business_address.id )
-                    
-                    ExceptionRecord.objects.create(
-                        is_resolved = True, 
-                        text= f'product id in sale {product} location {business_address} transfer {transfer}'
-                    )
-                    
+                    transfer = ProductStock.objects.get(product__id=product.id, location = business_address.id)
                     
                     if transfer.available_quantity > int(quantity):
                         sold = transfer.available_quantity - int(quantity)

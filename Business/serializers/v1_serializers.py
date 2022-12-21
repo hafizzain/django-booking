@@ -239,7 +239,7 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
     
     def get_opening_hours(self, obj):
         try:
-            location = BusinessOpeningHour.objects.filter(business_address=obj)
+            location = BusinessOpeningHour.objects.filter(business_address=obj).order_by('-created_at')
             return OpeningHoursSerializer(location, many=True).data
         
         except BusinessOpeningHour.DoesNotExist:
