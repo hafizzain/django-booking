@@ -1,4 +1,5 @@
 from cmath import cos
+from threading import Thread
 from django.http import HttpResponse
 from Utility.models import NstyleFile, ExceptionRecord
 from rest_framework.decorators import api_view, permission_classes
@@ -46,6 +47,15 @@ def get_test_api(request):
     data.append(str(product.id))
     product = Product.objects.get(id = '340b2c1f-ff66-4327-9cfe-692dff48ca40')#filter(is_deleted = False).exclude(id__in = location_ids)
     data.append(str(product))
+    
+    try:
+        thrd = Thread(target=add_product, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
+        thrd.start()
+    except Exception as err:
+        ExceptionRecord.objects.create(
+            text=str(err)
+        )
+    
         #data =  ProductStockTransfer.objects.filter(product = i).aggregate(Sum('quantity'))
     print(data)
     

@@ -722,6 +722,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     # sunday =  serializers.SerializerMethodField(read_only=True)
     
     schedule =  serializers.SerializerMethodField(read_only=True)
+    vacation =  serializers.SerializerMethodField(read_only=True)
     
     image = serializers.SerializerMethodField()
     
@@ -735,6 +736,10 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     def get_schedule(self, obj):
         schedule =  EmployeDailySchedule.objects.filter(employee= obj )
         return ScheduleSerializer(schedule, many = True,context=self.context).data
+    
+    def get_vacation(self, obj):
+        vacation = Vacation.objects.filter(employee= obj )
+        return VacationSerializer(vacation, many = True,context=self.context).data
     
     def get_image(self, obj):
         if obj.image:
@@ -805,7 +810,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Employee
-        fields = ['id', 'full_name','image','start_time', 'end_time','schedule','location','created_at']# 'monday','tuesday','wednesday','thursday','friday','saturday','sunday','created_at']
+        fields = ['id', 'full_name','image','start_time', 'end_time','vacation','schedule','location','created_at']# 'monday','tuesday','wednesday','thursday','friday','saturday','sunday','created_at']
 
 
 
