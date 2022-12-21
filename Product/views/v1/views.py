@@ -843,7 +843,7 @@ def add_product(request):
                 try:
                     loc = BusinessAddress.objects.get(id = location_id)
                     ExceptionRecord.objects.create(text=loc)
-                    location_ids.extend(loc)
+                    location_ids.append(loc)
                 except Exception as err:
                     ExceptionRecord.objects.create(text=str(err))
     
