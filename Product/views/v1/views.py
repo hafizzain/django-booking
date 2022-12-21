@@ -861,7 +861,6 @@ def add_product(request):
                         is_active = stock_status,
                     )
                     try:
-                        product_error.append(location_ids)
                         location_remaing = BusinessAddress.objects.filter(is_deleted = False).exclude(id__in = location_ids)
                         for i, value in enumerate(location_remaing):
                             ExceptionRecord.objects.create(is_resolved = True, text=f'id is remaing{i} and {value}')
