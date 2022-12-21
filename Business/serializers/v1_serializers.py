@@ -287,7 +287,8 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
             'location_name',
             'images',
             'opening_hours',
-            'is_deleted'
+            'is_deleted',
+            'is_publish',
         ]
 
 class BusinessThemeSerializer(serializers.ModelSerializer):

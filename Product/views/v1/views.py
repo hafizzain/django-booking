@@ -40,7 +40,8 @@ def get_test_api(request):
     # #data = product_stock.available_quantity
     # data = 1
     # print(data)
-    product = Product.objects.all()
+    location_ids = ['c7dfffd8-f399-48bf-9165-3fe26f565992','340b2c1f-ff66-4327-9cfe-692dff48ca40','8f8b22c9-8410-46b8-b0c7-f520a1480357']
+    product = Product.objects.filter(is_deleted = False).exclude(id__in = location_ids)
     for i in product:
         print(i)
         #data =  ProductStockTransfer.objects.filter(product = i).aggregate(Sum('quantity'))
@@ -860,15 +861,16 @@ def add_product(request):
                         alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
                         is_active = stock_status,
                     )
-                    try:
-                        location_remaing = BusinessAddress.objects.filter(is_deleted = False).exclude(id__in = location_ids)
-                        for i, value in enumerate(location_remaing):
-                            ExceptionRecord.objects.create(is_resolved = True, text=f'id is remaing{i} and {value}')
-                    except Exception as err:
-                        product_error.append(str(err))
 
             else:
                 ExceptionRecord.objects.create(text=f'fields not all {location_id}, {current_stock}, {low_stock}, {reorder_quantity}')
+                
+        try:
+            location_remaing = BusinessAddress.objects.filter(is_deleted = False).exclude(id__in = location_ids)
+            for i, value in enumerate(location_remaing):
+                ExceptionRecord.objects.create(is_resolved = True, text=f'id is remaing{i} and {value}')
+        except Exception as err:
+            product_error.append(str(err))
 
     else:
         ExceptionRecord.objects.create(text='No Location Quantities Find')
