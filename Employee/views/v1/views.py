@@ -438,7 +438,7 @@ def single_employee_schedule(request):
 @permission_classes([AllowAny])
 def working_schedule(request):
     all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
-    serialized = WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request} )
+    serialized = WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request,} )
    
     return Response(
         {
