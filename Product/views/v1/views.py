@@ -860,9 +860,12 @@ def add_product(request):
                         alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
                         is_active = stock_status,
                     )
-                    location_remaing = BusinessAddress.objects.filter(is_deleted = False).exclude(id__in = location_ids)
-                    for i, value in enumerate(location_remaing):
-                        ExceptionRecord.objects.create(is_resolved = True, text=f'id is remaing{i} and {value}')
+                    try:
+                        location_remaing = BusinessAddress.objects.filter(is_deleted = False).exclude(id__in = location_ids)
+                        for i, value in enumerate(location_remaing):
+                            ExceptionRecord.objects.create(is_resolved = True, text=f'id is remaing{i} and {value}')
+                    except Exception as err:
+                        product_error.append(str(err))
 
             else:
                 ExceptionRecord.objects.create(text=f'fields not all {location_id}, {current_stock}, {low_stock}, {reorder_quantity}')
