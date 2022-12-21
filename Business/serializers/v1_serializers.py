@@ -177,7 +177,17 @@ class Business_PutSerializer(serializers.ModelSerializer):
 
 
 class BusinessAddressMediaSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
     
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request)
+                return f'{url}{obj.image}'
+            except:
+                return obj.image
+        return None
     class Meta:
         model= BusinessAddressMedia
         fields= '__all__'
