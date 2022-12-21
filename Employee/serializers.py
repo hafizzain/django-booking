@@ -724,6 +724,12 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     schedule =  serializers.SerializerMethodField(read_only=True)
     
     image = serializers.SerializerMethodField()
+    
+    location = serializers.SerializerMethodField(read_only=True)
+    
+    def get_location(self, obj):
+        loc = obj.location.all()
+        return LocationSerializer(loc, many =True ).data
 
     
     def get_schedule(self, obj):
@@ -799,7 +805,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Employee
-        fields = ['id', 'full_name','image','start_time', 'end_time','schedule','created_at']# 'monday','tuesday','wednesday','thursday','friday','saturday','sunday','created_at']
+        fields = ['id', 'full_name','image','start_time', 'end_time','schedule','location','created_at']# 'monday','tuesday','wednesday','thursday','friday','saturday','sunday','created_at']
 
 
 
