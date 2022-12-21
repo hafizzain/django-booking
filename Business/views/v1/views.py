@@ -902,7 +902,7 @@ def update_location(request):
         if is_publish is not None:
             business_address.is_publish = True
         else:
-            business_address.is_publish = True
+            business_address.is_publish = False
             
         
         if images is not None:
@@ -963,6 +963,8 @@ def update_location(request):
             if s_day is not None:
                 bds_schedule.start_time = s_day['start_time']
                 bds_schedule.close_time = s_day['end_time']
+                bds_schedule.is_closed = False
+
             else:
                 bds_schedule.is_closed = True
 
