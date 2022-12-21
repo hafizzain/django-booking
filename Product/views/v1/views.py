@@ -1,6 +1,7 @@
 from cmath import cos
 from threading import Thread
 from django.http import HttpResponse
+from Product.Constants.Add_Product import add_product_remaing
 from Utility.models import NstyleFile, ExceptionRecord
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -49,7 +50,7 @@ def get_test_api(request):
     data.append(str(product))
     
     try:
-        thrd = Thread(target=add_product, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
+        thrd = Thread(target=add_product_remaing, args=[], kwargs={'product' : product, 'tenant' : request.tenant})
         thrd.start()
     except Exception as err:
         ExceptionRecord.objects.create(
@@ -57,7 +58,7 @@ def get_test_api(request):
         )
     
         #data =  ProductStockTransfer.objects.filter(product = i).aggregate(Sum('quantity'))
-    print(data)
+    #print(data)
     
     # product = Product.objects.filter(is_deleted = False).exclude(id__in = data)
     # for i in product:
@@ -729,11 +730,11 @@ def add_product(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     if stock_status is not None:
-        stock_status = json.loads(stock_status)
+        stock_status = False #json.loads(stock_status)
     else: 
         stock_status = True
     if alert_when_stock_becomes_lowest  is not None:
-        alert_when_stock_becomes_lowest= json.loads(alert_when_stock_becomes_lowest)
+        alert_when_stock_becomes_lowest= True #json.loads(alert_when_stock_becomes_lowest)
     else:
         alert_when_stock_becomes_lowest= False
     try:
@@ -884,8 +885,25 @@ def add_product(request):
                 
         try:
             location_remaing = BusinessAddress.objects.filter(is_deleted = False).exclude(id__in = location_ids)
-            for i, value in enumerate(location_remaing):
-                ExceptionRecord.objects.create(is_resolved = True, text=f'id is remaing{i} and {value}')
+            for i, location_id in enumerate(location_remaing):
+                ProductStock.objects.create(
+                        user = user,
+                        business = business,
+                        product = product,
+                        location = location_id,
+                        available_quantity = 0,
+                        low_stock = 0, 
+                        reorder_quantity = 0,
+                        alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
+                        is_active = stock_status,
+                    )
+        #         try:
+        #             thrd = Thread(target=add_product_remaing, args=[], kwargs={'product' : product, 'business' : business, 'location': location_id})
+        #             thrd.start()
+        #         except Exception as err:
+        #             ExceptionRecord.objects.create(
+        #                 text=str(err)
+        # )
         except Exception as err:
             product_error.append(str(err))
 
@@ -1767,14 +1785,14 @@ def update_orderstockproduct(request):
     
     
     try:
-        added_product = ProductStock.objects.get(product__id=product, location = location )
+        added_product = ProductStock.objects.get(product__id=product.id, location = location.id )
         added_product.available_quantity += rec_quantity
         added_product.save()
         
     except Exception as err:
         ExceptionRecord.objects.create(
             is_resolved = True, 
-            text= f'Issue raised in orderstockproduct quantity {str(err)}'
+            text= f'Issue raised in orderstockproduct quantity line 1795 {str(err)}'
         )
     
     serializer = OrderProductSerializer(order_stock, data=request.data, partial=True, context={'request' : request})
