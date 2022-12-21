@@ -1190,7 +1190,7 @@ def search_product(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_stocks(request):
-    all_stocks = Product.objects.filter(is_active=True, is_deleted=False, product_stock__gt=0 )
+    all_stocks = Product.objects.filter(is_active=True, is_deleted=False, product_stock__gt=0 ).order_by('-created_at').distinct()
     serialized = ProductWithStockSerializer(all_stocks, many=True, context={'request' : request})
     return Response(
         {
