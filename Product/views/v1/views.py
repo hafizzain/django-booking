@@ -42,8 +42,10 @@ def get_test_api(request):
     # print(data)
     data = []
     location_ids = ['c7dfffd8-f399-48bf-9165-3fe26f565992','340b2c1f-ff66-4327-9cfe-692dff48ca40','8f8b22c9-8410-46b8-b0c7-f520a1480357']
-    product = Product.objects.filter(is_deleted = False).exclude(id__in = location_ids)
-    data.append(product.id)
+    product = Product.objects.get(id = 'c7dfffd8-f399-48bf-9165-3fe26f565992')#filter(is_deleted = False).exclude(id__in = location_ids)
+    data.append(str(product.id))
+    product = Product.objects.get(id = '340b2c1f-ff66-4327-9cfe-692dff48ca40')#filter(is_deleted = False).exclude(id__in = location_ids)
+    data.append(str(product))
         #data =  ProductStockTransfer.objects.filter(product = i).aggregate(Sum('quantity'))
     print(data)
     
@@ -51,16 +53,16 @@ def get_test_api(request):
     # for i in product:
     #     print('test')
     
-    try:
-        added = ProductStock.objects.get(product__id=product_id, location = str(from_location_id) )
-        print(added)
-        # sold = added.available_quantity - 3
-        # added.available_quantity = sold
-        # added.save()
-        # print(sold)
-        # print(added.available_quantity)
-    except Exception as err:
-        print(err)
+    # try:
+    #     added = ProductStock.objects.get(product__id=product_id, location = str(from_location_id) )
+    #     print(added)
+    #     # sold = added.available_quantity - 3
+    #     # added.available_quantity = sold
+    #     # added.save()
+    #     # print(sold)
+    #     # print(added.available_quantity)
+    # except Exception as err:
+    #     print(err)
     data = 'test'
     return Response(
         {
@@ -849,7 +851,7 @@ def add_product(request):
                 try:
                     loc = BusinessAddress.objects.get(id = location_id)
                     ExceptionRecord.objects.create(text=loc)
-                    location_ids.append(loc)
+                    location_ids.append(str(loc))
                 except Exception as err:
                     ExceptionRecord.objects.create(text=str(err))
     
