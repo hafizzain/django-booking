@@ -551,7 +551,7 @@ def get_business_locations(request, business_id):
     ).order_by('-created_at').distinct()
     data = []
     if len(business_addresses) > 0:
-        serialized = BusinessAddress_GetSerializer(business_addresses, many=True)
+        serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
         data = serialized.data
 
     return Response(
@@ -741,7 +741,7 @@ def add_business_location(request):
     # if serialized.is_valid():
     #     serialized.save()
     #     data.update(serialized.data)
-    serialized = BusinessAddress_GetSerializer(business_address)
+    serialized = BusinessAddress_GetSerializer(business_address, context={'request' : request})
     # if serialized.is_valid():
     #     serialized.save()
     #     data.update(serialized.data)
@@ -971,7 +971,7 @@ def update_location(request):
 
             bds_schedule.save()
 
-        serialized = BusinessAddress_GetSerializer(business_address)
+        serialized = BusinessAddress_GetSerializer(business_address, context={'request' : request})
 
         return Response(
                 {
