@@ -2749,7 +2749,7 @@ def create_workingschedule(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
     try:
-        employee_id=Employee.objects.get(id=employee)
+        employee_id=Employee.objects.get(id=employee, is_deleted = False)
     except Exception as err:
             return Response(
                 {
