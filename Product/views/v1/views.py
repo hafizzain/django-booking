@@ -842,6 +842,7 @@ def add_product(request):
             if all([location_id, current_stock, low_stock, reorder_quantity]):
                 try:
                     loc = BusinessAddress.objects.get(id = location_id)
+                    ExceptionRecord.objects.create(text=loc)
                     location_ids.extend(loc)
                 except Exception as err:
                     ExceptionRecord.objects.create(text=str(err))
