@@ -1509,8 +1509,6 @@ def create_orderstock(request):
             status=status.HTTP_201_CREATED
         ) 
  
- 
- 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_orderstock(request):
@@ -1786,7 +1784,7 @@ def update_orderstockproduct(request):
     
     try:
         added_product = ProductStock.objects.get(product__id=product.id, location = location.id )
-        added_product.available_quantity += rec_quantity
+        added_product.available_quantity += int(rec_quantity)
         added_product.save()
         
     except Exception as err:
@@ -2244,8 +2242,6 @@ def add_product_stock_transfer(request):
         },
         status=status.HTTP_201_CREATED
     )
-
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
