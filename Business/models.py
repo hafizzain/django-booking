@@ -149,7 +149,7 @@ class BusinessAddressMedia(models.Model):
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_businessaddress_media')
     business_address = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_address_businessaddress_media')
 
-    image = models.ImageField(upload_to='business/addres_media/', null= True, blank= True)
+    image = models.ImageField(upload_to='business/address_media/', null= True, blank= True)
     is_cover = models.BooleanField(default=False)
 
     is_deleted = models.BooleanField(default=False)

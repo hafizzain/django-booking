@@ -858,6 +858,8 @@ def add_product(request):
                         alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
                         is_active = stock_status,
                     )
+                    
+                    
                     ExceptionRecord.objects.create(is_resolved = True, text='Created')
 
             else:
