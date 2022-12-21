@@ -2768,12 +2768,25 @@ def create_workingschedule(request):
         business = business ,
         employee = employee_id,
         day = day,
-        start_time = start_time,
-        end_time = end_time,
-        start_time_shift = start_time_shift,
-        end_time_shift = end_time_shift,
         
     )
+    try:
+        working_schedule.start_time = start_time,
+        working_schedule.end_time = end_time,
+        working_schedule.start_time_shift = start_time_shift,
+        working_schedule.end_time_shift = end_time_shift,
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'response' : {
+                    'message' : 'Error in time',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
     
     if is_leave is not None:
         working_schedule.is_leave = True
