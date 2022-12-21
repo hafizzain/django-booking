@@ -891,6 +891,7 @@ def update_location(request):
         business_address.banking= request.data.get('banking', business_address.banking)
         business_address.service_avaiable= request.data.get('service_avaiable', business_address.service_avaiable)
         business_address.location_name= request.data.get('location_name', business_address.location_name)
+        business_address.description= request.data.get('description', business_address.description)
              
         country = request.data.get('country', None)
         state = request.data.get('state', None)

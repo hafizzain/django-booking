@@ -40,12 +40,17 @@ def get_test_api(request):
     # #data = product_stock.available_quantity
     # data = 1
     # print(data)
+    data = []
     location_ids = ['c7dfffd8-f399-48bf-9165-3fe26f565992','340b2c1f-ff66-4327-9cfe-692dff48ca40','8f8b22c9-8410-46b8-b0c7-f520a1480357']
     product = Product.objects.filter(is_deleted = False).exclude(id__in = location_ids)
-    for i in product:
-        print(i)
+    data.append(product.id)
         #data =  ProductStockTransfer.objects.filter(product = i).aggregate(Sum('quantity'))
-    print(product_id, from_location_id)
+    print(data)
+    
+    # product = Product.objects.filter(is_deleted = False).exclude(id__in = data)
+    # for i in product:
+    #     print('test')
+    
     try:
         added = ProductStock.objects.get(product__id=product_id, location = str(from_location_id) )
         print(added)
@@ -1858,7 +1863,7 @@ def add_product_consumption(request):
         quantity = quantity
     )
     try:
-        consumed = ProductStock.objects.get(product__id=product, location = location )
+        consumed = ProductStock.objects.get(product__id=product.id, location = location.id )
         if consumed.available_quantity >= int(quantity):
             sold = consumed.available_quantity - int(quantity)
             consumed.available_quantity = sold

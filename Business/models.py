@@ -111,6 +111,7 @@ class BusinessAddress(models.Model):
     mobile_number = models.CharField(default='', max_length=30)
     is_mobile_verified = models.BooleanField(default=False)
     
+    description =  models.CharField(max_length=300, null=True, blank=True)
     banking = models.CharField(choices = BANKING_CHOICE , default = 'Disable' , max_length = 50)
     
     is_publish = models.BooleanField(default=False)
