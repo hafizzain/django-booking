@@ -178,6 +178,8 @@ def delete_stafftarget(request):
 @permission_classes([IsAuthenticated])
 def update_stafftarget(request):
     stafftarget_id = request.data.get('id', None)
+    year = request.data.get('year', None)
+    month = request.data.get('month', None)
     if stafftarget_id is None: 
        return Response(
             {
@@ -209,7 +211,19 @@ def update_stafftarget(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    try:
+        request.data._mutable = True
+    except:
+        pass
+    date_string =  f'{year} {month} 01'
+    c_year = datetime.strptime(date_string, '%Y %B %d')
+    request.data['year'] = c_year
+    staff_target.year = c_year
+    print(c_year)
+    staff_target.save()
+    
     serializer = StaffTargetSerializers(staff_target, data=request.data, partial=True, context={'request' : request})
+    serializer.year = c_year
     if not serializer.is_valid():
         return Response(
                 {
@@ -217,7 +231,7 @@ def update_stafftarget(request):
             'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
             'response' : {
                 'message' : 'Staff Target Serializer Invalid',
-                'error_message' : 'Error on update staff Target',
+                'error_message' : serializer.errors,
             }
         },
         status=status.HTTP_404_NOT_FOUND

@@ -1906,7 +1906,7 @@ def add_product_consumption(request):
         if consumed.available_quantity >= int(quantity):
             sold = consumed.available_quantity - int(quantity)
             consumed.available_quantity = sold
-            consumed.sold_quantity += int(quantity)
+            #consumed.sold_quantity += int(quantity)
             consumed.save()
         else:
             return Response(
@@ -2036,7 +2036,7 @@ def update_product_consumptions(request):
         if consumed.available_quantity > int(quantity):
             sold = consumed.available_quantity - int(quantity)
             consumed.available_quantity = sold
-            consumed.sold_quantity += int(quantity)
+            #consumed.sold_quantity += int(quantity)
             consumed.save()
         else:
             return Response(
@@ -2218,7 +2218,7 @@ def add_product_stock_transfer(request):
         if transfer.available_quantity >= int(quantity):
             sold = transfer.available_quantity - int(quantity)
             transfer.available_quantity = sold
-            transfer.sold_quantity += int(quantity)
+            #transfer.sold_quantity += int(quantity)
             transfer.save()
         try :
             transfer = ProductStock.objects.get(product__id=product.id, location = to_location )
