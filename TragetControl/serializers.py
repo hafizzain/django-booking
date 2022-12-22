@@ -58,7 +58,7 @@ class StaffTargetSerializers(serializers.ModelSerializer):
             print(err)
     class Meta:
         model = StaffTarget
-        fields = ['id','month', 'service_target', 'retail_target', 'year_add','employee','created_at']
+        fields = ['id','month', 'service_target', 'retail_target', 'year','employee','created_at']
 
 class ServiceGroupSerializers(serializers.ModelSerializer):
     
@@ -148,7 +148,7 @@ class RetailTargetSerializers(serializers.ModelSerializer):
     
     class Meta:
         model = RetailTarget
-        fields = ['id', 'location', 'brand', 'month','brand_target']
+        fields = ['id', 'location', 'brand', 'month','brand_target','year']
     
 class ServiceTargetSerializers(serializers.ModelSerializer):
     
@@ -171,4 +171,4 @@ class ServiceTargetSerializers(serializers.ModelSerializer):
     
     class Meta:
         model = ServiceTarget
-        fields = ['id', 'location', 'service_group', 'month','service_target']
+        fields = ['id', 'location', 'service_group', 'month','service_target','year']

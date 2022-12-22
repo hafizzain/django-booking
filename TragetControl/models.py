@@ -91,6 +91,7 @@ class TierStoreTarget(models.Model):
     retail_target = models.PositiveIntegerField(default=0)
     voucher_target = models.PositiveIntegerField(default=0)
     membership_target = models.PositiveIntegerField(default=0)
+    year = models.DateTimeField( null = True, blank =True)
 
     is_primary = models.BooleanField(default=False)
 
@@ -121,6 +122,7 @@ class ServiceTarget(models.Model):
     service_group = models.ForeignKey(ServiceGroup, on_delete=models.SET_NULL, null=True, related_name='servicegroup_servicetarget')
     
     month = models.CharField(choices=MONTH_CHOICE, max_length=100, default='January')
+    year = models.DateTimeField( null = True, blank =True)
 
     service_target = models.PositiveIntegerField(default=0)
     
@@ -153,6 +155,7 @@ class RetailTarget(models.Model):
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, related_name='brand_retailtarget')
     
     month = models.CharField(choices=MONTH_CHOICE, max_length=100, default='January')
+    year = models.DateTimeField( null = True, blank =True)
 
     brand_target = models.PositiveIntegerField(default=0)
     

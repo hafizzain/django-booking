@@ -413,6 +413,8 @@ def create_storetarget(request):
         voucher_target = tier.get('voucher_target', None)
         membership_target = tier.get('membership_target', None)
         is_primary = tier.get('is_primary', None)
+        year = request.data.get('year', None)
+
         
         tier_store =  TierStoreTarget.objects.create(
             storetarget = store_target,
@@ -423,6 +425,11 @@ def create_storetarget(request):
             membership_target = membership_target,
             
         )
+        date_string =  f'{year} {month} 01'
+        c_year = datetime.strptime(date_string, '%Y %B %d')
+        tier_store.year = c_year
+        tier_store.save()
+        
         if bool(is_primary) == True:
             tier_store.is_primary = True
         else:
@@ -631,6 +638,8 @@ def create_servicetarget(request):
     service_group = request.data.get('service_group', None)
     month = request.data.get('month', None)
     service_target = request.data.get('service_target', None)
+    year = request.data.get('year', None)
+
     
     if not all([business, month, service_group, service_target]):
         return Response(
@@ -706,7 +715,10 @@ def create_servicetarget(request):
         service_target = service_target,
         service_group = service_group_id,
     )
-    
+    date_string =  f'{year} {month} 01'
+    c_year = datetime.strptime(date_string, '%Y %B %d')
+    service_target.year = c_year
+    service_target.save()
     serializers= ServiceTargetSerializers(service_target, context={'request' : request})
     
     return Response(
@@ -900,6 +912,7 @@ def copy_servicetarget(request):
     user = request.user
     from_month = request.data.get('from_month', None)
     to_month = request.data.get('to_month', None)
+    
     print(to_month)
     
     if not all([from_month, to_month]):
@@ -1003,6 +1016,8 @@ def create_retailtarget(request):
     brand = request.data.get('brand', None)
     month = request.data.get('month', None)
     brand_target = request.data.get('brand_target', None)
+    year = request.data.get('year', None)
+
     
     if not all([business, month, brand, brand_target]):
         return Response(
@@ -1075,6 +1090,10 @@ def create_retailtarget(request):
         month =month,
         brand_target = brand_target,
     )
+    date_string =  f'{year} {month} 01'
+    c_year = datetime.strptime(date_string, '%Y %B %d')
+    retail.year = c_year
+    retail.save()
     
     serializers= RetailTargetSerializers(retail, context={'request' : request})
     
