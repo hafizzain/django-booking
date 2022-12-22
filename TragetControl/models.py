@@ -32,12 +32,23 @@ class StaffTarget(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_stafftarget')
     
     month = models.CharField(choices=MONTH_CHOICE, max_length=100, default='January')
+    year = models.DateTimeField( null = True, blank =True)
+
     
     service_target = models.PositiveIntegerField(default=0)
     retail_target = models.PositiveIntegerField(default=0)
     
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=now) 
+    
+    @property
+    def year_add(self):
+        try:
+            year = self.year.split('-')[0]
+            print(year)
+            return year
+        except:
+            return self.year
     
     def __str__(self):
         return str(self.id)

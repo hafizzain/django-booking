@@ -8,9 +8,18 @@ from Service.models import ServiceGroup
 from TragetControl.models import ServiceTarget, StaffTarget, StoreTarget, TierStoreTarget , RetailTarget
 
 
+class LocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessAddress
+        fields = ['id', 'address_name']
 class EmployeeNameSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
     designation = serializers.SerializerMethodField(read_only=True)
+    location = serializers.SerializerMethodField(read_only=True)
+    
+    def get_location(self, obj):
+        loc = obj.location.all()
+        return LocationSerializer(loc, many = True).data
     
     def get_designation(self, obj):        
         try:
@@ -35,7 +44,8 @@ class EmployeeNameSerializer(serializers.ModelSerializer):
                 'full_name',
                 'employee_id',
                 'image',
-                'designation'
+                'designation',
+                'location'
         ]
 class StaffTargetSerializers(serializers.ModelSerializer):
     employee = serializers.SerializerMethodField()
@@ -48,7 +58,7 @@ class StaffTargetSerializers(serializers.ModelSerializer):
             print(err)
     class Meta:
         model = StaffTarget
-        fields = '__all__'
+        fields = ['id','month', 'service_target', 'retail_target', 'year_add','employee','created_at']
 
 class ServiceGroupSerializers(serializers.ModelSerializer):
     

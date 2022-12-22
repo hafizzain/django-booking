@@ -974,3 +974,4 @@ def get_client_sale(request):
             },
             status=status.HTTP_201_CREATED
         )
+

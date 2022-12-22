@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -42,6 +43,7 @@ def create_stafftarget(request):
     month = request.data.get('month', None)
     service_target = request.data.get('service_target', None)
     retail_target = request.data.get('retail_target', None)
+    year = request.data.get('year', None)
     
     if not all([business,employee,month, service_target, retail_target]):
         return Response(
@@ -99,7 +101,13 @@ def create_stafftarget(request):
         month = month,
         service_target = service_target,
         retail_target = retail_target,
+       # year=year,
     )
+    date_string =  f'{year} {month} 01'
+    c_year = datetime.strptime(date_string, '%Y %B %d')
+    staff_target.year = c_year
+    staff_target.save()
+    
     
     serializers= StaffTargetSerializers(staff_target, context={'request' : request})
     
