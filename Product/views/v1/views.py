@@ -1026,9 +1026,9 @@ def update_product(request):
         except Exception as err:
             print(err)
             
-    all_stocks = ProductStock.objects.filter(product=product)
-    for stk in all_stocks:
-        stk.delete()
+    # all_stocks = ProductStock.objects.filter(product=product)
+    # for stk in all_stocks:
+    #     stk.delete()
 
     location_quantities = request.data.get('location_quantities', None)
     if location_quantities is not None:
@@ -1045,24 +1045,34 @@ def update_product(request):
 
             if all([location_id, current_stock, low_stock, reorder_quantity]):
                 try:
-                    loc = BusinessAddress.objects.get(id = location_id)
+                    product_stock = ProductStock.objects.get(product = product.id, location = location.id )
                 except Exception as err:
                     ExceptionRecord.objects.create(text=str(err))
+                    
+                product_stock.available_quantity = current_stock
+                product_stock.low_stock = low_stock
+                product_stock.reorder_quantity = reorder_quantity
+                product_stock.save()
+                
+                # try:
+                #     loc = BusinessAddress.objects.get(id = location_id)
+                # except Exception as err:
+                #     ExceptionRecord.objects.create(text=str(err))
     
-                    pass
-                else:
-                    product_stock = ProductStock.objects.create(
-                        user = request.user,
-                        business = product.business,
-                        product = product,
-                        location = loc,
-                        available_quantity = current_stock,
-                        low_stock = low_stock, 
-                        reorder_quantity = reorder_quantity,
-                        alert_when_stock_becomes_lowest = True,
-                        is_active = True
-                    )
-                    ExceptionRecord.objects.create(is_resolved = True, text='Created')
+                #     pass
+                # else:
+                #     product_stock = ProductStock.objects.create(
+                #         user = request.user,
+                #         business = product.business,
+                #         product = product,
+                #         location = loc,
+                #         available_quantity = current_stock,
+                #         low_stock = low_stock, 
+                #         reorder_quantity = reorder_quantity,
+                #         alert_when_stock_becomes_lowest = True,
+                #         is_active = True
+                #     )
+                #     ExceptionRecord.objects.create(is_resolved = True, text='Created')
 
             else:
                 ExceptionRecord.objects.create(text=f'fields not all {location_id}, {current_stock}, {low_stock}, {reorder_quantity}')
