@@ -1045,7 +1045,13 @@ def update_product(request):
 
             if all([location_id, current_stock, low_stock, reorder_quantity]):
                 try:
-                    product_stock = ProductStock.objects.get(product = product.id, location = location.id )
+                    loc = BusinessAddress.objects.get(id = location_id)
+                except Exception as err:
+                    ExceptionRecord.objects.create(text=str(err))
+    
+                    pass
+                try:
+                    product_stock = ProductStock.objects.get(product = product.id, location = loc.id )
                 except Exception as err:
                     ExceptionRecord.objects.create(text=str(err))
                     
@@ -1054,12 +1060,7 @@ def update_product(request):
                 product_stock.reorder_quantity = reorder_quantity
                 product_stock.save()
                 
-                # try:
-                #     loc = BusinessAddress.objects.get(id = location_id)
-                # except Exception as err:
-                #     ExceptionRecord.objects.create(text=str(err))
-    
-                #     pass
+                
                 # else:
                 #     product_stock = ProductStock.objects.create(
                 #         user = request.user,

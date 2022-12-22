@@ -75,16 +75,7 @@ class AppointmentService(models.Model):
         ('Cancel', 'Cancel'),
     ]
 
-    DURATION_CHOICES = [
-        ('30 Min', '30 Min'), 
-        ('60 Min', '60 Min'),
-        ('90 Min', '90 Min'),
-        ('120 Min', '120 Min'),
-        ('150 Min', '150 Min'),
-        ('180 Min', '180 Min'),
-        ('210 Min', '210 Min'),
-        ('240 Min', '240 Min'),
-    ]
+    
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_appointment_services', verbose_name='Creator ( User )')
@@ -99,7 +90,7 @@ class AppointmentService(models.Model):
     appointment_date = models.DateField()
     appointment_time = models.TimeField()
 
-    duration = models.CharField(choices=DURATION_CHOICES, max_length=100, default='')
+    duration = models.CharField(max_length=100, default='')
     appointment_status = models.CharField(choices=BOOKED_CHOICES, max_length=100, default='Appointment Booked')
     tip = models.PositiveIntegerField(default=0, null=True, blank=True)
     
