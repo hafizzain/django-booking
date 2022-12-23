@@ -59,7 +59,7 @@ urlpatterns = [
     # path('update_vacation/', views.update_vacation),
     
     path('create_vacation/', views.create_workingschedule),
-    path('get_vacation/', views.working_schedule),
+    path('get_vacation/', views.get_workingschedule),
     path('delete_vacation/', views.delete_workingschedule),
     path('update_vacation/', views.update_workingschedule),
     
