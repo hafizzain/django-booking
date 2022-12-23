@@ -336,7 +336,7 @@ class EmployeDailySchedule(models.Model):
     
     from_date = models.DateField(verbose_name = 'From Date', null=True)
     to_date = models.DateField(verbose_name = 'To Date', null=True)
-    note = models.CharField(max_length=300, default='')
+    note = models.CharField(max_length=300, default='', null=True)
     
     is_leave = models.BooleanField(default=False)
     is_off = models.BooleanField(default=False)

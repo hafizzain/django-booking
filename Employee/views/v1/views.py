@@ -1,3 +1,4 @@
+from datetime import datetime
 from time import strptime
 from django.shortcuts import render
 from Employee.models import( CategoryCommission, EmployeDailySchedule, Employee , EmployeeProfessionalInfo ,
@@ -1015,6 +1016,8 @@ def update_employee(request):
         working_days.append('Saturday')
     if sunday is not None:
         working_days.append('Sunday')
+    
+    schedule = EmployeDailySchedule.objects.filter(day__in = working_days, created_at__gte = datetime.now()  )
     
     
     if type(working_days) == str:
@@ -2778,11 +2781,11 @@ def create_workingschedule(request):
     start_time_shift = request.data.get('start_time_shift', None)
     end_time_shift = request.data.get('end_time_shift', None)
     
-    from_date = request.data.get('end_time_shift', None)
-    to_date = request.data.get('end_time_shift', None)
-    note = request.data.get('end_time_shift', None)
+    from_date = request.data.get('from_date', None)
+    to_date = request.data.get('to_date', None)
+    note = request.data.get('note', None)
 
-    is_vacation = request.data.get('is_leave', None)
+    is_vacation = request.data.get('is_vacation', None)
     
     is_leave = request.data.get('is_leave', None)
     is_off = request.data.get('is_off', None)
