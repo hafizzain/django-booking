@@ -1020,6 +1020,11 @@ def update_employee(request):
     schedule = EmployeDailySchedule.objects.filter(created_at__gte = datetime.now()).exclude(day__in = working_days)
     for sch in schedule:
         sch.delete()
+        
+    # schedule = EmployeDailySchedule.objects.filter(created_at__gte = datetime.now(), day__in = working_days)
+    # for sch in schedule:
+    #     sch.delete()
+        
     
     # if type(working_days) == str:
     #         working_days = json.loads(working_days)
@@ -2865,6 +2870,8 @@ def create_workingschedule(request):
         working_schedule.is_off = True
     else:
         working_schedule.is_off = False
+    
+    working_schedule.save()
         
     serializers= ScheduleSerializer(working_schedule, context={'request' : request})
     
