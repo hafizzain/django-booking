@@ -314,7 +314,7 @@ class EmployeSerializer(serializers.ModelSerializer):
                 'location',
                 'schedule',
                 # 'globel_permission',
-                'permissions' ,# 'monday','tuesday','wednesday','thursday','friday','saturday','sunday'    
+                'permissions' , 'monday','tuesday','wednesday','thursday','friday','saturday','sunday'    
                 #'module_permissions',
                 #'marketing_permissions',
             ]
