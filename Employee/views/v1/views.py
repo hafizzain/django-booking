@@ -1017,21 +1017,22 @@ def update_employee(request):
     if sunday is not None:
         working_days.append('Sunday')
     
-    schedule = EmployeDailySchedule.objects.filter(day__in = working_days, created_at__gte = datetime.now()  )
+    schedule = EmployeDailySchedule.objects.filter(created_at__gte = datetime.now()).exclude(day__in = working_days)
+    for sch in schedule:
+        sch.delete()
     
-    
-    if type(working_days) == str:
-            working_days = json.loads(working_days)
+    # if type(working_days) == str:
+    #         working_days = json.loads(working_days)
 
-    elif type(working_days) == list:
-            pass
-    for days in working_days:
-        EmployeDailySchedule.objects.create(
-            user=employee.user,
-            business=employee.business,
-            employee = employee,
-            day = days,
-        )
+    # elif type(working_days) == list:
+    #         pass
+    # for days in working_days:
+    #     EmployeDailySchedule.objects.create(
+    #         user=employee.user,
+    #         business=employee.business,
+    #         employee = employee,
+    #         day = days,
+    #     )
     
     
     if services_id is not None:

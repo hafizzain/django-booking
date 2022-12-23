@@ -178,6 +178,7 @@ def delete_stafftarget(request):
 @permission_classes([IsAuthenticated])
 def update_stafftarget(request):
     stafftarget_id = request.data.get('id', None)
+    employee = request.data.get('employee', None)
     year = request.data.get('year', None)
     month = request.data.get('month', None)
     if stafftarget_id is None: 
@@ -211,6 +212,23 @@ def update_stafftarget(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    
+    try:
+        employee_id=Employee.objects.get(id=employee)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'response' : {
+                    'message' : 'Employee not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    staff_target.employee = employee_id
+    
     try:
         request.data._mutable = True
     except:
@@ -556,6 +574,7 @@ def update_storetarget(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    
     try:
         location_id = BusinessAddress.objects.get( id = location)
         staff_target.location = location_id
