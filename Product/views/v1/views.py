@@ -1039,9 +1039,9 @@ def update_product(request):
         
         for loc_quan in location_quantities:
             location_id = loc_quan.get('id', None)
-            current_stock = loc_quan.get('current_stock', None)
-            low_stock = loc_quan.get('low_stock', None)
-            reorder_quantity = loc_quan.get('reorder_quantity', None)
+            current_stock = loc_quan.get('current_stock', 0)
+            low_stock = loc_quan.get('low_stock', 0)
+            reorder_quantity = loc_quan.get('reorder_quantity', 0)
 
             if all([location_id, current_stock, low_stock, reorder_quantity]):
                 try:

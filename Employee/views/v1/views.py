@@ -684,6 +684,7 @@ def create_employee(request):
     # employee_marketing = EmployeeMarketingPermission.objects.create(employee= employee)
     
     ser_error=[] 
+    working_days = []
     
     employee_p_info.monday = True if 'monday' in request.data else False
     employee_p_info.tuesday = True if 'tuesday' in request.data else False
@@ -692,6 +693,30 @@ def create_employee(request):
     employee_p_info.friday = True if 'friday' in request.data else False
     employee_p_info.saturday = True if 'saturday' in request.data else False
     employee_p_info.sunday = True if 'sunday' in request.data else False
+    
+    monday = request.data.get('monday', None)
+    tuesday = request.data.get('tuesday', None)
+    wednesday = request.data.get('wednesday', None)
+    thursday = request.data.get('thursday', None)
+    friday = request.data.get('friday', None)
+    saturday = request.data.get('saturday', None)
+    sunday = request.data.get('sunday', None)
+    
+    if monday is not None:
+        working_days.append('Monday')
+    if tuesday is not None:
+        working_days.append('Tuesday')
+    if wednesday is not None:
+        working_days.append('Wednesday')
+    if thursday is not None:
+        working_days.append('Thursday')
+    if friday is not None:
+        working_days.append('Friday')
+    if saturday is not None:
+        working_days.append('Saturday')
+    if sunday is not None:
+        working_days.append('Sunday')
+        
     
     if type(working_days) == str:
             working_days = json.loads(working_days)
