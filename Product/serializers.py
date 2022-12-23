@@ -396,4 +396,4 @@ class ProductStockTransferSerializer(serializers.ModelSerializer):
     #         ) 
     class Meta:
         model = ProductStockTransfer
-        fields = ['id', 'from_location', 'to_location', 'product', 'quantity']
+        fields = ['id', 'from_location', 'to_location', 'product', 'quantity','note']

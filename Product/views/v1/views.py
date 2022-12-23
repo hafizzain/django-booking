@@ -2151,6 +2151,7 @@ def add_product_stock_transfer(request):
     from_location_id = request.data.get('from_location', None)
     to_location_id = request.data.get('to_location', None)
     quantity = request.data.get('quantity', None)
+    note = request.data.get('note', None)
 
     if not all([product_id, from_location_id, to_location_id, quantity]):
         return Response(
@@ -2211,7 +2212,8 @@ def add_product_stock_transfer(request):
         product = product,
         from_location = from_location,
         to_location = to_location,
-        quantity = quantity
+        quantity = quantity,
+        note = note,
     )
     try:
         transfer = ProductStock.objects.get(product__id=product.id, location = from_location )
@@ -2362,6 +2364,7 @@ def update_product_stock_transfer(request):
         from_location_id = request.data.get('from_location',  stock_transfer.from_location.id)
         to_location_id = request.data.get('to_location',  stock_transfer.to_location.id)
         quantity = request.data.get('quantity',  stock_transfer.quantity)
+        note = request.data.get('note',  stock_transfer.note)
         try:
             product = Product.objects.get(id=product_id)
         except Exception as err:
@@ -2400,6 +2403,7 @@ def update_product_stock_transfer(request):
         stock_transfer.from_location = from_location
         stock_transfer.to_location = to_location
         stock_transfer.quantity = quantity
+        stock_transfer.note = note
         stock_transfer.save()
 
         serialized = ProductStockTransferSerializer(stock_transfer)
