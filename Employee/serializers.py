@@ -61,7 +61,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
     def get_employee(self, obj):
         try:
             data = Employee.objects.get(id = str(obj.employee))
-            return EmployeeNameSerializer(data).data
+            return EmployeeNameSerializer(data, context=self.context).data
         except Exception as err:
             print(err)
          
@@ -144,7 +144,7 @@ class EmployeSerializer(serializers.ModelSerializer):
     def get_schedule(self, obj):
         try:
             all_schedule = EmployeDailySchedule.objects.filter(employee = obj)
-            return ScheduleSerializer(all_schedule, many = True).data
+            return ScheduleSerializer(all_schedule, many = True, context=self.context).data
         except Exception as err:
             print(err)
             None
