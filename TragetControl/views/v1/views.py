@@ -427,7 +427,7 @@ def create_storetarget(request):
         voucher_target = tier.get('voucher_target', None)
         membership_target = tier.get('membership_target', None)
         is_primary = tier.get('is_primary', None)
-        year = request.data.get('year', None)
+        year = tier.data.get('year', None)
 
         
         tier_store =  TierStoreTarget.objects.create(
