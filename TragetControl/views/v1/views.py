@@ -1216,6 +1216,8 @@ def delete_retailtarget(request):
 def update_retailtarget(request):
     retailtarget_id = request.data.get('id', None)
     brand = request.data.get('brand', None)
+    year = request.data.get('year', None)
+    month = request.data.get('month', None)
     
     if retailtarget_id is None: 
        return Response(
@@ -1265,6 +1267,12 @@ def update_retailtarget(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    date_string =  f'{year} {month} 01'
+    c_year = datetime.strptime(date_string, '%Y %B %d')
+    request.data['year'] = c_year
+    retail_target.year = c_year
+    retail_target.save()
+    
     serializer = RetailTargetSerializers(retail_target, data=request.data, partial=True, context={'request' : request})
     if not serializer.is_valid():
         return Response(
