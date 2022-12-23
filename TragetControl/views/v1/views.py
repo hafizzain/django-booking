@@ -1267,6 +1267,10 @@ def update_retailtarget(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    try:
+        request.data._mutable = True
+    except:
+        pass
     date_string =  f'{year} {month} 01'
     c_year = datetime.strptime(date_string, '%Y %B %d')
     request.data['year'] = c_year
