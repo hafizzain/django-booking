@@ -4,6 +4,7 @@ from pkgutil import read_code
 from pyexpat import model
 from re import A
 from rest_framework import serializers
+from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Appointment.models import Appointment, AppointmentCheckout, AppointmentNotes, AppointmentService
 from Business.models import BusinessAddress
 from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer
@@ -222,7 +223,8 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             
             app_date_time = f'2000-01-01 {appointment_time}'
 
-            duration = DURATION_CHOICES_DATA[app_duration]
+            #duration = DURATION_CHOICES_DATA[app_duration]
+            duration = DURATION_CHOICES[app_duration]
             app_date_time = datetime.fromisoformat(app_date_time)
             datetime_duration = app_date_time + timedelta(minutes=duration)
             datetime_duration = datetime_duration.strftime('%H:%M:%S')
