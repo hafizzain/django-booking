@@ -244,49 +244,49 @@ class EmployeSerializer(serializers.ModelSerializer):
                     returned_value[permit].append(opt.text)
             return returned_value
 
-    def get_monday(self, obj):
-        try:
-            day = EmployeeProfessionalInfo.objects.get(employee=obj)
-            return day.monday
-        except Exception as err:
-            return None
-    def get_tuesday(self, obj):
-        try:
-            day = EmployeeProfessionalInfo.objects.get(employee=obj)
-            return day.tuesday
-        except Exception as err:
-            return None
-    def get_wednesday(self, obj):
-        try:
-            day = EmployeeProfessionalInfo.objects.get(employee=obj)
-            return day.wednesday
-        except Exception as err:
-            print(err)
-            return None 
-    def get_thursday(self, obj):
-        try:
-            day = EmployeeProfessionalInfo.objects.get(employee=obj)
-            return day.thursday
-        except Exception as err:
-            return None       
-    def get_friday(self, obj):
-        try:
-            day = EmployeeProfessionalInfo.objects.get(employee=obj)
-            return day.friday
-        except Exception as err:
-            return None       
-    def get_saturday(self, obj):
-        try:
-            day = EmployeeProfessionalInfo.objects.get(employee=obj)
-            return day.saturday
-        except Exception as err:
-            return None       
-    def get_sunday(self, obj):
-        try:
-            day = EmployeeProfessionalInfo.objects.get(employee=obj)
-            return day.sunday
-        except Exception as err:
-            return None    
+    # def get_monday(self, obj):
+    #     try:
+    #         day = EmployeeProfessionalInfo.objects.get(employee=obj)
+    #         return day.monday
+    #     except Exception as err:
+    #         return None
+    # def get_tuesday(self, obj):
+    #     try:
+    #         day = EmployeeProfessionalInfo.objects.get(employee=obj)
+    #         return day.tuesday
+    #     except Exception as err:
+    #         return None
+    # def get_wednesday(self, obj):
+    #     try:
+    #         day = EmployeeProfessionalInfo.objects.get(employee=obj)
+    #         return day.wednesday
+    #     except Exception as err:
+    #         print(err)
+    #         return None 
+    # def get_thursday(self, obj):
+    #     try:
+    #         day = EmployeeProfessionalInfo.objects.get(employee=obj)
+    #         return day.thursday
+    #     except Exception as err:
+    #         return None       
+    # def get_friday(self, obj):
+    #     try:
+    #         day = EmployeeProfessionalInfo.objects.get(employee=obj)
+    #         return day.friday
+    #     except Exception as err:
+    #         return None       
+    # def get_saturday(self, obj):
+    #     try:
+    #         day = EmployeeProfessionalInfo.objects.get(employee=obj)
+    #         return day.saturday
+    #     except Exception as err:
+    #         return None       
+    # def get_sunday(self, obj):
+    #     try:
+    #         day = EmployeeProfessionalInfo.objects.get(employee=obj)
+    #         return day.sunday
+    #     except Exception as err:
+    #         return None    
   
     class Meta:
         model = Employee
@@ -314,7 +314,7 @@ class EmployeSerializer(serializers.ModelSerializer):
                 'location',
                 'schedule',
                 # 'globel_permission',
-                'permissions' , 'monday','tuesday','wednesday','thursday','friday','saturday','sunday'    
+                'permissions' ,# 'monday','tuesday','wednesday','thursday','friday','saturday','sunday'    
                 #'module_permissions',
                 #'marketing_permissions',
             ]
