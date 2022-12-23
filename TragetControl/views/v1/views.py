@@ -590,6 +590,7 @@ def update_storetarget(request):
         voucher_target = tier.get('voucher_target', None)
         membership_target = tier.get('membership_target', None)
         is_primary = tier.get('is_primary', None)
+        year = tier.get('year', None)
         
         if id is not None:
             try:
@@ -604,6 +605,11 @@ def update_storetarget(request):
                     tierstore.is_primary = True
                 else:
                     tierstore.is_primary = False 
+                    
+                date_string =  f'{year} {month} 01'
+                c_year = datetime.strptime(date_string, '%Y %B %d')
+                tierstore.year = c_year
+                tierstore.save()
                 
                 tierstore.save()
             except Exception as err:
