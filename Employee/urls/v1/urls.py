@@ -53,10 +53,15 @@ urlpatterns = [
     path('generate_id/', views.generate_id),
     
     #Vacations For Employee
-    path('create_vacation/', views.create_vacation),
-    path('get_vacation/', views.get_vacation),
-    path('delete_vacation/', views.delete_vacation),
-    path('update_vacation/', views.update_vacation),
+    # path('create_vacation/', views.create_vacation),
+    # path('get_vacation/', views.get_vacation),
+    # path('delete_vacation/', views.delete_vacation),
+    # path('update_vacation/', views.update_vacation),
+    
+    path('create_vacation/', views.create_workingschedule),
+    path('get_vacation/', views.working_schedule),
+    path('delete_vacation/', views.delete_workingschedule),
+    path('update_vacation/', views.update_workingschedule),
     
     #Working Schecule for Employee
     path('create_workingschedule/', views.create_workingschedule),

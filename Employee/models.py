@@ -334,8 +334,13 @@ class EmployeDailySchedule(models.Model):
     start_time_shift = models.TimeField(null=True, blank=True)
     end_time_shift = models.TimeField(null=True, blank=True)
     
+    from_date = models.DateField(verbose_name = 'From Date', null=True)
+    to_date = models.DateField(verbose_name = 'To Date', null=True)
+    note = models.CharField(max_length=300, default='')
+    
     is_leave = models.BooleanField(default=False)
     is_off = models.BooleanField(default=False)
+    is_vacation = models.BooleanField(default=False)
     
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=now)

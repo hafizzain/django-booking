@@ -2778,6 +2778,12 @@ def create_workingschedule(request):
     start_time_shift = request.data.get('start_time_shift', None)
     end_time_shift = request.data.get('end_time_shift', None)
     
+    from_date = request.data.get('end_time_shift', None)
+    to_date = request.data.get('end_time_shift', None)
+    note = request.data.get('end_time_shift', None)
+
+    is_vacation = request.data.get('is_leave', None)
+    
     is_leave = request.data.get('is_leave', None)
     is_off = request.data.get('is_off', None)
     
@@ -2837,7 +2843,16 @@ def create_workingschedule(request):
         start_time_shift = start_time_shift,
         end_time_shift = end_time_shift,
         
+        from_date =from_date,
+        to_date = to_date,
+        note = note,
+        
     )    
+    if is_vacation is not None:
+        working_schedule.is_vacation = True
+    else:
+        working_schedule.is_vacation = False
+        
     if is_leave is not None:
         working_schedule.is_leave = True
     else:
