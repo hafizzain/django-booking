@@ -830,6 +830,8 @@ def update_servicetarget(request):
     location = request.data.get('location', None)
     
     service_group = request.data.get('service_group', None)
+    year = request.data.get('year', None)
+    month = request.data.get('month', None)
     
     if servicetarget_id is None: 
        return Response(
@@ -899,6 +901,16 @@ def update_servicetarget(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    try:
+        request.data._mutable = True
+    except:
+        pass
+    date_string =  f'{year} {month} 01'
+    c_year = datetime.strptime(date_string, '%Y %B %d')
+    request.data['year'] = c_year
+    service_target.year = c_year
+    service_target.save()
+    
     serializers= ServiceTargetSerializers(service_target,data=request.data, partial=True, context={'request' : request} )
     if not serializers.is_valid():
         return Response(
