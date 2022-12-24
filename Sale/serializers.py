@@ -347,7 +347,7 @@ class MemberShipOrderSerializer(serializers.ModelSerializer):
         model = MemberShipOrder
         fields =['id', 'membership','order_type' ,'client','member','quantity'
                  ,'location' ,'start_date', 'end_date','status', 'total_price', 
-                 'payment_type','membership_price' ]
+                 'payment_type','membership_price', 'created_at' ]
         
 class VoucherOrderSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
@@ -397,7 +397,7 @@ class VoucherOrderSerializer(serializers.ModelSerializer):
         model = VoucherOrder
         fields =['id', 'voucher', 'client' , 'location' , 
                  'member' ,'start_date', 'end_date','status','quantity',
-                 'total_price', 'payment_type' , 'order_type','voucher_price' ]
+                 'total_price', 'payment_type' , 'order_type','voucher_price', 'created_at' ]
     
 
         
