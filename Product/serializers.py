@@ -2,7 +2,7 @@
 
 from rest_framework import serializers
 from Product.Constants.index import tenant_media_base_url
-from Product.models import (Category, Brand, Product, ProductMedia, 
+from Product.models import (Category, Brand, CurrencyRetailPrice, Product, ProductMedia, 
                             ProductStock, OrderStock , OrderStockProduct, ProductConsumption, ProductStockTransfer)
 from Business.models import BusinessAddress, BusinessVendor
 from django.conf import settings
@@ -211,6 +211,10 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id']
         
+class CurrencyRetailPriceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CurrencyRetailPrice
+        fields = '__all__'
 class ProductStockTransferlocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductStockTransfer
@@ -232,9 +236,14 @@ class ProductSerializer(serializers.ModelSerializer):
     cover_image = serializers.SerializerMethodField()
     consumed = serializers.SerializerMethodField()
     stocktransfer = serializers.SerializerMethodField()
+    currency_retail = serializers.SerializerMethodField()
     
     location = serializers.SerializerMethodField()
     
+    def get_currency_retail(self, obj):
+            currency_retail = CurrencyRetailPrice.objects.filter(product = obj)
+            return CurrencyRetailPriceSerializer( currency_retail, many = True).data
+        
     def get_stocktransfer(self, obj):
         
             stocktransfer = ProductStockTransfer.objects.filter(product = obj)
@@ -290,6 +299,7 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = [
             'id', 
             'name', 
+            'currency_retail',
             'product_size',
             'product_type',
             'cost_price',
