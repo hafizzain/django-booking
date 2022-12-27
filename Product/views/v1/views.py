@@ -857,7 +857,7 @@ def add_product(request):
         
         for retail in currency_retail_price:
             #currency_id = retail['currency']
-            price = retail['retail_price']
+            #price = retail['retail_price']
             
             try:
                 currency= Currency.objects.get(id=retail['currency'])
@@ -871,7 +871,7 @@ def add_product(request):
                 product = product,
                 
                 currency = currency,
-                retail_price =  price ,
+                retail_price =  retail['retail_price'] ,
             )
                     
     location_quantities = request.data.get('location_quantities', None)
