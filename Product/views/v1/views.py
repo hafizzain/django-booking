@@ -871,7 +871,7 @@ def add_product(request):
             )
             except Exception as err:
                 print(str(err))
-                ExceptionRecord.objects.create(is_resolved = False, text= retail['currency'])
+                ExceptionRecord.objects.create(is_resolved = False, text=f'currency not found product line 866  ' )
             
                     
     location_quantities = request.data.get('location_quantities', None)
