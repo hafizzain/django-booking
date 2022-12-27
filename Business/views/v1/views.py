@@ -907,6 +907,11 @@ def update_location(request):
             
         
         if images is not None:
+            try:
+                image = BusinessAddressMedia.objects.get(business = business_address.business,business_address = business_address,)
+                image.delete()
+            except:
+                pass
             images = BusinessAddressMedia.objects.create(
                 user = user,
                 business = business_address.business,
