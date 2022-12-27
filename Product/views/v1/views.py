@@ -687,7 +687,7 @@ def add_product(request):
     medias = request.data.getlist('product_images', None)
     
     #RetailPrice
-    currency_retail_price = request.data.getlist('currency_retail_price', None)
+    currency_retail_price = request.data.get('currency_retail_price', None)
     
     # location = request.data.get('location', None)
 
