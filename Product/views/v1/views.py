@@ -860,19 +860,19 @@ def add_product(request):
             #price = retail['retail_price']
             
             try:
-                currency= Currency.objects.get(id=str(retail['currency']))
+                currency_id= Currency.objects.get(id=(retail['currency']))
+                
+                CurrencyRetailPrice.objects.create(
+                user = user,
+                business = business,
+                product = product,
+                currency = currency_id,
+                retail_price =  retail['retail_price'] ,
+            )
             except Exception as err:
                 print(str(err))
                 ExceptionRecord.objects.create(is_resolved = False, text='currency not found product line 866')
             
-            CurrencyRetailPrice.objects.create(
-                user = user,
-                business = business,
-                product = product,
-                
-                currency = currency,
-                retail_price =  retail['retail_price'] ,
-            )
                     
     location_quantities = request.data.get('location_quantities', None)
     if location_quantities is not None:
