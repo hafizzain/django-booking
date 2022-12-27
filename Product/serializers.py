@@ -236,11 +236,11 @@ class ProductSerializer(serializers.ModelSerializer):
     cover_image = serializers.SerializerMethodField()
     consumed = serializers.SerializerMethodField()
     stocktransfer = serializers.SerializerMethodField()
-    currency_retail = serializers.SerializerMethodField()
+    currency_retail_price = serializers.SerializerMethodField()
     
     location = serializers.SerializerMethodField()
     
-    def get_currency_retail(self, obj):
+    def get_currency_retail_price(self, obj):
             currency_retail = CurrencyRetailPrice.objects.filter(product = obj)
             return CurrencyRetailPriceSerializer( currency_retail, many = True).data
         
@@ -299,7 +299,7 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = [
             'id', 
             'name', 
-            'currency_retail',
+            'currency_retail_price',
             'product_size',
             'product_type',
             'cost_price',
