@@ -1819,7 +1819,7 @@ def update_payment_method(request):
         )
     payment_method.method_type = method_type
     payment_method.save()
-    serialized = PaymentMethodSerializer(payment_method)
+    serialized = PaymentMethodSerializer(payment_method, context={'request':request})
 
     return Response(
             {
@@ -2001,22 +2001,22 @@ def add_business_tax(request):
     if tax_type == 'Group':
         # all_errors.append({'type' : str(type(tax_ids))})
         # all_errors.append({'tax_ids' : tax_ids})
-        if type(tax_ids) == str :
-            ids_data = json.loads(tax_ids)
-        else:
-            ids_data = tax_ids
-        for id in ids_data:
-            #all_errors.append(str(id))
-            try:
-                get_p_tax = BusinessTax.objects.get(id=id)
-                business_tax.parent_tax.add(get_p_tax)
-            except Exception as err:
-                all_errors.append(str(err))
-
+        if tax_ids is not None:
+            if type(tax_ids) == str :
+                ids_data = json.loads(tax_ids)
+            else:
+                ids_data = tax_ids
+            for id in ids_data:
+                #all_errors.append(str(id))
+                try:
+                    get_p_tax = BusinessTax.objects.get(id=id)
+                    business_tax.parent_tax.add(get_p_tax)
+                except Exception as err:
+                    all_errors.append(str(err))
 
     # parent_tax = 
     business_tax.save()
-    serialized = BusinessTaxSerializer(business_tax)
+    serialized = BusinessTaxSerializer(business_tax,context={'request':request} )
     return Response(
             {
                 'status' : True,
@@ -2171,7 +2171,7 @@ def update_business_tax(request):
 
     # parent_tax = 
     business_tax.save()
-    serialized = BusinessTaxSerializer(business_tax)
+    serialized = BusinessTaxSerializer(business_tax , context={'request':request} )
     return Response(
             {
                 'status' : True,
@@ -2295,7 +2295,7 @@ def get_business_taxes(request):
             )
 
     all_taxes = BusinessTax.objects.filter(business=business, is_active=True)
-    serialized = BusinessTaxSerializer(all_taxes, many=True)
+    serialized = BusinessTaxSerializer(all_taxes, many=True, context={'request':request})
     return Response(
             {
                 'status' : True,
