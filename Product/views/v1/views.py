@@ -856,8 +856,8 @@ def add_product(request):
             pass
         
         for retail in currency_retail_price:
-            currency_id = retail.get('currency', None)
-            price = retail.get('retail_price', None)
+            currency_id = retail['currency']
+            price = retail['retail_price']
             
             try:
                 currency= Currency.objects.get(id=currency_id)
