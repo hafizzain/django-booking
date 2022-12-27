@@ -860,7 +860,7 @@ def add_product(request):
             #price = retail['retail_price']
             
             try:
-                currency_id= Currency.objects.get(id=(retail['currency']))
+                currency_id= Currency.objects.get(id=retail['currency'])
                 
                 CurrencyRetailPrice.objects.create(
                 user = user,
