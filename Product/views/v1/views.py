@@ -860,7 +860,7 @@ def add_product(request):
             #price = retail['retail_price']
             
             try:
-                currency= Currency.objects.get(id=retail['currency'])
+                currency= Currency.objects.get(id=str(retail['currency']))
             except Exception as err:
                 print(str(err))
                 ExceptionRecord.objects.create(is_resolved = False, text='currency not found product line 866')
