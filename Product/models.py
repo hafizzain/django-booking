@@ -5,6 +5,7 @@ import uuid
 
 from Authentication.models import User
 from Business.models import Business, BusinessAddress, BusinessVendor
+from Utility.models import Currency
 
 
 
@@ -54,9 +55,9 @@ class Product(models.Model):
 
     name = models.CharField(max_length=1000, default='')
 
-    cost_price = models.PositiveIntegerField(default=0)
-    full_price = models.PositiveIntegerField(default=0)
-    sell_price = models.PositiveIntegerField(default=0)
+    cost_price = models.PositiveIntegerField(default=0, null = True, blank= True)
+    full_price = models.PositiveIntegerField(default=0, null = True, blank= True)
+    sell_price = models.PositiveIntegerField(default=0, null = True, blank= True)
     #product_size = models.PositiveIntegerField(default=0)
     product_size = models.CharField(max_length=50, null=True, blank=True)
 
@@ -81,6 +82,22 @@ class Product(models.Model):
     def __str__(self):
         return str(self.id)
 
+class CurrencyRetailPrice(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products_currencyretailprice')
+    business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_currencyretailprice')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_currencyretailprice')
+    
+    currency = models.ForeignKey(Currency, on_delete=models.SET_NULL, null=True, blank=True)
+    retail_price = models.PositiveIntegerField(default=0)
+
+    is_deleted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+
+
+    def __str__(self):
+        return str(self.id)
 
 class ProductMedia(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)

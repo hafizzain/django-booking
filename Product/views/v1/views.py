@@ -2,7 +2,7 @@ from cmath import cos
 from threading import Thread
 from django.http import HttpResponse
 from Product.Constants.Add_Product import add_product_remaing
-from Utility.models import NstyleFile, ExceptionRecord
+from Utility.models import Currency, NstyleFile, ExceptionRecord
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -17,7 +17,7 @@ from rest_framework.settings import api_settings
 
 from NStyle.Constants import StatusCodes
 
-from Product.models import ( Category, Brand , Product, ProductMedia, ProductStock
+from Product.models import ( Category, Brand, CurrencyRetailPrice , Product, ProductMedia, ProductStock
                             , OrderStock, OrderStockProduct, ProductConsumption, ProductStockTransfer
                            )
 from Business.models import Business, BusinessAddress, BusinessVendor
@@ -686,6 +686,9 @@ def add_product(request):
     is_active = request.data.get('is_active', True)
     medias = request.data.getlist('product_images', None)
     
+    #RetailPrice
+    currency_retail_price = request.data.getlist('currency_retail_price', None)
+    
     # location = request.data.get('location', None)
 
     # Product Stock Details 
@@ -703,7 +706,7 @@ def add_product(request):
     
     product_error = []
 
-    if not all([name,medias, brand_id, category_id, cost_price, full_price, sell_price, sku,  stock_status ]):
+    if not all([name,medias, brand_id, category_id, cost_price, sku,  stock_status ]):
         return Response(
             {
                 'status' : False,
@@ -844,7 +847,33 @@ def add_product(request):
             image=img,
             is_cover = True
         )
-    
+    if currency_retail_price is not None:
+        if type(currency_retail_price) == str:
+            currency_retail_price = currency_retail_price.replace("'" , '"')
+            currency_retail_price = json.loads(currency_retail_price)
+
+        elif type(currency_retail_price) == list:
+            pass
+        
+        for retail in currency_retail_price:
+            currency_id = retail.get('currency', None)
+            price = retail.get('retail_price', None)
+            
+            try:
+                currency= Currency.objects.get(id=currency_id)
+            except Exception as err:
+                print(str(err))
+                ExceptionRecord.objects.create(is_resolved = False, text='currency not found product line 866')
+            
+            CurrencyRetailPrice.objects.create(
+                user = user,
+                business = business,
+                product = product,
+                
+                currency = currency,
+                retail_price =  price ,
+            )
+                    
     location_quantities = request.data.get('location_quantities', None)
     if location_quantities is not None:
         if type(location_quantities) == str:
