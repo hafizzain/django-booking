@@ -849,7 +849,7 @@ def add_product(request):
         )
     if currency_retail_price is not None:
         if type(currency_retail_price) == str:
-            currency_retail_price = currency_retail_price.replace("'" , '"')
+            #currency_retail_price = currency_retail_price.replace("'" , '"')
             currency_retail_price = json.loads(currency_retail_price)
 
         elif type(currency_retail_price) == list:
