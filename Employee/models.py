@@ -245,6 +245,10 @@ class CommissionSchemeSetting(models.Model):
         return str(self.id)
 
 class CategoryCommission(models.Model):
+    COMMISSION_CHOICE = [
+        ('percentage', 'percentage'),
+        ('currency', 'currency'),
+    ]
     CATEGORY_CHOICES =[
         ('Service', 'Service'),
         ('Retail', 'Retail'),
@@ -259,6 +263,7 @@ class CategoryCommission(models.Model):
     commission_percentage = models.PositiveIntegerField(default=0, null=True, blank=True)
     
     category_comission = models.CharField(choices=CATEGORY_CHOICES, max_length=50, default='Service',)
+    comission_choice = models.CharField(choices=COMMISSION_CHOICE, max_length=50, default='percentage',)
     
     created_at = models.DateTimeField(auto_now_add=now)
     
