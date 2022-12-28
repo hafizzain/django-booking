@@ -25,7 +25,7 @@ from Employee.Constants.Add_Employe import add_employee
 from Service.models import Service
 from rest_framework import status
 from Business.models import Business, BusinessAddress
-from Utility.models import Country, State, City
+from Utility.models import Country, ExceptionRecord, State, City
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
@@ -1929,6 +1929,10 @@ def create_commission(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    ExceptionRecord.objects.create(
+        Text = f'{service_comission}'
+    )
+        
     try:
         business=Business.objects.get(id=business_id)
     except Exception as err:
@@ -1991,6 +1995,7 @@ def create_commission(request):
             symbol = symbol,
             category_comission = 'Service',
         )
+        
     if product_comission is not None:
         if type(product_comission) == str:
             product_comission = product_comission.replace("'" , '"')
