@@ -812,9 +812,9 @@ def add_product(request):
         product_type = product_type,
         name = name,
         cost_price = cost_price,
-        full_price = full_price,
-        sell_price = sell_price,
-        product_size=product_size,
+        #full_price = full_price,
+        #sell_price = sell_price,
+        #product_size=product_size,
         tax_rate = tax_rate,
         short_description = short_description,
         description = description,
@@ -894,8 +894,8 @@ def add_product(request):
                     location_ids.append(str(loc))
                 except Exception as err:
                     ExceptionRecord.objects.create(text=str(err))
-    
                     pass
+                
                 else:
                     product_stock = ProductStock.objects.create(
                         user = user,
@@ -958,11 +958,16 @@ def add_product(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_product(request):
+    user = request.user
     product_id = request.data.get('product', None)
     vendor_id = request.data.get('vendor', None)
     category_id = request.data.get('category', None)
     brand_id = request.data.get('brand', None)
     location = request.data.get('location', None)
+    
+    currency_retail_price = request.data.get('currency_retail_price', None)
+    
+    error = []
 
     if not all([product_id, category_id, brand_id]):
         return Response(
@@ -1022,6 +1027,8 @@ def update_product(request):
     
     product = Product.objects.get(
         id=product_id,
+        is_deleted = False,
+        
     )
     images = request.data.getlist('product_images', None)
 
@@ -1058,6 +1065,46 @@ def update_product(request):
     # all_stocks = ProductStock.objects.filter(product=product)
     # for stk in all_stocks:
     #     stk.delete()
+    
+    if currency_retail_price is not None:
+        if type(currency_retail_price) == str:
+            currency_retail_price = currency_retail_price.replace("'" , '"')
+            currency_retail_price = json.loads(currency_retail_price)
+
+        elif type(currency_retail_price) == list:
+            pass
+        
+        for retail in currency_retail_price:
+            currency_id = retail['currency']
+            id = retail.get('id', None)
+            price = retail['retail_price']
+            
+            if id is not None:
+                try:
+                    currency_retail = CurrencyRetailPrice.objects.get(id=retail['id'])
+                    is_deleted = retail.get('is_deleted', None)
+                    if is_deleted is not None:
+                        currency_retail.delete()
+                        continue
+                    currency_id= Currency.objects.get(id=retail['currency'])
+                    currency_retail.currency = currency_id
+                    currency_retail.retail_price = retail['retail_price']
+                    currency_retail.save()
+                except Exception as err:
+                    error.append(str(err))
+                    print(err)
+            else:
+                currency_id= Currency.objects.get(id=retail['currency'])
+                
+                CurrencyRetailPrice.objects.create(
+                user = user,
+                business = product.business,
+                product = product,
+                currency = currency_id,
+                retail_price =  retail['retail_price'] ,
+                )
+            
+                
 
     location_quantities = request.data.get('location_quantities', None)
     if location_quantities is not None:
@@ -1068,9 +1115,9 @@ def update_product(request):
         
         for loc_quan in location_quantities:
             location_id = loc_quan.get('id', None)
-            current_stock = loc_quan.get('current_stock', 0)
-            low_stock = loc_quan.get('low_stock', 0)
-            reorder_quantity = loc_quan.get('reorder_quantity', 0)
+            current_stock = loc_quan.get('current_stock', None)
+            low_stock = loc_quan.get('low_stock', None)
+            reorder_quantity = loc_quan.get('reorder_quantity', None)
 
             if all([location_id, current_stock, low_stock, reorder_quantity]):
                 try:
@@ -1083,8 +1130,10 @@ def update_product(request):
                     product_stock = ProductStock.objects.get(product = product.id, location = loc.id )
                 except Exception as err:
                     ExceptionRecord.objects.create(text=str(err))
-                    
-                product_stock.reorder_quantity = int(reorder_quantity)    
+                
+                if reorder_quantity is not None:
+                    product_stock.reorder_quantity = int(reorder_quantity) 
+                    product_stock.save()
                 product_stock.available_quantity = int(current_stock)
                 product_stock.low_stock = int(low_stock)
                 product_stock.save()
@@ -1102,7 +1151,7 @@ def update_product(request):
                 #         alert_when_stock_becomes_lowest = True,
                 #         is_active = True
                 #     )
-                #     ExceptionRecord.objects.create(is_resolved = True, text='Created')
+                #     ExceptionRecord.objects.create(is_resolved = True, text ='Created')
 
             else:
                 ExceptionRecord.objects.create(text=f'fields not all {location_id}, {current_stock}, {low_stock}, {reorder_quantity}')
@@ -1127,7 +1176,7 @@ def update_product(request):
                 'status_code' : 200,
                 'response' : {
                     'message' : 'Product Updated!',
-                    'error_message' : None,
+                    'error_message' : error,
                     'product' : data
                 }
             },

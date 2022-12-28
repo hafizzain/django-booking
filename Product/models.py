@@ -56,10 +56,10 @@ class Product(models.Model):
     name = models.CharField(max_length=1000, default='')
 
     cost_price = models.PositiveIntegerField(default=0, null = True, blank= True)
-    full_price = models.PositiveIntegerField(default=0, null = True, blank= True)
-    sell_price = models.PositiveIntegerField(default=0, null = True, blank= True)
+    #full_price = models.PositiveIntegerField(default=0, null = True, blank= True)
+    #sell_price = models.PositiveIntegerField(default=0, null = True, blank= True)
     #product_size = models.PositiveIntegerField(default=0)
-    product_size = models.CharField(max_length=50, null=True, blank=True)
+    #product_size = models.CharField(max_length=50, null=True, blank=True)
 
 
     tax_rate = models.PositiveIntegerField(default=0, null=True, blank=True)

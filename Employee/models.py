@@ -259,7 +259,7 @@ class CategoryCommission(models.Model):
     commission = models.ForeignKey(CommissionSchemeSetting, on_delete=models.CASCADE, related_name='categorycommission_commission')
     
     from_value = models.PositiveIntegerField(default=0, null=True, blank=True)
-    to_value = models.PositiveIntegerField(default=0, null=True, blank=True)
+    to_value = models.CharField(max_length=50, null=True, blank= True)
     commission_percentage = models.PositiveIntegerField(default=0, null=True, blank=True)
     
     category_comission = models.CharField(choices=CATEGORY_CHOICES, max_length=50, default='Service',)
