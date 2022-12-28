@@ -1971,7 +1971,7 @@ def create_commission(request):
     
     if service_comission is not None:
         if type(service_comission) == str:
-            service_comission = service_comission.replace("'" , '"')
+            #service_comission = service_comission.replace("'" , '"')
             service_comission = json.loads(service_comission)
 
         elif type(service_comission) == list:
@@ -1998,7 +1998,7 @@ def create_commission(request):
         
     if product_comission is not None:
         if type(product_comission) == str:
-            product_comission = product_comission.replace("'" , '"')
+            #product_comission = product_comission.replace("'" , '"')
             product_comission = json.loads(product_comission)
 
         elif type(product_comission) == list:
@@ -2027,7 +2027,7 @@ def create_commission(request):
     if voucher_comission is not None:
         
         if type(voucher_comission) == str:
-            voucher_comission = voucher_comission.replace("'" , '"')
+            #voucher_comission = voucher_comission.replace("'" , '"')
             voucher_comission = json.loads(voucher_comission)
 
         elif type(voucher_comission) == list:
