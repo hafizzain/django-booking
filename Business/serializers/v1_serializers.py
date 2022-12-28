@@ -190,7 +190,7 @@ class BusinessAddressMediaSerializer(serializers.ModelSerializer):
         return None
     class Meta:
         model= BusinessAddressMedia
-        fields= '__all__'
+        fields= ['id', 'image']
         
 class OpeningHoursSerializer(serializers.ModelSerializer):
     

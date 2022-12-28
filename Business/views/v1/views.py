@@ -16,10 +16,11 @@ from NStyle.Constants import StatusCodes
 
 from Authentication.models import User
 from Business.models import Business, BusinessSocial, BusinessAddress, BusinessOpeningHour, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BookingSetting, BusinessPaymentMethod, BusinessTax, BusinessVendor
+from Product.models import Product, ProductStock
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
 from Tenants.models import Domain, Tenant
-from Utility.models import Country, Currency, Language, NstyleFile, Software, State, City
+from Utility.models import Country, Currency, ExceptionRecord, Language, NstyleFile, Software, State, City
 from Utility.serializers import LanguageSerializer
 import json
 from django.db.models import Q
@@ -741,6 +742,26 @@ def add_business_location(request):
     # if serialized.is_valid():
     #     serialized.save()
     #     data.update(serialized.data)
+    try:
+        for pro in Product:
+            stock  = ProductStock.objects.create(
+                    user = user,
+                    business = business,
+                    product = pro.id,
+                    location = business_address,
+                    available_quantity = 0,
+                    low_stock = 0, 
+                    reorder_quantity = 0,
+                    #alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
+                    #is_active = stock_status,
+            )
+    except Exception as err:
+        print(str(err))
+        ExceptionRecord.objects.create(
+            text = f'{str(err) } line number 761'
+        )
+    
+    
     serialized = BusinessAddress_GetSerializer(business_address, context={'request' : request})
     # if serialized.is_valid():
     #     serialized.save()
