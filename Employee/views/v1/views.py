@@ -1930,7 +1930,7 @@ def create_commission(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     ExceptionRecord.objects.create(
-        Text = f'{service_comission}'
+        text = f'{service_comission}'
     )
         
     try:
