@@ -1083,7 +1083,7 @@ def update_product(request):
                 try:
                     currency_retail = CurrencyRetailPrice.objects.get(id=retail['id'])
                     is_deleted = retail.get('is_deleted', None)
-                    if is_deleted is not None:
+                    if bool(is_deleted) == True:
                         currency_retail.delete()
                         continue
                     currency_id= Currency.objects.get(id=retail['currency'])
