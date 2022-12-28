@@ -235,7 +235,15 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
     def get_images(self, obj):
         try:
             image = BusinessAddressMedia.objects.get(business_address = obj)
-            return BusinessAddressMediaSerializer(image, context=self.context).data
+            if image.image:
+                try:
+                    request = self.context["request"]
+                    url = tenant_media_base_url(request)
+                    return f'{url}{image.image}'
+                except:
+                    return image.image
+            return None
+            #return BusinessAddressMediaSerializer(image, context=self.context).data
         except Exception as err:
             print(err)
             
