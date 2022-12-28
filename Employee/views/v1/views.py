@@ -1977,7 +1977,7 @@ def create_commission(request):
             from_value = ser.get('from_value', None)
             to_value = ser.get('to_value', None)
             commission_per = ser.get('commission', None)
-            commission_choice = ser.get('comission_choice', None)
+            symbol = ser.get('symbol', None)
             
         # from_value = service_comission['from_value'] #ser.get('from_value', None)
         # to_value = service_comission['to_value'] #ser.get('to_value', None)
@@ -1988,7 +1988,7 @@ def create_commission(request):
             from_value =from_value,
             to_value = to_value,
             commission_percentage = commission_per,
-            comission_choice = commission_choice,
+            symbol = symbol,
             category_comission = 'Service',
         )
     if product_comission is not None:
@@ -2003,7 +2003,7 @@ def create_commission(request):
             from_value = pro.get('from_value', None)
             to_value = pro.get('to_value', None)
             commission_per = pro.get('commission', None)
-            commission_choice = ser.get('comission_choice', None)
+            symbol = pro.get('symbol', None)
 
         
         # from_value = product_comission['from_value'] #ser.get('from_value', None)
@@ -2015,7 +2015,7 @@ def create_commission(request):
             from_value = from_value,
             to_value = to_value,
             commission_percentage = commission_per,
-            comission_choice = commission_choice,
+            symbol = symbol,
             category_comission = 'Retail',
         )
         
@@ -2032,7 +2032,7 @@ def create_commission(request):
             from_value = vou.get('from_value', None)
             to_value = vou.get('to_value', None)
             commission_per = vou.get('commission', None)
-            commission_choice = ser.get('comission_choice', None)
+            symbol = vou.get('symbol', None)
 
         
         # from_value = voucher_comission['from_value'] #ser.get('from_value', None)
@@ -2044,7 +2044,7 @@ def create_commission(request):
             from_value = from_value,
             to_value = to_value,
             commission_percentage = commission_per,
-            comission_choice = commission_choice,
+            symbol = symbol,
             category_comission = 'Both',
         )           
             

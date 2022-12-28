@@ -263,7 +263,8 @@ class CategoryCommission(models.Model):
     commission_percentage = models.PositiveIntegerField(default=0, null=True, blank=True)
     
     category_comission = models.CharField(choices=CATEGORY_CHOICES, max_length=50, default='Service',)
-    comission_choice = models.CharField(choices=COMMISSION_CHOICE, max_length=50, default='percentage',)
+    #comission_choice = models.CharField(choices=COMMISSION_CHOICE, max_length=50, default='percentage',)
+    symbol = models.CharField(max_length=50, null=True, blank= True)
     
     created_at = models.DateTimeField(auto_now_add=now)
     
