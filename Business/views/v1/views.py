@@ -948,10 +948,16 @@ def update_location(request):
                 
             if country is not None:
                 country = Country.objects.get( id=country, is_deleted=False, is_active=True )
+                business_address.country = country
+                business_address.save()
             if state is not None:
                 state = State.objects.get( id=state, is_deleted=False, is_active=True )
+                business_address.state = state
+                business_address.save()
             if city is not None:
                 city = City.objects.get( id=city, is_deleted=False, is_active=True )
+                business_address.city = city
+                business_address.save()
         except Exception as err:
             return Response(
                 {

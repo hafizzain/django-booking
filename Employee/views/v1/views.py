@@ -1929,9 +1929,6 @@ def create_commission(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    ExceptionRecord.objects.create(
-        text = f'{service_comission}'
-    )
         
     try:
         business=Business.objects.get(id=business_id)
@@ -2061,7 +2058,7 @@ def create_commission(request):
                     to_value = to_value,
                     commission_percentage = commission_per,
                     symbol = symbol,
-                    category_comission = 'Both',
+                    category_comission = 'Voucher',
                 )           
             except Exception as err:
                 ExceptionRecord.objects.create(
@@ -2233,54 +2230,174 @@ def update_commision(request):
             },
                 status=status.HTTP_404_NOT_FOUND
         )
-    
+        
     if service_comission is not None:
-        from_value = service_comission['from_value'] #ser.get('from_value', None)
-        to_value = service_comission['to_value'] #ser.get('to_value', None)
-        commission_per = service_comission['commission_percentage'] #ser.get('commission', None)
-        id = service_comission['id'] #ser.get('commission', None)
+        if type(service_comission) == str:
+            #product_comission = product_comission.replace("'" , '"')
+            service_comission = json.loads(service_comission)
+
+        elif type(service_comission) == list:
+            pass
         
-        try:
-            category = CategoryCommission.objects.get(id  = id)
-            category.from_value = from_value
-            category.to_value = to_value
-            category.commission_percentage = commission_per
-            category.save()
+        for pro in service_comission:
             
-        except Exception as err:
-            print(err)
-            
+            from_value = pro.get('from_value', None)
+            to_value = pro.get('to_value', None)
+            commission_per = pro.get('commission', None)
+            isDeleted = pro.get('isDeleted', None)
+            symbol = pro.get('symbol', None)
+            id = pro.get('id', None)
+            if id is not None:
+                try:
+                    commision_ser= CategoryCommission.objects.get(id=id)
+                    if bool(isDeleted) == True:
+                        commision_ser.delete()
+                    
+                    commision_ser.from_value = from_value
+                    commision_ser.to_value = to_value
+                    commision_ser.commission_percentage = commission_per
+                    commision_ser.symbol = symbol
+                    commision_ser.save()           
+                    
+                except Exception as err:
+                    print(str(err))
+            else:
+                CategoryCommission.objects.create(
+                    commission =  commission,
+                    from_value = from_value,
+                    to_value = to_value,
+                    commission_percentage = commission_per,
+                    symbol = symbol,
+                    category_comission = 'Service',
+                )
+                
     if product_comission is not None:
-        from_value = product_comission['from_value'] #ser.get('from_value', None)
-        to_value = product_comission['to_value'] #ser.get('to_value', None)
-        commission_per = product_comission['commission_percentage'] #ser.get('commission', None)
-        id = product_comission['id'] #ser.get('commission', None)
+        if type(product_comission) == str:
+            #product_comission = product_comission.replace("'" , '"')
+            product_comission = json.loads(product_comission)
+
+        elif type(product_comission) == list:
+            pass
         
-        try:
-            category = CategoryCommission.objects.get(id  = id)
-            category.from_value = from_value
-            category.to_value = to_value
-            category.commission_percentage = commission_per
-            category.save()
+        for pro in product_comission:
             
-        except Exception as err:
-            print(err)
-            
+            from_value = pro.get('from_value', None)
+            to_value = pro.get('to_value', None)
+            commission_per = pro.get('commission', None)
+            isDeleted = pro.get('isDeleted', None)
+            symbol = pro.get('symbol', None)
+            id = pro.get('id', None)
+            if id is not None:
+                try:
+                    commision_ser= CategoryCommission.objects.get(id=id)
+                    if bool(isDeleted) == True:
+                        commision_ser.delete()
+                    
+                    commision_ser.from_value = from_value
+                    commision_ser.to_value = to_value
+                    commision_ser.commission_percentage = commission_per
+                    commision_ser.symbol = symbol
+                    commision_ser.save()           
+                    
+                except Exception as err:
+                    print(str(err))
+            else:
+                CategoryCommission.objects.create(
+                    commission =  commission,
+                    from_value = from_value,
+                    to_value = to_value,
+                    commission_percentage = commission_per,
+                    symbol = symbol,
+                    category_comission = 'Retail',
+                )
+                
     if voucher_comission is not None:
-        from_value = voucher_comission['from_value'] #ser.get('from_value', None)
-        to_value = voucher_comission['to_value'] #ser.get('to_value', None)
-        commission_per = voucher_comission['commission_percentage'] #ser.get('commission', None)
-        id = voucher_comission['id'] #ser.get('commission', None)
+        if type(voucher_comission) == str:
+            #product_comission = product_comission.replace("'" , '"')
+            voucher_comission = json.loads(voucher_comission)
+
+        elif type(voucher_comission) == list:
+            pass
         
-        try:
-            category = CategoryCommission.objects.get(id  = id)
-            category.from_value = from_value
-            category.to_value = to_value
-            category.commission_percentage = commission_per
-            category.save()
+        for pro in voucher_comission:
             
-        except Exception as err:
-            print(err)
+            from_value = pro.get('from_value', None)
+            to_value = pro.get('to_value', None)
+            commission_per = pro.get('commission', None)
+            isDeleted = pro.get('isDeleted', None)
+            symbol = pro.get('symbol', None)
+            id = pro.get('id', None)
+            if id is not None:
+                try:
+                    commision_ser= CategoryCommission.objects.get(id=id)
+                    if bool(isDeleted) == True:
+                        commision_ser.delete()
+                    
+                    commision_ser.from_value = from_value
+                    commision_ser.to_value = to_value
+                    commision_ser.commission_percentage = commission_per
+                    commision_ser.symbol = symbol
+                    commision_ser.save()           
+                    
+                except Exception as err:
+                    print(str(err))
+            else:
+                CategoryCommission.objects.create(
+                    commission =  commission,
+                    from_value = from_value,
+                    to_value = to_value,
+                    commission_percentage = commission_per,
+                    symbol = symbol,
+                    category_comission = 'Voucher',
+                )
+    
+    # if service_comission is not None:
+    #     from_value = service_comission['from_value'] #ser.get('from_value', None)
+    #     to_value = service_comission['to_value'] #ser.get('to_value', None)
+    #     commission_per = service_comission['commission_percentage'] #ser.get('commission', None)
+    #     id = service_comission['id'] #ser.get('commission', None)
+        
+    #     try:
+    #         category = CategoryCommission.objects.get(id  = id)
+    #         category.from_value = from_value
+    #         category.to_value = to_value
+    #         category.commission_percentage = commission_per
+    #         category.save()
+            
+    #     except Exception as err:
+    #         print(err)
+            
+    # if product_comission is not None:
+    #     from_value = product_comission['from_value'] #ser.get('from_value', None)
+    #     to_value = product_comission['to_value'] #ser.get('to_value', None)
+    #     commission_per = product_comission['commission_percentage'] #ser.get('commission', None)
+    #     id = product_comission['id'] #ser.get('commission', None)
+        
+    #     try:
+    #         category = CategoryCommission.objects.get(id  = id)
+    #         category.from_value = from_value
+    #         category.to_value = to_value
+    #         category.commission_percentage = commission_per
+    #         category.save()
+            
+    #     except Exception as err:
+    #         print(err)
+            
+    # if voucher_comission is not None:
+    #     from_value = voucher_comission['from_value'] #ser.get('from_value', None)
+    #     to_value = voucher_comission['to_value'] #ser.get('to_value', None)
+    #     commission_per = voucher_comission['commission_percentage'] #ser.get('commission', None)
+    #     id = voucher_comission['id'] #ser.get('commission', None)
+        
+    #     try:
+    #         category = CategoryCommission.objects.get(id  = id)
+    #         category.from_value = from_value
+    #         category.to_value = to_value
+    #         category.commission_percentage = commission_per
+    #         category.save()
+            
+    #     except Exception as err:
+    #         print(err)
     
     try:
         employee_id=Employee.objects.get(id=employee)

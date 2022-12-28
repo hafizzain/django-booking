@@ -252,7 +252,7 @@ class CategoryCommission(models.Model):
     CATEGORY_CHOICES =[
         ('Service', 'Service'),
         ('Retail', 'Retail'),
-        ('Both', 'Both'),
+        ('Voucher', 'Voucher'),
     ]
     
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
