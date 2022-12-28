@@ -1978,23 +1978,28 @@ def create_commission(request):
             pass
         
         for ser in service_comission:
-            from_value = ser.get('from_value', None)
-            to_value = ser.get('to_value', None)
-            commission_per = ser.get('commission', None)
-            symbol = ser.get('symbol', None)
+            try:
+                from_value = ser.get('from_value', None)
+                to_value = ser.get('to_value', None)
+                commission_per = ser.get('commission', None)
+                symbol = ser.get('symbol', None)
+                
+            # from_value = service_comission['from_value'] #ser.get('from_value', None)
+            # to_value = service_comission['to_value'] #ser.get('to_value', None)
+            # commission_per = service_comission['commission_percentage'] #ser.get('commission', None)
             
-        # from_value = service_comission['from_value'] #ser.get('from_value', None)
-        # to_value = service_comission['to_value'] #ser.get('to_value', None)
-        # commission_per = service_comission['commission_percentage'] #ser.get('commission', None)
-        
-        CategoryCommission.objects.create(
-            commission =  commission_setting,
-            from_value =from_value,
-            to_value = to_value,
-            commission_percentage = commission_per,
-            symbol = symbol,
-            category_comission = 'Service',
-        )
+                CategoryCommission.objects.create(
+                    commission =  commission_setting,
+                    from_value =from_value,
+                    to_value = to_value,
+                    commission_percentage = commission_per,
+                    symbol = symbol,
+                    category_comission = 'Service',
+                )
+            except Exception as err:
+                ExceptionRecord.objects.create(
+                    text = f'Service data {str(err)}'
+                )
         
     if product_comission is not None:
         if type(product_comission) == str:
@@ -2005,24 +2010,29 @@ def create_commission(request):
             pass
         
         for pro in product_comission:
-            from_value = pro.get('from_value', None)
-            to_value = pro.get('to_value', None)
-            commission_per = pro.get('commission', None)
-            symbol = pro.get('symbol', None)
+            try:
+                from_value = pro.get('from_value', None)
+                to_value = pro.get('to_value', None)
+                commission_per = pro.get('commission', None)
+                symbol = pro.get('symbol', None)
 
-        
-        # from_value = product_comission['from_value'] #ser.get('from_value', None)
-        # to_value = product_comission['to_value'] #ser.get('to_value', None)
-        # commission_per = product_comission['commission_percentage'] #ser.get('commission', None)
-        
-        CategoryCommission.objects.create(
-            commission =  commission_setting,
-            from_value = from_value,
-            to_value = to_value,
-            commission_percentage = commission_per,
-            symbol = symbol,
-            category_comission = 'Retail',
-        )
+            
+            # from_value = product_comission['from_value'] #ser.get('from_value', None)
+            # to_value = product_comission['to_value'] #ser.get('to_value', None)
+            # commission_per = product_comission['commission_percentage'] #ser.get('commission', None)
+            
+                CategoryCommission.objects.create(
+                    commission =  commission_setting,
+                    from_value = from_value,
+                    to_value = to_value,
+                    commission_percentage = commission_per,
+                    symbol = symbol,
+                    category_comission = 'Retail',
+                )
+            except Exception as err:
+                ExceptionRecord.objects.create(
+                    text = f'Retail data {str(err)}'
+                )
         
     if voucher_comission is not None:
         
@@ -2034,24 +2044,29 @@ def create_commission(request):
             pass
         
         for vou in voucher_comission:
-            from_value = vou.get('from_value', None)
-            to_value = vou.get('to_value', None)
-            commission_per = vou.get('commission', None)
-            symbol = vou.get('symbol', None)
+            try:
+                from_value = vou.get('from_value', None)
+                to_value = vou.get('to_value', None)
+                commission_per = vou.get('commission', None)
+                symbol = vou.get('symbol', None)
 
+            
+            # from_value = voucher_comission['from_value'] #ser.get('from_value', None)
+            # to_value = voucher_comission['to_value'] #ser.get('to_value', None)
+            # commission_per = voucher_comission['commission_percentage'] #ser.get('commission', None)
         
-        # from_value = voucher_comission['from_value'] #ser.get('from_value', None)
-        # to_value = voucher_comission['to_value'] #ser.get('to_value', None)
-        # commission_per = voucher_comission['commission_percentage'] #ser.get('commission', None)
-        
-        CategoryCommission.objects.create(
-            commission =  commission_setting,
-            from_value = from_value,
-            to_value = to_value,
-            commission_percentage = commission_per,
-            symbol = symbol,
-            category_comission = 'Both',
-        )           
+                CategoryCommission.objects.create(
+                    commission =  commission_setting,
+                    from_value = from_value,
+                    to_value = to_value,
+                    commission_percentage = commission_per,
+                    symbol = symbol,
+                    category_comission = 'Both',
+                )           
+            except Exception as err:
+                ExceptionRecord.objects.create(
+                    text = f'Both data {str(err)}'
+                )
             
     serializers= CommissionSerializer(commission_setting, context={'request' : request})
     
