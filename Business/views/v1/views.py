@@ -2781,7 +2781,7 @@ def get_domain_business_address(request):
     for tnt in tenants:
         with tenant_context(tnt):
             user_business = Business.objects.get(
-                id = busines_id,
+                id = str(busines_id),
                 is_deleted=False,
                 is_active=True,
                 is_blocked=False
