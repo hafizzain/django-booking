@@ -2799,6 +2799,19 @@ def get_domain_business_address(request):
                     is_active=True,
                     is_blocked=False
                 )
+            
+                try:
+                    business_addresses = BusinessAddress.objects.filter(
+                        business = user_business,
+                        is_deleted=False,
+                        is_closed=False,
+                        is_active=True
+                    ).order_by('-created_at').distinct()
+                except Exception as err:
+                    ExceptionRecord.objects.create(
+                        text = f'err in get busines {str(err)}'
+                    )
+                
                 # if len(user_business) > 0:
                 #     user_business = user_business[0]
                 # else:
@@ -2819,18 +2832,6 @@ def get_domain_business_address(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-
-    try:
-        business_addresses = BusinessAddress.objects.filter(
-            business = user_business,
-            is_deleted=False,
-            is_closed=False,
-            is_active=True
-        ).order_by('-created_at').distinct()
-    except Exception as err:
-        ExceptionRecord.objects.create(
-            text = f'err in get busines {str(err)}'
-        )
     #data = []
     #if len(business_addresses) > 0:
     serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
