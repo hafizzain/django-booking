@@ -2260,7 +2260,9 @@ def update_commision(request):
                     commision_ser.save()           
                     
                 except Exception as err:
-                    print(str(err))
+                    ExceptionRecord.objects.create(
+                        text = f'error to service_comission create {str(err)}'
+                    )
             else:
                 CategoryCommission.objects.create(
                     commission =  commission,
@@ -2300,7 +2302,9 @@ def update_commision(request):
                     commision_ser.save()           
                     
                 except Exception as err:
-                    print(str(err))
+                    ExceptionRecord.objects.create(
+                        text = f'error to product_comission create {str(err)}'
+                    )
             else:
                 CategoryCommission.objects.create(
                     commission =  commission,
@@ -2313,14 +2317,13 @@ def update_commision(request):
                 
     if voucher_comission is not None:
         if type(voucher_comission) == str:
-            #product_comission = product_comission.replace("'" , '"')
+            voucher_comission = voucher_comission.replace("'" , '"')
             voucher_comission = json.loads(voucher_comission)
 
         elif type(voucher_comission) == list:
             pass
         
         for pro in voucher_comission:
-            
             from_value = pro.get('from_value', None)
             to_value = pro.get('to_value', None)
             commission_per = pro.get('commission', None)
@@ -2340,6 +2343,9 @@ def update_commision(request):
                     commision_ser.save()           
                     
                 except Exception as err:
+                    ExceptionRecord.objects.create(
+                        text = f'error to voucher_comission create {str(err)}'
+                    )
                     print(str(err))
             else:
                 CategoryCommission.objects.create(
