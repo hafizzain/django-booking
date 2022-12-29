@@ -2851,7 +2851,7 @@ def get_domain_business_address(request):
         ).order_by('-created_at').distinct()
     except Exception as err:
         ExceptionRecord.objects.create(
-            text = f'business_addresses line 2854 {str(err)}'
+            text = f'business_addresses line 2854 {str(err)} location is {str(data[0])}'
         )
     data = []
     if len(business_addresses) > 0:
