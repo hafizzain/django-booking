@@ -2842,13 +2842,17 @@ def get_domain_business_address(request):
     #         },
     #         status=status.HTTP_404_NOT_FOUND
     #     )
-
-    business_addresses = BusinessAddress.objects.filter(
-        business = data[0],
-        is_deleted=False,
-        is_closed=False,
-        is_active=True
-    ).order_by('-created_at').distinct()
+    try:
+        business_addresses = BusinessAddress.objects.filter(
+            business = str(data[0]),
+            is_deleted=False,
+            is_closed=False,
+            is_active=True
+        ).order_by('-created_at').distinct()
+    except Exception as err:
+        ExceptionRecord.objects.create(
+            text = f'business_addresses line 2854 {str(err)}'
+        )
     data = []
     if len(business_addresses) > 0:
         serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
