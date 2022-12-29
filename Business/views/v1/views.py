@@ -2820,10 +2820,10 @@ def get_domain_business_address(request):
                 except Exception as err:
                     print(err)
                 
-                if len(user_business) > 0:
-                    user_business = user_business[0]
-                else:
-                    raise Exception('0 Business found')
+                # if len(user_business) > 0:
+                #     user_business = user_business[0]
+                # else:
+                #     raise Exception('0 Business found')
         else :
             raise Exception('Business Not Exist')
     except Exception as err:
@@ -2886,6 +2886,7 @@ def get_domain_business_address(request):
                     'error_message' : None,
                     'count' : len(data),
                     'locations' : data,
+                    'business_name' : str(user_business.business_name),
                 }
             },
             status=status.HTTP_200_OK
