@@ -2769,7 +2769,7 @@ def search_business_vendor(request):
 def get_domain_business_address(request):
     domain_name = request.GET.get('domain', None)
     
-    data = []
+    data =[]
     if domain_name is None:
         return Response(
             {
@@ -2800,19 +2800,10 @@ def get_domain_business_address(request):
                     is_active=True,
                     is_blocked=False
                 )
-                
-                # business_addresses = BusinessAddress.objects.filter(
-                #     business = user_business,
-                #     is_deleted=False,
-                #     is_closed=False,
-                #     is_active=True
-                # ).order_by('-created_at').distinct()[:1]
-                
-                data.append(user_business.id)
-                # if len(user_business) > 0:
-                #     user_business = user_business[0]
-                # else:
-                #     raise Exception('0 Business found')
+                if len(user_business) > 0:
+                    user_business = user_business[0]
+                else:
+                    raise Exception('0 Business found')
         else :
             raise Exception('Business Not Exist')
     except Exception as err:
@@ -2827,6 +2818,27 @@ def get_domain_business_address(request):
                 }
             },
             status=status.HTTP_404_NOT_FOUND
+        )
+    
+    data.append(str(user_business.id))
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : 'BUSINESS_FOUND',
+                'response' : {
+                    'message' : 'Business Found',
+                    'error_message' : None,
+                    'business' : {
+                        'id' : str(user_business.id),
+                        'business_name' : str(user_business.business_name),
+                        'data': data
+                        # 'logo' : user_business.logo if user_business.logo else None ,
+                    }
+                }
+            },
+            status=status.HTTP_200_OK
         )
     
     #data = []
