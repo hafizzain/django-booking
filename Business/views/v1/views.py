@@ -2799,8 +2799,8 @@ def get_domain_business_address(request):
     try:
         domain_name = f'{domain_name}.{settings.BACKEND_DOMAIN_NAME}'
         domain = None
-        with tenant_context(Tenant.objects.get(schema_name = 'public')):
-            domain = Domain.objects.get(domain=domain_name)
+        #with tenant_context(Tenant.objects.get(schema_name = 'public')):
+        domain = Domain.objects.get(domain=domain_name)
 
         if domain is not None:
             with tenant_context(domain.tenant):
@@ -2839,7 +2839,7 @@ def get_domain_business_address(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    ids = str(user_business.id)
+    #ids = str(user_business.id)
     
     # try:
     #     business = Business.objects.get(
