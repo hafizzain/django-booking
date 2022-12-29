@@ -2770,6 +2770,7 @@ def get_domain_business_address(request):
     domain_name = request.GET.get('domain', None)
     
     data =[]
+    ids = '' 
     if domain_name is None:
         return Response(
             {
@@ -2800,6 +2801,7 @@ def get_domain_business_address(request):
                     is_active=True,
                     is_blocked=False
                 )
+                ids = user_business
                 if len(user_business) > 0:
                     user_business = user_business[0]
                 else:
@@ -2828,7 +2830,7 @@ def get_domain_business_address(request):
     
     try:
         business = Business.objects.get(
-            id=str(data[0]),
+            id= ids,
             is_deleted=False,
             is_blocked=False,
             is_active=True
@@ -2893,7 +2895,7 @@ def get_domain_business_address(request):
                     'business' : {
                         'id' : str(user_business.id),
                         'business_name' : str(user_business.business_name),
-                        'data': business
+                        'data': data[0]
                         # 'logo' : user_business.logo if user_business.logo else None ,
                     }
                 }
