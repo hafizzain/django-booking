@@ -60,4 +60,8 @@ urlpatterns = [
     path('search_business_vendor/', views.search_business_vendor),
     path('import_business_vendor/', views.import_business_vendor),
     
+    #Business Domain by user
+    path('get_domain_business_address/', views.get_domain_business_address),
+
+    
 ]
