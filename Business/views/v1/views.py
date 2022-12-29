@@ -2780,24 +2780,26 @@ def get_domain_business_address(request):
     tenants= Tenant.objects.all()
     for tnt in tenants:
         with tenant_context(tnt):
-            user_business = Business.objects.get(
-                id = str(busines_id),
-                is_deleted=False,
-                is_active=True,
-                is_blocked=False
-            )
-                    
             try:
-                business_addresses = BusinessAddress.objects.filter(
-                    business = user_business,
+                user_business = Business.objects.get(
+                    id = str(busines_id),
                     is_deleted=False,
-                    is_closed=False,
-                    is_active=True
-                ).order_by('-created_at').distinct()
+                    is_active=True,
+                    is_blocked=False
+                )
             except Exception as err:
-                print(err)
-        serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
-        data = serialized.data
+                pass
+        #     try:
+        #         business_addresses = BusinessAddress.objects.filter(
+        #             business = user_business,
+        #             is_deleted=False,
+        #             is_closed=False,
+        #             is_active=True
+        #         ).order_by('-created_at').distinct()
+        #     except Exception as err:
+        #         print(err)
+        # serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
+        # data = serialized.data
 
     return Response(
             {
@@ -2807,8 +2809,7 @@ def get_domain_business_address(request):
                 'response' : {
                     'message' : 'Business All Locations',
                     'error_message' : None,
-                    'count' : len(data),
-                    'locations' : data,
+                    'locations' : 'data',
                 }
             },
             status=status.HTTP_200_OK
