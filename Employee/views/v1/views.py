@@ -2247,6 +2247,9 @@ def update_commision(request):
             isDeleted = pro.get('isDeleted', None)
             symbol = pro.get('symbol', None)
             id = pro.get('id', None)
+            ExceptionRecord.objects.create(
+                        text = f'error to service_comission create {id} delete {isDeleted}'
+                    )
             if id is not None:
                 try:
                     commision_ser= CategoryCommission.objects.get(id=id)
@@ -2289,6 +2292,9 @@ def update_commision(request):
             isDeleted = pro.get('isDeleted', None)
             symbol = pro.get('symbol', None)
             id = pro.get('id', None)
+            ExceptionRecord.objects.create(
+                        text = f'error to service_comission create {id} delete {isDeleted}'
+                    )
             if id is not None:
                 try:
                     commision_ser= CategoryCommission.objects.get(id=id)
@@ -2330,6 +2336,9 @@ def update_commision(request):
             isDeleted = pro.get('isDeleted', None)
             symbol = pro.get('symbol', None)
             id = pro.get('id', None)
+            ExceptionRecord.objects.create(
+                        text = f'error to service_comission create {id} delete {isDeleted}'
+                    )
             if id is not None:
                 try:
                     commision_ser= CategoryCommission.objects.get(id=id)
