@@ -198,8 +198,6 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
             'id', 
             'name', 
             'cost_price',
-            'full_price',
-            'sell_price',
             'category', 
             'brand', 
             'vendor',

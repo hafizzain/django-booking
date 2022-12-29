@@ -2255,6 +2255,7 @@ def update_commision(request):
                     commision_ser= CategoryCommission.objects.get(id=id)
                     if bool(isDeleted) == True:
                         commision_ser.delete()
+                        pass
                     
                     commision_ser.from_value = from_value
                     commision_ser.to_value = to_value
@@ -2300,6 +2301,7 @@ def update_commision(request):
                     commision_ser= CategoryCommission.objects.get(id=id)
                     if bool(isDeleted) == True:
                         commision_ser.delete()
+                        pass
                     
                     commision_ser.from_value = from_value
                     commision_ser.to_value = to_value
@@ -2344,6 +2346,7 @@ def update_commision(request):
                     commision_ser= CategoryCommission.objects.get(id=id)
                     if bool(isDeleted) == True:
                         commision_ser.delete()
+                        pass
                     
                     commision_ser.from_value = from_value
                     commision_ser.to_value = to_value
