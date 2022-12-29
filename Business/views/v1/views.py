@@ -2769,7 +2769,6 @@ def search_business_vendor(request):
 def get_domain_business_address(request):
     domain_name = request.GET.get('domain', None)
     
-    data =[]
     ids = '' 
     if domain_name is None:
         return Response(
@@ -2822,7 +2821,6 @@ def get_domain_business_address(request):
             status=status.HTTP_404_NOT_FOUND
         )
     ids = str(user_business.id)
-    data.append(str(user_business.id))
     
     ExceptionRecord.objects.create(
             text = f'business_addresses line 285 location is {str(data[0])}'
@@ -2848,58 +2846,58 @@ def get_domain_business_address(request):
     #         },
     #         status=status.HTTP_404_NOT_FOUND
     #     )
-    # try:
-    #     business_addresses = BusinessAddress.objects.filter(
-    #         business = str(data[0]),
-    #         is_deleted=False,
-    #         is_closed=False,
-    #         is_active=True
-    #     ).order_by('-created_at').distinct()
-    # except Exception as err:
-    #     ExceptionRecord.objects.create(
-    #         text = f'business_addresses line 2854 {str(err)} location is {str(data[0])}'
-    #     )
-    # ExceptionRecord.objects.create(
-    #         text = f'business_addresses line 285 location is {str(data[0])}'
-    #     )
-    # data = []
-    # if len(business_addresses) > 0:
-    #     serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
-    #     data = serialized.data
+    try:
+        business_addresses = BusinessAddress.objects.filter(
+            business = ids,
+            is_deleted=False,
+            is_closed=False,
+            is_active=True
+        ).order_by('-created_at').distinct()
+    except Exception as err:
+        ExceptionRecord.objects.create(
+            text = f'business_addresses line 2854 {str(err)} location is {str(data[0])}'
+        )
+    ExceptionRecord.objects.create(
+            text = f'business_addresses line 285 location is {str(data[0])}'
+        )
+    data = []
+    if len(business_addresses) > 0:
+        serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
+        data = serialized.data
 
-    # return Response(
-    #         {
-    #             'status' : True,
-    #             'status_code' : 200,
-    #             'status_code_text' : '200',
-    #             'response' : {
-    #                 'message' : 'Business All Locations',
-    #                 'error_message' : None,
-    #                 'count' : len(data),
-    #                 'locations' : data,
-    #             }
-    #         },
-    #         status=status.HTTP_200_OK
-    #     )
-    
-    
-    
     return Response(
             {
                 'status' : True,
                 'status_code' : 200,
-                'status_code_text' : 'BUSINESS_FOUND',
+                'status_code_text' : '200',
                 'response' : {
-                    'message' : 'Business Found',
+                    'message' : 'Business All Locations',
                     'error_message' : None,
-                    'business' : {
-                        'id' : str(user_business.id),
-                        'business_name' : str(user_business.business_name),
-                        'data': ids
-                        # 'logo' : user_business.logo if user_business.logo else None ,
-                    }
+                    'count' : len(data),
+                    'locations' : data,
                 }
             },
             status=status.HTTP_200_OK
         )
+    
+    
+    
+    # return Response(
+    #         {
+    #             'status' : True,
+    #             'status_code' : 200,
+    #             'status_code_text' : 'BUSINESS_FOUND',
+    #             'response' : {
+    #                 'message' : 'Business Found',
+    #                 'error_message' : None,
+    #                 'business' : {
+    #                     'id' : str(user_business.id),
+    #                     'business_name' : str(user_business.business_name),
+    #                     'data': ids
+    #                     # 'logo' : user_business.logo if user_business.logo else None ,
+    #                 }
+    #             }
+    #         },
+    #         status=status.HTTP_200_OK
+    #     )
     
