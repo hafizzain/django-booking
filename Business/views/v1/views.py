@@ -2853,6 +2853,9 @@ def get_domain_business_address(request):
         ExceptionRecord.objects.create(
             text = f'business_addresses line 2854 {str(err)} location is {str(data[0])}'
         )
+    ExceptionRecord.objects.create(
+            text = f'business_addresses line 285 location is {str(data[0])}'
+        )
     data = []
     if len(business_addresses) > 0:
         serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
