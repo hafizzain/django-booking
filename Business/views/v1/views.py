@@ -2800,12 +2800,12 @@ def get_domain_business_address(request):
                     is_blocked=False
                 )
                 
-                # business_addresses = BusinessAddress.objects.filter(
-                #     business = user_business,
-                #     is_deleted=False,
-                #     is_closed=False,
-                #     is_active=True
-                # ).order_by('-created_at').distinct()
+                business_addresses = BusinessAddress.objects.filter(
+                    business = user_business,
+                    is_deleted=False,
+                    is_closed=False,
+                    is_active=True
+                ).order_by('-created_at').distinct()
                 
                 # if len(user_business) > 0:
                 #     user_business = user_business[0]
@@ -2829,7 +2829,7 @@ def get_domain_business_address(request):
     
     #data = []
     #if len(business_addresses) > 0:
-    # serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
+    serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
     # data = serialized.data
 
     return Response(
@@ -2840,7 +2840,7 @@ def get_domain_business_address(request):
                 'response' : {
                     'message' : 'Business All Locations',
                     'error_message' : None,
-                    'locations' : 'data',
+                    'locations' : serialized.data,
                 }
             },
             status=status.HTTP_200_OK
