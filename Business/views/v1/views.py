@@ -2824,7 +2824,7 @@ def get_domain_business_address(request):
     
     try:
         business = Business.objects.get(
-            id=data[0],
+            id=str(data[0]),
             is_deleted=False,
             is_blocked=False,
             is_active=True
