@@ -2808,7 +2808,7 @@ def get_domain_business_address(request):
                 #     is_active=True
                 # ).order_by('-created_at').distinct()[:1]
                 
-                # data.append(business_addresses)
+                data.append(user_business)
                 # if len(user_business) > 0:
                 #     user_business = user_business[0]
                 # else:
