@@ -550,6 +550,9 @@ def get_business_locations(request, business_id):
         is_closed=False,
         is_active=True
     ).order_by('-created_at').distinct()
+    all_products = BusinessAddress.objects.filter(is_deleted=True)
+    for i in all_products:
+        i.delete()
     data = []
     if len(business_addresses) > 0:
         serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
