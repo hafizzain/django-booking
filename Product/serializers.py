@@ -284,11 +284,11 @@ class ProductSerializer(serializers.ModelSerializer):
         return ProductMediaSerializer(all_medias, many=True, context=context).data
 
     def get_stocks(self, obj):
-        all_stocks = ProductStock.objects.filter(product=obj, is_deleted=False)
+        all_stocks = ProductStock.objects.filter(product=obj, is_deleted=False).order_by('-created_at')
         return ProductStockSerializer(all_stocks, many=True).data
 
     def get_location_quantities(self, obj):
-        all_stocks = ProductStock.objects.filter(product=obj, location__is_deleted=False)
+        all_stocks = ProductStock.objects.filter(product=obj, location__is_deleted=False).order_by('-created_at')
         return ProductStockSerializer(all_stocks, many=True).data
 
 

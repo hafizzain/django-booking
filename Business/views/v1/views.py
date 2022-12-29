@@ -746,7 +746,8 @@ def add_business_location(request):
     #     serialized.save()
     #     data.update(serialized.data)
     try:
-        for pro in Product:
+        all_product = Product.objects.all()
+        for pro in all_product:
             stock  = ProductStock.objects.create(
                     user = user,
                     business = business,
