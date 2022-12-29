@@ -103,7 +103,7 @@ class ProductStockSerializer(serializers.ModelSerializer):
     def get_location(self, obj):
         try:
             print(obj.location)
-            loc = BusinessAddress.objects.get(id = str(obj.location))
+            loc = BusinessAddress.objects.get(id = str(obj.location), is_deleted=False )
             #loc = obj.location.all()
             return LocationSerializer(loc).data
             # return EmployeeServiceSerializer(obj.services).data
@@ -288,7 +288,7 @@ class ProductSerializer(serializers.ModelSerializer):
         return ProductStockSerializer(all_stocks, many=True).data
 
     def get_location_quantities(self, obj):
-        all_stocks = ProductStock.objects.filter(product=obj, is_deleted=False)
+        all_stocks = ProductStock.objects.filter(product=obj, location__is_deleted=False)
         return ProductStockSerializer(all_stocks, many=True).data
 
 
