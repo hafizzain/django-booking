@@ -2801,12 +2801,12 @@ def get_domain_business_address(request):
                     is_blocked=False
                 )
                 
-                business_addresses = BusinessAddress.objects.filter(
-                    business = user_business,
-                    is_deleted=False,
-                    is_closed=False,
-                    is_active=True
-                )[0]#.order_by('-created_at').distinct()[:1]
+                # business_addresses = BusinessAddress.objects.filter(
+                #     business = user_business,
+                #     is_deleted=False,
+                #     is_closed=False,
+                #     is_active=True
+                # ).order_by('-created_at').distinct()[:1]
                 
                 # data.append(business_addresses)
                 # if len(user_business) > 0:
@@ -2842,7 +2842,7 @@ def get_domain_business_address(request):
                 'response' : {
                     'message' : 'Business All Locations',
                     'error_message' : None,
-                    'locations' : data,
+                    'locations' : 'data',
                 }
             },
             status=status.HTTP_200_OK
