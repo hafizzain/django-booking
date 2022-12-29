@@ -2822,29 +2822,29 @@ def get_domain_business_address(request):
     
     data.append(str(user_business.id))
     
-    try:
-        business = Business.objects.get(
-            id=str(data[0]),
-            is_deleted=False,
-            is_blocked=False,
-            is_active=True
-        )
-    except Exception as err:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
-                'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
-                'response' : {
-                    'message' : 'Business Not Found',
-                    'error_message' : str(err),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
+    # try:
+    #     business = Business.objects.get(
+    #         id=data[0],
+    #         is_deleted=False,
+    #         is_blocked=False,
+    #         is_active=True
+    #     )
+    # except Exception as err:
+    #     return Response(
+    #         {
+    #             'status' : False,
+    #             'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+    #             'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+    #             'response' : {
+    #                 'message' : 'Business Not Found',
+    #                 'error_message' : str(err),
+    #             }
+    #         },
+    #         status=status.HTTP_404_NOT_FOUND
+    #     )
 
     business_addresses = BusinessAddress.objects.filter(
-        business = business,
+        business = data[0],
         is_deleted=False,
         is_closed=False,
         is_active=True
