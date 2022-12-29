@@ -1134,7 +1134,7 @@ def update_product(request):
                 if reorder_quantity is not None:
                     product_stock.reorder_quantity = int(reorder_quantity) 
                     product_stock.save()
-                ExceptionRecord.objects.create(text=f'fields not all reorder_quantity {reorder_quantity}')
+                ExceptionRecord.objects.create(text=f'fields not all {product_stock}reorder_quantity {reorder_quantity}')
                 product_stock.available_quantity = int(current_stock)
                 product_stock.low_stock = int(low_stock)
                 product_stock.save()
