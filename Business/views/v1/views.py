@@ -2768,7 +2768,8 @@ def search_business_vendor(request):
 @permission_classes([AllowAny])
 def get_domain_business_address(request):
     domain_name = request.GET.get('domain', None)
-
+    
+    data = []
     if domain_name is None:
         return Response(
             {
@@ -2807,6 +2808,7 @@ def get_domain_business_address(request):
                     is_active=True
                 ).order_by('-created_at').distinct()
                 
+                data.append(business_addresses)
                 # if len(user_business) > 0:
                 #     user_business = user_business[0]
                 # else:
@@ -2829,7 +2831,7 @@ def get_domain_business_address(request):
     
     #data = []
     #if len(business_addresses) > 0:
-    serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
+    #serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
     # data = serialized.data
 
     return Response(
@@ -2840,7 +2842,7 @@ def get_domain_business_address(request):
                 'response' : {
                     'message' : 'Business All Locations',
                     'error_message' : None,
-                    'locations' : serialized.data,
+                    'locations' : data,
                 }
             },
             status=status.HTTP_200_OK
