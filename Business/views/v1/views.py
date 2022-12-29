@@ -2828,26 +2828,26 @@ def get_domain_business_address(request):
             text = f'business_addresses line 285 location is {str(data[0])}'
         )
     
-    try:
-        business = Business.objects.get(
-            id= ids,
-            is_deleted=False,
-            is_blocked=False,
-            is_active=True
-        )
-    except Exception as err:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
-                'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
-                'response' : {
-                    'message' : 'Business Not Found',
-                    'error_message' : str(err),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
+    # try:
+    #     business = Business.objects.get(
+    #         id= ids,
+    #         is_deleted=False,
+    #         is_blocked=False,
+    #         is_active=True
+    #     )
+    # except Exception as err:
+    #     return Response(
+    #         {
+    #             'status' : False,
+    #             'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+    #             'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+    #             'response' : {
+    #                 'message' : 'Business Not Found',
+    #                 'error_message' : str(err),
+    #             }
+    #         },
+    #         status=status.HTTP_404_NOT_FOUND
+    #     )
     # try:
     #     business_addresses = BusinessAddress.objects.filter(
     #         business = str(data[0]),
@@ -2895,7 +2895,7 @@ def get_domain_business_address(request):
                     'business' : {
                         'id' : str(user_business.id),
                         'business_name' : str(user_business.business_name),
-                        'data': data[0]
+                        'data': ids
                         # 'logo' : user_business.logo if user_business.logo else None ,
                     }
                 }
