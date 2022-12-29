@@ -2801,7 +2801,7 @@ def get_domain_business_address(request):
                     is_active=True,
                     is_blocked=False
                 )
-                ids = str(user_business.id)
+                
                 if len(user_business) > 0:
                     user_business = user_business[0]
                 else:
@@ -2821,7 +2821,7 @@ def get_domain_business_address(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    
+    ids = str(user_business.id)
     data.append(str(user_business.id))
     
     ExceptionRecord.objects.create(
