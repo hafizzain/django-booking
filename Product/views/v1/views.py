@@ -1202,6 +1202,9 @@ def update_product(request):
 def get_products(request):
     all_products = Product.objects.filter(is_deleted=False).order_by('-created_at')
     serialized = ProductSerializer(all_products, many=True, context={'request' : request})
+    all_products = Product.objects.filter(is_deleted=True)
+    for i in all_products:
+        i.delete()
 
     return Response(
         {
