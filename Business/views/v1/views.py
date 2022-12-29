@@ -2776,69 +2776,108 @@ def search_business_vendor(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_domain_business_address(request):
-    domain_name = request.GET.get('domain', None)
-    
-    ids = '' 
-    if domain_name is None:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.MISSING_FIELDS_4001,
-                'status_code_text' : 'MISSING_FIELDS_4001',
-                'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : 'User id is required',
-                    'fields' : [
-                        'domain',
-                    ]
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    try:
-        domain_name = f'{domain_name}.{settings.BACKEND_DOMAIN_NAME}'
-        domain = None
-        #with tenant_context(Tenant.objects.get(schema_name = 'public')):
-        domain = Domain.objects.get(domain=domain_name)
-
-        if domain is not None:
-            with tenant_context(domain.tenant):
-                user_business = Business.objects.filter(
+    busines_id = request.GET.get('busines_id', None)
+    tenants= Tenant.objects.all()
+    for tnt in tenants:
+        with tenant_context(tnt):
+            user_business = Business.objects.get(
+                id = busines_id,
+                is_deleted=False,
+                is_active=True,
+                is_blocked=False
+            )
+                    
+            try:
+                business_addresses = BusinessAddress.objects.filter(
+                    business = user_business,
                     is_deleted=False,
-                    is_active=True,
-                    is_blocked=False
-                )
-                
-                try:
-                    business_addresses = BusinessAddress.objects.filter(
-                        business = user_business[0],
-                        is_deleted=False,
-                        is_closed=False,
-                        is_active=True
-                    ).order_by('-created_at').distinct()
-                except Exception as err:
-                    print(err)
-                
-                # if len(user_business) > 0:
-                #     user_business = user_business[0]
-                # else:
-                #     raise Exception('0 Business found')
-        else :
-            raise Exception('Business Not Exist')
-    except Exception as err:
-        return Response(
+                    is_closed=False,
+                    is_active=True
+                ).order_by('-created_at').distinct()
+            except Exception as err:
+                print(err)
+        serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
+        data = serialized.data
+
+    return Response(
             {
-                'status' : False,
-                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
-                'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
                 'response' : {
-                    'message' : 'Business Not Found',
-                    'error_message' : str(err),
+                    'message' : 'Business All Locations',
+                    'error_message' : None,
+                    'count' : len(data),
+                    'locations' : data,
                 }
             },
-            status=status.HTTP_404_NOT_FOUND
+            status=status.HTTP_200_OK
         )
+    
+                    
+    # domain_name = request.GET.get('domain', None)
+    
+    # ids = '' 
+    # if domain_name is None:
+    #     return Response(
+    #         {
+    #             'status' : False,
+    #             'status_code' : StatusCodes.MISSING_FIELDS_4001,
+    #             'status_code_text' : 'MISSING_FIELDS_4001',
+    #             'response' : {
+    #                 'message' : 'Invalid Data!',
+    #                 'error_message' : 'User id is required',
+    #                 'fields' : [
+    #                     'domain',
+    #                 ]
+    #             }
+    #         },
+    #         status=status.HTTP_400_BAD_REQUEST
+    #     )
+    
+    # try:
+    #     domain_name = f'{domain_name}.{settings.BACKEND_DOMAIN_NAME}'
+    #     domain = None
+    #     #with tenant_context(Tenant.objects.get(schema_name = 'public')):
+    #     domain = Domain.objects.get(domain=domain_name)
+
+    #     if domain is not None:
+    #         with tenant_context(domain.tenant):
+    #             user_business = Business.objects.filter(
+    #                 is_deleted=False,
+    #                 is_active=True,
+    #                 is_blocked=False
+    #             )
+                
+    #             try:
+    #                 business_addresses = BusinessAddress.objects.filter(
+    #                     business = user_business[0],
+    #                     is_deleted=False,
+    #                     is_closed=False,
+    #                     is_active=True
+    #                 ).order_by('-created_at').distinct()
+    #             except Exception as err:
+    #                 print(err)
+                
+    #             # if len(user_business) > 0:
+    #             #     user_business = user_business[0]
+    #             # else:
+    #             #     raise Exception('0 Business found')
+    #     else :
+    #         raise Exception('Business Not Exist')
+    # except Exception as err:
+    #     return Response(
+    #         {
+    #             'status' : False,
+    #             'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+    #             'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+    #             'response' : {
+    #                 'message' : 'Business Not Found',
+    #                 'error_message' : str(err),
+    #             }
+    #         },
+    #         status=status.HTTP_404_NOT_FOUND
+    #     )
     #ids = str(user_business.id)
     
     # try:
@@ -2871,26 +2910,26 @@ def get_domain_business_address(request):
     # except Exception as err:
     #     print(err)
         
-    data = []
-    if len(business_addresses) > 0:
-        serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
-        data = serialized.data
+    # data = []
+    # if len(business_addresses) > 0:
+    #     serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
+    #     data = serialized.data
 
-    return Response(
-            {
-                'status' : True,
-                'status_code' : 200,
-                'status_code_text' : '200',
-                'response' : {
-                    'message' : 'Business All Locations',
-                    'error_message' : None,
-                    'count' : len(data),
-                    'locations' : data,
-                    'business_name' : str(user_business.business_name),
-                }
-            },
-            status=status.HTTP_200_OK
-        )
+    # return Response(
+    #         {
+    #             'status' : True,
+    #             'status_code' : 200,
+    #             'status_code_text' : '200',
+    #             'response' : {
+    #                 'message' : 'Business All Locations',
+    #                 'error_message' : None,
+    #                 'count' : len(data),
+    #                 'locations' : data,
+    #                 'business_name' : str(user_business.id),
+    #             }
+    #         },
+    #         status=status.HTTP_200_OK
+    #     )
     
     
     
