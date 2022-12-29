@@ -2822,6 +2822,10 @@ def get_domain_business_address(request):
     
     data.append(str(user_business.id))
     
+    ExceptionRecord.objects.create(
+            text = f'business_addresses line 285 location is {str(data[0])}'
+        )
+    
     # try:
     #     business = Business.objects.get(
     #         id=data[0],
