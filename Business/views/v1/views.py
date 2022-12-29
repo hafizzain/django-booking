@@ -2842,7 +2842,7 @@ def get_domain_business_address(request):
                 'response' : {
                     'message' : 'Business All Locations',
                     'error_message' : None,
-                    'locations' : 'data',
+                    'locations' : data,
                 }
             },
             status=status.HTTP_200_OK
