@@ -2801,7 +2801,7 @@ def get_domain_business_address(request):
                     is_active=True,
                     is_blocked=False
                 )
-                ids = user_business
+                ids = str(user_business.id)
                 if len(user_business) > 0:
                     user_business = user_business[0]
                 else:
