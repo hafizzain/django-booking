@@ -1119,7 +1119,7 @@ def update_product(request):
             low_stock = loc_quan.get('low_stock', None)
             reorder_quantity = loc_quan.get('reorder_quantity', None)
 
-            if all([location_id, current_stock, low_stock, reorder_quantity]):
+            if all([location_id, ]):
                 try:
                     loc = BusinessAddress.objects.get(id = location_id)
                 except Exception as err:
@@ -1131,7 +1131,6 @@ def update_product(request):
                 except Exception as err:
                     ExceptionRecord.objects.create(text=str(err))
                 
-                ExceptionRecord.objects.create(text=f'fields not all {product_stock} stock order ')
                 if reorder_quantity is not None:
                     product_stock.reorder_quantity += int(reorder_quantity) 
                     product_stock.save()
