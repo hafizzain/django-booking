@@ -295,7 +295,7 @@ def copy_stafftarget(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         ) 
-    staff_target = StaffTarget.objects.filter(month__icontains = from_month, )
+    staff_target = StaffTarget.objects.filter(month__icontains = from_month, year__icontains = from_year ) #years__icontains = from_year )
     for staff in staff_target:
         
         try:
@@ -326,7 +326,6 @@ def copy_stafftarget(request):
                     },
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            
         staff_target = StaffTarget.objects.create(
                 user = staff.user,
                 business = business_id,
@@ -335,6 +334,11 @@ def copy_stafftarget(request):
                 service_target = staff.service_target,
                 retail_target = staff.retail_target,
         )
+        date_string =  f'{to_year} {to_month} 01'
+        c_year = datetime.strptime(date_string, '%Y %B %d')
+        staff_target.year = c_year
+        staff_target.save()
+    
     staff_target = StaffTarget.objects.all().order_by('-created_at')   
     serializer = StaffTargetSerializers(staff_target, many = True,context={'request' : request})
     
@@ -963,10 +967,11 @@ def update_servicetarget(request):
 @permission_classes([IsAuthenticated])
 def copy_servicetarget(request):
     user = request.user
+    from_year = request.data.get('from_year', None)
     from_month = request.data.get('from_month', None)
+    to_year = request.data.get('to_year', None)
     to_month = request.data.get('to_month', None)
     
-    print(to_month)
     
     if not all([from_month, to_month]):
         return Response(
@@ -985,7 +990,7 @@ def copy_servicetarget(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         ) 
-    service_target_id = ServiceTarget.objects.filter(month__icontains = from_month)
+    service_target_id = ServiceTarget.objects.filter(month__icontains = from_month, year__icontains = from_year )
     for service in service_target_id:
         
         try:
@@ -1034,7 +1039,7 @@ def copy_servicetarget(request):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-        ServiceTarget.objects.create(
+        servicetarget = ServiceTarget.objects.create(
             user = user,
             business = business_id,
             location = location_id,
@@ -1043,6 +1048,12 @@ def copy_servicetarget(request):
             service_target = service.service_target,
             
         )
+    
+    date_string =  f'{to_year} {to_month} 01'
+    c_year = datetime.strptime(date_string, '%Y %B %d')
+    servicetarget.year = c_year
+    servicetarget.save()
+    
     service_target = ServiceTarget.objects.all().order_by('-created_at').distinct()
     serializer = ServiceTargetSerializers(service_target, many = True,context={'request' : request})
     
@@ -1329,7 +1340,9 @@ def update_retailtarget(request):
 @permission_classes([IsAuthenticated])
 def copy_retailtarget(request):
     user = request.user
+    from_year = request.data.get('from_year', None)
     from_month = request.data.get('from_month', None)
+    to_year = request.data.get('to_year', None)
     to_month = request.data.get('to_month', None)
     
     if not all([from_month, to_month]):
@@ -1349,7 +1362,7 @@ def copy_retailtarget(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         ) 
-    retail_target_id = RetailTarget.objects.filter(month__icontains = from_month)
+    retail_target_id = RetailTarget.objects.filter(month__icontains = from_month, year__icontains = from_year )
     for retail in retail_target_id:
         try:
             business_id=Business.objects.get(id=str(retail.business))
@@ -1403,6 +1416,12 @@ def copy_retailtarget(request):
             month =to_month,
             brand_target = retail.brand_target,
         )
+    
+    date_string =  f'{to_year} {to_month} 01'
+    c_year = datetime.strptime(date_string, '%Y %B %d')
+    retail.year = c_year
+    retail.save()
+        
     retail_target = RetailTarget.objects.all().order_by('-created_at').distinct()
     serializer = RetailTargetSerializers(retail_target, many = True,context={'request' : request})
     
