@@ -2782,7 +2782,7 @@ def get_domain_business_address(request):
     for tnt in tenants:
         with tenant_context(tnt):
             try:
-                user_business = Business.objects.get(
+                user_business = Business.objects.filter(
                     id = str(busines_id),
                     is_deleted=False,
                     is_active=True,
@@ -2790,7 +2790,11 @@ def get_domain_business_address(request):
                 )
             except Exception as err:
                 pass
-            business = user_business
+            if len(user_business) > 0:
+                user_business = user_business[0]
+            else:
+                user_business = 0
+                raise Exception('0 Business found')
             # try:
             #     business_addresses = BusinessAddress.objects.filter(
             #         business = business,
@@ -2812,7 +2816,7 @@ def get_domain_business_address(request):
                     'message' : 'Business All Locations',
                     'error_message' : None,
                     'locations' : data,
-                    'business_id': business,
+                    'business_id': user_business,
                 }
             },
             status=status.HTTP_200_OK
