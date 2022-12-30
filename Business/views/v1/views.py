@@ -2800,8 +2800,8 @@ def get_domain_business_address(request):
                 ).order_by('-created_at').distinct()
             except Exception as err:
                 print(err)
-            serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
-            data = serialized.data
+            # serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
+            # data = serialized.data
 
     return Response(
             {
