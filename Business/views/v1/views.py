@@ -19,6 +19,7 @@ from Business.models import Business, BusinessSocial, BusinessAddress, BusinessO
 from Product.models import Product, ProductStock
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
+from Service.models import Service
 from Tenants.models import Domain, Tenant
 from Utility.models import Country, Currency, ExceptionRecord, Language, NstyleFile, Software, State, City
 from Utility.serializers import LanguageSerializer
@@ -26,6 +27,9 @@ import json
 from django.db.models import Q
 
 from django_tenants.utils import tenant_context
+
+from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -2831,6 +2835,21 @@ def get_domain_business_address(request):
                 else:
                     raise Exception('0 business addresses found')
                 
+                try:
+                    services= Service.objects.filter(
+                        business = str(user_business.id)
+                        ,is_deleted=False,
+                        is_blocked=False).order_by('-created_at')
+                except Exception as err:
+                    print(err)    
+                
+                
+                if len(business_addresses) > 0:
+                    serialized = ServiceSerializer(services,  many=True, context={'request' : request} )     
+                    service = serialized.data
+                else:
+                    raise Exception('0 business addresses found')
+                
         else :
             raise Exception('Business Not Exist')
     except Exception as err:
@@ -2857,7 +2876,7 @@ def get_domain_business_address(request):
                     'error_message' : None,
                     'count' : len(data),
                     'locations' : data,
-                    'business_id' : str(user_business.id),
+                    'service': service,
                 }
             },
             status=status.HTTP_200_OK
