@@ -2790,7 +2790,7 @@ def get_domain_business_address(request):
                 )
             except Exception as err:
                 pass
-            # business = user_business[0]
+            business = user_business[0]
             # try:
             #     business_addresses = BusinessAddress.objects.filter(
             #         business = business,
