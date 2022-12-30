@@ -1049,10 +1049,10 @@ def copy_servicetarget(request):
             
         )
     
-    date_string =  f'{to_year} {to_month} 01'
-    c_year = datetime.strptime(date_string, '%Y %B %d')
-    servicetarget.year = c_year
-    servicetarget.save()
+        date_string =  f'{to_year} {to_month} 01'
+        c_year = datetime.strptime(date_string, '%Y %B %d')
+        servicetarget.year = c_year
+        servicetarget.save()
     
     service_target = ServiceTarget.objects.all().order_by('-created_at').distinct()
     serializer = ServiceTargetSerializers(service_target, many = True,context={'request' : request})
@@ -1417,10 +1417,10 @@ def copy_retailtarget(request):
             brand_target = retail.brand_target,
         )
     
-    date_string =  f'{to_year} {to_month} 01'
-    c_year = datetime.strptime(date_string, '%Y %B %d')
-    retail.year = c_year
-    retail.save()
+        date_string =  f'{to_year} {to_month} 01'
+        c_year = datetime.strptime(date_string, '%Y %B %d')
+        retail.year = c_year
+        retail.save()
         
     retail_target = RetailTarget.objects.all().order_by('-created_at').distinct()
     serializer = RetailTargetSerializers(retail_target, many = True,context={'request' : request})
