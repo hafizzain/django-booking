@@ -19,7 +19,7 @@ from Business.models import Business, BusinessSocial, BusinessAddress, BusinessO
 from Product.models import Product, ProductStock
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
-from Service.models import Service
+from Service.models import Service, ServiceGroup
 from Tenants.models import Domain, Tenant
 from Utility.models import Country, Currency, ExceptionRecord, Language, NstyleFile, Software, State, City
 from Utility.serializers import LanguageSerializer
@@ -2844,9 +2844,24 @@ def get_domain_business_address(request):
                     print(err)    
                 
                 
-                if len(business_addresses) > 0:
+                if len(services) > 0:
                     serialized = ServiceSerializer(services,  many=True, context={'request' : request} )     
                     service = serialized.data
+                else:
+                    raise Exception('0 business addresses found')
+                
+                try:
+                    services_group= ServiceGroup.objects.filter(
+                        business = str(user_business.id)
+                        ,is_deleted=False,
+                        is_blocked=False).order_by('-created_at')
+                except Exception as err:
+                    print(err)    
+                
+                
+                if len(services_group) > 0:
+                    serialized = ServiceGroupSerializer(services,  many=True, context={'request' : request} )     
+                    service_group = serialized.data
                 else:
                     raise Exception('0 business addresses found')
                 
@@ -2877,6 +2892,7 @@ def get_domain_business_address(request):
                     'count' : len(data),
                     'locations' : data,
                     'service': service,
+                    'service_group': service_group,
                 }
             },
             status=status.HTTP_200_OK
