@@ -2935,7 +2935,7 @@ def get_domain_business_address(request):
                     'error_message' : None,
                     'count' : len(data),
                     'locations' : data,
-                    'business_name' : str(user_business.id),
+                    'business_id' : str(user_business.id),
                 }
             },
             status=status.HTTP_200_OK
