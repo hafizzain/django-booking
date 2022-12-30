@@ -273,7 +273,9 @@ def update_stafftarget(request):
 @permission_classes([IsAuthenticated])
 def copy_stafftarget(request):
     user = request.user
+    from_year = request.data.get('from_year', None)
     from_month = request.data.get('from_month', None)
+    to_year = request.data.get('to_year', None)
     to_month = request.data.get('to_month', None)
     
     if not all([from_month, to_month]):
@@ -293,7 +295,7 @@ def copy_stafftarget(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         ) 
-    staff_target = StaffTarget.objects.filter(month__icontains = from_month)
+    staff_target = StaffTarget.objects.filter(month__icontains = from_month, )
     for staff in staff_target:
         
         try:

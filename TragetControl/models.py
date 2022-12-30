@@ -44,7 +44,8 @@ class StaffTarget(models.Model):
     @property
     def year_add(self):
         try:
-            year = self.year.split('-')[0]
+            year_str = str(self.year)
+            year = year_str.split('-')[0]
             print(year)
             return year
         except:

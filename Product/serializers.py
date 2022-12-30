@@ -65,7 +65,10 @@ class ProductMediaSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductMedia
         fields = ['id', 'image']
-        
+class CurrencyRetailPriceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CurrencyRetailPrice
+        fields = '__all__'        
         
 class VendorSerializer(serializers.ModelSerializer):
     class Meta:
@@ -135,6 +138,7 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
     vendor= VendorSerializer(read_only=True)
     stocktransfer = serializers.SerializerMethodField()
     consumed = serializers.SerializerMethodField()
+    currency_retail_price = serializers.SerializerMethodField()
     
     def get_consumed(self, obj):
         
@@ -150,6 +154,10 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
     #         ExceptionRecord.objects.create(
     #             text = f"Product quantity issue {str(err)}"
     #         ) 
+    
+    def get_currency_retail_price(self, obj):
+            currency_retail = CurrencyRetailPrice.objects.filter(product = obj)
+            return CurrencyRetailPriceSerializer( currency_retail, many = True).data
     
     def get_stocktransfer(self, obj):
             stocktransfer = ProductStockTransfer.objects.filter(product = obj)
@@ -205,14 +213,12 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
             'stocktransfer',
             'location',
             'consumed',
+            'currency_retail_price',
             
         ]
         read_only_fields = ['id']
         
-class CurrencyRetailPriceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CurrencyRetailPrice
-        fields = '__all__'
+
 class ProductStockTransferlocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductStockTransfer
