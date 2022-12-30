@@ -42,7 +42,7 @@ class StaffTarget(models.Model):
     created_at = models.DateTimeField(auto_now_add=now) 
     
     @property
-    def year_add(self):
+    def years(self):
         try:
             year_str = str(self.year)
             year = year_str.split('-')[0]

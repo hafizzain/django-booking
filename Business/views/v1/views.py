@@ -2775,57 +2775,11 @@ def search_business_vendor(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_domain_business_address(request):
-    # busines_id = request.GET.get('busines_id', None)
-    # data=[]
-    # tenants= Tenant.objects.all()
-    # for tnt in tenants:
-    #     with tenant_context(tnt):
-    #         try:
-    #             user_business = Business.objects.filter(
-    #                 id = str(busines_id),
-    #                 is_deleted=False,
-    #                 is_active=True,
-    #                 is_blocked=False
-    #             )
-    #         except Exception as err:
-    #             pass
-    #         if len(user_business) > 0:
-    #             user_business = user_business[0]
-    #         else:
-    #             user_business = 0
-    #             raise Exception('0 Business found')
-    #         # try:
-    #         #     business_addresses = BusinessAddress.objects.filter(
-    #         #         business = business,
-    #         #         is_deleted=False,
-    #         #         is_closed=False,
-    #         #         is_active=True
-    #         #     ).order_by('-created_at').distinct()
-    #         # except Exception as err:
-    #         #     print(err)
-    #         # serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
-    #         # data = serialized.data
-
-    # return Response(
-    #         {
-    #             'status' : True,
-    #             'status_code' : 200,
-    #             'status_code_text' : '200',
-    #             'response' : {
-    #                 'message' : 'Business All Locations',
-    #                 'error_message' : None,
-    #                 'locations' : data,
-    #                 'business_id': user_business,
-    #             }
-    #         },
-    #         status=status.HTTP_200_OK
-    #     )
-    
-                    
+def get_domain_business_address(request):                    
     domain_name = request.GET.get('domain', None)
     data = []
-    ids = '' 
+    service_group = []
+    service = []
     if domain_name is None:
         return Response(
             {
@@ -2855,18 +2809,7 @@ def get_domain_business_address(request):
                     is_deleted=False,
                     is_active=True,
                     is_blocked=False
-                )
-                
-                try:
-                    business_addresses = BusinessAddress.objects.filter(
-                        business = user_business[0],
-                        is_deleted=False,
-                        is_closed=False,
-                        is_active=True
-                    ).order_by('-created_at').distinct()
-                except Exception as err:
-                    print(err)
-                
+                )                
                 if len(user_business) > 0:
                     user_business = user_business[0]
                 else:
@@ -2887,6 +2830,7 @@ def get_domain_business_address(request):
                     data = serialized.data
                 else:
                     raise Exception('0 business addresses found')
+                
         else :
             raise Exception('Business Not Exist')
     except Exception as err:
@@ -2902,29 +2846,7 @@ def get_domain_business_address(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    ids = str(user_business.id)
-    
-    # try:
-    #     business = Business.objects.get(
-    #         id= ids,
-    #         is_deleted=False,
-    #         is_blocked=False,
-    #         is_active=True
-    #     )
-    # except Exception as err:
-    #     return Response(
-    #         {
-    #             'status' : False,
-    #             'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
-    #             'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
-    #             'response' : {
-    #                 'message' : 'Business Not Found',
-    #                 'error_message' : str(err),
-    #             }
-    #         },
-    #         status=status.HTTP_404_NOT_FOUND
-    #     )
-
+            
     return Response(
             {
                 'status' : True,
@@ -2940,25 +2862,3 @@ def get_domain_business_address(request):
             },
             status=status.HTTP_200_OK
         )
-    
-    
-    
-    # return Response(
-    #         {
-    #             'status' : True,
-    #             'status_code' : 200,
-    #             'status_code_text' : 'BUSINESS_FOUND',
-    #             'response' : {
-    #                 'message' : 'Business Found',
-    #                 'error_message' : None,
-    #                 'business' : {
-    #                     'id' : str(user_business.id),
-    #                     'business_name' : str(user_business.business_name),
-    #                     'data': ids
-    #                     # 'logo' : user_business.logo if user_business.logo else None ,
-    #                 }
-    #             }
-    #         },
-    #         status=status.HTTP_200_OK
-    #     )
-    

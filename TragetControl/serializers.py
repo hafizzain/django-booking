@@ -58,7 +58,7 @@ class StaffTargetSerializers(serializers.ModelSerializer):
             print(err)
     class Meta:
         model = StaffTarget
-        fields = ['id','month', 'service_target', 'retail_target', 'year','employee','created_at','year_add']
+        fields = ['id','month', 'service_target', 'retail_target', 'year','employee','created_at','years']
 
 class ServiceGroupSerializers(serializers.ModelSerializer):
     
