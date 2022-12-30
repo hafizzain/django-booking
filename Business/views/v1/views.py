@@ -2790,16 +2790,16 @@ def get_domain_business_address(request):
                 )
             except Exception as err:
                 pass
-            business = user_business[0]
-            try:
-                business_addresses = BusinessAddress.objects.filter(
-                    business = business,
-                    is_deleted=False,
-                    is_closed=False,
-                    is_active=True
-                ).order_by('-created_at').distinct()
-            except Exception as err:
-                print(err)
+            # business = user_business[0]
+            # try:
+            #     business_addresses = BusinessAddress.objects.filter(
+            #         business = business,
+            #         is_deleted=False,
+            #         is_closed=False,
+            #         is_active=True
+            #     ).order_by('-created_at').distinct()
+            # except Exception as err:
+            #     print(err)
             # serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
             # data = serialized.data
 
