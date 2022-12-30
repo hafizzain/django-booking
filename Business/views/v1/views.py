@@ -2777,6 +2777,7 @@ def search_business_vendor(request):
 @permission_classes([AllowAny])
 def get_domain_business_address(request):
     busines_id = request.GET.get('busines_id', None)
+    data=[]
     tenants= Tenant.objects.all()
     for tnt in tenants:
         with tenant_context(tnt):
@@ -2792,7 +2793,7 @@ def get_domain_business_address(request):
             business = user_business[0]
             try:
                 business_addresses = BusinessAddress.objects.filter(
-                    business = user_business[0],
+                    business = business,
                     is_deleted=False,
                     is_closed=False,
                     is_active=True
