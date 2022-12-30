@@ -1008,8 +1008,8 @@ def copy_servicetarget(request):
                     status=status.HTTP_400_BAD_REQUEST
                 )
         try:
-            location_id = BusinessAddress.objects.get( id = str(service.location))
-        except:
+            location_id = BusinessAddress.objects.get( id = service.location.id)
+        except Exception as err:
             return Response(
                 {
                     'status' : False,
@@ -1024,7 +1024,7 @@ def copy_servicetarget(request):
             )
         
         try:
-            service_group_id = ServiceGroup.objects.get(id= str(service.service_group))
+            service_group_id = ServiceGroup.objects.get(id= service.service_group.id)
         except Exception as err:
             return Response(
                 {
@@ -1380,7 +1380,7 @@ def copy_retailtarget(request):
                 )
         try:
             location_id = BusinessAddress.objects.get( id = str(retail.location))
-        except:
+        except Exception as err:
             return Response(
                 {
                     'status' : False,
