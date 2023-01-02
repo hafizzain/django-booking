@@ -8,6 +8,8 @@ from Employee.models import Employee, EmployeeSelectedService
 from Business.models import BusinessAddress, BusinessTax
 from Order.models import Checkout, MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
 from Product.Constants.index import tenant_media_base_url
+from django_tenants.utils import tenant_context
+
 from Product.models import ProductStock
 
 from Service.models import PriceService, Service, ServiceGroup
@@ -30,6 +32,24 @@ class ServiceSearchSerializer(serializers.ModelSerializer):
         model = Service
         fields = ['id','name', 'location', 'client_can_book', 'priceservice', 'slot_availible_for_online']
         
+class ServiceGroup_TennatSerializer(serializers.ModelSerializer):
+    
+    services  = serializers.SerializerMethodField(read_only=True)
+    status  = serializers.SerializerMethodField(read_only=True)
+
+    def get_status(self, obj):
+        return obj.is_active
+    
+    def get_services(self, obj):
+            tenant = self.context["tenant"]
+            with tenant_context(tenant):
+                all_service = obj.services.all()
+                #ser = Service.objects.get(id = obj.services)
+                return ServiceSearchSerializer(all_service, many = True).data
+    
+    class Meta:
+        model = ServiceGroup
+        fields = ['id', 'business', 'name', 'services', 'status', 'allow_client_to_select_team_member']
 class ServiceGroupSerializer(serializers.ModelSerializer):
     
     services  = serializers.SerializerMethodField(read_only=True)
@@ -39,12 +59,9 @@ class ServiceGroupSerializer(serializers.ModelSerializer):
         return obj.is_active
     
     def get_services(self, obj):
-        try:
             all_service = obj.services.all()
             #ser = Service.objects.get(id = obj.services)
             return ServiceSearchSerializer(all_service, many = True).data
-        except Exception as err:
-            print(str(err))
     
     class Meta:
         model = ServiceGroup
