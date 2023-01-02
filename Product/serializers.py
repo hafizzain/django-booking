@@ -413,6 +413,21 @@ class ProductStockTransferSerializer(serializers.ModelSerializer):
         model = ProductStockTransfer
         fields = ['id', 'from_location', 'to_location', 'product', 'quantity','note']
 class ProductOrderStockReportSerializer(serializers.ModelSerializer):
+    
+    from_location = BusiessAddressAppointmentSerializer()
+    to_location = BusiessAddressAppointmentSerializer()
+    location = BusiessAddressAppointmentSerializer()
+    consumed_location = BusiessAddressAppointmentSerializer()
+    vendor_name = serializers.SerializerMethodField(read_only=True)
+    product = ProductOrderSerializer()
+    
+    def get_vendor_name(self, obj):
+        try:
+            return obj.vendor.vendor_name
+        except Exception as err:
+            return None
+    
     class Meta:
         model = ProductOrderStockReport
-        fields = '__all__'#['id', 'from_location', 'to_location', 'product', 'quantity','note']
+        #fields = '__all__'#['id', 'from_location', 'to_location', 'product', 'quantity','note']
+        exclude = ('is_active','is_deleted', 'user')

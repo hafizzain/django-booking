@@ -1873,8 +1873,19 @@ def update_orderstockproduct(request):
     
     try:
         added_product = ProductStock.objects.get(product__id=product.id, location = location.id )
+        stock_cunsumed = ProductOrderStockReport.objects.create(
+            report_choice = 'Purchase',
+            product = product,
+            user = user,
+            #location = product_location,
+            location = location,
+            quantity = int(rec_quantity), 
+            before_quantity = added_product.available_quantity  
+            )
         added_product.available_quantity += int(rec_quantity)
         added_product.save()
+        stock_cunsumed.after_quantity = added_product.available_quantity
+        stock_cunsumed.save()
         
     except Exception as err:
         ExceptionRecord.objects.create(
