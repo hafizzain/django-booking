@@ -238,3 +238,37 @@ class ProductStockTransfer(models.Model):
     def __str__(self):
         return str(self.id)
     
+class ProductOrderStockReport(models.Model):
+    TYPE_CHOICE = [
+        ('Purchase', 'Purchase'),
+        ('Consumed', 'Consumed'),
+        ('Sold', 'Sold'),
+        ('Transfer_to', 'Transfer_to'),
+        ('Transfer_from', 'Transfer_From'),
+        
+    ]
+    
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_stock_report')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='users_location_product_stock_report')
+
+    vendor = models.ForeignKey(BusinessVendor, on_delete=models.CASCADE, related_name='vendor_product_stock_report', default=None, null=True, blank=True)
+
+    
+    location =  models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='location_product_stock_report')
+    consumed_location =  models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='consumed_location_product_stock_report')
+    from_location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='from_location_product_stock_report')
+    to_location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='to_location_product_stock_report')
+
+    report_choice = models.CharField(choices = TYPE_CHOICE, max_length =100, default='Sold')
+    
+    quantity = models.PositiveIntegerField(default=0)
+    before_quantity = models.PositiveIntegerField(default=0)
+    after_quantity = models.PositiveIntegerField(default=0)
+    
+    is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now, null= True)
+    
+    def __str__(self):
+        return str(self.id)

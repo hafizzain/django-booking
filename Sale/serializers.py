@@ -32,24 +32,6 @@ class ServiceSearchSerializer(serializers.ModelSerializer):
         model = Service
         fields = ['id','name', 'location', 'client_can_book', 'priceservice', 'slot_availible_for_online']
         
-class ServiceGroup_TennatSerializer(serializers.ModelSerializer):
-    
-    services  = serializers.SerializerMethodField(read_only=True)
-    status  = serializers.SerializerMethodField(read_only=True)
-
-    def get_status(self, obj):
-        return obj.is_active
-    
-    def get_services(self, obj):
-            tenant = self.context["tenant"]
-            with tenant_context(tenant):
-                all_service = obj.services.all()
-                #ser = Service.objects.get(id = obj.services)
-                return ServiceSearchSerializer(all_service, many = True).data
-    
-    class Meta:
-        model = ServiceGroup
-        fields = ['id', 'business', 'name', 'services', 'status', 'allow_client_to_select_team_member']
 class ServiceGroupSerializer(serializers.ModelSerializer):
     
     services  = serializers.SerializerMethodField(read_only=True)

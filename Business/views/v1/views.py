@@ -2891,7 +2891,6 @@ def get_domain_business_address(request):
                     'error_message' : None,
                     'count' : len(data),
                     'locations' : data,
-                    'service': service,
                     'service_group': service_group,
                 }
             },

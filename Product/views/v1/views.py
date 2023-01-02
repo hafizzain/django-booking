@@ -17,11 +17,11 @@ from rest_framework.settings import api_settings
 
 from NStyle.Constants import StatusCodes
 
-from Product.models import ( Category, Brand, CurrencyRetailPrice , Product, ProductMedia, ProductStock
+from Product.models import ( Category, Brand, CurrencyRetailPrice , Product, ProductMedia, ProductOrderStockReport, ProductStock
                             , OrderStock, OrderStockProduct, ProductConsumption, ProductStockTransfer
                            )
 from Business.models import Business, BusinessAddress, BusinessVendor
-from Product.serializers import (CategorySerializer, BrandSerializer, ProductSerializer, ProductStockSerializer, ProductWithStockSerializer
+from Product.serializers import (CategorySerializer, BrandSerializer, ProductOrderStockReportSerializer, ProductSerializer, ProductStockSerializer, ProductWithStockSerializer
                                  ,OrderSerializer , OrderProductSerializer, ProductConsumptionSerializer, ProductStockTransferSerializer
                                  )
 
@@ -2029,6 +2029,7 @@ def add_product_consumption(request):
 def update_product_consumptions(request):
     
     consumption_id = request.data.get('consumption_id', None)
+    user = request.user
 
     if not all([consumption_id]):
         return Response(
@@ -2102,6 +2103,22 @@ def update_product_consumptions(request):
                 }
             },
             status=status.HTTP_404_NOT_FOUND
+        
+    )
+    try:
+        product_location = BusinessAddress.objects.get(id=product.location.id)
+    except:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Location Not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
         )
     
     product_con.product = product
@@ -2112,10 +2129,22 @@ def update_product_consumptions(request):
     try:
         consumed = ProductStock.objects.get(product__id=product, location = location )
         if consumed.available_quantity > int(quantity):
+            stock_cunsumed = ProductOrderStockReport.objects.create(
+            report_choice = 'Consumed',
+            product = product,
+            user = user,
+            location = product_location,
+            consumed_location = product_location,
+            quantity = int(quantity), 
+            before_quantity = consumed.available_quantity     
+            )
             sold = consumed.available_quantity - int(quantity)
             consumed.available_quantity = sold
             #consumed.sold_quantity += int(quantity)
             consumed.save()
+            stock_cunsumed.after_quantity = sold
+            stock_cunsumed.save()
+            
         else:
             return Response(
             {
@@ -2271,6 +2300,7 @@ def add_product_stock_transfer(request):
     try:
         from_location = BusinessAddress.objects.get(id=from_location_id)
         to_location = BusinessAddress.objects.get(id=to_location_id)
+        product_location = BusinessAddress.objects.get(id=product.location.id)
     except Exception as err:
         return Response(
             {
@@ -2296,20 +2326,45 @@ def add_product_stock_transfer(request):
     try:
         transfer = ProductStock.objects.get(product__id=product.id, location = from_location )
         if transfer.available_quantity >= int(quantity):
+            stock_transfer = ProductOrderStockReport.objects.create(
+            report_choice = 'Transfer_from',
+            product = product,
+            user = request.user,
+            location = product_location,
+            from_location = from_location,
+            quantity = int(quantity), 
+            before_quantity = transfer.available_quantity      
+            )
             sold = transfer.available_quantity - int(quantity)
             transfer.available_quantity = sold
             #transfer.sold_quantity += int(quantity)
             transfer.save()
+            stock_transfer.after_quantity = sold
+            stock_transfer.save()
+            
         try :
             transfer = ProductStock.objects.get(product__id=product.id, location = to_location )
+            stock_transfer = ProductOrderStockReport.objects.create(
+            report_choice = 'Transfer_to',
+            product = product,
+            user = request.user,
+            location = product_location,
+            to_location = to_location,
+            quantity = int(quantity), 
+            before_quantity = transfer.available_quantity      
+            )
             sold = transfer.available_quantity + int(quantity)
             transfer.available_quantity = sold
             transfer.save()
+            
+            stock_transfer.after_quantity = sold
+            stock_transfer.save()
+            
         except Exception as err:
             ExceptionRecord.objects.create(
             is_resolved = True, 
             text= f'added id to location {str(err)}'
-        )
+            )
         
     except Exception as err:
         ExceptionRecord.objects.create(
@@ -2317,8 +2372,6 @@ def add_product_stock_transfer(request):
             text= f'transfer id from location {str(err)}'
         )
     
-    
-
     serialized = ProductStockTransferSerializer(cunsumption_obj)
 
     return Response(
@@ -2498,3 +2551,21 @@ def update_product_stock_transfer(request):
             },
             status=status.HTTP_200_OK
         )
+        
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_product_stock_report(request):
+    stock_report = ProductOrderStockReport.objects.filter(is_deleted=False).order_by('-created_at').distinct()
+    serialized = ProductOrderStockReportSerializer(stock_report, many=True)
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Product Stock Reports',
+                'error_message' : None,
+                'product_stock_report' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )

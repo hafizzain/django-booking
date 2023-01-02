@@ -58,6 +58,9 @@ urlpatterns = [
     path('delete_product_stock_transfer/', views.delete_product_stock_transfer),
     path('update_product_stock_transfer/', views.update_product_stock_transfer),
     
+    #Inventory Reports
+    path('get_product_stock_report/', views.get_product_stock_report),
+    
     #Testing Api
     path('get_test_api/', views.get_test_api)
 ]
