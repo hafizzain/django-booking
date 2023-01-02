@@ -1795,8 +1795,10 @@ def update_orderstockproduct(request):
     stockproduct_id = request.data.get('stockproduct_id', None)
     note = request.data.get('note', None)
     rec_quantity = request.data.get('rec_quantity', None)
+    quantity = request.data.get('quantity', None)
     product_id = request.data.get('product_id', None)
     to_location = request.data.get('to_location', None)
+    vendor_id = request.data.get('vendor_id', None)
     error = []
     if stockproduct_id is None:
             return Response(
@@ -1869,6 +1871,20 @@ def update_orderstockproduct(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    try:
+        vendor=BusinessVendor.objects.get(id=vendor_id)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.VENDOR_NOT_FOUND_4019,
+                    'response' : {
+                    'message' : 'Vendor not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
     
     
     try:
@@ -1877,9 +1893,10 @@ def update_orderstockproduct(request):
             report_choice = 'Purchase',
             product = product,
             user = user,
-            #location = product_location,
+            vendor = vendor,            
             location = location,
             quantity = int(rec_quantity), 
+            reorder_quantity =int(quantity), 
             before_quantity = added_product.available_quantity  
             )
         added_product.available_quantity += int(rec_quantity)

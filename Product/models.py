@@ -265,6 +265,7 @@ class ProductOrderStockReport(models.Model):
     quantity = models.PositiveIntegerField(default=0)
     before_quantity = models.PositiveIntegerField(default=0)
     after_quantity = models.PositiveIntegerField(default=0)
+    reorder_quantity = models.PositiveIntegerField(default=0)
     
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
