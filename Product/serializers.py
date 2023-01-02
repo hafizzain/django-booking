@@ -332,13 +332,16 @@ class ProductSerializer(serializers.ModelSerializer):
         read_only_fields = ['slug', 'id']
 class ProductOrderSerializer(serializers.ModelSerializer):
     avaiable = serializers.SerializerMethodField()
+    retail_price = serializers.SerializerMethodField()
     
     def get_avaiable(self, obj):
-        try:
             quantity = ProductStock.objects.filter(product = obj)
             return ProductStockSerializer(quantity, many = True).data
-        except Exception as err:
-            print(err)
+
+            
+    def get_retail_price(self, obj):
+            quantity = CurrencyRetailPrice.objects.filter(product = obj)
+            return CurrencyRetailPriceSerializer( quantity, many = True).data
             
     class Meta:
         model = Product
