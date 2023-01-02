@@ -2553,7 +2553,7 @@ def update_product_stock_transfer(request):
         )
         
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def get_product_stock_report(request):
     stock_report = ProductOrderStockReport.objects.filter(is_deleted=False).order_by('-created_at').distinct()
     serialized = ProductOrderStockReportSerializer(stock_report, many=True)
