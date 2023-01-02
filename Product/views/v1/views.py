@@ -1982,10 +1982,21 @@ def add_product_consumption(request):
     try:
         consumed = ProductStock.objects.get(product__id=product.id, location = location.id )
         if consumed.available_quantity >= int(quantity):
+            stock_cunsumed = ProductOrderStockReport.objects.create(
+            report_choice = 'Consumed',
+            product = product,
+            user = request.user,
+            #location = product_location,
+            consumed_location = location,
+            quantity = int(quantity), 
+            before_quantity = consumed.available_quantity     
+            )
             sold = consumed.available_quantity - int(quantity)
             consumed.available_quantity = sold
             #consumed.sold_quantity += int(quantity)
             consumed.save()
+            stock_cunsumed.after_quantity = sold
+            stock_cunsumed.save()
         else:
             return Response(
             {
@@ -2105,21 +2116,6 @@ def update_product_consumptions(request):
             status=status.HTTP_404_NOT_FOUND
         
     )
-    try:
-        product_location = BusinessAddress.objects.get(id=product.location.id)
-    except:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : 404,
-                'status_code_text' : 'OBJECT_NOT_FOUND',
-                'response' : {
-                    'message' : 'Location Not found',
-                    'error_message' : str(err),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
     
     product_con.product = product
     product_con.location = location
@@ -2129,21 +2125,10 @@ def update_product_consumptions(request):
     try:
         consumed = ProductStock.objects.get(product__id=product, location = location )
         if consumed.available_quantity > int(quantity):
-            stock_cunsumed = ProductOrderStockReport.objects.create(
-            report_choice = 'Consumed',
-            product = product,
-            user = user,
-            location = product_location,
-            consumed_location = product_location,
-            quantity = int(quantity), 
-            before_quantity = consumed.available_quantity     
-            )
             sold = consumed.available_quantity - int(quantity)
             consumed.available_quantity = sold
             #consumed.sold_quantity += int(quantity)
             consumed.save()
-            stock_cunsumed.after_quantity = sold
-            stock_cunsumed.save()
             
         else:
             return Response(
@@ -2300,7 +2285,7 @@ def add_product_stock_transfer(request):
     try:
         from_location = BusinessAddress.objects.get(id=from_location_id)
         to_location = BusinessAddress.objects.get(id=to_location_id)
-        product_location = BusinessAddress.objects.get(id=product.location.id)
+        #product_location = BusinessAddress.objects.get(id=product.location.id)
     except Exception as err:
         return Response(
             {
@@ -2330,7 +2315,7 @@ def add_product_stock_transfer(request):
             report_choice = 'Transfer_from',
             product = product,
             user = request.user,
-            location = product_location,
+            #location = product_location,
             from_location = from_location,
             quantity = int(quantity), 
             before_quantity = transfer.available_quantity      
@@ -2348,7 +2333,7 @@ def add_product_stock_transfer(request):
             report_choice = 'Transfer_to',
             product = product,
             user = request.user,
-            location = product_location,
+            #location = product_location,
             to_location = to_location,
             quantity = int(quantity), 
             before_quantity = transfer.available_quantity      
