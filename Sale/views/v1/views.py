@@ -24,7 +24,7 @@ from Employee.models import Employee, EmployeeSelectedService
 from Business.models import BusinessAddress
 from Service.models import PriceService, Service, ServiceGroup
 
-from Product.models import Product, ProductStock
+from Product.models import Product, ProductOrderStockReport, ProductStock
 from django.db.models import Avg, Count, Min, Sum
 
 
@@ -1253,12 +1253,23 @@ def create_sale_order(request):
 
                 try:
                     transfer = ProductStock.objects.get(product__id=product.id, location = business_address.id)
-                    
                     if transfer.available_quantity > int(quantity):
+                        stock_transfer = ProductOrderStockReport.objects.create(
+                        report_choice = 'Sold',
+                        product = product,
+                        user = request.user,
+                        location = business_address,
+                        quantity = int(quantity), 
+                        before_quantity = transfer.available_quantity      
+                        )                    
                         sold = transfer.available_quantity - int(quantity)
                         transfer.available_quantity = sold
                         transfer.sold_quantity += int(quantity)
                         transfer.save()
+                        
+                        stock_transfer.after_quantity = sold
+                        stock_transfer.save()
+                        
                     else:
                         errors.append('Available quantity issue')
                 

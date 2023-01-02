@@ -333,6 +333,13 @@ class ProductSerializer(serializers.ModelSerializer):
 class ProductOrderSerializer(serializers.ModelSerializer):
     avaiable = serializers.SerializerMethodField()
     retail_price = serializers.SerializerMethodField()
+    brand = serializers.SerializerMethodField()
+    
+    def get_brand(self, obj):
+        try:
+            return obj.brand.name
+        except Exception as err:
+            return None
     
     def get_avaiable(self, obj):
             quantity = ProductStock.objects.filter(product = obj)
@@ -340,7 +347,7 @@ class ProductOrderSerializer(serializers.ModelSerializer):
 
             
     def get_retail_price(self, obj):
-            quantity = CurrencyRetailPrice.objects.filter(product = obj)
+            quantity = CurrencyRetailPrice.objects.filter(product = obj)#.order_by('-created_at').distinct()
             return CurrencyRetailPriceSerializer( quantity, many = True).data
             
     class Meta:
