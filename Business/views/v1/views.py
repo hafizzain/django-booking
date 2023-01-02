@@ -2835,20 +2835,20 @@ def get_domain_business_address(request):
                 else:
                     raise Exception('0 business addresses found')
                 
-                try:
-                    services= Service.objects.filter(
-                        business = str(user_business.id)
-                        ,is_deleted=False,
-                        is_blocked=False).order_by('-created_at')
-                except Exception as err:
-                    print(err)    
+                # try:
+                #     services= Service.objects.filter(
+                #         business = str(user_business.id)
+                #         ,is_deleted=False,
+                #         is_blocked=False).order_by('-created_at')
+                # except Exception as err:
+                #     print(err)    
                 
                 
-                if len(services) > 0:
-                    serialized = ServiceSerializer(services,  many=True, context={'request' : request} )     
-                    service = serialized.data
-                else:
-                    raise Exception('0 business addresses found')
+                # if len(services) > 0:
+                #     serialized = ServiceSerializer(services,  many=True, context={'request' : request} )     
+                #     service = serialized.data
+                # else:
+                #     raise Exception('0 business addresses found')
                 
                 try:
                     services_group= ServiceGroup.objects.filter(
@@ -2860,7 +2860,7 @@ def get_domain_business_address(request):
                 
                 
                 if len(services_group) > 0:
-                    serialized = ServiceGroupSerializer(services,  many=True, context={'request' : request, 'tenant': domain.tenant} )     
+                    serialized = ServiceGroupSerializer(services_group,  many=True, context={'request' : request, 'tenant': domain.tenant} )     
                     service_group = serialized.data
                 else:
                     raise Exception('0 business addresses found')
