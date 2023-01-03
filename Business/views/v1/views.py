@@ -2834,22 +2834,6 @@ def get_domain_business_address(request):
                     data = serialized.data
                 else:
                     raise Exception('0 business addresses found')
-                
-                # try:
-                #     services= Service.objects.filter(
-                #         business = str(user_business.id)
-                #         ,is_deleted=False,
-                #         is_blocked=False).order_by('-created_at')
-                # except Exception as err:
-                #     print(err)    
-                
-                
-                # if len(services) > 0:
-                #     serialized = ServiceSerializer(services,  many=True, context={'request' : request} )     
-                #     service = serialized.data
-                # else:
-                #     raise Exception('0 business addresses found')
-                
                 try:
                     services_group= ServiceGroup.objects.filter(
                         business = str(user_business.id)

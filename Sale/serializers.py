@@ -4,7 +4,7 @@ from rest_framework import serializers
 from Appointment.models import AppointmentCheckout
 from Client.models import Client, Membership
 
-from Employee.models import Employee, EmployeeSelectedService
+from Employee.models import Employee, EmployeeProfessionalInfo, EmployeeSelectedService
 from Business.models import BusinessAddress, BusinessTax
 from Order.models import Checkout, MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
 from Product.Constants.index import tenant_media_base_url
@@ -86,9 +86,17 @@ class MemberSerializer(serializers.ModelSerializer):
 class EmployeeSelectedServiceSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
+    designation = serializers.SerializerMethodField()
     
     def get_full_name(self, obj):
         return obj.employee.full_name
+    
+    def get_designation(self, obj):
+        try:
+            emp = EmployeeProfessionalInfo.objects.get(id = obj.employee.id)
+            return emp.designation
+        except Exception as err:
+            print(err)
     
     def get_image(self, obj):
         try:
@@ -116,7 +124,7 @@ class EmployeeSelectedServiceSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = EmployeeSelectedService
-        fields = ['id', 'service', 'employee', 'level', 'full_name', 'image']
+        fields = ['id', 'service', 'employee', 'level', 'full_name', 'designation','image']
 
 class LocationServiceSerializer(serializers.ModelSerializer):
     class Meta:
