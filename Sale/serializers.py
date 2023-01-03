@@ -93,7 +93,7 @@ class EmployeeSelectedServiceSerializer(serializers.ModelSerializer):
     
     def get_designation(self, obj):
         try:
-            emp = EmployeeProfessionalInfo.objects.get(id = obj.employee.id)
+            emp = EmployeeProfessionalInfo.objects.get(employee = obj.employee.id)
             return emp.designation
         except Exception as err:
             print(err)
