@@ -21,6 +21,11 @@ class PriceServiceSerializers(serializers.ModelSerializer):
         
 class ServiceSearchSerializer(serializers.ModelSerializer):
     priceservice = serializers.SerializerMethodField(read_only=True)
+    employees = serializers.SerializerMethodField(read_only=True)
+    
+    def get_employees(self, obj):
+        emp = EmployeeSelectedService.objects.filter(service = obj) 
+        return EmployeeSelectedServiceSerializer(emp, many = True, context=self.context).data
     
     def get_priceservice(self, obj):
         try:
@@ -30,7 +35,7 @@ class ServiceSearchSerializer(serializers.ModelSerializer):
             pass
     class Meta:
         model = Service
-        fields = ['id','name', 'location', 'client_can_book', 'priceservice', 'slot_availible_for_online']
+        fields = ['id','name', 'location', 'client_can_book', 'employees','priceservice', 'slot_availible_for_online']
         
 class ServiceGroupSerializer(serializers.ModelSerializer):
     
