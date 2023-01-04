@@ -3101,7 +3101,125 @@ def create_workingschedule(request):
     #         status=status.HTTP_201_CREATED
     #     ) 
     
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_workingschedule(request):
+    user = request.user
+    business_id = request.data.get('business', None)
+    
+    employee = request.data.get('employee', None)
+    day = request.data.get('day', None)
+    
+    start_time = request.data.get('start_time', None)
+    end_time = request.data.get('end_time', None)
+    
+    start_time_shift = request.data.get('start_time_shift', None)
+    end_time_shift = request.data.get('end_time_shift', None)
+    
+    from_date = request.data.get('from_date', None)
+    to_date = request.data.get('to_date', None)
+    date = request.data.get('date', None)
+    note = request.data.get('note', None)
+
+    is_vacation = request.data.get('is_vacation', None)
+    
+    is_leave = request.data.get('is_leave', None)
+    is_off = request.data.get('is_off', None)
+    
+    if not all([business_id,employee ]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                          'employee'
+                            ]
+                    }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        business = Business.objects.get(id=business_id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    try:
+        employee_id=Employee.objects.get(id=employee, is_deleted = False)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'response' : {
+                    'message' : 'Employee not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+    working_schedule = EmployeDailySchedule.objects.create(
+        user = user,
+        business = business ,
+        employee = employee_id,
+        day = day,
         
+        start_time = start_time,
+        end_time = end_time,
+        start_time_shift = start_time_shift,
+        end_time_shift = end_time_shift,
+        
+        from_date =from_date,
+        to_date = to_date,
+        note = note,
+        
+        date = date,
+        
+    )    
+    if is_vacation is not None:
+        working_schedule.is_vacation = True
+    else:
+        working_schedule.is_vacation = False
+        
+    if is_leave is not None:
+        working_schedule.is_leave = True
+    else:
+        working_schedule.is_leave = False
+    if is_off is not None:
+        working_schedule.is_off = True
+    else:
+        working_schedule.is_off = False
+    
+    working_schedule.save()
+    serializers= ScheduleSerializer(working_schedule, context={'request' : request})
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Working Schedule Created Successfully!',
+                    'error_message' : None,
+                    'schedule' : serializers.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        ) 
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_workingschedule(request):
