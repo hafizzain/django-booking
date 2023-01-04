@@ -2894,8 +2894,10 @@ def get_tennat_employee(request):
             try:
                 employe = Employee.objects.get(id = str(employe_id) )
             except Exception as err:
-                return f'{str(err)}employe'
+                #return f'{str(err)}employe'
+                employe = ''
                 pass
+            
             serialized = EmployeTenatSerializer(employe, context={'request' : request} )     
 
             return Response(
@@ -2906,6 +2908,7 @@ def get_tennat_employee(request):
                 'response' : {
                     'message' : 'Employee All Schedule',
                     'error_message' : None,
+                    'tenat':ten,
                     'employee': serialized.data,
                 }
             },
