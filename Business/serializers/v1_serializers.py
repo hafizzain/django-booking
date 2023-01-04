@@ -494,7 +494,7 @@ class EmployeTenatSerializer(serializers.ModelSerializer):
             app_date_time = f'2000-01-01 {app_time}'
 
             app_date_time = datetime.fromisoformat(app_date_time)
-            datetime_duration = app_date_time + timedelta(minutes=cal_duration)
+            datetime_duration = app_date_time + timedelta(minutes=int(cal_duration))
             datetime_duration = datetime_duration.strftime('%H:%M:%S')
             end_time = datetime_duration
             
