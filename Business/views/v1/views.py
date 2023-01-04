@@ -2888,9 +2888,10 @@ def get_tennat_employee(request):
     employe_id = request.GET.get('employe_id', None)
     
     tenant = Tenant.objects.filter(is_deleted = False)
-    
+    data = []
     for ten in tenant:
         with tenant_context(ten):
+            data.append(ten)
             try:
                 employe = Employee.objects.get(id = str(employe_id) )
             except Exception as err:
@@ -2922,7 +2923,7 @@ def get_tennat_employee(request):
                     'response' : {
                         'message' : 'Employee All Schedule',
                         'error_message' : None,
-                        'employee':serialized.data,
+                        'data': data
                     }
                 },
                 status=status.HTTP_200_OK
