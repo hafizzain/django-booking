@@ -5,7 +5,7 @@ from Appointment.models import AppointmentService
 from Employee.models import EmployeDailySchedule, Employee
 from Utility.models import Currency, ExceptionRecord, State, Country,City
 from rest_framework import serializers
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 from Business.models import BookingSetting, BusinessAddressMedia, BusinessType, Business, BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BusinessPaymentMethod, BusinessTax, BusinessVendor,BusinessOpeningHour
@@ -483,12 +483,17 @@ class EmployeTenatSerializer(serializers.ModelSerializer):
         for ser in service:
             date = datetime.strptime(self.context["date"], "%Y-%m-%d")
             app_date = ser.appointment_date
+            app_time = ser.appointment_time
+            duration = ser.duration
+            cal_duration = str(duration).split(' ')[0]
+            
             ExceptionRecord.objects.create(
                 text = f'user {date.date()} database date {app_date}'
             )
             if date.date() == app_date:
+                new_time = app_time + timedelta(minutes=int(cal_duration))
                 print('ts')
-                return 'Date are same'
+                return f'Date are same{new_time}'
             else:
                 return 'create emmployee'
              
