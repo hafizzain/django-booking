@@ -487,6 +487,10 @@ class EmployeTenatSerializer(serializers.ModelSerializer):
             duration = ser.duration
             cal_duration = str(duration).split(' ')[0]
             
+            ExceptionRecord.objects.create(
+                text = f'user {cal_duration} database date {duration}'
+            )
+            
             app_date_time = f'2000-01-01 {app_time}'
 
             app_date_time = datetime.fromisoformat(app_date_time)
@@ -494,9 +498,7 @@ class EmployeTenatSerializer(serializers.ModelSerializer):
             datetime_duration = datetime_duration.strftime('%H:%M:%S')
             end_time = datetime_duration
             
-            ExceptionRecord.objects.create(
-                text = f'user {cal_duration} database date {end_time}'
-            )
+            
             if date.date() == app_date:
                 #new_time = app_time + timedelta(minutes=int(cal_duration))
                 print('ts')
