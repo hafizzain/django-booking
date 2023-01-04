@@ -2909,7 +2909,6 @@ def get_tennat_employee(request):
                     'message' : 'Employee All Schedule',
                     'error_message' : None,
                     'tenat':ten,
-                    'employee': serialized.data,
                 }
             },
             status=status.HTTP_200_OK
