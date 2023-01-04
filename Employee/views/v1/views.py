@@ -724,12 +724,19 @@ def create_employee(request):
 
     elif type(working_days) == list:
             pass
-    for days in working_days:
+    now = datetime.now()
+        
+    for i, day in enumerate(working_days):
+        if i == 0:
+            date = now + timedelta(days=i)
+        else:
+            date = now + timedelta(days=1)
         EmployeDailySchedule.objects.create(
             user=user,
             business=business,
             employee = employee,
-            day = days,
+            day = day,
+            date = date,
         )
             
     if type(services_id) == str:
