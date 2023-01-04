@@ -484,9 +484,9 @@ class EmployeTenatSerializer(serializers.ModelSerializer):
             date = datetime.strptime(self.context["date"], "%Y-%m-%d")
             app_date = ser.appointment_date
             ExceptionRecord.objects.create(
-                text = f'user {date} database date {app_date}'
+                text = f'user {date.date()} database date {app_date}'
             )
-            if date == app_date:
+            if date.date() == app_date:
                 print('ts')
                 return 'Date are same'
             else:
