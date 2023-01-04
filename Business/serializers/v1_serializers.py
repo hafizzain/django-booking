@@ -1,14 +1,12 @@
-
-
-
 from cmath import e
 from dataclasses import field
-from locale import currency
 from pyexpat import model
 from Appointment.models import AppointmentService
 from Employee.models import EmployeDailySchedule, Employee
 from Utility.models import Currency, State, Country,City
 from rest_framework import serializers
+from datetime import datetime
+
 
 from Business.models import BookingSetting, BusinessAddressMedia, BusinessType, Business, BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BusinessPaymentMethod, BusinessTax, BusinessVendor,BusinessOpeningHour
 from Authentication.serializers import UserSerializer
@@ -482,6 +480,15 @@ class EmployeTenatSerializer(serializers.ModelSerializer):
     
     def get_appointmemt(self, obj):
         service = AppointmentService.objects.filter(member = obj,is_deleted = False).order_by('-created_at')
+        for ser in service:
+            date = datetime(self.context["date"])
+            app_date = datetime(ser.appointment_date)
+            if date == app_date:
+                print('ts')
+                return 'Date are same'
+            else:
+                return 'create emmployee'
+             
         return AppointmentServiceSerializer(service, many = True).data
     
     class Meta:

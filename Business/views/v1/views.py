@@ -2886,6 +2886,8 @@ def get_domain_business_address(request):
 @permission_classes([AllowAny])
 def get_tennat_employee(request):                    
     employe_id = request.GET.get('employe_id', None)
+    start_time = request.GET.get('start_time', None)
+    date = request.GET.get('date', None)
     
     tenant = Tenant.objects.filter(is_deleted = False)
     data = []
@@ -2899,7 +2901,8 @@ def get_tennat_employee(request):
                 employe = ''
                 pass
             if employe != '':
-                serialized = EmployeTenatSerializer(employe, context={'request' : request} )     
+                serialized = EmployeTenatSerializer(employe, context={'request' : request, 
+                                                'start_time' : start_time, 'date' : date} )     
 
             #'employee': serialized.data,
                 return Response(
