@@ -3,7 +3,7 @@ from dataclasses import field
 from pyexpat import model
 from Appointment.models import AppointmentService
 from Employee.models import EmployeDailySchedule, Employee
-from Utility.models import Currency, State, Country,City
+from Utility.models import Currency, ExceptionRecord, State, Country,City
 from rest_framework import serializers
 from datetime import datetime
 
@@ -483,6 +483,9 @@ class EmployeTenatSerializer(serializers.ModelSerializer):
         for ser in service:
             date = datetime.strptime(self.context["date"], "%Y-%m-%d")
             app_date = ser.appointment_date
+            ExceptionRecord.objects.create(
+                text = f'user {date} database date {app_date}'
+            )
             if date == app_date:
                 print('ts')
                 return 'Date are same'
