@@ -2958,7 +2958,7 @@ def update_vacation(request):
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def create_workingschedule(request):
+def create_vacation_emp(request):
     user = request.user
     business_id = request.data.get('business', None)
     
