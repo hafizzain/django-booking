@@ -2900,16 +2900,17 @@ def get_tennat_employee(request):
             if employe != '':
                 serialized = EmployeTenatSerializer(employe, context={'request' : request} )     
 
-            return Response(
-            {
-                'status' : True,
-                'status_code' : 200,
-                'status_code_text' : '200',
-                'response' : {
-                    'message' : 'Employee All Schedule',
-                    'error_message' : None,
-                    'tenat':ten,
-                }
-            },
-            status=status.HTTP_200_OK
-        )
+#'employee': serialized.data,
+                return Response(
+                {
+                    'status' : True,
+                    'status_code' : 200,
+                    'status_code_text' : '200',
+                    'response' : {
+                        'message' : 'Employee All Schedule',
+                        'error_message' : None,
+                        'employee':serialized.data,
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
