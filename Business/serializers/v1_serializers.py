@@ -487,13 +487,20 @@ class EmployeTenatSerializer(serializers.ModelSerializer):
             duration = ser.duration
             cal_duration = str(duration).split(' ')[0]
             
+            app_date_time = f'2000-01-01 {app_time}'
+
+            app_date_time = datetime.fromisoformat(app_date_time)
+            datetime_duration = app_date_time + timedelta(minutes=duration)
+            datetime_duration = datetime_duration.strftime('%H:%M:%S')
+            end_time = datetime_duration
+            
             ExceptionRecord.objects.create(
-                text = f'user {date.date()} database date {app_date}'
+                text = f'user {cal_duration} database date {end_time}'
             )
             if date.date() == app_date:
-                new_time = app_time + timedelta(minutes=int(cal_duration))
+                #new_time = app_time + timedelta(minutes=int(cal_duration))
                 print('ts')
-                return f'Date are same{new_time}'
+                return f'Date are same{end_time}'
             else:
                 return 'create emmployee'
              
