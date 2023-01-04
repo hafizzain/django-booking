@@ -481,8 +481,8 @@ class EmployeTenatSerializer(serializers.ModelSerializer):
     def get_appointmemt(self, obj):
         service = AppointmentService.objects.filter(member = obj,is_deleted = False).order_by('-created_at')
         for ser in service:
-            date = datetime(self.context["date"])
-            app_date = datetime(ser.appointment_date)
+            date = datetime.strptime(self.context["date"], "%Y-%m-%d")
+            app_date = datetime.strptime(ser.appointment_date, "%Y-%m-%d")
             if date == app_date:
                 print('ts')
                 return 'Date are same'
