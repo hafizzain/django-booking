@@ -2887,7 +2887,7 @@ def get_domain_business_address(request):
 def get_tennat_employee(request):                    
     employe_id = request.GET.get('employe_id', None)
     
-    tenant = Tenant.objects.filter(is_delete = False)
+    tenant = Tenant.objects.filter(is_deleted = False)
     
     for ten in tenant:
         with tenant_context(ten):

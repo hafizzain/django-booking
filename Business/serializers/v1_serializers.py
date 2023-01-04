@@ -481,7 +481,7 @@ class EmployeTenatSerializer(serializers.ModelSerializer):
         return ScheduleSerializer(schedule, many = True,context=self.context).data
     
     def get_appointmemt(self, obj):
-        service = AppointmentService.objects.filter(member = obj,is_delete = False).order_by('-created_at')
+        service = AppointmentService.objects.filter(member = obj,is_deleted = False).order_by('-created_at')
         return AppointmentServiceSerializer(service, many = True).data
     
     class Meta:
