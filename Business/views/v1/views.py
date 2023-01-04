@@ -2915,6 +2915,7 @@ def get_tennat_employee(request):
                 },
                 status=status.HTTP_200_OK
             )
+    data = json.loads(data)
     return Response(
                 {
                     'status' : True,
