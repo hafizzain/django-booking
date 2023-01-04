@@ -2897,8 +2897,8 @@ def get_tennat_employee(request):
                 #return f'{str(err)}employe'
                 employe = ''
                 pass
-            
-            serialized = EmployeTenatSerializer(employe, context={'request' : request} )     
+            if employe != '':
+                serialized = EmployeTenatSerializer(employe, context={'request' : request} )     
 
             return Response(
             {
