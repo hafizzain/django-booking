@@ -2892,8 +2892,9 @@ def get_tennat_employee(request):
     for ten in tenant:
         with tenant_context(ten):
             try:
-                employe = Employee.objects.get(id = employe_id )
+                employe = Employee.objects.get(id = str(employe_id) )
             except Exception as err:
+                return f'{str(err)}employe'
                 pass
             serialized = EmployeTenatSerializer(employe, context={'request' : request} )     
 
