@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from time import strptime
 from django.shortcuts import render
 from Employee.models import( CategoryCommission, EmployeDailySchedule, Employee , EmployeeProfessionalInfo ,
@@ -3018,52 +3018,81 @@ def create_workingschedule(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+    
+    # from_date ='2023-01-04'
+    # to_date ='2023-01-06'
+    
+    from_date = datetime.strptime(from_date, "%Y-%m-%d")
+    to_date = datetime.strptime(to_date, "%Y-%m-%d")
+    diff = to_date - from_date 
+    #print(diff.days)
+    days = int(diff.days)
+    if days > 0 :
+        for i, value in enumerate(range(days+1)):
+            if i == 0:
+                from_date = from_date + timedelta(days=i)
+            else:
+                from_date = from_date + timedelta(days=1)
+            working_schedule = EmployeDailySchedule.objects.create(
+                user = user,
+                business = business ,
+                employee = employee_id,
+                day = day,
+                start_time = start_time,
+                end_time = end_time,
+                start_time_shift = start_time_shift,
+                end_time_shift = end_time_shift,
+                
+                from_date =from_date,
+                to_date = to_date,
+                note = note,
+                
+            )    
+            if is_vacation is not None:
+                working_schedule.is_vacation = True
+            else:
+                working_schedule.is_vacation = False
+                
+            if is_leave is not None:
+                working_schedule.is_leave = True
+            else:
+                working_schedule.is_leave = False
+            if is_off is not None:
+                working_schedule.is_off = True
+            else:
+                working_schedule.is_off = False
             
-    working_schedule = EmployeDailySchedule.objects.create(
-        user = user,
-        business = business ,
-        employee = employee_id,
-        day = day,
-        start_time = start_time,
-        end_time = end_time,
-        start_time_shift = start_time_shift,
-        end_time_shift = end_time_shift,
-        
-        from_date =from_date,
-        to_date = to_date,
-        note = note,
-        
-    )    
-    if is_vacation is not None:
-        working_schedule.is_vacation = True
-    else:
-        working_schedule.is_vacation = False
-        
-    if is_leave is not None:
-        working_schedule.is_leave = True
-    else:
-        working_schedule.is_leave = False
-    if is_off is not None:
-        working_schedule.is_off = True
-    else:
-        working_schedule.is_off = False
-    
-    working_schedule.save()
-        
-    serializers= ScheduleSerializer(working_schedule, context={'request' : request})
-    
+            working_schedule.save()
+            
+    all_employe= EmployeDailySchedule.objects.all().order_by('created_at')
+    serialized = ScheduleSerializer(all_employe, many=True, context={'request' : request})
     return Response(
-            {
-                'status' : True,
-                'status_code' : 201,
-                'response' : {
-                    'message' : 'Working Schedule Created Successfully!',
-                    'error_message' : None,
-                    'schedule' : serializers.data,
-                }
-            },
-            status=status.HTTP_201_CREATED
-        ) 
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Schedule',
+                'error_message' : None,
+                'schedule' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+        
+    # serializers= ScheduleSerializer(working_schedule, context={'request' : request})
+    
+    # return Response(
+    #         {
+    #             'status' : True,
+    #             'status_code' : 201,
+    #             'response' : {
+    #                 'message' : 'Working Schedule Created Successfully!',
+    #                 'error_message' : None,
+    #                 'schedule' : serializers.data,
+    #             }
+    #         },
+    #         status=status.HTTP_201_CREATED
+    #     ) 
     
         
 @api_view(['GET'])
