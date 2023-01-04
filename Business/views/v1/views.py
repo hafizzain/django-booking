@@ -10,7 +10,8 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from Business.models import BusinessAddressMedia, BusinessType
-from Business.serializers.v1_serializers import OpeningHoursSerializer,AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer
+from Business.serializers.v1_serializers import EmployeTenatSerializer, OpeningHoursSerializer,AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer
+from Employee.models import Employee
 
 from NStyle.Constants import StatusCodes
 
@@ -2876,6 +2877,35 @@ def get_domain_business_address(request):
                     'count' : len(data),
                     'locations' : data,
                     'service_group': service_group,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_tennat_employee(request):                    
+    employe_id = request.GET.get('employe_id', None)
+    
+    tenant = Tenant.objects.filter(is_delete = False)
+    
+    for ten in tenant:
+        with tenant_context(ten):
+            try:
+                employe = Employee.objects.get(id = employe_id )
+            except Exception as err:
+                pass
+            serialized = EmployeTenatSerializer(employe, context={'request' : request} )     
+
+            return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Employee All Schedule',
+                    'error_message' : None,
+                    'employee': serialized.data,
                 }
             },
             status=status.HTTP_200_OK

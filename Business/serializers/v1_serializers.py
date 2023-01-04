@@ -5,6 +5,8 @@ from cmath import e
 from dataclasses import field
 from locale import currency
 from pyexpat import model
+from Appointment.models import AppointmentService
+from Employee.models import EmployeDailySchedule, Employee
 from Utility.models import Currency, State, Country,City
 from rest_framework import serializers
 
@@ -451,3 +453,37 @@ class BusiessAddressAppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessAddress
         fields = ['id', 'address_name']
+class AppointmentServiceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = AppointmentService
+        fields = '__all__'
+class ScheduleSerializer(serializers.ModelSerializer):
+    # employee = serializers.SerializerMethodField(read_only=True)
+    
+    # def get_employee(self, obj):
+    #     try:
+    #         data = Employee.objects.get(id = str(obj.employee))
+    #         return EmployeeNameSerializer(data, context=self.context).data
+    #     except Exception as err:
+    #         print(err)
+         
+    class Meta:
+        model = EmployeDailySchedule
+        fields = '__all__'
+        
+class EmployeTenatSerializer(serializers.ModelSerializer):
+    appointmemt = serializers.SerializerMethodField(read_only=True)
+    schedule =  serializers.SerializerMethodField(read_only=True)
+    
+    def get_schedule(self, obj):
+        schedule =  EmployeDailySchedule.objects.filter(employee= obj )
+        return ScheduleSerializer(schedule, many = True,context=self.context).data
+    
+    def get_appointmemt(self, obj):
+        service = AppointmentService.objects.filter(member = obj,is_delete = False).order_by('-created_at')
+        return AppointmentServiceSerializer(service, many = True).data
+    
+    class Meta:
+        model = Employee
+        fields = '__all__'
