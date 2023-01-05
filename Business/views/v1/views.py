@@ -2911,7 +2911,7 @@ def get_check_availability(request):
                 dt = datetime.strptime(start_time, "%H:%M:%S")
                 start_time = dt.time()
                 try:
-                    employee = Employee.objects.get(id = str(emp_id))
+                    employee = Employee.objects.get(id = emp_id)
                     av_staff_ids = AppointmentService.objects.filter(
                     #member__id__in = empl_list,
                     #business = ,
