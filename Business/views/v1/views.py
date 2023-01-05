@@ -2912,18 +2912,18 @@ def get_check_availability(request):
                 start_time = dt.time()
                 try:
                     employee = Employee.objects.get(id = emp_id)
-                    data.append(f'the employe id {employee}')
+                    data.append(f'the employe id {employee}, start_time {start_time}, {date}')
                     av_staff_ids = AppointmentService.objects.filter(
-                    #member__id__in = empl_list,
-                    #business = ,
-                    member__id = employee.id,
-                    appointment_date = date,
-                    appointment_time__lte = start_time, # 1:00
-                    end_time__gte = start_time, # 1:40
-                    member__employee_employedailyschedule__date = date,
-                    member__employee_employedailyschedule__start_time__lte = start_time,
-                    member__employee_employedailyschedule__end_time__gte = start_time,
-                    is_blocked = False,
+                        #member__id__in = empl_list,
+                        #business = ,
+                        member__id = employee.id,
+                        appointment_date = date,
+                        appointment_time__lte = start_time, # 1:00
+                        end_time__gte = start_time, # 1:40
+                        member__employee_employedailyschedule__date = date,
+                        member__employee_employedailyschedule__start_time__lte = start_time,
+                        member__employee_employedailyschedule__end_time__gte = start_time,
+                        is_blocked = False,
                     ).values_list('member__id', flat=True)
                     if len(av_staff_ids) > 0 :
                         data.append(f'Employe already busy {employee.id}')
@@ -2931,7 +2931,7 @@ def get_check_availability(request):
                         data.append(f'Employe are free {employee.id}')
                     #data.append(av_staff_ids)
                 except Exception as err:
-                    data.append(str(err))
+                    #data.append(str(err))
                     pass
                     # return Response(
                     #         {
