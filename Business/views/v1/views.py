@@ -2907,7 +2907,7 @@ def get_check_availability(request):
                 start_time = check.get('app_time', None)
                 date = check.get('date', None)
                 try:
-                    employee = Employee.objects.get(id = str(emp_id))
+                    employee = Employee.objects.get(id = emp_id)
                     av_staff_ids = AppointmentService.objects.filter(
                     #member__id__in = empl_list,
                     #business = ,
@@ -2924,6 +2924,7 @@ def get_check_availability(request):
                 except Exception as err:
                     data.append(str(err))
                     data.append(str(ten))
+                    data.append(emp_id)
                     pass
                     # return Response(
                     #         {
