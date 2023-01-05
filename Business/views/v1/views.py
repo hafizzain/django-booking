@@ -2923,6 +2923,7 @@ def get_check_availability(request):
                     data.append(av_staff_ids)
                 except Exception as err:
                     data.append(str(err))
+                    data.append(str(ten))
                     pass
                     # return Response(
                     #         {
