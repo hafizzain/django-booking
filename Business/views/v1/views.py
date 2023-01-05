@@ -2923,7 +2923,7 @@ def get_check_availability(request):
                 start_time = check.get('app_time', None)
                 date = check.get('date', None)
                 try:
-                    employe = Employee.objects.get(id = employe_id)
+                    employe = Employee.objects.get(id = str(employe_id))
                 except Exception as err:
                     return Response(
                             {
