@@ -2910,6 +2910,9 @@ def get_check_availability(request):
                 
                 dt = datetime.strptime(start_time, "%H:%M:%S")
                 start_time = dt.time()
+                
+                date = datetime(date)
+                
                 try:
                     employee = Employee.objects.get(id = emp_id)
                     data.append(f'the employe id {employee}, start_time {start_time}, {date}')
@@ -2917,7 +2920,7 @@ def get_check_availability(request):
                         #member__id__in = empl_list,
                         #business = ,
                         member__id = employee.id,
-                        #appointment_date = date,
+                        appointment_date = date,
                         # appointment_time__lte = start_time, # 1:00
                         # end_time__gte = start_time, # 1:40
                         # member__employee_employedailyschedule__date = date,
