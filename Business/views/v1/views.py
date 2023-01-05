@@ -2924,37 +2924,39 @@ def get_check_availability(request):
                 date = check.get('date', None)
                 try:
                     employe = Employee.objects.get(id = str(emp_id))
+                    av_staff_ids = AppointmentService.objects.filter(
+                    #member__id__in = empl_list,
+                    #business = ,
+                    member__id = employe,
+                    appointment_date = date,
+                    appointment_time__lte = start_time, # 1:00
+                    end_time__gte = start_time, # 1:40
+                    member__employee_employedailyschedule__date = date,
+                    member__employee_employedailyschedule__start_time__lte = start_time,
+                    member__employee_employedailyschedule__end_time__gte = start_time,
+                    is_blocked = False,
+                ).values_list('member__id', flat=True)
                 except Exception as err:
-                    return Response(
-                            {
-                                'status' : False,
-                                'status_code' : 400,
-                                'status_code_text' : 'Employee Id Invalid Data',
-                                'response' : {
-                                    'message' : 'Something went wrong',
-                                    'error_message' : str(err),
-                                    'employee' : emp_id,
-                                }
-                            },
-                            status=status.HTTP_400_BAD_REQUEST
-                        )
+                    pass
+                    # return Response(
+                    #         {
+                    #             'status' : False,
+                    #             'status_code' : 400,
+                    #             'status_code_text' : 'Employee Id Invalid Data',
+                    #             'response' : {
+                    #                 'message' : 'Something went wrong',
+                    #                 'error_message' : str(err),
+                    #                 'employee' : emp_id,
+                    #             }
+                    #         },
+                    #         status=status.HTTP_400_BAD_REQUEST
+                    #     )
                 # try:
                 #     business = Business.objects.get(id = str(employe_id) )
                 # except Exception as err:
                 #     #return f'{str(err)}employe'
                 #     pass
-                av_staff_ids = AppointmentService.objects.filter(
-                #member__id__in = empl_list,
-                #business = ,
-                member__id = employe,
-                appointment_date = date,
-                appointment_time__lte = start_time, # 1:00
-                end_time__gte = start_time, # 1:40
-                member__employee_employedailyschedule__date = date,
-                member__employee_employedailyschedule__start_time__lte = start_time,
-                member__employee_employedailyschedule__end_time__gte = start_time,
-                is_blocked = False,
-            ).values_list('member__id', flat=True)
+                
     
             if len(av_staff_ids) > 0 :
                 # result => 1
