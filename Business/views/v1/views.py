@@ -2926,7 +2926,6 @@ def get_check_availability(request):
                         'response' : {
                             'message' : 'Employee All Schedule',
                             'error_message' : None,
-                            'employee':serialized.data,
                         }
                     },
                     status=status.HTTP_200_OK

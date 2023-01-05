@@ -62,7 +62,7 @@ urlpatterns = [
     
     #Business Domain by user
     path('get_domain_business_address/', views.get_domain_business_address),
-    path('get_tennat_employee/', views.get_tennat_employee),
+    #path('get_tennat_employee/', views.get_tennat_employee),
 
     
 ]
