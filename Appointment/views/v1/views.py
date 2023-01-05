@@ -273,8 +273,10 @@ def create_appointment(request):
         promotion_id = appoinmnt.get('promotion', None)
         # tip = appoinmnt['tip']
         
+        app_date_time = f'2000-01-01 {date_time}'
+        
         duration = DURATION_CHOICES[app_duration]
-        app_date_time = datetime.fromisoformat(date_time)
+        app_date_time = datetime.fromisoformat(app_date_time)
         datetime_duration = app_date_time + timedelta(minutes=duration)
         datetime_duration = datetime_duration.strftime('%H:%M:%S')
         end_time = datetime_duration
