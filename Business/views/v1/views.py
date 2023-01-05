@@ -2918,12 +2918,12 @@ def get_check_availability(request):
     for ten in tenant:
         with tenant_context(ten):
             for check in check_availability:
-                employe_id = check.get('member_id', None)
+                emp_id = check.get('member_id', None)
                 duration = check.get('duration', None)
                 start_time = check.get('app_time', None)
                 date = check.get('date', None)
                 try:
-                    employe = Employee.objects.get(id = str(employe_id))
+                    employe = Employee.objects.get(id = str(emp_id))
                 except Exception as err:
                     return Response(
                             {
@@ -2933,7 +2933,7 @@ def get_check_availability(request):
                                 'response' : {
                                     'message' : 'Something went wrong',
                                     'error_message' : str(err),
-                                    'employee' : employe_id,
+                                    'employee' : emp_id,
                                 }
                             },
                             status=status.HTTP_400_BAD_REQUEST
