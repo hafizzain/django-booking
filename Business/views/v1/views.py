@@ -2911,26 +2911,23 @@ def get_check_availability(request):
                 dt = datetime.strptime(start_time, "%H:%M:%S")
                 start_time = dt.time()
                 try:
-                    employee = Employee.objects.filter(id = emp_id)[0]
-                    av_staff_ids = AppointmentService.objects.filter(
-                    #member__id__in = empl_list,
-                    #business = ,
-                    member__id = employee,
-                    appointment_date = date,
-                    appointment_time__lte = start_time, # 1:00
-                    end_time__gte = start_time, # 1:40
-                    member__employee_employedailyschedule__date = date,
-                    member__employee_employedailyschedule__start_time__lte = start_time,
-                    member__employee_employedailyschedule__end_time__gte = start_time,
-                    is_blocked = False,
-                ).values_list('member__id', flat=True)
-                    data.append(av_staff_ids)
+                    employee = Employee.objects.get(id = emp_id)
+                    data.append(f'the employe id {employee}')
+                #     av_staff_ids = AppointmentService.objects.filter(
+                #     #member__id__in = empl_list,
+                #     #business = ,
+                #     member__id = employee,
+                #     appointment_date = date,
+                #     appointment_time__lte = start_time, # 1:00
+                #     end_time__gte = start_time, # 1:40
+                #     member__employee_employedailyschedule__date = date,
+                #     member__employee_employedailyschedule__start_time__lte = start_time,
+                #     member__employee_employedailyschedule__end_time__gte = start_time,
+                #     is_blocked = False,
+                # ).values_list('member__id', flat=True)
+                    #data.append(av_staff_ids)
                 except Exception as err:
                     data.append(str(err))
-                    try:
-                        data.append(f'the employe id {employee}')
-                    except:
-                        pass
                     pass
                     # return Response(
                     #         {
@@ -3022,6 +3019,7 @@ def get_employee_appointment(request):
     date = request.GET.get('date', None)
     start_time = request.GET.get('start_time', None)
     tenant = Tenant.objects.filter(is_deleted = False)
+    data = []
     
     for ten in tenant:
         with tenant_context(ten):
@@ -3037,6 +3035,7 @@ def get_employee_appointment(request):
                     end_time__gte = start_time,
                 )
                 if len(availability) >= 0 or len(availability) <= 3 :
+                    data.append(f'the employe id {emp.id}')
                     serializer = EmployeeBusinessSerializer(emp)
                     return Response(
                     {
@@ -3051,7 +3050,7 @@ def get_employee_appointment(request):
                     },
                     status=status.HTTP_200_OK
                 )
-        return Response(
+    return Response(
                     {
                         'status' : True,
                         'status_code' : 200,
@@ -3059,6 +3058,7 @@ def get_employee_appointment(request):
                         'response' : {
                             'message' : 'Employees are free',
                             'error_message' : None,
+                            'employee': data
                         }
                     },
                     status=status.HTTP_200_OK
