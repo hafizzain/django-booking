@@ -2918,12 +2918,12 @@ def get_check_availability(request):
                         #business = ,
                         member__id = employee.id,
                         appointment_date = date,
-                        appointment_time__lte = start_time, # 1:00
-                        end_time__gte = start_time, # 1:40
-                        member__employee_employedailyschedule__date = date,
-                        member__employee_employedailyschedule__start_time__lte = start_time,
-                        member__employee_employedailyschedule__end_time__gte = start_time,
-                        is_blocked = False,
+                        # appointment_time__lte = start_time, # 1:00
+                        # end_time__gte = start_time, # 1:40
+                        # member__employee_employedailyschedule__date = date,
+                        # member__employee_employedailyschedule__start_time__lte = start_time,
+                        # member__employee_employedailyschedule__end_time__gte = start_time,
+                        # is_blocked = False,
                     ).values_list('member__id', flat=True)
                     if len(av_staff_ids) > 0 :
                         data.append(f'Employe already busy {employee.id}')
