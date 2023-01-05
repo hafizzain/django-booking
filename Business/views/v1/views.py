@@ -2908,7 +2908,7 @@ def get_check_availability(request):
                 start_time = check.get('app_time', None)
                 date = check.get('date', None)
                 
-                dt = datetime.datetime.strptime(start_time, "%H:%M:%S")
+                dt = datetime.strptime(start_time, "%H:%M:%S")
                 start_time = dt.time()
                 try:
                     employee = Employee.objects.get(id = str(emp_id))
