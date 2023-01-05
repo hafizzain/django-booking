@@ -2938,6 +2938,7 @@ def get_check_availability(request):
                 ).values_list('member__id', flat=True)
                     data.append(av_staff_ids)
                 except Exception as err:
+                    data.append(str(err))
                     pass
                     # return Response(
                     #         {
