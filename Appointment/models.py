@@ -88,7 +88,7 @@ class AppointmentService(models.Model):
     is_favourite = models.BooleanField(default = False)
         
     appointment_date = models.DateField()
-    appointment_time = models.TimeField()
+    appointment_time = models.TimeField(verbose_name='Appointment Start Time')
 
     duration = models.CharField(max_length=100, default='')
     appointment_status = models.CharField(choices=BOOKED_CHOICES, max_length=100, default='Appointment Booked')

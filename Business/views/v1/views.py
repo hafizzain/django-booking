@@ -15,6 +15,7 @@ from Employee.models import Employee
 
 from NStyle.Constants import StatusCodes
 
+from Appointment.models import AppointmentService
 from Authentication.models import User
 from Business.models import Business, BusinessSocial, BusinessAddress, BusinessOpeningHour, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BookingSetting, BusinessPaymentMethod, BusinessTax, BusinessVendor
 from Product.models import Product, ProductStock
@@ -2884,50 +2885,61 @@ def get_domain_business_address(request):
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_tennat_employee(request):                    
-    employe_id = request.GET.get('employe_id', None)
-    start_time = request.GET.get('start_time', None)
-    date = request.GET.get('date', None)
+def get_check_availability(request):                    
+    # employe_id = request.GET.get('employe_id', None) 
+    # start_time = request.GET.get('start_time', None) # 1:20
+    # date = request.GET.get('date', None)
+    
+    check_availability = request.data.get('check_availability', None)
+    
     
     tenant = Tenant.objects.filter(is_deleted = False)
+    
+    empl_list = []
+    
     data = []
     for ten in tenant:
         with tenant_context(ten):
             data.append(ten)
-            try:
-                employe = Employee.objects.get(id = str(employe_id) )
-            except Exception as err:
-                #return f'{str(err)}employe'
-                employe = ''
-                pass
-            if employe != '':
-                serialized = EmployeTenatSerializer(employe, context={'request' : request, 
-                                                'start_time' : start_time, 'date' : date} )     
+            for check in check_availability:
+                employe_id = check.get('member_id', None)
+                duration = check.get('duration', None)
+                date = check.get('date', None)
+                try:
+                    employe = Employee.objects.get(id = str(employe_id) )
+                except Exception as err:
+                    #return f'{str(err)}employe'
+                    employe = ''
+                    pass
+                
+                # if employe != '':
+                #     serialized = EmployeTenatSerializer(employe, context={'request' : request, 
+                #                                     'start_time' : start_time, 'date' : date} )
+                        
 
-            #'employee': serialized.data,
-                return Response(
-                {
-                    'status' : True,
-                    'status_code' : 200,
-                    'status_code_text' : '200',
-                    'response' : {
-                        'message' : 'Employee All Schedule',
-                        'error_message' : None,
-                        'employee':serialized.data,
-                    }
-                },
-                status=status.HTTP_200_OK
-            )
-    data = json.loads(data)
-    return Response(
-                {
-                    'status' : True,
-                    'status_code' : 200,
-                    'status_code_text' : '200',
-                    'response' : {
-                        'message' : 'Employee All Schedule',
-                        'error_message' : None,
-                    }
-                },
-                status=status.HTTP_200_OK
-            )
+                #'employee': serialized.data,
+                    return Response(
+                    {
+                        'status' : True,
+                        'status_code' : 200,
+                        'status_code_text' : '200',
+                        'response' : {
+                            'message' : 'Employee All Schedule',
+                            'error_message' : None,
+                            'employee':serialized.data,
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
+        return Response(
+                    {
+                        'status' : True,
+                        'status_code' : 200,
+                        'status_code_text' : '200',
+                        'response' : {
+                            'message' : 'Employee All Schedule',
+                            'error_message' : None,
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )

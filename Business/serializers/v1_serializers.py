@@ -482,13 +482,14 @@ class EmployeTenatSerializer(serializers.ModelSerializer):
         service = AppointmentService.objects.filter(member = obj,is_deleted = False).order_by('-created_at')
         for ser in service:
             date = datetime.strptime(self.context["date"], "%Y-%m-%d")
+            start_time = self.context["start_time"]
             app_date = ser.appointment_date
             app_time = ser.appointment_time
             duration = ser.duration
             cal_duration = str(duration).split(' ')[0]
             
             ExceptionRecord.objects.create(
-                text = f'user {cal_duration} database date {duration}'
+                text = f'user {cal_duration} database date {start_time}'
             )
             
             app_date_time = f'2000-01-01 {app_time}'
@@ -500,9 +501,8 @@ class EmployeTenatSerializer(serializers.ModelSerializer):
             
             
             if date.date() == app_date:
-                #new_time = app_time + timedelta(minutes=int(cal_duration))
-                print('ts')
-                return f'Date are same{end_time}'
+                if end_time == start_time and end_time :
+                    return f'Date are same{end_time}'
             else:
                 return 'create emmployee'
              

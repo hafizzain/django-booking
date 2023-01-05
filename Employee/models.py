@@ -337,11 +337,11 @@ class EmployeDailySchedule(models.Model):
     start_time = models.TimeField(null=True, blank=True)
     end_time = models.TimeField(null=True, blank=True)
     
-    start_time_shift = models.TimeField(null=True, blank=True)
-    end_time_shift = models.TimeField(null=True, blank=True)
+    start_time_shift = models.TimeField(null=True, blank=True) #  =>>  Will be terminated
+    end_time_shift = models.TimeField(null=True, blank=True) # =>>   Will be terminated
     
-    from_date = models.DateField(verbose_name = 'From Date', null=True)
-    to_date = models.DateField(verbose_name = 'To Date', null=True)
+    from_date = models.DateField(verbose_name = 'From Date', null=True) #  =>>  Will be terminated
+    to_date = models.DateField(verbose_name = 'To Date', null=True) # =>>   Will be terminated
     note = models.CharField(max_length=300, default='', null=True)
     
     date = models.DateTimeField(verbose_name = 'Date', null=True)

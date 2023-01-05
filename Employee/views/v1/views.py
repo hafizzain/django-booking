@@ -686,6 +686,7 @@ def create_employee(request):
     
     ser_error=[] 
     working_days = []
+    off_days = []
     
     employee_p_info.monday = True if 'monday' in request.data else False
     employee_p_info.tuesday = True if 'tuesday' in request.data else False
@@ -705,18 +706,32 @@ def create_employee(request):
     
     if monday is not None:
         working_days.append('Monday')
+    else:
+        off_days.append('Monday')
     if tuesday is not None:
         working_days.append('Tuesday')
+    else:
+        off_days.append('Tuesday')
     if wednesday is not None:
         working_days.append('Wednesday')
+    else:
+        off_days.append('Wednesday')
     if thursday is not None:
         working_days.append('Thursday')
+    else:
+        off_days.append('Thursday')
     if friday is not None:
         working_days.append('Friday')
+    else:
+        off_days.append('Friday')
     if saturday is not None:
         working_days.append('Saturday')
+    else:
+        off_days.append('Saturday')
     if sunday is not None:
         working_days.append('Sunday')
+    else:
+        off_days.append('Sunday')
         
     
     if type(working_days) == str:
@@ -738,13 +753,22 @@ def create_employee(request):
             day = day,
             date = date,
         )
+        
+    for i, day in enumerate(off_days):
+        date = now + timedelta(days=1)
+        EmployeDailySchedule.objects.create(
+            user=user,
+            business=business,
+            employee = employee,
+            day = day,
+            date = date,
+            is_off = False
+        )
             
     if type(services_id) == str:
-        #services_id = services_id.replace("'" , '"')
         services_id = json.loads(services_id)
     else:
         pass
-    
     if services_id is not None:
         for services in services_id :
             try:

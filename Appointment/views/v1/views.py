@@ -9,6 +9,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from rest_framework import status
+from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Business.models import Business , BusinessAddress
 from datetime import datetime
 from Order.models import Checkout, MemberShipOrder, ProductOrder, VoucherOrder
@@ -261,7 +262,7 @@ def create_appointment(request):
     for appoinmnt in appointments:
         member = appoinmnt['member']
         service = appoinmnt['service']
-        duration = appoinmnt['duration']
+        app_duration = appoinmnt['duration']
         price = appoinmnt['price']
         date_time = appoinmnt['date_time']
         fav = appoinmnt.get('favourite', None)
@@ -271,6 +272,12 @@ def create_appointment(request):
         membership_id = appoinmnt.get('membership', None)
         promotion_id = appoinmnt.get('promotion', None)
         # tip = appoinmnt['tip']
+        
+        duration = DURATION_CHOICES[app_duration]
+        app_date_time = datetime.fromisoformat(app_date_time)
+        datetime_duration = app_date_time + timedelta(minutes=duration)
+        datetime_duration = datetime_duration.strftime('%H:%M:%S')
+        end_time = datetime_duration
         
         try:
             voucher = Vouchers.objects.get(id = voucher_id )
@@ -323,9 +330,10 @@ def create_appointment(request):
             user = user,
             business = business,
             appointment = appointment,
-            duration=duration,
+            duration=app_duration,
             appointment_time=date_time,
             appointment_date = appointment_date,
+            end_time = end_time,
             service = service,
             member = member,
             price = price,
