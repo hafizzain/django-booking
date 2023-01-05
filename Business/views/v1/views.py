@@ -2903,7 +2903,8 @@ def get_check_availability(request):
                                 'status_code_text' : 'check_availability list data',
                                 'response' : {
                                     'message' : 'check_availability convert to list',
-                                    'error_message' : type(check_availability) ,
+                                    'error_message' : None,
+                                    'error': type(check_availability),
                                 }
                             },
                             status=status.HTTP_400_BAD_REQUEST
