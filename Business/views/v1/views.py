@@ -2936,6 +2936,7 @@ def get_check_availability(request):
                     member__employee_employedailyschedule__end_time__gte = start_time,
                     is_blocked = False,
                 ).values_list('member__id', flat=True)
+                    data.append(av_staff_ids)
                 except Exception as err:
                     pass
                     # return Response(
@@ -2958,24 +2959,24 @@ def get_check_availability(request):
                 #     pass
                 
     
-            if len(av_staff_ids) > 0 :
-                # result => 1
-                print(av_staff_ids)
-                print('this staff is not available')
-                data.append(ten)
-                return Response(
-                    {
-                        'status' : True,
-                        'status_code' : 200,
-                        'status_code_text' : '200',
-                        'response' : {
-                            'message' : 'Check Availability of Employees',
-                            'error_message' : None,
-                            'employee':data
-                        }
-                    },
-                    status=status.HTTP_200_OK
-                )
+            # if len(av_staff_ids) > 0 :
+            #     # result => 1
+            #     print(av_staff_ids)
+            #     print('this staff is not available')
+            #     data.append(av_staff_ids)
+            #     return Response(
+            #         {
+            #             'status' : True,
+            #             'status_code' : 200,
+            #             'status_code_text' : '200',
+            #             'response' : {
+            #                 'message' : 'Check Availability of Employees',
+            #                 'error_message' : None,
+            #                 'employee':data
+            #             }
+            #         },
+            #         status=status.HTTP_200_OK
+            #     )
                 #return False
             
             else:
@@ -2987,6 +2988,7 @@ def get_check_availability(request):
                         'response' : {
                             'message' : 'Employees are free, you can proceed further',
                             'error_message' : None,
+                            'employee':data
                         }
                     },
                     status=status.HTTP_200_OK
