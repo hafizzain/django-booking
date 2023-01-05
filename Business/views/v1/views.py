@@ -2883,7 +2883,7 @@ def get_domain_business_address(request):
             status=status.HTTP_200_OK
         )
     
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def get_check_availability(request):                    
     # employe_id = request.GET.get('employe_id', None) 
@@ -2900,10 +2900,10 @@ def get_check_availability(request):
     data = []
     for ten in tenant:
         with tenant_context(ten):
-            data.append(ten)
             for check in check_availability:
                 employe_id = check.get('member_id', None)
                 duration = check.get('duration', None)
+                start_time = check.get('app_time', None)
                 date = check.get('date', None)
                 try:
                     employe = Employee.objects.get(id = str(employe_id) )
@@ -2911,34 +2911,71 @@ def get_check_availability(request):
                     #return f'{str(err)}employe'
                     employe = ''
                     pass
+                # try:
+                #     business = Business.objects.get(id = str(employe_id) )
+                # except Exception as err:
+                #     #return f'{str(err)}employe'
+                #     pass
+                av_staff_ids = AppointmentService.objects.filter(
+                #member__id__in = empl_list,
+                #business = ,
+                member__id = employe,
+                appointment_date = date,
+                appointment_time__lte = start_time, # 1:00
+                end_time__gte = start_time, # 1:40
+                member__employee_employedailyschedule__date = date,
+                member__employee_employedailyschedule__start_time__lte = start_time,
+                member__employee_employedailyschedule__end_time__gte = start_time,
+                is_blocked = False,
+            ).values_list('member__id', flat=True)
+    
+            if len(av_staff_ids) > 0 :
+                # result => 1
+                print(av_staff_ids)
+                print('this staff is not available')
+                data.append(ten)
+                return Response(
+                    {
+                        'status' : True,
+                        'status_code' : 200,
+                        'status_code_text' : '200',
+                        'response' : {
+                            'message' : 'Check Availability of Employees',
+                            'error_message' : None,
+                            'employee':data
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
+                #return False
+            
+            else:
+                return Response(
+                    {
+                        'status' : True,
+                        'status_code' : 200,
+                        'status_code_text' : '200',
+                        'response' : {
+                            'message' : 'Employees are free, you can proceed further',
+                            'error_message' : None,
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
                 
                 # if employe != '':
                 #     serialized = EmployeTenatSerializer(employe, context={'request' : request, 
                 #                                     'start_time' : start_time, 'date' : date} )
                         
-
-                #'employee': serialized.data,
-                    return Response(
-                    {
-                        'status' : True,
-                        'status_code' : 200,
-                        'status_code_text' : '200',
-                        'response' : {
-                            'message' : 'Employee All Schedule',
-                            'error_message' : None,
-                        }
-                    },
-                    status=status.HTTP_200_OK
-                )
-        return Response(
-                    {
-                        'status' : True,
-                        'status_code' : 200,
-                        'status_code_text' : '200',
-                        'response' : {
-                            'message' : 'Employee All Schedule',
-                            'error_message' : None,
-                        }
-                    },
-                    status=status.HTTP_200_OK
-                )
+        # return Response(
+        #             {
+        #                 'status' : True,
+        #                 'status_code' : 200,
+        #                 'status_code_text' : '200',
+        #                 'response' : {
+        #                     'message' : 'Employee All Schedule',
+        #                     'error_message' : None,
+        #                 }
+        #             },
+        #             status=status.HTTP_200_OK
+        #         )
