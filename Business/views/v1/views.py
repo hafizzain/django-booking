@@ -2895,8 +2895,19 @@ def get_check_availability(request):
     if type(check_availability) == str:
         check_availability = json.loads(check_availability)
     else:
-        pass
-    
+        #pass
+        return Response(
+                            {
+                                'status' : False,
+                                'status_code' : 400,
+                                'status_code_text' : 'check_availability list data',
+                                'response' : {
+                                    'message' : 'check_availability convert to list',
+                                    'error_message' : str(err),
+                                }
+                            },
+                            status=status.HTTP_400_BAD_REQUEST
+                        )    
     tenant = Tenant.objects.filter(is_deleted = False)
     
     empl_list = []
