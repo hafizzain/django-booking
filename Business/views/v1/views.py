@@ -2906,11 +2906,20 @@ def get_check_availability(request):
                 start_time = check.get('app_time', None)
                 date = check.get('date', None)
                 try:
-                    employe = Employee.objects.get(id = str(employe_id) )
+                    employe = Employee.objects.get(id = employe_id)
                 except Exception as err:
-                    #return f'{str(err)}employe'
-                    employe = ''
-                    pass
+                    return Response(
+                            {
+                                'status' : False,
+                                'status_code' : 400,
+                                'status_code_text' : 'Employee Id Invalid Data',
+                                'response' : {
+                                    'message' : 'Something went wrong',
+                                    'error_message' : str(err),
+                                }
+                            },
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
                 # try:
                 #     business = Business.objects.get(id = str(employe_id) )
                 # except Exception as err:
