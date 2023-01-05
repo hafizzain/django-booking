@@ -745,7 +745,7 @@ def create_employee(request):
         if i == 0:
             date = now + timedelta(days=i)
         else:
-            date = now + timedelta(days=1)
+            date = date + timedelta(days=1)
         EmployeDailySchedule.objects.create(
             user=user,
             business=business,
@@ -755,7 +755,7 @@ def create_employee(request):
         )
         
     for i, day in enumerate(off_days):
-        date = now + timedelta(days=1)
+        date = date + timedelta(days=1)
         EmployeDailySchedule.objects.create(
             user=user,
             business=business,
