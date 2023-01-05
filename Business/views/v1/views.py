@@ -2964,21 +2964,33 @@ def get_check_availability(request):
             #         status=status.HTTP_200_OK
             #     )
                 #return False
-            
-            else:
-                return Response(
+    if len(av_staff_ids) > 0 :
+        return Response(
                     {
                         'status' : True,
                         'status_code' : 200,
                         'status_code_text' : '200',
                         'response' : {
-                            'message' : 'Employees are free, you can proceed further',
+                            'message' : 'Check Availability not Employees',
                             'error_message' : None,
-                            'employee':data
                         }
                     },
                     status=status.HTTP_200_OK
-                )
+        )
+    else:     
+        return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Employees are free, you can proceed further',
+                    'error_message' : None,
+                    'employee':data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
                 
                 # if employe != '':
                 #     serialized = EmployeTenatSerializer(employe, context={'request' : request, 
