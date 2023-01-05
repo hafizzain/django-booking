@@ -1,6 +1,7 @@
 
 
 
+from datetime import datetime
 import email
 from django.conf import settings
 from operator import ge
@@ -2906,6 +2907,9 @@ def get_check_availability(request):
                 duration = check.get('duration', None)
                 start_time = check.get('app_time', None)
                 date = check.get('date', None)
+                
+                dt = datetime.datetime.strptime(start_time, "%H:%M:%S")
+                start_time = dt.time()
                 try:
                     employee = Employee.objects.get(id = str(emp_id))
                     av_staff_ids = AppointmentService.objects.filter(
@@ -2923,7 +2927,6 @@ def get_check_availability(request):
                     data.append(av_staff_ids)
                 except Exception as err:
                     data.append(str(err))
-                    data.append(str(ten))
                     try:
                         data.append(f'the employe id {employee}')
                     except:
