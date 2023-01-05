@@ -2895,20 +2895,21 @@ def get_check_availability(request):
     if type(check_availability) == str:
         check_availability = json.loads(check_availability)
     else:
+        data = json.dumps(check_availability)
         #pass
         return Response(
-                            {
-                                'status' : False,
-                                'status_code' : 400,
-                                'status_code_text' : 'check_availability list data',
-                                'response' : {
-                                    'message' : 'check_availability convert to list',
-                                    'error_message' : None,
-                                    'error': type(check_availability),
-                                }
-                            },
-                            status=status.HTTP_400_BAD_REQUEST
-                        )    
+                {
+                    'status' : False,
+                    'status_code' : 400,
+                    'status_code_text' : 'check_availability list data',
+                    'response' : {
+                        'message' : 'check_availability convert to list',
+                        'error_message' : None,
+                        'error': type(data),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )    
     tenant = Tenant.objects.filter(is_deleted = False)
     
     empl_list = []
