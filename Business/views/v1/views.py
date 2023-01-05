@@ -30,7 +30,7 @@ from django.db.models import Q
 
 from django_tenants.utils import tenant_context
 
-from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
+from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, EmployeeBusinessSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
 
 
 @api_view(['GET'])
@@ -2885,31 +2885,15 @@ def get_domain_business_address(request):
     
 @api_view(['POST'])
 @permission_classes([AllowAny])
-def get_check_availability(request):                    
-    # employe_id = request.GET.get('employe_id', None) 
-    # start_time = request.GET.get('start_time', None) # 1:20
-    # date = request.GET.get('date', None)
-    
+def get_check_availability(request):  
+                      
     check_availability = request.data.get('check_availability', None)
     
     if type(check_availability) == str:
         check_availability = json.loads(check_availability)
     else:
-        #data = json.dumps(check_availability)
         pass
-        # return Response(
-        #         {
-        #             'status' : False,
-        #             'status_code' : 400,
-        #             'status_code_text' : 'check_availability list data',
-        #             'response' : {
-        #                 'message' : 'check_availability convert to list',
-        #                 'error_message' : None,
-        #                 'error': type(data),
-        #             }
-        #         },
-        #         status=status.HTTP_400_BAD_REQUEST
-        #     )    
+      
     tenant = Tenant.objects.filter(is_deleted = False)
     
     empl_list = []
@@ -2923,11 +2907,11 @@ def get_check_availability(request):
                 start_time = check.get('app_time', None)
                 date = check.get('date', None)
                 try:
-                    employe = Employee.objects.get(id = str(emp_id))
+                    employee = Employee.objects.get(id = emp_id)
                     av_staff_ids = AppointmentService.objects.filter(
                     #member__id__in = empl_list,
                     #business = ,
-                    member__id = employe,
+                    member__id = employee,
                     appointment_date = date,
                     appointment_time__lte = start_time, # 1:00
                     end_time__gte = start_time, # 1:40
@@ -3011,3 +2995,51 @@ def get_check_availability(request):
         #             },
         #             status=status.HTTP_200_OK
         #         )
+        
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_employee_appointment(request):
+    date = request.GET.get('date', None)
+    start_time = request.GET.get('start_time', None)
+    tenant = Tenant.objects.filter(is_deleted = False)
+    
+    for ten in tenant:
+        with tenant_context(ten):
+            all_emp = Employee.objects.filter(is_deleted=False).order_by('-created_at')
+            for emp in all_emp:
+                availability = AppointmentService.objects.filter(
+                    #member__id__in = empl_list,
+                    #business = ,
+                    member__id = emp.id,
+                    appointment_date = date,
+                    is_blocked = False,
+                    appointment_time__lte = start_time, # 1:00
+                    end_time__gte = start_time,
+                )
+                if len(availability) >= 0 or len(availability) <= 3 :
+                    serializer = EmployeeBusinessSerializer(emp)
+                    return Response(
+                    {
+                        'status' : True,
+                        'status_code' : 200,
+                        'status_code_text' : '200',
+                        'response' : {
+                            'message' : 'Employees are free',
+                            'error_message' : None,
+                            'employee':serializer.data
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
+        return Response(
+                    {
+                        'status' : True,
+                        'status_code' : 200,
+                        'status_code_text' : '200',
+                        'response' : {
+                            'message' : 'Employees are free',
+                            'error_message' : None,
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )

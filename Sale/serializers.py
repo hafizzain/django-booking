@@ -536,7 +536,6 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentCheckout
         fields = ('__all__')
-        #exclude = ('is_deleted')
         
 
 class BusinessTaxSerializer(serializers.ModelSerializer):
@@ -544,7 +543,12 @@ class BusinessTaxSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = BusinessTax
-        #fields = '__all__'
+        exclude = ('created_at','user')
+class EmployeeBusinessSerializer(serializers.ModelSerializer):
+    parent_tax = ParentBusinessTaxSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = Employee
         exclude = ('created_at','user')
     
 class BusinessAddressSerializer(serializers.ModelSerializer):
