@@ -2892,6 +2892,10 @@ def get_check_availability(request):
     
     check_availability = request.data.get('check_availability', None)
     
+    if type(check_availability) == str:
+        check_availability = json.loads(check_availability)
+    else:
+        pass
     
     tenant = Tenant.objects.filter(is_deleted = False)
     
