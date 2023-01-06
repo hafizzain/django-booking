@@ -1026,7 +1026,7 @@ def create_appointment_client(request):
     
     
     try:
-        tenant = Tenant.objects.filter(id = str(tenant_id))
+        tenant = Tenant.objects.get(id = str(tenant_id))
     except Exception as err:
         return Response(
             {
