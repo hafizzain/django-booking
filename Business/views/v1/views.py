@@ -3076,7 +3076,7 @@ def get_employee_appointment(request):
                     status=status.HTTP_200_OK
                 )
     
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def create_client_business(request):
     tenant_id = request.data.get('hash', None)

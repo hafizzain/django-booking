@@ -61,9 +61,9 @@ class TenantDetail(models.Model):
 
 # class ClientTenantDetail(models.Model):
 #     id = models.UUIDField(default=uuid4, unique=True, primary_key=True, editable=False)
-#     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='tenant_detail')
-#     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='client')
-
+#     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='tenant_client')
+#     client_id = models.CharField(null=True, blank=True, default='', max_length=1000, unique=True)
+    
 #     is_tenant_admin = models.BooleanField(default=False)
 #     is_tenant_staff = models.BooleanField(default=False)
 #     is_tenant_superuser = models.BooleanField(default=False)
