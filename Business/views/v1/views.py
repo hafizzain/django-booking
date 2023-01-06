@@ -2793,7 +2793,6 @@ def get_domain_business_address(request):
     domain_name = request.GET.get('domain', None)
     data = []
     service_group = []
-    service = []
     if domain_name is None:
         return Response(
             {
@@ -3075,5 +3074,3 @@ def create_client(request):
                     },
                     status=status.HTTP_200_OK
                 )
-        
-        

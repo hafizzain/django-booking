@@ -29,6 +29,8 @@ from threading import Thread
 
 from Appointment.models import Appointment, AppointmentService, AppointmentNotes , AppointmentCheckout
 from Appointment.serializers import  CheckoutSerializer, AppoinmentSerializer, ServiceClientSaleSerializer, ServiceEmployeeSerializer,SingleAppointmentSerializer ,BlockSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer
+from Tenants.models import Tenant
+from django_tenants.utils import tenant_context
 from Utility.models import ExceptionRecord
 
 @api_view(['GET'])
@@ -983,5 +985,241 @@ def get_client_sale(request):
                 }
             },
             status=status.HTTP_201_CREATED
+        )
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_appointment_client(request):
+    user = request.user
+    tenant_id = request.data.get('hash', None)
+    business_id = request.data.get('business', None)
+    appointments = request.data.get('appointments', None)
+    appointment_date = request.data.get('appointment_date', None)
+    text = request.data.get('appointment_notes', None)
+
+    client = request.data.get('client', None)
+    client_type = request.data.get('client_type', None)
+    
+    payment_method = request.data.get('payment_method', None)
+    discount_type = request.data.get('discount_type', None)
+    
+    #if tenant_id is None:
+    if not all([tenant_id , client_type, appointment_date, business_id  ]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'hash',
+                        'client_type',
+                        'appointment_date',
+                        'business_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    
+    try:
+        tenant = Tenant.objects.filter(id = tenant_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Invalid Tenant Id',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+        
+    with tenant_context(tenant):
+        try:
+            business=Business.objects.get(id=business_id)
+        except Exception as err:
+            return Response(
+                {
+                        'status' : False,
+                        'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                        'response' : {
+                        'message' : 'Business not found',
+                        'error_message' : str(err),
+                    }
+                }
+        
+            )
+        
+        business_address_id = request.data.get('business_address', None)
+
+        if business_address_id is not None:
+            try:
+                business_address = BusinessAddress.objects.get(id=business_address_id)
+            except Exception as err:
+                return Response(
+                {
+                        'status' : False,
+                        # 'error_message' : str(err),
+                        'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                        'response' : {
+                        'message' : 'Business not found',
+                    }
+                }
+            )
+        try:
+            client = Client.objects.get(id=client)
+        except Exception as err:
+            client = None
+            # return Response(
+            #     {
+            #             'status' : False,
+            #             'status_code' : StatusCodes.INVALID_CLIENT_4032,
+            #             'response' : {
+            #             'message' : 'Client not found',
+            #             'error_message' : str(err),
+            #         }
+            #     }
+            # )
+        
+                
+        appointment = Appointment.objects.create(
+                user = user,
+                business=business,
+                client=client,
+                client_type=client_type,
+                payment_method=payment_method,
+                discount_type=discount_type,
+            )
+        if business_address_id is not None:
+            appointment.business_address = business_address
+            appointment.save()
+        
+        if type(appointments) == str:
+            appointments = json.loads(appointments)
+
+        elif type(appointments) == list:
+            pass
+        
+        if type(text) == str:
+            text = json.loads(text)
+        else:
+            pass
+        if text is not None:
+            for note in text:
+                AppointmentNotes.objects.create(
+                    appointment=appointment,
+                    text = note
+                )
+        
+        all_members = []
+        for appoinmnt in appointments:
+            member = appoinmnt['member']
+            service = appoinmnt['service']
+            app_duration = appoinmnt['duration']
+            price = appoinmnt['price']
+            date_time = appoinmnt['date_time']
+            fav = appoinmnt.get('favourite', None)
+            
+            voucher_id = appoinmnt.get('voucher', None)
+            reward_id = appoinmnt.get('reward', None)
+            membership_id = appoinmnt.get('membership', None)
+            promotion_id = appoinmnt.get('promotion', None)
+            # tip = appoinmnt['tip']
+            
+            app_date_time = f'2000-01-01 {date_time}'
+            
+            duration = DURATION_CHOICES[app_duration]
+            app_date_time = datetime.fromisoformat(app_date_time)
+            datetime_duration = app_date_time + timedelta(minutes=duration)
+            datetime_duration = datetime_duration.strftime('%H:%M:%S')
+            end_time = datetime_duration
+                
+            try:
+                member=Employee.objects.get(id=member)
+                all_members.append(str(member.id))
+            except Exception as err:
+                return Response(
+                {
+                        'status' : False,
+                        'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
+                        'response' : {
+                        'message' : 'Employee not found',
+                        'error_message' : str(err),
+                    }
+                }
+            )
+            try:
+                service=Service.objects.get(id=service)
+            except Exception as err:
+                return Response(
+                {
+                        'status' : False,
+                        'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
+                        'response' : {
+                        'message' : 'Service not found',
+                        'error_message' : str(err),
+                    }
+                }
+            )
+                
+            appointment_service = AppointmentService.objects.create(
+                user = user,
+                business = business,
+                appointment = appointment,
+                duration=app_duration,
+                appointment_time=date_time,
+                appointment_date = appointment_date,
+                end_time = end_time,
+                service = service,
+                member = member,
+                price = price,
+                # voucher = voucher,
+                # reward = reward,
+                # membership = membership,
+                # promotion = promotion
+                # tip=tip,
+            )
+            if fav is not None:
+                appointment_service.is_favourite = True
+                appointment_service.save()
+                
+            if business_address_id is not None:
+                appointment_service.business_address = business_address
+                appointment_service.save()
+        serialized = AppoinmentSerializer(appointment)
+        
+        try:
+            thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
+            thrd.start()
+        except Exception as err:
+            ExceptionRecord.objects.create(
+                text=str(err)
+            )
+        
+        all_memebers= Employee.objects.filter(
+            is_deleted = False,
+            is_active = True,
+            is_blocked = False,
+        ).order_by('-created_at')
+        serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request' : request})
+
+        return Response(
+                {
+                    'status' : True,
+                    'status_code' : 201,
+                    'response' : {
+                        'message' : 'Appointment Create!',
+                        'error_message' : None,
+                        'appointments' : serialized.data,
+                    }
+                },
+                status=status.HTTP_201_CREATED
         )
 
