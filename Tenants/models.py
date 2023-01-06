@@ -64,9 +64,8 @@ class TenantDetail(models.Model):
 #     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='tenant_client')
 #     client_id = models.CharField(null=True, blank=True, default='', max_length=1000, unique=True)
     
-#     is_tenant_admin = models.BooleanField(default=False)
+#     is_appointment = models.BooleanField(default=False)
 #     is_tenant_staff = models.BooleanField(default=False)
-#     is_tenant_superuser = models.BooleanField(default=False)
 #     created_at = models.DateTimeField(auto_now_add=now)
 
 #     def __str__(self):

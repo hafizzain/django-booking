@@ -3120,7 +3120,12 @@ def create_client_business(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    
+    user = User.objects.create(
         
+    )
+    
+    
     with tenant_context(tenant):
        
         try:
@@ -3141,6 +3146,7 @@ def create_client_business(request):
         try:
             client = Client.objects.get(mobile_number__icontains = number )
         except Exception as err:
+            client = 0
             pass
         if len(client) > 0:
             data.append(f'Client Phone number already exist {client.full_name}')
