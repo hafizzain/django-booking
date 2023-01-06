@@ -3146,7 +3146,7 @@ def create_client_business(request):
         try:
             client = Client.objects.get(mobile_number__icontains = number )
         except Exception as err:
-            client = 0
+            client = ''
             pass
         if len(client) > 0:
             data.append(f'Client Phone number already exist {client.full_name}')
