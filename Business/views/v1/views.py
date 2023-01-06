@@ -2964,38 +2964,71 @@ def get_check_availability(request):
 def get_employee_appointment(request):
     date = request.GET.get('date', None)
     start_time = request.GET.get('start_time', None)
-    tenant = Tenant.objects.filter(is_deleted = False)
+    tenant_id = request.GET.get('hash', None)
+    
+    if tenant_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'hash',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        tenant = Tenant.objects.get(id = str(tenant_id))
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Invalid Tenant Id',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
     data = []
     
-    for ten in tenant:
-        with tenant_context(ten):
-            all_emp = Employee.objects.filter(is_deleted=False).order_by('-created_at')
-            for emp in all_emp:
-                availability = AppointmentService.objects.filter(
-                    #member__id__in = empl_list,
-                    #business = ,
-                    member__id = emp.id,
-                    appointment_date = date,
-                    is_blocked = False,
-                    appointment_time__lte = start_time, # 1:00
-                    end_time__gte = start_time,
-                )
-                if len(availability) >= 0 or len(availability) <= 3 :
-                    data.append(f'the employe id {emp.id}')
-                    serializer = EmployeeBusinessSerializer(emp)
-                    return Response(
-                    {
-                        'status' : True,
-                        'status_code' : 200,
-                        'status_code_text' : '200',
-                        'response' : {
-                            'message' : 'Employees are free',
-                            'error_message' : None,
-                            'employee':serializer.data
-                        }
-                    },
-                    status=status.HTTP_200_OK
-                )
+    with tenant_context(tenant):
+        all_emp = Employee.objects.filter(is_deleted=False).order_by('-created_at')
+        for emp in all_emp:
+            availability = AppointmentService.objects.filter(
+                #member__id__in = empl_list,
+                #business = ,
+                member__id = emp.id,
+                appointment_date = date,
+                is_blocked = False,
+                appointment_time__lte = start_time, # 1:00
+                end_time__gte = start_time,
+            )
+            if len(availability) >= 0 or len(availability) <= 3 :
+                data.append(f'the employe id {emp.id}')
+                serializer = EmployeeBusinessSerializer(emp)
+                return Response(
+                {
+                    'status' : True,
+                    'status_code' : 200,
+                    'status_code_text' : '200',
+                    'response' : {
+                        'message' : 'Employees are free',
+                        'error_message' : None,
+                        'employee':serializer.data
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
     return Response(
                     {
                         'status' : True,

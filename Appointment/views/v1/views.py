@@ -1142,7 +1142,7 @@ def create_appointment_client(request):
             end_time = datetime_duration
                 
             try:
-                member=Employee.objects.get(id=member)
+                member=Employee.objects.get(id=str(member))
                 all_members.append(str(member.id))
             except Exception as err:
                 return Response(
