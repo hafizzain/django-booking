@@ -298,10 +298,10 @@ def get_business_by_domain(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-    try:
-        tenant = Tenant.objects.get(domain__icontains = domain_name )
-    except Exception as err:
-        pass
+    # try:
+    #     tenant = Tenant.objects.get(domain__icontains = domain_name )
+    # except Exception as err:
+    #     pass
         
     
     return Response(
