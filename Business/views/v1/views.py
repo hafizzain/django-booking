@@ -2895,55 +2895,87 @@ def get_domain_business_address(request):
 def get_check_availability(request):  
                       
     check_availability = request.data.get('check_availability', None)
+    tenant_id = request.data.get('hash', None)
+    
+    if tenant_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'hash',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    
+    try:
+        tenant = Tenant.objects.filter(id = tenant_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Invalid Tenat Id',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
     
     if type(check_availability) == str:
         check_availability = json.loads(check_availability)
     else:
         pass
-      
-    tenant = Tenant.objects.filter(is_deleted = False)
-        
+              
     data = []
-    for ten in tenant:
-        with tenant_context(ten):
-            for check in check_availability:
-                emp_id = check.get('member_id', None)
-                duration = check.get('duration', None)
-                start_time = check.get('app_time', None)
-                date = check.get('date', None)
+    with tenant_context(tenant):
+        for check in check_availability:
+            emp_id = check.get('member_id', None)
+            duration = check.get('duration', None)
+            start_time = check.get('app_time', None)
+            date = check.get('date', None)
+            
+            dt = datetime.strptime(start_time, "%H:%M:%S")
+            start_time = dt.time()
+            
+            date = datetime(date)
+            
+            try:
+                employee = Employee.objects.get(id = emp_id)
+                data.append(f'the employe id {employee}, start_time {start_time}, {date}')
                 
-                dt = datetime.strptime(start_time, "%H:%M:%S")
-                start_time = dt.time()
-                
-                date = datetime(date)
-                
-                try:
-                    employee = Employee.objects.get(id = emp_id)
-                    data.append(f'the employe id {employee}, start_time {start_time}, {date}')
+                av_staff_ids = AppointmentService.objects.filter(
                     
-                    av_staff_ids = AppointmentService.objects.filter(
-                        
-                        member__id = employee.id,
-                        appointment_date = date,
-                        appointment_time__gte = start_time, # 1:00
-                        end_time__lte = start_time, # 1:40
-                        member__employee_employedailyschedule__date = date,
-                        member__employee_employedailyschedule__start_time__lte = start_time,
-                        member__employee_employedailyschedule__end_time__gte = start_time,
-                        is_blocked = False,
-                        
-                    ).values_list('member__id', flat=True)
+                    member__id = employee.id,
+                    appointment_date = date,
+                    appointment_time__gte = start_time, # 1:00
+                    end_time__lte = start_time, # 1:40
+                    member__employee_employedailyschedule__date = date,
+                    member__employee_employedailyschedule__start_time__lte = start_time,
+                    member__employee_employedailyschedule__end_time__gte = start_time,
+                    is_blocked = False,
                     
-                    if len(av_staff_ids) > 0 :
-                        for av_staff in av_staff_ids:
-                            av_staff.appointment_time
-                        data.append(f'Employe already busy {employee.id}')
-                    else:
-                        data.append(f'Employees are free, you can proceed further employee id: {employee.id}')
-                    #data.append(av_staff_ids)
-                except Exception as err:
-                    #data.append(str(err))
-                    pass
+                ).values_list('member__id', flat=True)
+                
+                if len(av_staff_ids) > 0 :
+                    for av_staff in av_staff_ids:
+                        av_staff.appointment_time
+                    data.append(f'Employe already busy {employee.id}')
+                else:
+                    data.append(f'Employees are free, you can proceed further employee id: {employee.id}')
+                #data.append(av_staff_ids)
+            except Exception as err:
+                #data.append(str(err))
+                pass
                     
     return Response(
             {
