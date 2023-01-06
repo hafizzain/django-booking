@@ -117,7 +117,7 @@ class UserTenantLoginSerializer(serializers.ModelSerializer):
             )
             return tenant.id
         except Exception as err:
-            return None
+            return str(err)
     class Meta:
         model = User
         fields = ['id', 'username', 'first_name', 'last_name', 'email', 'domain', 'is_tenant', 'access_token','joined_at','tenant_id']
