@@ -64,7 +64,5 @@ urlpatterns = [
     path('get_domain_business_address/', views.get_domain_business_address),
     path('get_check_availability/', views.get_check_availability),
     path('get_employee_appointment/', views.get_employee_appointment),
-    path('create_client/', views.create_client),
-
-    
+    path('create_client_business/', views.create_client_business),
 ]

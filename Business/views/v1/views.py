@@ -3078,11 +3078,13 @@ def get_employee_appointment(request):
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def create_client(request):
+def create_client_business(request):
     tenant_id = request.GET.get('hash', None)
-    name = request.data.get('name', None)
+    name = request.data.get('full_name', None)
     email = request.data.get('email', None)
     number = request.data.get('number', None)
+    
+    business_id= request.data.get('business', None)
     
     data = []
     
@@ -3122,15 +3124,45 @@ def create_client(request):
     with tenant_context(tenant):
         try:
             client = Client.objects.get(mobile_number__icontains = number )
-        except:
-            pass
+        except Exception as err:
+           return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Employee Already Exist',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+        try:
+            business=Business.objects.get(id=business_id)
+        except Exception as err:
+            return Response(
+            {
+                'status' : True,
+                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                'status_code_text' :'BUSINESS_NOT_FOUND_4015' ,
+                'response' : {
+                    'message' : 'Business not found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
         if len(client) > 0:
             data.append(f'Client Phone number already exist {client.full_name}')
         else:
             client  = Client.objects.create(
                 user = tenant.user,
-                
+                business = business,
+                full_name = name,
+                mobile_number=number,
+                email = email,
             )
+            data.append(f'Client Created Successfully {client.full_name}')
         
     return Response(
         {
@@ -3140,7 +3172,7 @@ def create_client(request):
             'response' : {
                 'message' : 'Employees are free',
                 'error_message' : None,
-                'employee': 'data'
+                'employee': data,
             }
         },
         status=status.HTTP_200_OK
