@@ -3079,7 +3079,7 @@ def get_employee_appointment(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def create_client_business(request):
-    tenant_id = request.GET.get('hash', None)
+    tenant_id = request.data.get('hash', None)
     name = request.data.get('full_name', None)
     email = request.data.get('email', None)
     number = request.data.get('number', None)
