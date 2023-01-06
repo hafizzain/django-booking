@@ -268,6 +268,11 @@ def get_business_by_domain(request):
     try:
         domain_name = f'{domain_name}.{settings.BACKEND_DOMAIN_NAME}'
         domain = None
+        try :
+           tenant_id = Tenant.objects.get(domain = domain_name )
+           id = tenant_id.id
+        except Exception as err:
+            pass
         with tenant_context(Tenant.objects.get(schema_name = 'public')):
             domain = Domain.objects.get(domain=domain_name)
 
@@ -310,7 +315,7 @@ def get_business_by_domain(request):
                     'business' : {
                         'id' : str(user_business.id),
                         'business_name' : str(user_business.business_name),
-                        'tennat_id' : str(user_business.business_name),
+                        'tenant_id' : str(id),
                         # 'logo' : user_business.logo if user_business.logo else None ,
                     }
                 }
