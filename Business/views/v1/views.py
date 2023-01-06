@@ -3122,21 +3122,7 @@ def create_client_business(request):
         )
         
     with tenant_context(tenant):
-        try:
-            client = Client.objects.get(mobile_number = number )
-        except Exception as err:
-           return Response(
-            {
-                'status' : False,
-                'status_code' : 400,
-                'status_code_text' : 'Invalid Data',
-                'response' : {
-                    'message' : 'Employee Already Exist',
-                    'error_message' : str(err),
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
+       
         try:
             business=Business.objects.get(id=business_id)
         except Exception as err:
@@ -3152,6 +3138,10 @@ def create_client_business(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+        try:
+            client = Client.objects.get(mobile_number__icontains = number )
+        except Exception as err:
+            pass
         if len(client) > 0:
             data.append(f'Client Phone number already exist {client.full_name}')
         else:
