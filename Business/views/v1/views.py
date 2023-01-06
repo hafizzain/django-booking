@@ -2947,7 +2947,8 @@ def get_check_availability(request):
             dt = datetime.strptime(start_time, "%H:%M:%S")
             start_time = dt.time()
             
-            date = datetime(date)
+            dt = datetime.strptime(date, "%Y-%m-%d")
+            date = dt.date()
             
             try:
                 employee = Employee.objects.get(id = emp_id)
@@ -3128,6 +3129,7 @@ def create_client(request):
             data.append(f'Client Phone number already exist {client.full_name}')
         else:
             client  = Client.objects.create(
+                user = tenant.user,
                 
             )
         
