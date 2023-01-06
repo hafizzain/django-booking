@@ -2958,8 +2958,8 @@ def get_check_availability(request):
                     
                     member__id = employee.id,
                     appointment_date = date,
-                    appointment_time__gte = start_time, # 1:00
-                    end_time__lte = start_time, # 1:40
+                    # appointment_time__gte = start_time, # 1:00
+                    # end_time__lte = start_time, # 1:40
                     member__employee_employedailyschedule__date = date,
                     member__employee_employedailyschedule__start_time__lte = start_time,
                     member__employee_employedailyschedule__end_time__gte = start_time,
@@ -3102,8 +3102,7 @@ def create_client(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    
-    
+        
     try:
         tenant = Tenant.objects.get(id = tenant_id)
     except Exception as err:
