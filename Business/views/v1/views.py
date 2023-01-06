@@ -3123,7 +3123,7 @@ def create_client_business(request):
         
     with tenant_context(tenant):
         try:
-            client = Client.objects.get(mobile_number__icontains = number )
+            client = Client.objects.get(mobile_number = number )
         except Exception as err:
            return Response(
             {
