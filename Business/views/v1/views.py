@@ -3121,9 +3121,9 @@ def create_client_business(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    user = User.objects.create(
+    # user = User.objects.create(
         
-    )
+    # )
     
     
     with tenant_context(tenant):
