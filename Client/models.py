@@ -34,7 +34,7 @@ class Client(models.Model):
         ('Friends' , 'Friends'),
     ]
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='client')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='client' , null=True, blank=True)
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_client')
     
     #business_addess = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE,  null=True, blank=True,  related_name='business_addess_client')

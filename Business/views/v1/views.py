@@ -3152,7 +3152,7 @@ def create_client_business(request):
             data.append(f'Client Phone number already exist {client.full_name}')
         else:
             client  = Client.objects.create(
-                user = tenant.user,
+                #user = tenant.user,
                 business = business,
                 full_name = name,
                 mobile_number=number,
