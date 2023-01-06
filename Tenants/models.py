@@ -59,8 +59,9 @@ class TenantDetail(models.Model):
     def __str__(self):
         return str(self.id)
 
-# class ClientTenantDetail(models.Model):
+# class ClientTenantAppDetail(models.Model):
 #     id = models.UUIDField(default=uuid4, unique=True, primary_key=True, editable=False)
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tenant_detail_client')
 #     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='tenant_client')
 #     client_id = models.CharField(null=True, blank=True, default='', max_length=1000, unique=True)
     

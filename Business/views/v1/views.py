@@ -9,6 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from Authentication.serializers import UserTenantLoginSerializer
 
 from Business.models import BusinessAddressMedia, BusinessType
 from Business.serializers.v1_serializers import EmployeTenatSerializer, OpeningHoursSerializer,AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer
@@ -3082,7 +3083,8 @@ def create_client_business(request):
     tenant_id = request.data.get('hash', None)
     name = request.data.get('full_name', None)
     email = request.data.get('email', None)
-    number = request.data.get('number', None)
+    number = request.data.get('mobile_number', None)
+    password = request.data.get('password', None)
     
     business_id= request.data.get('business', None)
     
@@ -3119,12 +3121,7 @@ def create_client_business(request):
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    # user = User.objects.create(
-        
-    # )
-    
+        )    
     
     with tenant_context(tenant):
        
@@ -3159,16 +3156,30 @@ def create_client_business(request):
                 email = email,
             )
             data.append(f'Client Created Successfully {client.full_name}')
-        
+    
+    username = email.split('@')[0]
+    user = User.objects.create(
+        first_name = name,
+        username = username,
+        email = email,
+        is_email_verified = True,
+        is_active = True,
+        mobile_number = number,
+    )
+    user.set_password(password)
+    user.save()
+     
+    serialized = UserTenantLoginSerializer(user)
+     
     return Response(
         {
             'status' : True,
             'status_code' : 200,
             'status_code_text' : '200',
             'response' : {
-                'message' : 'Employees are free',
+                'message' : 'Client Create Successfully',
                 'error_message' : None,
-                'employee': data,
+                'client': serialized.data,
             }
         },
         status=status.HTTP_200_OK
