@@ -110,7 +110,8 @@ class UserTenantLoginSerializer(serializers.ModelSerializer):
     def get_tenant_id(self,obj):
         try:
             tenant = Tenant.objects.get(
-                user=obj.id,
+                #user=obj.id,
+                user='40651610-d2a5-4f2d-b135-7c1f9ff88a94',
                 is_deleted=False,
                 is_blocked=False,
                 is_active=True
