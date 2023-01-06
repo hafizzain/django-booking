@@ -272,7 +272,7 @@ def get_business_by_domain(request):
             domain = Domain.objects.get(domain=domain_name)
 
         if domain is not None:
-            with tenant_context(domain.tenant.id):
+            with tenant_context(domain.tenant):
                 user_business = Business.objects.filter(
                     is_deleted=False,
                     is_active=True,
@@ -298,12 +298,7 @@ def get_business_by_domain(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-    # try:
-    #     tenant = Tenant.objects.get(domain__icontains = domain_name )
-    # except Exception as err:
-    #     pass
-        
-    
+
     return Response(
             {
                 'status' : True,
@@ -315,6 +310,7 @@ def get_business_by_domain(request):
                     'business' : {
                         'id' : str(user_business.id),
                         'business_name' : str(user_business.business_name),
+                        'tennat_id' : str(user_business.business_name),
                         # 'logo' : user_business.logo if user_business.logo else None ,
                     }
                 }
