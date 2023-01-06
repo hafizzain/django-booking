@@ -2916,7 +2916,7 @@ def get_check_availability(request):
     
     
     try:
-        tenant = Tenant.objects.filter(id = tenant_id)
+        tenant = Tenant.objects.get(id = tenant_id)
     except Exception as err:
         return Response(
             {
@@ -3104,7 +3104,7 @@ def create_client(request):
     
     
     try:
-        tenant = Tenant.objects.filter(id = tenant_id)
+        tenant = Tenant.objects.get(id = tenant_id)
     except Exception as err:
         return Response(
             {
