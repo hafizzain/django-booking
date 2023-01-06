@@ -3018,6 +3018,7 @@ def create_client(request):
     email = request.data.get('email', None)
     number = request.data.get('number', None)
     
+    data = []
     
     if tenant_id is None:
         return Response(
@@ -3059,18 +3060,23 @@ def create_client(request):
         except:
             pass
         if len(client) > 0:
-            pass
+            data.append(f'Client Phone number already exist {client.full_name}')
+        else:
+            client  = Client.objects.create(
+                
+            )
         
     return Response(
-                    {
-                        'status' : True,
-                        'status_code' : 200,
-                        'status_code_text' : '200',
-                        'response' : {
-                            'message' : 'Employees are free',
-                            'error_message' : None,
-                            'employee': 'data'
-                        }
-                    },
-                    status=status.HTTP_200_OK
-                )
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Employees are free',
+                'error_message' : None,
+                'employee': 'data'
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    

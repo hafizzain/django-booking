@@ -988,9 +988,9 @@ def get_client_sale(request):
         )
     
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def create_appointment_client(request):
-    user = request.user
+    #user = request.user
     tenant_id = request.data.get('hash', None)
     business_id = request.data.get('business', None)
     appointments = request.data.get('appointments', None)
@@ -1040,7 +1040,7 @@ def create_appointment_client(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-        
+    
     with tenant_context(tenant):
         try:
             business=Business.objects.get(id=business_id)
@@ -1090,7 +1090,7 @@ def create_appointment_client(request):
         
                 
         appointment = Appointment.objects.create(
-                user = user,
+                user = business.user,
                 business=business,
                 client=client,
                 client_type=client_type,
@@ -1170,7 +1170,7 @@ def create_appointment_client(request):
             )
                 
             appointment_service = AppointmentService.objects.create(
-                user = user,
+                user = business.user,
                 business = business,
                 appointment = appointment,
                 duration=app_duration,
