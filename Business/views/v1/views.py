@@ -12,6 +12,7 @@ from rest_framework import status
 
 from Business.models import BusinessAddressMedia, BusinessType
 from Business.serializers.v1_serializers import EmployeTenatSerializer, OpeningHoursSerializer,AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer
+from Client.models import Client
 from Employee.models import Employee
 
 from NStyle.Constants import StatusCodes
@@ -2896,9 +2897,7 @@ def get_check_availability(request):
         pass
       
     tenant = Tenant.objects.filter(is_deleted = False)
-    
-    empl_list = []
-    
+        
     data = []
     for ten in tenant:
         with tenant_context(ten):
@@ -2916,109 +2915,44 @@ def get_check_availability(request):
                 try:
                     employee = Employee.objects.get(id = emp_id)
                     data.append(f'the employe id {employee}, start_time {start_time}, {date}')
+                    
                     av_staff_ids = AppointmentService.objects.filter(
-                        #member__id__in = empl_list,
-                        #business = ,
+                        
                         member__id = employee.id,
                         appointment_date = date,
-                        # appointment_time__lte = start_time, # 1:00
-                        # end_time__gte = start_time, # 1:40
-                        # member__employee_employedailyschedule__date = date,
-                        # member__employee_employedailyschedule__start_time__lte = start_time,
-                        # member__employee_employedailyschedule__end_time__gte = start_time,
-                        # is_blocked = False,
+                        appointment_time__gte = start_time, # 1:00
+                        end_time__lte = start_time, # 1:40
+                        member__employee_employedailyschedule__date = date,
+                        member__employee_employedailyschedule__start_time__lte = start_time,
+                        member__employee_employedailyschedule__end_time__gte = start_time,
+                        is_blocked = False,
+                        
                     ).values_list('member__id', flat=True)
+                    
                     if len(av_staff_ids) > 0 :
+                        for av_staff in av_staff_ids:
+                            av_staff.appointment_time
                         data.append(f'Employe already busy {employee.id}')
                     else:
-                        data.append(f'Employe are free {employee.id}')
+                        data.append(f'Employees are free, you can proceed further employee id: {employee.id}')
                     #data.append(av_staff_ids)
                 except Exception as err:
                     #data.append(str(err))
                     pass
-                    # return Response(
-                    #         {
-                    #             'status' : False,
-                    #             'status_code' : 400,
-                    #             'status_code_text' : 'Employee Id Invalid Data',
-                    #             'response' : {
-                    #                 'message' : 'Something went wrong',
-                    #                 'error_message' : str(err),
-                    #                 'employee' : emp_id,
-                    #             }
-                    #         },
-                    #         status=status.HTTP_400_BAD_REQUEST
-                    #     )
-                # try:
-                #     business = Business.objects.get(id = str(employe_id) )
-                # except Exception as err:
-                #     #return f'{str(err)}employe'
-                #     pass
-                
-    
-            # if len(av_staff_ids) > 0 :
-            #     # result => 1
-            #     print(av_staff_ids)
-            #     print('this staff is not available')
-            #     data.append(av_staff_ids)
-            #     return Response(
-            #         {
-            #             'status' : True,
-            #             'status_code' : 200,
-            #             'status_code_text' : '200',
-            #             'response' : {
-            #                 'message' : 'Check Availability of Employees',
-            #                 'error_message' : None,
-            #                 'employee':data
-            #             }
-            #         },
-            #         status=status.HTTP_200_OK
-            #     )
-                #return False
-    # if len(av_staff_ids) > 0 :
-    #     return Response(
-    #                 {
-    #                     'status' : True,
-    #                     'status_code' : 200,
-    #                     'status_code_text' : '200',
-    #                     'response' : {
-    #                         'message' : 'Check Availability not Employees',
-    #                         'error_message' : None,
-    #                     }
-    #                 },
-    #                 status=status.HTTP_200_OK
-    #     )
-    # else:     
+                    
     return Response(
             {
                 'status' : True,
                 'status_code' : 200,
                 'status_code_text' : '200',
                 'response' : {
-                    'message' : 'Employees are free, you can proceed further',
+                    'message' : 'Employees Check Availability',
                     'error_message' : None,
                     'employee':data
                 }
             },
             status=status.HTTP_200_OK
         )
-                
-                # if employe != '':
-                #     serialized = EmployeTenatSerializer(employe, context={'request' : request, 
-                #                                     'start_time' : start_time, 'date' : date} )
-                        
-        # return Response(
-        #             {
-        #                 'status' : True,
-        #                 'status_code' : 200,
-        #                 'status_code_text' : '200',
-        #                 'response' : {
-        #                     'message' : 'Employee All Schedule',
-        #                     'error_message' : None,
-        #                 }
-        #             },
-        #             status=status.HTTP_200_OK
-        #         )
         
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -3070,3 +3004,70 @@ def get_employee_appointment(request):
                     },
                     status=status.HTTP_200_OK
                 )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def create_client(request):
+    tenant_id = request.GET.get('hash', None)
+    name = request.data.get('name', None)
+    email = request.data.get('email', None)
+    number = request.data.get('number', None)
+    
+    
+    if tenant_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'hash',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    
+    try:
+        tenant = Tenant.objects.filter(id = tenant_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Invalid Tenat Id',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+        
+    with tenant_context(tenant):
+        try:
+            client = Client.objects.get(mobile_number__icontains = number )
+        except:
+            pass
+        if len(client) > 0:
+            pass
+        
+    return Response(
+                    {
+                        'status' : True,
+                        'status_code' : 200,
+                        'status_code_text' : '200',
+                        'response' : {
+                            'message' : 'Employees are free',
+                            'error_message' : None,
+                            'employee': 'data'
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
+        
+        

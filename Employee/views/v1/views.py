@@ -740,8 +740,10 @@ def create_employee(request):
     elif type(working_days) == list:
             pass
     now = datetime.now()
+    today = now.date()
     
     for i, day in enumerate(working_days):
+        
         if i == 0:
             date = now + timedelta(days=i)
         else:
