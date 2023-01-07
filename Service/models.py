@@ -7,6 +7,7 @@ from django.utils.timezone import now
 from Authentication.models import User
 from Business.models import Business, BusinessAddress
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
+from Utility.models import Currency
 
 class Service(models.Model):
     SERVICE_CHOICE = [
@@ -128,6 +129,7 @@ class PriceService(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='service_priceservice')
+    currency = models.ForeignKey(Currency, on_delete=models.SET_NULL, null=True, blank=True, related_name='priceservice_currency')
 
     duration = models.CharField(max_length=50, null=True, blank=True, choices=DURATION_CHOICES )
     price = models.PositiveIntegerField(default=0)

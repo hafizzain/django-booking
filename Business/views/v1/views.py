@@ -3168,7 +3168,7 @@ def create_client_business(request):
     )
     user.set_password(password)
     user.save()
-     
+            
     serialized = UserTenantLoginSerializer(user)
      
     return Response(

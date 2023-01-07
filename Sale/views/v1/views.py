@@ -11,7 +11,7 @@ from Client.models import Client, Membership, Vouchers
 from Order.models import Checkout, MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
 from Sale.Constants.Custom_pag import CustomPagination
 from Utility.Constants.Data.months import MONTHS
-from Utility.models import Country, ExceptionRecord, State, City
+from Utility.models import Country, Currency, ExceptionRecord, State, City
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
@@ -245,9 +245,16 @@ def create_service(request):
             try:
                 duration = ser['duration']
                 price = ser['price']
+                currency = ser['currency']
+                
+                try:
+                    currency_id = Currency.objects.get(id = currency)                   )
+                except Exception as err:
+                    pass
                 
                 price_service = PriceService.objects.create(
                     service = service_obj ,
+                    currency = currency_id,
                     duration = duration,
                     price = price,
                 )
@@ -366,9 +373,6 @@ def update_service(request):
         )
         
     error = []
-    
-    
-    
     if location is not None:
         if type(location) == str:
             location = json.loads(location)
@@ -396,14 +400,10 @@ def update_service(request):
                 error.append(str(err))
     
     if employeeslist is not None:
-        
         if type(employeeslist) == str:
             employeeslist = json.loads(employeeslist)
         elif type(employeeslist) == list:
             pass
-        
-        print(type(employeeslist))
-       # service_id.employee.clear()
         all_pending_services = EmployeeSelectedService.objects.filter(service=service_id).exclude(employee__in=employeeslist)
         for empl_service in all_pending_services:
             empl_service.delete()
@@ -419,7 +419,6 @@ def update_service(request):
                 #service_id.employee.add(employe)
             except Exception as err:
                 error.append(str(err))
-    #service_id.save()
     try:
         print(staffgroup_id)
         all_prev_ser_grops = ServiceGroup.objects.filter(services=service_id)
@@ -434,6 +433,7 @@ def update_service(request):
     except Exception as err:
         error.append(str(err)) 
     
+    
     if priceservice is not None:
         if type(priceservice) == str:
             priceservice = priceservice.replace("'" , '"')
@@ -442,9 +442,14 @@ def update_service(request):
             pass
         for ser in priceservice:
             s_service_id = ser.get('id', None)
-            #service_id_price = ser.get('service', None)
             duration = ser.get('duration', None)
             price = ser.get('price', None)
+            currency = ser.get('currency', None)
+            try:
+                currency_id = Currency.objects.get(id = currency)
+            except Exception as err:
+                pass
+                
             if s_service_id is not None:
                 try: 
                     price_service = PriceService.objects.get(id=ser['id'])
@@ -456,6 +461,7 @@ def update_service(request):
                     price_service.service = servic
                     price_service.duration = ser['duration']
                     price_service.price = ser['price']
+                    price_service.currency = currency_id
                     price_service.save()
                     
                 except Exception as err:
@@ -467,7 +473,8 @@ def update_service(request):
                 PriceService.objects.create(
                     service=ser,
                     duration = duration,
-                    price=price
+                    price=price,
+                    currency = currency_id
                 )
 
     serializer= ServiceSerializer(service_id, context={'request' : request} , data=request.data, partial=True)
