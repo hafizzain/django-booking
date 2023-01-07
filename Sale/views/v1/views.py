@@ -248,7 +248,7 @@ def create_service(request):
                 currency = ser['currency']
                 
                 try:
-                    currency_id = Currency.objects.get(id = currency)                   )
+                    currency_id = Currency.objects.get(id = currency)
                 except Exception as err:
                     pass
                 
