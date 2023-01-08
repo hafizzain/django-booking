@@ -56,6 +56,8 @@ NSTYLE_APPS = [
     'Dashboard.apps.DashboardConfig',
     'CRM.apps.CrmConfig',
     'TragetControl.apps.TragetcontrolConfig',
+    'Customer.apps.CustomerConfig',
+    'Promotions.apps.PromotionsConfig',
 ]
 
 
