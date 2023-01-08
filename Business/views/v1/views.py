@@ -3156,18 +3156,30 @@ def create_client_business(request):
                 email = email,
             )
             data.append(f'Client Created Successfully {client.full_name}')
-    
-    username = email.split('@')[0]
-    user = User.objects.create(
-        first_name = name,
-        username = username,
-        email = email,
-        is_email_verified = True,
-        is_active = True,
-        mobile_number = number,
-    )
-    user.set_password(password)
-    user.save()
+    try:
+        username = email.split('@')[0]
+        user = User.objects.create(
+            first_name = name,
+            username = username,
+            email = email,
+            is_email_verified = True,
+            is_active = True,
+            mobile_number = number,
+        )
+        user.set_password(password)
+        user.save()
+    except Exception as err:
+        return Response(
+            {
+                'status' : True,
+                'status_code_text' :'BUSINESS_NOT_FOUND_4015' ,
+                'response' : {
+                    'message' : 'User not found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
             
     serialized = UserTenantLoginSerializer(user)
      
