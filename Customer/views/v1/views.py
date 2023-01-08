@@ -226,13 +226,6 @@ def customer_verify_otp(request):
         else:
             otp = None
             raise Exception('Verification OTP not found')
-        
-        # try:
-        #     thrd = Thread(target=verify_tenant_email_mobile, args=[], kwargs={'prev_tenant_name': 'public', 'user' : otp.user ,'verify': code_for})
-        #     thrd.start()
-        # except Exception as err:
-        #     print('ERROR Threading : ', err)
-        #     pass
     except Exception as err:
         print(err)
         return Response(
@@ -262,7 +255,11 @@ def customer_verify_otp(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    
+    try:
+        token = Token.objects.get(user=user)
+    except Token.DoesNotExist:
+        token = Token.objects.create(user=user)
+        
     s_data = dict()
     if change_password is None:
         user = otp.user
