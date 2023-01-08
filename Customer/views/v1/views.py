@@ -119,7 +119,7 @@ def create_client_business(request):
         try:
             OTP.generate_user_otp(user=user, code_for='Email')
         except Exception as error:
-            ExceptionRecord.objects.create(text=f'error from create Customer Employee \n{str(error)}')
+            ExceptionRecord.objects.create(text=f'Error from create Customer User \n{str(error)}')
         user.set_password(password)
         user.save()
     except Exception as err:
@@ -135,7 +135,7 @@ def create_client_business(request):
             status=status.HTTP_404_NOT_FOUND
         )
             
-    serialized = UserTenantLoginSerializer(user)
+    #serialized = UserTenantLoginSerializer(user)
      
     return Response(
         {
@@ -143,9 +143,9 @@ def create_client_business(request):
             'status_code' : 200,
             'status_code_text' : '200',
             'response' : {
-                'message' : 'Client Create Successfully',
+                'message' : 'End OTP to User email Please verify!',
                 'error_message' : None,
-                'client': serialized.data,
+                #'client': serialized.data,
             }
         },
         status=status.HTTP_200_OK
