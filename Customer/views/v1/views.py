@@ -256,9 +256,9 @@ def customer_verify_otp(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     try:
-        token = Token.objects.get(user=user)
+        token = Token.objects.get(user=otp.user)
     except Token.DoesNotExist:
-        token = Token.objects.create(user=user)
+        token = Token.objects.create(user=otp.user)
         
     s_data = dict()
     if change_password is None:
