@@ -158,7 +158,7 @@ def create_client_business(request):
     
 @api_view(['POST'])
 @permission_classes([AllowAny])
-def verify_otp(request):
+def customer_verify_otp(request):
     code = request.data.get('code', None)
     code_for = request.data.get('code_for', None)
     email = request.data.get('email', None)
