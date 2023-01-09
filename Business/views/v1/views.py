@@ -2791,7 +2791,7 @@ def search_business_vendor(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_domain_business_address(request):   
-    tenant_id = request.data.get('hash', None)
+    tenant_id = request.GET.get('hash', None)
     data = []
     service_group = []
     
