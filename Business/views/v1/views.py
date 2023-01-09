@@ -2790,11 +2790,12 @@ def search_business_vendor(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_domain_business_address(request):                    
-    domain_name = request.GET.get('domain', None)
+def get_domain_business_address(request):   
+    tenant_id = request.data.get('hash', None)
     data = []
     service_group = []
-    if domain_name is None:
+    
+    if tenant_id is None:
         return Response(
             {
                 'status' : False,
@@ -2802,78 +2803,114 @@ def get_domain_business_address(request):
                 'status_code_text' : 'MISSING_FIELDS_4001',
                 'response' : {
                     'message' : 'Invalid Data!',
-                    'error_message' : 'User id is required',
+                    'error_message' : 'Following fields are required',
                     'fields' : [
-                        'domain',
+                        'hash',
                     ]
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
         )
     
+    
     try:
-        domain_name = f'{domain_name}.{settings.BACKEND_DOMAIN_NAME}'
-        domain = None
-        #with tenant_context(Tenant.objects.get(schema_name = 'public')):
-        domain = Domain.objects.get(domain=domain_name)
-
-        if domain is not None:
-            with tenant_context(domain.tenant):
-                user_business = Business.objects.filter(
-                    is_deleted=False,
-                    is_active=True,
-                    is_blocked=False
-                )                
-                if len(user_business) > 0:
-                    user_business = user_business[0]
-                else:
-                    raise Exception('0 Business found')
-                try:
-                    business_addresses = BusinessAddress.objects.filter(
-                        business = str(user_business.id),
-                        is_deleted=False,
-                        is_closed=False,
-                        is_active=True
-                    ).order_by('-created_at').distinct()
-                except Exception as err:
-                    print(err)
-                    
-                
-                if len(business_addresses) > 0:
-                    serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
-                    data = serialized.data
-                else:
-                    raise Exception('0 business addresses found')
-                try:
-                    services_group= ServiceGroup.objects.filter(
-                        business = str(user_business.id)
-                        ,is_deleted=False,
-                        is_blocked=False).order_by('-created_at')
-                except Exception as err:
-                    print(err)    
-                
-                
-                if len(services_group) > 0:
-                    serialized = ServiceGroupSerializer(services_group,  many=True, context={'request' : request, 'tenant': domain.tenant} )     
-                    service_group = serialized.data
-                else:
-                    raise Exception('0 business addresses found')
-                
-        else :
-            raise Exception('Business Not Exist')
+        tenant = Tenant.objects.get(id = tenant_id)
     except Exception as err:
         return Response(
             {
                 'status' : False,
-                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
-                'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
                 'response' : {
-                    'message' : 'Business Not Found',
+                    'message' : 'Invalid Tenat Id',
                     'error_message' : str(err),
                 }
             },
-            status=status.HTTP_404_NOT_FOUND
-        )
+            status=status.HTTP_400_BAD_REQUEST
+        )                 
+    # domain_name = request.GET.get('domain', None)
+    
+    # if domain_name is None:
+    #     return Response(
+    #         {
+    #             'status' : False,
+    #             'status_code' : StatusCodes.MISSING_FIELDS_4001,
+    #             'status_code_text' : 'MISSING_FIELDS_4001',
+    #             'response' : {
+    #                 'message' : 'Invalid Data!',
+    #                 'error_message' : 'User id is required',
+    #                 'fields' : [
+    #                     'domain',
+    #                 ]
+    #             }
+    #         },
+    #         status=status.HTTP_400_BAD_REQUEST
+    #     )
+    
+    # try:
+    #     domain_name = f'{domain_name}.{settings.BACKEND_DOMAIN_NAME}'
+    #     domain = None
+    #     #with tenant_context(Tenant.objects.get(schema_name = 'public')):
+    #     domain = Domain.objects.get(domain=domain_name)
+
+    #     if domain is not None:
+    
+    with tenant_context(tenant):
+        user_business = Business.objects.filter(
+            is_deleted=False,
+            is_active=True,
+            is_blocked=False
+        )                
+        if len(user_business) > 0:
+            user_business = user_business[0]
+        else:
+            raise Exception('0 Business found')
+        try:
+            business_addresses = BusinessAddress.objects.filter(
+                business = str(user_business.id),
+                is_deleted=False,
+                is_closed=False,
+                is_active=True
+            ).order_by('-created_at').distinct()
+        except Exception as err:
+            print(err)
+            
+        
+        if len(business_addresses) > 0:
+            serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
+            data = serialized.data
+        else:
+            raise Exception('0 business addresses found')
+        try:
+            services_group= ServiceGroup.objects.filter(
+                business = str(user_business.id)
+                ,is_deleted=False,
+                is_blocked=False).order_by('-created_at')
+        except Exception as err:
+            print(err)    
+        
+        
+        if len(services_group) > 0:
+            serialized = ServiceGroupSerializer(services_group,  many=True, context={'request' : request, 'tenant': domain.tenant} )     
+            service_group = serialized.data
+        else:
+            raise Exception('0 business addresses found')
+                
+    #     else :
+    #         raise Exception('Business Not Exist')
+    # except Exception as err:
+    #     return Response(
+    #         {
+    #             'status' : False,
+    #             'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+    #             'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+    #             'response' : {
+    #                 'message' : 'Business Not Found',
+    #                 'error_message' : str(err),
+    #             }
+    #         },
+    #         status=status.HTTP_404_NOT_FOUND
+    #     )
             
     return Response(
             {

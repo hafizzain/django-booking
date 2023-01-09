@@ -11,6 +11,7 @@ from rest_framework import status
 from Authentication.Constants.Email import send_welcome_email
 from Authentication.serializers import UserTenantLoginSerializer
 from Authentication.Constants import CreateTenant, AuthTokenConstants, OTP
+from django.contrib.auth import authenticate, logout
 
 
 from Business.models import Business, BusinessAddressMedia, BusinessType
@@ -78,7 +79,6 @@ def create_client_business(request):
         )    
     
     with tenant_context(tenant):
-       
         try:
             business=Business.objects.get(id=business_id)
         except Exception as err:
@@ -95,7 +95,7 @@ def create_client_business(request):
             status=status.HTTP_404_NOT_FOUND
         )
         try:
-            client = Client.objects.get(mobile_number__icontains = number )
+            client = Client.objects.get(email__icontains = email )
         except Exception as err:
             client = ''
             pass
@@ -112,6 +112,22 @@ def create_client_business(request):
             data.append(f'Client Created Successfully {client.full_name}')
     try:
         username = email.split('@')[0]
+        if username:
+            try:
+                user_check = User.objects.get(username = username)
+                return Response(
+                    {
+                        'status' : True,
+                        'status_code_text' :'USER_ALREADY_EXIST' ,
+                        'response' : {
+                            'message' : 'User are Exist with this username!',
+                            'error_message' : user_check.username,
+                        }
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            except Exception as err:
+                pass
         user = User.objects.create(
             first_name = name,
             username = username,
@@ -260,19 +276,9 @@ def customer_verify_otp(request):
     except Token.DoesNotExist:
         token = Token.objects.create(user=otp.user)
         
-    s_data = dict()
     if change_password is None:
         user = otp.user
         serialized = UserTenantLoginSerializer(user)
-        #s_data = dict(serialized.data)
-        
-        # try:
-        #     with tenant_context(Tenant.objects.get(user=user)):
-        #         tnt_token = Token.objects.get(user__username=user.username)
-        #         s_data['id'] = str(tnt_token.user.id)
-        #         s_data['access_token'] = str(tnt_token.key)
-        # except:
-        #     pass
     try:
         thrd = Thread(target=send_welcome_email(user=otp.user))
         thrd.start()
@@ -290,4 +296,155 @@ def customer_verify_otp(request):
             },
             status=status.HTTP_200_OK
         )
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def customer_login(request):
+    email = request.data.get('email', None)
+    social_account = request.data.get('social_account', False)
+    password = request.data.get('password', None)
+
+    if social_account:
+        social_platform = request.data.get('social_platform', None)
     
+    if not email or (not social_account and not password ) or (social_account and not social_platform ):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'email',
+                        'password',
+                        'social_account',
+                        'social_platform',
+                        ],
+                    'choices_fields' : ['password if social account', 'social_account if logged in with email']
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    #connection.set_schema_to_public()
+    try:
+        user = User.objects.get(
+            email=email,
+            is_deleted=False
+        )
+        
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
+                'status_code_text' : 'INVALID_CREDENTIALS_4013',
+                'response' : {
+                    'message' : 'User does not exist with this email',
+                    'error_message' : str(err),
+                    'fields' : ['email']
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+
+    if not social_account and not user.is_active:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.USER_ACCOUNT_INACTIVE_4009,
+                'status_code_text' : 'USER_ACCOUNT_INACTIVE_4009',
+                'response' : {
+                    'message' : 'This account is inactive! Please verify.',
+                    'error_message' : 'Account is not active'
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    if user.social_account and not social_account:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.ACCOUNT_ASSOCIATED_WITH_SOCIAL,
+                'status_code_text' : 'ACCOUNT_ASSOCIATED_WITH_SOCIAL',
+                'response' : {
+                    'message' : f'This Account associated with {user.social_platform}, Please signin with {user.social_platform}',
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    if not social_account:
+        user = authenticate(username=user.username, password=password)
+        if user is None:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
+                    'status_code_text' : 'INVALID_CREDENTIALS_4013',
+                    'response' : {
+                        'message' : 'Incorrect Password',
+                        'fields' : ['password']
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+    if not social_account and not user.is_email_verified:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.USER_EMAIL_NOT_VERIFIED_4010,
+                'status_code_text' : 'USER_EMAIL_NOT_VERIFIED_4010',
+                'response' : {
+                    'message' : 'Your Email is not verified.',
+                    'error_message' : 'User Email is not verified yet'
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    # elif not user.is_mobile_verified:
+    #     return Response(
+    #         {
+    #             'status' : False,
+    #             'status_code' : StatusCodes.USER_PHONE_NUMBER_NOT_VERIFIED_4011,
+    #             'status_code_text' : 'USER_PHONE_NUMBER_NOT_VERIFIED_4011',
+    #             'response' : {
+    #                 'message' : 'Your Mobile Number is not verified',
+    #                 'error_message' : 'Users"s mobile number is not verified'
+    #             }
+    #         },
+    #         status=status.HTTP_404_NOT_FOUND
+    #     )
+    elif user.is_blocked:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.USER_ACCOUNT_IS_BLOCKED_4012,
+                'status_code_text' : 'USER_ACCOUNT_IS_BLOCKED_4012',
+                'response' : {
+                    'message' : 'Your Account is blocked! Contact our support',
+                    'error_message' : 'Users"s Account is blocked, Can"t access this account'
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    serialized = UserTenantLoginSerializer(user)
+    
+    return Response(
+            {
+                'status' : False,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Authenticated',
+                    'data' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )

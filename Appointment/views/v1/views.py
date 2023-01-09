@@ -29,7 +29,7 @@ from threading import Thread
 
 from Appointment.models import Appointment, AppointmentService, AppointmentNotes , AppointmentCheckout
 from Appointment.serializers import  CheckoutSerializer, AppoinmentSerializer, ServiceClientSaleSerializer, ServiceEmployeeSerializer,SingleAppointmentSerializer ,BlockSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer
-from Tenants.models import Tenant
+from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
 from Utility.models import ExceptionRecord
 
@@ -1040,6 +1040,16 @@ def create_appointment_client(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    
+    try:
+        tenant_client = ClientTenantAppDetail.objects.create(
+            # user = user 
+            tenant = tenant,
+            client_id = client,
+            is_appointment = True
+        )
+    except Exception as err:
+        ExceptionRecord.objects.create(text = f'Tenant Created Customer error and  {str(err)}')
     
     with tenant_context(tenant):
         try:
