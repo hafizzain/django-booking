@@ -2828,33 +2828,6 @@ def get_domain_business_address(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )                 
-    # domain_name = request.GET.get('domain', None)
-    
-    # if domain_name is None:
-    #     return Response(
-    #         {
-    #             'status' : False,
-    #             'status_code' : StatusCodes.MISSING_FIELDS_4001,
-    #             'status_code_text' : 'MISSING_FIELDS_4001',
-    #             'response' : {
-    #                 'message' : 'Invalid Data!',
-    #                 'error_message' : 'User id is required',
-    #                 'fields' : [
-    #                     'domain',
-    #                 ]
-    #             }
-    #         },
-    #         status=status.HTTP_400_BAD_REQUEST
-    #     )
-    
-    # try:
-    #     domain_name = f'{domain_name}.{settings.BACKEND_DOMAIN_NAME}'
-    #     domain = None
-    #     #with tenant_context(Tenant.objects.get(schema_name = 'public')):
-    #     domain = Domain.objects.get(domain=domain_name)
-
-    #     if domain is not None:
-    
     with tenant_context(tenant):
         user_business = Business.objects.filter(
             is_deleted=False,
@@ -3002,7 +2975,6 @@ def get_check_availability(request):
                     # member__employee_employedailyschedule__start_time__lte = start_time,
                     # member__employee_employedailyschedule__end_time__gte = start_time,
                     is_blocked = False,
-                    
                 ).values_list('member__id', flat=True)
                 
                 if len(av_staff_ids) > 0 :

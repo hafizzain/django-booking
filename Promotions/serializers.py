@@ -1,0 +1,74 @@
+from rest_framework import serializers
+
+from Business.models import BusinessAddress, BusinessTax
+from Product.Constants.index import tenant_media_base_url
+from django_tenants.utils import tenant_context
+
+from Promotions.models import DirectOrFlatDiscount , CategoryDiscount , DateRestrictions , DayRestrictions, BlockDate
+
+class BlockDateSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = BlockDate
+        fields = '__all__'
+        
+class DayRestrictionsSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = DayRestrictions
+        fields = '__all__'
+        
+class DateRestrictionsSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = DateRestrictions
+        fields = '__all__'
+        
+class CategoryDiscountSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = CategoryDiscount
+        fields = '__all__'
+        
+class LocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessAddress
+        fields = ['id','address_name']
+        
+class DirectOrFlatDiscountSerializers(serializers.ModelSerializer):
+    category_discount = serializers.SerializerMethodField(read_only=True)
+    day_restrictions = serializers.SerializerMethodField(read_only=True)
+    date_restrictions = serializers.SerializerMethodField(read_only=True)
+    block_date = serializers.SerializerMethodField(read_only=True)
+    
+    def get_block_date(self, obj):
+        try:
+            ser = BlockDate.objects.filter(directorflat = obj)
+            return BlockDateSerializers(ser, many = True).data
+        except Exception as err:
+            pass
+    
+    
+    def get_date_restrictions(self, obj):
+        try:
+            ser = DateRestrictions.objects.get(directorflat = obj)
+            return DateRestrictionsSerializers(ser).data
+        except Exception as err:
+            pass
+   
+    
+    def get_day_restrictions(self, obj):
+        try:
+            ser = DayRestrictions.objects.filter(directorflat = obj)
+            return DayRestrictionsSerializers(ser, many = True).data
+        except Exception as err:
+            pass
+        
+    
+    
+    def get_category_discount(self, obj):
+        try:
+            ser = CategoryDiscount.objects.filter(directorflat = obj)
+            return CategoryDiscountSerializers(ser, many = True).data
+        except Exception as err:
+            pass
+    
+    class Meta:
+        model = DirectOrFlatDiscount
+        fields = '__all__'
