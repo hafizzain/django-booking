@@ -2822,7 +2822,7 @@ def get_domain_business_address(request):
                 'status_code' : 400,
                 'status_code_text' : 'Invalid Data',
                 'response' : {
-                    'message' : 'Invalid Tenat Id',
+                    'message' : 'Invalid Tenant Id',
                     'error_message' : str(err),
                 }
             },
@@ -2891,7 +2891,7 @@ def get_domain_business_address(request):
         
         
         if len(services_group) > 0:
-            serialized = ServiceGroupSerializer(services_group,  many=True, context={'request' : request, 'tenant': domain.tenant} )     
+            serialized = ServiceGroupSerializer(services_group,  many=True, context={'request' : request, 'tenant': tenant} )     
             service_group = serialized.data
         else:
             raise Exception('0 business addresses found')
