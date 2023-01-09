@@ -26,9 +26,6 @@ def send_otp_to_email(user=None, ):
         pass
         #return
     
-    ExceptionRecord.objects.create(
-                    text = f"VerificationOTP send OTP for sended"
-                )
     html_file = render_to_string("otp_email.html", {'user_name': user_otp.user.username,'otp': user_otp.code, 'email':user_otp.user.email})
     text_content = strip_tags(html_file)
     
