@@ -35,20 +35,20 @@ class ServiceAppointmentSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'price')
         
 class AppointmentServiceClientSerializer(serializers.ModelSerializer):
-    address = serializers.SerializerMethodField()
-    employee = serializers.SerializerMethodField()
+    business_address = serializers.SerializerMethodField()
+    member = serializers.SerializerMethodField()
     service = serializers.SerializerMethodField()
     
-    def get_address(self, obj):
+    def get_business_address(self, obj):
         try:
-            addres = BusinessAddress.objects.get(id =obj.business_address )
+            addres = BusinessAddress.objects.get(id = str(obj.business_address) )
             return LocationSerializer(addres).data
         except Exception as err:
             pass
         
-    def get_employee(self, obj):
+    def get_member(self, obj):
         try:
-            emp = Employee.objects.get(id =obj.member )
+            emp = Employee.objects.get(id = str(obj.member) )
             return EmployeAppoinmentSerializer(emp).data
         except Exception as err:
             pass
@@ -56,7 +56,7 @@ class AppointmentServiceClientSerializer(serializers.ModelSerializer):
     
     def get_service(self, obj):
         try:
-            service = Service.objects.get(id =obj.service )
+            service = Service.objects.get(id = str(obj.service) )
             return ServiceAppointmentSerializer(service).data
         except Exception as err:
             pass
