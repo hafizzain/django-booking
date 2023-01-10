@@ -519,7 +519,7 @@ def get_client_appointment(request):
         )
     
     
-    client_app = ClientTenantAppDetail.objects.filter(client_id__icontains = client)
+    client_app = ClientTenantAppDetail.objects.filter(client_id__icontains = client_id)
     
     for tenant in client_app:
         with tenant_context(tenant):
