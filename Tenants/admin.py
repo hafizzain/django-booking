@@ -3,7 +3,7 @@ from django.contrib import admin
 # Register your models here.
 
 
-from .models import Tenant, Domain, TenantDetail, ClientTenantAppDetail
+from .models import Tenant, Domain, TenantDetail, ClientTenantAppDetail, ClientIdUser
 
 @admin.register(Tenant)
 class TenantAdmin(admin.ModelAdmin):
@@ -50,3 +50,4 @@ class TenantDetailAdmin(admin.ModelAdmin):
     ]
     
 admin.site.register(ClientTenantAppDetail)
+admin.site.register(ClientIdUser)
