@@ -15,8 +15,20 @@ class DayRestrictionsSerializers(serializers.ModelSerializer):
     class Meta:
         model = DayRestrictions
         fields = '__all__'
+class LocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessAddress
+        fields = ['id','address_name']        
         
 class DateRestrictionsSerializers(serializers.ModelSerializer):
+    address = serializers.SerializerMethodField()
+    
+    def get_address(self, obj):
+        try:
+            address = BusinessAddress.objects.get(id =obj.business_address)
+            return LocationSerializer(address).data
+        except Exception as err:
+            pass
     class Meta:
         model = DateRestrictions
         fields = '__all__'
@@ -25,12 +37,7 @@ class CategoryDiscountSerializers(serializers.ModelSerializer):
     class Meta:
         model = CategoryDiscount
         fields = '__all__'
-        
-class LocationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BusinessAddress
-        fields = ['id','address_name']
-        
+
 class DirectOrFlatDiscountSerializers(serializers.ModelSerializer):
     category_discount = serializers.SerializerMethodField(read_only=True)
     day_restrictions = serializers.SerializerMethodField(read_only=True)

@@ -124,24 +124,28 @@ def create_client_business(request):
             )
             client_id = client.id
             data.append(f'Client Created Successfully {client.full_name}')
+            
     try:
         username = email.split('@')[0]
         if username:
             try:
                 user_check = User.objects.get(username = username)
-                return Response(
-                    {
-                        'status' : True,
-                        'status_code_text' :'USER_ALREADY_EXIST' ,
-                        'response' : {
-                            'message' : 'User are Exist with this username!',
-                            'error_message' : user_check.username,
-                        }
-                    },
-                    status=status.HTTP_404_NOT_FOUND
-                )
             except Exception as err:
                 pass
+            else:
+                # return Response(
+                #     {
+                #         'status' : True,
+                #         'status_code_text' :'USER_ALREADY_EXIST' ,
+                #         'response' : {
+                #             'message' : 'User are Exist with this username!',
+                #             'error_message' : user_check.username,
+                #         }
+                #     },
+                #     status=status.HTTP_404_NOT_FOUND
+                # )
+                username = f'{username} {len(User.objects.all())}'
+
         if client:
             data.append(f'Client Email already exist {client.full_name}')
     
