@@ -10,7 +10,7 @@ from Service.models import PriceService, Service
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessAddress
-        fields = ['id','address_name']
+        fields = ['id','address_name', 'address']
 
 class EmployeAppoinmentSerializer(serializers.ModelSerializer):
     # image = serializers.SerializerMethodField()
