@@ -5,10 +5,66 @@ from Authentication.models import User
 from Business.models import Business, BusinessAddress
 
 from Product.models import Product
-from Service.models import Service
+from Service.models import Service, ServiceGroup
 
 
 # Create your models here.
+class SpecificGroupDiscount(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_specificgroup_discount')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='businessgroup_specific_discount')
+    
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+    updated_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return str(self.id)
+    
+class ServiceGroupDiscount(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    specificgroupdiscount = models.ForeignKey(SpecificGroupDiscount, on_delete=models.CASCADE, related_name='servicegroupdiscount_specificgroupdiscount')
+    
+    servicegroup = models.ForeignKey(ServiceGroup, on_delete=models.CASCADE, related_name='servicegroup_specificgroupdiscount')
+    discount = models.PositiveIntegerField(default=0, blank= True, null=True)
+    
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return str(self.id) 
+    
+class PurchaseDiscount(models.Model):
+    TYPE_CHOICES = [
+        ('Service', 'Service'),
+        ('Product', 'Product'),
+    ]
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_purchase_discount')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_purchase_discount')
+    
+    select_type= models.CharField(choices=TYPE_CHOICES, max_length=50, null=True, blank=True, default = 'Product')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_purchase_discount')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='service_purchase_discount')
+    
+    purchase = models.PositiveIntegerField(default=0, blank= True, null=True)
+    
+    discount_product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='discountproduct_purchase_discount')
+    discount_service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='discountservice_purchase_discount')
+    
+    discount_value = models.PositiveIntegerField(default=0, blank= True, null=True)
+    
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+    updated_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return str(self.id)
+
 class DirectOrFlatDiscount(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='directorflatdiscount')
