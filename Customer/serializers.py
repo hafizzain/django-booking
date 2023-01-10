@@ -49,7 +49,7 @@ class AppointmentServiceClientSerializer(serializers.ModelSerializer):
     def get_member(self, obj):
         try:
             emp = Employee.objects.get(id = str(obj.member) )
-            return EmployeAppoinmentSerializer(emp).data
+            return EmployeAppoinmentSerializer(emp, context=self.context).data
         except Exception as err:
             pass
     
