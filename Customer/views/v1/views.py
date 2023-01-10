@@ -102,12 +102,17 @@ def create_client_business(request):
         except Exception as err:
             pass
         
+        try:
+            user = User.objects.get(id = tenant.user.id )
+        except Exception as err:
+            pass
+        
         if client:
             data.append(f'Client Email already exist {client.full_name}')
-
+            
         else:
             client  = Client.objects.create(
-                user = tenant.user,
+                user = user,
                 business = business,
                 full_name = name,
                 mobile_number=number,
