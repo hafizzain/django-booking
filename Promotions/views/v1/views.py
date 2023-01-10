@@ -82,11 +82,11 @@ def create_directorflat(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-    flatordirect = DirectOrFlatDiscount.objects.crate(
+    flatordirect = DirectOrFlatDiscount.objects.create(
         user = user,
         business =  business,
     )
-    date_res = DateRestrictions.objects.crate(
+    date_res = DateRestrictions.objects.create(
         directorflat = flatordirect ,
         start_date = start_date,
         end_date =end_date,
