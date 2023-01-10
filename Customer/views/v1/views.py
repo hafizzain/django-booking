@@ -506,7 +506,7 @@ def get_client_appointment(request):
                 'status_code' : 400,
                 'status_code_text' : 'Invalid Data',
                 'response' : {
-                    'message' : 'Invalid Tenat Id',
+                    'message' : 'Invalid Tenant Id',
                     'error_message' : str(err),
                 }
             },
