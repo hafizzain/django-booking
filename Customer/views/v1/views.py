@@ -549,14 +549,13 @@ def get_client_appointment(request):
 
     return Response(
             {
-                'status' : False,
-                'status_code' : 400,
-                'status_code_text' : 'Invalid Data',
+                'status' : True,
+                'status_code' : 200,
                 'response' : {
                     'message' : 'All Appointment Client',
                     'error_message' : None,
                     'appointment': data
                 }
             },
-            status=status.HTTP_400_BAD_REQUEST
+            status=status.HTTP_200_OK
         )

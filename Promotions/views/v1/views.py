@@ -24,7 +24,7 @@ from Business.models import Business, BusinessSocial, BusinessAddress, BusinessO
 from Product.models import Product, ProductStock
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
-from Promotions.models import CategoryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount
+from Promotions.models import BlockDate, CategoryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount
 from Promotions.serializers import DirectOrFlatDiscountSerializers
 from Service.models import Service, ServiceGroup
 from Tenants.models import Domain, Tenant
@@ -163,7 +163,7 @@ def create_directorflat(request):
             
             try: 
                 date = bl_date.get('date', None)
-                DayRestrictions.objects.create(
+                BlockDate.objects.create(
                     directorflat = flatordirect ,
                     date = date,
                 )
