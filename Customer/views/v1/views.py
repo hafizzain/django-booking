@@ -9,7 +9,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from Authentication.Constants.Email import send_welcome_email
-from Authentication.serializers import UserTenantLoginSerializer
+from Authentication.serializers import UserSerializerByClient, UserTenantLoginSerializer
 from Authentication.Constants import CreateTenant, AuthTokenConstants, OTP
 from django.contrib.auth import authenticate, logout
 
@@ -21,7 +21,7 @@ from Employee.models import Employee
 from NStyle.Constants import StatusCodes
 
 from Authentication.models import AccountType, User, VerificationOTP
-from Tenants.models import ClientTenantAppDetail, Domain, Tenant
+from Tenants.models import ClientIdUser, ClientTenantAppDetail, Domain, Tenant
 from Utility.models import Country, Currency, ExceptionRecord, Language, NstyleFile, Software, State, City
 from Utility.serializers import LanguageSerializer
 import json
@@ -78,8 +78,9 @@ def create_client_business(request):
             status=status.HTTP_400_BAD_REQUEST
         )    
     client = ''
-    with tenant_context(tenant):
-        
+    client_id = ''
+   
+    with tenant_context(tenant):   
         try:
             business=Business.objects.get(id=business_id)
         except Exception as err:
@@ -99,6 +100,7 @@ def create_client_business(request):
         try:
             client = Client.objects.get(email__icontains = email )
             client = client
+            client_id = client.id
         except Exception as err:
             pass
         
@@ -118,6 +120,7 @@ def create_client_business(request):
                 mobile_number=number,
                 email = email,
             )
+            client_id = client.id
             data.append(f'Client Created Successfully {client.full_name}')
     try:
         username = email.split('@')[0]
@@ -152,6 +155,10 @@ def create_client_business(request):
                 user = user,
                 account_type = 'Everyone'
             )
+            user = ClientIdUser.objects.create(
+                user = user,
+                client_id = client_id 
+            )
         else:
             user = User.objects.create(
                 first_name = name,
@@ -164,6 +171,10 @@ def create_client_business(request):
             account_type = AccountType.objects.create(
                 user = user,
                 account_type = 'Everyone'
+            )
+            user = ClientIdUser.objects.create(
+                user = user,
+                client_id = client_id 
             )
         
         try:
@@ -308,7 +319,7 @@ def customer_verify_otp(request):
         
     if change_password is None:
         user = otp.user
-        serialized = UserTenantLoginSerializer(user)
+        serialized = UserSerializerByClient(user)
     try:
         thrd = Thread(target=send_welcome_email(user=otp.user))
         thrd.start()
@@ -465,7 +476,7 @@ def customer_login(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    serialized = UserTenantLoginSerializer(user)
+    serialized = UserSerializerByClient(user)
     
     return Response(
             {
