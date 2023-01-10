@@ -545,7 +545,7 @@ def get_client_appointment(request):
             app_service = Appointment.objects.filter(client = client) 
                                 #created_at__gte = day )
             serializer = AppointmentClientSerializer(app_service, many = True)
-            data.append(serializer.data)
+            data.extend(serializer.data)
 
     return Response(
             {
