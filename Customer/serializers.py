@@ -3,7 +3,7 @@ from rest_framework import serializers
 from Appointment.models import Appointment, AppointmentService
 from Business.models import BusinessAddress
 from Product.Constants.index import tenant_media_base_url
-from Employee.models import Employee
+from Employee.models import Employee, EmployeeProfessionalInfo
 from Service.models import PriceService, Service
 
 
@@ -13,7 +13,16 @@ class LocationSerializer(serializers.ModelSerializer):
         fields = ['id','address_name', 'address']
 
 class EmployeAppoinmentSerializer(serializers.ModelSerializer):
+    designation = serializers.SerializerMethodField()
     # image = serializers.SerializerMethodField()
+    
+    def get_designation(self, obj):
+        try:
+            designation = EmployeeProfessionalInfo.objects.get(employee = obj)
+            return designation.designation
+        except Exception as err:
+            pass
+            
     
     # def get_image(self, obj):
     #     if obj.image:
@@ -27,7 +36,7 @@ class EmployeAppoinmentSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Employee
-        fields = ('id', 'full_name', 'image')
+        fields = ('id', 'full_name', 'image','designation')
         
 class ServiceAppointmentSerializer(serializers.ModelSerializer):
     class Meta:
