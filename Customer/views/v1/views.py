@@ -522,7 +522,10 @@ def get_client_appointment(request):
     client_app = ClientTenantAppDetail.objects.filter(client_id__icontains = client_id)
     
     for tenant in client_app:
-        with tenant_context(tenant):
+        ExceptionRecord.objects.create(
+            text=f'Tenant is  Is {tenant.tenant}'
+        )
+        with tenant_context(tenant.tenant):
             try:
                 client = Client.objects.get(id = str(client_id))
             except Exception as err:
