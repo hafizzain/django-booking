@@ -8,6 +8,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from Appointment.models import Appointment, AppointmentService
 from Authentication.Constants.Email import send_welcome_email
 from Authentication.serializers import UserSerializerByClient, UserTenantLoginSerializer
 from Authentication.Constants import CreateTenant, AuthTokenConstants, OTP
@@ -16,6 +17,7 @@ from django.contrib.auth import authenticate, logout
 
 from Business.models import Business, BusinessAddressMedia, BusinessType
 from Client.models import Client
+from Customer.serializers import AppointmentClientSerializer
 from Employee.models import Employee
 
 from NStyle.Constants import StatusCodes
@@ -497,6 +499,7 @@ def customer_login(request):
 @permission_classes([AllowAny])
 def get_client_appointment(request):
     client_id = request.GET.get('client_id', None)
+    data = []
     
     if client_id is None:
         return Response(
@@ -536,17 +539,21 @@ def get_client_appointment(request):
     
     for tenant in client_app:
         with tenant_context(tenant):
-            pass
-            
-    
+            today = datetime.today()
+            app_service = Appointment.objects.filter(client = client,) 
+                                #created_at__gte = day )
+            serializer = AppointmentClientSerializer(app_service, many = True)
+            data.append(serializer.data)
+
     return Response(
             {
                 'status' : False,
                 'status_code' : 400,
                 'status_code_text' : 'Invalid Data',
                 'response' : {
-                    'message' : 'Invalid Tenat Id',
-                    'error_message' : str(err),
+                    'message' : 'All Appointment Client',
+                    'error_message' : None,
+                    'appointment': data
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
