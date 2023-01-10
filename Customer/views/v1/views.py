@@ -517,6 +517,7 @@ def get_client_appointment(request):
     
     for tenant in client_app:
         with tenant_context(tenant):
+            pass
             
     
     return Response(
