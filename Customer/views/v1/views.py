@@ -155,9 +155,10 @@ def create_client_business(request):
                 user = user,
                 account_type = 'Everyone'
             )
-            user = ClientIdUser.objects.create(
+            user_client = ClientIdUser.objects.create(
                 user = user,
-                client_id = client_id 
+                client_id = client_id,
+                is_everyone = True
             )
         else:
             user = User.objects.create(
@@ -172,9 +173,11 @@ def create_client_business(request):
                 user = user,
                 account_type = 'Everyone'
             )
-            user = ClientIdUser.objects.create(
+            user_client = ClientIdUser.objects.create(
                 user = user,
-                client_id = client_id 
+                client_id = client_id,
+                is_everyone = True
+                
             )
         
         try:
