@@ -1,7 +1,7 @@
 
 
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import email
 from django.conf import settings
 from operator import ge
@@ -9,6 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Authentication.serializers import UserTenantLoginSerializer
 
 from Business.models import BusinessAddressMedia, BusinessType
@@ -2961,6 +2962,14 @@ def get_check_availability(request):
             dt = datetime.strptime(date, "%Y-%m-%d")
             date = dt.date()
             
+            app_date_time = f'2000-01-01 {start_time}'
+        
+            duration = DURATION_CHOICES[duration]
+            app_date_time = datetime.fromisoformat(app_date_time)
+            datetime_duration = app_date_time + timedelta(minutes=duration)
+            datetime_duration = datetime_duration.strftime('%H:%M:%S')
+            end_time = datetime_duration
+                
             try:
                 employee = Employee.objects.get(id = emp_id)
                 data.append(f'the employe id {employee}, start_time {start_time}, {date}')
@@ -2976,16 +2985,18 @@ def get_check_availability(request):
                     # member__employee_employedailyschedule__end_time__gte = start_time,
                     is_blocked = False,
                 ).values_list('member__id', flat=True)
-                
-                if len(av_staff_ids) > 0 :
-                    # for av_staff in av_staff_ids:
-                    #     av_staff.appointment_time
-                    data.append(f'Employe already busy {employee.id}')
-                else:
-                    data.append(f'Employees are free, you can proceed further employee id: {employee.id}')
-                #data.append(av_staff_ids)
+                for staff in av_staff_ids:
+                    if end_time <= staff.appointment_time or start_time >= staff.end_time:
+                        data.append(f'Employees are free, you can proceed further employee id: {employee.id}')
+                    
+                    else:
+                        data.append(f'Employe already busy {employee.id}')
+                    
+                # if len(av_staff_ids) > 0 :
+                #     data.append(f'Employe already busy {employee.id}')
+                # else:
+                #     data.append(f'Employees are free, you can proceed further employee id: {employee.id}')
             except Exception as err:
-                #data.append(str(err))
                 pass
                     
     return Response(

@@ -20,8 +20,8 @@ from Employee.models import Employee
 
 from NStyle.Constants import StatusCodes
 
-from Authentication.models import User, VerificationOTP
-from Tenants.models import Domain, Tenant
+from Authentication.models import AccountType, User, VerificationOTP
+from Tenants.models import ClientTenantAppDetail, Domain, Tenant
 from Utility.models import Country, Currency, ExceptionRecord, Language, NstyleFile, Software, State, City
 from Utility.serializers import LanguageSerializer
 import json
@@ -77,8 +77,9 @@ def create_client_business(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )    
-    
+    client = ''
     with tenant_context(tenant):
+        
         try:
             business=Business.objects.get(id=business_id)
         except Exception as err:
@@ -94,16 +95,19 @@ def create_client_business(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+        
         try:
             client = Client.objects.get(email__icontains = email )
+            client = client
         except Exception as err:
-            client = ''
             pass
-        if len(client) > 0:
-            data.append(f'Client Phone number already exist {client.full_name}')
+        
+        if client:
+            data.append(f'Client Email already exist {client.full_name}')
+
         else:
             client  = Client.objects.create(
-                #user = tenant.user,
+                user = tenant.user,
                 business = business,
                 full_name = name,
                 mobile_number=number,
@@ -128,14 +132,35 @@ def create_client_business(request):
                 )
             except Exception as err:
                 pass
-        user = User.objects.create(
-            first_name = name,
-            username = username,
-            email = email,
-            is_email_verified = True,
-            is_active = True,
-            mobile_number = number,
-        )
+        if client:
+            data.append(f'Client Email already exist {client.full_name}')
+    
+            user = User.objects.create(
+                first_name = str(client.full_name),
+                username = str(client.full_name),
+                email = str(client.email),
+                is_email_verified = True,
+                is_active = True,
+                mobile_number = str(client.mobile_number),
+            )
+            account_type = AccountType.objects.create(
+                user = user,
+                account_type = 'Everyone'
+            )
+        else:
+            user = User.objects.create(
+                first_name = name,
+                username = username,
+                email = email,
+                is_email_verified = True,
+                is_active = True,
+                mobile_number = number,
+            )
+            account_type = AccountType.objects.create(
+                user = user,
+                account_type = 'Everyone'
+            )
+        
         try:
             OTP.generate_user_otp(user=user, code_for='Email')
         except Exception as error:
@@ -447,4 +472,62 @@ def customer_login(request):
                 }
             },
             status=status.HTTP_200_OK
+        )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_client_appointment(request):
+    client_id = request.GET.get('client_id', None)
+    
+    if client_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'client_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    
+    try:
+        client = Client.objects.get(id = client_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Invalid Tenat Id',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    client_app = ClientTenantAppDetail.objects.filter(client_id__icontains = client)
+    
+    for tenant in client_app:
+        with tenant_context(tenant):
+            
+    
+    return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Invalid Tenat Id',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
         )

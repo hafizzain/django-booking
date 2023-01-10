@@ -696,76 +696,76 @@ def create_employee(request):
     employee_p_info.saturday = True if 'saturday' in request.data else False
     employee_p_info.sunday = True if 'sunday' in request.data else False
     
-    monday = request.data.get('monday', None)
-    tuesday = request.data.get('tuesday', None)
-    wednesday = request.data.get('wednesday', None)
-    thursday = request.data.get('thursday', None)
-    friday = request.data.get('friday', None)
-    saturday = request.data.get('saturday', None)
-    sunday = request.data.get('sunday', None)
+    # monday = request.data.get('monday', None)
+    # tuesday = request.data.get('tuesday', None)
+    # wednesday = request.data.get('wednesday', None)
+    # thursday = request.data.get('thursday', None)
+    # friday = request.data.get('friday', None)
+    # saturday = request.data.get('saturday', None)
+    # sunday = request.data.get('sunday', None)
     
-    if monday is not None:
-        working_days.append('Monday')
-    else:
-        off_days.append('Monday')
-    if tuesday is not None:
-        working_days.append('Tuesday')
-    else:
-        off_days.append('Tuesday')
-    if wednesday is not None:
-        working_days.append('Wednesday')
-    else:
-        off_days.append('Wednesday')
-    if thursday is not None:
-        working_days.append('Thursday')
-    else:
-        off_days.append('Thursday')
-    if friday is not None:
-        working_days.append('Friday')
-    else:
-        off_days.append('Friday')
-    if saturday is not None:
-        working_days.append('Saturday')
-    else:
-        off_days.append('Saturday')
-    if sunday is not None:
-        working_days.append('Sunday')
-    else:
-        off_days.append('Sunday')
+    # if monday is not None:
+    #     working_days.append('Monday')
+    # else:
+    #     off_days.append('Monday')
+    # if tuesday is not None:
+    #     working_days.append('Tuesday')
+    # else:
+    #     off_days.append('Tuesday')
+    # if wednesday is not None:
+    #     working_days.append('Wednesday')
+    # else:
+    #     off_days.append('Wednesday')
+    # if thursday is not None:
+    #     working_days.append('Thursday')
+    # else:
+    #     off_days.append('Thursday')
+    # if friday is not None:
+    #     working_days.append('Friday')
+    # else:
+    #     off_days.append('Friday')
+    # if saturday is not None:
+    #     working_days.append('Saturday')
+    # else:
+    #     off_days.append('Saturday')
+    # if sunday is not None:
+    #     working_days.append('Sunday')
+    # else:
+    #     off_days.append('Sunday')
         
     
-    if type(working_days) == str:
-            working_days = json.loads(working_days)
+    # if type(working_days) == str:
+    #         working_days = json.loads(working_days)
 
-    elif type(working_days) == list:
-            pass
-    now = datetime.now()
-    today = now.date()
+    # elif type(working_days) == list:
+    #         pass
+    # now = datetime.now()
+    # today = now.date()
     
-    for i, day in enumerate(working_days):
+    # for i, day in enumerate(working_days):
         
-        if i == 0:
-            date = now + timedelta(days=i)
-        else:
-            date = date + timedelta(days=1)
-        EmployeDailySchedule.objects.create(
-            user=user,
-            business=business,
-            employee = employee,
-            day = day,
-            date = date,
-        )
+    #     if i == 0:
+    #         date = now + timedelta(days=i)
+    #     else:
+    #         date = date + timedelta(days=1)
+    #     EmployeDailySchedule.objects.create(
+    #         user=user,
+    #         business=business,
+    #         employee = employee,
+    #         day = day,
+    #         date = date,
+    #     )
         
-    for i, day in enumerate(off_days):
-        date = date + timedelta(days=1)
-        EmployeDailySchedule.objects.create(
-            user=user,
-            business=business,
-            employee = employee,
-            day = day,
-            date = date,
-            is_off = True
-        )
+    # for i, day in enumerate(off_days):
+    #     date = date + timedelta(days=1)
+    #     EmployeDailySchedule.objects.create(
+    #         user=user,
+    #         business=business,
+    #         employee = employee,
+    #         day = day,
+    #         date = date,
+    #         is_off = True
+    #     )
             
     if type(services_id) == str:
         services_id = json.loads(services_id)
@@ -1027,34 +1027,30 @@ def update_employee(request):
     Employe_Informations.saturday = True if 'saturday' in request.data else False
     Employe_Informations.sunday = True if 'sunday' in request.data else False
     
-    monday = request.data.get('monday', None)
-    tuesday = request.data.get('tuesday', None)
-    wednesday = request.data.get('wednesday', None)
-    thursday = request.data.get('thursday', None)
-    friday = request.data.get('friday', None)
-    saturday = request.data.get('saturday', None)
-    sunday = request.data.get('sunday', None)
+    # monday = request.data.get('monday', None)
+    # tuesday = request.data.get('tuesday', None)
+    # wednesday = request.data.get('wednesday', None)
+    # thursday = request.data.get('thursday', None)
+    # friday = request.data.get('friday', None)
+    # saturday = request.data.get('saturday', None)
+    # sunday = request.data.get('sunday', None)
     
-    if monday is not None:
-        working_days.append('Monday')
-    if tuesday is not None:
-        working_days.append('Tuesday')
-    if wednesday is not None:
-        working_days.append('Wednesday')
-    if thursday is not None:
-        working_days.append('Thursday')
-    if friday is not None:
-        working_days.append('Friday')
-    if saturday is not None:
-        working_days.append('Saturday')
-    if sunday is not None:
-        working_days.append('Sunday')
+    # if monday is not None:
+    #     working_days.append('Monday')
+    # if tuesday is not None:
+    #     working_days.append('Tuesday')
+    # if wednesday is not None:
+    #     working_days.append('Wednesday')
+    # if thursday is not None:
+    #     working_days.append('Thursday')
+    # if friday is not None:
+    #     working_days.append('Friday')
+    # if saturday is not None:
+    #     working_days.append('Saturday')
+    # if sunday is not None:
+    #     working_days.append('Sunday')
     
-    schedule = EmployeDailySchedule.objects.filter(created_at__gte = datetime.now()).exclude(day__in = working_days)
-    for sch in schedule:
-        sch.delete()
-        
-    # schedule = EmployeDailySchedule.objects.filter(created_at__gte = datetime.now(), day__in = working_days)
+    # schedule = EmployeDailySchedule.objects.filter(created_at__gte = datetime.now()).exclude(day__in = working_days)
     # for sch in schedule:
     #     sch.delete()
         

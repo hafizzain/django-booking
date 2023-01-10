@@ -97,14 +97,14 @@ def create_tenant_user_token(tenant_user=None, tenant=None):
         return user_token
         
 
-def create_tenant_account_type(tenant_user=None, tenant=None, account_type='everyone'):
+def create_tenant_account_type(tenant_user=None, tenant=None, account_type='Business'):
     if tenant_user is None or tenant is None :
         return None
     
     with tenant_context(tenant):
         return AccountType.objects.create(
             user=tenant_user,
-            account_type=account_type.capitalize()
+            account_type= account_type#account_type.capitalize()
         )
 
 def create_global_permission(tenant=None, user = None, business=None):
@@ -285,7 +285,7 @@ def create_tenant(request=None, user=None, data=None):
             )
 
             try:
-                create_tenant_account_type(tenant_user=t_user, tenant=user_tenant, account_type=data['account_type'])
+                create_tenant_account_type(tenant_user=t_user, tenant=user_tenant, account_type='Business')#data['account_type'])
             except:
                 pass
             

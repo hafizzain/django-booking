@@ -155,7 +155,7 @@ def create_appointment(request):
     appointments = request.data.get('appointments', None)
     appointment_date = request.data.get('appointment_date', None)
     text = request.data.get('appointment_notes', None)
-    #[business_id, member, appointment_date, appointment_time, duration
+    #business_id, member, appointment_date, appointment_time, duration
 
     client = request.data.get('client', None)
     client_type = request.data.get('client_type', None)
