@@ -519,28 +519,27 @@ def get_client_appointment(request):
         )
     
     
-    try:
-        client = Client.objects.get(id = client_id)
-    except Exception as err:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : 400,
-                'status_code_text' : 'Invalid Data',
-                'response' : {
-                    'message' : 'Invalid Tenant Id',
-                    'error_message' : str(err),
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
     client_app = ClientTenantAppDetail.objects.filter(client_id__icontains = client)
     
     for tenant in client_app:
         with tenant_context(tenant):
+            try:
+                client = Client.objects.get(id = str(client_id))
+            except Exception as err:
+                return Response(
+                    {
+                    'status' : False,
+                    'status_code' : 400,
+                    'status_code_text' : 'Invalid Data',
+                    'response' : {
+                        'message' : 'Invalid Tenant Id',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
             today = datetime.today()
-            app_service = Appointment.objects.filter(client = client,) 
+            app_service = Appointment.objects.filter(client = client) 
                                 #created_at__gte = day )
             serializer = AppointmentClientSerializer(app_service, many = True)
             data.append(serializer.data)

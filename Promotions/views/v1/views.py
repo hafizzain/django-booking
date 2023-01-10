@@ -113,18 +113,22 @@ def create_directorflat(request):
             pass
         for cat in categorydiscount:
             try:
-                all_category = cat.get('all_category', None)
-                service_discount = cat.get('service_discount', None)
-                retail_discount = cat.get('retail_discount', None)
-                voucher_discount = cat.get('voucher_discount', None)
+                category = cat.get('category', None)
+                discount = cat.get('discount', None)
+                # all_category = cat.get('all_category', None)
+                # service_discount = cat.get('service_discount', None)
+                # retail_discount = cat.get('retail_discount', None)
+                # voucher_discount = cat.get('voucher_discount', None)
                 
                 category_discount = CategoryDiscount.objects.create(
                     directorflat = flatordirect ,
                     
-                    all_category = all_category,
-                    service_discount = service_discount,
-                    retail_discount = retail_discount,
-                    voucher_discount = voucher_discount,
+                    category_type = category,
+                    discount = discount
+                    # all_category = all_category,
+                    # service_discount = service_discount,
+                    # retail_discount = retail_discount,
+                    # voucher_discount = voucher_discount,
                 )
                 
             except Exception as err:

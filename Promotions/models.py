@@ -23,14 +23,18 @@ class DirectOrFlatDiscount(models.Model):
     def __str__(self):
         return str(self.id)
 class CategoryDiscount(models.Model):
+    TYPE_CHOICES = [
+        ('All', 'All'),
+        ('Service', 'Service'),
+        ('Retail', 'Retail'),
+        ('Voucher', 'Voucher'),
+    ]
+    
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     directorflat = models.ForeignKey(DirectOrFlatDiscount, on_delete=models.CASCADE, related_name='directorflat_categorydiscount')
-
-    all_category = models.PositiveIntegerField(default=0, blank= True, null=True,)
     
-    service_discount = models.PositiveIntegerField(default=0, blank= True, null=True,)
-    retail_discount = models.PositiveIntegerField(default=0, blank= True, null=True,)
-    voucher_discount = models.PositiveIntegerField(default=0, blank= True, null=True,)
+    category_type= models.CharField(choices=TYPE_CHOICES, max_length=50, null=True, blank=True, )
+    discount = models.PositiveIntegerField(default=0, blank= True, null=True)
     
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
