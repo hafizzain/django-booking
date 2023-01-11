@@ -2992,6 +2992,7 @@ def get_check_availability(request):
                         
                         else:
                             data.append(f'Employe already busy {employee.id}')
+                    data.append(f'{av_staff_ids}')
                     
                 # if len(av_staff_ids) > 0 :
                 #     data.append(f'Employe already busy {employee.id}')
