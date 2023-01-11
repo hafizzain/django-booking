@@ -3072,32 +3072,33 @@ def get_employee_appointment(request):
             if len(availability) >= 0 or len(availability) <= 3 :
                 data.append(f'the employe id {emp.id}')
                 serializer = EmployeeBusinessSerializer(emp)
-                return Response(
-                {
-                    'status' : True,
-                    'status_code' : 200,
-                    'status_code_text' : '200',
-                    'response' : {
-                        'message' : 'Employees are free',
-                        'error_message' : None,
-                        'employee':serializer.data
-                    }
-                },
-                status=status.HTTP_200_OK
-            )
+                data.append(serializer.data)
+            #     return Response(
+            #     {
+            #         'status' : True,
+            #         'status_code' : 200,
+            #         'status_code_text' : '200',
+            #         'response' : {
+            #             'message' : 'Employees are free',
+            #             'error_message' : None,
+            #             'employee':serializer.data
+            #         }
+            #     },
+            #     status=status.HTTP_200_OK
+            # )
     return Response(
-                    {
-                        'status' : True,
-                        'status_code' : 200,
-                        'status_code_text' : '200',
-                        'response' : {
-                            'message' : 'Employees are free',
-                            'error_message' : None,
-                            'employee': data
-                        }
-                    },
-                    status=status.HTTP_200_OK
-                )
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Employees are free',
+                    'error_message' : None,
+                    'employee': data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
     
 @api_view(['POST'])
 @permission_classes([AllowAny])
