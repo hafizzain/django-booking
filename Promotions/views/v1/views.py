@@ -385,8 +385,9 @@ def update_directorflat(request):
                     dayrestriction = DayRestrictions.objects.get(id  = str(id))
                     if bool(is_deleted) == True:
                         dayrestriction.delete()
-                    dayrestriction.day = day
-                    dayrestriction.save()
+                    else:
+                        dayrestriction.day = day
+                        dayrestriction.save()
                 except Exception as err:
                     error.append(str(err))
             else:
@@ -430,6 +431,7 @@ def update_directorflat(request):
             'response' : {
                 'message' : 'Direct or Flat Updated Successfully!',
                 'error_message' : None,
+                'error' : error,
                 'flatordirect' : serializers.data
             }
         },
