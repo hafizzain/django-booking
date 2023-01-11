@@ -388,8 +388,9 @@ def update_directorflat(request):
                     is_deleted = dayres.get('is_deleted', None)
                     
                     ExceptionRecord.objects.create(text = f'prmotion {is_deleted}')
-                    
-                    if bool(is_deleted) == True:
+                    test = bool(is_deleted)
+                    ExceptionRecord.objects.create(text = f'prmotion test {test}')
+                    if test == True:
                         dayrestriction.delete()
                         pass
                     dayrestriction.day = day
