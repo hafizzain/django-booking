@@ -17,7 +17,7 @@ from django.contrib.auth import authenticate, logout
 
 from Business.models import Business, BusinessAddressMedia, BusinessType
 from Client.models import Client
-from Customer.serializers import AppointmentClientSerializer
+from Customer.serializers import AppointmentClientSerializer, AppointmentServiceClientSerializer
 from Employee.models import Employee
 
 from NStyle.Constants import StatusCodes
@@ -648,11 +648,11 @@ def cancel_appointment_client(request):
 @api_view(['PUT'])
 @permission_classes([AllowAny])
 def update_appointment_client(request):
-    appointment_id = request.GET.get('appointment_id', None)
+    appointment_service = request.GET.get('appointment_service', None)
     hash = request.GET.get('hash', None)
     
     data = []    
-    if appointment_id and hash is None: 
+    if appointment_service and hash is None: 
        return Response(
             {
                 'status' : False,
@@ -686,43 +686,36 @@ def update_appointment_client(request):
         )    
     
     with tenant_context(tenant):
-        try:
-            appointment = Appointment.objects.get(id=str(appointment_id))
-        except Exception as err:
-            return Response(
-                {
-                    'status' : False,
-                    'status_code' : 404,
-                    'status_code_text' : '404',
-                    'response' : {
-                        'message' : 'Invalid Appointment ID!',
-                        'error_message' : str(err),
-                    }
-                },
-                status=status.HTTP_404_NOT_FOUND
-            )
-        appointment_service = AppointmentService.objects.filter(appointment=appointment.id)
-        for app_service in appointment_service:
-            app_service.appointment_status = 'Cancel'
-            app_service.save()
-            
-        serializer = AppointmentClientSerializer(appointment, context={'request' : request})
-        data.append(serializer.data)
-        # try:
-        #     thrd = Thread(target=cancel_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant} )
-        #     thrd.start()
-        # except Exception as err:
-        #     print(err)
-        #     pass
-            
+        if type(appointment_service) == str:
+            appointment_service = appointment_service.replace("'" , '"')
+            appointment_service = json.loads(appointment_service)
+        else:
+            pass
+        
+        for service in appointment_service:
+            try:
+                date = service.get('date', None)
+                date_time = service.get('date_time', None)
+                id = service.get('id', None)
+                
+                appoint_service = AppointmentService.objects.get(appointment = str(id))
+                appoint_service.appointment_time = date
+                appoint_service.appointment_time = date_time
+                appoint_service.save()
+                
+                serializer = AppointmentServiceClientSerializer(appoint_service, context={'request' : request})
+                data.append(serializer.data)
+            except Exception as err:
+                pass
+
     return Response(
         {
             'status' : True,
             'status_code' : 200,
             'response' : {
-                'message' : 'Cancel Appointment Successfully',
+                'message' : 'Update Appointment Successfully',
                 'error_message' : None,
-                'appointment': serializer.data
+                'appointment': data
             }
         },
         status=status.HTTP_200_OK
