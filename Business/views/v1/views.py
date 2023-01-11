@@ -3222,7 +3222,7 @@ def create_client_business(request):
     
 @api_view(['POST'])
 @permission_classes([AllowAny])
-def get_check_availability(request):                  
+def employee_availability(request):                  
     employee = request.data.get('employee', None)
     tenant_id = request.data.get('hash', None)
     
