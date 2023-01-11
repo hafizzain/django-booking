@@ -356,9 +356,9 @@ def update_directorflat(request):
             if id is not None:
                 try:
                     category_id = CategoryDiscount.objects.get(id = str(id))
-                    if bool(is_deleted) is True:
+                    if str(is_deleted) == "True":
                         category_id.delete()
-                        pass
+                        continue
                     category_id.category_type = category
                     category_id.discount = discount
                     category_id.save()
@@ -386,14 +386,8 @@ def update_directorflat(request):
                 try:
                     dayrestriction = DayRestrictions.objects.get(id  = str(id))
                     is_deleted = dayres.get('is_deleted', None)
-                    
-                    ExceptionRecord.objects.create(text = f'prmotion {str(is_deleted) == "True"} len {len(is_deleted) == len("True") }')
-                    test = bool(is_deleted)
-                    ExceptionRecord.objects.create(text = f'prmotion test {test} type of {type(test)}  {str(is_deleted) == "True" }or {test}')
                     if str(is_deleted) == "True":
                         dayrestriction.delete()
-                        # dayrestriction.save()
-                        ExceptionRecord.objects.create(text = f'Delete test')
                         continue
                     dayrestriction.day = day
                     dayrestriction.save()
@@ -421,8 +415,9 @@ def update_directorflat(request):
             if id is not None:
                 try:
                     block_date = BlockDate.objects.get(id = str(id))
-                    if bool(is_deleted) == True:
+                    if str(is_deleted) == "True":
                         block_date.delete()
+                        continue
                     block_date.date= date
                     block_date.save()
                 except Exception as err:
