@@ -2851,7 +2851,7 @@ def get_domain_business_address(request):
             
         
         if len(business_addresses) > 0:
-            serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request,
+            serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={
                                                             'tenant' : tenant.schema_name})
             data = serialized.data
         else:
