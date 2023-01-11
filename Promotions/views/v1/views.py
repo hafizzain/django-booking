@@ -420,15 +420,17 @@ def update_directorflat(request):
                     directorflat = directorflat,
                     date = date,
                 ) 
-                    
+    
+    serializers= DirectOrFlatDiscountSerializers(directorflat, context={'request' : request})
+       
     return Response(
         {
             'status' : True,
             'status_code' : 200,
             'response' : {
-                'message' : 'Update Appointment Successfully',
+                'message' : 'Direct or Flat Updated Successfully!',
                 'error_message' : None,
-                'Appointment' : 'serializer.data'
+                'flatordirect' : serializers.data
             }
         },
         status=status.HTTP_200_OK
