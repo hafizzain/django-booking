@@ -383,7 +383,7 @@ def update_directorflat(request):
             if id is not None:
                 try:
                     dayrestriction = DayRestrictions.objects.get(id  = str(id))
-                    if str(is_deleted) == 'true':
+                    if bool(is_deleted) == True:
                         dayrestriction.delete()
                     dayrestriction.day = day
                     dayrestriction.save()
