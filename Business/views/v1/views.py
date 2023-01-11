@@ -2977,7 +2977,6 @@ def get_check_availability(request):
                 
                 try:
                     av_staff_ids = AppointmentService.objects.filter(
-                        
                         member__id = employee.id,
                         appointment_date = date,
                         # appointment_time__gte = start_time, # 1:00
@@ -2987,19 +2986,16 @@ def get_check_availability(request):
                         # member__employee_employedailyschedule__end_time__gte = start_time,
                         is_blocked = False,
                     )#.values_list('member__id', flat=True)
-                    for ser in av_staff_ids:
-                        data.append(f'{av_staff_ids} type {type(start_time)}, tested {ser.appointment_time}')
-                        if tested < ser.appointment_time and start_time > ser.end_time:
-                            data.append(f'Employees are free, you can proceed further employee id: {employee.id}')
-                        
-                        else:
-                            data.append(f'Employe already busy {employee.id}')
-                    data.append(f'{av_staff_ids} type {type(datetime_duration)}, ')
                     
-                # if len(av_staff_ids) > 0 :
-                #     data.append(f'Employe already busy {employee.id}')
-                # else:
-                #     data.append(f'Employees are free, you can proceed further employee id: {employee.id}')
+                    for ser in av_staff_ids:
+                        #data.append(f'{av_staff_ids} type {type(start_time)}, tested {ser.appointment_time}')
+                        if tested < ser.appointment_time and start_time > ser.end_time:
+                            data.append(f'Employe Already busy  {employee.full_name}')
+                                        
+                        else:
+                            data.append(f'Employees are free, you can proceed further employee name {employee.full_name}')
+                    #data.append(f'{av_staff_ids} type {type(datetime_duration)}, ')
+                    
                 except Exception as err:
                     data.append(f'the employe{employee}, start_time {str(err)}')
             except Exception as err:
