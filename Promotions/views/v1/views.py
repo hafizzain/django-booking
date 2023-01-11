@@ -263,7 +263,18 @@ def delete_directorflat(request):
 @permission_classes([IsAuthenticated])
 def update_directorflat(request):
     directorflat_id = request.data.get('id', None)
-
+    
+    location = request.data.get('location', None)
+    
+    start_date = request.data.get('start_date', None)
+    end_date = request.data.get('end_date', None)
+    
+    dayrestrictions = request.data.get('dayrestrictions', None)
+    categorydiscount = request.data.get('categorydiscount', None)
+    blockdate = request.data.get('blockdate', None)
+    
+    error = []
+    
     if directorflat_id is None: 
        return Response(
             {
@@ -296,6 +307,120 @@ def update_directorflat(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    try:
+        datetestriction = DateRestrictions.objects.get(id=directorflat.id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Direct Or Flat Discount datetestriction Service Not Found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    if start_date:
+        datetestriction.start_date = start_date
+    if end_date:
+        datetestriction.end_date = end_date
+    
+    datetestriction.save()
+    
+    if location is not None:
+        if type(location) == str:
+            location = json.loads(location)
+        elif type(location) == list:
+            pass
+        datetestriction.business_address.clear()
+        for loc in location:
+            try:
+                loca = BusinessAddress.objects.get(id=loc)  
+                datetestriction.business_address.add(loca)
+            except Exception as err:
+                error.append(str(err))
+        
+    if categorydiscount is not None:
+        if type(categorydiscount) == str:
+            categorydiscount = categorydiscount.replace("'" , '"')
+            categorydiscount = json.loads(categorydiscount)
+        else:
+            pass
+        for cat in categorydiscount:
+            id = cat.get('id', None)
+            category = cat.get('category', None)
+            discount = cat.get('discount', None)
+            is_deleted = cat.get('is_deleted', None)
+            if id is not None:
+                try:
+                    category_id = CategoryDiscount.objects.get(id = str(id))
+                    if bool(is_deleted) == True:
+                        category_id.delete()
+                    category_id.category_type = category
+                    category_id.discount = discount
+                    category_id.save()
+                except Exception as err:
+                    error.append(str(err))
+            else:
+                CategoryDiscount.objects.create(
+                    directorflat = directorflat ,
+                    
+                    category_type = category,
+                    discount = discount
+                )
+    if dayrestrictions is not None:
+        if type(dayrestrictions) == str:
+            dayrestrictions = dayrestrictions.replace("'" , '"')
+            dayrestrictions = json.loads(dayrestrictions)
+        else:
+            pass
+        for dayres in dayrestrictions:
+            id = dayres.get('id', None)
+            day = dayres.get('day', None)
+            is_deleted = cat.get('is_deleted', None)
+            if id is not None:
+                try:
+                    dayrestriction = DayRestrictions.objects.get(id  = str(id))
+                    if bool(is_deleted) == True:
+                        dayrestriction.delete()
+                    dayrestriction.day = day
+                    dayrestriction.save()
+                except Exception as err:
+                    error.append(str(err))
+            else:
+                DayRestrictions.objects.create(
+                    directorflat = directorflat ,
+                    day = day,
+                )
+                
+    if blockdate is not None:
+        if type(blockdate) == str:
+            blockdate = blockdate.replace("'" , '"')
+            blockdate = json.loads(blockdate)
+        else:
+            pass
+        
+        for bl_date in blockdate:    
+            date = bl_date.get('date', None)
+            is_deleted = bl_date.get('is_deleted', None)
+            id = bl_date.get('id', None)
+            if id is not None:
+                try:
+                    block_date = BlockDate.objects.get(id = str(id))
+                    if bool(is_deleted) == True:
+                        block_date.delete()
+                    block_date.date= date
+                    block_date.save()
+                except Exception as err:
+                    error.append(str(err))
+            else:
+               BlockDate.objects.create(
+                    directorflat = directorflat,
+                    date = date,
+                ) 
+                    
     return Response(
         {
             'status' : True,
@@ -382,13 +507,14 @@ def create_specificgroupdiscount(request):
             except Exception as err:
                 error.append(str(err))
                 
-    if categorydiscount is not None:
-        if type(categorydiscount) == str:
-            categorydiscount = categorydiscount.replace("'" , '"')
-            categorydiscount = json.loads(categorydiscount)
+                
+    if servicegroup is not None:
+        if type(servicegroup) == str:
+            servicegroup = servicegroup.replace("'" , '"')
+            servicegroup = json.loads(servicegroup)
         else:
             pass
-        for cat in categorydiscount:
+        for cat in servicegroup:
             try:
                 category = cat.get('service_group', None)
                 discount = cat.get('discount', None)
@@ -398,15 +524,48 @@ def create_specificgroupdiscount(request):
                     
                     servicegroup = category,
                     discount = discount
-                    # all_category = all_category,
-                    # service_discount = service_discount,
-                    # retail_discount = retail_discount,
-                    # voucher_discount = voucher_discount,
                 )
                 
             except Exception as err:
                error.append(str(err))
+               
+    if dayrestrictions is not None:
+        if type(dayrestrictions) == str:
+            dayrestrictions = dayrestrictions.replace("'" , '"')
+            dayrestrictions = json.loads(dayrestrictions)
+        else:
+            pass
+        for dayres in dayrestrictions:
+            try: 
+                day = dayres.get('day', None)
+                
+                DayRestrictions.objects.create(
+                    specificgroupdiscount = sp_grp ,
+                    day = day,
+                )
+                
+            except Exception as err:
+                error.append(str(err))
     
+    if blockdate is not None:
+        if type(blockdate) == str:
+            blockdate = blockdate.replace("'" , '"')
+            blockdate = json.loads(blockdate)
+        else:
+            pass
+        
+        for bl_date in blockdate:
+            
+            try: 
+                date = bl_date.get('date', None)
+                BlockDate.objects.create(
+                    specificgroupdiscount = sp_grp,
+                    date = date,
+                )
+                
+            except Exception as err:
+               error.append(str(err))
+               
     return Response(
             {
                 'status' : True,
