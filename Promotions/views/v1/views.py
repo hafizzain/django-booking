@@ -356,7 +356,7 @@ def update_directorflat(request):
             if id is not None:
                 try:
                     category_id = CategoryDiscount.objects.get(id = str(id))
-                    if bool(is_deleted) == True:
+                    if bool(is_deleted) is True:
                         category_id.delete()
                         pass
                     category_id.category_type = category
