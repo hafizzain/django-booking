@@ -637,7 +637,7 @@ def cancel_appointment_client(request):
             'response' : {
                 'message' : 'Cancel Appointment Successfully',
                 'error_message' : None,
-                'appointment': data
+                'appointment': serializer.data
             }
         },
         status=status.HTTP_200_OK
