@@ -1274,7 +1274,7 @@ def cancel_appointment_client(request):
     
     with tenant_context(tenant):
         try:
-            appointment = Appointment.objects.get(id=appointment_id)
+            appointment = Appointment.objects.get(id=str(appointment_id))
         except Exception as err:
             return Response(
                 {
