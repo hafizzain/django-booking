@@ -2998,7 +2998,7 @@ def get_check_availability(request):
                 # else:
                 #     data.append(f'Employees are free, you can proceed further employee id: {employee.id}')
                 except Exception as err:
-                    data.append(f'the employe id {employee}, start_time {str(err)}')
+                    data.append(f'the employe{employee}, start_time {str(err)}')
             except Exception as err:
                 pass
                     

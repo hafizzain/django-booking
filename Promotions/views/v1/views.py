@@ -308,7 +308,7 @@ def update_directorflat(request):
             status=status.HTTP_404_NOT_FOUND
         )
     try:
-        datetestriction = DateRestrictions.objects.get(id=directorflat.id)
+        datetestriction = DateRestrictions.objects.get(directorflat = directorflat.id)
     except Exception as err:
         return Response(
             {
