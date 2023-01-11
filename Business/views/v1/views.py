@@ -2985,9 +2985,9 @@ def get_check_availability(request):
                         # member__employee_employedailyschedule__start_time__lte = start_time,
                         # member__employee_employedailyschedule__end_time__gte = start_time,
                         is_blocked = False,
-                    ).values_list('member__id', flat=True)
-                    for staff in av_staff_ids:
-                        if end_time <= staff.appointment_time or start_time >= staff.end_time:
+                    )#.values_list('member__id', flat=True)
+                    for ser in av_staff_ids:
+                        if end_time <= ser.appointment_time or start_time >= ser.end_time:
                             data.append(f'Employees are free, you can proceed further employee id: {employee.id}')
                         
                         else:
@@ -3220,3 +3220,115 @@ def create_client_business(request):
         status=status.HTTP_200_OK
     )
     
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def get_check_availability(request):                  
+    employee = request.data.get('employee', None)
+    tenant_id = request.data.get('hash', None)
+    
+    if tenant_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'hash',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    
+    try:
+        tenant = Tenant.objects.get(id = tenant_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Invalid Tenat Id',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    if type(check_availability) == str:
+        check_availability = json.loads(check_availability)
+    else:
+        pass
+              
+    data = []
+    with tenant_context(tenant):
+        for check in check_availability:
+            emp_id = check.get('member_id', None)
+            duration = check.get('duration', None)
+            start_time = check.get('app_time', None)
+            date = check.get('date', None)
+            
+            dt = datetime.strptime(start_time, "%H:%M:%S")
+            start_time = dt.time()
+            
+            dt = datetime.strptime(date, "%Y-%m-%d")
+            date = dt.date()
+            
+            app_date_time = f'2000-01-01 {start_time}'
+        
+            duration = DURATION_CHOICES[duration]
+            app_date_time = datetime.fromisoformat(app_date_time)
+            datetime_duration = app_date_time + timedelta(minutes=duration)
+            datetime_duration = datetime_duration.strftime('%H:%M:%S')
+            end_time = datetime_duration
+                
+            try:
+                employee = Employee.objects.get(id = emp_id)
+                data.append(f'the employe id {employee}, start_time {start_time}, {date}')
+                
+                try:
+                    av_staff_ids = AppointmentService.objects.filter(
+                        
+                        member__id = employee.id,
+                        appointment_date = date,
+                        # appointment_time__gte = start_time, # 1:00
+                        # end_time__lte = start_time, # 1:40
+                        # member__employee_employedailyschedule__date = date,
+                        # member__employee_employedailyschedule__start_time__lte = start_time,
+                        # member__employee_employedailyschedule__end_time__gte = start_time,
+                        is_blocked = False,
+                    ).values_list('member__id', flat=True)
+                    for staff in av_staff_ids:
+                        if end_time <= staff.appointment_time or start_time >= staff.end_time:
+                            data.append(f'Employees are free, you can proceed further employee id: {employee.id}')
+                        
+                        else:
+                            data.append(f'Employe already busy {employee.id}')
+                    
+                # if len(av_staff_ids) > 0 :
+                #     data.append(f'Employe already busy {employee.id}')
+                # else:
+                #     data.append(f'Employees are free, you can proceed further employee id: {employee.id}')
+                except Exception as err:
+                    data.append(f'the employe id {employee}, start_time {str(err)}')
+            except Exception as err:
+                pass
+                    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Employees Check Availability',
+                    'error_message' : None,
+                    'employee':data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
