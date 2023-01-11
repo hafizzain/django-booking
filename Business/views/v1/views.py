@@ -2987,12 +2987,13 @@ def get_check_availability(request):
                         is_blocked = False,
                     )#.values_list('member__id', flat=True)
                     for ser in av_staff_ids:
+                        data.append(f'{av_staff_ids} type {type(datetime_duration)}, tested {ser.appointment_time}')
                         if datetime_duration < ser.appointment_time or dtime > ser.end_time:
                             data.append(f'Employees are free, you can proceed further employee id: {employee.id}')
                         
                         else:
                             data.append(f'Employe already busy {employee.id}')
-                    data.append(f'{av_staff_ids}')
+                    data.append(f'{av_staff_ids} type {type(datetime_duration)}, ')
                     
                 # if len(av_staff_ids) > 0 :
                 #     data.append(f'Employe already busy {employee.id}')

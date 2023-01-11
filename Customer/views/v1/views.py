@@ -560,9 +560,94 @@ def get_client_appointment(request):
             },
             status=status.HTTP_200_OK
         )
+
 @api_view(['PUT'])
 @permission_classes([AllowAny])
 def cancel_appointment_client(request):
+    appointment_id = request.GET.get('appointment_id', None)
+    hash = request.GET.get('hash', None)
+    
+    data = []    
+    if appointment_id and hash is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'appointment_id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        tenant = Tenant.objects.get(id = hash)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Invalid Tenant Id',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )    
+    
+    with tenant_context(tenant):
+        try:
+            appointment = Appointment.objects.get(id=str(appointment_id))
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 404,
+                    'status_code_text' : '404',
+                    'response' : {
+                        'message' : 'Invalid Appointment ID!',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        appointment_service = AppointmentService.objects.filter(appointment=appointment.id)
+        for app_service in appointment_service:
+            app_service.appointment_status = 'Cancel'
+            app_service.save()
+            
+        serializer = AppointmentClientSerializer(appointment, context={'request' : request})
+        data.append(serializer.data)
+        # try:
+        #     thrd = Thread(target=cancel_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant} )
+        #     thrd.start()
+        # except Exception as err:
+        #     print(err)
+        #     pass
+            
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Cancel Appointment Successfully',
+                'error_message' : None,
+                'appointment': serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+    
+@api_view(['PUT'])
+@permission_classes([AllowAny])
+def update_appointment_client(request):
     appointment_id = request.GET.get('appointment_id', None)
     hash = request.GET.get('hash', None)
     
