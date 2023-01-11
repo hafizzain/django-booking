@@ -622,7 +622,7 @@ def cancel_appointment_client(request):
             app_service.save()
             
         serializer = AppointmentClientSerializer(appointment, context={'request' : request})
-        data.extend(serializer.data)
+        data.append(serializer.data)
         # try:
         #     thrd = Thread(target=cancel_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant} )
         #     thrd.start()
