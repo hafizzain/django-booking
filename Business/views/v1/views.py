@@ -2988,8 +2988,8 @@ def get_check_availability(request):
                         is_blocked = False,
                     )#.values_list('member__id', flat=True)
                     for ser in av_staff_ids:
-                        data.append(f'{av_staff_ids} type {type(tested)}, tested {ser.appointment_time}')
-                        if tested < ser.appointment_time or dtime > ser.end_time:
+                        data.append(f'{av_staff_ids} type {type(start_time)}, tested {ser.appointment_time}')
+                        if tested < ser.appointment_time or start_time > ser.end_time:
                             data.append(f'Employees are free, you can proceed further employee id: {employee.id}')
                         
                         else:
