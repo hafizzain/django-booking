@@ -390,7 +390,7 @@ def update_directorflat(request):
                     ExceptionRecord.objects.create(text = f'prmotion {str(is_deleted) == "True"} len {len(is_deleted) == len("True") }')
                     test = bool(is_deleted)
                     ExceptionRecord.objects.create(text = f'prmotion test {test} type of {type(test)}  {str(is_deleted) == "True" }or {test}')
-                    if test:
+                    if str(is_deleted) == "True":
                         dayrestriction.delete()
                         dayrestriction.save()
                         pass
@@ -399,6 +399,7 @@ def update_directorflat(request):
                     
                 except Exception as err:
                     error.append(str(err))
+                    ExceptionRecord.objects.create(text = f'{str(err)}')
             else:
                 DayRestrictions.objects.create(
                     directorflat = directorflat ,
