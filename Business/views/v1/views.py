@@ -2956,8 +2956,8 @@ def get_check_availability(request):
             start_time = check.get('app_time', None)
             date = check.get('date', None)
             
-            dt = datetime.strptime(start_time, "%H:%M:%S")
-            start_time = dt.time()
+            dtime = datetime.strptime(start_time, "%H:%M:%S")
+            start_time = dtime.time()
             
             dt = datetime.strptime(date, "%Y-%m-%d")
             date = dt.date()
@@ -2987,7 +2987,7 @@ def get_check_availability(request):
                         is_blocked = False,
                     )#.values_list('member__id', flat=True)
                     for ser in av_staff_ids:
-                        if datetime_duration <= ser.appointment_time or start_time >= ser.end_time:
+                        if datetime_duration <= ser.appointment_time or dtime >= ser.end_time:
                             data.append(f'Employees are free, you can proceed further employee id: {employee.id}')
                         
                         else:
