@@ -358,6 +358,7 @@ def update_directorflat(request):
                     category_id = CategoryDiscount.objects.get(id = str(id))
                     if bool(is_deleted) == True:
                         category_id.delete()
+                        pass
                     category_id.category_type = category
                     category_id.discount = discount
                     category_id.save()
@@ -370,6 +371,8 @@ def update_directorflat(request):
                     category_type = category,
                     discount = discount
                 )
+                
+                
     if dayrestrictions is not None:
         if type(dayrestrictions) == str:
             dayrestrictions = dayrestrictions.replace("'" , '"')
