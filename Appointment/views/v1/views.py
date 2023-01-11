@@ -1288,7 +1288,7 @@ def cancel_appointment_client(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-        appointment_service = AppointmentService.objects.filter(id=appointment)
+        appointment_service = AppointmentService.objects.filter(id=appointment.id)
         for app_service in appointment_service:
             app_service.appointment_status = 'Cancel'
             app_service.save()
