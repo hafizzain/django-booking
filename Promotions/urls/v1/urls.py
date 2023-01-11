@@ -9,4 +9,7 @@ urlpatterns = [
     path('delete_directorflat/', views.delete_directorflat),
     path('update_directorflat/', views.update_directorflat),
     
+    #Specific Group Category
+    path('create_directorflat/', views.create_directorflat),
+    
 ]

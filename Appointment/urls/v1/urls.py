@@ -32,4 +32,5 @@ urlpatterns = [
     
     #Create Client Book Appointment
     path('create_appointment_client/', views.create_appointment_client),
+    path('cancel_appointment_client/', views.cancel_appointment_client),
 ]

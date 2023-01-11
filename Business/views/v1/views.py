@@ -2905,8 +2905,7 @@ def get_domain_business_address(request):
     
 @api_view(['POST'])
 @permission_classes([AllowAny])
-def get_check_availability(request):  
-                      
+def get_check_availability(request):                  
     check_availability = request.data.get('check_availability', None)
     tenant_id = request.data.get('hash', None)
     

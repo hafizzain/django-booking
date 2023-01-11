@@ -308,3 +308,75 @@ def update_directorflat(request):
         },
         status=status.HTTP_200_OK
     )
+    
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_specificgroupdiscount(request):
+    user = request.user
+    business_id = request.data.get('business', None)
+    
+    location = request.data.get('location', None)
+    start_date = request.data.get('start_date', None)
+    end_date = request.data.get('end_date', None)
+    
+    dayrestrictions = request.data.get('dayrestrictions', None)
+    blockdate = request.data.get('blockdate', None)
+    
+    error = []
+    
+    if not all([business_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                            ]
+                    }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        business = Business.objects.get(id=business_id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    flatordirect = DirectOrFlatDiscount.objects.create(
+        user = user,
+        business =  business,
+    )
+    date_res = DateRestrictions.objects.create(
+        directorflat = flatordirect ,
+        start_date = start_date,
+        end_date =end_date,
+    )
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Direct or Flat Created Successfully!',
+                    'error_message' : None,
+                    'errors' : error,
+                    'flatordirect' : 'serializers.data',
+                    
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
