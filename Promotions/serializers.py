@@ -7,21 +7,46 @@ from django_tenants.utils import tenant_context
 from Promotions.models import DirectOrFlatDiscount , CategoryDiscount , DateRestrictions , DayRestrictions, BlockDate
 
 class BlockDateSerializers(serializers.ModelSerializer):
+    is_deleted = serializers.SerializerMethodField(read_only=True)
+    
+    
+    def get_is_deleted(self, obj):
+        if obj.is_deleted == True:
+            return 'True'
+        else:
+            return 'False'
     class Meta:
         model = BlockDate
         fields = '__all__'
         
 class DayRestrictionsSerializers(serializers.ModelSerializer):
+    is_deleted = serializers.SerializerMethodField(read_only=True)
+    
+    
+    def get_is_deleted(self, obj):
+        if obj.is_deleted == True:
+            return 'True'
+        else:
+            return 'False'
     class Meta:
         model = DayRestrictions
         fields = '__all__'
 class LocationSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = BusinessAddress
         fields = ['id','address_name']        
         
 class DateRestrictionsSerializers(serializers.ModelSerializer):
     address = serializers.SerializerMethodField()
+    is_deleted = serializers.SerializerMethodField(read_only=True)
+    
+    
+    def get_is_deleted(self, obj):
+        if obj.is_deleted == True:
+            return 'True'
+        else:
+            return 'False'
     
     def get_address(self, obj):
         try:
@@ -34,6 +59,14 @@ class DateRestrictionsSerializers(serializers.ModelSerializer):
         fields = '__all__'
         
 class CategoryDiscountSerializers(serializers.ModelSerializer):
+    is_deleted = serializers.SerializerMethodField(read_only=True)
+    
+    
+    def get_is_deleted(self, obj):
+        if obj.is_deleted == True:
+            return 'True'
+        else:
+            return 'False'
     class Meta:
         model = CategoryDiscount
         fields = '__all__'
@@ -44,6 +77,14 @@ class DirectOrFlatDiscountSerializers(serializers.ModelSerializer):
     date_restrictions = serializers.SerializerMethodField(read_only=True)
     block_date = serializers.SerializerMethodField(read_only=True)
     type = serializers.SerializerMethodField(read_only=True)
+    is_deleted = serializers.SerializerMethodField(read_only=True)
+    
+    
+    def get_is_deleted(self, obj):
+        if obj.is_deleted == True:
+            return 'True'
+        else:
+            return 'False'
     
     def get_type(self, obj):
         return 'Direct Or Flat'
