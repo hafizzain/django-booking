@@ -3282,7 +3282,7 @@ def employee_availability(request):
                     is_blocked = False,
                 ) #.values_list('member__id', flat=True)
                 serilizer =  EmployeAppointmentServiceSerializer(av_staff_ids, many = True)
-                data.append(serilizer.data)
+                data.extend(serilizer.data)
             except Exception as err:
                 pass
                     

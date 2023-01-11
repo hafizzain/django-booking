@@ -24,7 +24,7 @@ from Business.models import Business, BusinessSocial, BusinessAddress, BusinessO
 from Product.models import Product, ProductStock
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
-from Promotions.models import BlockDate, CategoryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount
+from Promotions.models import BlockDate, CategoryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount, ServiceGroupDiscount, SpecificGroupDiscount
 from Promotions.serializers import DirectOrFlatDiscountSerializers
 from Service.models import Service, ServiceGroup
 from Tenants.models import Domain, Tenant
@@ -323,6 +323,9 @@ def create_specificgroupdiscount(request):
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)
     
+    servicegroup = request.data.get('servicegroup', None)    
+    
+    
     error = []
     
     if not all([business_id]):
@@ -356,15 +359,53 @@ def create_specificgroupdiscount(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-    flatordirect = DirectOrFlatDiscount.objects.create(
+    sp_grp = SpecificGroupDiscount.objects.create(
         user = user,
         business =  business,
     )
     date_res = DateRestrictions.objects.create(
-        directorflat = flatordirect ,
+        specificgroupdiscount = sp_grp ,
         start_date = start_date,
         end_date =end_date,
     )
+    if location is not None:
+        if type(location) == str:
+                location = json.loads(location)
+
+        elif type(location) == list:
+            pass
+    
+        for loc in location:
+            try:
+                address = BusinessAddress.objects.get(id=loc)
+                date_res.business_address.add(address)
+            except Exception as err:
+                error.append(str(err))
+                
+    if categorydiscount is not None:
+        if type(categorydiscount) == str:
+            categorydiscount = categorydiscount.replace("'" , '"')
+            categorydiscount = json.loads(categorydiscount)
+        else:
+            pass
+        for cat in categorydiscount:
+            try:
+                category = cat.get('service_group', None)
+                discount = cat.get('discount', None)
+                
+                category_discount = ServiceGroupDiscount.objects.create(
+                    specificgroupdiscount = sp_grp ,
+                    
+                    servicegroup = category,
+                    discount = discount
+                    # all_category = all_category,
+                    # service_discount = service_discount,
+                    # retail_discount = retail_discount,
+                    # voucher_discount = voucher_discount,
+                )
+                
+            except Exception as err:
+               error.append(str(err))
     
     return Response(
             {

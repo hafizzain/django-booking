@@ -516,4 +516,4 @@ class EmployeAppointmentServiceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AppointmentService
-        fields = ('id', 'appointment_date', 'appointment_time', 'end_time')
+        fields = ('appointment_time', 'end_time')
