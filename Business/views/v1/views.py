@@ -1,7 +1,7 @@
 
 
 
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 import email
 from django.conf import settings
 from operator import ge
@@ -2968,7 +2968,7 @@ def get_check_availability(request):
             app_date_time = datetime.fromisoformat(app_date_time)
             datetime_duration = app_date_time + timedelta(minutes=duration)
             datetime_duration = datetime_duration.strftime('%H:%M:%S')
-            tested = datetime.strptime(datetime_duration ,'%H:%M:%S')
+            tested = time.strptime(datetime_duration ,'%H:%M:%S')
             end_time = datetime_duration
                 
             try:
