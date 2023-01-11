@@ -12,7 +12,7 @@ from Business.models import BookingSetting, BusinessAddressMedia, BusinessType, 
 from Authentication.serializers import UserSerializer
 from django.conf import settings
 
-from Product.Constants.index  import tenant_media_base_url
+from Product.Constants.index  import tenant_media_base_url, tenant_media_domain
 
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
@@ -238,6 +238,10 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
             if image.image:
                 try:
                     request = self.context["request"]
+                    tenant = self.context["tenant"]
+                    if tenant:
+                        url = tenant_media_domain(tenant)
+                        return f'{url}{image.image}'
                     url = tenant_media_base_url(request)
                     return f'{url}{image.image}'
                 except:
