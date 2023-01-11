@@ -13,7 +13,7 @@ from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Authentication.serializers import UserTenantLoginSerializer
 
 from Business.models import BusinessAddressMedia, BusinessType
-from Business.serializers.v1_serializers import EmployeAppointmentServiceSerializer, EmployeTenatSerializer, OpeningHoursSerializer,AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer
+from Business.serializers.v1_serializers import BusinessAddress_CustomerSerializer, EmployeAppointmentServiceSerializer, EmployeTenatSerializer, OpeningHoursSerializer,AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer
 from Client.models import Client
 from Employee.models import Employee
 
@@ -2851,7 +2851,7 @@ def get_domain_business_address(request):
             
         
         if len(business_addresses) > 0:
-            serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={
+            serialized = BusinessAddress_CustomerSerializer(business_addresses, many=True,context={
                                                             'tenant' : tenant.schema_name})
             data = serialized.data
         else:

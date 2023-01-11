@@ -236,20 +236,118 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
         try:
             image = BusinessAddressMedia.objects.get(business_address = obj)
             if image.image:
-                request = self.context["request"]
-                tenant = self.context["tenant"]
-                if tenant:
-                    try:
-                        url = tenant_media_domain(tenant)
-                        return f'{url}{image.image}'
-                    except:
-                        return image.image
-                if request:
-                    try:
-                        url = tenant_media_base_url(request)
-                        return f'{url}{image.image}'
-                    except:
-                        return image.image
+                try:
+                    request = self.context["request"]
+                    url = tenant_media_base_url(request)
+                    return f'{url}{image.image}'
+                except:
+                    return image.image
+            return None
+            #return BusinessAddressMediaSerializer(image, context=self.context).data
+        except Exception as err:
+            print(err)
+            
+    def get_currency(self, obj):
+        try:
+            currency = Currency.objects.get(id=obj.currency.id)
+            return CurrencySerializer(currency).data
+        
+        except Exception as err:
+            print(err)
+    
+    def get_opening_hours(self, obj):
+        try:
+            location = BusinessOpeningHour.objects.filter(business_address=obj).order_by('-created_at')
+            return OpeningHoursSerializer(location, many=True).data
+        
+        except BusinessOpeningHour.DoesNotExist:
+            return None
+
+    def get_start_time(self, obj):
+        try:
+            location = BusinessOpeningHour.objects.get(
+                business_address=obj,
+                day__iexact = 'Monday'
+            )
+            return location.start_time
+        except BusinessOpeningHour.DoesNotExist:
+            return None
+            
+    def get_close_time(self, obj):
+        try:
+            location = BusinessOpeningHour.objects.get(
+                business_address=obj,
+                day__iexact = 'Monday'
+            )
+            return location.close_time
+        except BusinessOpeningHour.DoesNotExist:
+            return None
+
+    class Meta:
+        model = BusinessAddress
+        fields = [
+            'id',
+            'country',
+            'state',
+            'city',
+            'currency',
+            'email',
+            'mobile_number',
+            'address',
+            'address_name',
+            'postal_code',
+            'website',
+            'is_primary',
+            'banking',
+            'start_time',
+            'close_time',
+            'service_avaiable',
+            'location_name',
+            'images',
+            'opening_hours',
+            'is_deleted',
+            'is_publish',
+            'description',
+        ]
+class BusinessAddress_CustomerSerializer(serializers.ModelSerializer):
+    #opening_hours= OpeningHoursSerializer(read_only=True)
+    opening_hours = serializers.SerializerMethodField(read_only=True)
+    start_time=  serializers.SerializerMethodField(read_only=True)
+    close_time= serializers.SerializerMethodField(read_only=True)
+    currency = serializers.SerializerMethodField(read_only=True)
+    images = serializers.SerializerMethodField(read_only=True)
+    
+    country = serializers.SerializerMethodField(read_only=True)
+    state = serializers.SerializerMethodField(read_only=True)
+    city = serializers.SerializerMethodField(read_only=True)
+    
+    def get_country(self, obj):
+        try:
+            return CountrySerializer(obj.country).data
+        except Country.DoesNotExist:
+            return None
+    def get_state(self, obj):
+        try:
+            return StateSerializer(obj.state).data
+        except State.DoesNotExist:
+            return None
+    
+    def get_city(self, obj):
+        try:
+            return CitySerializer(obj.city).data
+        except City.DoesNotExist:
+            return None    
+    
+    def get_images(self, obj):
+        try:
+            image = BusinessAddressMedia.objects.get(business_address = obj)
+            if image.image:
+                try:
+                    tenant = self.context["tenant"]
+                    url = tenant_media_domain(tenant)
+                    return f'{url}{image.image}'
+                except:
+                    return image.image
             return None
             #return BusinessAddressMediaSerializer(image, context=self.context).data
         except Exception as err:
@@ -524,4 +622,4 @@ class EmployeAppointmentServiceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AppointmentService
-        fields = ('appointment_time', 'end_time')
+        fields = ( 'appointment_time', 'end_time')
