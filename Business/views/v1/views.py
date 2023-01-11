@@ -2972,9 +2972,7 @@ def get_check_availability(request):
             end_time = datetime_duration
                 
             try:
-                employee = Employee.objects.get(id = emp_id)
-                data.append(f'the employe id {employee}, start_time {start_time}, {date}')
-                
+                employee = Employee.objects.get(id = emp_id)                
                 try:
                     av_staff_ids = AppointmentService.objects.filter(
                         member__id = employee.id,
@@ -2994,7 +2992,9 @@ def get_check_availability(request):
                                         
                         else:
                             data.append(f'Employees are free, you can proceed further employee name {employee.full_name}')
-                    #data.append(f'{av_staff_ids} type {type(datetime_duration)}, ')
+                    if len(av_staff_ids) == 0:
+                        data.append(f'Employees are free, you can proceed further employee name {employee.full_name}')
+                        #data.append(f'{av_staff_ids} type {type(datetime_duration)}, ')
                     
                 except Exception as err:
                     data.append(f'the employe{employee}, start_time {str(err)}')
