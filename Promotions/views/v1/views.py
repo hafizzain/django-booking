@@ -393,6 +393,7 @@ def update_directorflat(request):
                     if str(is_deleted) == "True":
                         dayrestriction.delete()
                         dayrestriction.save()
+                        ExceptionRecord.objects.create(text = f'Delete test')
                         pass
                     dayrestriction.day = day
                     dayrestriction.save()
