@@ -236,16 +236,20 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
         try:
             image = BusinessAddressMedia.objects.get(business_address = obj)
             if image.image:
-                try:
-                    request = self.context["request"]
-                    tenant = self.context["tenant"]
-                    if tenant:
+                request = self.context["request"]
+                tenant = self.context["tenant"]
+                if tenant:
+                    try:
                         url = tenant_media_domain(tenant)
                         return f'{url}{image.image}'
-                    url = tenant_media_base_url(request)
-                    return f'{url}{image.image}'
-                except:
-                    return image.image
+                    except:
+                        return image.image
+                if request:
+                    try:
+                        url = tenant_media_base_url(request)
+                        return f'{url}{image.image}'
+                    except:
+                        return image.image
             return None
             #return BusinessAddressMediaSerializer(image, context=self.context).data
         except Exception as err:
