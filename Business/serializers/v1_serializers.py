@@ -511,3 +511,9 @@ class EmployeTenatSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = '__all__'
+        
+class EmployeAppointmentServiceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = AppointmentService
+        fields = ('id', 'appointment_date', 'appointment_time', 'end_time')

@@ -13,7 +13,7 @@ from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Authentication.serializers import UserTenantLoginSerializer
 
 from Business.models import BusinessAddressMedia, BusinessType
-from Business.serializers.v1_serializers import EmployeTenatSerializer, OpeningHoursSerializer,AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer
+from Business.serializers.v1_serializers import EmployeAppointmentServiceSerializer, EmployeTenatSerializer, OpeningHoursSerializer,AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer
 from Client.models import Client
 from Employee.models import Employee
 
@@ -2936,7 +2936,7 @@ def get_check_availability(request):
                 'status_code' : 400,
                 'status_code_text' : 'Invalid Data',
                 'response' : {
-                    'message' : 'Invalid Tenat Id',
+                    'message' : 'Invalid Tenant Id',
                     'error_message' : str(err),
                 }
             },
@@ -3225,6 +3225,7 @@ def create_client_business(request):
 def employee_availability(request):                  
     employee = request.data.get('employee', None)
     tenant_id = request.data.get('hash', None)
+    date = request.data.get('date', None)
     
     if tenant_id is None:
         return Response(
@@ -3243,7 +3244,6 @@ def employee_availability(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    
     try:
         tenant = Tenant.objects.get(id = tenant_id)
     except Exception as err:
@@ -3253,69 +3253,36 @@ def employee_availability(request):
                 'status_code' : 400,
                 'status_code_text' : 'Invalid Data',
                 'response' : {
-                    'message' : 'Invalid Tenat Id',
+                    'message' : 'Invalid Tenant Id',
                     'error_message' : str(err),
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    if type(check_availability) == str:
-        check_availability = json.loads(check_availability)
+    if type(employee) == str:
+        employee = json.loads(employee)
     else:
         pass
               
     data = []
+    dt = datetime.strptime(date, "%Y-%m-%d")
+    date = dt.date()
+            
     with tenant_context(tenant):
-        for check in check_availability:
+        for check in employee:
             emp_id = check.get('member_id', None)
-            duration = check.get('duration', None)
-            start_time = check.get('app_time', None)
-            date = check.get('date', None)
             
-            dt = datetime.strptime(start_time, "%H:%M:%S")
-            start_time = dt.time()
-            
-            dt = datetime.strptime(date, "%Y-%m-%d")
-            date = dt.date()
-            
-            app_date_time = f'2000-01-01 {start_time}'
-        
-            duration = DURATION_CHOICES[duration]
-            app_date_time = datetime.fromisoformat(app_date_time)
-            datetime_duration = app_date_time + timedelta(minutes=duration)
-            datetime_duration = datetime_duration.strftime('%H:%M:%S')
-            end_time = datetime_duration
-                
             try:
-                employee = Employee.objects.get(id = emp_id)
-                data.append(f'the employe id {employee}, start_time {start_time}, {date}')
-                
-                try:
-                    av_staff_ids = AppointmentService.objects.filter(
-                        
-                        member__id = employee.id,
-                        appointment_date = date,
-                        # appointment_time__gte = start_time, # 1:00
-                        # end_time__lte = start_time, # 1:40
-                        # member__employee_employedailyschedule__date = date,
-                        # member__employee_employedailyschedule__start_time__lte = start_time,
-                        # member__employee_employedailyschedule__end_time__gte = start_time,
-                        is_blocked = False,
-                    ).values_list('member__id', flat=True)
-                    for staff in av_staff_ids:
-                        if end_time <= staff.appointment_time or start_time >= staff.end_time:
-                            data.append(f'Employees are free, you can proceed further employee id: {employee.id}')
-                        
-                        else:
-                            data.append(f'Employe already busy {employee.id}')
+                employee = Employee.objects.get(id = emp_id)                
+                av_staff_ids = AppointmentService.objects.filter(
                     
-                # if len(av_staff_ids) > 0 :
-                #     data.append(f'Employe already busy {employee.id}')
-                # else:
-                #     data.append(f'Employees are free, you can proceed further employee id: {employee.id}')
-                except Exception as err:
-                    data.append(f'the employe id {employee}, start_time {str(err)}')
+                    member__id = employee.id,
+                    appointment_date = date,
+                    is_blocked = False,
+                ) #.values_list('member__id', flat=True)
+                serilizer =  EmployeAppointmentServiceSerializer(av_staff_ids, many = True)
+                data.append(serilizer.data)
             except Exception as err:
                 pass
                     
