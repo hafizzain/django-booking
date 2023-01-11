@@ -2968,6 +2968,7 @@ def get_check_availability(request):
             app_date_time = datetime.fromisoformat(app_date_time)
             datetime_duration = app_date_time + timedelta(minutes=duration)
             datetime_duration = datetime_duration.strftime('%H:%M:%S')
+            tested = datetime.strftime(datetime_duration ,'%H:%M:%S')
             end_time = datetime_duration
                 
             try:
@@ -2987,7 +2988,7 @@ def get_check_availability(request):
                         is_blocked = False,
                     )#.values_list('member__id', flat=True)
                     for ser in av_staff_ids:
-                        data.append(f'{av_staff_ids} type {type(datetime_duration)}, tested {ser.appointment_time}')
+                        data.append(f'{av_staff_ids} type {type(tested)}, tested {ser.appointment_time}')
                         if datetime_duration < ser.appointment_time or dtime > ser.end_time:
                             data.append(f'Employees are free, you can proceed further employee id: {employee.id}')
                         
