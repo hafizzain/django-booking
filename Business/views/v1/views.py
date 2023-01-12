@@ -2988,7 +2988,7 @@ def get_check_availability(request):
                     
                     for ser in av_staff_ids:
                         #data.append(f'{av_staff_ids} type {type(start_time)}, tested {ser.appointment_time}')
-                        if tested < ser.appointment_time and start_time > ser.end_time:
+                        if tested <= ser.appointment_time and start_time >= ser.end_time:
                             data.append(f'Employe Already busy  {employee.full_name}')
                             Availability = False
                                         
