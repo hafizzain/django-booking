@@ -121,6 +121,7 @@ def create_client_business(request):
                 full_name = name,
                 mobile_number=number,
                 email = email,
+                is_active = True
             )
             client_id = client.id
             data.append(f'Client Created Successfully {client.full_name}')
@@ -183,7 +184,6 @@ def create_client_business(request):
                 user = user,
                 client_id = client_id,
                 is_everyone = True
-                
             )
         
         try:
@@ -204,9 +204,7 @@ def create_client_business(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-            
     #serialized = UserTenantLoginSerializer(user)
-     
     return Response(
         {
             'status' : True,
@@ -220,7 +218,6 @@ def create_client_business(request):
         },
         status=status.HTTP_200_OK
     )
-    
     
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -648,8 +645,8 @@ def cancel_appointment_client(request):
 @api_view(['PUT'])
 @permission_classes([AllowAny])
 def update_appointment_client(request):
-    appointment_service = request.GET.get('appointment_service', None)
-    hash = request.GET.get('hash', None)
+    appointment_service = request.data.get('appointment_service', None)
+    hash = request.data.get('hash', None)
     
     data = []    
     if appointment_service and hash is None: 

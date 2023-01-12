@@ -24,8 +24,8 @@ from Business.models import Business, BusinessSocial, BusinessAddress, BusinessO
 from Product.models import Product, ProductStock
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
-from Promotions.models import BlockDate, CategoryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount, ServiceGroupDiscount, SpecificGroupDiscount
-from Promotions.serializers import DirectOrFlatDiscountSerializers
+from Promotions.models import BlockDate, CategoryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount, PurchaseDiscount, ServiceGroupDiscount, SpecificGroupDiscount
+from Promotions.serializers import DirectOrFlatDiscountSerializers, SpecificGroupDiscountSerializers
 from Service.models import Service, ServiceGroup
 from Tenants.models import Domain, Tenant
 from Utility.models import Country, Currency, ExceptionRecord, Language, NstyleFile, Software, State, City
@@ -577,16 +577,18 @@ def create_specificgroupdiscount(request):
                 
             except Exception as err:
                error.append(str(err))
-               
+    
+    serializers= SpecificGroupDiscountSerializers(sp_grp, context={'request' : request})
+    
     return Response(
             {
                 'status' : True,
                 'status_code' : 201,
                 'response' : {
-                    'message' : 'Direct or Flat Created Successfully!',
+                    'message' : 'Specific Group Discount Created Successfully!',
                     'error_message' : None,
                     'errors' : error,
-                    'flatordirect' : 'serializers.data',
+                    'specificgroup' : serializers.data,
                     
                 }
             },
@@ -679,18 +681,78 @@ def update_specificgroupdiscount(request):
             except Exception as err:
                 error.append(str(err))
                 
-    serializers= DirectOrFlatDiscountSerializers( context={'request' : request})
+    serializers= SpecificGroupDiscountSerializers(specific_group, context={'request' : request})
        
     return Response(
         {
             'status' : True,
             'status_code' : 200,
             'response' : {
-                'message' : 'Direct or Flat Updated Successfully!',
+                'message' : 'Specific Group Discount Updated Successfully!',
                 'error_message' : None,
                 'error' : error,
-                'flatordirect' : serializers.data
+                'specificgroup' : serializers.data
             }
         },
         status=status.HTTP_200_OK
+    )
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_purchasediscount(request):
+    user = request.user
+    business_id = request.data.get('business', None)
+    
+    select_type = request.data.get('location', None)
+    product = request.data.get('product', None)
+    service = request.data.get('service', None)
+    
+    purchase = request.data.get('purchase', None)
+    discount_product = request.data.get('discount_product', None)
+    discount_service = request.data.get('discount_service', None)
+    
+    discount_value = request.data.get('discount_value', None)
+    
+    location = request.data.get('location', None)
+    start_date = request.data.get('start_date', None)
+    end_date = request.data.get('end_date', None)
+    
+    dayrestrictions = request.data.get('dayrestrictions', None)
+    blockdate = request.data.get('blockdate', None)
+    
+    error = []
+    
+    if not all([business_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                            ]
+                    }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        business = Business.objects.get(id=business_id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    purchase_discount = PurchaseDiscount.objects.create(
+        user = user,
+        business =  business,
     )
