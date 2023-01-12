@@ -191,17 +191,24 @@ def create_directorflat(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_directorflat(request):
+    data = []
+    
     flatordirect = DirectOrFlatDiscount.objects.filter(is_deleted=False).order_by('-created_at')
     serialized = DirectOrFlatDiscountSerializers(flatordirect,  many=True, context={'request' : request})
+    data.extend(serialized.data)
+    
+    specific_group = SpecificGroupDiscount.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = SpecificGroupDiscountSerializers(specific_group,  many=True, context={'request' : request})
+    data.extend(serialized.data)
     
     return Response(
         {
             'status' : 200,
             'status_code' : '200',
             'response' : {
-                'message' : 'All Direct or Flat Discount',
+                'message' : 'All Discount',
                 'error_message' : None,
-                'flatordirect' : serialized.data
+                'flatordirect' : data
             }
         },
         status=status.HTTP_200_OK
