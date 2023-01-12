@@ -683,6 +683,7 @@ def update_appointment_client(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )    
+    appointment = ''
     
     with tenant_context(tenant):
         if type(appointment_service) == str:
@@ -710,6 +711,7 @@ def update_appointment_client(request):
                 appoint_service.appointment_date = date
                 appoint_service.appointment_time = date_time
                 appoint_service.end_time = end_time
+                appointment = appoint_service.appointment.id
                 appoint_service.save()
                 
                 serializer = AppointmentServiceClientSerializer(appoint_service, context={'request' : request})
@@ -725,7 +727,8 @@ def update_appointment_client(request):
             'response' : {
                 'message' : 'Update Appointment Successfully',
                 'error_message' : None,
-                'appointment': data
+                'appointment_id': appointment,
+                'appointment': data,
             }
         },
         status=status.HTTP_200_OK
