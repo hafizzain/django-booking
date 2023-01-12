@@ -2988,12 +2988,17 @@ def get_check_availability(request):
                     
                     for ser in av_staff_ids:
                         #data.append(f'{av_staff_ids} type {type(start_time)}, tested {ser.appointment_time}')
-                        if tested <= ser.appointment_time or start_time >= ser.end_time:
-                            data.append(f'Employe Already busy  {employee.full_name}')
-                            Availability = False
-                                        
+                        if tested <= ser.appointment_time:# or start_time >= ser.end_time:
+                            if start_time >= ser.end_time:
+                                data.append(f'Employees are free, employee name {employee.full_name}')
+                                
+                            else:
+                                data.append(f'The selected staff is not available at this time  {employee.full_name}')
+                                Availability = False
+                                                                        
                         else:
-                            data.append(f'Employees are free, employee name {employee.full_name}')
+                            data.append(f'Employees are free, employee name: {employee.full_name}')
+                            
                     if len(av_staff_ids) == 0:
                         data.append(f'Employees are free, you can proceed further employee name {employee.full_name}')
                         #data.append(f'{av_staff_ids} type {type(datetime_duration)}, ')
