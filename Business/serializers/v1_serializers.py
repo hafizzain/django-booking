@@ -203,6 +203,36 @@ class CurrencySerializer(serializers.ModelSerializer):
         model= Currency
         fields= '__all__'
 
+class ParentBusinessTax_RateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessTax
+        fields = ['id', 'name', 'parent_tax', 'tax_rate', 'tax_type', 'is_active']
+
+class ParentBusinessTaxSerializer(serializers.ModelSerializer):
+    # parent_tax = serializers.SerializerMethodField(read_only=True)
+    
+    # def get_parent_tax(self, obj):
+    #     try:
+    #         tax = obj.parent_tax.all()
+    #         # ser = BusinessTax.objects.filter(service = obj).first()
+    #         return tax.tax_rate
+    #     except Exception as err:
+    #         pass
+    parent_tax = ParentBusinessTax_RateSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = BusinessTax
+        fields = ['id', 'name', 'parent_tax', 'tax_rate', 'location', 'tax_type', 'is_active']
+
+class BusinessTaxBusinessAddressSerializer(serializers.ModelSerializer):
+
+    parent_tax = ParentBusinessTaxSerializer(many=True, read_only=True)
+    #location = BusinessAddress_GetSerializer()
+    class Meta:
+        model = BusinessTax
+        fields = ['id', 'name', 'parent_tax',
+                  'tax_rate', 'location', 'tax_type', 'is_active']
+        
 class BusinessAddress_GetSerializer(serializers.ModelSerializer):
     #opening_hours= OpeningHoursSerializer(read_only=True)
     opening_hours = serializers.SerializerMethodField(read_only=True)
@@ -214,12 +244,21 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
     country = serializers.SerializerMethodField(read_only=True)
     state = serializers.SerializerMethodField(read_only=True)
     city = serializers.SerializerMethodField(read_only=True)
+    businesstax = serializers.SerializerMethodField(read_only=True)
+    
+    def get_businesstax(self, obj):
+        try:
+            tax = BusinessTax.objects.get(location = obj)
+            return BusinessTaxBusinessAddressSerializer(tax).data
+        except Exception as err:
+            print(err)
     
     def get_country(self, obj):
         try:
             return CountrySerializer(obj.country).data
         except Country.DoesNotExist:
             return None
+    
     def get_state(self, obj):
         try:
             return StateSerializer(obj.state).data
@@ -502,27 +541,6 @@ class PaymentMethodSerializer(serializers.ModelSerializer):
         model = BusinessPaymentMethod
         fields = ['id', 'method_type', 'is_active']
         
-class ParentBusinessTax_RateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BusinessTax
-        fields = ['id', 'name', 'parent_tax', 'tax_rate', 'tax_type', 'is_active']
-
-class ParentBusinessTaxSerializer(serializers.ModelSerializer):
-    # parent_tax = serializers.SerializerMethodField(read_only=True)
-    
-    # def get_parent_tax(self, obj):
-    #     try:
-    #         tax = obj.parent_tax.all()
-    #         # ser = BusinessTax.objects.filter(service = obj).first()
-    #         return tax.tax_rate
-    #     except Exception as err:
-    #         pass
-    parent_tax = ParentBusinessTax_RateSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = BusinessTax
-        fields = ['id', 'name', 'parent_tax', 'tax_rate', 'location', 'tax_type', 'is_active']
-
 class BusinessTaxSerializer(serializers.ModelSerializer):
 
     parent_tax = ParentBusinessTaxSerializer(many=True, read_only=True)
@@ -531,8 +549,6 @@ class BusinessTaxSerializer(serializers.ModelSerializer):
         model = BusinessTax
         fields = ['id', 'name', 'parent_tax',
                   'tax_rate', 'location', 'tax_type', 'is_active']
-
-
 class BusinessVendorSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessVendor

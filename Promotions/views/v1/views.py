@@ -25,7 +25,7 @@ from Product.models import Product, ProductStock
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
 from Promotions.models import BlockDate, CategoryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount, PurchaseDiscount, ServiceGroupDiscount, SpecificGroupDiscount
-from Promotions.serializers import DirectOrFlatDiscountSerializers, SpecificGroupDiscountSerializers
+from Promotions.serializers import DirectOrFlatDiscountSerializers, PurchaseDiscountSerializers, SpecificGroupDiscountSerializers
 from Service.models import Service, ServiceGroup
 from Tenants.models import Domain, Tenant
 from Utility.models import Country, Currency, ExceptionRecord, Language, NstyleFile, Software, State, City
@@ -1039,14 +1039,14 @@ def create_purchasediscount(request):
             except Exception as err:
                error.append(str(err))
                
-    serializers= SpecificGroupDiscountSerializers(purchase_discount, context={'request' : request})
+    serializers= PurchaseDiscountSerializers(purchase_discount, context={'request' : request})
     
     return Response(
             {
                 'status' : True,
                 'status_code' : 201,
                 'response' : {
-                    'message' : 'Specific Group Discount Created Successfully!',
+                    'message' : 'Purchase Discount Created Successfully!',
                     'error_message' : None,
                     'errors' : error,
                     'specificgroup' : serializers.data,

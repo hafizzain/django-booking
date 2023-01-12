@@ -3014,7 +3014,7 @@ def get_check_availability(request):
                 'status_code' : 200,
                 'status_code_text' : '200',
                 'response' : {
-                    'message' : 'Employees Check Availability',
+                    'message' : 'The selected staff is not available at this time',
                     'error_message' : None,
                     'employee':data,
                     'Availability': Availability,

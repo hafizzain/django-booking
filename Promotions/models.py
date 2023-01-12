@@ -78,6 +78,35 @@ class DirectOrFlatDiscount(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+class SpendDiscount(models.Model):
+    TYPE_CHOICES = [
+        ('Service', 'Service'),
+        ('Product', 'Product'),
+    ]
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_spend_discount')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_spend_discount')
+    
+    spend_amount = models.PositiveIntegerField(default=0, blank= True, null=True)
+    select_type= models.CharField(choices=TYPE_CHOICES, max_length=50, default = 'Service')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='service_spend_discount')
+    
+    discount_product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True, related_name='discountproduct_spend_discount')
+    discount_service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='discountservice_spend_discount')
+    
+    discount_value = models.PositiveIntegerField(default=0, blank= True, null=True)
+    
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+    updated_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return str(self.id)
+    
+    
 class CategoryDiscount(models.Model):
     TYPE_CHOICES = [
         ('All', 'All'),
