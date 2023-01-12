@@ -695,7 +695,7 @@ def update_appointment_client(request):
                 date_time = service.get('date_time', None)
                 id = service.get('id', None)
                 
-                appoint_service = AppointmentService.objects.get(appointment = str(id))
+                appoint_service = AppointmentService.objects.get(id = str(id))
                 appoint_service.appointment_time = date
                 appoint_service.appointment_time = date_time
                 appoint_service.save()
@@ -703,7 +703,8 @@ def update_appointment_client(request):
                 serializer = AppointmentServiceClientSerializer(appoint_service, context={'request' : request})
                 data.append(serializer.data)
             except Exception as err:
-                pass
+                data.append(str(err))
+                #pass
 
     return Response(
         {
