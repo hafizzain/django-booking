@@ -1,5 +1,5 @@
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import email
 from threading import Thread
 from django.conf import settings
@@ -8,6 +8,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Appointment.models import Appointment, AppointmentService
 from Authentication.Constants.Email import send_welcome_email
 from Authentication.serializers import UserSerializerByClient, UserTenantLoginSerializer
@@ -24,6 +25,7 @@ from NStyle.Constants import StatusCodes
 
 from Authentication.models import AccountType, User, VerificationOTP
 from Tenants.models import ClientIdUser, ClientTenantAppDetail, Domain, Tenant
+from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 from Utility.models import Country, Currency, ExceptionRecord, Language, NstyleFile, Software, State, City
 from Utility.serializers import LanguageSerializer
 import json
@@ -693,11 +695,21 @@ def update_appointment_client(request):
             try:
                 date = service.get('date', None)
                 date_time = service.get('date_time', None)
+                app_duration = service.get('duration', None)
                 id = service.get('id', None)
                 
+                app_date_time = f'2000-01-01 {date_time}'
+        
+                duration = DURATION_CHOICES[app_duration]
+                app_date_time = datetime.fromisoformat(app_date_time)
+                datetime_duration = app_date_time + timedelta(minutes=duration)
+                datetime_duration = datetime_duration.strftime('%H:%M:%S')
+                end_time = datetime_duration
+                
                 appoint_service = AppointmentService.objects.get(id = str(id))
-                appoint_service.appointment_time = date
+                appoint_service.appointment_date = date
                 appoint_service.appointment_time = date_time
+                appoint_service.end_time = end_time
                 appoint_service.save()
                 
                 serializer = AppointmentServiceClientSerializer(appoint_service, context={'request' : request})
