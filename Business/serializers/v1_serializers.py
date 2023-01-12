@@ -245,7 +245,7 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
     state = serializers.SerializerMethodField(read_only=True)
     city = serializers.SerializerMethodField(read_only=True)
     businesstax = serializers.SerializerMethodField(read_only=True)
-    
+
     def get_businesstax(self, obj):
         try:
             tax = BusinessTax.objects.get(location = obj)
@@ -336,6 +336,7 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
             'address_name',
             'postal_code',
             'website',
+            'businesstax',
             'is_primary',
             'banking',
             'start_time',
