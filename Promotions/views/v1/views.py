@@ -833,7 +833,25 @@ def delete_specificgroupdiscount(request):
         status=status.HTTP_200_OK
     )
   
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_specificgroupdiscount(request):
+    specific_group = SpecificGroupDiscount.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = SpecificGroupDiscountSerializers(specific_group,  many=True, context={'request' : request})
     
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Specific Group Discount',
+                'error_message' : None,
+                'specificgroup' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+   
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_purchasediscount(request):

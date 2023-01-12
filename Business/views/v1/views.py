@@ -2993,7 +2993,7 @@ def get_check_availability(request):
                             Availability = False
                                         
                         else:
-                            data.append(f'Employees are free, you can proceed further employee name {employee.full_name}')
+                            data.append(f'Employees are free, employee name {employee.full_name}')
                     if len(av_staff_ids) == 0:
                         data.append(f'Employees are free, you can proceed further employee name {employee.full_name}')
                         #data.append(f'{av_staff_ids} type {type(datetime_duration)}, ')

@@ -142,8 +142,7 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
     block_date = serializers.SerializerMethodField(read_only=True)
     type = serializers.SerializerMethodField(read_only=True)
     is_deleted = serializers.SerializerMethodField(read_only=True)
-    
-    
+
     def get_is_deleted(self, obj):
         if obj.is_deleted == True:
             return 'True'
@@ -185,3 +184,5 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
     class Meta:
         model = SpecificGroupDiscount
         fields = '__all__'
+        
+#class Purchase
