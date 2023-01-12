@@ -528,13 +528,13 @@ def create_specificgroupdiscount(request):
             pass
         for cat in servicegroup:
             try:
-                category = cat.get('service_group', None)
+                service_group = cat.get('service_group', None)
                 discount = cat.get('discount', None)
                 
-                category_discount = ServiceGroupDiscount.objects.create(
+                ServiceGroupDiscount.objects.create(
                     specificgroupdiscount = sp_grp ,
                     
-                    servicegroup = category,
+                    servicegroup = service_group,
                     discount = discount
                 )
                 
@@ -645,6 +645,36 @@ def update_specificgroupdiscount(request):
             status=status.HTTP_404_NOT_FOUND
         )
         
+        
+    if servicegroup is not None:
+        if type(servicegroup) == str:
+            servicegroup = servicegroup.replace("'" , '"')
+            servicegroup = json.loads(servicegroup)
+        else:
+            pass
+        for cat in servicegroup:
+            id = cat.get('id', None)
+            service_group = cat.get('service_group', None)
+            discount = cat.get('discount', None)
+            is_deleted = cat.get('is_deleted', None)
+            if id is not None:
+                try:
+                    ser_grp = ServiceGroupDiscount.objects.get(id = str(id))
+                    if str(is_deleted) == "True":
+                        ser_grp.delete()
+                        continue
+                    ser_grp.servicegroup = service_group
+                    ser_grp.discount = discount
+                    ser_grp.save()
+                except Exception as err:
+                    error.append(str(err))
+            else:
+                ServiceGroupDiscount.objects.create(
+                    specificgroupdiscount = specific_group ,
+                    servicegroup = service_group,
+                    discount = discount
+                )
+        
     try:
         daterestriction = DateRestrictions.objects.get(specificgroupdiscount = specific_group.id)
     except Exception as err:
@@ -665,7 +695,6 @@ def update_specificgroupdiscount(request):
         daterestriction.start_date = start_date
     if end_date:
         daterestriction.end_date = end_date
-    
     daterestriction.save()
     
     if location is not None:
@@ -680,7 +709,62 @@ def update_specificgroupdiscount(request):
                 daterestriction.business_address.add(loca)
             except Exception as err:
                 error.append(str(err))
-                
+    
+    if dayrestrictions is not None:
+        if type(dayrestrictions) == str:
+            dayrestrictions = dayrestrictions.replace("'" , '"')
+            dayrestrictions = json.loads(dayrestrictions)
+        else:
+            pass
+        for dayres in dayrestrictions:
+            id = dayres.get('id', None)
+            day = dayres.get('day', None)
+            if id is not None:
+                try:
+                    dayrestriction = DayRestrictions.objects.get(id  = str(id))
+                    is_deleted = dayres.get('is_deleted', None)
+                    if str(is_deleted) == "True":
+                        dayrestriction.delete()
+                        continue
+                    dayrestriction.day = day
+                    dayrestriction.save()
+                    
+                except Exception as err:
+                    error.append(str(err))
+                    ExceptionRecord.objects.create(text = f'{str(err)}')
+            else:
+                DayRestrictions.objects.create(
+                    specificgroupdiscount = specific_group,
+                    day = day,
+                )       
+    
+    if blockdate is not None:
+        if type(blockdate) == str:
+            blockdate = blockdate.replace("'" , '"')
+            blockdate = json.loads(blockdate)
+        else:
+            pass
+        
+        for bl_date in blockdate:    
+            date = bl_date.get('date', None)
+            is_deleted = bl_date.get('is_deleted', None)
+            id = bl_date.get('id', None)
+            if id is not None:
+                try:
+                    block_date = BlockDate.objects.get(id = str(id))
+                    if str(is_deleted) == "True":
+                        block_date.delete()
+                        continue
+                    block_date.date= date
+                    block_date.save()
+                except Exception as err:
+                    error.append(str(err))
+            else:
+               BlockDate.objects.create(
+                    specificgroupdiscount = specific_group,
+                    date = date,
+                ) 
+        
     serializers= SpecificGroupDiscountSerializers(specific_group, context={'request' : request})
        
     return Response(
@@ -696,6 +780,59 @@ def update_specificgroupdiscount(request):
         },
         status=status.HTTP_200_OK
     )
+  
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_specificgroupdiscount(request):
+    specific_id = request.data.get('id', None)
+
+    if specific_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        specific_grp = SpecificGroupDiscount.objects.get(id=specific_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Specific group Not Found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    specific_grp.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Specific Group Discount deleted successfully',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+  
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -703,7 +840,7 @@ def create_purchasediscount(request):
     user = request.user
     business_id = request.data.get('business', None)
     
-    select_type = request.data.get('location', None)
+    select_type = request.data.get('select_type', None)
     product = request.data.get('product', None)
     service = request.data.get('service', None)
     
@@ -755,4 +892,148 @@ def create_purchasediscount(request):
     purchase_discount = PurchaseDiscount.objects.create(
         user = user,
         business =  business,
+        select_type = select_type,
+        purchase = purchase,
+        discount_value = discount_value,
     )
+    if select_type == 'Product':
+        try:
+            product_id=Product.objects.get(id=product)
+        except Exception as err:
+            return Response(
+                {
+                        'status' : False,
+                        'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
+                        'response' : {
+                        'message' : 'Product not found',
+                        'error_message' : str(err),
+                    }
+                }
+        
+            )
+            
+        try:
+            discount_product_id=Product.objects.get(id=discount_product)
+        except Exception as err:
+            return Response(
+                {
+                        'status' : False,
+                        'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
+                        'response' : {
+                        'message' : 'Discount Product not found',
+                        'error_message' : str(err),
+                        
+                    }
+                }
+            )
+        purchase_discount.product = product_id
+        purchase_discount.discount_product = discount_product_id
+        purchase_discount.save()
+   
+    else:
+        try:
+            service_id=Service.objects.get(id=service)
+        except Exception as err:
+            return Response(
+                {
+                        'status' : False,
+                        'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
+                        'response' : {
+                        'message' : 'Product not found',
+                        'error_message' : str(err),
+                    }
+                }
+        
+            )
+            
+        try:
+            discount_service_id=Service.objects.get(id=discount_service)
+        except Exception as err:
+            return Response(
+                {
+                        'status' : False,
+                        'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
+                        'response' : {
+                        'message' : 'Discount Product not found',
+                        'error_message' : str(err),
+                    }
+                }
+        
+            )
+        purchase_discount.service = service_id
+        purchase_discount.discount_service = discount_service_id
+        purchase_discount.save()
+      
+    date_res = DateRestrictions.objects.create(
+        purchasediscount = purchase_discount,
+        start_date = start_date,
+        end_date =end_date,
+    )
+    
+    if location is not None:
+        if type(location) == str:
+                location = json.loads(location)
+
+        elif type(location) == list:
+            pass
+    
+        for loc in location:
+            try:
+                address = BusinessAddress.objects.get(id=loc)
+                date_res.business_address.add(address)
+            except Exception as err:
+                error.append(str(err))
+        
+    if dayrestrictions is not None:
+        if type(dayrestrictions) == str:
+            dayrestrictions = dayrestrictions.replace("'" , '"')
+            dayrestrictions = json.loads(dayrestrictions)
+        else:
+            pass
+        for dayres in dayrestrictions:
+            try: 
+                day = dayres.get('day', None)
+                
+                DayRestrictions.objects.create(
+                    purchasediscount = purchase_discount ,
+                    day = day,
+                )
+                
+            except Exception as err:
+                error.append(str(err))
+                
+    if blockdate is not None:
+        if type(blockdate) == str:
+            blockdate = blockdate.replace("'" , '"')
+            blockdate = json.loads(blockdate)
+        else:
+            pass
+        
+        for bl_date in blockdate:
+            
+            try: 
+                date = bl_date.get('date', None)
+                BlockDate.objects.create(
+                    purchasediscount = purchase_discount,
+                    date = date,
+                )
+                
+            except Exception as err:
+               error.append(str(err))
+               
+    serializers= SpecificGroupDiscountSerializers(purchase_discount, context={'request' : request})
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Specific Group Discount Created Successfully!',
+                    'error_message' : None,
+                    'errors' : error,
+                    'specificgroup' : serializers.data,
+                    
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )

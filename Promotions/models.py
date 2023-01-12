@@ -45,14 +45,14 @@ class PurchaseDiscount(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_purchase_discount')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_purchase_discount')
     
-    select_type= models.CharField(choices=TYPE_CHOICES, max_length=50, null=True, blank=True, default = 'Product')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_purchase_discount')
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='service_purchase_discount')
+    select_type= models.CharField(choices=TYPE_CHOICES, max_length=50, default = 'Product')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True, related_name='product_purchase_discount')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='service_purchase_discount')
     
     purchase = models.PositiveIntegerField(default=0, blank= True, null=True)
     
-    discount_product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='discountproduct_purchase_discount')
-    discount_service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='discountservice_purchase_discount')
+    discount_product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True, related_name='discountproduct_purchase_discount')
+    discount_service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='discountservice_purchase_discount')
     
     discount_value = models.PositiveIntegerField(default=0, blank= True, null=True)
     
@@ -103,6 +103,7 @@ class DateRestrictions(models.Model):
     
     directorflat = models.ForeignKey(DirectOrFlatDiscount, on_delete=models.CASCADE,  null=True, blank=True, related_name='directorflat_daterestrictions')
     specificgroupdiscount = models.ForeignKey(SpecificGroupDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='specificgroupdiscount_daterestrictions')
+    purchasediscount = models.ForeignKey(PurchaseDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='purchasediscount_daterestrictions')
     
     
     business_address = models.ManyToManyField(BusinessAddress, null=True, blank=True, related_name='business_address_daterestrictions')
@@ -117,8 +118,11 @@ class DateRestrictions(models.Model):
     
 class DayRestrictions(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
     directorflat = models.ForeignKey(DirectOrFlatDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='directorflat_dayrestrictions')
     specificgroupdiscount = models.ForeignKey(SpecificGroupDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='specificgroupdiscount_dayrestrictions')
+    purchasediscount = models.ForeignKey(PurchaseDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='purchasediscount_dayrestrictions')
+    
     day = models.CharField(max_length=20, null=True, blank=True)
     
     is_deleted = models.BooleanField(default=False)
@@ -129,8 +133,10 @@ class DayRestrictions(models.Model):
     
 class BlockDate(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
     directorflat = models.ForeignKey(DirectOrFlatDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='directorflat_blockdate')
     specificgroupdiscount = models.ForeignKey(SpecificGroupDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='specificgroupdiscount_blockdate')
+    purchasediscount = models.ForeignKey(PurchaseDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='purchasediscount_blockdate')
 
     
     date = models.DateField(verbose_name = 'Block Date', null=True)

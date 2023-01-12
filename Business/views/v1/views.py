@@ -2909,6 +2909,7 @@ def get_check_availability(request):
     check_availability = request.data.get('check_availability', None)
     tenant_id = request.data.get('hash', None)
     
+    Availability = True
     if tenant_id is None:
         return Response(
             {
@@ -2989,6 +2990,7 @@ def get_check_availability(request):
                         #data.append(f'{av_staff_ids} type {type(start_time)}, tested {ser.appointment_time}')
                         if tested < ser.appointment_time and start_time > ser.end_time:
                             data.append(f'Employe Already busy  {employee.full_name}')
+                            Availability = False
                                         
                         else:
                             data.append(f'Employees are free, you can proceed further employee name {employee.full_name}')
@@ -3009,7 +3011,8 @@ def get_check_availability(request):
                 'response' : {
                     'message' : 'Employees Check Availability',
                     'error_message' : None,
-                    'employee':data
+                    'employee':data,
+                    'Availability': Availability,
                 }
             },
             status=status.HTTP_200_OK
@@ -3070,7 +3073,6 @@ def get_employee_appointment(request):
                 end_time__gte = start_time,
             )
             if len(availability) >= 0 or len(availability) <= 3 :
-                data.append(f'the employe id {emp.id}')
                 serializer = EmployeeBusinessSerializer(emp)
                 data.append(serializer.data)
             #     return Response(
