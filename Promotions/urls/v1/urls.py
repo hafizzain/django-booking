@@ -10,8 +10,8 @@ urlpatterns = [
     path('update_directorflat/', views.update_directorflat),
     
     #Specific Group Category
-    path('create_directorflat/', views.create_specificgroupdiscount),
-    path('create_directorflat/', views.update_specificgroupdiscount),
+    path('create_specificgroupdiscount/', views.create_specificgroupdiscount),
+    path('update_specificgroupdiscount/', views.update_specificgroupdiscount),
     path('delete_specificgroupdiscount/', views.delete_specificgroupdiscount),
     
     #PurchaseDiscount
