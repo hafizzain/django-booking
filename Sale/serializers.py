@@ -53,6 +53,22 @@ class ServiceGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceGroup
         fields = ['id', 'business', 'name', 'services', 'status', 'allow_client_to_select_team_member']
+class ServiceGroup_TenantSerializer(serializers.ModelSerializer):
+    
+    services  = serializers.SerializerMethodField(read_only=True)
+    status  = serializers.SerializerMethodField(read_only=True)
+
+    def get_status(self, obj):
+        return obj.is_active
+    
+    def get_services(self, obj):
+            all_service = obj.services.all()
+            #ser = Service.objects.get(id = obj.services)
+            return ServiceSearchSerializer(all_service, many = True).data
+    
+    class Meta:
+        model = ServiceGroup
+        fields = ['id', 'business', 'name', 'services', 'status', 'allow_client_to_select_team_member']
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -87,7 +103,7 @@ class MemberlocationSerializer(serializers.ModelSerializer):
     
     def get_location(self, obj):
         try:
-            ser = BusinessAddress.objects.filter(id = obj.location.id)[0]
+            ser = BusinessAddress.objects.filter(id = obj.location)[0]
             return LocationSerializer(ser).data
         except Exception as err:
             pass
@@ -98,6 +114,56 @@ class MemberlocationSerializer(serializers.ModelSerializer):
         
 
 class EmployeeSelectedServiceSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField(read_only=True)
+    image = serializers.SerializerMethodField()
+    designation = serializers.SerializerMethodField()
+    emp_location = serializers.SerializerMethodField()
+    
+    def get_emp_location(self, obj):
+        try:
+            ser = Employee.objects.get(id = obj.employee)
+            return MemberlocationSerializer(ser).data
+        except Exception as err:
+            pass
+    
+    def get_full_name(self, obj):
+        return obj.employee.full_name
+    
+    def get_designation(self, obj):
+        try:
+            emp = EmployeeProfessionalInfo.objects.get(employee = obj.employee.id)
+            return emp.designation
+        except Exception as err:
+            print(err)
+    
+    def get_image(self, obj):
+        try:
+            request = self.context["request"]
+            url = tenant_media_base_url(request)
+            img = Employee.objects.get(id = obj.employee.id)
+            return f'{url}{img.image}'
+        except Exception as err:
+            print(str(err))
+        # try:    
+        #     print(obj.employee.image)
+        #     if obj.employee.image:
+        #         try:
+        #             print('test')
+        #             request = self.context["request"]
+        #             url = tenant_media_base_url(request)
+        #             return f'{url}{obj.employee.image}'
+        #         except Exception as err:
+        #             print(err)
+        #             return obj.employee.image
+                    
+        #     return None
+        # except Exception as err:
+        #     print(err)
+    
+    class Meta:
+        model = EmployeeSelectedService
+        fields = ['id', 'service', 'employee', 'level', 'full_name', 'designation','image', 'emp_location']
+class Employee_TenantServiceSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
     designation = serializers.SerializerMethodField()
