@@ -16,6 +16,9 @@ urlpatterns = [
     path('get_specificgroupdiscount/', views.get_specificgroupdiscount),
     
     #PurchaseDiscount
+    path('get_purchasediscount/', views.get_purchasediscount),
     path('create_purchasediscount/', views.create_purchasediscount),
+    path('update_purchasediscount/', views.update_purchasediscount),
+    path('delete_purchasediscount/', views.delete_purchasediscount),
     
 ]
