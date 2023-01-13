@@ -106,7 +106,7 @@ class MemberlocationSerializer(serializers.ModelSerializer):
             ser = BusinessAddress.objects.filter(id = obj.location)[0]
             return LocationSerializer(ser).data
         except Exception as err:
-            pass
+            return str(err)
     
     class Meta:
         model = Employee
@@ -121,10 +121,10 @@ class EmployeeSelectedServiceSerializer(serializers.ModelSerializer):
     
     def get_emp_location(self, obj):
         try:
-            ser = Employee.objects.get(id = obj.employee)
+            ser = Employee.objects.get(id = obj.employee.id)
             return MemberlocationSerializer(ser).data
         except Exception as err:
-            pass
+            return str(err)
     
     def get_full_name(self, obj):
         return obj.employee.full_name
