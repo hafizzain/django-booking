@@ -1103,7 +1103,7 @@ def create_appointment_client(request):
                 user = business.user,
                 business=business,
                 client=client,
-                client_type=client_type,
+                client_type='IN HOUSE',
                 payment_method=payment_method,
                 discount_type=discount_type,
             )

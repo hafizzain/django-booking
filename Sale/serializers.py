@@ -82,11 +82,33 @@ class MemberSerializer(serializers.ModelSerializer):
         model = Employee
         fields = ['id','full_name', 'image' ]
         
+class MemberlocationSerializer(serializers.ModelSerializer):
+    location = serializers.SerializerMethodField()
+    
+    def get_location(self, obj):
+        try:
+            ser = BusinessAddress.objects.filter(id = obj.location.id)[0]
+            return LocationSerializer(ser).data
+        except Exception as err:
+            pass
+    
+    class Meta:
+        model = Employee
+        fields = ['id','full_name', 'location' ]
+        
 
 class EmployeeSelectedServiceSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
     designation = serializers.SerializerMethodField()
+    location = serializers.SerializerMethodField()
+    
+    def get_location(self, obj):
+        try:
+            ser = BusinessAddress.objects.filter(id = obj.location.id)[0]
+            return LocationSerializer(ser).data
+        except Exception as err:
+            pass
     
     def get_full_name(self, obj):
         return obj.employee.full_name

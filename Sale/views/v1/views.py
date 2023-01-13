@@ -445,6 +445,7 @@ def update_service(request):
             duration = ser.get('duration', None)
             price = ser.get('price', None)
             currency = ser.get('currency', None)
+            is_deleted = ser.get('is_deleted', None)
             try:
                 currency_id = Currency.objects.get(id = currency)
             except Exception as err:
@@ -453,7 +454,7 @@ def update_service(request):
             if s_service_id is not None:
                 try: 
                     price_service = PriceService.objects.get(id=ser['id'])
-                    is_deleted = ser.get('is_deleted', None)
+                    
                     if bool(is_deleted) == True:
                         price_service.delete()
                         continue
@@ -468,14 +469,16 @@ def update_service(request):
                     error.append(str(err))
                     print(err)
             else:
-                #
-                ser = Service.objects.get(id=id)
-                PriceService.objects.create(
-                    service=ser,
-                    duration = duration,
-                    price=price,
-                    currency = currency_id
-                )
+                if bool(is_deleted) == True:
+                    pass
+                else:
+                    ser = Service.objects.get(id=id)
+                    PriceService.objects.create(
+                        service=ser,
+                        duration = duration,
+                        price=price,
+                        currency = currency_id
+                    )
 
     serializer= ServiceSerializer(service_id, context={'request' : request} , data=request.data, partial=True)
     if serializer.is_valid():
