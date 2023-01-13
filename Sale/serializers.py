@@ -103,8 +103,9 @@ class MemberlocationSerializer(serializers.ModelSerializer):
     
     def get_location(self, obj):
         try:
-            ser = BusinessAddress.objects.filter(id = obj.location)[0]
-            return LocationSerializer(ser).data
+            #ser = BusinessAddress.objects.filter(id = obj.location).filter(service = obj).first()
+            all_location = obj.location.filter(is_deleted=False).first()
+            return LocationSerializer(all_location).data
         except Exception as err:
             return str(err)
     
@@ -117,14 +118,20 @@ class EmployeeSelectedServiceSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
     designation = serializers.SerializerMethodField()
-    emp_location = serializers.SerializerMethodField()
+    location = serializers.SerializerMethodField()
     
-    def get_emp_location(self, obj):
+    def get_location(self, obj):
+        #def get_location(self, obj):
         try:
-            ser = Employee.objects.get(id = obj.employee.id)
-            return MemberlocationSerializer(ser).data
+            all_location = obj.employee.location.filter(is_deleted=False).first()
+            return LocationSerializer(all_location).data
         except Exception as err:
             return str(err)
+        # try:
+        #     ser = Employee.objects.get(id = obj.employee.id)
+        #     return MemberlocationSerializer(ser).data
+        # except Exception as err:
+        #     return str(err)
     
     def get_full_name(self, obj):
         return obj.employee.full_name
@@ -162,7 +169,7 @@ class EmployeeSelectedServiceSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = EmployeeSelectedService
-        fields = ['id', 'service', 'employee', 'level', 'full_name', 'designation','image', 'emp_location']
+        fields = ['id', 'service', 'employee', 'level', 'full_name', 'designation','image', 'location']
 class Employee_TenantServiceSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()

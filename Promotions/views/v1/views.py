@@ -21,11 +21,11 @@ from NStyle.Constants import StatusCodes
 from Appointment.models import AppointmentService
 from Authentication.models import User
 from Business.models import Business, BusinessSocial, BusinessAddress, BusinessOpeningHour, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BookingSetting, BusinessPaymentMethod, BusinessTax, BusinessVendor
-from Product.models import Product, ProductStock
+from Product.models import Brand, Product, ProductStock
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
-from Promotions.models import BlockDate, CategoryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount, PurchaseDiscount, ServiceGroupDiscount, SpecificGroupDiscount
-from Promotions.serializers import DirectOrFlatDiscountSerializers, PurchaseDiscountSerializers, SpecificGroupDiscountSerializers
+from Promotions.models import BlockDate, CategoryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount, PurchaseDiscount, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount
+from Promotions.serializers import DirectOrFlatDiscountSerializers, PurchaseDiscountSerializers, SpecificBrandSerializers, SpecificGroupDiscountSerializers
 from Service.models import Service, ServiceGroup
 from Tenants.models import Domain, Tenant
 from Utility.models import Country, Currency, ExceptionRecord, Language, NstyleFile, Software, State, City
@@ -203,6 +203,10 @@ def get_directorflat(request):
     
     purchase_discount = PurchaseDiscount.objects.filter(is_deleted=False).order_by('-created_at').distinct()
     serialized = PurchaseDiscountSerializers(purchase_discount,  many=True, context={'request' : request})
+    data.extend(serialized.data)
+    
+    specificbrand = SpecificBrand.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = SpecificBrandSerializers(specificbrand,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
     return Response(
@@ -1302,6 +1306,240 @@ def get_purchasediscount(request):
                 'message' : 'All Purchase Discount',
                 'error_message' : None,
                 'purchasediscount' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_specificbrand_discount(request):
+    user = request.user
+    business_id = request.data.get('business', None)
+    
+    service_group = request.data.get('service_group', None)
+    brand = request.data.get('brand', None)
+    
+    discount_brand = request.data.get('discount_brand', None)
+    discount_service_group = request.data.get('discount_service_group', None)
+    
+    location = request.data.get('location', None)
+    start_date = request.data.get('start_date', None)
+    end_date = request.data.get('end_date', None)
+    
+    dayrestrictions = request.data.get('dayrestrictions', None)
+    blockdate = request.data.get('blockdate', None)
+    
+    error = []
+    
+    if not all([business_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                            ]
+                    }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        business = Business.objects.get(id=business_id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    try:
+        service_grp = ServiceGroup.objects.get(id = str(service_group))
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.SERVICEGROUP_NOT_FOUND_4042,
+                    'response' : {
+                    'message' : 'Service Group not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    try:
+        brand_id = Brand.objects.get(id = str(brand))
+    except Exception as err:
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_CATEGORY_BRAND_4020,
+                'response' : {
+                'message' : 'Brand not found',
+                'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    specific_brand = SpecificBrand.objects.create(
+        user = user,
+        business =  business,
+        
+        servicegroup = service_grp,
+        brand = brand_id,
+        discount_brand = discount_brand,
+        discount_service_group = discount_service_group,
+    )
+    
+    date_res = DateRestrictions.objects.create(
+        specificbrand = specific_brand ,
+        start_date = start_date,
+        end_date =end_date,
+    )
+    if location is not None:
+        if type(location) == str:
+                location = json.loads(location)
+
+        elif type(location) == list:
+            pass
+    
+        for loc in location:
+            try:
+                address = BusinessAddress.objects.get(id=loc)
+                date_res.business_address.add(address)
+            except Exception as err:
+                error.append(str(err))
+    
+    if dayrestrictions is not None:
+        if type(dayrestrictions) == str:
+            dayrestrictions = dayrestrictions.replace("'" , '"')
+            dayrestrictions = json.loads(dayrestrictions)
+        else:
+            pass
+        for dayres in dayrestrictions:
+            try: 
+                day = dayres.get('day', None)
+                
+                DayRestrictions.objects.create(
+                    specificbrand = specific_brand,
+                    day = day,
+                )
+                
+            except Exception as err:
+                error.append(str(err))
+    
+    if blockdate is not None:
+        if type(blockdate) == str:
+            blockdate = blockdate.replace("'" , '"')
+            blockdate = json.loads(blockdate)
+        else:
+            pass
+        
+        for bl_date in blockdate:
+            
+            try: 
+                date = bl_date.get('date', None)
+                BlockDate.objects.create(
+                    specificbrand = specific_brand,
+                    date = date,
+                )
+                
+            except Exception as err:
+               error.append(str(err))
+    
+    serializers= SpecificBrandSerializers(specific_brand, context={'request' : request})
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Specific Brand Discount Created Successfully!',
+                    'error_message' : None,
+                    'errors' : error,
+                    'specificbrand' : serializers.data,
+                    
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+    
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_specificbrand_discount(request):
+    id = request.data.get('id', None)
+
+    if id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        specific_dicount = SpecificBrand.objects.get(id=id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Specific Brand Discount Not Found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    specific_dicount.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Specific Brand Discount deleted successfully',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_specificbrand_discount(request):
+    specificbrand = SpecificBrand.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = SpecificBrandSerializers(specificbrand,  many=True, context={'request' : request})
+    
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Purchase Discount',
+                'error_message' : None,
+                'specificbrand' : serialized.data
             }
         },
         status=status.HTTP_200_OK
