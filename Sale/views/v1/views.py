@@ -454,7 +454,7 @@ def update_service(request):
                 try: 
                     price_service = PriceService.objects.get(id=ser['id'])
                     is_deleted = ser.get('is_deleted', None)
-                    if is_deleted is not None:
+                    if bool(is_deleted) == True:
                         price_service.delete()
                         continue
                     servic = Service.objects.get(id=ser['service'])

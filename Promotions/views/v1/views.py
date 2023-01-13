@@ -193,15 +193,15 @@ def create_directorflat(request):
 def get_directorflat(request):
     data = []
     
-    flatordirect = DirectOrFlatDiscount.objects.filter(is_deleted=False).order_by('-created_at')
+    flatordirect = DirectOrFlatDiscount.objects.filter(is_deleted=False).order_by('-created_at').distinct()
     serialized = DirectOrFlatDiscountSerializers(flatordirect,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
-    specific_group = SpecificGroupDiscount.objects.filter(is_deleted=False).order_by('-created_at')
+    specific_group = SpecificGroupDiscount.objects.filter(is_deleted=False).order_by('-created_at').distinct()
     serialized = SpecificGroupDiscountSerializers(specific_group,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
-    purchase_discount = SpecificGroupDiscount.objects.filter(is_deleted=False).order_by('-created_at')
+    purchase_discount = SpecificGroupDiscount.objects.filter(is_deleted=False).order_by('-created_at').distinct()
     serialized = PurchaseDiscountSerializers(purchase_discount,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
