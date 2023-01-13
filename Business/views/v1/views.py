@@ -3306,3 +3306,76 @@ def employee_availability(request):
             },
             status=status.HTTP_200_OK
         )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_tenant_business_taxes(request):
+    tenant_id = request.GET.get('hash', None)
+    business_id = request.GET.get('business', None)
+    
+    if tenant_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'hash',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        tenant = Tenant.objects.get(id = tenant_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Invalid Tenant Id',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )            
+    data = []
+    with tenant_context(tenant):
+        try:
+            business = Business.objects.get(id=business_id, is_deleted=False, is_active=True, is_blocked=False)
+        except Exception as err:
+            return Response(
+                    {
+                        'status' : False,
+                        'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                        'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                        'response' : {
+                            'message' : 'Business Not Found',
+                            'error_message' : str(err),
+                        }
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+        all_taxes = BusinessTax.objects.filter(business=business, is_active=True)
+        serialized = BusinessTaxSerializer(all_taxes, many=True, context={'request':request})
+        data.append(serialized.data)
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Business Taxes!',
+                    'error_message' : None,
+                    'tax' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
