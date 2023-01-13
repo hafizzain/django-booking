@@ -105,7 +105,7 @@ class EmployeeSelectedServiceSerializer(serializers.ModelSerializer):
     
     def get_location(self, obj):
         try:
-            ser = BusinessAddress.objects.filter(id = obj.location.id)[0]
+            ser = BusinessAddress.objects.filter(id = obj.employee.location.id)[0]
             return LocationSerializer(ser).data
         except Exception as err:
             pass
@@ -146,7 +146,7 @@ class EmployeeSelectedServiceSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = EmployeeSelectedService
-        fields = ['id', 'service', 'employee', 'level', 'full_name', 'designation','image']
+        fields = ['id', 'service', 'employee', 'level', 'full_name', 'designation','image', 'location']
 
 class LocationServiceSerializer(serializers.ModelSerializer):
     class Meta:
