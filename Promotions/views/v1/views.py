@@ -1225,7 +1225,20 @@ def update_purchasediscount(request):
                     date = date,
                 )
     serializers= PurchaseDiscountSerializers(purchase_discount, data=request.data, partial=True, context={'request' : request})
-       
+    if serializers.is_valid():
+        serializers.save()
+    else:
+        return Response(
+        {
+            'status' : False,
+            'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+            'response' : {
+                'message' : 'Invialid Data',
+                'error_message' : str(serializers.errors),
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+    )
     return Response(
         {
             'status' : True,
