@@ -114,7 +114,7 @@ def create_client_business(request):
         #     pass
         
         if client:
-            data.append(f'Client Email already exist {client.full_name}')
+            data.append(f'Client Email already exist tenant{client.full_name}')
             
         else:
             client  = Client.objects.create(
@@ -136,21 +136,24 @@ def create_client_business(request):
             except Exception as err:
                 pass
             else:
-                # return Response(
-                #     {
-                #         'status' : True,
-                #         'status_code_text' :'USER_ALREADY_EXIST' ,
-                #         'response' : {
-                #             'message' : 'User are Exist with this username!',
-                #             'error_message' : user_check.username,
-                #         }
-                #     },
-                #     status=status.HTTP_404_NOT_FOUND
-                # )
                 username = f'{username} {len(User.objects.all())}'
+                return Response(
+                    {
+                        
+                        'status' : True,
+                        'status_code_text' :'USER_ALREADY_EXIST' ,
+                        'response' : {
+                            'message' : 'User are Exist with this username!',
+                            'error_message' : user_check.username,
+                            'username':username
+                        }
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+                
 
         if client:
-            data.append(f'Client Email already exist {client.full_name}')
+            data.append(f'Client Email already exist  in if else condition {client.full_name}')
     
             user = User.objects.create(
                 first_name = str(client.full_name),

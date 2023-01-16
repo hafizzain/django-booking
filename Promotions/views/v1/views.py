@@ -1702,7 +1702,7 @@ def update_specificbrand_discount(request):
             'status' : False,
             'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
             'response' : {
-                'message' : 'Invialid Data chnge',
+                'message' : 'Invialid Data',
                 'error_message' : str(serializers.errors),
             }
         },
