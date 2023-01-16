@@ -2866,7 +2866,7 @@ def get_domain_business_address(request):
         
         
         if len(services_group) > 0:
-            serialized = ServiceGroupSerializer(services_group,  many=True, context={'request' : request, 'tenant': tenant} )     
+            serialized = ServiceGroupSerializer(services_group,  many=True, context={'request' : request, 'tenant' : tenant.schema_name} )     
             service_group = serialized.data
         else:
             raise Exception('0 business addresses found')
