@@ -736,3 +736,80 @@ def update_appointment_client(request):
         },
         status=status.HTTP_200_OK
     )
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def generate_id(request):
+    
+    hash = request.data.get('hash', None)
+    
+    if hash is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'appointment_id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        tenant = Tenant.objects.get(id = hash)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Invalid Tenant Id',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )    
+    
+    with tenant_context(tenant):
+        tenant_name = tenant.schema_name
+        tenant_name = tenant_name.split('-')
+        tenant_name = [word[0] for word in tenant_name]
+        print(tenant_name)
+        ''.join(tenant_name)
+        count = Client.objects.all().count()
+        count += 1
+    
+        return_loop = True
+        while return_loop:
+            if 0 < count <= 9 : 
+                count = f'000{count}'
+            elif 9 < count <= 99 :
+                count = f'00{count}'
+            elif 99 < count <= 999:
+                count = f'0{count}'
+            new_id =f'{tenant_name}-CLI-{count}'
+            
+            try:
+                Client.objects.get(employee_id=new_id)
+                count += 1
+            except:
+                return_loop = False
+                break
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Generated ID',
+                'error_message' : None,
+                'id' : new_id
+            }
+        },
+        status=status.HTTP_200_OK
+    )
