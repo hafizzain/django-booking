@@ -13,5 +13,4 @@ urlpatterns = [
     path('cancel_appointment_client/', views.cancel_appointment_client),
     path('update_appointment_client/', views.update_appointment_client),
     
-
 ]
