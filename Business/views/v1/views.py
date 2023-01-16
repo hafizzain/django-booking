@@ -3385,7 +3385,7 @@ def get_tenant_business_taxes(request):
 def get_tenant_address_taxes(request):
     tenant_id = request.GET.get('hash', None)
     location_id = request.GET.get('location_id', None)
-    
+    data = []
     if tenant_id is None:
         return Response(
             {
@@ -3437,6 +3437,7 @@ def get_tenant_address_taxes(request):
                 status=status.HTTP_404_NOT_FOUND
             )
         serialized = BusinessAddressSerializer(location, context = {'request' : request, })
+        data.append(serialized.data)
     return Response(
             {
                 'status' : True,
@@ -3445,7 +3446,7 @@ def get_tenant_address_taxes(request):
                 'response' : {
                     'message' : 'Address Taxes!',
                     'error_message' : None,
-                    'tax' : serialized.data
+                    'tax' : data
                 }
             },
             status=status.HTTP_200_OK
