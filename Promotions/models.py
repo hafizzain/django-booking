@@ -115,7 +115,7 @@ class SpecificBrand(models.Model):
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='brand_specific_brand')
     
     discount_brand = models.PositiveIntegerField(default=0, blank= True, null=True)
-    discount_brand = models.PositiveIntegerField(default=0, blank= True, null=True)
+    discount_service_group = models.PositiveIntegerField(default=0, blank= True, null=True)
     
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
