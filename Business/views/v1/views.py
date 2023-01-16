@@ -3379,3 +3379,73 @@ def get_tenant_business_taxes(request):
             },
             status=status.HTTP_200_OK
         )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_tenant_address_taxes(request):
+    tenant_id = request.GET.get('hash', None)
+    location_id = request.GET.get('location_id', None)
+    
+    if tenant_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'hash',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        tenant = Tenant.objects.get(id = tenant_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Invalid Tenant Id',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )            
+    data = []
+    with tenant_context(tenant):
+        try:
+            location = BusinessAddress.objects.get(id=location_id, is_deleted=False)
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 404,
+                    'status_code_text' : 'OBJECT_NOT_FOUND',
+                    'response' : {
+                        'message' : 'Business Location Not found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        serialized = BusinessAddressSerializer(location, context = {'request' : request, })
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Address Taxes!',
+                    'error_message' : None,
+                    'tax' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )

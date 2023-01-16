@@ -25,4 +25,5 @@ urlpatterns = [
     path('create_specificbrand_discount/', views.create_specificbrand_discount),
     path('delete_specificbrand_discount/', views.delete_specificbrand_discount),
     path('get_specificbrand_discount/', views.get_specificbrand_discount),
+    path('update_specificbrand_discount/', views.update_specificbrand_discount),
 ]
