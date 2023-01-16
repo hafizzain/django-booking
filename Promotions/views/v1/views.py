@@ -1606,7 +1606,7 @@ def update_specificbrand_discount(request):
         )
         
     try:
-        daterestriction = DateRestrictions.objects.get(purchasediscount = specific_discount.id)
+        daterestriction = DateRestrictions.objects.get(specificbrand = specific_discount.id)
     except Exception as err:
         return Response(
             {
@@ -1663,7 +1663,7 @@ def update_specificbrand_discount(request):
                     ExceptionRecord.objects.create(text = f'{str(err)}')
             else:
                 DayRestrictions.objects.create(
-                    purchasediscount = specific_discount,
+                    specificbrand = specific_discount,
                     day = day,
                 )       
     
@@ -1690,7 +1690,7 @@ def update_specificbrand_discount(request):
                     error.append(str(err))
             else:
                BlockDate.objects.create(
-                    purchasediscount = specific_discount,
+                    specificbrand = specific_discount,
                     date = date,
                 )
     serializers= SpecificBrandSerializers(specific_discount, data=request.data, partial=True, context={'request' : request})
