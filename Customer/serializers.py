@@ -14,7 +14,7 @@ class LocationSerializer(serializers.ModelSerializer):
 
 class EmployeAppoinmentSerializer(serializers.ModelSerializer):
     designation = serializers.SerializerMethodField()
-    image = serializers.SerializerMethodField()
+    #image = serializers.SerializerMethodField()
     
     def get_designation(self, obj):
         try:
@@ -23,18 +23,18 @@ class EmployeAppoinmentSerializer(serializers.ModelSerializer):
         except Exception as err:
             pass
             
-    def get_image(self, obj):
-        try:
-            if obj.image:
-                try:
-                    tenant = self.context["tenant"]
-                    url = tenant_media_base_url(tenant)
-                    return f'{url}{obj.image}'
-                except:
-                    return obj.image
-            return None
-        except Exception as err:
-            return str(err)
+    # def get_image(self, obj):
+    #     try:
+    #         if obj.image:
+    #             try:
+    #                 tenant = self.context["tenant"]
+    #                 url = tenant_media_base_url(tenant)
+    #                 return f'{url}{obj.image}'
+    #             except:
+    #                 return obj.image
+    #         return None
+    #     except Exception as err:
+    #         return str(err)
     
     class Meta:
         model = Employee
