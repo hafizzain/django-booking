@@ -9,6 +9,7 @@ from Business.models import BusinessAddress, BusinessTax
 from Order.models import Checkout, MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
 from Product.Constants.index import tenant_media_base_url
 from django_tenants.utils import tenant_context
+from Utility.models import ExceptionRecord
 
 from Product.models import ProductStock
 
@@ -655,6 +656,9 @@ class BusinessAddressSerializer(serializers.ModelSerializer):
             tax = BusinessTax.objects.get(location = obj)
             return BusinessTaxSerializer(tax).data
         except Exception as err:
+            ExceptionRecord.objects.create(
+                text = f'error happen on busiens serializer line 660 {str(err)}'
+            )
             print(err)
             
     class Meta:

@@ -3418,6 +3418,7 @@ def get_tenant_address_taxes(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )            
+    
     data = []
     with tenant_context(tenant):
         try:

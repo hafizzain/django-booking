@@ -215,7 +215,7 @@ def create_client_business(request):
             'response' : {
                 'message' : 'End OTP to User email Please verify!',
                 'error_message' : None,
-                #'client': serialized.data,
+                'client': data,
             }
         },
         status=status.HTTP_200_OK
