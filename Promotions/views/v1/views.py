@@ -24,7 +24,7 @@ from Business.models import Business, BusinessSocial, BusinessAddress, BusinessO
 from Product.models import Brand, Product, ProductStock
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
-from Promotions.models import BlockDate, CategoryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount, PurchaseDiscount, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount
+from Promotions.models import BlockDate, CategoryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount, PurchaseDiscount, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount
 from Promotions.serializers import DirectOrFlatDiscountSerializers, PurchaseDiscountSerializers, SpecificBrandSerializers, SpecificGroupDiscountSerializers, SpendDiscountSerializers, SpendSomeAmountSerializers
 from Service.models import Service, ServiceGroup
 from Tenants.models import Domain, Tenant
@@ -2172,8 +2172,8 @@ def create_spend_some_amount(request):
     user = request.user
     business_id = request.data.get('business', None)
     
-    spend_amount = request.data.get('spend_amount', None)
-    service = request.data.get('service', None)
+    # spend_amount = request.data.get('spend_amount', None)
+    # service = request.data.get('service', None)
     
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
@@ -2181,6 +2181,8 @@ def create_spend_some_amount(request):
     
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)
+    
+    spend_service = request.data.get('spend_service', None)
     
     
     error = []
@@ -2216,27 +2218,54 @@ def create_spend_some_amount(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
     
-    try:
-        service_id=Service.objects.get(id=service)
-    except Exception as err:
-        return Response(
-            {
-                    'status' : False,
-                    'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
-                    'response' : {
-                    'message' : 'Service not found',
-                    'error_message' : str(err),
-                }
-            }
+    # try:
+    #     service_id=Service.objects.get(id=service)
+    # except Exception as err:
+    #     return Response(
+    #         {
+    #                 'status' : False,
+    #                 'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
+    #                 'response' : {
+    #                 'message' : 'Service not found',
+    #                 'error_message' : str(err),
+    #             }
+    #         }
     
-        )
+    #     )
     
     spend_some_amount = SpendSomeAmount.objects.create(
         user = user,
         business =  business,
-        service = service_id,
-        spend_amount = spend_amount,
+        # service = service_id,
+        # spend_amount = spend_amount,
     )
+      
+    if spend_service is not None:
+        if type(spend_service) == str:
+            spend_service = spend_service.replace("'" , '"')
+            spend_service = json.loads(spend_service)
+        else:
+            pass
+        for cat in spend_service:
+            try:
+                service = cat.get('service', None)
+                discount = cat.get('spend_amount', None)
+                
+                try:
+                    service_id = Service.objects.get(id = str(service))
+                except:
+                    pass
+                SpendSomeAmountAndGetDiscount.objects.create(
+                    # user = user,
+                    # business = business,
+                    
+                    spandsomeamount = spend_some_amount,
+                    servicegroup = service_id,
+                    discount = discount
+                )
+                
+            except Exception as err:
+               error.append(str(err))
       
     date_res = DateRestrictions.objects.create(
         spendsomeamount = spend_some_amount,
@@ -2318,6 +2347,8 @@ def update_spend_some_amount(request):
     
     spend_id = request.data.get('id', None)
     
+    spend_service = request.data.get('spend_service', None)
+
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
     end_date = request.data.get('end_date', None)
@@ -2393,7 +2424,40 @@ def update_spend_some_amount(request):
                 daterestriction.business_address.add(loca)
             except Exception as err:
                 error.append(str(err))
-                
+    
+    if spend_service is not None:
+        if type(spend_service) == str:
+            spend_service = spend_service.replace("'" , '"')
+            spend_service = json.loads(spend_service)
+        else:
+            pass
+        for cat in spend_service:
+            id = cat.get('id', None)
+            service_group = cat.get('service', None)
+            discount = cat.get('spend_amount', None)
+            is_deleted = cat.get('is_deleted', None)
+            try:
+                service_grp = Service.objects.get(id = str(service_group))
+            except:
+                pass
+            if id is not None:
+                try:
+                    ser_grp = SpendSomeAmountAndGetDiscount.objects.get(id = str(id))
+                    if str(is_deleted) == "True":
+                        ser_grp.delete()
+                        continue
+                    ser_grp.service = service_grp
+                    ser_grp.spend_amount = discount
+                    ser_grp.save()
+                except Exception as err:
+                    error.append(str(err))
+            else:
+                SpendSomeAmountAndGetDiscount.objects.create(
+                    spendsomeamount = spend_some,
+                    service = service_grp,
+                    spend_amount = discount
+                )
+         
     if dayrestrictions is not None:
         if type(dayrestrictions) == str:
             dayrestrictions = dayrestrictions.replace("'" , '"')

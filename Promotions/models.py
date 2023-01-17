@@ -122,8 +122,6 @@ class SpendSomeAmount(models.Model):
     
 class SpendSomeAmountAndGetDiscount(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_spendandgetdiscount')
-    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_spendandgetdiscount')
     
     spend_amount = models.PositiveIntegerField(default=0, blank= True, null=True)
     service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='service_spendandgetdiscount')
