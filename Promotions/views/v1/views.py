@@ -24,8 +24,8 @@ from Business.models import Business, BusinessSocial, BusinessAddress, BusinessO
 from Product.models import Brand, Product, ProductStock
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
-from Promotions.models import BlockDate, CategoryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount, PurchaseDiscount, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount
-from Promotions.serializers import DirectOrFlatDiscountSerializers, PurchaseDiscountSerializers, SpecificBrandSerializers, SpecificGroupDiscountSerializers
+from Promotions.models import BlockDate, CategoryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount, PurchaseDiscount, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount
+from Promotions.serializers import DirectOrFlatDiscountSerializers, PurchaseDiscountSerializers, SpecificBrandSerializers, SpecificGroupDiscountSerializers, SpendDiscountSerializers
 from Service.models import Service, ServiceGroup
 from Tenants.models import Domain, Tenant
 from Utility.models import Country, Currency, ExceptionRecord, Language, NstyleFile, Software, State, City
@@ -205,8 +205,12 @@ def get_directorflat(request):
     serialized = PurchaseDiscountSerializers(purchase_discount,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
-    specificbrand = SpecificBrand.objects.filter(is_deleted=False).order_by('-created_at')
+    specificbrand = SpecificBrand.objects.filter(is_deleted=False).order_by('-created_at').distinct()
     serialized = SpecificBrandSerializers(specificbrand,  many=True, context={'request' : request})
+    data.extend(serialized.data)
+    
+    spend_discount = SpendDiscount.objects.filter(is_deleted=False).order_by('-created_at').distinct()
+    serialized = SpendDiscountSerializers(spend_discount,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
     return Response(
@@ -1717,6 +1721,442 @@ def update_specificbrand_discount(request):
                 'error_message' : None,
                 'error' : error,
                 'specificbrand' : serializers.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_spend_discount(request):
+    user = request.user
+    business_id = request.data.get('business', None)
+    
+    spend_amount = request.data.get('spend_amount', None)
+    select_type = request.data.get('select_type', None)
+    service = request.data.get('service', None)
+    
+    discount_product = request.data.get('discount_product', None)
+    discount_service = request.data.get('discount_service', None)
+    
+    discount_value = request.data.get('discount_value', None)
+    
+    location = request.data.get('location', None)
+    start_date = request.data.get('start_date', None)
+    end_date = request.data.get('end_date', None)
+    
+    dayrestrictions = request.data.get('dayrestrictions', None)
+    blockdate = request.data.get('blockdate', None)
+    
+    
+    error = []
+    
+    if not all([business_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                            ]
+                    }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        business = Business.objects.get(id=business_id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    
+    try:
+            service_id=Service.objects.get(id=service)
+    except Exception as err:
+        return Response(
+            {
+                    'status' : False,
+                    'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
+                    'response' : {
+                    'message' : 'Service not found',
+                    'error_message' : str(err),
+                }
+            }
+    
+        )
+    
+    spend_discount = SpendDiscount.objects.create(
+        user = user,
+        business =  business,
+        select_type = select_type,
+        spend_amount = spend_amount,
+        discount_value = discount_value,
+        service = service_id,
+    )
+    
+    if discount_product:
+        try:
+            discount_product_id=Product.objects.get(id=discount_product)
+        except Exception as err:
+            return Response(
+                {
+                        'status' : False,
+                        'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
+                        'response' : {
+                        'message' : 'Discount Product not found',
+                        'error_message' : str(err),
+                        
+                    }
+                }
+            )
+        spend_discount.discount_product = discount_product_id
+        spend_discount.save()
+    if discount_service:
+        try:
+            discount_service_id=Service.objects.get(id=discount_service)
+        except Exception as err:
+            return Response(
+                {
+                        'status' : False,
+                        'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
+                        'response' : {
+                        'message' : 'Discount Service not found',
+                        'error_message' : str(err),
+                    }
+                }
+        
+            )
+        spend_discount.discount_service = discount_service_id
+        spend_discount.save()
+      
+    date_res = DateRestrictions.objects.create(
+        spenddiscount = spend_discount,
+        start_date = start_date,
+        end_date =end_date,
+    )
+    
+    if location is not None:
+        if type(location) == str:
+                location = json.loads(location)
+
+        elif type(location) == list:
+            pass
+    
+        for loc in location:
+            try:
+                address = BusinessAddress.objects.get(id=loc)
+                date_res.business_address.add(address)
+            except Exception as err:
+                error.append(str(err))
+        
+    if dayrestrictions is not None:
+        if type(dayrestrictions) == str:
+            dayrestrictions = dayrestrictions.replace("'" , '"')
+            dayrestrictions = json.loads(dayrestrictions)
+        else:
+            pass
+        for dayres in dayrestrictions:
+            try: 
+                day = dayres.get('day', None)
+                
+                DayRestrictions.objects.create(
+                    spenddiscount = spend_discount,
+                    day = day,
+                )
+                
+            except Exception as err:
+                error.append(str(err))
+                
+    if blockdate is not None:
+        if type(blockdate) == str:
+            blockdate = blockdate.replace("'" , '"')
+            blockdate = json.loads(blockdate)
+        else:
+            pass
+        
+        for bl_date in blockdate:
+            
+            try: 
+                date = bl_date.get('date', None)
+                BlockDate.objects.create(
+                    spenddiscount = spend_discount,
+                    date = date,
+                )
+                
+            except Exception as err:
+               error.append(str(err))
+               
+    serializers = SpendDiscountSerializers(spend_discount, context={'request' : request})
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Spend Discount Created Successfully!',
+                    'error_message' : None,
+                    'errors' : error,
+                    'purchasediscount' : serializers.data,
+                    
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+    
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_spend_discount(request):
+    
+    spend_id = request.data.get('id', None)
+    
+    select_type = request.data.get('select_type', None)
+    product = request.data.get('product', None)
+    service = request.data.get('service', None)
+    
+    purchase = request.data.get('purchase', None)
+    discount_product = request.data.get('discount_product', None)
+    discount_service = request.data.get('discount_service', None)
+    
+    discount_value = request.data.get('discount_value', None)
+    
+    location = request.data.get('location', None)
+    start_date = request.data.get('start_date', None)
+    end_date = request.data.get('end_date', None)
+    
+    dayrestrictions = request.data.get('dayrestrictions', None)
+    blockdate = request.data.get('blockdate', None)
+    
+    error = []
+    
+    if spend_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        spend_discount = PurchaseDiscount.objects.get(id=spend_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Purchase Discount Not Found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+        
+    try:
+        daterestriction = DateRestrictions.objects.get(spenddiscount = spend_discount.id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'daterestriction Service Not Found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+        
+    if start_date:
+        daterestriction.start_date = start_date
+    if end_date:
+        daterestriction.end_date = end_date
+    daterestriction.save()
+    
+    if location is not None:
+        if type(location) == str:
+            location = json.loads(location)
+        elif type(location) == list:
+            pass
+        daterestriction.business_address.clear()
+        for loc in location:
+            try:
+                loca = BusinessAddress.objects.get(id=loc)  
+                daterestriction.business_address.add(loca)
+            except Exception as err:
+                error.append(str(err))
+    
+    if dayrestrictions is not None:
+        if type(dayrestrictions) == str:
+            dayrestrictions = dayrestrictions.replace("'" , '"')
+            dayrestrictions = json.loads(dayrestrictions)
+        else:
+            pass
+        for dayres in dayrestrictions:
+            id = dayres.get('id', None)
+            day = dayres.get('day', None)
+            if id is not None:
+                try:
+                    dayrestriction = DayRestrictions.objects.get(id  = str(id))
+                    is_deleted = dayres.get('is_deleted', None)
+                    if str(is_deleted) == "True":
+                        dayrestriction.delete()
+                        continue
+                    dayrestriction.day = day
+                    dayrestriction.save()
+                    
+                except Exception as err:
+                    error.append(str(err))
+                    ExceptionRecord.objects.create(text = f'{str(err)}')
+            else:
+                DayRestrictions.objects.create(
+                    spenddiscount = spend_discount,
+                    day = day,
+                )       
+    
+    if blockdate is not None:
+        if type(blockdate) == str:
+            blockdate = blockdate.replace("'" , '"')
+            blockdate = json.loads(blockdate)
+        else:
+            pass
+        
+        for bl_date in blockdate:    
+            date = bl_date.get('date', None)
+            is_deleted = bl_date.get('is_deleted', None)
+            id = bl_date.get('id', None)
+            if id is not None:
+                try:
+                    block_date = BlockDate.objects.get(id = str(id))
+                    if str(is_deleted) == "True":
+                        block_date.delete()
+                        continue
+                    block_date.date= date
+                    block_date.save()
+                except Exception as err:
+                    error.append(str(err))
+            else:
+               BlockDate.objects.create(
+                    spenddiscount = spend_discount,
+                    date = date,
+                )
+   
+    serializers= PurchaseDiscountSerializers(spend_discount, data=request.data, partial=True, context={'request' : request})
+    if serializers.is_valid():
+        serializers.save()
+    else:
+        return Response(
+        {
+            'status' : False,
+            'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+            'response' : {
+                'message' : 'Invialid Data',
+                'error_message' : str(serializers.errors),
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+    )
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Purchase Discount Updated Successfully!',
+                'error_message' : None,
+                'error' : error,
+                'purchasediscount' : serializers.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_spend_discount(request):
+    spend_id = request.data.get('id', None)
+
+    if spend_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        spend_discount = SpendDiscount.objects.get(id=spend_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Spend Discount Not Found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    spend_discount.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Spend Discount deleted successfully',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_spend_discount(request):
+    spend_discount = SpendDiscount.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = SpendDiscountSerializers(spend_discount,  many=True, context={'request' : request})
+    
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Spend Discount',
+                'error_message' : None,
+                'purchasediscount' : serialized.data
             }
         },
         status=status.HTTP_200_OK

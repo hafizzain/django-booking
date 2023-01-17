@@ -26,4 +26,10 @@ urlpatterns = [
     path('delete_specificbrand_discount/', views.delete_specificbrand_discount),
     path('get_specificbrand_discount/', views.get_specificbrand_discount),
     path('update_specificbrand_discount/', views.update_specificbrand_discount),
+    
+    #Spend and Get Discount
+    path('create_spend_discount/', views.create_spend_discount),
+    path('update_spend_discount/', views.update_spend_discount),
+    path('delete_spend_discount/', views.delete_spend_discount),
+    path('get_spend_discount/', views.get_spend_discount),
 ]

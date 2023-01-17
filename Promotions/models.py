@@ -155,6 +155,7 @@ class DateRestrictions(models.Model):
     purchasediscount = models.ForeignKey(PurchaseDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='purchasediscount_daterestrictions')
     
     specificbrand = models.ForeignKey(SpecificBrand, on_delete=models.CASCADE, null=True, blank=True, related_name='specificbrand_daterestrictions')
+    spenddiscount = models.ForeignKey(SpendDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='spenddiscount_daterestrictions')
     
     
     business_address = models.ManyToManyField(BusinessAddress, null=True, blank=True, related_name='business_address_daterestrictions')
@@ -175,6 +176,7 @@ class DayRestrictions(models.Model):
     purchasediscount = models.ForeignKey(PurchaseDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='purchasediscount_dayrestrictions')
     
     specificbrand = models.ForeignKey(SpecificBrand, on_delete=models.CASCADE, null=True, blank=True, related_name='specificbrand_dayrestrictions')
+    spenddiscount = models.ForeignKey(SpendDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='spenddiscount_dayrestrictions')
     
     day = models.CharField(max_length=20, null=True, blank=True)
     
@@ -192,6 +194,7 @@ class BlockDate(models.Model):
     purchasediscount = models.ForeignKey(PurchaseDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='purchasediscount_blockdate')
     
     specificbrand = models.ForeignKey(SpecificBrand, on_delete=models.CASCADE, null=True, blank=True, related_name='specificbrand_blockdate')
+    spenddiscount = models.ForeignKey(SpendDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='spenddiscount_blockdate')
 
     
     date = models.DateField(verbose_name = 'Block Date', null=True)
