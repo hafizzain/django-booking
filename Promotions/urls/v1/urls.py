@@ -36,4 +36,6 @@ urlpatterns = [
     #Some Amount Discount
     path('create_spend_some_amount/', views.create_spend_some_amount),
     path('update_spend_some_amount/', views.update_spend_some_amount),
+    path('delete_spend_some_amount/', views.delete_spend_some_amount),
+    path('get_spend_some_amount/', views.get_spend_some_amount),
 ]

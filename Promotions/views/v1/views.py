@@ -2479,7 +2479,7 @@ def update_spend_some_amount(request):
     
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-def delete_spend_discount(request):
+def delete_spend_some_amount(request):
     spend_id = request.data.get('id', None)
 
     if spend_id is None: 
@@ -2531,7 +2531,7 @@ def delete_spend_discount(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_spend_discount(request):
+def get_spend_some_amount(request):
     spend_discount = SpendSomeAmount.objects.filter(is_deleted=False).order_by('-created_at')
     serialized = SpendSomeAmountSerializers(spend_discount,  many=True, context={'request' : request})
     
