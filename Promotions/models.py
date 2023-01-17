@@ -67,7 +67,7 @@ class PurchaseDiscount(models.Model):
 
 class DirectOrFlatDiscount(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='directorflatdiscount')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_directorflatdiscount')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_directorflatdiscount')
     
     is_deleted = models.BooleanField(default=False)
@@ -105,6 +105,22 @@ class SpendDiscount(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+class SpendSomeAmount(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_spendsomeamount')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_spendsomeamount')
+    
+    spend_amount = models.PositiveIntegerField(default=0, blank= True, null=True)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='service_spendsomeamount')
+    
+    
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+    updated_at = models.DateTimeField(null=True, blank=True)
+
     
 class SpecificBrand(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
@@ -125,7 +141,6 @@ class SpecificBrand(models.Model):
 
     def __str__(self):
         return str(self.id)
-    
     
 class CategoryDiscount(models.Model):
     TYPE_CHOICES = [
@@ -156,6 +171,7 @@ class DateRestrictions(models.Model):
     
     specificbrand = models.ForeignKey(SpecificBrand, on_delete=models.CASCADE, null=True, blank=True, related_name='specificbrand_daterestrictions')
     spenddiscount = models.ForeignKey(SpendDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='spenddiscount_daterestrictions')
+    spendsomeamount = models.ForeignKey(SpendSomeAmount, on_delete=models.CASCADE, null=True, blank=True, related_name='spendsomeamount_daterestrictions')
     
     
     business_address = models.ManyToManyField(BusinessAddress, null=True, blank=True, related_name='business_address_daterestrictions')
@@ -177,6 +193,7 @@ class DayRestrictions(models.Model):
     
     specificbrand = models.ForeignKey(SpecificBrand, on_delete=models.CASCADE, null=True, blank=True, related_name='specificbrand_dayrestrictions')
     spenddiscount = models.ForeignKey(SpendDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='spenddiscount_dayrestrictions')
+    spendsomeamount = models.ForeignKey(SpendSomeAmount, on_delete=models.CASCADE, null=True, blank=True, related_name='spendsomeamount_dayrestrictions')
     
     day = models.CharField(max_length=20, null=True, blank=True)
     
@@ -195,6 +212,7 @@ class BlockDate(models.Model):
     
     specificbrand = models.ForeignKey(SpecificBrand, on_delete=models.CASCADE, null=True, blank=True, related_name='specificbrand_blockdate')
     spenddiscount = models.ForeignKey(SpendDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='spenddiscount_blockdate')
+    spendsomeamount = models.ForeignKey(SpendSomeAmount, on_delete=models.CASCADE, null=True, blank=True, related_name='spendsomeamount_blockdate')
 
     
     date = models.DateField(verbose_name = 'Block Date', null=True)

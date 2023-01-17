@@ -44,7 +44,7 @@ def create_client_business(request):
     email = request.data.get('email', None)
     number = request.data.get('mobile_number', None)
     password = request.data.get('password', None)
-    
+    client_auto_id= request.data.get('client_id' ,None)    
     business_id= request.data.get('business', None)
     
     data = []
@@ -123,6 +123,7 @@ def create_client_business(request):
                 full_name = name,
                 mobile_number=number,
                 email = email,
+                client_id = client_auto_id,
                 is_active = True
             )
             client_id = client.id
