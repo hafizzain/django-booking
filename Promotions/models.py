@@ -111,8 +111,24 @@ class SpendSomeAmount(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_spendsomeamount')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_spendsomeamount')
     
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+    updated_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return str(self.id)
+    
+class SpendSomeAmountAndGetDiscount(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_spendandgetdiscount')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_spendandgetdiscount')
+    
     spend_amount = models.PositiveIntegerField(default=0, blank= True, null=True)
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='service_spendsomeamount')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='service_spendandgetdiscount')
+    
+    spandsomeamount = models.ForeignKey(SpendSomeAmount, on_delete=models.CASCADE, null=True, blank=True, related_name='spendandgetdiscount_spendsomeamount')
     
     
     is_deleted = models.BooleanField(default=False)
@@ -121,6 +137,8 @@ class SpendSomeAmount(models.Model):
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(null=True, blank=True)
 
+    def __str__(self):
+        return str(self.id)
     
 class SpecificBrand(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
