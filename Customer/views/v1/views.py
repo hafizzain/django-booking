@@ -134,7 +134,7 @@ def create_client_business(request):
         username = email.split('@')[0]
         if username:
             try:
-                user_check = User.objects.get(username__icontains = username)
+                user_check = User.objects.get(username = username)
             except Exception as err:
                 data.append(f'username user is  {str(err)}')
                 #data.append(f'username user is  {user_check}')
@@ -152,7 +152,7 @@ def create_client_business(request):
             try:
                 username = client.email.split('@')[0]
                 try:
-                    user_check = User.objects.get(username__icontains = username)
+                    user_check = User.objects.get(username = username)
                 except Exception as err:
                     data.append(f'username user is  {str(err)}')
                     #data.append(f'username user is  {user_check}')
