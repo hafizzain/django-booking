@@ -3195,7 +3195,7 @@ def get_employee_appointment(request):
                 'response' : {
                     'message' : 'Employees are free',
                     'error_message' : None,
-                    'error': data
+                    'error': data,
                     'employee': data
                 }
             },
