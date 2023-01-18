@@ -2261,7 +2261,7 @@ def create_spend_some_amount(request):
                     
                     spandsomeamount = spend_some_amount,
                     service = service_id,
-                    discount = discount
+                    spend_amount = discount
                 )
                 
             except Exception as err:
