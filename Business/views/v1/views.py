@@ -3075,7 +3075,7 @@ def get_employee_appointment(request):
         
         for check in employee_list:
             date = check.get('date', None)
-            start_time = check.get('start_time', None)
+            start_time = check.get('app_time', None)
             duration = check.get('duration', None)
             service = check.get('service', None)
             
