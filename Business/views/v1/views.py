@@ -3065,6 +3065,7 @@ def get_employee_appointment(request):
         )
     
     data = []
+    error = []
     
     if type(employee_list) == str:
         employee_list = json.loads(employee_list)
@@ -3135,6 +3136,7 @@ def get_employee_appointment(request):
                 serializer = EmployeeBusinessSerializer(all_emp)
                 data.append(serializer.data)
             except Exception as err:
+                data.append(str(err))
                 pass
         # for emp in all_emp:
         
@@ -3193,6 +3195,7 @@ def get_employee_appointment(request):
                 'response' : {
                     'message' : 'Employees are free',
                     'error_message' : None,
+                    'error': data
                     'employee': data
                 }
             },
