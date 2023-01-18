@@ -204,15 +204,15 @@ def create_client_business(request):
                 user = user,
                 account_type = 'Everyone'
             )
-            client_id = ClientIdUser.objects.get(user = user.id )
-            if client_id:
-                pass
-            else:
-                user_client = ClientIdUser.objects.create(
-                    user = user,
-                    client_id = client_id,
-                    is_everyone = True
-                )
+            # client_id = ClientIdUser.objects.get(user = user. )
+            # if client_id:
+            #     pass
+            # else:
+            user_client = ClientIdUser.objects.create(
+                user = user,
+                client_id = client_id,
+                is_everyone = True
+            )
         else:
             user = User.objects.create(
                 first_name = name,
@@ -226,11 +226,11 @@ def create_client_business(request):
                 user = user,
                 account_type = 'Everyone'
             )
-            # user_client = ClientIdUser.objects.create(
-            #     user = user,
-            #     client_id = client_id,
-            #     is_everyone = True
-            # )
+            user_client = ClientIdUser.objects.create(
+                user = user,
+                client_id = client_id,
+                is_everyone = True
+            )
         
         try:
             OTP.generate_user_otp(user=user, code_for='Email')
