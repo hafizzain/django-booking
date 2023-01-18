@@ -136,7 +136,7 @@ def create_client_business(request):
             try:
                 user_check = User.objects.get(username = username)
             except Exception as err:
-                data.append(f'username user is  {str(err)}')
+                data.append(f'username user is errors  {str(err)}')
                 #data.append(f'username user is  {user_check}')
                 pass
             else:
@@ -154,7 +154,7 @@ def create_client_business(request):
                 try:
                     user_check = User.objects.get(username = username)
                 except Exception as err:
-                    data.append(f'username user is  {str(err)}')
+                    data.append(f'username user is client errors {str(err)}')
                     #data.append(f'username user is  {user_check}')
                     pass
                 else:
@@ -193,11 +193,11 @@ def create_client_business(request):
                 user = user,
                 account_type = 'Everyone'
             )
-            user_client = ClientIdUser.objects.create(
-                user = user,
-                client_id = client_id,
-                is_everyone = True
-            )
+            # user_client = ClientIdUser.objects.create(
+            #     user = user,
+            #     client_id = client_id,
+            #     is_everyone = True
+            # )
         
         try:
             OTP.generate_user_otp(user=user, code_for='Email')
