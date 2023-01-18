@@ -2625,7 +2625,7 @@ def create_fixed_price_service(request):
     
     spend_amount = request.data.get('spendAmount', None)
     duration = request.data.get('duration', None)
-    service = request.data.get('spend_service', None)
+    service = request.data.get('service', None)
     
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
