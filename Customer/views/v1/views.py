@@ -162,23 +162,23 @@ def create_client_business(request):
             except Exception as err:
                 data.append(f'Client errors {str(err)}')
             
-            user = User.objects.create(
-                first_name = str(client.full_name),
-                username = username,
-                email = str(client.email),
-                is_email_verified = True,
-                is_active = True,
-                mobile_number = str(client.mobile_number),
-            )
-            account_type = AccountType.objects.create(
-                user = user,
-                account_type = 'Everyone'
-            )
-            user_client = ClientIdUser.objects.create(
-                user = user,
-                client_id = client_id,
-                is_everyone = True
-            )
+            # user = User.objects.create(
+            #     first_name = str(client.full_name),
+            #     username = username,
+            #     email = str(client.email),
+            #     is_email_verified = True,
+            #     is_active = True,
+            #     mobile_number = str(client.mobile_number),
+            # )
+            # account_type = AccountType.objects.create(
+            #     user = user,
+            #     account_type = 'Everyone'
+            # )
+            # user_client = ClientIdUser.objects.create(
+            #     user = user,
+            #     client_id = client_id,
+            #     is_everyone = True
+            # )
         # else:
         #     user = User.objects.create(
         #         first_name = name,
