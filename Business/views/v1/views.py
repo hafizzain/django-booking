@@ -3072,21 +3072,21 @@ def get_employee_appointment(request):
         pass
     
     try:
-            business=BusinessAddress.objects.get(id=business_id)
-        except Exception as err:
-            return Response(
-            {
-                'status' : True,
-                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
-                'status_code_text' :'BUSINESS_NOT_FOUND_4015' ,
-                'response' : {
-                    'message' : 'Business Address not found!',
-                    'error_message' : str(err),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
-    
+        business=BusinessAddress.objects.get(id=business_id)
+    except Exception as err:
+        return Response(
+        {
+            'status' : True,
+            'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+            'status_code_text' :'BUSINESS_NOT_FOUND_4015' ,
+            'response' : {
+                'message' : 'Business Address not found!',
+                'error_message' : str(err),
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+    )
+
     with tenant_context(tenant):
         
         for check in employee_list:
