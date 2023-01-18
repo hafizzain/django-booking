@@ -2454,6 +2454,7 @@ def update_spend_some_amount(request):
             else:
                 SpendSomeAmountAndGetDiscount.objects.create(
                     spandsomeamount = spend_some,
+                    
                     service = service_grp,
                     spend_amount = discount
                 )
