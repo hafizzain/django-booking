@@ -141,26 +141,27 @@ def create_client_business(request):
             else:
                 username = f'{username} {len(User.objects.all())}'
                 data.append(f'username user is {username}')
-                # return Response(
-                #     {
-                        
-                #         'status' : True,
-                #         'status_code_text' :'USER_ALREADY_EXIST' ,
-                #         'response' : {
-                #             'message' : 'User are Exist with this username!',
-                #             'error_message' : user_check.username,
-                #             'username':username
-                #         }
-                #     },
-                #     status=status.HTTP_404_NOT_FOUND
-                # )
     except Exception as err:
         data.append(f'Client errors {str(err)}')
         
     try:
         if client:
             data.append(f'Client Email already exist  in if else condition {client.full_name}')
-    
+            
+            try:
+                username = client.email.split('@')[0]
+                try:
+                    user_check = User.objects.get(username__icontains = username)
+                except Exception as err:
+                    data.append(f'username user is  {str(err)}')
+                    data.append(f'username user is  {user_check}')
+                    pass
+                else:
+                    username = f'{username} {len(User.objects.all())}'
+                    data.append(f'username user is {username}')
+            except Exception as err:
+                data.append(f'Client errors {str(err)}')
+            
             user = User.objects.create(
                 first_name = str(client.full_name),
                 username = str(client.full_name),
@@ -747,7 +748,7 @@ def update_appointment_client(request):
 @permission_classes([AllowAny])
 def generate_id(request):
     
-    hash = request.data.get('hash', None)
+    hash = request.GET.get('hash', None)
     
     if hash is None: 
        return Response(
@@ -759,7 +760,7 @@ def generate_id(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'fields are required!',
                     'fields' : [
-                        'appointment_id'                         
+                        'hash'                         
                     ]
                 }
             },
