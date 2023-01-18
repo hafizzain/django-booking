@@ -135,6 +135,7 @@ def create_client_business(request):
             try:
                 user_check = User.objects.get(username = username)
             except Exception as err:
+                data.append(f'username user is {user_check} {str(err)}')
                 pass
             else:
                 username = f'{username} {len(User.objects.all())}'
