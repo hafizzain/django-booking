@@ -3109,11 +3109,11 @@ def get_employee_appointment(request):
             tested = datetime.strptime(datetime_duration ,'%H:%M:%S').time()
             end_time = datetime_duration
             
-            try:
-                service_id=Service.objects.get(id=str(service))
-            except Exception as err:
-                #service_id = ''
-                pass
+            # try:
+            #     service_id=Service.objects.get(id=str(service))
+            # except Exception as err:
+            #     #service_id = ''
+            #     pass
         #     return Response(
         #     {
         #         'status' : True,
@@ -3130,7 +3130,7 @@ def get_employee_appointment(request):
                 all_emp = Employee.objects.get(is_deleted=False, 
                                 location__id = business.id, 
                                 employee_employedailyschedule__is_vacation = False,
-                                employee_selected_service__service__id = service_id,
+                                employee_selected_service__service__id = str(service),
                                 ).order_by('-created_at')
                 
                 serializer = EmployeeBusinessSerializer(all_emp)
