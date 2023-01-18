@@ -129,87 +129,87 @@ def create_client_business(request):
             client_id = client.id
             data.append(f'Client Created Successfully {client.full_name}')
             
-    try:
-        username = email.split('@')[0]
-        if username:
-            try:
-                user_check = User.objects.get(username = username)
-            except Exception as err:
-                pass
-            else:
-                username = f'{username} {len(User.objects.all())}'
-                return Response(
-                    {
+    # try:
+    #     username = email.split('@')[0]
+    #     if username:
+    #         try:
+    #             user_check = User.objects.get(username = username)
+    #         except Exception as err:
+    #             pass
+    #         else:
+    #             username = f'{username} {len(User.objects.all())}'
+    #             return Response(
+    #                 {
                         
-                        'status' : True,
-                        'status_code_text' :'USER_ALREADY_EXIST' ,
-                        'response' : {
-                            'message' : 'User are Exist with this username!',
-                            'error_message' : user_check.username,
-                            'username':username
-                        }
-                    },
-                    status=status.HTTP_404_NOT_FOUND
-                )
+    #                     'status' : True,
+    #                     'status_code_text' :'USER_ALREADY_EXIST' ,
+    #                     'response' : {
+    #                         'message' : 'User are Exist with this username!',
+    #                         'error_message' : user_check.username,
+    #                         'username':username
+    #                     }
+    #                 },
+    #                 status=status.HTTP_404_NOT_FOUND
+    #             )
                 
 
-        if client:
-            data.append(f'Client Email already exist  in if else condition {client.full_name}')
+    #     if client:
+    #         data.append(f'Client Email already exist  in if else condition {client.full_name}')
     
-            user = User.objects.create(
-                first_name = str(client.full_name),
-                username = str(client.full_name),
-                email = str(client.email),
-                is_email_verified = True,
-                is_active = True,
-                mobile_number = str(client.mobile_number),
-            )
-            account_type = AccountType.objects.create(
-                user = user,
-                account_type = 'Everyone'
-            )
-            user_client = ClientIdUser.objects.create(
-                user = user,
-                client_id = client_id,
-                is_everyone = True
-            )
-        else:
-            user = User.objects.create(
-                first_name = name,
-                username = username,
-                email = email,
-                is_email_verified = True,
-                is_active = True,
-                mobile_number = number,
-            )
-            account_type = AccountType.objects.create(
-                user = user,
-                account_type = 'Everyone'
-            )
-            user_client = ClientIdUser.objects.create(
-                user = user,
-                client_id = client_id,
-                is_everyone = True
-            )
+    #         user = User.objects.create(
+    #             first_name = str(client.full_name),
+    #             username = str(client.full_name),
+    #             email = str(client.email),
+    #             is_email_verified = True,
+    #             is_active = True,
+    #             mobile_number = str(client.mobile_number),
+    #         )
+    #         account_type = AccountType.objects.create(
+    #             user = user,
+    #             account_type = 'Everyone'
+    #         )
+    #         user_client = ClientIdUser.objects.create(
+    #             user = user,
+    #             client_id = client_id,
+    #             is_everyone = True
+    #         )
+    #     else:
+    #         user = User.objects.create(
+    #             first_name = name,
+    #             username = username,
+    #             email = email,
+    #             is_email_verified = True,
+    #             is_active = True,
+    #             mobile_number = number,
+    #         )
+    #         account_type = AccountType.objects.create(
+    #             user = user,
+    #             account_type = 'Everyone'
+    #         )
+    #         user_client = ClientIdUser.objects.create(
+    #             user = user,
+    #             client_id = client_id,
+    #             is_everyone = True
+    #         )
         
-        try:
-            OTP.generate_user_otp(user=user, code_for='Email')
-        except Exception as error:
-            ExceptionRecord.objects.create(text=f'Error from create Customer User \n{str(error)}')
-        user.set_password(password)
-        user.save()
-    except Exception as err:
-        return Response(
-            {
-                'status' : True,
-                'status_code_text' :'BUSINESS_NOT_FOUND_4015' ,
-                'response' : {
-                    'message' : 'User not found!',
-                    'error_message' : str(err),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
+    #     try:
+    #         OTP.generate_user_otp(user=user, code_for='Email')
+    #     except Exception as error:
+    #         ExceptionRecord.objects.create(text=f'Error from create Customer User \n{str(error)}')
+    #     user.set_password(password)
+    #     user.save()
+    # except Exception as err:
+    #     return Response(
+    #         {
+    #             'status' : True,
+    #             'status_code_text' :'BUSINESS_NOT_FOUND_4015' ,
+    #             'response' : {
+    #                 'message' : 'User not found!',
+    #                 'error_message' : str(err),
+    #             }
+    #         },
+    #         status=status.HTTP_404_NOT_FOUND
+    #     )
     #serialized = UserTenantLoginSerializer(user)
     return Response(
         {
