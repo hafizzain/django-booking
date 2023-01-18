@@ -4,7 +4,7 @@ from Business.models import BusinessAddress, BusinessTax
 from Product.Constants.index import tenant_media_base_url
 from django_tenants.utils import tenant_context
 
-from Promotions.models import DirectOrFlatDiscount , CategoryDiscount , DateRestrictions , DayRestrictions, BlockDate, PurchaseDiscount, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount
+from Promotions.models import DirectOrFlatDiscount , CategoryDiscount , DateRestrictions , DayRestrictions, BlockDate, PurchaseDiscount, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount
 
 class ServiceGroupDiscountSerializers(serializers.ModelSerializer):
     is_deleted = serializers.SerializerMethodField(read_only=True)
@@ -17,6 +17,18 @@ class ServiceGroupDiscountSerializers(serializers.ModelSerializer):
             return 'False'
     class Meta:
         model = ServiceGroupDiscount
+        fields = '__all__'
+class SpendSomeAmountAndGetDiscountSerializers(serializers.ModelSerializer):
+    is_deleted = serializers.SerializerMethodField(read_only=True)
+    
+    
+    def get_is_deleted(self, obj):
+        if obj.is_deleted == True:
+            return 'True'
+        else:
+            return 'False'
+    class Meta:
+        model = SpendSomeAmountAndGetDiscount
         fields = '__all__'
 class BlockDateSerializers(serializers.ModelSerializer):
     is_deleted = serializers.SerializerMethodField(read_only=True)
@@ -312,6 +324,7 @@ class SpendDiscountSerializers(serializers.ModelSerializer):
         
 class SpendSomeAmountSerializers(serializers.ModelSerializer):
     day_restrictions = serializers.SerializerMethodField(read_only=True)
+    spend_service = serializers.SerializerMethodField(read_only=True)
     date_restrictions = serializers.SerializerMethodField(read_only=True)
     block_date = serializers.SerializerMethodField(read_only=True)
     type = serializers.SerializerMethodField(read_only=True)
@@ -326,6 +339,13 @@ class SpendSomeAmountSerializers(serializers.ModelSerializer):
     def get_type(self, obj):
         return 'Spend_Some_Amount'
     
+    def get_spend_service(self, obj):
+        try:
+            ser = SpendSomeAmountAndGetDiscount.objects.filter(spendsomeamount = obj)
+            return SpendSomeAmountAndGetDiscountSerializers(ser, many = True).data
+        except Exception as err:
+            pass
+        
     def get_block_date(self, obj):
         try:
             ser = BlockDate.objects.filter(spendsomeamount = obj)
