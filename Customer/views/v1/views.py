@@ -198,12 +198,12 @@ def create_client_business(request):
         #         is_everyone = True
         #     )
         
-        try:
-            OTP.generate_user_otp(user=user, code_for='Email')
-        except Exception as error:
-            ExceptionRecord.objects.create(text=f'Error from create Customer User \n{str(error)}')
-        user.set_password(password)
-        user.save()
+        # try:
+        #     OTP.generate_user_otp(user=user, code_for='Email')
+        # except Exception as error:
+        #     ExceptionRecord.objects.create(text=f'Error from create Customer User \n{str(error)}')
+        # user.set_password(password)
+        # user.save()
     except Exception as err:
         return Response(
             {
