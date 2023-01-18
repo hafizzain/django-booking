@@ -3109,6 +3109,7 @@ def get_employee_appointment(request):
         try:
             service_id=Service.objects.get(id=service)
         except Exception as err:
+            service_id = ''
             pass
         #     return Response(
         #     {
