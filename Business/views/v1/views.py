@@ -2981,8 +2981,8 @@ def get_check_availability(request):
                         # appointment_time__gte = start_time, # 1:00
                         # end_time__lte = start_time, # 1:40
                         # member__employee_employedailyschedule__date = date,
-                        # member__employee_employedailyschedule__start_time__lte = start_time,
-                        # member__employee_employedailyschedule__end_time__gte = start_time,
+                        member__employee_employedailyschedule__start_time__gte = start_time,
+                        member__employee_employedailyschedule__end_time__lte = start_time,
                         is_blocked = False,
                     )#.values_list('member__id', flat=True)
                     
@@ -3126,18 +3126,53 @@ def get_employee_appointment(request):
         #     },
         #     status=status.HTTP_404_NOT_FOUND
         # )
+
+            employee = Employee.objects.get(is_deleted=False, 
+                location__id = business.id, 
+                employee_employedailyschedule__is_vacation = False,
+                #employee_selected_service__service__id = str(service),
+                )#.order_by('-created_at')
+            
             try:
-                all_emp = Employee.objects.get(is_deleted=False, 
-                                location__id = business.id, 
-                                employee_employedailyschedule__is_vacation = False,
-                                #employee_selected_service__service__id = str(service),
-                                )#.order_by('-created_at')
+                av_staff_ids = AppointmentService.objects.filter(
+                    member__id = employee.id,
+                    appointment_date = date,
+                    # appointment_time__gte = start_time, # 1:00
+                    # end_time__lte = start_time, # 1:40
+                    # member__employee_employedailyschedule__date = date,
+                    member__employee_employedailyschedule__start_time__gte = start_time,
+                    member__employee_employedailyschedule__end_time__lte = start_time,
+                    is_blocked = False,
+                )#.values_list('member__id', flat=True)
                 
-                serializer = EmployeeBusinessSerializer(all_emp)
-                data.append(serializer.data)
+                for ser in av_staff_ids:
+                    #data.append(f'{av_staff_ids} type {type(start_time)}, tested {ser.appointment_time}')
+                    if tested <= ser.appointment_time:# or start_time >= ser.end_time:
+                        if start_time >= ser.end_time:
+                            serializer = EmployeeBusinessSerializer(employee)
+                            data.append(serializer.data)
+                            #data.append(f'Employees are free, employee name {employee.full_name}')
+                            
+                        else:
+                            #data.append(f'The selected staff is not available at this time  {employee.full_name}')
+                            Availability = False
+                                                                    
+                    else:
+                        serializer = EmployeeBusinessSerializer(employee)
+                        data.append(serializer.data)
+                        #data.append(f'Employees are free, employee name: {employee.full_name}')
+                        
+                if len(av_staff_ids) == 0:
+                    serializer = EmployeeBusinessSerializer(employee)
+                    data.append(serializer.data)
+                    #data.append(f'Employees are free, you can proceed further employee name {employee.full_name}')
+                    
+                    #data.append(f'{av_staff_ids} type {type(datetime_duration)}, ')
+                    
             except Exception as err:
-                data.append(str(err))
                 pass
+                #data.append(f'the employe{employee}, start_time {str(err)}')
+        
         # for emp in all_emp:
         
         #     #data.append(emp)
@@ -3195,7 +3230,7 @@ def get_employee_appointment(request):
                 'response' : {
                     'message' : 'Employees are free',
                     'error_message' : None,
-                    'error': data,
+                    'error': error,
                     'employee': data
                 }
             },
