@@ -65,7 +65,19 @@ def create_client_business(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     except Exception as err:
-        pass
+        #pass
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Account Exit',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
     
     if tenant_id is None:
         return Response(
@@ -192,7 +204,7 @@ def create_client_business(request):
                 user = user,
                 account_type = 'Everyone'
             )
-            client_id = ClientIdUser.objects.get(client_id_icontains = client.id )
+            client_id = ClientIdUser.objects.get(user = user )
             if client_id:
                 pass
             else:
