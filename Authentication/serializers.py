@@ -123,6 +123,7 @@ class UserSerializerByClient(serializers.ModelSerializer):
             id = ClientIdUser.objects.get(user = obj)
             return id.client_id
         except Exception as err:
+            return str(err)
             pass
     
 
