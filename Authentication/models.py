@@ -61,7 +61,7 @@ class User(AbstractBaseUser):
     full_name = models.CharField(max_length=100, null=True, blank=True)
     username = models.CharField(max_length=30, unique=True)
 
-    email = models.EmailField(verbose_name="email", max_length=60, unique=True)
+    email = models.EmailField(verbose_name="email", max_length=60,) #unique=True)
     is_email_verified = models.BooleanField(default=False)
 
     is_admin = models.BooleanField(default=False)
