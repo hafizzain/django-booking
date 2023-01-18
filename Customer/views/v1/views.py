@@ -129,29 +129,32 @@ def create_client_business(request):
             client_id = client.id
             data.append(f'Client Created Successfully {client.full_name}')
             
-    # try:
-    #     username = email.split('@')[0]
-    #     if username:
-    #         try:
-    #             user_check = User.objects.get(username = username)
-    #         except Exception as err:
-    #             pass
-    #         else:
-    #             username = f'{username} {len(User.objects.all())}'
-    #             return Response(
-    #                 {
+    try:
+        username = email.split('@')[0]
+        if username:
+            try:
+                user_check = User.objects.get(username = username)
+            except Exception as err:
+                pass
+            else:
+                username = f'{username} {len(User.objects.all())}'
+                data.append(f'username user is {username}')
+                # return Response(
+                #     {
                         
-    #                     'status' : True,
-    #                     'status_code_text' :'USER_ALREADY_EXIST' ,
-    #                     'response' : {
-    #                         'message' : 'User are Exist with this username!',
-    #                         'error_message' : user_check.username,
-    #                         'username':username
-    #                     }
-    #                 },
-    #                 status=status.HTTP_404_NOT_FOUND
-    #             )
-                
+                #         'status' : True,
+                #         'status_code_text' :'USER_ALREADY_EXIST' ,
+                #         'response' : {
+                #             'message' : 'User are Exist with this username!',
+                #             'error_message' : user_check.username,
+                #             'username':username
+                #         }
+                #     },
+                #     status=status.HTTP_404_NOT_FOUND
+                # )
+    except Exception as err:
+        data.append(f'Client errors {str(err)}')
+        
 
     #     if client:
     #         data.append(f'Client Email already exist  in if else condition {client.full_name}')
