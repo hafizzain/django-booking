@@ -18,6 +18,7 @@ from django.contrib.auth import authenticate, logout
 
 from Business.models import Business, BusinessAddressMedia, BusinessType
 from Client.models import Client
+from Client.serializers import ClientSerializer
 from Customer.serializers import AppointmentClientSerializer, AppointmentServiceClientSerializer
 from Employee.models import Employee
 
@@ -820,3 +821,66 @@ def generate_id(request):
         },
         status=status.HTTP_200_OK
     )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_client_detail(request):
+    hash = request.GET.get('hash', None)
+    client_id = request.GET.get('client_id', None)
+    
+    data = []    
+    if hash is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'hash'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        tenant = Tenant.objects.get(id = hash)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Invalid Tenant Id',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )    
+    
+    with tenant_context(tenant):
+        try:
+            all_client=Client.objects.get(id = client_id)
+            serialized = ClientSerializer(all_client, context={'request' : request})
+            data.append(serialized.data)
+        except Exception as err:
+            pass
+            
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Client',
+                'error_message' : None,
+                'client' : data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+            

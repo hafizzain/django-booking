@@ -9,6 +9,9 @@ urlpatterns = [
     path('customer_login/', views.customer_login),
     path('get_client_appointment/', views.get_client_appointment),
     
+    #Get Client Id
+    path('get_client_detail/', views.get_client_detail),    
+    
     #Cancel Appointment
     path('cancel_appointment_client/', views.cancel_appointment_client),
     path('update_appointment_client/', views.update_appointment_client),
