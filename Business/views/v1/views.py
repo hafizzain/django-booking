@@ -3106,11 +3106,27 @@ def get_employee_appointment(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+        try:
+            service_id=Service.objects.get(id=service)
+        except Exception as err:
+            pass
+        #     return Response(
+        #     {
+        #         'status' : True,
+        #         'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+        #         'status_code_text' :'BUSINESS_NOT_FOUND_4015' ,
+        #         'response' : {
+        #             'message' : 'Business Address not found!',
+        #             'error_message' : str(err),
+        #         }
+        #     },
+        #     status=status.HTTP_404_NOT_FOUND
+        # )
               
         all_emp = Employee.objects.filter(is_deleted=False, 
                         location__id = business.id, 
                         employee_employedailyschedule__is_vacation = False,
-                        #employee_selected_service__service_id = service,
+                        employee_selected_service__service__id = service_id,
                         ).order_by('-created_at')
         for emp in all_emp:
         
