@@ -3093,7 +3093,7 @@ def get_employee_appointment(request):
             
             
         try:
-            business=Business.objects.get(id=business_id)
+            business=BusinessAddress.objects.get(id=business_id)
         except Exception as err:
             return Response(
             {
@@ -3101,7 +3101,7 @@ def get_employee_appointment(request):
                 'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
                 'status_code_text' :'BUSINESS_NOT_FOUND_4015' ,
                 'response' : {
-                    'message' : 'Business not found!',
+                    'message' : 'Business Address not found!',
                     'error_message' : str(err),
                 }
             },
