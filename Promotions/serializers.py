@@ -341,7 +341,7 @@ class SpendSomeAmountSerializers(serializers.ModelSerializer):
     
     def get_spend_service(self, obj):
         try:
-            ser = SpendSomeAmountAndGetDiscount.objects.filter(spendsomeamount = obj)
+            ser = SpendSomeAmountAndGetDiscount.objects.filter(spandsomeamount = obj)
             return SpendSomeAmountAndGetDiscountSerializers(ser, many = True).data
         except Exception as err:
             return str(err)
