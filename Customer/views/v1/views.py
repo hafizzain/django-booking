@@ -179,24 +179,24 @@ def create_client_business(request):
                 client_id = client_id,
                 is_everyone = True
             )
-        else:
-            user = User.objects.create(
-                first_name = name,
-                username = username,
-                email = email,
-                is_email_verified = True,
-                is_active = True,
-                mobile_number = number,
-            )
-            account_type = AccountType.objects.create(
-                user = user,
-                account_type = 'Everyone'
-            )
-            user_client = ClientIdUser.objects.create(
-                user = user,
-                client_id = client_id,
-                is_everyone = True
-            )
+        # else:
+        #     user = User.objects.create(
+        #         first_name = name,
+        #         username = username,
+        #         email = email,
+        #         is_email_verified = True,
+        #         is_active = True,
+        #         mobile_number = number,
+        #     )
+        #     account_type = AccountType.objects.create(
+        #         user = user,
+        #         account_type = 'Everyone'
+        #     )
+        #     user_client = ClientIdUser.objects.create(
+        #         user = user,
+        #         client_id = client_id,
+        #         is_everyone = True
+        #     )
         
         try:
             OTP.generate_user_otp(user=user, code_for='Email')
@@ -216,7 +216,7 @@ def create_client_business(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    serialized = UserTenantLoginSerializer(user)
+    #serialized = UserTenantLoginSerializer(user)
     return Response(
         {
             'status' : True,
