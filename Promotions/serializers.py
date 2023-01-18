@@ -372,7 +372,7 @@ class SpendSomeAmountSerializers(serializers.ModelSerializer):
         fields = '__all__'
 class FixedPriceServiceSerializers(serializers.ModelSerializer):
     day_restrictions = serializers.SerializerMethodField(read_only=True)
-    spend_service = serializers.SerializerMethodField(read_only=True)
+    #spend_service = serializers.SerializerMethodField(read_only=True)
     date_restrictions = serializers.SerializerMethodField(read_only=True)
     block_date = serializers.SerializerMethodField(read_only=True)
     type = serializers.SerializerMethodField(read_only=True)
