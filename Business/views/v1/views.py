@@ -3113,10 +3113,11 @@ def get_employee_appointment(request):
                         employee_employedailyschedule__is_vacation = False,
                         employee_selected_service__service_id = service,
                         ).order_by('-created_at')
+        for emp in all_emp:
         
-        data.append(all_emp)
-        serializer = EmployeeBusinessSerializer(all_emp, many = True)
-        data.append(serializer.data)
+            data.append(emp)
+            serializer = EmployeeBusinessSerializer(emp)
+            data.append(serializer.data)
        
         # for emp in all_emp:
         #     availability = AppointmentService.objects.filter(
