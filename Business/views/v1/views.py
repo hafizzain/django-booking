@@ -3114,6 +3114,7 @@ def get_employee_appointment(request):
                         employee_selected_service__service_id = service,
                         ).order_by('-created_at')
         
+        data.append(all_emp)
         serializer = EmployeeBusinessSerializer(all_emp, many = True)
         data.append(serializer.data)
        
