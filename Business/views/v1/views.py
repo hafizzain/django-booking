@@ -2973,7 +2973,7 @@ def get_check_availability(request):
             end_time = datetime_duration
                 
             try:
-                employee = Employee.objects.get(id = emp_id)                
+                employee = Employee.objects.get(id = emp_id, employee_employedailyschedule__is_vacation = False)                
                 try:
                     av_staff_ids = AppointmentService.objects.filter(
                         member__id = employee.id,
@@ -3023,12 +3023,13 @@ def get_check_availability(request):
             status=status.HTTP_200_OK
         )
         
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def get_employee_appointment(request):
-    date = request.GET.get('date', None)
-    start_time = request.GET.get('start_time', None)
-    tenant_id = request.GET.get('hash', None)
+    
+    tenant_id = request.data.get('hash', None)
+    business_id = request.data.get('business', None)    
+    employee_list = request.data.get('emp_list', None)
     
     if tenant_id is None:
         return Response(
@@ -3065,8 +3066,53 @@ def get_employee_appointment(request):
     
     data = []
     
+    if type(employee_list) == str:
+        employee_list = json.loads(employee_list)
+    else:
+        pass
+    
     with tenant_context(tenant):
-        all_emp = Employee.objects.filter(is_deleted=False).order_by('-created_at')
+        
+        for check in employee_list:
+            date = check.get('date', None)
+            start_time = check.get('start_time', None)
+            duration = check.get('duration', None)
+            service = check.get('service', None)
+            
+            dtime = datetime.strptime(start_time, "%H:%M:%S")
+            start_time = dtime.time()
+            
+            app_date_time = f'2000-01-01 {start_time}'
+                
+            duration = DURATION_CHOICES[duration]
+            app_date_time = datetime.fromisoformat(app_date_time)
+            datetime_duration = app_date_time + timedelta(minutes=duration)
+            datetime_duration = datetime_duration.strftime('%H:%M:%S')
+            tested = datetime.strptime(datetime_duration ,'%H:%M:%S').time()
+            end_time = datetime_duration
+            
+            
+        try:
+            business=Business.objects.get(id=business_id)
+        except Exception as err:
+            return Response(
+            {
+                'status' : True,
+                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                'status_code_text' :'BUSINESS_NOT_FOUND_4015' ,
+                'response' : {
+                    'message' : 'Business not found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+            
+        all_emp = Employee.objects.filter(is_deleted=False, 
+                        location__in = business.id, employee_employedailyschedule__is_vacation = False,
+                        employee_selected_service__service__id__in = service,
+                        ).order_by('-created_at')
+       
         for emp in all_emp:
             availability = AppointmentService.objects.filter(
                 #member__id__in = empl_list,
@@ -3074,9 +3120,25 @@ def get_employee_appointment(request):
                 member__id = emp.id,
                 appointment_date = date,
                 is_blocked = False,
-                appointment_time__lte = start_time, # 1:00
-                end_time__gte = start_time,
+                # appointment_time__lte = start_time, # 1:00
+                # end_time__gte = start_time,
             )
+            # for ser in availability:
+            #     #data.append(f'{av_staff_ids} type {type(start_time)}, tested {ser.appointment_time}')
+            #     if tested <= ser.appointment_time:# or start_time >= ser.end_time:
+            #         if start_time >= ser.end_time:
+            #             serializer = EmployeeBusinessSerializer(emp)
+            #             data.append(serializer.data)
+            #             #data.append(f'Employees are free, employee name {employee.full_name}')
+                        
+            #         else:
+            #             pass
+            #             data.append(f'The selected staff is not available at this time  {employee.full_name}')
+            #             #Availability = False
+                                                                
+            #     else:
+            #         data.append(f'Employees are free, employee name: {employee.full_name}')
+                            
             if len(availability) >= 0 or len(availability) <= 3 :
                 serializer = EmployeeBusinessSerializer(emp)
                 data.append(serializer.data)

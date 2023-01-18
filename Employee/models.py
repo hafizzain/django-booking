@@ -102,8 +102,6 @@ class EmployeeSelectedService(models.Model):
     def __str__(self):
         return str(self.id)
 
-    
-
 class EmployeePermissionSetting(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_permissions_setting')
