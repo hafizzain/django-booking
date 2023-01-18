@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from Product.Constants.index import tenant_media_base_url
+from Product.Constants.index import tenant_media_base_url, tenant_media_domain
 
 from Product.models import Product
 from Service.models import Service
@@ -44,6 +44,26 @@ class ClientSerializer(serializers.ModelSerializer):
             try:
                 request = self.context["request"]
                 url = tenant_media_base_url(request)
+                return f'{url}{obj.image}'
+            except:
+                return obj.image
+        return None
+class Client_TenantSerializer(serializers.ModelSerializer):
+    country_obj = serializers.SerializerMethodField(read_only=True)
+    image = serializers.SerializerMethodField()
+    
+    
+    def get_country_obj(self, obj):
+        try:
+            return CountrySerializer(obj.country).data
+        except Exception as err:
+            return None
+    
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["tenant"]
+                url = tenant_media_domain(request)
                 return f'{url}{obj.image}'
             except:
                 return obj.image

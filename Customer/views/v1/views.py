@@ -18,7 +18,7 @@ from django.contrib.auth import authenticate, logout
 
 from Business.models import Business, BusinessAddressMedia, BusinessType
 from Client.models import Client
-from Client.serializers import ClientSerializer
+from Client.serializers import Client_TenantSerializer, ClientSerializer
 from Customer.serializers import AppointmentClientSerializer, AppointmentServiceClientSerializer
 from Employee.models import Employee
 
@@ -898,7 +898,7 @@ def get_client_detail(request):
     with tenant_context(tenant):
         try:
             all_client=Client.objects.get(id = client_id)
-            serialized = ClientSerializer(all_client, context={'request' : request})
+            serialized = Client_TenantSerializer(all_client, context={'request' : request,'tenant' : tenant.schema_name })
             data.append(serialized.data)
         except Exception as err:
             pass
