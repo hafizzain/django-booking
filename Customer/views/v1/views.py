@@ -56,10 +56,10 @@ def create_client_business(request):
             {
                 'status' : False,
                 'status_code' : 400,
-                'status_code_text' : 'Invalid Data',
+                'status_code_text' : StatusCodes.USER_ALREADY_VERIFIED_4007,
                 'response' : {
                     'message' : 'Account Exit',
-                    'error_message' : 'On this email account Already exit',
+                    'error_message' : 'Account Already Exist on this Email',
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
