@@ -3131,7 +3131,7 @@ def get_employee_appointment(request):
                                 location__id = business.id, 
                                 employee_employedailyschedule__is_vacation = False,
                                 #employee_selected_service__service__id = str(service),
-                                ).order_by('-created_at')
+                                )#.order_by('-created_at')
                 
                 serializer = EmployeeBusinessSerializer(all_emp)
                 data.append(serializer.data)
