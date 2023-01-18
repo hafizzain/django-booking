@@ -38,4 +38,9 @@ urlpatterns = [
     path('update_spend_some_amount/', views.update_spend_some_amount),
     path('delete_spend_some_amount/', views.delete_spend_some_amount),
     path('get_spend_some_amount/', views.get_spend_some_amount),
+    
+    #Fixed price or in the group
+    path('create_fixed_price_service/', views.create_fixed_price_service),
+    path('update_fixed_price_service/', views.update_fixed_price_service),
+    path('delete_fixed_price_service/', views.delete_fixed_price_service),
 ]
