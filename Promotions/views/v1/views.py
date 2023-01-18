@@ -2453,7 +2453,7 @@ def update_spend_some_amount(request):
                     error.append(str(err))
             else:
                 SpendSomeAmountAndGetDiscount.objects.create(
-                    spendsomeamount = spend_some,
+                    spandsomeamount = spend_some,
                     service = service_grp,
                     spend_amount = discount
                 )
