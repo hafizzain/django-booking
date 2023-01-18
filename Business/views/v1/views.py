@@ -3111,7 +3111,7 @@ def get_employee_appointment(request):
         all_emp = Employee.objects.filter(is_deleted=False, 
                         #location__id__in = business.id, 
                         employee_employedailyschedule__is_vacation = False,
-                        #employee_selected_service__service__id__in = service,
+                        employee_selected_service__service = service,
                         ).order_by('-created_at')
        
         for emp in all_emp:
