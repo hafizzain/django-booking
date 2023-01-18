@@ -50,6 +50,23 @@ def create_client_business(request):
     
     data = []
     
+    try:
+        user = User.objects.get(email__icontains = email, user_account_type__account_type = 'Everyone' )
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Account Exit',
+                    'error_message' : 'On this email account Already exit',
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    except Exception as err:
+        pass
+    
     if tenant_id is None:
         return Response(
             {
@@ -175,11 +192,15 @@ def create_client_business(request):
                 user = user,
                 account_type = 'Everyone'
             )
-            user_client = ClientIdUser.objects.create(
-                user = user,
-                client_id = client_id,
-                is_everyone = True
-            )
+            client_id = ClientIdUser.objects.get(client_id_icontains = client.id )
+            if client_id:
+                pass
+            else:
+                user_client = ClientIdUser.objects.create(
+                    user = user,
+                    client_id = client_id,
+                    is_everyone = True
+                )
         else:
             user = User.objects.create(
                 first_name = name,
