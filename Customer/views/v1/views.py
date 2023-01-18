@@ -133,9 +133,10 @@ def create_client_business(request):
         username = email.split('@')[0]
         if username:
             try:
-                user_check = User.objects.get(username = username)
+                user_check = User.objects.get(username__icontains = username)
             except Exception as err:
-                data.append(f'username user is {user_check} {str(err)}')
+                data.append(f'username user is  {str(err)}')
+                data.append(f'username user is  {user_check}')
                 pass
             else:
                 username = f'{username} {len(User.objects.all())}'
