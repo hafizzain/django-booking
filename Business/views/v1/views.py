@@ -3110,9 +3110,9 @@ def get_employee_appointment(request):
             end_time = datetime_duration
             
             try:
-                service_id=Service.objects.get(id=service)
+                service_id=Service.objects.get(id=str(service))
             except Exception as err:
-                service_id = ''
+                #service_id = ''
                 pass
         #     return Response(
         #     {
