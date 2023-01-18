@@ -2260,7 +2260,7 @@ def create_spend_some_amount(request):
                     # business = business,
                     
                     spandsomeamount = spend_some_amount,
-                    servicegroup = service_id,
+                    service = service_id,
                     discount = discount
                 )
                 
