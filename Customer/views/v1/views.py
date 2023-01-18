@@ -744,7 +744,7 @@ def update_appointment_client(request):
     )
     
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def generate_id(request):
     
     hash = request.data.get('hash', None)

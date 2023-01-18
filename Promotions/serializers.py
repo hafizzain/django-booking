@@ -328,21 +328,21 @@ class SpendSomeAmountSerializers(serializers.ModelSerializer):
     
     def get_block_date(self, obj):
         try:
-            ser = BlockDate.objects.filter(specificbrand = obj)
+            ser = BlockDate.objects.filter(spendsomeamount = obj)
             return BlockDateSerializers(ser, many = True).data
         except Exception as err:
             pass
     
     def get_date_restrictions(self, obj):
         try:
-            ser = DateRestrictions.objects.get(specificbrand = obj)
+            ser = DateRestrictions.objects.get(spendsomeamount = obj)
             return DateRestrictionsSerializers(ser).data
         except Exception as err:
             pass
    
     def get_day_restrictions(self, obj):
         try:
-            ser = DayRestrictions.objects.filter(specificbrand = obj)
+            ser = DayRestrictions.objects.filter(spendsomeamount = obj)
             return DayRestrictionsSerializers(ser, many = True).data
         except Exception as err:
             pass
