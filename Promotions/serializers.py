@@ -344,6 +344,7 @@ class SpendSomeAmountSerializers(serializers.ModelSerializer):
             ser = SpendSomeAmountAndGetDiscount.objects.filter(spendsomeamount = obj)
             return SpendSomeAmountAndGetDiscountSerializers(ser, many = True).data
         except Exception as err:
+            return str(err)
             pass
         
     def get_block_date(self, obj):
