@@ -204,7 +204,7 @@ def create_client_business(request):
                 user = user,
                 account_type = 'Everyone'
             )
-            client_id = ClientIdUser.objects.get(user = user )
+            client_id = ClientIdUser.objects.get(user = user.id )
             if client_id:
                 pass
             else:
