@@ -3113,17 +3113,20 @@ def get_employee_appointment(request):
                         employee_employedailyschedule__is_vacation = False,
                         employee_selected_service__service_id = service,
                         ).order_by('-created_at')
+        
+        serializer = EmployeeBusinessSerializer(all_emp, many = True)
+        data.append(serializer.data)
        
-        for emp in all_emp:
-            availability = AppointmentService.objects.filter(
-                #member__id__in = empl_list,
-                #business = ,
-                member__id = emp.id,
-                appointment_date = date,
-                is_blocked = False,
-                # appointment_time__lte = start_time, # 1:00
-                # end_time__gte = start_time,
-            )
+        # for emp in all_emp:
+        #     availability = AppointmentService.objects.filter(
+        #         #member__id__in = empl_list,
+        #         #business = ,
+        #         member__id = emp.id,
+        #         appointment_date = date,
+        #         is_blocked = False,
+        #         # appointment_time__lte = start_time, # 1:00
+        #         # end_time__gte = start_time,
+        #     )
             # for ser in availability:
             #     #data.append(f'{av_staff_ids} type {type(start_time)}, tested {ser.appointment_time}')
             #     if tested <= ser.appointment_time:# or start_time >= ser.end_time:
@@ -3140,9 +3143,10 @@ def get_employee_appointment(request):
             #     else:
             #         data.append(f'Employees are free, employee name: {employee.full_name}')
                             
-            if len(availability) >= 0 or len(availability) <= 3 :
-                serializer = EmployeeBusinessSerializer(emp)
-                data.append(serializer.data)
+            # if len(availability) >= 0 or len(availability) <= 3 :
+            #     serializer = EmployeeBusinessSerializer(emp)
+            #     data.append(serializer.data)
+                
             #     return Response(
             #     {
             #         'status' : True,
