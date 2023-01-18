@@ -3073,6 +3073,23 @@ def get_employee_appointment(request):
     
     with tenant_context(tenant):
         
+        try:
+            business=BusinessAddress.objects.get(id=business_id)
+        except Exception as err:
+            return Response(
+            {
+                'status' : True,
+                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                'status_code_text' :'BUSINESS_NOT_FOUND_4015' ,
+                'response' : {
+                    'message' : 'Business Address not found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+        
+        
         for check in employee_list:
             date = check.get('date', None)
             start_time = check.get('app_time', None)
@@ -3091,26 +3108,11 @@ def get_employee_appointment(request):
             tested = datetime.strptime(datetime_duration ,'%H:%M:%S').time()
             end_time = datetime_duration
             
-        try:
-            business=BusinessAddress.objects.get(id=business_id)
-        except Exception as err:
-            return Response(
-            {
-                'status' : True,
-                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
-                'status_code_text' :'BUSINESS_NOT_FOUND_4015' ,
-                'response' : {
-                    'message' : 'Business Address not found!',
-                    'error_message' : str(err),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
-        try:
-            service_id=Service.objects.get(id=service)
-        except Exception as err:
-            service_id = ''
-            pass
+            try:
+                service_id=Service.objects.get(id=service)
+            except Exception as err:
+                service_id = ''
+                pass
         #     return Response(
         #     {
         #         'status' : True,
@@ -3124,16 +3126,19 @@ def get_employee_appointment(request):
         #     status=status.HTTP_404_NOT_FOUND
         # )
               
-        all_emp = Employee.objects.filter(is_deleted=False, 
-                        location__id = business.id, 
-                        employee_employedailyschedule__is_vacation = False,
-                        employee_selected_service__service__id = service,
-                        ).order_by('-created_at')
-        for emp in all_emp:
-        
-            #data.append(emp)
-            serializer = EmployeeBusinessSerializer(emp)
+            all_emp = Employee.objects.get(is_deleted=False, 
+                            location__id = business.id, 
+                            employee_employedailyschedule__is_vacation = False,
+                            employee_selected_service__service__id = service,
+                            ).order_by('-created_at')
+            
+            serializer = EmployeeBusinessSerializer(all_emp)
             data.append(serializer.data)
+        # for emp in all_emp:
+        
+        #     #data.append(emp)
+        #     serializer = EmployeeBusinessSerializer(emp)
+        #     data.append(serializer.data)
        
         # for emp in all_emp:
         #     availability = AppointmentService.objects.filter(
