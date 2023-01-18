@@ -48,6 +48,13 @@ class ClientSerializer(serializers.ModelSerializer):
             except:
                 return obj.image
         return None
+    class Meta:
+        model = Client
+        fields =['id','full_name','image','client_id','email','mobile_number','dob','postal_code','address','gender','card_number',
+                 'country','city','state', 'is_active',
+                 'language', 'about_us', 'marketing','country_obj','customer_note',
+                 'created_at']
+        
 class Client_TenantSerializer(serializers.ModelSerializer):
     country_obj = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
