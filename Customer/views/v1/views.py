@@ -136,7 +136,7 @@ def create_client_business(request):
                 user_check = User.objects.get(username__icontains = username)
             except Exception as err:
                 data.append(f'username user is  {str(err)}')
-                data.append(f'username user is  {user_check}')
+                #data.append(f'username user is  {user_check}')
                 pass
             else:
                 username = f'{username} {len(User.objects.all())}'
@@ -154,7 +154,7 @@ def create_client_business(request):
                     user_check = User.objects.get(username__icontains = username)
                 except Exception as err:
                     data.append(f'username user is  {str(err)}')
-                    data.append(f'username user is  {user_check}')
+                    #data.append(f'username user is  {user_check}')
                     pass
                 else:
                     username = f'{username} {len(User.objects.all())}'
@@ -162,48 +162,48 @@ def create_client_business(request):
             except Exception as err:
                 data.append(f'Client errors {str(err)}')
             
-            # user = User.objects.create(
-            #     first_name = str(client.full_name),
-            #     username = username,
-            #     email = str(client.email),
-            #     is_email_verified = True,
-            #     is_active = True,
-            #     mobile_number = str(client.mobile_number),
-            # )
-            # account_type = AccountType.objects.create(
-            #     user = user,
-            #     account_type = 'Everyone'
-            # )
-            # user_client = ClientIdUser.objects.create(
-            #     user = user,
-            #     client_id = client_id,
-            #     is_everyone = True
-            # )
-        # else:
-        #     user = User.objects.create(
-        #         first_name = name,
-        #         username = username,
-        #         email = email,
-        #         is_email_verified = True,
-        #         is_active = True,
-        #         mobile_number = number,
-        #     )
-        #     account_type = AccountType.objects.create(
-        #         user = user,
-        #         account_type = 'Everyone'
-        #     )
-        #     user_client = ClientIdUser.objects.create(
-        #         user = user,
-        #         client_id = client_id,
-        #         is_everyone = True
-        #     )
+            user = User.objects.create(
+                first_name = str(client.full_name),
+                username = username,
+                email = str(client.email),
+                is_email_verified = True,
+                is_active = True,
+                mobile_number = str(client.mobile_number),
+            )
+            account_type = AccountType.objects.create(
+                user = user,
+                account_type = 'Everyone'
+            )
+            user_client = ClientIdUser.objects.create(
+                user = user,
+                client_id = client_id,
+                is_everyone = True
+            )
+        else:
+            user = User.objects.create(
+                first_name = name,
+                username = username,
+                email = email,
+                is_email_verified = True,
+                is_active = True,
+                mobile_number = number,
+            )
+            account_type = AccountType.objects.create(
+                user = user,
+                account_type = 'Everyone'
+            )
+            user_client = ClientIdUser.objects.create(
+                user = user,
+                client_id = client_id,
+                is_everyone = True
+            )
         
-        # try:
-        #     OTP.generate_user_otp(user=user, code_for='Email')
-        # except Exception as error:
-        #     ExceptionRecord.objects.create(text=f'Error from create Customer User \n{str(error)}')
-        # user.set_password(password)
-        # user.save()
+        try:
+            OTP.generate_user_otp(user=user, code_for='Email')
+        except Exception as error:
+            ExceptionRecord.objects.create(text=f'Error from create Customer User \n{str(error)}')
+        user.set_password(password)
+        user.save()
     except Exception as err:
         return Response(
             {
