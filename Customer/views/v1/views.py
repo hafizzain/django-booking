@@ -164,7 +164,7 @@ def create_client_business(request):
             
             user = User.objects.create(
                 first_name = str(client.full_name),
-                username = str(client.full_name),
+                username = username,
                 email = str(client.email),
                 is_email_verified = True,
                 is_active = True,
