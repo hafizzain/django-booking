@@ -2988,8 +2988,12 @@ def get_check_availability(request):
                         is_vacation = False,
                         date = date,
                         )      
-                    if daily_schedule.start_time >= start_time or daily_schedule.end_time <= start_time:
+                    if start_time >= daily_schedule.start_time and start_time < daily_schedule.end_time :
                         pass
+                    
+                    # elif start_time >= daily_schedule.start_time and start_time < daily_schedule.end_time :
+                    #     pass
+                    
                         # if daily_schedule.end_time_shift != None:
                         #    if daily_schedule.end_time_shift <= start_time:
                         #        pass
@@ -3042,8 +3046,8 @@ def get_check_availability(request):
                 )
                     
                     
-                if EmployeDaily:
-                    data.append(f'Employees daily schedule not Available {employee.full_name}')
+                # if EmployeDaily:
+                #     data.append(f'Employees daily schedule not Available {employee.full_name}')
                                
                 try:
                     av_staff_ids = AppointmentService.objects.filter(
