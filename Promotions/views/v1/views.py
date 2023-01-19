@@ -3284,7 +3284,7 @@ def update_free_service(request):
             if id_service is not None:
                 try:
                     free_service = FreeService.objects.get(id  = str(id_service))
-                    is_deleted = dayres.get('is_deleted', None)
+                    is_deleted = ser.get('is_deleted', None)
                     if str(is_deleted) == "True":
                         free_service.delete()
                         continue
@@ -3359,21 +3359,21 @@ def update_free_service(request):
                     date = date,
                 )
     
-    serializers= MentionedNumberServiceSerializers(mention_service, )#data=request.data, partial=True, context={'request' : request})
-    # if serializers.is_valid():
-    #     serializers.save()
-    # else:
-    #     return Response(
-    #     {
-    #         'status' : False,
-    #         'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
-    #         'response' : {
-    #             'message' : 'Invialid Data',
-    #             'error_message' : str(serializers.errors),
-    #         }
-    #     },
-    #     status=status.HTTP_404_NOT_FOUND
-    # )
+    serializers= MentionedNumberServiceSerializers(mention_service, data=request.data, partial=True, context={'request' : request})
+    if serializers.is_valid():
+        serializers.save()
+    else:
+        return Response(
+        {
+            'status' : False,
+            'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+            'response' : {
+                'message' : 'Invialid Data',
+                'error_message' : str(serializers.errors),
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+    )
     return Response(
         {
             'status' : True,
