@@ -2984,23 +2984,25 @@ def get_check_availability(request):
                         # employedailyschedule__end_time__lte = start_time
                         ) 
                 try:
-                    daily_schedule = EmployeDailySchedule.objects.get(
+                    daily_schedule = EmployeDailySchedule.objects.filter(
                         employee = employee,
                         is_vacation = False,
-                       #created_at = dt,
+                        
                         )
-                    if (str(daily_schedule.created_at).split(" ")[0] == date ):
-                        pass
-                    else:
-                            return Response(
-                                {
-                                        'status' : False,
-                                        'response' : {
-                                        'message' : 'Employee Day Off',
-                                        'error_message' :f'This Employee day off, {employee.full_name} date {date}'
+                    for daily in daily_schedule:
+                        if (str(daily.created_at).split(" ")[0] == date ):
+                        # if 
+                            pass
+                        else:
+                                return Response(
+                                    {
+                                            'status' : False,
+                                            'response' : {
+                                            'message' : 'Employee Day Off',
+                                            'error_message' :f'This Employee day off, {employee.full_name} date {date}'
+                                        }
                                     }
-                                }
-                            )
+                                )
                     
                     
                 except Exception as err:
