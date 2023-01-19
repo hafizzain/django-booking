@@ -2999,6 +2999,7 @@ def get_check_availability(request):
                         'response' : {
                             'message' : 'Employee Day Off',
                             'error_message' : f'This Employee day off, {employee.full_name} date {date}',
+                            'Availability': False
                         }
                     },
                     status=status.HTTP_200_OK
