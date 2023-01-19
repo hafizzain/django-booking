@@ -196,6 +196,40 @@ class CategoryDiscount(models.Model):
     def __str__(self):
         return str(self.id)
     
+class MentionedNumberService(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_mentionednumberservice')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_mentionednumberservice')
+    
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='service_mentionednumberservice')    
+
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+    updated_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return str(self.id)
+    
+class FreeService(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    quantity = models.PositiveIntegerField(default=0, blank= True, null=True)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='service_freeservice')    
+    
+    mentionnumberservice = models.ForeignKey(MentionedNumberService, on_delete=models.CASCADE, null=True, blank=True, related_name='freeservice_mentionnumberservice')
+
+    
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+    updated_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return str(self.id)
+    
 class DateRestrictions(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     
@@ -208,6 +242,7 @@ class DateRestrictions(models.Model):
     spendsomeamount = models.ForeignKey(SpendSomeAmount, on_delete=models.CASCADE, null=True, blank=True, related_name='spendsomeamount_daterestrictions')
     
     fixedpriceservice = models.ForeignKey(FixedPriceService, on_delete=models.CASCADE, null=True, blank=True, related_name='fixedpriceservice_daterestrictions')
+    mentionednumberservice = models.ForeignKey(MentionedNumberService, on_delete=models.CASCADE, null=True, blank=True, related_name='mentionednumberservice_daterestrictions')
     
     
     business_address = models.ManyToManyField(BusinessAddress, null=True, blank=True, related_name='business_address_daterestrictions')
@@ -232,6 +267,7 @@ class DayRestrictions(models.Model):
     spendsomeamount = models.ForeignKey(SpendSomeAmount, on_delete=models.CASCADE, null=True, blank=True, related_name='spendsomeamount_dayrestrictions')
     
     fixedpriceservice = models.ForeignKey(FixedPriceService, on_delete=models.CASCADE, null=True, blank=True, related_name='fixedpriceservice_dayrestrictions')
+    mentionednumberservice = models.ForeignKey(MentionedNumberService, on_delete=models.CASCADE, null=True, blank=True, related_name='mentionednumberservice_dayrestrictions')
     
     day = models.CharField(max_length=20, null=True, blank=True)
     
@@ -253,6 +289,7 @@ class BlockDate(models.Model):
     spendsomeamount = models.ForeignKey(SpendSomeAmount, on_delete=models.CASCADE, null=True, blank=True, related_name='spendsomeamount_blockdate')
     
     fixedpriceservice = models.ForeignKey(FixedPriceService, on_delete=models.CASCADE, null=True, blank=True, related_name='fixedpriceservice_blockdate')
+    mentionednumberservice = models.ForeignKey(MentionedNumberService, on_delete=models.CASCADE, null=True, blank=True, related_name='mentionednumberservice_blockdate')
 
     
     date = models.DateField(verbose_name = 'Block Date', null=True)

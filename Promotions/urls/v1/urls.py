@@ -43,4 +43,7 @@ urlpatterns = [
     path('create_fixed_price_service/', views.create_fixed_price_service),
     path('update_fixed_price_service/', views.update_fixed_price_service),
     path('delete_fixed_price_service/', views.delete_fixed_price_service),
+    
+    #Get Free Service
+    path('create_free_service/', views.create_free_service),
 ]
