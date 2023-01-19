@@ -2993,17 +2993,16 @@ def get_check_availability(request):
                 except Exception as err:
                     #data.append(f'Employees daily schedule not Available {employee.full_name}, {dt} {str(err)}')
                     return Response(
-                        {
-                                'status' : False,
-                                'response' : {
-                                'message' : 'Employee Day Off',
-                                'error_message' :f'This Employee day off, {employee.full_name} date {date}',
-                                'Availability': False,
-                            }
-                        },
-                        status=status.HTTP_200_OK
-                        #status=status.HTTP_400_BAD_REQUEST
-                    )
+                    {
+                        'status' : True,
+                        'status_code' : 200,
+                        'response' : {
+                            'message' : 'Employee Day Off',
+                            'error_message' : f'This Employee day off, {employee.full_name} date {date}',
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
                     
                     
                 if EmployeDaily:
