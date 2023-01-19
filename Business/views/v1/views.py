@@ -2988,7 +2988,6 @@ def get_check_availability(request):
                         employee = employee,
                         is_vacation = False,
                         date = date,
-                        
                         )                   
                     
                 except Exception as err:

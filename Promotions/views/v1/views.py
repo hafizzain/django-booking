@@ -3273,7 +3273,7 @@ def update_free_service(request):
             pass
         for ser in service:
             id = ser.get('id', None)
-            service_id = ser.get('service_id', None)
+            service_id = ser.get('service', None)
             quantity = ser.get('quantity', None)
             
             try:
