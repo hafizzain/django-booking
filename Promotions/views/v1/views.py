@@ -3272,7 +3272,7 @@ def update_free_service(request):
         else:
             pass
         for ser in service:
-            id = ser.get('id', None)
+            id_service = ser.get('id', None)
             service_id = ser.get('service', None)
             quantity = ser.get('quantity', None)
             
@@ -3283,7 +3283,7 @@ def update_free_service(request):
             
             if id is not None:
                 try:
-                    free_service = FreeService.objects.get(id  = str(id))
+                    free_service = FreeService.objects.get(id  = str(id_service))
                     is_deleted = dayres.get('is_deleted', None)
                     if str(is_deleted) == "True":
                         free_service.delete()
@@ -3359,7 +3359,7 @@ def update_free_service(request):
                     date = date,
                 )
     
-    serializers= MentionedNumberServiceSerializers(mention_service, data=request.data, partial=True, context={'request' : request})
+    serializers= MentionedNumberServiceSerializers(mention_service, )#data=request.data, partial=True, context={'request' : request})
     if serializers.is_valid():
         serializers.save()
     else:
