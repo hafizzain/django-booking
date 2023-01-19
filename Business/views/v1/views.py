@@ -3023,7 +3023,7 @@ def get_check_availability(request):
                             'status' : True,
                             'status_code' : 200,
                             'response' : {
-                                'message' : 'Employee Day Off',
+                                'message' : f'This time {employee.full_name} not Available',
                                 'error_message' : f'This Employee day off, {employee.full_name} date {date}',
                                 'Availability': False
                             }
