@@ -3245,7 +3245,8 @@ def update_free_service(request):
                 'message' : 'Free Service not found',
                 'error_message' : str(err),
             }
-        }
+        },
+        status=status.HTTP_404_NOT_FOUND
     )
      
     try:
