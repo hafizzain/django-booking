@@ -3087,7 +3087,7 @@ def create_free_service(request):
     
         for ser in service:
             try:
-                id = ser.get('service_id', None)
+                id = ser.get('service', None)
                 quantity = ser.get('quantity', None)
                 
                 try:
