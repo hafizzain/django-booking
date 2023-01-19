@@ -2971,21 +2971,32 @@ def get_check_availability(request):
             datetime_duration = datetime_duration.strftime('%H:%M:%S')
             tested = datetime.strptime(datetime_duration ,'%H:%M:%S').time()
             end_time = datetime_duration
+            
+            EmployeDaily = False
                 
             try:
-                employee = Employee.objects.get(id = emp_id, 
-                        employedailyschedule__is_vacation = False,
-                        employedailyschedule__created_at__lte = dt,
+                employee = Employee.objects.get(
+                        id = emp_id, 
+                        #employedailyschedule__is_vacation = False,
+                        #employedailyschedule__created_at__lte = dt,
                         
                         # employedailyschedule__start_time__gte = start_time,
                         # employedailyschedule__end_time__lte = start_time
                         ) 
-                # try:
-                #     daily_schedule = EmployeDailySchedule.objects.get(employee = employee )
+                try:
+                    daily_schedule = EmployeDailySchedule.objects.get(
+                        employee = employee,
+                        is_vacation = False,
+                        created_at__lte = dt,
+                        )
+                    EmployeDaily = True
                     
-                # except Exception as err:
                     
-
+                except Exception as err:
+                    data.append(f'Employees daily schedule Error {str(err)}')
+                    
+                if EmployeDaily:
+                    data.append(f'Employees daily schedule not Available {employee.full_name}')
                                
                 try:
                     av_staff_ids = AppointmentService.objects.filter(
