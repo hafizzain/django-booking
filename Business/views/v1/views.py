@@ -2927,7 +2927,6 @@ def get_check_availability(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    
     try:
         tenant = Tenant.objects.get(id = tenant_id)
     except Exception as err:
@@ -2989,7 +2988,7 @@ def get_check_availability(request):
                         is_vacation = False,
                         date = date,
                         )      
-                    if daily_schedule.start_time >= start_time and start_time <= daily_schedule.end_time:
+                    if daily_schedule.start_time > start_time:# and start_time <= daily_schedule.end_time:
                         pass
                     elif daily_schedule.start_time_shift >= start_time and start_time <= daily_schedule.end_time_shift:
                         pass
@@ -3008,7 +3007,6 @@ def get_check_availability(request):
                     )
                         
                 except Exception as err:
-                    #data.append(f'Employees daily schedule not Available {employee.full_name}, {dt} {str(err)}')
                     return Response(
                     {
                         'status' : True,
@@ -3640,6 +3638,8 @@ def get_common_tenant(request):
     tenant_id = '14c286c6-c36c-4c7a-aa51-545efcd8738d'#request.GET.get('hash', None)
     business_location = '6febd650-50ba-4719-aaf2-02bccebb7856'
     business = '38a86f91-f0cb-4673-a68c-11645d0046b4'
+    address = 'MR lahore'
+    address_name = 'Multan Road, Samanabad Town, Lahore, Pakistan'
     
     
     return Response(
@@ -3653,6 +3653,8 @@ def get_common_tenant(request):
                     'hash' : tenant_id,
                     'business' : business,
                     'business_location' : business_location,
+                    'address' : address,
+                    'address_name' : address_name,
                 }
             },
             status=status.HTTP_200_OK
