@@ -3052,7 +3052,7 @@ def create_free_service(request):
             )
     
     try:
-            freeservice_id=Service.objects.get(id=freeservice)
+            freeservice_id=Service.objects.get(id=str(freeservice))
     except Exception as err:
         return Response(
         {
@@ -3175,10 +3175,9 @@ def create_free_service(request):
             status=status.HTTP_201_CREATED
         )
 
-
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def update_fixed_price_service(request):
+def update_free_service(request):
     
     mention_price_id = request.data.get('id', None)
     
@@ -3380,6 +3379,58 @@ def update_fixed_price_service(request):
                 'error_message' : None,
                 'error' : error,
                 'freservice' : serializers.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_free_service(request):
+    mention_id = request.data.get('id', None)
+
+    if mention_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        mention_price = MentionedNumberService.objects.get(id=mention_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Free Price Discount Not Found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    mention_price.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Free Price Service deleted successfully',
+                'error_message' : None
             }
         },
         status=status.HTTP_200_OK

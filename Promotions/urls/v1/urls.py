@@ -46,4 +46,9 @@ urlpatterns = [
     
     #Get Free Service
     path('create_free_service/', views.create_free_service),
+    path('update_free_service/', views.update_free_service),
+    path('delete_free_service/', views.delete_free_service),
+    
+    #Bundle Discount Service
+    
 ]
