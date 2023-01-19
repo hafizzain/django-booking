@@ -2987,9 +2987,20 @@ def get_check_availability(request):
                     daily_schedule = EmployeDailySchedule.objects.get(
                         employee = employee,
                         is_vacation = False,
-                        created_at = dt,
+                       #created_at = dt,
                         )
-                    EmployeDaily = True
+                    if (daily_schedule.create_at.split(" ")[0] == date ):
+                        pass
+                    else:
+                            return Response(
+                                {
+                                        'status' : False,
+                                        'response' : {
+                                        'message' : 'Employee Day Off',
+                                        'error_message' :f'This Employee day off, {employee.full_name} date {date}'
+                                    }
+                                }
+                            )
                     
                     
                 except Exception as err:
