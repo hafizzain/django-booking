@@ -2987,7 +2987,7 @@ def get_check_availability(request):
                     daily_schedule = EmployeDailySchedule.objects.get(
                         employee = employee,
                         is_vacation = False,
-                        created_at__exact = dt,
+                        created_at = dt,
                         )
                     EmployeDaily = True
                     
