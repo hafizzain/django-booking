@@ -3616,3 +3616,27 @@ def get_tenant_address_taxes(request):
             },
             status=status.HTTP_200_OK
         )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_common_tenant(request):  
+    tenant_id = '14c286c6-c36c-4c7a-aa51-545efcd8738d'#request.GET.get('hash', None)
+    business_location = '6febd650-50ba-4719-aaf2-02bccebb7856'
+    business = '38a86f91-f0cb-4673-a68c-11645d0046b4'
+    
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Tenant Details!',
+                    'error_message' : None,
+                    'hash' : tenant_id,
+                    'business' : business,
+                    'business_location' : business_location,
+                }
+            },
+            status=status.HTTP_200_OK
+        )

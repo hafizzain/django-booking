@@ -68,4 +68,7 @@ urlpatterns = [
     path('employee_availability/', views.employee_availability),
     path('get_tenant_business_taxes/', views.get_tenant_business_taxes),
     path('get_tenant_address_taxes/', views.get_tenant_address_taxes),
+    
+    #Tenant Detail
+    path('get_common_tenant/', views.get_common_tenant),
 ]
