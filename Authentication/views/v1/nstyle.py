@@ -503,7 +503,7 @@ def login(request):
         user = User.objects.filter(
             email=email,
             is_deleted=False
-        ).exclude(user_account_type__account_type = 'Everyone')
+        ).exclude(user_account_type__account_type = 'Everyone')[0]
         
     except Exception as err:
         return Response(
