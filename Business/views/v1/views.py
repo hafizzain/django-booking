@@ -3001,7 +3001,8 @@ def get_check_availability(request):
                                 'Availability': False,
                             }
                         },
-                        status=status.HTTP_400_BAD_REQUEST
+                        status=status.HTTP_200_OK
+                        #status=status.HTTP_400_BAD_REQUEST
                     )
                     
                     
