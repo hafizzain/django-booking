@@ -500,10 +500,10 @@ def login(request):
     
     connection.set_schema_to_public()
     try:
-        user = User.objects.get(
+        user = User.objects.filter(
             email=email,
             is_deleted=False
-        )
+        ).exclude(user_account_type__account_type = 'Everyone')
         
     except Exception as err:
         return Response(
