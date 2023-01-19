@@ -221,6 +221,10 @@ def get_directorflat(request):
     serialized = FixedPriceServiceSerializers(fixed_price,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
+    free_price = MentionedNumberService.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = MentionedNumberServiceSerializers(free_price,  many=True, context={'request' : request})
+    data.extend(serialized.data)
+    
     return Response(
         {
             'status' : 200,
