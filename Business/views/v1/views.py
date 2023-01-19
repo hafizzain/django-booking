@@ -2989,7 +2989,7 @@ def get_check_availability(request):
                         is_vacation = False,
                        #created_at = dt,
                         )
-                    if (daily_schedule.create_at.split(" ")[0] == date ):
+                    if (daily_schedule.created_at.split(" ")[0] == date ):
                         pass
                     else:
                             return Response(
