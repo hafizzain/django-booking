@@ -428,7 +428,7 @@ def customer_login(request):
             email=email,
             is_deleted=False,
             user_account_type__account_type = 'Everyone'
-        )#[0]
+        )
         
     except Exception as err:
         return Response(

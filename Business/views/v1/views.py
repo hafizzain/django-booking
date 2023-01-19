@@ -2988,8 +2988,25 @@ def get_check_availability(request):
                         employee = employee,
                         is_vacation = False,
                         date = date,
-                        )                   
-                    
+                        )      
+                    if daily_schedule.start_time >= start_time and start_time <= daily_schedule.end_time:
+                        pass
+                    elif daily_schedule.start_time_shift >= start_time and start_time <= daily_schedule.end_time_shift:
+                        pass
+                    else:
+                        return Response(
+                        {
+                            'status' : True,
+                            'status_code' : 200,
+                            'response' : {
+                                'message' : 'Employee Day Off',
+                                'error_message' : f'This Employee day off, {employee.full_name} date {date}',
+                                'Availability': False
+                            }
+                        },
+                        status=status.HTTP_200_OK
+                    )
+                        
                 except Exception as err:
                     #data.append(f'Employees daily schedule not Available {employee.full_name}, {dt} {str(err)}')
                     return Response(
