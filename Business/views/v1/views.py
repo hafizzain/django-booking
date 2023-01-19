@@ -2988,26 +2988,28 @@ def get_check_availability(request):
                         is_vacation = False,
                         date = date,
                         )      
-                    if daily_schedule.start_time >= start_time:
-                        if daily_schedule.end_time_shift != None:
-                           if daily_schedule.end_time_shift <= start_time:
-                               pass
-                        elif daily_schedule.end_time <= start_time:
-                            pass
-                            
-                        else:
-                            return Response(
-                            {
-                                'status' : True,
-                                'status_code' : 200,
-                                'response' : {
-                                    'message' : 'Employee Day Off',
-                                    'error_message' : f'This Employee day off, {employee.full_name} date {date} pass data',
-                                    'Availability': False
-                                }
-                            },
-                            status=status.HTTP_200_OK
-                        )
+                    if daily_schedule.start_time >= start_time or daily_schedule.end_time <= start_time::
+                        pass
+                        # if daily_schedule.end_time_shift != None:
+                        #    if daily_schedule.end_time_shift <= start_time:
+                        #        pass
+                        # elif daily_schedule.end_time <= start_time:
+                        #     pass
+                        # if daily_schedule.end_time <= start_time:
+                        #     pass
+                        # else:
+                        #     return Response(
+                        #     {
+                        #         'status' : True,
+                        #         'status_code' : 200,
+                        #         'response' : {
+                        #             'message' : 'Employee Day Off',
+                        #             'error_message' : f'This Employee day off, {employee.full_name} date {date} pass data',
+                        #             'Availability': False
+                        #         }
+                        #     },
+                        #     status=status.HTTP_200_OK
+                        # )
                         
                     # elif daily_schedule.start_time_shift > start_time and start_time < daily_schedule.end_time_shift:
                     #     pass
