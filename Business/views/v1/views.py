@@ -2989,6 +2989,19 @@ def get_check_availability(request):
                         date = date,
                         )      
                     if daily_schedule.start_time >= start_time and daily_schedule.end_time <= start_time :
+                        return Response(
+                        {
+                            'status' : True,
+                            'status_code' : 200,
+                            'response' : {
+                                'message' : 'Employee Day Off',
+                                'error_message' : f'This Employee day off, {employee.full_name} date {date} pass data',
+                                'Availability': False
+                            }
+                        },
+                        status=status.HTTP_200_OK
+                    )
+                        
                         pass
                     # elif daily_schedule.start_time_shift > start_time and start_time < daily_schedule.end_time_shift:
                     #     pass
