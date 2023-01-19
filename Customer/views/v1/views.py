@@ -424,11 +424,11 @@ def customer_login(request):
     
     #connection.set_schema_to_public()
     try:
-        user = User.objects.filter(
+        user = User.objects.get(
             email=email,
             is_deleted=False,
             user_account_type__account_type = 'Everyone'
-        )[0]
+        )#[0]
         
     except Exception as err:
         return Response(
