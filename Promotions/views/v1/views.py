@@ -3281,7 +3281,7 @@ def update_free_service(request):
             except Exception as err:
                 error.append(str(err))
             
-            if id is not None:
+            if id_service is not None:
                 try:
                     free_service = FreeService.objects.get(id  = str(id_service))
                     is_deleted = dayres.get('is_deleted', None)
