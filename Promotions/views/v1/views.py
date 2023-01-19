@@ -3234,7 +3234,7 @@ def update_free_service(request):
     if freeService:
         try:
             services = Service.objects.get(id=str(freeService))
-            mention_service.service = service
+            mention_service.service = services
             mention_service.save()
         except Exception as err:
             return Response(
