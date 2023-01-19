@@ -3091,7 +3091,7 @@ def create_free_service(request):
                 quantity = ser.get('quantity', None)
                 
                 try:
-                    service_id = Service.objects.get(id=id)
+                    service_id = Service.objects.get(id = str(id))
                 except Exception as err:
                     error.append(str(err))
                 
