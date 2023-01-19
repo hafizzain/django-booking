@@ -2993,7 +2993,7 @@ def get_check_availability(request):
                     
                     
                 except Exception as err:
-                    data.append(f'Employees daily schedule Error {str(err)}')
+                    data.append(f'Employees daily schedule not Available {employee.full_name}, {dt}')
                     
                 if EmployeDaily:
                     data.append(f'Employees daily schedule not Available {employee.full_name}')
