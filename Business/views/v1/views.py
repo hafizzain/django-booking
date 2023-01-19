@@ -3015,7 +3015,7 @@ def get_check_availability(request):
                         'status_code' : 200,
                         'response' : {
                             'message' : 'Employee Day Off',
-                            'error_message' : f'This Employee day off, {employee.full_name} date {date}',
+                            'error_message' : f'This Employee day off, {employee.full_name} date {date} {str(err)}',
                             'Availability': False
                         }
                     },
