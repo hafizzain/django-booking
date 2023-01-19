@@ -2984,29 +2984,25 @@ def get_check_availability(request):
                         # employedailyschedule__end_time__lte = start_time
                         ) 
                 try:
-                    daily_schedule = EmployeDailySchedule.objects.filter(
+                    daily_schedule = EmployeDailySchedule.objects.get(
                         employee = employee,
                         is_vacation = False,
+                        date = date,
                         
-                        )
-                    for daily in daily_schedule:
-                        if (str(daily.created_at).split(" ")[0] == date ):
-                        # if 
-                            pass
-                        else:
-                                return Response(
-                                    {
-                                            'status' : False,
-                                            'response' : {
-                                            'message' : 'Employee Day Off',
-                                            'error_message' :f'This Employee day off, {employee.full_name} date {date}'
-                                        }
-                                    }
-                                )
-                    
+                        )                   
                     
                 except Exception as err:
-                    data.append(f'Employees daily schedule not Available {employee.full_name}, {dt} {str(err)}')
+                    #data.append(f'Employees daily schedule not Available {employee.full_name}, {dt} {str(err)}')
+                    return Response(
+                        {
+                                'status' : False,
+                                'response' : {
+                                'message' : 'Employee Day Off',
+                                'error_message' :f'This Employee day off, {employee.full_name} date {date}'
+                            }
+                        }
+                    )
+                    
                     
                 if EmployeDaily:
                     data.append(f'Employees daily schedule not Available {employee.full_name}')
