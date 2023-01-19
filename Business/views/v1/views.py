@@ -15,7 +15,7 @@ from Authentication.serializers import UserTenantLoginSerializer
 from Business.models import BusinessAddressMedia, BusinessType
 from Business.serializers.v1_serializers import BusinessAddress_CustomerSerializer, EmployeAppointmentServiceSerializer, EmployeTenatSerializer, OpeningHoursSerializer,AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer
 from Client.models import Client
-from Employee.models import Employee
+from Employee.models import EmployeDailySchedule, Employee
 
 from NStyle.Constants import StatusCodes
 
@@ -2973,7 +2973,20 @@ def get_check_availability(request):
             end_time = datetime_duration
                 
             try:
-                employee = Employee.objects.get(id = emp_id, employee_employedailyschedule__is_vacation = False)                
+                employee = Employee.objects.get(id = emp_id, 
+                        employedailyschedule__is_vacation = False,
+                        employedailyschedule__created_at__lte = dt,
+                        
+                        # employedailyschedule__start_time__gte = start_time,
+                        # employedailyschedule__end_time__lte = start_time
+                        ) 
+                # try:
+                #     daily_schedule = EmployeDailySchedule.objects.get(employee = employee )
+                    
+                # except Exception as err:
+                    
+
+                               
                 try:
                     av_staff_ids = AppointmentService.objects.filter(
                         member__id = employee.id,
@@ -2981,8 +2994,8 @@ def get_check_availability(request):
                         # appointment_time__gte = start_time, # 1:00
                         # end_time__lte = start_time, # 1:40
                         # member__employee_employedailyschedule__date = date,
-                        member__employee_employedailyschedule__start_time__gte = start_time,
-                        member__employee_employedailyschedule__end_time__lte = start_time,
+                        # member__employee_employedailyschedule__start_time__gte = start_time,
+                        # member__employee_employedailyschedule__end_time__lte = start_time,
                         is_blocked = False,
                     )#.values_list('member__id', flat=True)
                     
@@ -3006,7 +3019,7 @@ def get_check_availability(request):
                 except Exception as err:
                     data.append(f'the employe{employee}, start_time {str(err)}')
             except Exception as err:
-                pass
+                data.append(f'the Error  {str(err)},  Employee Not Available on this time')
                     
     return Response(
             {
