@@ -3193,6 +3193,7 @@ def update_free_service(request):
     blockdate = request.data.get('blockdate', None)
     
     service = request.data.get('service', None)
+    freeService = request.data.get('freeService', None)
     
     error = []
     
@@ -3215,6 +3216,7 @@ def update_free_service(request):
     
     try:
         mention_service = MentionedNumberService.objects.get(id=mention_price_id)
+        
     except Exception as err:
         return Response(
             {
@@ -3228,7 +3230,24 @@ def update_free_service(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-                
+    
+    if freeService:
+        try:
+            services = Service.objects.get(id=freeService)
+            mention_service.service = service
+            mention_service.save()
+        except Exception as err:
+            return Response(
+        {
+                'status' : False,
+                'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
+                'response' : {
+                'message' : 'Free Service not found',
+                'error_message' : str(err),
+            }
+        }
+    )
+     
     try:
         daterestriction = DateRestrictions.objects.get(mentionednumberservice = mention_service.id)
     except Exception as err:
@@ -3359,21 +3378,8 @@ def update_free_service(request):
                     date = date,
                 )
     
-    serializers= MentionedNumberServiceSerializers(mention_service, data=request.data, partial=True, context={'request' : request})
-    if serializers.is_valid():
-        serializers.save()
-    else:
-        return Response(
-        {
-            'status' : False,
-            'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
-            'response' : {
-                'message' : 'Invialid Data',
-                'error_message' : str(serializers.errors),
-            }
-        },
-        status=status.HTTP_404_NOT_FOUND
-    )
+    serializers= MentionedNumberServiceSerializers(mention_service, )#data=request.data, partial=True, context={'request' : request})
+
     return Response(
         {
             'status' : True,
