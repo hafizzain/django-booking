@@ -2997,9 +2997,11 @@ def get_check_availability(request):
                                 'status' : False,
                                 'response' : {
                                 'message' : 'Employee Day Off',
-                                'error_message' :f'This Employee day off, {employee.full_name} date {date}'
+                                'error_message' :f'This Employee day off, {employee.full_name} date {date}',
+                                'Availability': False,
                             }
-                        }
+                        },
+                        status=status.HTTP_400_BAD_REQUEST
                     )
                     
                     
