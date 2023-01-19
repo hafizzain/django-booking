@@ -2988,9 +2988,9 @@ def get_check_availability(request):
                         is_vacation = False,
                         date = date,
                         )      
-                    if daily_schedule.start_time > start_time:# and start_time <= daily_schedule.end_time:
+                    if daily_schedule.start_time > start_time and start_time < daily_schedule.end_time:
                         pass
-                    elif daily_schedule.start_time_shift >= start_time and start_time <= daily_schedule.end_time_shift:
+                    elif daily_schedule.start_time_shift > start_time and start_time < daily_schedule.end_time_shift:
                         pass
                     else:
                         return Response(
