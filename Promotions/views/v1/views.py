@@ -3008,7 +3008,7 @@ def create_free_service(request):
     
     # spend_amount = request.data.get('spendAmount', None)
     # duration = request.data.get('duration', None)
-    freeservice = request.data.get('freeservice', None)
+    freeservice = request.data.get('freeService', None)
     service = request.data.get('service', None)
     
     location = request.data.get('location', None)
