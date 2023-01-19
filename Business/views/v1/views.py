@@ -2990,8 +2990,8 @@ def get_check_availability(request):
                         )      
                     if daily_schedule.start_time > start_time and start_time < daily_schedule.end_time:
                         pass
-                    elif daily_schedule.start_time_shift > start_time and start_time < daily_schedule.end_time_shift:
-                        pass
+                    # elif daily_schedule.start_time_shift > start_time and start_time < daily_schedule.end_time_shift:
+                    #     pass
                     else:
                         return Response(
                         {
