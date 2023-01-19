@@ -446,6 +446,7 @@ class MentionedNumberServiceSerializers(serializers.ModelSerializer):
             ser = FreeService.objects.filter(mentionnumberservice = obj)
             return FreeServiceSerializers(ser, many = True).data
         except Exception as err:
+            return err
             pass
         
     def get_block_date(self, obj):
