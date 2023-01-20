@@ -230,7 +230,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                 app_date_time = datetime.fromisoformat(app_date_time)
                 datetime_duration = app_date_time + timedelta(minutes=duration)
                 datetime_duration = datetime_duration.strftime('%H:%M:%S')
-                second_end = datetime_duration.strftime('%H:%M:%S').time()
+                #second_end = datetime_duration.strftime('%H:%M:%S')
                 end_time = datetime_duration # Calculated End Time
 
                 #print(appointment_time.microsecond)
