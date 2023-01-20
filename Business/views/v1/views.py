@@ -3192,7 +3192,7 @@ def get_employee_appointment(request):
 
             employee = Employee.objects.get(is_deleted=False, 
                 location__id = business.id, 
-                employee_employedailyschedule__is_vacation = False,
+                #employee_employedailyschedule__is_vacation = False,
                 #employee_selected_service__service__id = str(service),
                 )#.order_by('-created_at')
             
