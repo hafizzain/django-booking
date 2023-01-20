@@ -241,18 +241,19 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                 new_end_time = None
 
                 for dt in selected_data:
-                    # if ((dt['range_start'] >= appointment_time and dt['range_end'] <= end_time) and dt['date'] == app_date):
-                    #     ExceptionRecord.objects.create(
-                    #         text = f'tested successfully'
-                    #     )
-                    #     find_values.append(dt)
-                    # else:
-                    #     new_start_time = appointment_time
+                    if ((dt['range_start'] >= appointment_time and dt['range_end'] <= end_time) and dt['date'] == app_date):
+                        
+                        ExceptionRecord.objects.create(
+                            text = f'tested successfully'
+                        )
+                        find_values.append(dt)
+                    else:
+                        new_start_time = appointment_time
                     
-                    # if str(dt['range_end']) == str(end_time) and dt['date'] == app_date:
-                    #     find_values.append(dt)
-                    # else:
-                    #     pass
+                    if ((dt['range_start'] <= appointment_time and dt['range_end'] >= end_time) and dt['date'] == app_date):
+                        find_values.append(dt)
+                    else:
+                        pass
 
                     # if str(dt['range_end']) == str(appointment_time) and dt['date'] == app_date:
                     #     find_values.append(dt)
