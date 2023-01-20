@@ -3092,7 +3092,9 @@ def get_employee_appointment(request):
     
     tenant_id = request.data.get('hash', None)
     business_id = request.data.get('business', None)    
-    employee_list = request.data.get('emp_list', None)
+    appointment_date = request.data.get('appointment_date', None)    
+    start_time = request.data.get('start_time', None)    
+    #employee_list = request.data.get('emp_list', None)
     
     if tenant_id is None:
         return Response(
@@ -3130,10 +3132,15 @@ def get_employee_appointment(request):
     data = []
     error = []
     
-    if type(employee_list) == str:
-        employee_list = json.loads(employee_list)
-    else:
-        pass
+    dtime = datetime.strptime(start_time, "%H:%M:%S")
+    start_time = dtime.time()
+    
+    dt = datetime.strptime(appointment_date, "%Y-%m-%d")
+    date = dt.date()
+    # if type(employee_list) == str:
+    #     employee_list = json.loads(employee_list)
+    # else:
+    #     pass
     
     with tenant_context(tenant):
         
@@ -3152,14 +3159,59 @@ def get_employee_appointment(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-        employee = Employee.objects.get(
+        employee = Employee.objects.filter(
             is_deleted=False, 
             location__id = business.id, 
             #employee_employedailyschedule__is_vacation = False,
             #employee_selected_service__service__id = str(service),
         )
-        serializer = EmployeeBusinessSerializer(employee)
-        data.append(serializer.data)
+        for emp in employee:
+            try:
+                daily_schedule = EmployeDailySchedule.objects.get(
+                    employee = employee,
+                    is_vacation = False,
+                    date = date,
+                )  
+                if start_time >= daily_schedule.start_time and start_time < daily_schedule.end_time :
+                    serializer = EmployeeBusinessSerializer(employee)
+                    data.append(serializer.data)
+                elif daily_schedule.start_time_shift != None:
+                    if start_time >= daily_schedule.start_time_shift and start_time < daily_schedule.end_time_shift:
+                        serializer = EmployeeBusinessSerializer(employee)
+                        data.append(serializer.data)
+                    else:
+                        pass
+                    #     return Response(
+                    #     {
+                    #         'status' : True,
+                    #         'status_code' : 200,
+                    #         'response' : {
+                    #             'message' : f'This time {employee.full_name} not Available',
+                    #             'error_message' : f'This Employee day off, {employee.full_name} date {date}',
+                    #             'Availability': False
+                    #         }
+                    #     },
+                    #     status=status.HTTP_200_OK
+                    # )
+                else:
+                    pass
+                #     return Response(
+                #     {
+                #         'status' : True,
+                #         'status_code' : 200,
+                #         'response' : {
+                #             'message' : f'This time {employee.full_name} not Available',
+                #             'error_message' : f'This Employee day off, {employee.full_name} date {date}',
+                #             'Availability': False
+                #         }
+                #     },
+                #     status=status.HTTP_200_OK
+                # )
+            except Exception as err:
+                pass
+            
+        # serializer = EmployeeBusinessSerializer(employee)
+        # data.append(serializer.data)
         
         # for check in employee_list:
         #     date = check.get('date', None)
