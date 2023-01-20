@@ -3152,88 +3152,95 @@ def get_employee_appointment(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+        employee = Employee.objects.get(
+            is_deleted=False, 
+            location__id = business.id, 
+            #employee_employedailyschedule__is_vacation = False,
+            #employee_selected_service__service__id = str(service),
+        )
+        serializer = EmployeeBusinessSerializer(employee)
+        data.append(serializer.data)
         
-        
-        for check in employee_list:
-            date = check.get('date', None)
-            start_time = check.get('app_time', None)
-            duration = check.get('duration', None)
-            service = check.get('service', None)
+        # for check in employee_list:
+        #     date = check.get('date', None)
+        #     start_time = check.get('app_time', None)
+        #     duration = check.get('duration', None)
+        #     service = check.get('service', None)
             
-            dtime = datetime.strptime(start_time, "%H:%M:%S")
-            start_time = dtime.time()
+        #     dtime = datetime.strptime(start_time, "%H:%M:%S")
+        #     start_time = dtime.time()
             
-            app_date_time = f'2000-01-01 {start_time}'
+        #     app_date_time = f'2000-01-01 {start_time}'
                 
-            duration = DURATION_CHOICES[duration]
-            app_date_time = datetime.fromisoformat(app_date_time)
-            datetime_duration = app_date_time + timedelta(minutes=duration)
-            datetime_duration = datetime_duration.strftime('%H:%M:%S')
-            tested = datetime.strptime(datetime_duration ,'%H:%M:%S').time()
-            end_time = datetime_duration
+        #     duration = DURATION_CHOICES[duration]
+        #     app_date_time = datetime.fromisoformat(app_date_time)
+        #     datetime_duration = app_date_time + timedelta(minutes=duration)
+        #     datetime_duration = datetime_duration.strftime('%H:%M:%S')
+        #     tested = datetime.strptime(datetime_duration ,'%H:%M:%S').time()
+        #     end_time = datetime_duration
             
-            # try:
-            #     service_id=Service.objects.get(id=str(service))
-            # except Exception as err:
-            #     #service_id = ''
-            #     pass
-        #     return Response(
-        #     {
-        #         'status' : True,
-        #         'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
-        #         'status_code_text' :'BUSINESS_NOT_FOUND_4015' ,
-        #         'response' : {
-        #             'message' : 'Business Address not found!',
-        #             'error_message' : str(err),
-        #         }
-        #     },
-        #     status=status.HTTP_404_NOT_FOUND
-        # )
+        #     # try:
+        #     #     service_id=Service.objects.get(id=str(service))
+        #     # except Exception as err:
+        #     #     #service_id = ''
+        #     #     pass
+        # #     return Response(
+        # #     {
+        # #         'status' : True,
+        # #         'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+        # #         'status_code_text' :'BUSINESS_NOT_FOUND_4015' ,
+        # #         'response' : {
+        # #             'message' : 'Business Address not found!',
+        # #             'error_message' : str(err),
+        # #         }
+        # #     },
+        # #     status=status.HTTP_404_NOT_FOUND
+        # # )
 
-            employee = Employee.objects.get(is_deleted=False, 
-                location__id = business.id, 
-                #employee_employedailyschedule__is_vacation = False,
-                #employee_selected_service__service__id = str(service),
-                )#.order_by('-created_at')
+        #     employee = Employee.objects.get(is_deleted=False, 
+        #         location__id = business.id, 
+        #         #employee_employedailyschedule__is_vacation = False,
+        #         #employee_selected_service__service__id = str(service),
+        #         )#.order_by('-created_at')
             
-            try:
-                av_staff_ids = AppointmentService.objects.filter(
-                    member__id = employee.id,
-                    appointment_date = date,
-                    # appointment_time__gte = start_time, # 1:00
-                    # end_time__lte = start_time, # 1:40
-                    # member__employee_employedailyschedule__date = date,
-                    member__employee_employedailyschedule__start_time__gte = start_time,
-                    member__employee_employedailyschedule__end_time__lte = start_time,
-                    is_blocked = False,
-                )#.values_list('member__id', flat=True)
+        #     try:
+        #         av_staff_ids = AppointmentService.objects.filter(
+        #             member__id = employee.id,
+        #             appointment_date = date,
+        #             # appointment_time__gte = start_time, # 1:00
+        #             # end_time__lte = start_time, # 1:40
+        #             # member__employee_employedailyschedule__date = date,
+        #             member__employee_employedailyschedule__start_time__gte = start_time,
+        #             member__employee_employedailyschedule__end_time__lte = start_time,
+        #             is_blocked = False,
+        #         )#.values_list('member__id', flat=True)
                 
-                for ser in av_staff_ids:
-                    #data.append(f'{av_staff_ids} type {type(start_time)}, tested {ser.appointment_time}')
-                    if tested <= ser.appointment_time:# or start_time >= ser.end_time:
-                        if start_time >= ser.end_time:
-                            serializer = EmployeeBusinessSerializer(employee)
-                            data.append(serializer.data)
-                            #data.append(f'Employees are free, employee name {employee.full_name}')
+        #         for ser in av_staff_ids:
+        #             #data.append(f'{av_staff_ids} type {type(start_time)}, tested {ser.appointment_time}')
+        #             if tested <= ser.appointment_time:# or start_time >= ser.end_time:
+        #                 if start_time >= ser.end_time:
+        #                     serializer = EmployeeBusinessSerializer(employee)
+        #                     data.append(serializer.data)
+        #                     #data.append(f'Employees are free, employee name {employee.full_name}')
                             
-                        else:
-                            #data.append(f'The selected staff is not available at this time  {employee.full_name}')
-                            Availability = False
+        #                 else:
+        #                     #data.append(f'The selected staff is not available at this time  {employee.full_name}')
+        #                     Availability = False
                                                                     
-                    else:
-                        serializer = EmployeeBusinessSerializer(employee)
-                        data.append(serializer.data)
-                        #data.append(f'Employees are free, employee name: {employee.full_name}')
+        #             else:
+        #                 serializer = EmployeeBusinessSerializer(employee)
+        #                 data.append(serializer.data)
+        #                 #data.append(f'Employees are free, employee name: {employee.full_name}')
                         
-                if len(av_staff_ids) == 0:
-                    serializer = EmployeeBusinessSerializer(employee)
-                    data.append(serializer.data)
-                    #data.append(f'Employees are free, you can proceed further employee name {employee.full_name}')
+        #         if len(av_staff_ids) == 0:
+        #             serializer = EmployeeBusinessSerializer(employee)
+        #             data.append(serializer.data)
+        #             #data.append(f'Employees are free, you can proceed further employee name {employee.full_name}')
                     
-                    #data.append(f'{av_staff_ids} type {type(datetime_duration)}, ')
+        #             #data.append(f'{av_staff_ids} type {type(datetime_duration)}, ')
                     
-            except Exception as err:
-                pass
+        #     except Exception as err:
+        #         pass
                 #data.append(f'the employe{employee}, start_time {str(err)}')
         
         # for emp in all_emp:
