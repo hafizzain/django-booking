@@ -229,6 +229,10 @@ def get_directorflat(request):
     serialized = BundleFixedSerializers(bundle,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
+    retail = RetailAndGetService.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = RetailAndGetServiceSerializers(retail, many=True, context={'request' : request})
+    data.extend(serialized.data)
+    
     return Response(
         {
             'status' : 200,
