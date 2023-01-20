@@ -230,6 +230,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                 app_date_time = datetime.fromisoformat(app_date_time)
                 datetime_duration = app_date_time + timedelta(minutes=duration)
                 datetime_duration = datetime_duration.strftime('%H:%M:%S')
+                second_end = datetime_duration.strftime('%H:%M:%S').time()
                 end_time = datetime_duration # Calculated End Time
 
                 #print(appointment_time.microsecond)
@@ -240,6 +241,22 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                 new_end_time = None
 
                 for dt in selected_data:
+                    # if ((dt['range_start'] >= appointment_time and dt['range_end'] <= end_time) and dt['date'] == app_date):
+                    #     print('tested is sucess')
+                        #find_values.append(dt)
+                    # else:
+                    #     new_start_time = appointment_time
+                    
+                    # if str(dt['range_end']) == str(end_time) and dt['date'] == app_date:
+                    #     find_values.append(dt)
+                    # else:
+                    #     pass
+
+                    # if str(dt['range_end']) == str(appointment_time) and dt['date'] == app_date:
+                    #     find_values.append(dt)
+                    #     new_end_time = end_time
+                       ##OLD
+                        
                     if ((dt['range_start'] == appointment_time or str(dt['range_start']) == str(end_time)) and dt['date'] == app_date):
                         find_values.append(dt)
                     else:
