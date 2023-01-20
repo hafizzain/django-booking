@@ -3168,7 +3168,7 @@ def get_employee_appointment(request):
         for emp in employee:
             try:
                 daily_schedule = EmployeDailySchedule.objects.get(
-                    employee = employee,
+                    employee = emp.id,
                     is_vacation = False,
                     date = date,
                 )  
