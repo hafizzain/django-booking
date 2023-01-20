@@ -246,7 +246,39 @@ class BundleFixed(models.Model):
 
     def __str__(self):
         return str(self.id)
+  
+class RetailAndGetService(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_retailandgetservice')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_retailandgetservice')
     
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+    updated_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return str(self.id)  
+
+class ProductAndGetSpecific(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True, related_name='product_productandgetspecific')    
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='service_productandgetspecific')    
+    
+    retailandservice = models.ForeignKey(RetailAndGetService, on_delete=models.CASCADE, null=True, blank=True, related_name='retailandservice_productandgetspecific')
+
+    
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+    updated_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return str(self.id)
+  
 class DateRestrictions(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     

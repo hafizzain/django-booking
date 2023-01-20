@@ -55,5 +55,4 @@ urlpatterns = [
     path('delete_bundle_fixed_price/', views.delete_bundle_fixed_price),
     
     
-
 ]
