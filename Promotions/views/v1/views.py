@@ -4040,6 +4040,7 @@ def update_retail_get_service(request):
         else:
             pass
         for pro in promotion:
+            id = pro.get('id', None)
             product = pro.get('product', None)
             service = pro.get('service', None)
             
