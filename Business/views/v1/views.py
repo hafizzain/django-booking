@@ -2978,7 +2978,6 @@ def get_check_availability(request):
                         id = emp_id, 
                         #employedailyschedule__is_vacation = False,
                         #employedailyschedule__created_at__lte = dt,
-                        
                         # employedailyschedule__start_time__gte = start_time,
                         # employedailyschedule__end_time__lte = start_time
                         ) 
@@ -2990,33 +2989,22 @@ def get_check_availability(request):
                         )      
                     if start_time >= daily_schedule.start_time and start_time < daily_schedule.end_time :
                         pass
-                    
-                    # elif start_time >= daily_schedule.start_time and start_time < daily_schedule.end_time :
-                    #     pass
-                    
-                        # if daily_schedule.end_time_shift != None:
-                        #    if daily_schedule.end_time_shift <= start_time:
-                        #        pass
-                        # elif daily_schedule.end_time <= start_time:
-                        #     pass
-                        # if daily_schedule.end_time <= start_time:
-                        #     pass
-                        # else:
-                        #     return Response(
-                        #     {
-                        #         'status' : True,
-                        #         'status_code' : 200,
-                        #         'response' : {
-                        #             'message' : 'Employee Day Off',
-                        #             'error_message' : f'This Employee day off, {employee.full_name} date {date} pass data',
-                        #             'Availability': False
-                        #         }
-                        #     },
-                        #     status=status.HTTP_200_OK
-                        # )
-                        
-                    # elif daily_schedule.start_time_shift > start_time and start_time < daily_schedule.end_time_shift:
-                    #     pass
+                    elif daily_schedule.start_time_shift != None:
+                        if start_time >= daily_schedule.start_time_shift and start_time < daily_schedule.end_time_shift:
+                            pass
+                        else:
+                            return Response(
+                            {
+                                'status' : True,
+                                'status_code' : 200,
+                                'response' : {
+                                    'message' : f'This time {employee.full_name} not Available',
+                                    'error_message' : f'This Employee day off, {employee.full_name} date {date}',
+                                    'Availability': False
+                                }
+                            },
+                            status=status.HTTP_200_OK
+                        )
                     else:
                         return Response(
                         {
