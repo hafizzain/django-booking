@@ -4,7 +4,7 @@ from Business.models import BusinessAddress, BusinessTax
 from Product.Constants.index import tenant_media_base_url
 from django_tenants.utils import tenant_context
 
-from Promotions.models import DirectOrFlatDiscount , CategoryDiscount , DateRestrictions , DayRestrictions, BlockDate, FixedPriceService, FreeService, MentionedNumberService, PurchaseDiscount, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount
+from Promotions.models import BundleFixed, DirectOrFlatDiscount , CategoryDiscount , DateRestrictions , DayRestrictions, BlockDate, FixedPriceService, FreeService, MentionedNumberService, PurchaseDiscount, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount
 
 class ServiceGroupDiscountSerializers(serializers.ModelSerializer):
     is_deleted = serializers.SerializerMethodField(read_only=True)
@@ -471,4 +471,43 @@ class MentionedNumberServiceSerializers(serializers.ModelSerializer):
             pass
     class Meta:
         model = MentionedNumberService
+        fields = '__all__'
+class BundleFixedSerializers(serializers.ModelSerializer):
+    day_restrictions = serializers.SerializerMethodField(read_only=True)
+    date_restrictions = serializers.SerializerMethodField(read_only=True)
+    block_date = serializers.SerializerMethodField(read_only=True)
+    type = serializers.SerializerMethodField(read_only=True)
+    is_deleted = serializers.SerializerMethodField(read_only=True)
+
+    def get_is_deleted(self, obj):
+        if obj.is_deleted == True:
+            return 'True'
+        else:
+            return 'False'
+    
+    def get_type(self, obj):
+        return 'Bundle_Fixed_Service'
+        
+    def get_block_date(self, obj):
+        try:
+            ser = BlockDate.objects.filter(bundlefixed = obj)
+            return BlockDateSerializers(ser, many = True).data
+        except Exception as err:
+            pass
+    
+    def get_date_restrictions(self, obj):
+        try:
+            ser = DateRestrictions.objects.get(bundlefixed = obj)
+            return DateRestrictionsSerializers(ser).data
+        except Exception as err:
+            pass
+   
+    def get_day_restrictions(self, obj):
+        try:
+            ser = DayRestrictions.objects.filter(bundlefixed = obj)
+            return DayRestrictionsSerializers(ser, many = True).data
+        except Exception as err:
+            pass
+    class Meta:
+        model = BundleFixed
         fields = '__all__'

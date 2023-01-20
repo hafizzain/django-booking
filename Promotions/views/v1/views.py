@@ -24,8 +24,8 @@ from Business.models import Business, BusinessSocial, BusinessAddress, BusinessO
 from Product.models import Brand, Product, ProductStock
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
-from Promotions.models import BlockDate, CategoryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount, FixedPriceService, FreeService, MentionedNumberService, PurchaseDiscount, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount
-from Promotions.serializers import DirectOrFlatDiscountSerializers, FixedPriceServiceSerializers, MentionedNumberServiceSerializers, PurchaseDiscountSerializers, SpecificBrandSerializers, SpecificGroupDiscountSerializers, SpendDiscountSerializers, SpendSomeAmountSerializers
+from Promotions.models import BlockDate, BundleFixed, CategoryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount, FixedPriceService, FreeService, MentionedNumberService, PurchaseDiscount, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount
+from Promotions.serializers import BundleFixedSerializers, DirectOrFlatDiscountSerializers, FixedPriceServiceSerializers, MentionedNumberServiceSerializers, PurchaseDiscountSerializers, SpecificBrandSerializers, SpecificGroupDiscountSerializers, SpendDiscountSerializers, SpendSomeAmountSerializers
 from Service.models import Service, ServiceGroup
 from Tenants.models import Domain, Tenant
 from Utility.models import Country, Currency, ExceptionRecord, Language, NstyleFile, Software, State, City
@@ -3442,6 +3442,325 @@ def delete_free_service(request):
             'response' : {
                 'message' : 'Free Price Service deleted successfully',
                 'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_bundle_fixed_price(request):
+    user = request.user
+    business_id = request.data.get('business', None)
+    
+    spend_amount = request.data.get('spend_amount', None)
+    # duration = request.data.get('duration', None)
+    service = request.data.get('service', None)
+    #service = request.data.get('service', None)
+    
+    location = request.data.get('location', None)
+    start_date = request.data.get('start_date', None)
+    end_date = request.data.get('end_date', None)
+    
+    dayrestrictions = request.data.get('dayrestrictions', None)
+    blockdate = request.data.get('blockdate', None)    
+    
+    error = []
+    
+    if not all([business_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                            ]
+                    }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        business = Business.objects.get(id=business_id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    
+    bundle_fixed = BundleFixed.objects.create(
+        user = user,
+        business =  business,
+        
+        spend_amount = spend_amount,
+    )
+    if service is not None:
+        if type(service) == str:
+                service = json.loads(service)
+
+        elif type(service) == list:
+            pass
+    
+        for ser in service:
+            try:
+                servic =Service.objects.get(id=str(ser))
+                bundle_fixed.service.add(servic)
+            except Exception as err:
+                error.append(str(err))
+    
+    date_res = DateRestrictions.objects.create(
+        bundlefixed = bundle_fixed,
+        start_date = start_date,
+        end_date =end_date,
+    )
+    
+    if location is not None:
+        if type(location) == str:
+                location = json.loads(location)
+
+        elif type(location) == list:
+            pass
+    
+        for loc in location:
+            try:
+                address = BusinessAddress.objects.get(id=loc)
+                date_res.business_address.add(address)
+            except Exception as err:
+                error.append(str(err))
+        
+    if dayrestrictions is not None:
+        if type(dayrestrictions) == str:
+            dayrestrictions = dayrestrictions.replace("'" , '"')
+            dayrestrictions = json.loads(dayrestrictions)
+        else:
+            pass
+        for dayres in dayrestrictions:
+            try: 
+                day = dayres.get('day', None)
+                
+                DayRestrictions.objects.create(
+                    bundlefixed = bundle_fixed,
+                    day = day,
+                )
+                
+            except Exception as err:
+                error.append(str(err))
+                
+    if blockdate is not None:
+        if type(blockdate) == str:
+            blockdate = blockdate.replace("'" , '"')
+            blockdate = json.loads(blockdate)
+        else:
+            pass
+        
+        for bl_date in blockdate:
+            
+            try: 
+                date = bl_date.get('date', None)
+                BlockDate.objects.create(
+                    bundlefixed = bundle_fixed,
+                    date = date,
+                )
+                
+            except Exception as err:
+               error.append(str(err))
+               
+    serializers = BundleFixedSerializers(bundle_fixed, context={'request' : request})
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Bundle fixed Services Created Successfully!',
+                    'error_message' : None,
+                    'errors' : error,
+                    'bundlefixed' : serializers.data,
+                    
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_bundle_fixed_price(request):
+    
+    bundle_id = request.data.get('id', None)
+    
+    location = request.data.get('location', None)
+    start_date = request.data.get('start_date', None)
+    end_date = request.data.get('end_date', None)
+    
+    dayrestrictions = request.data.get('dayrestrictions', None)
+    blockdate = request.data.get('blockdate', None)
+    
+    service = request.data.get('service', None)
+    spend_amount = request.data.get('spend_amount', None)
+    
+    error = []
+    
+    if bundle_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        bundle_fixed = BundleFixed.objects.get(id=bundle_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Mention number Service Discount Not Found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    if spend_amount:
+        bundle_fixed.spend_amount = spend_amount
+        bundle_fixed.save()
+    
+    if service is not None:
+        if type(service) == str:
+            service = json.loads(service)
+        elif type(service) == list:
+            pass
+        bundle_fixed.service.clear()
+        for ser in service:
+            try:
+                servic = Service.objects.get(id=ser)  
+                bundle_fixed.service.add(servic)
+            except Exception as err:
+                error.append(str(err))
+    
+    try:
+        daterestriction = DateRestrictions.objects.get(bundlefixed = bundle_fixed.id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'daterestriction Service Not Found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+        
+    if start_date:
+        daterestriction.start_date = start_date
+    if end_date:
+        daterestriction.end_date = end_date
+    daterestriction.save()
+    
+    if location is not None:
+        if type(location) == str:
+            location = json.loads(location)
+        elif type(location) == list:
+            pass
+        daterestriction.business_address.clear()
+        for loc in location:
+            try:
+                loca = BusinessAddress.objects.get(id=loc)  
+                daterestriction.business_address.add(loca)
+            except Exception as err:
+                error.append(str(err))
+    
+    if dayrestrictions is not None:
+        if type(dayrestrictions) == str:
+            dayrestrictions = dayrestrictions.replace("'" , '"')
+            dayrestrictions = json.loads(dayrestrictions)
+        else:
+            pass
+        for dayres in dayrestrictions:
+            id = dayres.get('id', None)
+            day = dayres.get('day', None)
+            if id is not None:
+                try:
+                    dayrestriction = DayRestrictions.objects.get(id  = str(id))
+                    is_deleted = dayres.get('is_deleted', None)
+                    if str(is_deleted) == "True":
+                        dayrestriction.delete()
+                        continue
+                    dayrestriction.day = day
+                    dayrestriction.save()
+                    
+                except Exception as err:
+                    error.append(str(err))
+                    #ExceptionRecord.objects.create(text = f'{str(err)}')
+            else:
+                DayRestrictions.objects.create(
+                    bundlefixed = bundle_fixed,
+                    day = day,
+                )       
+    
+    if blockdate is not None:
+        if type(blockdate) == str:
+            blockdate = blockdate.replace("'" , '"')
+            blockdate = json.loads(blockdate)
+        else:
+            pass
+        
+        for bl_date in blockdate:    
+            date = bl_date.get('date', None)
+            is_deleted = bl_date.get('is_deleted', None)
+            id = bl_date.get('id', None)
+            if id is not None:
+                try:
+                    block_date = BlockDate.objects.get(id = str(id))
+                    if str(is_deleted) == "True":
+                        block_date.delete()
+                        continue
+                    block_date.date= date
+                    block_date.save()
+                except Exception as err:
+                    error.append(str(err))
+            else:
+               BlockDate.objects.create(
+                    bundlefixed = bundle_fixed,
+                    date = date,
+                )
+    
+    serializers= BundleFixedSerializers(bundle_fixed, )#data=request.data, partial=True, context={'request' : request})
+
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Bundle Fixed Service Updated Successfully!',
+                'error_message' : None,
+                'error' : error,
+                'bundlefixed' : serializers.data
             }
         },
         status=status.HTTP_200_OK
