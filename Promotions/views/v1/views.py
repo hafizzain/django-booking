@@ -4165,20 +4165,20 @@ def update_retail_get_service(request):
                 )
     
     serializers= RetailAndGetServiceSerializers(retail_price)#data=request.data, partial=True, context={'request' : request})
-    if serializers.is_valid():
-        serializers.save()
-    else:
-        return Response(
-        {
-            'status' : False,
-            'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
-            'response' : {
-                'message' : 'Invialid Data',
-                'error_message' : str(serializers.errors),
-            }
-        },
-        status=status.HTTP_404_NOT_FOUND
-    )
+    # if serializers.is_valid():
+    #     serializers.save()
+    # else:
+    #     return Response(
+    #     {
+    #         'status' : False,
+    #         'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+    #         'response' : {
+    #             'message' : 'Invialid Data',
+    #             'error_message' : str(serializers.errors),
+    #         }
+    #     },
+    #     status=status.HTTP_404_NOT_FOUND
+    # )
     return Response(
         {
             'status' : True,
