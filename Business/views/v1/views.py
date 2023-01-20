@@ -3166,49 +3166,51 @@ def get_employee_appointment(request):
             #employee_selected_service__service__id = str(service),
         )
         for emp in employee:
-            try:
-                daily_schedule = EmployeDailySchedule.objects.get(
-                    employee = emp.id,
-                    is_vacation = False,
-                    date = date,
-                )  
-                if start_time >= daily_schedule.start_time and start_time < daily_schedule.end_time :
-                    serializer = EmployeeBusinessSerializer(employee)
-                    data.append(serializer.data)
-                elif daily_schedule.start_time_shift != None:
-                    if start_time >= daily_schedule.start_time_shift and start_time < daily_schedule.end_time_shift:
-                        serializer = EmployeeBusinessSerializer(employee)
-                        data.append(serializer.data)
-                    else:
-                        pass
-                    #     return Response(
-                    #     {
-                    #         'status' : True,
-                    #         'status_code' : 200,
-                    #         'response' : {
-                    #             'message' : f'This time {employee.full_name} not Available',
-                    #             'error_message' : f'This Employee day off, {employee.full_name} date {date}',
-                    #             'Availability': False
-                    #         }
-                    #     },
-                    #     status=status.HTTP_200_OK
-                    # )
-                else:
-                    pass
-                #     return Response(
-                #     {
-                #         'status' : True,
-                #         'status_code' : 200,
-                #         'response' : {
-                #             'message' : f'This time {employee.full_name} not Available',
-                #             'error_message' : f'This Employee day off, {employee.full_name} date {date}',
-                #             'Availability': False
-                #         }
-                #     },
-                #     status=status.HTTP_200_OK
-                # )
-            except Exception as err:
-                pass
+            serializer = EmployeeBusinessSerializer(emp)
+            data.append(serializer.data)
+            # try:
+            #     daily_schedule = EmployeDailySchedule.objects.get(
+            #         employee = emp.id,
+            #         is_vacation = False,
+            #         date = date,
+            #     )  
+            #     if start_time >= daily_schedule.start_time and start_time < daily_schedule.end_time :
+            #         serializer = EmployeeBusinessSerializer(emp)
+            #         data.append(serializer.data)
+            #     elif daily_schedule.start_time_shift != None:
+            #         if start_time >= daily_schedule.start_time_shift and start_time < daily_schedule.end_time_shift:
+            #             serializer = EmployeeBusinessSerializer(emp)
+            #             data.append(serializer.data)
+            #         else:
+            #             pass
+            #         #     return Response(
+            #         #     {
+            #         #         'status' : True,
+            #         #         'status_code' : 200,
+            #         #         'response' : {
+            #         #             'message' : f'This time {employee.full_name} not Available',
+            #         #             'error_message' : f'This Employee day off, {employee.full_name} date {date}',
+            #         #             'Availability': False
+            #         #         }
+            #         #     },
+            #         #     status=status.HTTP_200_OK
+            #         # )
+            #     else:
+            #         pass
+            #     #     return Response(
+            #     #     {
+            #     #         'status' : True,
+            #     #         'status_code' : 200,
+            #     #         'response' : {
+            #     #             'message' : f'This time {employee.full_name} not Available',
+            #     #             'error_message' : f'This Employee day off, {employee.full_name} date {date}',
+            #     #             'Availability': False
+            #     #         }
+            #     #     },
+            #     #     status=status.HTTP_200_OK
+            #     # )
+            # except Exception as err:
+            #     pass
             
         # serializer = EmployeeBusinessSerializer(employee)
         # data.append(serializer.data)
