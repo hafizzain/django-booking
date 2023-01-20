@@ -52,5 +52,8 @@ urlpatterns = [
     #Bundle Discount Service
     path('create_bundle_fixed_price/', views.create_bundle_fixed_price),
     path('update_bundle_fixed_price/', views.update_bundle_fixed_price),
+    path('delete_bundle_fixed_price/', views.delete_bundle_fixed_price),
+    
+    
 
 ]
