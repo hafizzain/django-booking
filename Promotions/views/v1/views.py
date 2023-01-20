@@ -24,8 +24,8 @@ from Business.models import Business, BusinessSocial, BusinessAddress, BusinessO
 from Product.models import Brand, Product, ProductStock
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
-from Promotions.models import BlockDate, BundleFixed, CategoryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount, FixedPriceService, FreeService, MentionedNumberService, PurchaseDiscount, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount
-from Promotions.serializers import BundleFixedSerializers, DirectOrFlatDiscountSerializers, FixedPriceServiceSerializers, MentionedNumberServiceSerializers, PurchaseDiscountSerializers, SpecificBrandSerializers, SpecificGroupDiscountSerializers, SpendDiscountSerializers, SpendSomeAmountSerializers
+from Promotions.models import BlockDate, BundleFixed, CategoryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount, FixedPriceService, FreeService, MentionedNumberService, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount
+from Promotions.serializers import BundleFixedSerializers, DirectOrFlatDiscountSerializers, FixedPriceServiceSerializers, MentionedNumberServiceSerializers, PurchaseDiscountSerializers, RetailAndGetServiceSerializers, SpecificBrandSerializers, SpecificGroupDiscountSerializers, SpendDiscountSerializers, SpendSomeAmountSerializers
 from Service.models import Service, ServiceGroup
 from Tenants.models import Domain, Tenant
 from Utility.models import Country, Currency, ExceptionRecord, Language, NstyleFile, Software, State, City
@@ -3822,3 +3822,420 @@ def delete_bundle_fixed_price(request):
         status=status.HTTP_200_OK
     )
     
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_retail_get_service(request):
+    user = request.user
+    business_id = request.data.get('business', None)
+    
+    promotion = request.data.get('promotion', None)
+    
+    location = request.data.get('location', None)
+    start_date = request.data.get('start_date', None)
+    end_date = request.data.get('end_date', None)
+    
+    dayrestrictions = request.data.get('dayrestrictions', None)
+    blockdate = request.data.get('blockdate', None)    
+    
+    error = []
+    
+    if not all([business_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                            ]
+                    }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        business = Business.objects.get(id=business_id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    
+    
+    retail_service = RetailAndGetService.objects.create(
+        user = user,
+        business =  business,
+    )
+    
+    if promotion is not None:
+        if type(promotion) == str:
+            promotion = promotion.replace("'" , '"')
+            promotion = json.loads(promotion)
+        else:
+            pass
+        for pro in promotion:
+            try: 
+                product = pro.get('product', None)
+                service = pro.get('service', None)
+                
+                try:
+                    product_id = Product.objects.get(id = product)
+                except Exception as err:
+                    pass
+                try:
+                    service_id = Service.objects.get(id = service)
+                except Exception as err:
+                    pass
+                
+                ProductAndGetSpecific.objects.create(
+                    retailandservice = retail_service,
+                    product = product_id,
+                    service = service_id,
+                )
+                
+            except Exception as err:
+                error.append(str(err))
+    
+    date_res = DateRestrictions.objects.create(
+        retailandservice = retail_service,
+        start_date = start_date,
+        end_date =end_date,
+    )
+    
+    if location is not None:
+        if type(location) == str:
+                location = json.loads(location)
+
+        elif type(location) == list:
+            pass
+    
+        for loc in location:
+            try:
+                address = BusinessAddress.objects.get(id=loc)
+                date_res.business_address.add(address)
+            except Exception as err:
+                error.append(str(err))
+        
+    if dayrestrictions is not None:
+        if type(dayrestrictions) == str:
+            dayrestrictions = dayrestrictions.replace("'" , '"')
+            dayrestrictions = json.loads(dayrestrictions)
+        else:
+            pass
+        for dayres in dayrestrictions:
+            try: 
+                day = dayres.get('day', None)
+                
+                DayRestrictions.objects.create(
+                    retailandservice = retail_service,
+                    day = day,
+                )
+                
+            except Exception as err:
+                error.append(str(err))
+                
+    if blockdate is not None:
+        if type(blockdate) == str:
+            blockdate = blockdate.replace("'" , '"')
+            blockdate = json.loads(blockdate)
+        else:
+            pass
+        
+        for bl_date in blockdate:
+            
+            try: 
+                date = bl_date.get('date', None)
+                BlockDate.objects.create(
+                    retailandservice = retail_service,
+                    date = date,
+                )
+                
+            except Exception as err:
+               error.append(str(err))
+               
+    serializers = RetailAndGetServiceSerializers(retail_service, context={'request' : request})
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Retail and get Service Created Successfully!',
+                    'error_message' : None,
+                    'errors' : error,
+                    'retail' : serializers.data,
+                    
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_retail_get_service(request):
+    
+    retail_id = request.data.get('id', None)
+    
+    location = request.data.get('location', None)
+    start_date = request.data.get('start_date', None)
+    end_date = request.data.get('end_date', None)
+    
+    dayrestrictions = request.data.get('dayrestrictions', None)
+    blockdate = request.data.get('blockdate', None)
+    
+    promotion = request.data.get('promotion', None)
+    
+    error = []
+    
+    if retail_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+   
+    try:
+        retail_price = RetailAndGetService.objects.get(id=retail_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Retail Service Discount Not Found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+       
+    if promotion is not None:
+        if type(promotion) == str:
+            promotion = promotion.replace("'" , '"')
+            promotion = json.loads(promotion)
+        else:
+            pass
+        for pro in promotion:
+            product = pro.get('product', None)
+            service = pro.get('service', None)
+            
+            try:
+                product_id = Product.objects.get(id = product)
+            except Exception as err:
+                pass
+            try:
+                service_id = Service.objects.get(id = service)
+            except Exception as err:
+                pass
+
+            if id is not None:
+                try:
+                    productandget = ProductAndGetSpecific.objects.get(id  = str(id))
+                    is_deleted = dayres.get('is_deleted', None)
+                    if str(is_deleted) == "True":
+                        productandget.delete()
+                        continue
+                    productandget.product = product_id
+                    productandget.service = service_id
+                    productandget.save()
+                    
+                except Exception as err:
+                    error.append(str(err))
+            else:
+                ProductAndGetSpecific.objects.create(
+                    retailandservice = retail_price,
+                    
+                    product = product_id,
+                    service = service_id,
+                ) 
+                
+    try:
+        daterestriction = DateRestrictions.objects.get(retailandservice = retail_price.id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'daterestriction Service Not Found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+        
+    if start_date:
+        daterestriction.start_date = start_date
+    if end_date:
+        daterestriction.end_date = end_date
+    daterestriction.save()
+    
+    if location is not None:
+        if type(location) == str:
+            location = json.loads(location)
+        elif type(location) == list:
+            pass
+        daterestriction.business_address.clear()
+        for loc in location:
+            try:
+                loca = BusinessAddress.objects.get(id=loc)  
+                daterestriction.business_address.add(loca)
+            except Exception as err:
+                error.append(str(err))
+    
+         
+    if dayrestrictions is not None:
+        if type(dayrestrictions) == str:
+            dayrestrictions = dayrestrictions.replace("'" , '"')
+            dayrestrictions = json.loads(dayrestrictions)
+        else:
+            pass
+        for dayres in dayrestrictions:
+            id = dayres.get('id', None)
+            day = dayres.get('day', None)
+            if id is not None:
+                try:
+                    dayrestriction = DayRestrictions.objects.get(id  = str(id))
+                    is_deleted = dayres.get('is_deleted', None)
+                    if str(is_deleted) == "True":
+                        dayrestriction.delete()
+                        continue
+                    dayrestriction.day = day
+                    dayrestriction.save()
+                    
+                except Exception as err:
+                    error.append(str(err))
+            else:
+                DayRestrictions.objects.create(
+                    retailandservice = retail_price,
+                    day = day,
+                )       
+    
+    if blockdate is not None:
+        if type(blockdate) == str:
+            blockdate = blockdate.replace("'" , '"')
+            blockdate = json.loads(blockdate)
+        else:
+            pass
+        
+        for bl_date in blockdate:    
+            date = bl_date.get('date', None)
+            is_deleted = bl_date.get('is_deleted', None)
+            id = bl_date.get('id', None)
+            if id is not None:
+                try:
+                    block_date = BlockDate.objects.get(id = str(id))
+                    if str(is_deleted) == "True":
+                        block_date.delete()
+                        continue
+                    block_date.date= date
+                    block_date.save()
+                except Exception as err:
+                    error.append(str(err))
+            else:
+               BlockDate.objects.create(
+                    retailandservice = retail_price,
+                    date = date,
+                )
+    
+    serializers= RetailAndGetServiceSerializers(retail_price)#data=request.data, partial=True, context={'request' : request})
+    if serializers.is_valid():
+        serializers.save()
+    else:
+        return Response(
+        {
+            'status' : False,
+            'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+            'response' : {
+                'message' : 'Invialid Data',
+                'error_message' : str(serializers.errors),
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+    )
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Retail Service Updated Successfully!',
+                'error_message' : None,
+                'error' : error,
+                'retail' : serializers.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_retail_get_service(request):
+    retail_id = request.data.get('id', None)
+
+    if retail_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        retail_price = RetailAndGetService.objects.get(id=retail_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Retail Service Price Discount Not Found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    retail_price.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Retail Service deleted successfully',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )

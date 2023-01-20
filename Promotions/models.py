@@ -294,6 +294,7 @@ class DateRestrictions(models.Model):
     mentionednumberservice = models.ForeignKey(MentionedNumberService, on_delete=models.CASCADE, null=True, blank=True, related_name='mentionednumberservice_daterestrictions')
     bundlefixed = models.ForeignKey(BundleFixed, on_delete=models.CASCADE, null=True, blank=True, related_name='bundlefixed_daterestrictions')
     
+    retailandservice = models.ForeignKey(RetailAndGetService, on_delete=models.CASCADE, null=True, blank=True, related_name='retailandservice_daterestrictions')
     
     business_address = models.ManyToManyField(BusinessAddress, null=True, blank=True, related_name='business_address_daterestrictions')
     start_date = models.DateField(verbose_name = 'Start Date', null=True)
@@ -320,6 +321,9 @@ class DayRestrictions(models.Model):
     mentionednumberservice = models.ForeignKey(MentionedNumberService, on_delete=models.CASCADE, null=True, blank=True, related_name='mentionednumberservice_dayrestrictions')
     bundlefixed = models.ForeignKey(BundleFixed, on_delete=models.CASCADE, null=True, blank=True, related_name='bundlefixed_dayrestrictions')
     
+    retailandservice = models.ForeignKey(RetailAndGetService, on_delete=models.CASCADE, null=True, blank=True, related_name='retailandservice_dayrestrictions')
+
+    
     day = models.CharField(max_length=20, null=True, blank=True)
     
     is_deleted = models.BooleanField(default=False)
@@ -342,6 +346,8 @@ class BlockDate(models.Model):
     fixedpriceservice = models.ForeignKey(FixedPriceService, on_delete=models.CASCADE, null=True, blank=True, related_name='fixedpriceservice_blockdate')
     mentionednumberservice = models.ForeignKey(MentionedNumberService, on_delete=models.CASCADE, null=True, blank=True, related_name='mentionednumberservice_blockdate')
     bundlefixed = models.ForeignKey(BundleFixed, on_delete=models.CASCADE, null=True, blank=True, related_name='bundlefixed_blockdate')
+    
+    retailandservice = models.ForeignKey(RetailAndGetService, on_delete=models.CASCADE, null=True, blank=True, related_name='retailandservice_blockdate')
 
     
     date = models.DateField(verbose_name = 'Block Date', null=True)

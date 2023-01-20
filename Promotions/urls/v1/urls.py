@@ -54,5 +54,9 @@ urlpatterns = [
     path('update_bundle_fixed_price/', views.update_bundle_fixed_price),
     path('delete_bundle_fixed_price/', views.delete_bundle_fixed_price),
     
+    #Retail And Get Specific Service
+    path('create_retail_get_service/', views.create_retail_get_service),
+    path('update_retail_get_service/', views.update_retail_get_service),
+    path('delete_retail_get_service/', views.delete_retail_get_service),
     
 ]
