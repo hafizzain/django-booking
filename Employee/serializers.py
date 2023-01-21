@@ -611,7 +611,8 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'employee_info',  
             'services',
             'created_at' ,
-            'location',   
+            'location', 
+            'is_active',  
             ]   
 
 class CategoryCommissionSerializer(serializers.ModelSerializer):
