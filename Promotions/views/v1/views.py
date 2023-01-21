@@ -24,8 +24,8 @@ from Business.models import Business, BusinessSocial, BusinessAddress, BusinessO
 from Product.models import Brand, Product, ProductStock
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
-from Promotions.models import BlockDate, BundleFixed, CategoryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount, FixedPriceService, FreeService, MentionedNumberService, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount
-from Promotions.serializers import BundleFixedSerializers, DirectOrFlatDiscountSerializers, FixedPriceServiceSerializers, MentionedNumberServiceSerializers, PurchaseDiscountSerializers, RetailAndGetServiceSerializers, SpecificBrandSerializers, SpecificGroupDiscountSerializers, SpendDiscountSerializers, SpendSomeAmountSerializers
+from Promotions.models import BlockDate, BundleFixed, CategoryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount, FixedPriceService, FreeService, MentionedNumberService, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount, UserRestrictedDiscount
+from Promotions.serializers import BundleFixedSerializers, DirectOrFlatDiscountSerializers, FixedPriceServiceSerializers, MentionedNumberServiceSerializers, PurchaseDiscountSerializers, RetailAndGetServiceSerializers, SpecificBrandSerializers, SpecificGroupDiscountSerializers, SpendDiscountSerializers, SpendSomeAmountSerializers, UserRestrictedDiscountSerializers
 from Service.models import Service, ServiceGroup
 from Tenants.models import Domain, Tenant
 from Utility.models import Country, Currency, ExceptionRecord, Language, NstyleFile, Software, State, City
@@ -4244,3 +4244,148 @@ def delete_retail_get_service(request):
         },
         status=status.HTTP_200_OK
     )
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_user_restricted_discount(request):
+    user = request.user
+    business_id = request.data.get('business', None)
+    
+    corporate_type = request.data.get('corporate_type', None)
+    discount_percentage = request.data.get('discount', None)
+    client = request.data.get('client', None)
+    
+    location = request.data.get('location', None)
+    start_date = request.data.get('start_date', None)
+    end_date = request.data.get('end_date', None)
+    
+    dayrestrictions = request.data.get('dayrestrictions', None)
+    blockdate = request.data.get('blockdate', None)    
+    
+    error = []
+    
+    if not all([business_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                            ]
+                    }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        business = Business.objects.get(id=business_id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    
+    usr_res = UserRestrictedDiscount.objects.create(
+        user = user,
+        business =  business,
+        
+        corporate_type = corporate_type,
+        discount_percentage = discount_percentage
+    )
+    if client is not None:
+        if type(client) == str:
+                client = json.loads(client)
+
+        elif type(client) == list:
+            pass
+    
+        for cl in client:
+            try:
+                cli =Client.objects.get(id=str(cl))
+                usr_res.client.add(cli)
+            except Exception as err:
+                error.append(str(err))
+    
+    date_res = DateRestrictions.objects.create(
+        userrestricteddiscount = usr_res,
+        start_date = start_date,
+        end_date =end_date,
+    )
+    
+    if location is not None:
+        if type(location) == str:
+                location = json.loads(location)
+
+        elif type(location) == list:
+            pass
+    
+        for loc in location:
+            try:
+                address = BusinessAddress.objects.get(id=loc)
+                date_res.business_address.add(address)
+            except Exception as err:
+                error.append(str(err))
+        
+    if dayrestrictions is not None:
+        if type(dayrestrictions) == str:
+            dayrestrictions = dayrestrictions.replace("'" , '"')
+            dayrestrictions = json.loads(dayrestrictions)
+        else:
+            pass
+        for dayres in dayrestrictions:
+            try: 
+                day = dayres.get('day', None)
+                
+                DayRestrictions.objects.create(
+                    userrestricteddiscount = usr_res,
+                    day = day,
+                )
+                
+            except Exception as err:
+                error.append(str(err))
+                
+    if blockdate is not None:
+        if type(blockdate) == str:
+            blockdate = blockdate.replace("'" , '"')
+            blockdate = json.loads(blockdate)
+        else:
+            pass
+        
+        for bl_date in blockdate:
+            
+            try: 
+                date = bl_date.get('date', None)
+                BlockDate.objects.create(
+                    userrestricteddiscount = usr_res,
+                    date = date,
+                )
+                
+            except Exception as err:
+               error.append(str(err))
+               
+    serializers = UserRestrictedDiscountSerializers(usr_res, context={'request' : request})
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'User Restricted Discount Created Successfully!',
+                    'error_message' : None,
+                    'errors' : error,
+                    'userRestricted' : serializers.data,
+                    
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )

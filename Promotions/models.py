@@ -3,6 +3,7 @@ from django.db import models
 from django.utils.timezone import now
 from Authentication.models import User
 from Business.models import Business, BusinessAddress
+from Client.models import Client
 
 from Product.models import Brand, Product
 from Service.models import Service, ServiceGroup
@@ -279,6 +280,28 @@ class ProductAndGetSpecific(models.Model):
     def __str__(self):
         return str(self.id)
   
+class UserRestrictedDiscount(models.Model):
+    CORPORATE_CHOICE = [
+        ('All_Service' , 'All Service'),
+        ('Retail_Product' , 'Retail Product'),
+    ] 
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_userrestricteddiscount', null= True, blank = True)
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_userrestricteddiscount')
+    
+    corporate_type = models.CharField(choices=CORPORATE_CHOICE, default='All_Service', max_length=50)
+    client = models.ManyToManyField(Client, related_name='client_userrestricteddiscount')
+    discount_percentage = models.PositiveIntegerField(default=0, blank= True, null=True)
+    
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+    updated_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return str(self.id) 
+  
 class DateRestrictions(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     
@@ -295,6 +318,7 @@ class DateRestrictions(models.Model):
     bundlefixed = models.ForeignKey(BundleFixed, on_delete=models.CASCADE, null=True, blank=True, related_name='bundlefixed_daterestrictions')
     
     retailandservice = models.ForeignKey(RetailAndGetService, on_delete=models.CASCADE, null=True, blank=True, related_name='retailandservice_daterestrictions')
+    userrestricteddiscount = models.ForeignKey(UserRestrictedDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='userrestricteddiscount_daterestrictions')
     
     business_address = models.ManyToManyField(BusinessAddress, null=True, blank=True, related_name='business_address_daterestrictions')
     start_date = models.DateField(verbose_name = 'Start Date', null=True)
@@ -322,6 +346,7 @@ class DayRestrictions(models.Model):
     bundlefixed = models.ForeignKey(BundleFixed, on_delete=models.CASCADE, null=True, blank=True, related_name='bundlefixed_dayrestrictions')
     
     retailandservice = models.ForeignKey(RetailAndGetService, on_delete=models.CASCADE, null=True, blank=True, related_name='retailandservice_dayrestrictions')
+    userrestricteddiscount = models.ForeignKey(UserRestrictedDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='userrestricteddiscount_dayrestrictions')
 
     
     day = models.CharField(max_length=20, null=True, blank=True)
@@ -348,6 +373,7 @@ class BlockDate(models.Model):
     bundlefixed = models.ForeignKey(BundleFixed, on_delete=models.CASCADE, null=True, blank=True, related_name='bundlefixed_blockdate')
     
     retailandservice = models.ForeignKey(RetailAndGetService, on_delete=models.CASCADE, null=True, blank=True, related_name='retailandservice_blockdate')
+    userrestricteddiscount = models.ForeignKey(UserRestrictedDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='userrestricteddiscount_blockdate')
 
     
     date = models.DateField(verbose_name = 'Block Date', null=True)
