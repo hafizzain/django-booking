@@ -4056,7 +4056,7 @@ def update_retail_get_service(request):
             if id is not None:
                 try:
                     productandget = ProductAndGetSpecific.objects.get(id  = str(id))
-                    is_deleted = dayres.get('is_deleted', None)
+                    is_deleted = pro.get('is_deleted', None)
                     if str(is_deleted) == "True":
                         productandget.delete()
                         continue
@@ -4252,8 +4252,8 @@ def create_user_restricted_discount(request):
     business_id = request.data.get('business', None)
     
     corporate_type = request.data.get('corporate_type', None)
-    discount_percentage = request.data.get('discount', None)
-    client = request.data.get('client', None)
+    discount_percentage = request.data.get('discount_percentage', None)
+    clients = request.data.get('client', None)
     
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
@@ -4302,14 +4302,14 @@ def create_user_restricted_discount(request):
         corporate_type = corporate_type,
         discount_percentage = discount_percentage
     )
-    if client is not None:
-        if type(client) == str:
-                client = json.loads(client)
+    if clients is not None:
+        if type(clients) == str:
+                clients = json.loads(clients)
 
-        elif type(client) == list:
+        elif type(clients) == list:
             pass
     
-        for cl in client:
+        for cl in clients:
             try:
                 cli =Client.objects.get(id=str(cl))
                 usr_res.client.add(cli)
@@ -4389,3 +4389,234 @@ def create_user_restricted_discount(request):
             },
             status=status.HTTP_201_CREATED
         )
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_user_restricted_discount(request):
+    
+    res_id = request.data.get('id', None)
+    
+    location = request.data.get('location', None)
+    start_date = request.data.get('start_date', None)
+    end_date = request.data.get('end_date', None)
+    
+    dayrestrictions = request.data.get('dayrestrictions', None)
+    blockdate = request.data.get('blockdate', None)
+    
+    clients = request.data.get('client', None)
+    corporate_type = request.data.get('corporate_type', None)
+    discount_percentage = request.data.get('discount_percentage', None)
+    
+    error = []
+    
+    if res_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        usr_res = UserRestrictedDiscount.objects.get(id=res_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'User Restricted Discount Discount Not Found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    if corporate_type:
+        usr_res.corporate_type = corporate_type
+        usr_res.save()
+    
+    if discount_percentage:
+        usr_res.discount_percentage = discount_percentage
+        usr_res.save()
+    
+    if clients is not None:
+        if type(clients) == str:
+            service = json.loads(clients)
+        elif type(clients) == list:
+            pass
+        usr_res.client.clear()
+        for cl in service:
+            try:
+                cli = Client.objects.get(id=str(cl))  
+                usr_res.client.add(cli)
+            except Exception as err:
+                error.append(str(err))
+    
+    try:
+        daterestriction = DateRestrictions.objects.get(userrestricteddiscount = usr_res.id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'daterestriction Service Not Found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+        
+    if start_date:
+        daterestriction.start_date = start_date
+    if end_date:
+        daterestriction.end_date = end_date
+    daterestriction.save()
+    
+    if location is not None:
+        if type(location) == str:
+            location = json.loads(location)
+        elif type(location) == list:
+            pass
+        daterestriction.business_address.clear()
+        for loc in location:
+            try:
+                loca = BusinessAddress.objects.get(id=loc)  
+                daterestriction.business_address.add(loca)
+            except Exception as err:
+                error.append(str(err))
+    
+    if dayrestrictions is not None:
+        if type(dayrestrictions) == str:
+            dayrestrictions = dayrestrictions.replace("'" , '"')
+            dayrestrictions = json.loads(dayrestrictions)
+        else:
+            pass
+        for dayres in dayrestrictions:
+            id = dayres.get('id', None)
+            day = dayres.get('day', None)
+            if id is not None:
+                try:
+                    dayrestriction = DayRestrictions.objects.get(id  = str(id))
+                    is_deleted = dayres.get('is_deleted', None)
+                    if str(is_deleted) == "True":
+                        dayrestriction.delete()
+                        continue
+                    dayrestriction.day = day
+                    dayrestriction.save()
+                    
+                except Exception as err:
+                    error.append(str(err))
+                    #ExceptionRecord.objects.create(text = f'{str(err)}')
+            else:
+                DayRestrictions.objects.create(
+                    userrestricteddiscount = usr_res,
+                    day = day,
+                )       
+    
+    if blockdate is not None:
+        if type(blockdate) == str:
+            blockdate = blockdate.replace("'" , '"')
+            blockdate = json.loads(blockdate)
+        else:
+            pass
+        
+        for bl_date in blockdate:    
+            date = bl_date.get('date', None)
+            is_deleted = bl_date.get('is_deleted', None)
+            id = bl_date.get('id', None)
+            if id is not None:
+                try:
+                    block_date = BlockDate.objects.get(id = str(id))
+                    if str(is_deleted) == "True":
+                        block_date.delete()
+                        continue
+                    block_date.date= date
+                    block_date.save()
+                except Exception as err:
+                    error.append(str(err))
+            else:
+               BlockDate.objects.create(
+                    userrestricteddiscount = usr_res,
+                    date = date,
+                )
+    
+    serializers= UserRestrictedDiscountSerializers(usr_res)#data=request.data, partial=True, context={'request' : request})
+
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'User Restricted Discount Updated Successfully!',
+                'error_message' : None,
+                'error' : error,
+                'userRestricted' : serializers.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_user_restricted_discount(request):
+    res_id = request.data.get('id', None)
+
+    if res_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        user_res = UserRestrictedDiscount.objects.get(id=res_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'User Restricted Discount Not Found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    user_res.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'User Restricted Discount deleted successfully',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )

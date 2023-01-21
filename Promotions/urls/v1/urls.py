@@ -59,4 +59,9 @@ urlpatterns = [
     path('update_retail_get_service/', views.update_retail_get_service),
     path('delete_retail_get_service/', views.delete_retail_get_service),
     
+    #User Restricted Discount
+    path('create_user_restricted_discount/', views.create_user_restricted_discount),
+    path('update_user_restricted_discount/', views.update_user_restricted_discount),
+    path('delete_user_restricted_discount/', views.delete_user_restricted_discount),
+    
 ]
