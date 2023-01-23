@@ -4456,11 +4456,11 @@ def update_user_restricted_discount(request):
     
     if clients is not None:
         if type(clients) == str:
-            service = json.loads(clients)
+            clients = json.loads(clients)
         elif type(clients) == list:
             pass
         usr_res.client.clear()
-        for cl in service:
+        for cl in clients:
             try:
                 cli = Client.objects.get(id=str(cl))  
                 usr_res.client.add(cli)
