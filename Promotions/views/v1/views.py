@@ -233,6 +233,10 @@ def get_directorflat(request):
     serialized = RetailAndGetServiceSerializers(retail, many=True, context={'request' : request})
     data.extend(serialized.data)
     
+    retail = UserRestrictedDiscount.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = UserRestrictedDiscountSerializers(retail, many=True, context={'request' : request})
+    data.extend(serialized.data)
+    
     return Response(
         {
             'status' : 200,

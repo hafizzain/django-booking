@@ -302,6 +302,47 @@ class UserRestrictedDiscount(models.Model):
     def __str__(self):
         return str(self.id) 
   
+class ComplimentaryDiscount(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_complimentrydiscount')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_complimentrydiscount')
+        
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+    updated_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return str(self.id)  
+    
+class DiscountOnFreeService(models.Model):
+    TYPE_CHOICES = [
+        ('Next 1 visit', 'Next 1 visit'),
+        ('Next 2 visit', 'Next 2 visit'),
+        ('Next 3 visit', 'Next 3 visit'),
+        ('Next 4 visit', 'Next 4 visit'),
+        ('Next 5 visit', 'Next 5 visit'),
+        ('Next 6 visit', 'Next 6 visit'),
+        ('Next 7 visit', 'Next 7 visit'),
+        ('Next 8 visit', 'Next 8 visit'),
+        ('Next 9 visit', 'Next 9 visit'),
+        ('Next 10 visit', 'Next 10 visit')
+    ]
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    complimentary = models.ForeignKey(ComplimentaryDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='complimentary_discountonfreeservice')    
+
+    discount_percentage = models.PositiveIntegerField(default=0, blank= True, null=True)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='service_discountonfreeservice')    
+    discount_duration= models.CharField(choices=TYPE_CHOICES, max_length=100, null=True, blank=True,default= 'Next 1 visit' )
+    
+    
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return str(self.id)
+
 class DateRestrictions(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     
@@ -319,7 +360,8 @@ class DateRestrictions(models.Model):
     
     retailandservice = models.ForeignKey(RetailAndGetService, on_delete=models.CASCADE, null=True, blank=True, related_name='retailandservice_daterestrictions')
     userrestricteddiscount = models.ForeignKey(UserRestrictedDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='userrestricteddiscount_daterestrictions')
-    
+    complimentary = models.ForeignKey(ComplimentaryDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='complimentary_daterestrictions')    
+
     business_address = models.ManyToManyField(BusinessAddress, null=True, blank=True, related_name='business_address_daterestrictions')
     start_date = models.DateField(verbose_name = 'Start Date', null=True)
     end_date = models.DateField(verbose_name = 'End Date', null=True)
@@ -347,6 +389,7 @@ class DayRestrictions(models.Model):
     
     retailandservice = models.ForeignKey(RetailAndGetService, on_delete=models.CASCADE, null=True, blank=True, related_name='retailandservice_dayrestrictions')
     userrestricteddiscount = models.ForeignKey(UserRestrictedDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='userrestricteddiscount_dayrestrictions')
+    complimentary = models.ForeignKey(ComplimentaryDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='complimentary_dayrestrictions')    
 
     
     day = models.CharField(max_length=20, null=True, blank=True)
@@ -374,6 +417,7 @@ class BlockDate(models.Model):
     
     retailandservice = models.ForeignKey(RetailAndGetService, on_delete=models.CASCADE, null=True, blank=True, related_name='retailandservice_blockdate')
     userrestricteddiscount = models.ForeignKey(UserRestrictedDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='userrestricteddiscount_blockdate')
+    complimentary = models.ForeignKey(ComplimentaryDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='complimentary_blockdate')    
 
     
     date = models.DateField(verbose_name = 'Block Date', null=True)
