@@ -711,15 +711,15 @@ class ScheduleSerializer(serializers.ModelSerializer):
         model = EmployeDailySchedule
         fields = '__all__'
 class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
-    #total_hours = serializers.SerializerMethodField(read_only=True)
+    total_hours = serializers.SerializerMethodField(read_only=True)
             
-    # def get_total_hours(self, obj):
-    #     try:
-    #         start_time = obj.start_time
-    #         if obj.start_time_shift is None:
-    #             return str(obj.start_time_shift)
-    #     except Exception as err:
-    #         pass
+    def get_total_hours(self, obj):
+        try:
+            start_time = obj.start_time
+            if obj.start_time_shift is None:
+                return str(obj.start_time_shift)
+        except Exception as err:
+            pass
          
     class Meta:
         model = EmployeDailySchedule
