@@ -710,7 +710,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployeDailySchedule
         fields = '__all__'
-class WorkingScheduleSerializer(serializers.ModelSerializer):
+class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
     #total_hours = serializers.SerializerMethodField(read_only=True)
             
     # def get_total_hours(self, obj):
@@ -843,7 +843,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     
     def get_schedule(self, obj):
         schedule =  EmployeDailySchedule.objects.filter(employee= obj )            
-        return WorkingScheduleSerializer(schedule, many = True,context=self.context).data
+        return WorkingSchedulePayrollSerializer(schedule, many = True,context=self.context).data
     
     def get_image(self, obj):
         if obj.image:
