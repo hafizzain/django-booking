@@ -730,6 +730,7 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
                 td2 = timedelta(hours=time2.hour, minutes=time2.minute, seconds=time2.second)
                 
                 td = td2 - td1
+                return td
 
                 #time_diff = time2 - time1
                 return f'{type(td)}'
