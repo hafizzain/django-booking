@@ -857,6 +857,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     schedule =  serializers.SerializerMethodField(read_only=True)    
     image = serializers.SerializerMethodField()
     income_type = serializers.SerializerMethodField(read_only=True)
+    salary = serializers.SerializerMethodField(read_only=True)
     
     location = serializers.SerializerMethodField(read_only=True)
     
@@ -864,6 +865,13 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         loc = obj.location.all()
         return LocationSerializer(loc, many =True ).data
     
+    def get_salary(self, obj):        
+        try:
+            income_info = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return income_info.salary 
+        except: 
+            return None
+        
     def get_income_type(self, obj):        
         try:
             income_info = EmployeeProfessionalInfo.objects.get(employee=obj)
@@ -888,5 +896,5 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Employee
-        fields = ['id', 'full_name','image','location','schedule','created_at', 'income_type']
+        fields = ['id', 'full_name','image','location','schedule','created_at', 'income_type', 'salary']
 
