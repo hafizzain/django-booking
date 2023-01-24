@@ -588,7 +588,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
         try:
             professional = EmployeeProfessionalInfo.objects.get(employee=obj)
             return EmployeInformationsSerializer(professional).data
-        except EmployeeProfessionalInfo.DoesNotExist:
+        except:
             return None
         
     class Meta:
