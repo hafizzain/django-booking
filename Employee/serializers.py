@@ -708,7 +708,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
         except Exception as err:
             print(err)
             
-    def total_hours(self, obj):
+    def get_total_hours(self, obj):
         try:
             start_time = obj.start_time
             if obj.start_time_shift is None:
