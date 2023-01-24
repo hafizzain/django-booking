@@ -564,7 +564,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             return None
     def get_level(self, obj):
         try:
-            level = EmployeeProfessionalInfo.objects.get(employee=obj)
+            level = EmployeeSelectedService.objects.get(employee=obj)
             return level.level
         except Exception:
             return None

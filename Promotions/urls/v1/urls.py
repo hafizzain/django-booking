@@ -64,4 +64,8 @@ urlpatterns = [
     path('update_user_restricted_discount/', views.update_user_restricted_discount),
     path('delete_user_restricted_discount/', views.delete_user_restricted_discount),
     
+    #Complimentry Discount
+    path('create_complimentrydiscount/', views.create_complimentrydiscount),
+    path('update_complimentrydiscount/', views.update_complimentrydiscount),
+    path('delete_complimentrydiscount/', views.delete_complimentrydiscount),
 ]

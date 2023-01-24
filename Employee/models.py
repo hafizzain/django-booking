@@ -196,16 +196,16 @@ class Attendance(models.Model):
         
 
 class Payroll(models.Model):
-     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
-     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_payrolls')
-     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_employee_payrolls')
-     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_payrolls')
-     
-     name = models.CharField(max_length=300, default='')
-     created_at = models.DateTimeField(auto_now_add=now)
-     Total_hours = models.CharField(max_length=300, default='')
-     
-     def __str__(self):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_payrolls')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_employee_payrolls')
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_payrolls')
+    
+    name = models.CharField(max_length=300, default='')
+    created_at = models.DateTimeField(auto_now_add=now)
+    Total_hours = models.CharField(max_length=300, default='')
+    
+    def __str__(self):
         return str(self.id)
 
 

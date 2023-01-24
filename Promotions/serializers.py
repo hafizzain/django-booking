@@ -4,7 +4,7 @@ from Business.models import BusinessAddress, BusinessTax
 from Product.Constants.index import tenant_media_base_url
 from django_tenants.utils import tenant_context
 
-from Promotions.models import BundleFixed, DirectOrFlatDiscount , CategoryDiscount , DateRestrictions , DayRestrictions, BlockDate, FixedPriceService, FreeService, MentionedNumberService, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount, UserRestrictedDiscount
+from Promotions.models import BundleFixed, ComplimentaryDiscount, DirectOrFlatDiscount , CategoryDiscount , DateRestrictions , DayRestrictions, BlockDate, DiscountOnFreeService, FixedPriceService, FreeService, MentionedNumberService, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount, UserRestrictedDiscount
 
 class ServiceGroupDiscountSerializers(serializers.ModelSerializer):
     is_deleted = serializers.SerializerMethodField(read_only=True)
@@ -117,6 +117,18 @@ class ProductAndGetSpecificSerializers(serializers.ModelSerializer):
             return 'False'
     class Meta:
         model = ProductAndGetSpecific
+        fields = '__all__'
+class DiscountOnFreeServiceSerializers(serializers.ModelSerializer):
+    is_deleted = serializers.SerializerMethodField(read_only=True)
+    
+    
+    def get_is_deleted(self, obj):
+        if obj.is_deleted == True:
+            return 'True'
+        else:
+            return 'False'
+    class Meta:
+        model = DiscountOnFreeService
         fields = '__all__'
 
 class DirectOrFlatDiscountSerializers(serializers.ModelSerializer):
@@ -611,4 +623,53 @@ class UserRestrictedDiscountSerializers(serializers.ModelSerializer):
             pass
     class Meta:
         model = UserRestrictedDiscount
+        fields = '__all__'
+        
+class ComplimentaryDiscountSerializers(serializers.ModelSerializer):
+    day_restrictions = serializers.SerializerMethodField(read_only=True)
+    freeservice = serializers.SerializerMethodField(read_only=True)
+    date_restrictions = serializers.SerializerMethodField(read_only=True)
+    block_date = serializers.SerializerMethodField(read_only=True)
+    type = serializers.SerializerMethodField(read_only=True)
+    is_deleted = serializers.SerializerMethodField(read_only=True)
+
+    def get_is_deleted(self, obj):
+        if obj.is_deleted == True:
+            return 'True'
+        else:
+            return 'False'
+    
+    def get_type(self, obj):
+        return 'Complimentary_Discount'
+        
+    def get_freeservice(self, obj):
+        try:
+            ser = DiscountOnFreeService.objects.filter(complimentary = obj)
+            return DiscountOnFreeServiceSerializers(ser, many = True).data
+        except Exception as err:
+            return err
+            pass
+        
+    def get_block_date(self, obj):
+        try:
+            ser = BlockDate.objects.filter(complimentary = obj)
+            return BlockDateSerializers(ser, many = True).data
+        except Exception as err:
+            pass
+    
+    def get_date_restrictions(self, obj):
+        try:
+            ser = DateRestrictions.objects.get(complimentary = obj)
+            return DateRestrictionsSerializers(ser).data
+        except Exception as err:
+            pass
+   
+    def get_day_restrictions(self, obj):
+        try:
+            ser = DayRestrictions.objects.filter(complimentary = obj)
+            return DayRestrictionsSerializers(ser, many = True).data
+        except Exception as err:
+            pass
+    class Meta:
+        model = ComplimentaryDiscount
         fields = '__all__'
