@@ -473,7 +473,8 @@ class EmployPayrollSerializers(serializers.ModelSerializer):
     class Meta:
         model= Employee
         fields = [
-           'id',
+            'id',
+            'full_name',
             'income_type',
             'salary',
             'start_time',
@@ -814,4 +815,34 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         fields = ['id', 'full_name','image','start_time', 'end_time','vacation','schedule','location','created_at']# 'monday','tuesday','wednesday','thursday','friday','saturday','sunday','created_at']
 
 
+
+class WorkingScheduleSerializer(serializers.ModelSerializer):    
+    schedule =  serializers.SerializerMethodField(read_only=True)    
+    image = serializers.SerializerMethodField()
+    
+    location = serializers.SerializerMethodField(read_only=True)
+    
+    def get_location(self, obj):
+        loc = obj.location.all()
+        return LocationSerializer(loc, many =True ).data
+
+    
+    def get_schedule(self, obj):
+        schedule =  EmployeDailySchedule.objects.filter(employee= obj )
+        return ScheduleSerializer(schedule, many = True,context=self.context)
+    
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request)
+                return f'{url}{obj.image}'
+            except:
+                return obj.image
+        return None
+    
+    
+    class Meta:
+        model = Employee
+        fields = ['id', 'full_name','image','schedule','location','created_at']
 

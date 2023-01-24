@@ -238,7 +238,7 @@ def get_directorflat(request):
     data.extend(serialized.data)
     
     complimentry = ComplimentaryDiscount.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = UserRestrictedDiscountSerializers(complimentry, many=True, context={'request' : request})
+    serialized = ComplimentaryDiscountSerializers(complimentry, many=True, context={'request' : request})
     data.extend(serialized.data)
     
     return Response(

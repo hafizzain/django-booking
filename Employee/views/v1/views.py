@@ -1793,7 +1793,26 @@ def get_payrolls(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_payrol_work(request):
+    all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
+    serialized = WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request,} )
+   
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Employee',
+                'error_message' : None,
+                'employees' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_payroll(request):
