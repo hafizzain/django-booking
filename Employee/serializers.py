@@ -720,22 +720,14 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
         try:
             start_time = obj.start_time
             if obj.start_time_shift != None:
-                time1 = datetime.strptime(str(obj.start_time), "%H:%M:%S").time()
-                time2 = datetime.strptime(str(obj.end_time_shift), "%H:%M:%S").time()
-                
-                # time1 = datetime.combine(datetime.today(), time1)
-                # time2 = datetime.combine(datetime.today(), time2)
-                
-                td1 = timedelta(hours=time1.hour, minutes=time1.minute, seconds=time1.second)
-                td2 = timedelta(hours=time2.hour, minutes=time2.minute, seconds=time2.second)
-                
-                td = td2 - td1
-                return td
+                time1 = datetime.strptime(str(obj.start_time), "%H:%M:%S")
+                time2 = datetime.strptime(str(obj.end_time_shift), "%H:%M:%S")
 
-                #time_diff = time2 - time1
-                return f'{type(td)}'
-                #return time_diff
-                #return str(obj.start_time_shift)
+                time_diff = time2 - time1
+                hours = time_diff / 3600
+                td = timedelta(hours=hours)
+                
+                return td
             return start_time
         except Exception as err:
             return str(err)
