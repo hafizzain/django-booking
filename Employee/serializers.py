@@ -718,6 +718,7 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
             start_time = obj.start_time
             if obj.start_time_shift is None:
                 return str(obj.start_time_shift)
+            return start_time
         except Exception as err:
             pass
          
