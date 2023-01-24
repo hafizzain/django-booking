@@ -712,7 +712,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
         try:
             start_time = obj.start_time
             if obj.start_time_shift is None:
-                return obj.start_time_shift
+                return str(obj.start_time_shift)
         except Exception as err:
             pass
          
