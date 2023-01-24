@@ -843,7 +843,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     
     def get_schedule(self, obj):
         schedule =  EmployeDailySchedule.objects.filter(employee= obj )            
-        return WorkingScheduleSerializer(schedule, many = True,context=self.context)
+        return WorkingScheduleSerializer(schedule, many = True,context=self.context).data
     
     def get_image(self, obj):
         if obj.image:
