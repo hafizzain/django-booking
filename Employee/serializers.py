@@ -720,8 +720,8 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
         try:
             start_time = obj.start_time
             if obj.start_time_shift != None:
-                time1 = datetime.strptime(str(obj.start_time), "%H:%M:%S")
-                time2 = datetime.strptime(str(obj.end_time_shift), "%H:%M:%S")
+                time1 = datetime.strptime(str(obj.start_time), "%H:%M:%S").time()
+                time2 = datetime.strptime(str(obj.end_time_shift), "%H:%M:%S").time()
                 
                 time1 = datetime.combine(datetime.today(), time1)
                 time2 = datetime.combine(datetime.today(), time2)
