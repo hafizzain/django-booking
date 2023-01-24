@@ -727,7 +727,7 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
                 time2 = datetime.combine(datetime.today(), time2)
                 
                 time_diff = time2 - time1
-                return type(time_diff)
+                return f'{type(time_diff)}'
                 #return time_diff
                 #return str(obj.start_time_shift)
             return start_time
