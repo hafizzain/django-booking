@@ -699,7 +699,7 @@ class AssetSerializer(serializers.ModelSerializer):
 
 class ScheduleSerializer(serializers.ModelSerializer):
     employee = serializers.SerializerMethodField(read_only=True)
-    total_hours = serializers.SerializerMethodField(read_only=True)
+    #total_hours = serializers.SerializerMethodField(read_only=True)
     
     def get_employee(self, obj):
         try:
@@ -708,13 +708,13 @@ class ScheduleSerializer(serializers.ModelSerializer):
         except Exception as err:
             print(err)
             
-    def get_total_hours(self, obj):
-        try:
-            start_time = obj.start_time
-            if obj.start_time_shift is None:
-                return str(obj.start_time_shift)
-        except Exception as err:
-            pass
+    # def get_total_hours(self, obj):
+    #     try:
+    #         start_time = obj.start_time
+    #         if obj.start_time_shift is None:
+    #             return str(obj.start_time_shift)
+    #     except Exception as err:
+    #         pass
          
     class Meta:
         model = EmployeDailySchedule
