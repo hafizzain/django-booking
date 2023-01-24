@@ -716,7 +716,7 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
     def get_total_hours(self, obj):
         try:
             start_time = obj.start_time
-            if obj.start_time_shift is None:
+            if obj.start_time_shift != None:
                 return str(obj.start_time_shift)
             return start_time
         except Exception as err:
