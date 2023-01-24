@@ -8,6 +8,8 @@ from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSION
 from Utility.models import Country, GlobalPermissionChoices, State, City
 from Service.models import Service
 from Permissions.models import EmployePermission
+from datetime import datetime, timedelta
+
 
 from rest_framework import serializers
 from .models import( EmployeDailySchedule, Employee, EmployeeProfessionalInfo ,
@@ -710,6 +712,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployeDailySchedule
         fields = '__all__'
+        
 class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
     total_hours = serializers.SerializerMethodField(read_only=True)
             
@@ -717,7 +720,11 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
         try:
             start_time = obj.start_time
             if obj.start_time_shift != None:
-                return str(obj.start_time_shift)
+                time1 = datetime.strptime(obj.start_time, "%H:%M:%S")
+                time2 = datetime.strptime(obj.end_time_shift, "%H:%M:%S")
+                time_diff = time2 - time1
+                return time_diff
+                #return str(obj.start_time_shift)
             return start_time
         except Exception as err:
             pass
