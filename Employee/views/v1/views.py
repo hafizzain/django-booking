@@ -13,7 +13,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from Employee.serializers import( EmployeSerializer , EmployeInformationsSerializer
                           , EmployPermissionSerializer,  EmployeModulesSerializer
-                          ,  EmployeeMarketingSerializers, ScheduleSerializer, StaffGroupSerializers , 
+                          ,  EmployeeMarketingSerializers, Payroll_WorkingScheduleSerializer, ScheduleSerializer, StaffGroupSerializers , 
                           StaffpermisionSerializers , AttendanceSerializers
                           ,PayrollSerializers, VacationSerializer,singleEmployeeSerializer , CommissionSerializer
                           , AssetSerializer, WorkingScheduleSerializer
@@ -1796,9 +1796,9 @@ def get_payrolls(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_payrol_work(request):
+def get_payrol_working(request):
     all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
-    serialized = WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request,} )
+    serialized = Payroll_WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request,} )
    
     return Response(
         {

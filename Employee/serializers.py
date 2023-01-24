@@ -699,6 +699,7 @@ class AssetSerializer(serializers.ModelSerializer):
 
 class ScheduleSerializer(serializers.ModelSerializer):
     employee = serializers.SerializerMethodField(read_only=True)
+    total_hours = serializers.SerializerMethodField(read_only=True)
     
     def get_employee(self, obj):
         try:
@@ -706,6 +707,14 @@ class ScheduleSerializer(serializers.ModelSerializer):
             return EmployeeNameSerializer(data, context=self.context).data
         except Exception as err:
             print(err)
+            
+    def total_hours(self, obj):
+        try:
+            start_time = obj.start_time
+            if obj.start_time_shift is None:
+                return obj.start_time_shift
+        except Exception as err:
+            pass
          
     class Meta:
         model = EmployeDailySchedule
@@ -816,7 +825,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
 
 
 
-class WorkingScheduleSerializer(serializers.ModelSerializer):    
+class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):    
     schedule =  serializers.SerializerMethodField(read_only=True)    
     image = serializers.SerializerMethodField()
     
@@ -828,7 +837,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
 
     
     def get_schedule(self, obj):
-        schedule =  EmployeDailySchedule.objects.filter(employee= obj )
+        schedule =  EmployeDailySchedule.objects.filter(employee= obj )            
         return ScheduleSerializer(schedule, many = True,context=self.context)
     
     def get_image(self, obj):

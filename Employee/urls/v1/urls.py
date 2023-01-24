@@ -31,6 +31,7 @@ urlpatterns = [
     #Payroll
     path('create_payroll/', views.create_payroll),
     path('get_payrolls/', views.get_payrolls),
+    path('get_payrol_working/', views.get_payrol_working),
     path('delete_payroll/', views.delete_payroll),
     
     #commssion
