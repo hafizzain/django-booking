@@ -696,7 +696,7 @@ class AssetSerializer(serializers.ModelSerializer):
             return None
     
     class Meta:
-        model = Asset
+        model =Asset
         fields = ['id','name','employee','given_date','return_date', 'document', 'created_at', 'is_active']
 
 class ScheduleSerializer(serializers.ModelSerializer):
@@ -720,8 +720,8 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
         try:
             start_time = obj.start_time
             if obj.start_time_shift != None:
-                time1 = datetime.strptime(obj.start_time, "%H:%M:%S")
-                time2 = datetime.strptime(obj.end_time_shift, "%H:%M:%S")
+                time1 = datetime.strptime(str(obj.start_time), "%H:%M:%S")
+                time2 = datetime.strptime(str(obj.end_time_shift), "%H:%M:%S")
                 
                 time1 = datetime.combine(datetime.today(), time1)
                 time2 = datetime.combine(datetime.today(), time2)
