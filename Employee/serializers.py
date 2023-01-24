@@ -827,28 +827,28 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
 
 class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):    
     # schedule =  serializers.SerializerMethodField(read_only=True)    
-    # image = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
     
-    # location = serializers.SerializerMethodField(read_only=True)
+    location = serializers.SerializerMethodField(read_only=True)
     
-    # def get_location(self, obj):
-    #     loc = obj.location.all()
-    #     return LocationSerializer(loc, many =True ).data
+    def get_location(self, obj):
+        loc = obj.location.all()
+        return LocationSerializer(loc, many =True ).data
 
     
     # def get_schedule(self, obj):
     #     schedule =  EmployeDailySchedule.objects.filter(employee= obj )            
     #     return ScheduleSerializer(schedule, many = True,context=self.context)
     
-    # def get_image(self, obj):
-    #     if obj.image:
-    #         try:
-    #             request = self.context["request"]
-    #             url = tenant_media_base_url(request)
-    #             return f'{url}{obj.image}'
-    #         except:
-    #             return obj.image
-    #     return None
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request)
+                return f'{url}{obj.image}'
+            except:
+                return obj.image
+        return None
     
     
     class Meta:
