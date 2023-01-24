@@ -723,7 +723,7 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
                 time1 = datetime.strptime(str(obj.start_time), "%H:%M:%S")
                 time2 = datetime.strptime(str(obj.end_time_shift), "%H:%M:%S")
 
-                time_diff = time2 - time1
+                int(time_diff) = time2 - time1
                 hours = time_diff / 3600
                 td = timedelta(hours=hours)
                 
