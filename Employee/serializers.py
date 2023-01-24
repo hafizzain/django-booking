@@ -699,7 +699,6 @@ class AssetSerializer(serializers.ModelSerializer):
 
 class ScheduleSerializer(serializers.ModelSerializer):
     employee = serializers.SerializerMethodField(read_only=True)
-    #total_hours = serializers.SerializerMethodField(read_only=True)
     
     def get_employee(self, obj):
         try:
@@ -707,6 +706,12 @@ class ScheduleSerializer(serializers.ModelSerializer):
             return EmployeeNameSerializer(data, context=self.context).data
         except Exception as err:
             print(err)
+            
+    class Meta:
+        model = EmployeDailySchedule
+        fields = '__all__'
+class WorkingScheduleSerializer(serializers.ModelSerializer):
+    #total_hours = serializers.SerializerMethodField(read_only=True)
             
     # def get_total_hours(self, obj):
     #     try:
@@ -826,7 +831,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
 
 
 class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):    
-    # schedule =  serializers.SerializerMethodField(read_only=True)    
+    schedule =  serializers.SerializerMethodField(read_only=True)    
     image = serializers.SerializerMethodField()
     
     location = serializers.SerializerMethodField(read_only=True)
@@ -836,9 +841,9 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         return LocationSerializer(loc, many =True ).data
 
     
-    # def get_schedule(self, obj):
-    #     schedule =  EmployeDailySchedule.objects.filter(employee= obj )            
-    #     return ScheduleSerializer(schedule, many = True,context=self.context)
+    def get_schedule(self, obj):
+        schedule =  EmployeDailySchedule.objects.filter(employee= obj )            
+        return WorkingScheduleSerializer(schedule, many = True,context=self.context)
     
     def get_image(self, obj):
         if obj.image:
