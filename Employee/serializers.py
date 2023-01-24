@@ -727,7 +727,7 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
                 #return str(obj.start_time_shift)
             return start_time
         except Exception as err:
-            pass
+            return str(err)
          
     class Meta:
         model = EmployeDailySchedule
