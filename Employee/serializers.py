@@ -853,5 +853,5 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Employee
-        fields = ['id', 'full_name','image','schedule','location','created_at']
+        fields = ['id', 'full_name','image','location','created_at']#'schedule'
 
