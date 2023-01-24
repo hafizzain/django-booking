@@ -715,7 +715,17 @@ class ScheduleSerializer(serializers.ModelSerializer):
         
 class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
     total_hours = serializers.SerializerMethodField(read_only=True)
-            
+    end_time = serializers.SerializerMethodField(read_only=True)
+    
+    def get_end_time(self, obj):
+        try:
+            if obj.start_time_shift != None:
+                return str(obj.end_time_shift)
+            return obj.end_time_shift
+        except:
+            pass
+                    
+    
     def get_total_hours(self, obj):
         try:
             if obj.start_time_shift != None:
@@ -846,14 +856,21 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
 class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):    
     schedule =  serializers.SerializerMethodField(read_only=True)    
     image = serializers.SerializerMethodField()
+    income_type = serializers.SerializerMethodField(read_only=True)
     
     location = serializers.SerializerMethodField(read_only=True)
     
     def get_location(self, obj):
         loc = obj.location.all()
         return LocationSerializer(loc, many =True ).data
-
     
+    def get_income_type(self, obj):        
+        try:
+            income_info = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return income_info.income_type 
+        except: 
+            return None
+
     def get_schedule(self, obj):
         schedule =  EmployeDailySchedule.objects.filter(employee= obj )            
         return WorkingSchedulePayrollSerializer(schedule, many = True,context=self.context).data
@@ -871,5 +888,5 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Employee
-        fields = ['id', 'full_name','image','location','schedule','created_at']
+        fields = ['id', 'full_name','image','location','schedule','created_at', 'income_type']
 
