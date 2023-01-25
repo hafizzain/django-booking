@@ -5305,7 +5305,7 @@ def update_packagesdiscount(request):
             else:
                 durationservice = ServiceDurationForSpecificTime.objects.create(
                     package = package_discount,
-                    service = service_id,
+                    #service = service_id,
                     
                     service_duration = service_duration,
                     package_duration = package_duration,
