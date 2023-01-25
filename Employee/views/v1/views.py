@@ -1564,8 +1564,13 @@ def update_staff_group(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_attendence(request):
-    all_attendence= Attendance.objects.all()
-    serialized = AttendanceSerializers(all_attendence, many=True, context={'request' : request})
+    # all_attendence= Attendance.objects.all()
+    # serialized = AttendanceSerializers(all_attendence, many=True, context={'request' : request})
+    
+    
+    all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
+    serialized = Payroll_WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request,} )
+    
     return Response(
         {
             'status' : 200,
