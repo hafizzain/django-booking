@@ -5093,25 +5093,37 @@ def create_packagesdiscount(request):
             pass
         for pro in service_duration:
             try: 
-                service_duration = pro.get('service_duration', None)
+                service_duration = pro.get('duration', None)
                 package_duration = pro.get('package_duration', None)
-                total_amount = pro.get('total_amount', None)
+                total_amount = pro.get('amount', None)
                 service = pro.get('service', None)
+                # try:
+                #     service_id = Service.objects.get(id = service)
+                # except Exception as err:
+                #     pass
                 
-                try:
-                    service_id = Service.objects.get(id = service)
-                except Exception as err:
-                    pass
-                
-                ServiceDurationForSpecificTime.objects.create(
+                durationservice = ServiceDurationForSpecificTime.objects.create(
                     package = package_discount,
-                    service = service_id,
+                    #service = service_id,
                     
                     service_duration = service_duration,
                     package_duration = package_duration,
                     total_amount = total_amount
                     
                 )
+                if service is not None:
+                    if type(service) == str:
+                            service = json.loads(service)
+
+                    elif type(service) == list:
+                        pass
+                
+                    for ser in service:
+                        try:
+                            service_id = Service.objects.get(id = ser)
+                            durationservice.service.add(service_id)
+                        except Exception as err:
+                            error.append(str(err))
                 
             except Exception as err:
                 error.append(str(err))

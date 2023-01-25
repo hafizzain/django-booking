@@ -333,7 +333,7 @@ class PackagesDiscount(models.Model):
 class ServiceDurationForSpecificTime(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='service_servicedurationspecifictime')
+    service = models.ManyToManyField(Service, null=True, blank=True, related_name='service_servicedurationspecifictime')
     package = models.ForeignKey(PackagesDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='package_servicedurationspecifictime')    
 
     service_duration= models.CharField(max_length=100, null=True, blank=True )
