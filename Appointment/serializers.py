@@ -337,7 +337,7 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
     member = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)
-    price = serializers.SerializerMethodField(read_only=True)
+    #price = serializers.SerializerMethodField(read_only=True)
     booked_by = serializers.SerializerMethodField(read_only=True)
     booking_id = serializers.SerializerMethodField(read_only=True)
     appointment_type = serializers.SerializerMethodField(read_only=True)
@@ -393,11 +393,11 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
         except Exception as err:
             return None
             
-    def get_price(self, obj):
-        try:
-            return obj.service.price
-        except Exception as err:
-            return None
+    # def get_price(self, obj):
+    #     try:
+    #         return obj.service.price
+    #     except Exception as err:
+    #         return None
     
     class Meta:
         model = AppointmentService
