@@ -68,4 +68,9 @@ urlpatterns = [
     path('create_complimentrydiscount/', views.create_complimentrydiscount),
     path('update_complimentrydiscount/', views.update_complimentrydiscount),
     path('delete_complimentrydiscount/', views.delete_complimentrydiscount),
+    
+    #Packages Discount
+    path('create_packagesdiscount/', views.create_packagesdiscount),
+    path('update_packagesdiscount/', views.update_packagesdiscount),
+    path('delete_packagesdiscount/', views.delete_packagesdiscount),
 ]

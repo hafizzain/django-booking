@@ -24,8 +24,8 @@ from Business.models import Business, BusinessSocial, BusinessAddress, BusinessO
 from Product.models import Brand, Product, ProductStock
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
-from Promotions.models import BlockDate, BundleFixed, CategoryDiscount, ComplimentaryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount, DiscountOnFreeService, FixedPriceService, FreeService, MentionedNumberService, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount, UserRestrictedDiscount
-from Promotions.serializers import BundleFixedSerializers, ComplimentaryDiscountSerializers, DirectOrFlatDiscountSerializers, FixedPriceServiceSerializers, MentionedNumberServiceSerializers, PurchaseDiscountSerializers, RetailAndGetServiceSerializers, SpecificBrandSerializers, SpecificGroupDiscountSerializers, SpendDiscountSerializers, SpendSomeAmountSerializers, UserRestrictedDiscountSerializers
+from Promotions.models import BlockDate, BundleFixed, CategoryDiscount, ComplimentaryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount, DiscountOnFreeService, FixedPriceService, FreeService, MentionedNumberService, PackagesDiscount, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, ServiceDurationForSpecificTime, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount, UserRestrictedDiscount
+from Promotions.serializers import BundleFixedSerializers, ComplimentaryDiscountSerializers, DirectOrFlatDiscountSerializers, FixedPriceServiceSerializers, MentionedNumberServiceSerializers, PackagesDiscountSerializers, PurchaseDiscountSerializers, RetailAndGetServiceSerializers, SpecificBrandSerializers, SpecificGroupDiscountSerializers, SpendDiscountSerializers, SpendSomeAmountSerializers, UserRestrictedDiscountSerializers
 from Service.models import Service, ServiceGroup
 from Tenants.models import Domain, Tenant
 from Utility.models import Country, Currency, ExceptionRecord, Language, NstyleFile, Software, State, City
@@ -4978,6 +4978,7 @@ def update_complimentrydiscount(request):
         },
         status=status.HTTP_200_OK
     )
+
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_complimentrydiscount(request):
@@ -5024,6 +5025,415 @@ def delete_complimentrydiscount(request):
             'status_code_text' : '200',
             'response' : {
                 'message' : 'Complimentry Discount deleted successfully',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_packagesdiscount(request):
+    user = request.user
+    business_id = request.data.get('business', None)
+    
+    service_duration = request.data.get('service_duration', None)
+    
+    location = request.data.get('location', None)
+    start_date = request.data.get('start_date', None)
+    end_date = request.data.get('end_date', None)
+    
+    dayrestrictions = request.data.get('dayrestrictions', None)
+    blockdate = request.data.get('blockdate', None)    
+    
+    error = []
+    
+    if not all([business_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                            ]
+                    }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        business = Business.objects.get(id=business_id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    
+    
+    package_discount = PackagesDiscount.objects.create(
+        user = user,
+        business =  business,
+    )
+    
+    if service_duration is not None:
+        if type(service_duration) == str:
+            service_duration = service_duration.replace("'" , '"')
+            service_duration = json.loads(service_duration)
+        else:
+            pass
+        for pro in service_duration:
+            try: 
+                service_duration = pro.get('service_duration', None)
+                package_duration = pro.get('package_duration', None)
+                total_amount = pro.get('total_amount', None)
+                service = pro.get('service', None)
+                
+                try:
+                    service_id = Service.objects.get(id = service)
+                except Exception as err:
+                    pass
+                
+                ServiceDurationForSpecificTime.objects.create(
+                    package = package_discount,
+                    service = service_id,
+                    
+                    service_duration = service_duration,
+                    package_duration = package_duration,
+                    total_amount = total_amount
+                    
+                )
+                
+            except Exception as err:
+                error.append(str(err))
+    
+    date_res = DateRestrictions.objects.create(
+        package = package_discount,
+        start_date = start_date,
+        end_date =end_date,
+    )
+    
+    if location is not None:
+        if type(location) == str:
+                location = json.loads(location)
+
+        elif type(location) == list:
+            pass
+    
+        for loc in location:
+            try:
+                address = BusinessAddress.objects.get(id=loc)
+                date_res.business_address.add(address)
+            except Exception as err:
+                error.append(str(err))
+        
+    if dayrestrictions is not None:
+        if type(dayrestrictions) == str:
+            dayrestrictions = dayrestrictions.replace("'" , '"')
+            dayrestrictions = json.loads(dayrestrictions)
+        else:
+            pass
+        for dayres in dayrestrictions:
+            try: 
+                day = dayres.get('day', None)
+                
+                DayRestrictions.objects.create(
+                    package = package_discount,
+                    day = day,
+                )
+                
+            except Exception as err:
+                error.append(str(err))
+                
+    if blockdate is not None:
+        if type(blockdate) == str:
+            blockdate = blockdate.replace("'" , '"')
+            blockdate = json.loads(blockdate)
+        else:
+            pass
+        
+        for bl_date in blockdate:
+            
+            try: 
+                date = bl_date.get('date', None)
+                BlockDate.objects.create(
+                    package = package_discount,
+                    date = date,
+                )
+                
+            except Exception as err:
+               error.append(str(err))
+               
+    serializers = PackagesDiscountSerializers(package_discount, context={'request' : request})
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Packages Discount Created Successfully!',
+                    'error_message' : None,
+                    'errors' : error,
+                    'packages' : serializers.data,
+                    
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+    
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_packagesdiscount(request):
+    
+    package_id = request.data.get('id', None)
+    
+    location = request.data.get('location', None)
+    start_date = request.data.get('start_date', None)
+    end_date = request.data.get('end_date', None)
+    
+    dayrestrictions = request.data.get('dayrestrictions', None)
+    blockdate = request.data.get('blockdate', None)
+    
+    service_duration = request.data.get('service_duration', None)
+    
+    error = []
+    
+    if package_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+   
+    try:
+        package_discount = PackagesDiscount.objects.get(id=package_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Packages Discount Not Found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+       
+    if service_duration is not None:
+        if type(service_duration) == str:
+            service_duration = service_duration.replace("'" , '"')
+            service_duration = json.loads(service_duration)
+        else:
+            pass
+        for pro in service_duration:
+            id = pro.get('id', None)
+            service_duration = pro.get('service_duration', None)
+            package_duration = pro.get('package_duration', None)
+            total_amount = pro.get('total_amount', None)
+            service = pro.get('service', None)
+            
+            try:
+                service_id = Service.objects.get(id = service)
+            except Exception as err:
+                pass
+
+            if id is not None:
+                try:
+                    productandget = ServiceDurationForSpecificTime.objects.get(id  = str(id))
+                    is_deleted = pro.get('is_deleted', None)
+                    if str(is_deleted) == "True":
+                        productandget.delete()
+                        continue
+                    productandget.service_duration = service_duration
+                    productandget.package_duration = package_duration
+                    productandget.total_amount = total_amount
+                    productandget.service = service_id
+                    productandget.save()
+                    
+                except Exception as err:
+                    error.append(str(err))
+            else:
+                ServiceDurationForSpecificTime.objects.create(
+                    package = package_discount,
+                    service = service_id,
+                    
+                    service_duration = service_duration,
+                    package_duration = package_duration,
+                    total_amount = total_amount
+                ) 
+                
+    try:
+        daterestriction = DateRestrictions.objects.get(package = package_discount.id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'daterestriction Service Not Found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+            
+    if start_date:
+        daterestriction.start_date = start_date
+    if end_date:
+        daterestriction.end_date = end_date
+    daterestriction.save()
+    
+    if location is not None:
+        if type(location) == str:
+            location = json.loads(location)
+        elif type(location) == list:
+            pass
+        daterestriction.business_address.clear()
+        for loc in location:
+            try:
+                loca = BusinessAddress.objects.get(id=loc)  
+                daterestriction.business_address.add(loca)
+            except Exception as err:
+                error.append(str(err))
+    
+         
+    if dayrestrictions is not None:
+        if type(dayrestrictions) == str:
+            dayrestrictions = dayrestrictions.replace("'" , '"')
+            dayrestrictions = json.loads(dayrestrictions)
+        else:
+            pass
+        for dayres in dayrestrictions:
+            id = dayres.get('id', None)
+            day = dayres.get('day', None)
+            if id is not None:
+                try:
+                    dayrestriction = DayRestrictions.objects.get(id  = str(id))
+                    is_deleted = dayres.get('is_deleted', None)
+                    if str(is_deleted) == "True":
+                        dayrestriction.delete()
+                        continue
+                    dayrestriction.day = day
+                    dayrestriction.save()
+                    
+                except Exception as err:
+                    error.append(str(err))
+            else:
+                DayRestrictions.objects.create(
+                    package = package_discount,
+                    day = day,
+                )       
+    
+    if blockdate is not None:
+        if type(blockdate) == str:
+            blockdate = blockdate.replace("'" , '"')
+            blockdate = json.loads(blockdate)
+        else:
+            pass
+        
+        for bl_date in blockdate:    
+            date = bl_date.get('date', None)
+            is_deleted = bl_date.get('is_deleted', None)
+            id = bl_date.get('id', None)
+            if id is not None:
+                try:
+                    block_date = BlockDate.objects.get(id = str(id))
+                    if str(is_deleted) == "True":
+                        block_date.delete()
+                        continue
+                    block_date.date= date
+                    block_date.save()
+                except Exception as err:
+                    error.append(str(err))
+            else:
+               BlockDate.objects.create(
+                    package = package_discount,
+                    date = date,
+                )
+    
+    serializers= PackagesDiscountSerializers(package_discount)#data=request.data, partial=True, context={'request' : request})
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Packages Discount Updated Successfully!',
+                'error_message' : None,
+                'error' : error,
+                'packages' : serializers.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_packagesdiscount(request):
+    packages_id = request.data.get('id', None)
+
+    if packages_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        packages = PackagesDiscount.objects.get(id=packages_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Packages Discount Not Found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    packages.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Packages Discount deleted successfully',
                 'error_message' : None
             }
         },
