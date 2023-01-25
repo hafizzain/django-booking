@@ -5264,9 +5264,9 @@ def update_packagesdiscount(request):
             pass
         for pro in service_duration:
             id = pro.get('id', None)
-            service_duration = pro.get('duration', None)
+            service_duration = pro.get('service_duration', None)
             package_duration = pro.get('package_duration', None)
-            total_amount = pro.get('amount', None)
+            total_amount = pro.get('total_amount', None)
             service = pro.get('service', None)
             
             # try:

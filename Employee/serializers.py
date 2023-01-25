@@ -858,6 +858,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     income_type = serializers.SerializerMethodField(read_only=True)
     salary = serializers.SerializerMethodField(read_only=True)
+    employe_id = serializers.SerializerMethodField(read_only=True)
     
     location = serializers.SerializerMethodField(read_only=True)
     
@@ -896,5 +897,5 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Employee
-        fields = ['id', 'full_name','image','location','schedule','created_at', 'income_type', 'salary']
+        fields = ['id', 'employee_id','is_active','full_name','image','location','schedule','created_at', 'income_type', 'salary']
 
