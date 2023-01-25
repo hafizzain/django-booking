@@ -5037,7 +5037,7 @@ def create_packagesdiscount(request):
     user = request.user
     business_id = request.data.get('business', None)
     
-    service_duration = request.data.get('service_duration', None)
+    service_duration = request.data.get('packages', None)
     
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
