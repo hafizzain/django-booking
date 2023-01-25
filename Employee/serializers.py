@@ -858,7 +858,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     income_type = serializers.SerializerMethodField(read_only=True)
     salary = serializers.SerializerMethodField(read_only=True)
-    employe_id = serializers.SerializerMethodField(read_only=True)
+    #employe_id = serializers.SerializerMethodField(read_only=True)
     
     location = serializers.SerializerMethodField(read_only=True)
     
