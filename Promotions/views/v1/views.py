@@ -241,6 +241,10 @@ def get_directorflat(request):
     serialized = ComplimentaryDiscountSerializers(complimentry, many=True, context={'request' : request})
     data.extend(serialized.data)
     
+    package = PackagesDiscount.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = PackagesDiscountSerializers(package, many=True, context={'request' : request})
+    data.extend(serialized.data)
+    
     return Response(
         {
             'status' : 200,
@@ -5215,7 +5219,7 @@ def update_packagesdiscount(request):
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)
     
-    service_duration = request.data.get('service_duration', None)
+    service_duration = request.data.get('packages', None)
     
     error = []
     
@@ -5260,15 +5264,15 @@ def update_packagesdiscount(request):
             pass
         for pro in service_duration:
             id = pro.get('id', None)
-            service_duration = pro.get('service_duration', None)
+            service_duration = pro.get('duration', None)
             package_duration = pro.get('package_duration', None)
-            total_amount = pro.get('total_amount', None)
+            total_amount = pro.get('amount', None)
             service = pro.get('service', None)
             
-            try:
-                service_id = Service.objects.get(id = service)
-            except Exception as err:
-                pass
+            # try:
+            #     service_id = Service.objects.get(id = service)
+            # except Exception as err:
+            #     pass
 
             if id is not None:
                 try:
@@ -5280,13 +5284,26 @@ def update_packagesdiscount(request):
                     productandget.service_duration = service_duration
                     productandget.package_duration = package_duration
                     productandget.total_amount = total_amount
-                    productandget.service = service_id
+                    #productandget.service = service_id
                     productandget.save()
+                    if service is not None:
+                        if type(service) == str:
+                                service = json.loads(service)
+
+                        elif type(service) == list:
+                            pass
+                    
+                        for ser in service:
+                            try:
+                                service_id = Service.objects.get(id = ser)
+                                productandget.service.add(service_id)
+                            except Exception as err:
+                                error.append(str(err))
                     
                 except Exception as err:
                     error.append(str(err))
             else:
-                ServiceDurationForSpecificTime.objects.create(
+                durationservice = ServiceDurationForSpecificTime.objects.create(
                     package = package_discount,
                     service = service_id,
                     
@@ -5294,6 +5311,19 @@ def update_packagesdiscount(request):
                     package_duration = package_duration,
                     total_amount = total_amount
                 ) 
+                if service is not None:
+                    if type(service) == str:
+                            service = json.loads(service)
+
+                    elif type(service) == list:
+                        pass
+                
+                    for ser in service:
+                        try:
+                            service_id = Service.objects.get(id = ser)
+                            durationservice.service.add(service_id)
+                        except Exception as err:
+                            error.append(str(err))
                 
     try:
         daterestriction = DateRestrictions.objects.get(package = package_discount.id)
