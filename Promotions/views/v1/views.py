@@ -5292,7 +5292,7 @@ def update_packagesdiscount(request):
 
                         elif type(service) == list:
                             pass
-                    
+                        productandget.service.clear()
                         for ser in service:
                             try:
                                 service_id = Service.objects.get(id = ser)
@@ -5317,7 +5317,7 @@ def update_packagesdiscount(request):
 
                     elif type(service) == list:
                         pass
-                
+                    #daterestriction.business_address.clear()
                     for ser in service:
                         try:
                             service_id = Service.objects.get(id = ser)
