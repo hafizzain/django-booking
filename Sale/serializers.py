@@ -157,6 +157,7 @@ class EmployeeSelectedServiceSerializer(serializers.ModelSerializer):
 
 class EmployeeSelected_TenantServiceSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField(read_only=True)
+    status = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
     designation = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField()
@@ -170,6 +171,9 @@ class EmployeeSelected_TenantServiceSerializer(serializers.ModelSerializer):
     
     def get_full_name(self, obj):
         return obj.employee.full_name
+    
+    def get_status(self, obj):
+        return obj.employee.is_active
     
     def get_designation(self, obj):
         try:
@@ -189,7 +193,7 @@ class EmployeeSelected_TenantServiceSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = EmployeeSelectedService
-        fields = ['id', 'service', 'employee', 'level', 'full_name', 'designation','image', 'location']
+        fields = ['id', 'service', 'employee', 'level', 'full_name', 'designation','image','status', 'location']
 class Employee_TenantServiceSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
