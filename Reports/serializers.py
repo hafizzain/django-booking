@@ -147,7 +147,7 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
                     service_target += int(ord.service_target)
                     retail_target += int(ord.retail_target)
                     #return total
-            data.append({
+            data.update({
                 'service_target': service_target,
                 'retail_target': retail_target
             })
