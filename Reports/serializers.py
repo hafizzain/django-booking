@@ -222,7 +222,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 'product_commission': product_commission,
                 'voucher_commission': voucher_commission,
             })
-            return f'{total}'
+            return data
                 
         except Exception as err:
             return str(err)
