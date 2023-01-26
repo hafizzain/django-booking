@@ -192,6 +192,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             range_end = self.context["range_end"]
             year = self.context["year"]
             total = 0
+            data = {}
             
             service_orders = ProductOrder.objects.filter(
                 is_deleted=False, 
@@ -205,9 +206,15 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                     total = 3
                 else:
                     total += int(ord.total_price)
+                    
                 # if int(range_start) == match:
                 #     total += int(ord.total_price)
-            
+            data.update({
+                'service_sale_price': total,
+                'service_commission': ord.checkout.service_commission,
+                'product_commission': ord.checkout.product_commission,
+                'voucher_commission': ord.checkout.voucher_commission,
+            })
             return f'{total}'
                 
         except Exception as err:
@@ -229,8 +236,12 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                         )
             for ord  in service_orders:
                 create = str(ord.created_at)
+                ord.checkout.service_commission
                 match = int(create.split(" ")[0].split("-")[1])
-                if range_start is None:
+                if range_start is not None:
+                    pass
+                    #total += int(ord.total_price)
+                else:
                     total += int(ord.total_price)
                                 
             return f'{total}'         

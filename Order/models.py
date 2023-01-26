@@ -41,8 +41,8 @@ class Checkout(models.Model):
     
     tip = models.PositiveBigIntegerField(default = 0)
     
-    service_commission =models.PositiveBigIntegerField(default = 0)
-    product_commission =models.PositiveBigIntegerField(default = 0)
+    service_commission = models.PositiveBigIntegerField(default = 0)
+    product_commission = models.PositiveBigIntegerField(default = 0)
     voucher_commission = models.PositiveBigIntegerField(default = 0)
     
     status =  models.CharField(choices=status_choice, max_length=100, default='Active')
