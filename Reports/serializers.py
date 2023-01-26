@@ -181,11 +181,9 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField(read_only=True)
     
-    service_sale_price = serializers.SerializerMethodField(read_only=True)
+    #service_sale_price = serializers.SerializerMethodField(read_only=True)
     product_sale_price = serializers.SerializerMethodField(read_only=True)
-    
-    staff_target = serializers.SerializerMethodField(read_only=True)
-        
+            
     def get_product_sale_price(self, obj):
         try:
 
