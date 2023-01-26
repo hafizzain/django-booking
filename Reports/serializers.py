@@ -127,4 +127,4 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Employee
-        fields = ['id', 'employee_id','is_active','full_name','image','location','created_at','staff_target',]
+        fields = ['id', 'employee_id','is_active','full_name','image','location','created_at','staff_target', 'product_sale_price','service_sale_price']
