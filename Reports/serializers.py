@@ -200,10 +200,10 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             for ord  in service_orders:
                 create = str(ord.created_at)
                 match = int(create.split(" ")[0].split("-")[1])
-                if range_start:
-                    total = 3
-                else:
-                    total += int(ord.total_price)
+                # if range_start:
+                #     total = 3
+                # else:
+                total += int(ord.total_price)
                 # if int(range_start) == match:
                 #     total += int(ord.total_price)
             
