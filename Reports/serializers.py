@@ -109,13 +109,15 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
             year = self.context["year"]
             total = 0
             test = 0
-            service_orders = ServiceOrder.objects.filter(is_deleted=False, member = obj)
+            service_orders = ServiceOrder.objects.filter(is_deleted=False, 
+                        member = obj,
+                        created_at__icontains = year
+                        )
             for ord  in service_orders:
                 create = str(ord.created_at)
                 match = int(create.split(" ")[0].split("-")[1])
                 if int(month) == match:
                     total += int(ord.total_price)
-                    test = test + 5
                     #return total
             
             return f'{total} {test} {month} {match} {int(month) == match} {type(month)} {type(match)}'            
