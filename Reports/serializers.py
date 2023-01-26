@@ -134,6 +134,7 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
             year = self.context["year"]
             service_target = 0
             retail_target = 0
+            data = {}
             
             staff_target = StaffTarget.objects.filter(
                 employee = obj,
@@ -146,8 +147,13 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
                     service_target += int(ord.service_target)
                     retail_target += int(ord.retail_target)
                     #return total
+            data.append({
+                'service_target': service_target,
+                'retail_target': retail_target
+            })
             
-            return f'service_target {service_target} retail_target {retail_target}'
+            #return f'service_target {service_target} retail_target {retail_target}'
+            return data
             
         except Exception as err:
             return str(err)
