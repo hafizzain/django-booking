@@ -102,14 +102,24 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
     
     def get_service_sale_price(self, obj):
         try:
-            service_orders = ServiceOrder.objects.filter(is_deleted=False).order_by('-created_at')
-            serialized = ServiceOrderSerializer(service_orders,  many=True, context=self.context).data
-            return serialized
-            # total = 0
-            # service_orders = ServiceOrder.objects.filter(is_deleted=False, member = obj)
-            # for ord  in service_orders:
-            #     total += ord.total_price
-            #     return total
+            # service_orders = ServiceOrder.objects.filter(is_deleted=False).order_by('-created_at')
+            # serialized = ServiceOrderSerializer(service_orders,  many=True, context=self.context).data
+            # return serialized
+            month = self.context["month"]
+            year = self.context["year"]
+            total = 0
+            test = 0
+            service_orders = ServiceOrder.objects.filter(is_deleted=False, member = obj)
+            for ord  in service_orders:
+                create = str(ord.created_at)
+                match = int(create.split(" ")[0].split("-")[1])
+                if int(month) == match:
+                    total += int(ord.total_price)
+                    test = test + 5
+                    #return total
+            
+            return f'{total} {test} {month} {match} {int(month) == match} {type(month)} {type(match)}'            
+            
         except Exception as err:
             return str(err)
         
