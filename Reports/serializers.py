@@ -86,6 +86,7 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
             service_orders = ProductOrder.objects.filter(
                 is_deleted=False, 
                 member = obj, 
+                created_at__icontains = year
                 )
             for ord  in service_orders:
                 create = str(ord.created_at)
@@ -95,7 +96,7 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
                     test = test + 5
                     #return total
             
-            return f'{total} {test} {month} {match} {int(month) == match} {type(month)} {type(match)}'
+            return f'{total}'
                 
         except Exception as err:
             return str(err)
@@ -120,7 +121,7 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
                     total += int(ord.total_price)
                     #return total
             
-            return f'{total} {test} {month} {match} {int(month) == match} {type(month)} {type(match)}'            
+            return f'{total}'         
             
         except Exception as err:
             return str(err)
