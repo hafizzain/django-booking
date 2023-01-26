@@ -192,6 +192,9 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             range_end = self.context["range_end"]
             year = self.context["year"]
             total = 0
+            service_commission = 0
+            product_commission = 0
+            voucher_commission = 0
             data = {}
             
             service_orders = ProductOrder.objects.filter(
@@ -202,9 +205,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             for ord  in service_orders:
                 create = str(ord.created_at)
                 match = int(create.split(" ")[0].split("-")[1])
-                service_commission = 0,
-                product_commission = 0,
-                voucher_commission = 0,
+                
                 if range_start:
                     total = 3
                 else:
