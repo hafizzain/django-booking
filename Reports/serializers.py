@@ -128,11 +128,11 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
         
     def get_staff_target(self, obj):
         try:
-            staff_target = StaffTarget.objects.filter(is_deleted=False, employee = obj).order_by('-created_at')   
+            staff_target = StaffTarget.objects.filter(is_deleted=False, employee = obj)  
             serializer = StaffTargetSerializers(staff_target, many = True, context=self.context).data
             return serializer
         except Exception as err:
-            pass
+            return str(err)
             
     
     def get_location(self, obj):
