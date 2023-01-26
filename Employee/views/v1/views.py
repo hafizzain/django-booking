@@ -2198,7 +2198,7 @@ def get_employee_commission(request):
     except Exception as err:
         pass
     
-    commission = CommissionSchemeSetting.objects.get(employee = employe.id).order_by('-created_at')   
+    commission = CommissionSchemeSetting.objects.get(employee = employe.id)
     serializer = CommissionSerializer(commission, context={'request' : request})
     
     return Response(
