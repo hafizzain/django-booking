@@ -88,7 +88,8 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
                 )
             for ord  in service_orders:
                 create = str(ord.created_at)
-                if month == int(create.split(" ")[0].split("-")[1]):
+                match = int(create.split(" ")[0].split("-")[1])
+                if month == match:
                     total += ord.total_price
                     return total
                 
