@@ -91,7 +91,9 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
                 match = int(create.split(" ")[0].split("-")[1])
                 if month == match:
                     total += ord.total_price
-                    return total
+                    #return total
+            
+            return total
                 
         except Exception as err:
             return str(err)
