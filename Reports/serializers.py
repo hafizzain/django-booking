@@ -82,6 +82,7 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
             month = self.context["month"]
             year = self.context["year"]
             total = 0
+            test = 0
             service_orders = ProductOrder.objects.filter(
                 is_deleted=False, 
                 member = obj, 
@@ -90,7 +91,8 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
                 create = str(ord.created_at)
                 match = int(create.split(" ")[0].split("-")[1])
                 if int(month) == match:
-                    total += ord.total_price
+                    total += int(ord.total_price)
+                    #test = test + 
                     #return total
             
             return f'{total} {month} {match} {int(month) == match} {type(month)} {type(match)}'
