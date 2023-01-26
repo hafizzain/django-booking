@@ -1168,6 +1168,12 @@ def create_sale_order(request):
     client_type = request.data.get('client_type', None)
     ids = request.data.get('ids', None)
     
+    service_commission = request.data.get('service_commission', None)
+    product_commission = request.data.get('product_commission', None)
+    voucher_commission = request.data.get('voucher_commission', None)
+    
+    
+    
     
     #product_id = request.data.get('product', None)
     
@@ -1246,6 +1252,11 @@ def create_sale_order(request):
         member = member ,
         client_type = client_type,
         payment_type = payment_type,
+        
+        service_commission = service_commission,
+        product_commission = product_commission,
+        voucher_commission = voucher_commission,      
+        
         tip = tip
     )
     for id in ids:          
