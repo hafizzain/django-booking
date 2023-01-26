@@ -202,6 +202,9 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             for ord  in service_orders:
                 create = str(ord.created_at)
                 match = int(create.split(" ")[0].split("-")[1])
+                service_commission = ord.checkout.service_commission,
+                product_commission = ord.checkout.product_commission,
+                voucher_commission = ord.checkout.voucher_commission,
                 if range_start:
                     total = 3
                 else:
@@ -211,9 +214,9 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 #     total += int(ord.total_price)
             data.update({
                 'service_sale_price': total,
-                'service_commission': ord.checkout.service_commission,
-                'product_commission': ord.checkout.product_commission,
-                'voucher_commission': ord.checkout.voucher_commission,
+                'service_commission': service_commission,
+                'product_commission': product_commission,
+                'voucher_commission': voucher_commission,
             })
             return f'{total}'
                 
