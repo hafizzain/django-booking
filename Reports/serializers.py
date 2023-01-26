@@ -119,8 +119,7 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
                 match = int(create.split(" ")[0].split("-")[1])
                 if int(month) == match:
                     total += int(ord.total_price)
-                    #return total
-            
+                                
             return f'{total}'         
             
         except Exception as err:
@@ -128,9 +127,28 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
         
     def get_staff_target(self, obj):
         try:
-            staff_target = StaffTarget.objects.filter(employee = obj)  
-            serializer = StaffTargetSerializers(staff_target, many = True, context=self.context).data
-            return serializer
+            # staff_target = StaffTarget.objects.filter(employee = obj)  
+            # serializer = StaffTargetSerializers(staff_target, many = True, context=self.context).data
+            # return serializer
+            month = self.context["month"]
+            year = self.context["year"]
+            service_target = 0
+            retail_target = 0
+            
+            staff_target = StaffTarget.objects.filter(
+                employee = obj,
+                 created_at__icontains = year                
+                ) 
+            for ord  in staff_target:
+                create = str(ord.created_at)
+                match = int(create.split(" ")[0].split("-")[1])
+                if int(month) == match:
+                    service_target += int(ord.service_target)
+                    retail_target += int(ord.retail_target)
+                    #return total
+            
+            return f'service_target {service_target} retail_target {retail_target}'
+            
         except Exception as err:
             return str(err)
             
