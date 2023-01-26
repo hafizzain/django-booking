@@ -93,7 +93,7 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
                     total += ord.total_price
                     #return total
             
-            return total
+            return f'{total} {month} {match}'
                 
         except Exception as err:
             return str(err)
