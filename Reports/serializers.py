@@ -92,7 +92,7 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
                 match = int(create.split(" ")[0].split("-")[1])
                 if int(month) == match:
                     total += int(ord.total_price)
-                    test = test + int(ord.total_price)
+                    test = test + 5
                     #return total
             
             return f'{total} {test} {month} {match} {int(month) == match} {type(month)} {type(match)}'
