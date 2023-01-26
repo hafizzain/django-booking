@@ -17,7 +17,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from Employee.models import Employee, EmployeeSelectedService
+from Employee.models import CategoryCommission, CommissionSchemeSetting, Employee, EmployeeSelectedService
 from Business.models import BusinessAddress
 from Service.models import PriceService, Service, ServiceGroup
 
@@ -1248,7 +1248,7 @@ def create_sale_order(request):
         payment_type = payment_type,
         tip = tip
     )
-    for id in ids:
+    for id in ids:          
         sale_type = id['selection_type']
         service_id = id['id']
         quantity = id['quantity']
@@ -1257,6 +1257,11 @@ def create_sale_order(request):
             #for pro in ids:
             try:
                 product = Product.objects.get(id = service_id)
+                commission = CommissionSchemeSetting.objects.filter(
+                    employee = member,
+                    categorycommission__from_value = total_price,
+                    categorycommission__commission__category_comission = 'Retail'
+                    )
 
                 try:
                     transfer = ProductStock.objects.get(product__id=product.id, location = business_address.id)
@@ -1282,51 +1287,6 @@ def create_sale_order(request):
                 
                 except Exception as err:
                     errors.append(str(err))
-                
-                # product_stock = product.product_stock.all()#.first()
-                # available = 0
-                
-                # print(product_stock.consumable_quantity)
-                # print(product_stock.sellable_quantity)
-                
-                # if product_stock.consumable_quantity is not None:
-                #     available += product_stock.consumable_quantity
-
-                # if product_stock.sellable_quantity is not None:
-                #     available += product_stock.sellable_quantity
-                    
-                #available = int(product_stock.consumable_quantity) + int(product_stock.sellable_quantity)
-                
-                # for i in product_stock:
-                #     if business_address == str(i.location):
-                #        available += i.available_quantity
-                #        ExceptionRecord.objects.create(
-                #             text = f"aviable quantity location {str(i.location)}"
-                #     ) 
-                #        ExceptionRecord.objects.create(
-                #             text = f"business_address {business_address}"
-                #     ) 
-                #        ExceptionRecord.objects.create(
-                #             text = f"qunatity {i.available_quantity}"
-                #     ) 
-                
-                # if available  == 0:
-                #     return Response(
-                #     {
-                #         'status' : False,
-                #         #'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
-                #         'response' : {
-                #         'message' : 'consumable_quantity and sellable_quantity not Avaiable',
-                #         'error_message' : "available_quantity", 
-                #         }
-                #     },
-                # status=status.HTTP_400_BAD_REQUEST
-                # )                    
-                
-                #product_stock.available_quantity -=1
-                    
-                # product_stock.sold_quantity += 1
-                # product_stock.save()
 
                 product_order = ProductOrder.objects.create(
                     user = user,

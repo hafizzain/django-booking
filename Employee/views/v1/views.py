@@ -2188,6 +2188,31 @@ def get_commission(request):
         },
         status=status.HTTP_200_OK
     )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_employee_commission(request): 
+    employe_id = request.data.get('id', None)
+    try:
+        employe = Employee.objects.get(id = str(employe_id))
+    except Exception as err:
+        pass
+    
+    commission = CommissionSchemeSetting.objects.get(employee = employe.id).order_by('-created_at')   
+    serializer = CommissionSerializer(commission, context={'request' : request})
+    
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All  Employee Commission',
+                'error_message' : None,
+                'commission' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
    
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
