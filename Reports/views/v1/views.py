@@ -7,7 +7,7 @@ from Appointment.models import Appointment, AppointmentCheckout, AppointmentServ
 from Business.models import Business
 from Client.models import Client, Membership, Vouchers
 from Order.models import Checkout, MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
-from Reports.serializers import ReportsEmployeSerializer
+from Reports.serializers import ComissionReportsEmployeSerializer, ReportsEmployeSerializer
 from Sale.Constants.Custom_pag import CustomPagination
 from Utility.Constants.Data.months import MONTHS
 from Utility.models import Country, Currency, ExceptionRecord, State, City
@@ -38,6 +38,34 @@ def get_reports_staff_target(request):
     
     employee = Employee.objects.filter(is_deleted=False).order_by('-created_at')
     serialized = ReportsEmployeSerializer(employee,  many=True, context={'request' : request, 'month': month, 'year': year})
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Employee Orders',
+                'error_message' : None,
+                'staff_report' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_commission_reports_by_staff(request):
+    range_start = request.GET.get('range_start', None)
+    year = request.GET.get('year', None)
+    
+    range_end = request.GET.get('range_end', None)
+    
+    employee = Employee.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = ComissionReportsEmployeSerializer(employee,  many=True, context={
+                        'request' : request, 
+                        'range_start': range_start, 
+                        'range_end': range_end, 
+                        'year': year
+            })
     return Response(
         {
             'status' : 200,
