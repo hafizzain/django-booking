@@ -75,15 +75,23 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
     def get_product_sale_price(self, obj):
         try:
             
-            product_order = ProductOrder.objects.filter(is_deleted=False, member = obj).order_by('-created_at')
+            # product_order = ProductOrder.objects.filter(is_deleted=False, member = obj).order_by('-created_at')
             
-            serialized = ProductOrderSerializer(product_order,  many=True, context=self.context ).data
-            return serialized
-                    # total = 0
-            # service_orders = ProductOrder.objects.filter(is_deleted=False, member = obj)
-            # for ord  in service_orders:
-            #     total += ord.total_price
-            #     return total
+            # serialized = ProductOrderSerializer(product_order,  many=True, context=self.context ).data
+            # return serialized
+            month = self.context["month"]
+            year = self.context["year"]
+            total = 0
+            service_orders = ProductOrder.objects.filter(
+                is_deleted=False, 
+                member = obj, 
+                )
+            for ord  in service_orders:
+                create = ord.create_at
+                if month == int(create.split(" ")[0].split("-")[1]):
+                    total += ord.total_price
+                    return total
+                
         except Exception as err:
             return str(err)
     

@@ -33,8 +33,11 @@ from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSeria
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_reports_staff_target(request):
+    month = request.GET.get('month', None)
+    year = request.GET.get('year', None)
+    
     employee = Employee.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = ReportsEmployeSerializer(employee,  many=True, context={'request' : request, })
+    serialized = ReportsEmployeSerializer(employee,  many=True, context={'request' : request, 'month': month, 'year': year})
     return Response(
         {
             'status' : 200,
