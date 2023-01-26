@@ -214,64 +214,32 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
         except Exception as err:
             return str(err)
     
-    def get_service_sale_price(self, obj):
-        try:
-            # service_orders = ServiceOrder.objects.filter(is_deleted=False).order_by('-created_at')
-            # serialized = ServiceOrderSerializer(service_orders,  many=True, context=self.context).data
-            # return serialized
-            range_start = self.context["range_start"]
-            range_end = self.context["range_end"]
-            year = self.context["year"]
-            total = 0
-            test = 0
-            service_orders = ServiceOrder.objects.filter(is_deleted=False, 
-                        member = obj,
-                        created_at__icontains = year
-                        )
-            for ord  in service_orders:
-                create = str(ord.created_at)
-                match = int(create.split(" ")[0].split("-")[1])
-                # if range_start is None:
-                #     total += int(ord.total_price)
-                # if int(month) == match:
-                #     total += int(ord.total_price)
+    # def get_service_sale_price(self, obj):
+    #     try:
+    #         # service_orders = ServiceOrder.objects.filter(is_deleted=False).order_by('-created_at')
+    #         # serialized = ServiceOrderSerializer(service_orders,  many=True, context=self.context).data
+    #         # return serialized
+    #         range_start = self.context["range_start"]
+    #         range_end = self.context["range_end"]
+    #         year = self.context["year"]
+    #         total = 0
+    #         test = 0
+    #         service_orders = ServiceOrder.objects.filter(is_deleted=False, 
+    #                     member = obj,
+    #                     created_at__icontains = year
+    #                     )
+    #         for ord  in service_orders:
+    #             create = str(ord.created_at)
+    #             match = int(create.split(" ")[0].split("-")[1])
+    #             # if range_start is None:
+    #             #     total += int(ord.total_price)
+    #             # if int(month) == match:
+    #             #     total += int(ord.total_price)
                                 
-            return f'{total}'         
+    #         return f'{total}'         
             
-        except Exception as err:
-            return str(err)
-        
-    def get_staff_target(self, obj):
-        try:
-            # staff_target = StaffTarget.objects.filter(employee = obj)  
-            # serializer = StaffTargetSerializers(staff_target, many = True, context=self.context).data
-            # return serializer
-            month = self.context["month"]
-            year = self.context["year"]
-            service_target = 0
-            retail_target = 0
-            data = {}
-            
-            staff_target = StaffTarget.objects.filter(
-                employee = obj,
-                 created_at__icontains = year                
-                ) 
-            for ord  in staff_target:
-                create = str(ord.created_at)
-                match = int(create.split(" ")[0].split("-")[1])
-                if int(month) == match:
-                    service_target += int(ord.service_target)
-                    retail_target += int(ord.retail_target)
-                    #return total
-            data.update({
-                'service_target': service_target,
-                'retail_target': retail_target
-            })
-            
-            return data
-            
-        except Exception as err:
-            return str(err)
+    #     except Exception as err:
+    #         return str(err)
             
     
     def get_location(self, obj):
@@ -292,4 +260,4 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ['id', 'employee_id','is_active','full_name','image','location',
-                  'created_at','staff_target', 'product_sale_price','service_sale_price']
+                  'created_at','product_sale_price',]#'service_sale_price']
