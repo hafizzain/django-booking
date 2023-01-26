@@ -1257,11 +1257,11 @@ def create_sale_order(request):
             #for pro in ids:
             try:
                 product = Product.objects.get(id = service_id)
-                commission = CommissionSchemeSetting.objects.filter(
-                    employee = member,
-                    categorycommission__from_value = total_price,
-                    categorycommission__commission__category_comission = 'Retail'
-                    )
+                # commission = CommissionSchemeSetting.objects.filter(
+                #     employee = member,
+                #     categorycommission__from_value = total_price,
+                #     categorycommission__commission__category_comission = 'Retail'
+                #     )
 
                 try:
                     transfer = ProductStock.objects.get(product__id=product.id, location = business_address.id)

@@ -2192,7 +2192,7 @@ def get_commission(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_employee_commission(request): 
-    employe_id = request.data.get('id', None)
+    employe_id = request.GET.get('id', None)
     try:
         employe = Employee.objects.get(id = str(employe_id))
     except Exception as err:
