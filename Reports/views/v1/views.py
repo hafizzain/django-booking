@@ -33,19 +33,8 @@ from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSeria
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_reports_staff_target(request):
-    data = []
     employee = Employee.objects.filter(is_deleted=False).order_by('-created_at')
     serialized = ReportsEmployeSerializer(employee,  many=True, context={'request' : request, })
-    # for emp in employee:
-    #     service_orders = ServiceOrder.objects.filter(is_deleted=False, member = emp.id ).annotate(total=Sum('total_price'))
-        
-    #     data.append({
-    #                     'employee_name' : emp.full_name,
-    #                     'sales' : service_orders,
-    #                 })
-        
-        
-    #serialized = ServiceOrderSerializer(service_orders,  many=True, context={'request' : request, })
     return Response(
         {
             'status' : 200,
@@ -53,7 +42,7 @@ def get_reports_staff_target(request):
             'response' : {
                 'message' : 'All Employee Orders',
                 'error_message' : None,
-                'orders' : serialized.data
+                'staff_report' : serialized.data
             }
         },
         status=status.HTTP_200_OK

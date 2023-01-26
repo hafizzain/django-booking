@@ -3,7 +3,10 @@ from Appointment.serializers import LocationSerializer
 from Employee.models import Employee
 from Product.Constants.index import tenant_media_base_url
 
-from Order.models import ServiceOrder
+from Order.models import ProductOrder, ServiceOrder
+from Sale.serializers import ProductOrderSerializer
+from TragetControl.models import StaffTarget
+from TragetControl.serializers import StaffTargetSerializers
 
 
 class ServiceOrderSerializer(serializers.ModelSerializer):
@@ -59,20 +62,53 @@ class ServiceOrderSerializer(serializers.ModelSerializer):
                 #   ]
 
 
+
 class ReportsEmployeSerializer(serializers.ModelSerializer):    
     image = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField(read_only=True)
-    sale_price = serializers.SerializerMethodField(read_only=True)
     
-    def get_sale_price(self, obj):
+    service_sale_price = serializers.SerializerMethodField(read_only=True)
+    product_sale_price = serializers.SerializerMethodField(read_only=True)
+    
+    staff_target = serializers.SerializerMethodField(read_only=True)
+    #retail_target = serializers.SerializerMethodField(read_only=True)
+    
+    def get_product_sale_price(self, obj):
         try:
-            total = 0
-            service_orders = ServiceOrder.objects.filter(is_deleted=False, member = obj)
-            for ord  in service_orders:
-                total += ord.total_price
-                return total
+            
+            product_order = ProductOrder.objects.filter(is_deleted=False, member = obj).order_by('-created_at')
+            
+            serialized = ProductOrderSerializer(product_order,  many=True, context=self.context ).data
+            return serialized
+                    # total = 0
+            # service_orders = ProductOrder.objects.filter(is_deleted=False, member = obj)
+            # for ord  in service_orders:
+            #     total += ord.total_price
+            #     return total
         except Exception as err:
             return str(err)
+    
+    def get_service_sale_price(self, obj):
+        try:
+            service_orders = ServiceOrder.objects.filter(is_deleted=False).order_by('-created_at')
+            serialized = ServiceOrderSerializer(service_orders,  many=True, context=self.context).data
+            return serialized
+            # total = 0
+            # service_orders = ServiceOrder.objects.filter(is_deleted=False, member = obj)
+            # for ord  in service_orders:
+            #     total += ord.total_price
+            #     return total
+        except Exception as err:
+            return str(err)
+        
+    def get_staff_target(self, obj):
+        try:
+            staff_target = StaffTarget.objects.filter(is_deleted=False, employee = obj).order_by('-created_at')   
+            serializer = StaffTargetSerializers(staff_target, many = True, context=self.context).data
+            return serializer
+        except Exception as err:
+            pass
+            
     
     def get_location(self, obj):
         loc = obj.location.all()
@@ -91,4 +127,4 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Employee
-        fields = ['id', 'employee_id','is_active','full_name','image','location','created_at','sale_price']
+        fields = ['id', 'employee_id','is_active','full_name','image','location','created_at','staff_target',]
