@@ -1,7 +1,4 @@
 from datetime import timedelta
-from http import client
-import imp
-import re
 from django.shortcuts import render
 
 from rest_framework import status

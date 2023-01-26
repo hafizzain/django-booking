@@ -428,7 +428,10 @@ class ServiceOrderSerializer(serializers.ModelSerializer):
             return None
     class Meta:
         model = ServiceOrder
-        fields = ['id', 'client','quantity', 'service','created_at' ,'user', 'duration', 'location', 'member', 'total_price', 'payment_type','tip','gst', 'order_type','created_at']
+        fields = ['id', 'client','quantity', 'service','created_at' ,'user',
+                  'duration', 'location', 'member', 'total_price',
+                  'payment_type','tip','gst', 'order_type','created_at'
+                  ]
         
 class MemberShipOrderSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)

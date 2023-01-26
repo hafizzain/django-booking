@@ -58,6 +58,7 @@ NSTYLE_APPS = [
     'TragetControl.apps.TragetcontrolConfig',
     'Customer.apps.CustomerConfig',
     'Promotions.apps.PromotionsConfig',
+    'Reports.apps.ReportsConfig',
 ]
 
 
