@@ -54,9 +54,9 @@ def get_reports_staff_target(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_commission_reports_by_staff(request):
+    
     range_start = request.GET.get('range_start', None)
     year = request.GET.get('year', None)
-    
     range_end = request.GET.get('range_end', None)
     
     employee = Employee.objects.filter(is_deleted=False).order_by('-created_at')
