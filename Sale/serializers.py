@@ -601,7 +601,10 @@ class CheckoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Checkout
         fields = ['id', 'product', 'service', 'membership',
-                  'voucher','client','location','member','created_at','payment_type', 'tip']
+                  'voucher','client','location','member','created_at','payment_type', 'tip',
+                  'service_commission', 'voucher_commission', 'product_commission'
+                  
+                  ]
 
 class ParentBusinessTax_RateSerializer(serializers.ModelSerializer):
     class Meta:
