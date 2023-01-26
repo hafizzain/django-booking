@@ -1,4 +1,7 @@
 from rest_framework import serializers
+from Appointment.serializers import LocationSerializer
+from Employee.models import Employee
+from Product.Constants.index import tenant_media_base_url
 
 from Order.models import ServiceOrder
 
@@ -51,6 +54,41 @@ class ServiceOrderSerializer(serializers.ModelSerializer):
         model = ServiceOrder
         fields = ('__all__')
         #fields = ['id', 'client','quantity', 'service','created_at' ,'user',
-                  'duration', 'location', 'member', 'total_price',
-                  'payment_type','tip','gst', 'order_type','created_at'
-                  ]
+                #   'duration', 'location', 'member', 'total_price',
+                #   'payment_type','tip','gst', 'order_type','created_at'
+                #   ]
+
+
+class ReportsEmployeSerializer(serializers.ModelSerializer):    
+    image = serializers.SerializerMethodField()
+    location = serializers.SerializerMethodField(read_only=True)
+    sale_price = serializers.SerializerMethodField(read_only=True)
+    
+    def get_sale_price(self, obj):
+        try:
+            total = 0
+            service_orders = ServiceOrder.objects.filter(is_deleted=False, member = obj)
+            for ord  in service_orders:
+                total += ord.total_price
+                return total
+        except Exception as err:
+            return str(err)
+    
+    def get_location(self, obj):
+        loc = obj.location.all()
+        return LocationSerializer(loc, many =True ).data
+    
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request)
+                return f'{url}{obj.image}'
+            except:
+                return obj.image
+        return None
+    
+    
+    class Meta:
+        model = Employee
+        fields = ['id', 'employee_id','is_active','full_name','image','location','created_at','sale_price']

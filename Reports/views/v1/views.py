@@ -7,6 +7,7 @@ from Appointment.models import Appointment, AppointmentCheckout, AppointmentServ
 from Business.models import Business
 from Client.models import Client, Membership, Vouchers
 from Order.models import Checkout, MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
+from Reports.serializers import ReportsEmployeSerializer
 from Sale.Constants.Custom_pag import CustomPagination
 from Utility.Constants.Data.months import MONTHS
 from Utility.models import Country, Currency, ExceptionRecord, State, City
@@ -34,13 +35,14 @@ from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSeria
 def get_reports_staff_target(request):
     data = []
     employee = Employee.objects.filter(is_deleted=False).order_by('-created_at')
-    for emp in employee:
-        service_orders = ServiceOrder.objects.filter(is_deleted=False, member = emp.id ).annotate(total=Sum('total_price'))
+    serialized = ReportsEmployeSerializer(employee,  many=True, context={'request' : request, })
+    # for emp in employee:
+    #     service_orders = ServiceOrder.objects.filter(is_deleted=False, member = emp.id ).annotate(total=Sum('total_price'))
         
-        data.append({
-                        'employee_name' : emp.full_name,
-                        'sales' : service_orders,
-                    })
+    #     data.append({
+    #                     'employee_name' : emp.full_name,
+    #                     'sales' : service_orders,
+    #                 })
         
         
     #serialized = ServiceOrderSerializer(service_orders,  many=True, context={'request' : request, })
@@ -49,9 +51,9 @@ def get_reports_staff_target(request):
             'status' : 200,
             'status_code' : '200',
             'response' : {
-                'message' : 'All Service Orders',
+                'message' : 'All Employee Orders',
                 'error_message' : None,
-                'orders' : data
+                'orders' : serialized.data
             }
         },
         status=status.HTTP_200_OK
