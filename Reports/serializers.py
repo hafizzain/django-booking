@@ -336,7 +336,7 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
             year = self.context["year"]
             total = 0
             service_orders = ServiceOrder.objects.filter(is_deleted=False,
-                        location = obj
+                        location = obj,
                         created_at__icontains = year
                         
                         )
@@ -359,7 +359,7 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
 
             service_orders = ProductOrder.objects.filter(
                 is_deleted=False, 
-                location = obj 
+                location = obj,
                 created_at__icontains = year
                 )
             for ord  in service_orders:
