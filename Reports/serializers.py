@@ -7,8 +7,8 @@ from Product.Constants.index import tenant_media_base_url
 
 from Order.models import MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
 from Sale.serializers import ProductOrderSerializer
-from TragetControl.models import StaffTarget, TierStoreTarget
-from TragetControl.serializers import StaffTargetSerializers, TierStoreTargetSerializers
+from TragetControl.models import StaffTarget, StoreTarget, TierStoreTarget
+from TragetControl.serializers import StaffTargetSerializers, StoreTargetSerializers, TierStoreTargetSerializers
 from Utility.Constants.Data.months import MONTH_DICT
 
 
@@ -338,27 +338,27 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
     
     def get_tier_target(self,obj):
         try:
-            month = self.context["month"]
-            year = self.context["year"]
-            service_target = 0
-            retail_target = 0
-            voucher_target = 0
-            membership_target = 0
-            month_find = MONTH_DICT[month]
-            return month_find
-            tier = TierStoreTarget.objects.filter(
-                storetarget__location = obj,
-                month = month_find
+            # month = self.context["month"]
+            # year = self.context["year"]
+            # service_target = 0
+            # retail_target = 0
+            # voucher_target = 0
+            # membership_target = 0
+            # month_find = MONTH_DICT[month]
+            # return month_find
+            tier = StoreTarget.objects.filter(
+                # storetarget__location = obj,
+                # month = month_find
                 )
-            for tier_target in  tier:
-                create = str(tier_target.year)
-                match = int(create.split(" ")[0].split("-")[0])
-                return tier_target.year
+            # for tier_target in  tier:
+            #     create = str(tier_target.year)
+            #     match = int(create.split(" ")[0].split("-")[0])
+            #     return tier_target.year
                 #if int(year) == match:
                     
                     #total += int(ord.total_price)
                 
-            #return TierStoreTargetSerializers(tier,many = True ,context=self.context).data
+            return StoreTargetSerializers(tier,many = True ,context=self.context).data
         except Exception as err:
             return str(err)
     
