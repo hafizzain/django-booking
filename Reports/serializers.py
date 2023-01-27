@@ -195,10 +195,10 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             year = self.context["year"] 
             
             if range_start:
-                range_start = date(range_start)
-                range_end = date(range_end)
-                #range_start = datetime.strptime(range_start, "%Y-%m-%d")
-                #range_end = datetime.strptime(range_end, "%Y-%m-%d") 
+                # range_start = date(range_start)
+                # range_end = date(range_end)
+                range_start = datetime.strptime(range_start, "%Y-%m-%d")
+                range_end = datetime.strptime(range_end, "%Y-%m-%d") 
                           
             total = 0
             service_commission = 0
@@ -214,8 +214,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 )
             for ord  in service_orders:
                 create = str(ord.created_at)
-                create = create.split(" ")[0]
-                created_at = date(create) #datetime.strptime(create, "%Y-%m-%d")
+                created_at = datetime.strptime(create, "%Y-%m-%d")
                 #match = create.split(" ")[0]#.split("-")[1])
                 
                 if range_start >= created_at  and created_at <= range_end:
