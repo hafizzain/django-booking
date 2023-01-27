@@ -352,12 +352,12 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
             for tier_target in  tier:
                 create = str(tier_target.year)
                 match = int(create.split(" ")[0].split("-")[0])
-                return create
+                return tier_target.year
                 #if int(year) == match:
                     
                     #total += int(ord.total_price)
                 
-            return TierStoreTargetSerializers(tier,many = True ,context=self.context).data
+            #return TierStoreTargetSerializers(tier,many = True ,context=self.context).data
         except Exception as err:
             return str(err)
     
