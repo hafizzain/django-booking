@@ -626,7 +626,7 @@ def update_storetarget(request):
                 tierstore.voucher_target = voucher_target
                 tierstore.membership_target = membership_target
                 
-                if bool(is_primary) == True:
+                if is_primary == 'True':
                     tierstore.is_primary = True
                 else:
                     tierstore.is_primary = False 
@@ -652,7 +652,7 @@ def update_storetarget(request):
                 membership_target = membership_target,
                 
             )
-            if is_primary is not None:
+            if is_primary == 'True':
                 tier.is_primary = True
             else:
                 tier.is_primary = False
