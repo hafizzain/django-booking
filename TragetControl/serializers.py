@@ -97,8 +97,8 @@ class GETStoreTargetSerializers(serializers.ModelSerializer):
     
     def get_tier(self,obj):
         try:
-            tier = TierStoreTarget.objects.filter(storetarget = obj, is_primary = True )
-            return TierStoreTargetSerializers(tier,many = True ,context=self.context).data
+            tier = TierStoreTarget.objects.filter(storetarget = obj, )#is_primary = True )
+            return TierStoreTargetSerializers(tier, many = True ,context=self.context).data
         except Exception as err:
             print(err)
     
