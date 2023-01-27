@@ -214,7 +214,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 create = str(ord.created_at)
                 created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
                 if range_start is not None:
-                    return f'range start {range_start >= created_at}{range_start} created at {created_at}'
+                    return f'range start {range_start >= created_at} {created_at <= range_end}  {range_start} created at {created_at}'
                     if range_start >= created_at  and created_at <= range_end:
                         total += int(ord.total_price)
                         service_commission += ord.checkout.service_commission
