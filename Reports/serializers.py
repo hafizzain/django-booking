@@ -359,7 +359,7 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
                 
             return TierStoreTargetSerializers(tier,many = True ,context=self.context).data
         except Exception as err:
-            print(err)
+            return str(err)
     
     def get_service_sale_price(self, obj):
         try:
