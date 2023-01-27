@@ -217,9 +217,10 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                     
                 # if int(range_start) == match:
                 #     total += int(ord.total_price)
-                
+            commission_total = service_commission + product_commission + voucher_commission
             data.update({
                 'product_sale_price': total,
+                'commission_total': commission_total,
                 'service_commission': service_commission,
                 'product_commission': product_commission,
                 'voucher_commission': voucher_commission,
@@ -281,8 +282,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             return total         
             
         except Exception as err:
-            return str(err)
-            
+            return str(err)         
     
     def get_location(self, obj):
         loc = obj.location.all()
