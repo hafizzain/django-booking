@@ -3,7 +3,7 @@ from Appointment.serializers import LocationSerializer
 from Employee.models import Employee
 from Product.Constants.index import tenant_media_base_url
 
-from Order.models import ProductOrder, ServiceOrder
+from Order.models import ProductOrder, ServiceOrder, VoucherOrder
 from Sale.serializers import ProductOrderSerializer
 from TragetControl.models import StaffTarget
 from TragetControl.serializers import StaffTargetSerializers
@@ -184,6 +184,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
     
     service_sale_price = serializers.SerializerMethodField(read_only=True)
     product_sale_price = serializers.SerializerMethodField(read_only=True)
+    voucher_sale_price = serializers.SerializerMethodField(read_only=True)
             
     def get_product_sale_price(self, obj):
         try:
@@ -216,6 +217,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                     
                 # if int(range_start) == match:
                 #     total += int(ord.total_price)
+                
             data.update({
                 'product_sale_price': total,
                 'service_commission': service_commission,
@@ -255,6 +257,31 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             
         except Exception as err:
             return str(err)
+        
+    def get_voucher_sale_price(self, obj):
+        try:
+            range_start = self.context["range_start"]
+            range_end = self.context["range_end"]
+            year = self.context["year"]
+            total = 0
+            test = 0
+            service_orders = VoucherOrder.objects.filter(is_deleted=False, 
+                        member = obj,
+                        #created_at__icontains = year
+                        )
+            for ord  in service_orders:
+                create = str(ord.created_at)
+                match = int(create.split(" ")[0].split("-")[1])
+                if range_start is not None:
+                    pass
+                    #total += int(ord.total_price)
+                else:
+                    total += int(ord.total_price)
+                                
+            return total         
+            
+        except Exception as err:
+            return str(err)
             
     
     def get_location(self, obj):
@@ -275,4 +302,4 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ['id', 'employee_id','is_active','full_name','image','location',
-                  'created_at','product_sale_price','service_sale_price']
+                  'created_at','product_sale_price','service_sale_price', 'voucher_sale_price']
