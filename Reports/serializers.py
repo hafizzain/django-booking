@@ -274,10 +274,14 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
     def get_voucher_sale_price(self, obj):
         try:
             range_start = self.context["range_start"]
-            range_end = self.context["range_end"]
+            range_end = self.context["range_end"]            
             year = self.context["year"]
+            
+            if range_start:
+                range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
+                range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
+            
             total = 0
-            test = 0
             service_orders = VoucherOrder.objects.filter(is_deleted=False, 
                         member = obj,
                         #created_at__icontains = year
@@ -289,7 +293,6 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 if range_start:
                     if range_start >= created_at  and created_at <= range_end:
                         total += int(ord.total_price)
-                    #total += int(ord.total_price)
                 else:
                     total += int(ord.total_price)
                                 
