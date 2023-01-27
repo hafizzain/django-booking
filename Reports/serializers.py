@@ -195,8 +195,6 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             year = self.context["year"] 
             
             if range_start:
-                # range_start = date(range_start)
-                # range_end = date(range_end)
                 range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
                 range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
                                           
@@ -244,24 +242,26 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
     
     def get_service_sale_price(self, obj):
         try:
-            # service_orders = ServiceOrder.objects.filter(is_deleted=False).order_by('-created_at')
-            # serialized = ServiceOrderSerializer(service_orders,  many=True, context=self.context).data
-            # return serialized
             range_start = self.context["range_start"]
             range_end = self.context["range_end"]
             year = self.context["year"]
+            
+            if range_start:
+                range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
+                range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
+            
             total = 0
-            test = 0
             service_orders = ServiceOrder.objects.filter(is_deleted=False, 
                         member = obj,
                         #created_at__icontains = year
                         )
-            for ord  in service_orders:
+            for ord  in service_orders:                
                 create = str(ord.created_at)
-                ord.checkout.service_commission
-                match = int(create.split(" ")[0].split("-")[1])
-                if range_start is not None:
-                    pass
+                created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
+                
+                if range_start:
+                    if range_start >= created_at  and created_at <= range_end:
+                        total += int(ord.total_price)
                     #total += int(ord.total_price)
                 else:
                     total += int(ord.total_price)
@@ -284,9 +284,11 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                         )
             for ord  in service_orders:
                 create = str(ord.created_at)
-                match = int(create.split(" ")[0].split("-")[1])
-                if range_start is not None:
-                    pass
+                created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
+                
+                if range_start:
+                    if range_start >= created_at  and created_at <= range_end:
+                        total += int(ord.total_price)
                     #total += int(ord.total_price)
                 else:
                     total += int(ord.total_price)
