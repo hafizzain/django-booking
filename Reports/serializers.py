@@ -214,7 +214,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 )
             for ord  in service_orders:
                 create = str(ord.created_at)
-                created_at = datetime.strptime(create, "%Y-%m-%d").date()
+                created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S").date()
                 #match = create.split(" ")[0]#.split("-")[1])
                 return create
                 # if range_start:
