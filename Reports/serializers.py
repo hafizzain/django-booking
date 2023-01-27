@@ -345,6 +345,7 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
             voucher_target = 0
             membership_target = 0
             month_find = MONTH_DICT[month]
+            return month_find
             tier = TierStoreTarget.objects.filter(
                 storetarget__location = obj,
                 month = month_find
