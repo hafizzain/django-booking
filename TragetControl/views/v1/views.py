@@ -626,7 +626,7 @@ def update_storetarget(request):
                 tierstore.voucher_target = voucher_target
                 tierstore.membership_target = membership_target
                 
-                if str(is_primary) == 'true':
+                if str(is_primary) == 'True':
                     tierstore.is_primary = True
                 else:
                     tierstore.is_primary = False 
@@ -656,7 +656,7 @@ def update_storetarget(request):
             c_year = datetime.strptime(date_str, '%Y %B %d')
             tier.year = c_year
             tier.save()
-            if is_primary == 'true':
+            if is_primary == 'True':
                 tier.is_primary = True
             else:
                 tier.is_primary = False
