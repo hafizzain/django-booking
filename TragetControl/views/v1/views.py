@@ -468,7 +468,7 @@ def create_storetarget(request):
         tier_store.year = c_year
         tier_store.save()
         
-        if is_primary == 'true':
+        if is_primary == 'True':
             tier_store.is_primary = True
         else:
             tier_store.is_primary = False
