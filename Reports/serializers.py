@@ -1,3 +1,4 @@
+from datetime import datetime
 from rest_framework import serializers
 from Appointment.serializers import LocationSerializer
 from Employee.models import Employee
@@ -192,6 +193,11 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             range_start = self.context["range_start"]
             range_end = self.context["range_end"]
             year = self.context["year"]
+            
+                        
+            range_start = datetime.strptime(range_start, "%H:%M:%S")
+            range_end = datetime.strptime(range_end, "%H:%M:%S")
+            
             total = 0
             service_commission = 0
             product_commission = 0
@@ -205,10 +211,15 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 )
             for ord  in service_orders:
                 create = str(ord.created_at)
-                match = int(create.split(" ")[0].split("-")[1])
+                created_at = datetime.strptime(create, "%H:%M:%S")
+                #match = create.split(" ")[0]#.split("-")[1])
                 
-                if range_start:
-                    total = 3
+                if range_start >= created_at  and created_at <= range_end:
+                    total += int(ord.total_price)
+                    service_commission += ord.checkout.service_commission
+                    product_commission += ord.checkout.product_commission
+                    voucher_commission += ord.checkout.voucher_commission
+                    #total = 3
                 else:
                     total += int(ord.total_price)
                     service_commission += ord.checkout.service_commission
