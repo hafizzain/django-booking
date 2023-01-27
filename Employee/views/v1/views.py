@@ -2193,13 +2193,41 @@ def get_commission(request):
 @permission_classes([AllowAny])
 def get_employee_commission(request): 
     employe_id = request.GET.get('id', None)
+    
+    if not all([employe_id ]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'id'
+                            ]
+                    }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
     try:
         employe = Employee.objects.get(id = str(employe_id))
     except Exception as err:
         pass
-    
-    commission = CommissionSchemeSetting.objects.get(employee = employe.id)
-    serializer = CommissionSerializer(commission, context={'request' : request})
+    try:
+        commission = CommissionSchemeSetting.objects.get(employee = employe.id)
+        serializer = CommissionSerializer(commission, context={'request' : request})
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'response' : {
+                    'message' : 'Commission Scheme Setting',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
     
     return Response(
         {

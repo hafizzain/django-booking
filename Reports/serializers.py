@@ -217,7 +217,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 # if int(range_start) == match:
                 #     total += int(ord.total_price)
             data.update({
-                'service_sale_price': total,
+                'product_sale_price': total,
                 'service_commission': service_commission,
                 'product_commission': product_commission,
                 'voucher_commission': voucher_commission,
@@ -251,7 +251,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 else:
                     total += int(ord.total_price)
                                 
-            return f'{total}'         
+            return total         
             
         except Exception as err:
             return str(err)
