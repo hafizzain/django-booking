@@ -217,19 +217,19 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 created_at = datetime.strptime(create, "%Y-%m-%d").date()
                 #match = create.split(" ")[0]#.split("-")[1])
                 return create
-                if range_start:
-                    return created_at
-                    if range_start >= created_at  and created_at <= range_end:
-                        total += int(ord.total_price)
-                        service_commission += ord.checkout.service_commission
-                        product_commission += ord.checkout.product_commission
-                        voucher_commission += ord.checkout.voucher_commission
-                    #total = 3
-                else:
-                    total += int(ord.total_price)
-                    service_commission += ord.checkout.service_commission
-                    product_commission += ord.checkout.product_commission
-                    voucher_commission += ord.checkout.voucher_commission
+                # if range_start:
+                #     return created_at
+                #     if range_start >= created_at  and created_at <= range_end:
+                #         total += int(ord.total_price)
+                #         service_commission += ord.checkout.service_commission
+                #         product_commission += ord.checkout.product_commission
+                #         voucher_commission += ord.checkout.voucher_commission
+                #     #total = 3
+                # else:
+                #     total += int(ord.total_price)
+                #     service_commission += ord.checkout.service_commission
+                #     product_commission += ord.checkout.product_commission
+                #     voucher_commission += ord.checkout.voucher_commission
 
             commission_total = service_commission + product_commission + voucher_commission
             data.update({
