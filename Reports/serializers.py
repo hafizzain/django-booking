@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from rest_framework import serializers
 from Appointment.serializers import LocationSerializer
 from Employee.models import Employee
@@ -192,14 +192,17 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
 
             range_start = self.context["range_start"]
             range_end = self.context["range_end"]
-            year = self.context["year"]
+            year = self.context["year"] 
             
-                        
-            range_start = datetime.strptime(range_start, "%Y-%m-%d")
-            range_end = datetime.strptime(range_end, "%Y-%m-%d")
-            
+            if range_start:
+                range_start = date(range_start)
+                range_end = date(range_end)
+                #range_start = datetime.strptime(range_start, "%Y-%m-%d")
+                #range_end = datetime.strptime(range_end, "%Y-%m-%d") 
+                          
             total = 0
             service_commission = 0
+            
             product_commission = 0
             voucher_commission = 0
             data = {}
@@ -211,7 +214,8 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 )
             for ord  in service_orders:
                 create = str(ord.created_at)
-                created_at = datetime.strptime(create, "%Y-%m-%d")
+                create = create.split(" ")[0]
+                created_at = date(create) #datetime.strptime(create, "%Y-%m-%d")
                 #match = create.split(" ")[0]#.split("-")[1])
                 
                 if range_start >= created_at  and created_at <= range_end:
