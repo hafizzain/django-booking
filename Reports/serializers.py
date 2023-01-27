@@ -7,8 +7,9 @@ from Product.Constants.index import tenant_media_base_url
 
 from Order.models import MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
 from Sale.serializers import ProductOrderSerializer
-from TragetControl.models import StaffTarget
-from TragetControl.serializers import StaffTargetSerializers
+from TragetControl.models import StaffTarget, TierStoreTarget
+from TragetControl.serializers import StaffTargetSerializers, TierStoreTargetSerializers
+from Utility.Constants.Data.months import MONTH_DICT
 
 
 class ServiceOrderSerializer(serializers.ModelSerializer):
@@ -330,6 +331,36 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
     voucher_sale_price = serializers.SerializerMethodField(read_only=True)
     membership_sale_price = serializers.SerializerMethodField(read_only=True)
     
+    tier_target = serializers.SerializerMethodField(read_only=True)
+    # product_target = serializers.SerializerMethodField(read_only=True)
+    # voucher_target = serializers.SerializerMethodField(read_only=True)
+    # membership_target = serializers.SerializerMethodField(read_only=True)
+    
+    def get_tier_target(self,obj):
+        try:
+            month = self.context["month"]
+            year = self.context["year"]
+            service_target = 0
+            retail_target = 0
+            voucher_target = 0
+            membership_target = 0
+            month_find = MONTH_DICT[month]
+            tier = TierStoreTarget.objects.filter(
+                storetarget__location = obj,
+                month = month_find
+                )
+            for tier_target in  tier:
+                create = str(tier_target.year)
+                match = int(create.split(" ")[0].split("-")[0])
+                return match
+                #if int(year) == match:
+                    
+                    #total += int(ord.total_price)
+                
+            return TierStoreTargetSerializers(tier,many = True ,context=self.context).data
+        except Exception as err:
+            print(err)
+    
     def get_service_sale_price(self, obj):
         try:
             month = self.context["month"]
@@ -420,6 +451,6 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessAddress
         fields = ['id', 'address_name','voucher_sale_price','membership_sale_price',
-                  'service_sale_price', 'product_sale_price', 'created_at',
+                  'service_sale_price', 'product_sale_price', 'tier_target','created_at',
                   ]
         
