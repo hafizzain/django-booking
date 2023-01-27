@@ -199,7 +199,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 # range_end = date(range_end)
                 range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
                 range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
-                return f'{range_end} {range_start}'
+                #return f'{range_end} {range_start}'
                           
             total = 0
             service_commission = 0
