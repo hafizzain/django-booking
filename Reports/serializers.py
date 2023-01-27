@@ -1,10 +1,11 @@
 from datetime import date, datetime
 from rest_framework import serializers
 from Appointment.serializers import LocationSerializer
+from Business.models import BusinessAddress
 from Employee.models import Employee
 from Product.Constants.index import tenant_media_base_url
 
-from Order.models import ProductOrder, ServiceOrder, VoucherOrder
+from Order.models import MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
 from Sale.serializers import ProductOrderSerializer
 from TragetControl.models import StaffTarget
 from TragetControl.serializers import StaffTargetSerializers
@@ -321,4 +322,104 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
         model = Employee
         fields = ['id', 'employee_id','is_active','full_name','image','location',
                   'created_at','product_sale_price','service_sale_price', 'voucher_sale_price']
+        
+class BusinesAddressReportSerializer(serializers.ModelSerializer): 
+    
+    service_sale_price = serializers.SerializerMethodField(read_only=True)    
+    product_sale_price = serializers.SerializerMethodField(read_only=True)
+    voucher_sale_price = serializers.SerializerMethodField(read_only=True)
+    membership_sale_price = serializers.SerializerMethodField(read_only=True)
+    
+    def get_service_sale_price(self, obj):
+        try:
+            month = self.context["month"]
+            year = self.context["year"]
+            total = 0
+            service_orders = ServiceOrder.objects.filter(is_deleted=False,
+                        location = obj
+                        created_at__icontains = year
+                        
+                        )
+            for ord  in service_orders:
+                create = str(ord.created_at)
+                match = int(create.split(" ")[0].split("-")[1])
+                if int(month) == match:
+                    total += int(ord.total_price)
+                                
+            return total         
+            
+        except Exception as err:
+            return str(err)
+    
+    def get_product_sale_price(self, obj):
+        try:
+            month = self.context["month"]
+            year = self.context["year"]
+            total = 0
+
+            service_orders = ProductOrder.objects.filter(
+                is_deleted=False, 
+                location = obj 
+                created_at__icontains = year
+                )
+            for ord  in service_orders:
+                create = str(ord.created_at)
+                match = int(create.split(" ")[0].split("-")[1])
+                if int(month) == match:
+                    total += int(ord.total_price)
+            
+            return total
+                
+        except Exception as err:
+            return str(err)
+        
+    def get_voucher_sale_price(self, obj):
+        try:
+            month = self.context["month"]
+            year = self.context["year"]
+            total = 0
+
+            service_orders = VoucherOrder.objects.filter(
+                is_deleted=False, 
+                location = obj,
+                created_at__icontains = year,
+                )
+            for ord  in service_orders:
+                create = str(ord.created_at)
+                match = int(create.split(" ")[0].split("-")[1])
+                if int(month) == match:
+                    total += int(ord.total_price)
+            
+            return total
+                
+        except Exception as err:
+            return str(err)
+    
+    def get_membership_sale_price(self, obj):
+        try:
+            month = self.context["month"]
+            year = self.context["year"]
+            total = 0
+
+            service_orders = MemberShipOrder.objects.filter(
+                is_deleted=False, 
+                location = obj,
+                created_at__icontains = year,
+                )
+            for ord  in service_orders:
+                create = str(ord.created_at)
+                match = int(create.split(" ")[0].split("-")[1])
+                if int(month) == match:
+                    total += int(ord.total_price)
+            
+            return total
+                
+        except Exception as err:
+            return str(err)
+    
+    class Meta:
+        model = BusinessAddress
+        fields = ['id', 'address_name','voucher_sale_price','membership_sale_price',
+                  'service_sale_price', 'product_sale_price', 'created_at',
+                  ]
         
