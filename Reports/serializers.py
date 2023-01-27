@@ -217,6 +217,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 create = str(ord.created_at)
                 created_at = datetime.strptime(create, "%Y-%m-%d").date()
                 #match = create.split(" ")[0]#.split("-")[1])
+                return created_at
                 if range_start:
                     return created_at
                     if range_start >= created_at  and created_at <= range_end:
