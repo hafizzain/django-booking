@@ -220,7 +220,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                         product_commission += ord.checkout.product_commission
                         voucher_commission += ord.checkout.voucher_commission
                     else:
-                        pass
+                        return f'range start {service_commission}'
                 else:
                     total += int(ord.total_price)
                     service_commission += ord.checkout.service_commission
