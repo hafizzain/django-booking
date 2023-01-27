@@ -195,8 +195,8 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             year = self.context["year"]
             
                         
-            range_start = datetime.strptime(range_start, "%H:%M:%S")
-            range_end = datetime.strptime(range_end, "%H:%M:%S")
+            range_start = datetime.strptime(range_start, "%Y-%m-%d")
+            range_end = datetime.strptime(range_end, "%Y-%m-%d")
             
             total = 0
             service_commission = 0
@@ -211,7 +211,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 )
             for ord  in service_orders:
                 create = str(ord.created_at)
-                created_at = datetime.strptime(create, "%H:%M:%S")
+                created_at = datetime.strptime(ord.created_at, "%Y-%m-%d")
                 #match = create.split(" ")[0]#.split("-")[1])
                 
                 if range_start >= created_at  and created_at <= range_end:
@@ -225,9 +225,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                     service_commission += ord.checkout.service_commission
                     product_commission += ord.checkout.product_commission
                     voucher_commission += ord.checkout.voucher_commission
-                    
-                # if int(range_start) == match:
-                #     total += int(ord.total_price)
+
             commission_total = service_commission + product_commission + voucher_commission
             data.update({
                 'product_sale_price': total,
