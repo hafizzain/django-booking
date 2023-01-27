@@ -213,14 +213,14 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             for ord  in service_orders:
                 create = str(ord.created_at)
                 created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
-                #match = create.split(" ")[0]#.split("-")[1])
                 if range_start:
                     if range_start >= created_at  and created_at <= range_end:
                         total += int(ord.total_price)
                         service_commission += ord.checkout.service_commission
                         product_commission += ord.checkout.product_commission
                         voucher_commission += ord.checkout.voucher_commission
-                    #total = 3
+                    else:
+                        pass
                 else:
                     total += int(ord.total_price)
                     service_commission += ord.checkout.service_commission
@@ -320,3 +320,4 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
         model = Employee
         fields = ['id', 'employee_id','is_active','full_name','image','location',
                   'created_at','product_sale_price','service_sale_price', 'voucher_sale_price']
+        
