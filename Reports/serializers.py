@@ -454,4 +454,43 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
         fields = ['id', 'address_name','voucher_sale_price','membership_sale_price',
                   'service_sale_price', 'product_sale_price', 'tier_target','created_at',
                   ]
+    
+class StaffCommissionReport(serializers.ModelSerializer):
+    service_sale_price = serializers.SerializerMethodField(read_only=True)
+    
+    def get_service_sale_price(self, obj):
+        try:
+            range_start = self.context["range_start"]
+            range_end = self.context["range_end"]
+            year = self.context["year"]
+            
+            if range_start:
+                range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
+                range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
+            
+            total = 0
+            service_orders = ServiceOrder.objects.filter(is_deleted=False, 
+                        member = obj,
+                        #created_at__icontains = year
+                        )
+            for ord  in service_orders:                
+                create = str(ord.created_at)
+                created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
+                
+                if range_start:
+                    if range_start >= created_at  and created_at <= range_end:
+                        total += int(ord.total_price)
+                    #total += int(ord.total_price)
+                else:
+                    total += int(ord.total_price)
+                                
+            return total         
+            
+        except Exception as err:
+            return str(err)
+    
+    class Meta:
+        model = Employee
+        fields =  ['id', 'full_name', 'service_sale_price' ]
         
+

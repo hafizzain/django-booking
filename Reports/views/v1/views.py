@@ -7,7 +7,7 @@ from Appointment.models import Appointment, AppointmentCheckout, AppointmentServ
 from Business.models import Business
 from Client.models import Client, Membership, Vouchers
 from Order.models import Checkout, MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
-from Reports.serializers import BusinesAddressReportSerializer, ComissionReportsEmployeSerializer, ReportsEmployeSerializer
+from Reports.serializers import BusinesAddressReportSerializer, ComissionReportsEmployeSerializer, ReportsEmployeSerializer, StaffCommissionReport
 from Sale.Constants.Custom_pag import CustomPagination
 from Utility.Constants.Data.months import MONTHS
 from Utility.models import Country, Currency, ExceptionRecord, State, City
@@ -95,6 +95,27 @@ def get_store_target_report(request):
                 'message' : 'All Business Address Report',
                 'error_message' : None,
                 'address' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_commission_reports_by_commission_details(request):
+    month = request.GET.get('month', None)
+    year = request.GET.get('year', None)
+    
+    employee = Employee.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = StaffCommissionReport (employee,  many=True, context={'request' : request, 'month': month, 'year': year})
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Employee Orders',
+                'error_message' : None,
+                'staff_report' : serialized.data
             }
         },
         status=status.HTTP_200_OK
