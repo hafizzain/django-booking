@@ -83,10 +83,16 @@ def get_commission_reports_by_staff(request):
 @permission_classes([AllowAny])
 def get_store_target_report(request):
     month = request.GET.get('month', None)
+    range_start = request.GET.get('range_start', None)
     year = request.GET.get('year', None)
-    
+    range_end = request.GET.get('range_end', None)  
+      
     address = BusinessAddress.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = BusinesAddressReportSerializer(address, many=True, context={'request' : request, 'month': month, 'year': year})
+    serialized = BusinesAddressReportSerializer(address, many=True, context={'request' : request, 
+                        'range_start': range_start, 
+                        'range_end': range_end, 
+                        'year': year                                
+                        })
     return Response(
         {
             'status' : 200,
