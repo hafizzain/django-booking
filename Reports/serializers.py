@@ -468,7 +468,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                 range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
                 range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
             
-            total = 0
+            data = {}
             service_orders = ServiceOrder.objects.filter(is_deleted=False, 
                         member = obj,
                         #created_at__icontains = year
@@ -479,12 +479,25 @@ class StaffCommissionReport(serializers.ModelSerializer):
                 
                 if range_start:
                     if range_start >= created_at  and created_at <= range_end:
-                        total += int(ord.total_price)
-                    #total += int(ord.total_price)
+                        #total += int(ord.total_price)
+                        #sale_value = ord.sold_quantity * 
+                        data.update({
+                            'item_sold': ord.service.name,
+                            'ItemType': 'Service',
+                            'Quantity': ord.sold_quantity,
+                            'Sale_Value': ord.total_price,
+                            'Commission_Rate': ord.checkout.service_commission
+                        })
                 else:
-                    total += int(ord.total_price)
+                    data.update({
+                            'item_sold': ord.service.name,
+                            'ItemType': 'Service',
+                            'Quantity': ord.sold_quantity,
+                            'Sale_Value': ord.total_price,
+                            'Commission_Rate': ord.checkout.service_commission
+                        })
                                 
-            return total         
+            return data         
             
         except Exception as err:
             return str(err)
