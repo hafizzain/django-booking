@@ -122,7 +122,7 @@ def get_commission_reports_by_commission_details(request):
     response_data = serialized.data
     
     for da in response_data:
-        test =  da['location']#[0]
+        test =  da['location'].address_name
         #newdata = {'employee':,'data':}
         
         # newdata.update({
