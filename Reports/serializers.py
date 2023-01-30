@@ -9,7 +9,7 @@ from Product.Constants.index import tenant_media_base_url
 from Order.models import MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
 from Sale.serializers import ProductOrderSerializer
 from Service.models import Service, ServiceGroup
-from TragetControl.models import StaffTarget, StoreTarget, TierStoreTarget
+from TragetControl.models import ServiceTarget, StaffTarget, StoreTarget, TierStoreTarget
 from TragetControl.serializers import StaffTargetSerializers, StoreTargetSerializers, TierStoreTargetSerializers
 from Utility.Constants.Data.months import MONTH_DICT
 
@@ -624,37 +624,41 @@ class StaffCommissionReport(serializers.ModelSerializer):
 class ServiceGroupReport(serializers.ModelSerializer):
     # service_sale_price = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
-    total_service_target = serializers.SerializerMethodField(read_only=True)
+    service_target = serializers.SerializerMethodField(read_only=True)
     
     
     def get_service(self, obj):
         ser = obj.services.all()
         return ServiceReportSerializer(ser, many =True ).data
     
-    
-    
-    # def get_service_sale_price(self, obj):
-    #     try:
-    #         month = self.context["month"]
-    #         year = self.context["year"]
-    #         total = 0
-    #         service_orders = ServiceOrder.objects.filter(
-    #                     is_deleted=False,
-    #                     service = str(obj.services),
-    #                     created_at__icontains = year
-                        
-    #                     )
-    #         for ord  in service_orders:
-    #             create = str(ord.created_at)
-    #             match = int(create.split(" ")[0].split("-")[1])
-    #             if int(month) == match:
-    #                 total += int(ord.total_price)
-                                
-    #         return total         
+    def get_service_target(self, obj):
+        try:
+            month = self.context["month"]
+            year = self.context["year"]
+            service_target = 0
+            retail_target = 0
+            data = {}
             
-    #     except Exception as err:
-    #         return str(err)
-        
+            service_target = ServiceTarget.objects.filter(
+                employee = obj,
+                 created_at__icontains = year                
+                ) 
+            for ord  in service_target:
+                create = str(ord.created_at)
+                match = int(create.split(" ")[0].split("-")[1])
+                if int(month) == match:
+                    service_target += int(ord.service_target)
+                    #retail_target += int(ord.retail_target)
+                    #return total
+            # data.update({
+            #     'service_target': service_target,
+            #     'retail_target': retail_target
+            # })
+            
+            return service_target
+            
+        except Exception as err:
+            return str(err)        
     class Meta:
         model = ServiceGroup
-        fields = ['id','name','service']#'service_sale_price']
+        fields = ['id','name','service','service_target']#'service_sale_price']
