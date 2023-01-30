@@ -624,7 +624,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
             total = 0
             service_orders = ServiceOrder.objects.filter(
                         is_deleted=False,
-                        service = str(obj.services),
+                        service = obj.services,
                         created_at__icontains = year
                         
                         )
@@ -638,6 +638,6 @@ class ServiceGroupReport(serializers.ModelSerializer):
             
         except Exception as err:
             return str(err)
-    
-    model = ServiceGroup
-    fields = ['id','name','service_sale_price']
+    class Meta:
+        model = ServiceGroup
+        fields = ['id','name','service_sale_price']
