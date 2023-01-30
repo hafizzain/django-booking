@@ -71,6 +71,8 @@ urlpatterns = [
     path('get_workingschedule/', views.working_schedule),
     path('delete_workingschedule/', views.delete_workingschedule), 
     path('update_workingschedule/', views.update_workingschedule), 
+    
+    
 
 
 ]

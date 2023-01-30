@@ -26,7 +26,7 @@ from Service.models import Service
 from rest_framework import status
 from Business.models import Business, BusinessAddress
 from Utility.models import Country, ExceptionRecord, State, City
-from Authentication.models import User
+from Authentication.models import AccountType, User
 from NStyle.Constants import StatusCodes
 import json
 from Utility.models import NstyleFile
@@ -3460,3 +3460,56 @@ def update_workingschedule(request):
         },
         status=status.HTTP_200_OK
         )
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_employe_account(request):
+    employee_id = request.data.get('employee_id', None)
+    data = []
+    try:
+        employe = Employee.objects.get(id = employee_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Invalid employee Id',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )  
+    try:
+        username = employe.email.split('@')[0]
+        try:
+            user_check = User.objects.get(username = username)
+        except Exception as err:
+            data.append(f'username user is client errors {str(err)}')
+            #data.append(f'username user is  {user_check}')
+            pass
+        else:
+            username = f'{username} {len(User.objects.all())}'
+            data.append(f'username user is {username}')
+    except Exception as err:
+        data.append(f'Employee errors {str(err)}')
+    
+    user = User.objects.create(
+                first_name = str(employe.full_name),
+                username = username,
+                email = str(employe.email),
+                is_email_verified = True,
+                is_active = True,
+                mobile_number = str(employe.mobile_number),
+            )
+    account_type = AccountType.objects.create(
+        user = user,
+        account_type = 'Employee'
+    )
+    
+    user_client = ClientIdUser.objects.create(
+        user = user,
+        client_id = client_id,
+        is_everyone = True
+    )

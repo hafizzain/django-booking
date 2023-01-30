@@ -110,6 +110,7 @@ class AccountType(models.Model):
     ACCOUNT_TYPES = [
         ('Everyone', 'Everyone'),
         ('Business', 'Business'),
+        ('Employee', 'Employee'),
     ]
     id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, primary_key=True)
 
