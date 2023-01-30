@@ -1172,8 +1172,9 @@ def create_sale_order(request):
     product_commission = request.data.get('product_commission', None)
     voucher_commission = request.data.get('voucher_commission', None)
     
-    
-    
+    service_commission_type = request.data.get('service_commission_type', None)
+    product_commission_type = request.data.get('product_commission_type', None)
+    voucher_commission_type = request.data.get('voucher_commission_type', None)
     
     #product_id = request.data.get('product', None)
     
