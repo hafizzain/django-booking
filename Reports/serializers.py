@@ -42,7 +42,7 @@ class ServiceReportSerializer(serializers.ModelSerializer):
         data = []
         service_orders = ServiceOrder.objects.filter(
                         is_deleted=False,
-                        service = str(obj.services),
+                        service = obj,
                         #created_at__icontains = year
                         )
         serialized = ServiceOrderSerializer(service_orders, many = True)
