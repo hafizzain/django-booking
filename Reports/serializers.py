@@ -37,6 +37,12 @@ class AppointmentCheckoutReportSerializer(serializers.ModelSerializer):
 
 class ServiceReportSerializer(serializers.ModelSerializer):
     sale = serializers.SerializerMethodField(read_only=True)
+    location = serializers.SerializerMethodField(read_only=True)
+    
+    
+    def get_location(self, obj):
+        loc = obj.location.all()
+        return LocationSerializer(loc, many =True ).data
     
     def get_sale(self, obj):
         data = []
