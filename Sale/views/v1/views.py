@@ -1254,9 +1254,9 @@ def create_sale_order(request):
         client_type = client_type,
         payment_type = payment_type,
         
-        service_commission = service_commission,
-        product_commission = product_commission,
-        voucher_commission = voucher_commission,   
+        # service_commission = service_commission,
+        # product_commission = product_commission,
+        # voucher_commission = voucher_commission,   
         
         service_commission_type = service_commission_type,
         product_commission_type = product_commission_type,
@@ -1270,7 +1270,6 @@ def create_sale_order(request):
         quantity = id['quantity']
         
         if sale_type == 'PRODUCT':
-            #for pro in ids:
             try:
                 product = Product.objects.get(id = service_id)
                 # commission = CommissionSchemeSetting.objects.filter(
@@ -1320,6 +1319,8 @@ def create_sale_order(request):
                 )
                 product_order.sold_quantity += 1 # product_stock.sold_quantity
                 product_order.save()
+                checkout.product_commission = product_commission
+                checkout.save()
             except Exception as err:
                 return Response(
                     {
@@ -1334,14 +1335,6 @@ def create_sale_order(request):
             )
                         
         elif sale_type == 'SERVICE':
-            
-            # if type(service_id) == str:
-            #     service_id = json.loads(service_id)
-
-            # elif type(service_id) == list:
-            #     pass
-            
-           # for servics in ids:
             try:
                 service = Service.objects.get(id = service_id)
                 service_price = PriceService.objects.filter(service = service_id).first()
@@ -1364,6 +1357,8 @@ def create_sale_order(request):
 
                     
                 )
+                checkout.service_commission = service_commission
+                checkout.save()
             except Exception as err:
                 return Response(
                     {
@@ -1377,28 +1372,7 @@ def create_sale_order(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
             
-            # serialized = ServiceOrderSerializer(service_order)
-            # return Response(
-            #     {
-            #         'status' : True,
-            #         'status_code' : 201,
-            #         'response' : {
-            #             'message' : 'Service Order Sale Created!',
-            #             'error_message' : None,
-            #             'sale' : serialized.data
-            #         }
-            #     },
-            #     status=status.HTTP_201_CREATED
-            # )
-            
         elif sale_type == 'MEMBERSHIP':
-            # if type(membership_id) == str:
-            #     membership_id = json.loads(membership_id)
-
-            # elif type(membership_id) == list:
-            #     pass
-            
-            #for membership in ids:
             try:
                 membership = Membership.objects.get(id = service_id)
                 validity = int(membership.valid_for.split(" ")[0])
@@ -1478,6 +1452,8 @@ def create_sale_order(request):
                     quantity = quantity,
 
                 )
+                checkout.voucher_commission = voucher_commission
+                checkout.save()
             except Exception as err:
                 return Response(
                     {
@@ -1490,25 +1466,7 @@ def create_sale_order(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-        # else:
-        #     return Response(
-        #     {
-        #         'status' : False,
-        #         'status_code' : StatusCodes.MISSING_FIELDS_4001,
-        #         'status_code_text' : 'MISSING_FIELDS_4001',
-        #         'response' : {
-        #             'message' : 'Invalid Data!',
-        #             'error_message' : 'selection_type fields missing choice one',
-        #             'fields' : [
-        #                   'PRODUCT',
-        #                   'SERVICE', 
-        #                   'MEMBERSHIP', 
-        #                   'VOUCHER', 
-        #                     ]
-        #         }
-        #     },
-        #     status=status.HTTP_400_BAD_REQUEST
-        # )
+    
     serialized = CheckoutSerializer(checkout, context = {'request' : request, })
     
     return Response(
