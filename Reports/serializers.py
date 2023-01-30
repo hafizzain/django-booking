@@ -487,7 +487,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'ItemType': 'Service',
                             'Quantity': ord.sold_quantity,
                             'Sale_Value': ord.total_price,
-                            'Commission_Rate': ord.checkout.service_commission,
+                            'Commission_amount': ord.checkout.service_commission,
                             'cerated_at': ord.created_at
                         })
                 else:
@@ -497,7 +497,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'ItemType': 'Service',
                             'Quantity': ord.sold_quantity,
                             'Sale_Value': ord.total_price,
-                            'Commission_Rate': ord.checkout.service_commission,
+                            'Commission_amount': ord.checkout.service_commission,
                             'cerated_at': ord.created_at
                         })
                                 
@@ -535,7 +535,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'ItemType': 'Product',
                             'Quantity': ord.sold_quantity,
                             'Sale_Value': ord.total_price,
-                            'Commission_Rate': ord.checkout.service_commission,
+                            'Commission_amount': ord.checkout.service_commission,
                             'cerated_at': ord.created_at
                         })
                 else:
@@ -545,7 +545,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'ItemType': 'Product',
                             'Quantity': ord.sold_quantity,
                             'Sale_Value': ord.total_price,
-                            'Commission_Rate': ord.checkout.service_commission,
+                            'Commission_amount': ord.checkout.service_commission,
                             'cerated_at': ord.created_at
                         })
                                 
@@ -580,20 +580,20 @@ class StaffCommissionReport(serializers.ModelSerializer):
                         data.update({
                             'id': ord.id,
                             'item_sold': ord.voucher.name,
-                            'ItemType': 'Product',
+                            'ItemType': 'Voucher',
                             'Quantity': ord.sold_quantity,
                             'Sale_Value': ord.total_price,
-                            'Commission_Rate': ord.checkout.service_commission,
+                            'Commission_amount': ord.checkout.service_commission,
                             'cerated_at': ord.created_at
                         })
                 else:
                     data.update({
                             'id': ord.id,
                             'item_sold': ord.voucher.name,
-                            'ItemType': 'Product',
+                            'ItemType': 'Voucher',
                             'Quantity': ord.sold_quantity,
                             'Sale_Value': ord.total_price,
-                            'Commission_Rate': ord.checkout.service_commission,
+                            'Commission_amount': ord.checkout.service_commission,
                             'cerated_at': ord.created_at,
                         })
                                 
@@ -624,11 +624,14 @@ class StaffCommissionReport(serializers.ModelSerializer):
 class ServiceGroupReport(serializers.ModelSerializer):
     # service_sale_price = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
+    total_service_target = serializers.SerializerMethodField(read_only=True)
     
     
     def get_service(self, obj):
         ser = obj.services.all()
         return ServiceReportSerializer(ser, many =True ).data
+    
+    
     
     # def get_service_sale_price(self, obj):
     #     try:
