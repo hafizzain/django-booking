@@ -122,18 +122,22 @@ def get_commission_reports_by_commission_details(request):
     response_data = serialized.data
     
     for da in response_data:
-        test =  da['location']
-        test = da['full_name']
-        #newdata = {'employee':,'data':}
+        location =  da['location']
+        name = da['full_name']
+        newdata = {
+            'employee': name,
+            'location': location,
+            #''                
+            }
         
         # newdata.update({
               
         # })
-        Append_data.extend(test)
+        Append_data.append(newdata)
         
-        ExceptionRecord.objects.create(
-        text = test
-    )
+    #     ExceptionRecord.objects.create(
+    #     text = test
+    # )
         
     
     return Response(
