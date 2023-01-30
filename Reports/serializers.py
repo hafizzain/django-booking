@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from rest_framework import serializers
+from Appointment.models import AppointmentCheckout
 from Appointment.serializers import LocationSerializer
 from Business.models import BusinessAddress
 from Employee.models import Employee
@@ -14,58 +15,47 @@ from Utility.Constants.Data.months import MONTH_DICT
 
 
 class ServiceOrderSerializer(serializers.ModelSerializer):
-    # client = serializers.SerializerMethodField(read_only=True)
-    # service = serializers.SerializerMethodField(read_only=True)
-    # location = serializers.SerializerMethodField(read_only=True)
-    # member  = serializers.SerializerMethodField(read_only=True)
-    user  = serializers.SerializerMethodField(read_only=True)
-    order_type  = serializers.SerializerMethodField(read_only=True)
+    # user  = serializers.SerializerMethodField(read_only=True)
+    # order_type  = serializers.SerializerMethodField(read_only=True)
     
-    def get_order_type(self, obj):
-        return 'Service'
-    
-    # def get_service(self, obj):
-    #     try:
-    #         serializers = ServiceSearchSerializer(obj.service).data
-    #         return serializers
-    #     except Exception as err:
-    #         return None
+    # def get_order_type(self, obj):
+    #     return 'Service'
         
-    # def get_location(self, obj):
+    # def get_user(self, obj):
     #     try:
-    #         serializers = LocationSerializer(obj.location).data
-    #         return serializers
+    #         return obj.user.full_name
     #     except Exception as err:
     #         return None
-    
-    # def get_member(self, obj):
-    #     try:
-    #         serializers = MemberSerializer(obj.member, context=self.context).data
-    #         return serializers
-    #     except Exception as err:
-    #         return None
-        
-    # def get_client(self, obj):
-    #     try:
-    #         serializers = ClientSerializer(obj.client).data
-    #         return serializers
-    #     except Exception as err:
-    #         return None
-        
-    def get_user(self, obj):
-        try:
-            return obj.user.full_name
-        except Exception as err:
-            return None
     class Meta:
         model = ServiceOrder
-        fields = ('__all__')
+        fields = ('total_price', 'sold_quantity','current_price')
+        
+class AppointmentCheckoutReportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AppointmentCheckout
+        fields = ['total_price']
 
-# class ServiceReportSerializer(serializers.ModelSerializer):
+class ServiceReportSerializer(serializers.ModelSerializer):
+    sale = serializers.SerializerMethodField(read_only=True)
     
-#     class Meta:
-#         model = Service
-#         fi
+    def get_sale(self, obj):
+        data = []
+        service_orders = ServiceOrder.objects.filter(
+                        is_deleted=False,
+                        service = str(obj.services),
+                        #created_at__icontains = year
+                        )
+        serialized = ServiceOrderSerializer(service_orders, many = True)
+        data.extend(serialized.data)
+        
+        
+        appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')
+        serialized = AppointmentCheckoutReportSerializer(appointment_checkout, many = True)
+        data.extend(serialized.data)
+    
+    class Meta:
+        model = Service
+        fields = ['id','name']
 
 class ReportsEmployeSerializer(serializers.ModelSerializer):    
     image = serializers.SerializerMethodField()
@@ -628,12 +618,12 @@ class StaffCommissionReport(serializers.ModelSerializer):
         
 class ServiceGroupReport(serializers.ModelSerializer):
     # service_sale_price = serializers.SerializerMethodField(read_only=True)
-    # service = serializers.SerializerMethodField(read_only=True)
+    service = serializers.SerializerMethodField(read_only=True)
     
     
-    # def get_location(self, obj):
-    #     loc = obj.location.all()
-    #     return LocationSerializer(loc, many =True ).data
+    def get_location(self, obj):
+        ser = obj.services.all()
+        return ServiceReportSerializer(ser, many =True ).data
     
     # def get_service_sale_price(self, obj):
     #     try:
