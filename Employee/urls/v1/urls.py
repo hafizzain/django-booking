@@ -72,7 +72,7 @@ urlpatterns = [
     path('delete_workingschedule/', views.delete_workingschedule), 
     path('update_workingschedule/', views.update_workingschedule), 
     
+    #Create User Account
+    path('create_employe_account/', views.create_employe_account),
     
-
-
 ]
