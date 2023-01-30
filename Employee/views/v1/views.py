@@ -3468,9 +3468,11 @@ def update_workingschedule(request):
 def create_employe_account(request):
     employee_id = request.data.get('employee_id', None)
     tenant_id = request.data.get('tenant_id', None)
+    password = request.data.get('password', None)
+    
     data = []
     
-    if not all([employee_id,tenant_id]):
+    if not all([employee_id,tenant_id, password]):
         return Response(
             {
                 'status' : False,
@@ -3482,6 +3484,7 @@ def create_employe_account(request):
                     'fields' : [
                         'employee_id',
                         'tenant_id',
+                        'password',
                     ]
                 }
             },
@@ -3524,7 +3527,7 @@ def create_employe_account(request):
         try:
             user_check = User.objects.get(username = username)
         except Exception as err:
-            data.append(f'username user is client errors {str(err)}')
+            #data.append(f'username user is client errors {str(err)}')
             pass
         else:
             username = f'{username} {len(User.objects.all())}'
@@ -3540,6 +3543,8 @@ def create_employe_account(request):
                 is_active = True,
                 mobile_number = str(employe.mobile_number),
             )
+    user.set_password(password)
+    user.save()
     
     with tenant_context(Tenant.objects.get(schema_name = 'public')):
         try:
@@ -3547,7 +3552,7 @@ def create_employe_account(request):
             try:
                 user_check = User.objects.get(username = username)
             except Exception as err:   
-                data.append(f'username user is client errors {str(err)}')
+                #data.append(f'username user is client errors {str(err)}')
                 pass
             else:
                 username = f'{username} {len(User.objects.all())}'
@@ -3573,6 +3578,8 @@ def create_employe_account(request):
             #client_id = client_id,
             is_tenant_staff = True
         )
+        user.set_password(password)
+        user.save()
     return Response(
         {
             'status' : True,
