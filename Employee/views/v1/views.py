@@ -3571,7 +3571,7 @@ def create_employe_account(request):
             user = user,
             tenant = tenant_id,
             #client_id = client_id,
-            is_everyone = True
+            is_tenant_staff = True
         )
     return Response(
         {
