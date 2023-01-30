@@ -41,13 +41,13 @@ class Checkout(models.Model):
     
     tip = models.PositiveBigIntegerField(default = 0)
     
-    service_commission = models.PositiveBigIntegerField(default = 0)
-    product_commission = models.PositiveBigIntegerField(default = 0)
-    voucher_commission = models.PositiveBigIntegerField(default = 0)
+    service_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
+    product_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
+    voucher_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
     
-    service_commission_type = models.PositiveBigIntegerField(default = 0)
-    product_commission_type = models.PositiveBigIntegerField(default = 0)
-    voucher_commission_type = models.PositiveBigIntegerField(default = 0)
+    service_commission_type = models.CharField( max_length=50 , default = '')
+    product_commission_type = models.CharField( max_length=50 , default = '')
+    voucher_commission_type = models.CharField( max_length=50 , default = '')
     
     status =  models.CharField(choices=status_choice, max_length=100, default='Active')
     is_deleted = models.BooleanField(default=False)
