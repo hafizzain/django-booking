@@ -485,6 +485,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                 
                 if range_start:
                     if range_start >= created_at  and created_at <= range_end:
+                        rate = ord.checkout.voucher_commission_type
                         #total += int(ord.total_price)
                         #sale_value = ord.sold_quantity * 
                         data.update({
@@ -494,10 +495,11 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'Quantity': ord.quantity,
                             'Sale_Value': ord.total_price,
                             'Commission_amount': ord.checkout.service_commission,
-                            'Commission_Rate': ord.checkout.service_commission_type,
+                            'Commission_Rate': rate if rate != None else 0  ,
                             'cerated_at': ord.created_at
                         })
                 else:
+                    rate = ord.checkout.voucher_commission_type
                     data.update({
                             'id': ord.id,
                             'item_sold': ord.service.name,
@@ -505,7 +507,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'Quantity': ord.quantity,
                             'Sale_Value': ord.total_price,
                             'Commission_amount': ord.checkout.service_commission,
-                            'Commission_Rate': ord.checkout.service_commission_type,
+                            'Commission_Rate': rate if rate != None else 0  ,
                             'cerated_at': ord.created_at
                         })
                                 
@@ -607,7 +609,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'Quantity': ord.quantity,
                             'Sale_Value': ord.total_price,
                             'Commission_amount': ord.checkout.service_commission,
-                            'Commission_Rate': rate if rate != 'null' else 0  ,
+                            'Commission_Rate': rate if rate != None else 0  ,
                             'cerated_at': ord.created_at,
                         })
                                 
