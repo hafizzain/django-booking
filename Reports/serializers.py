@@ -7,7 +7,7 @@ from Product.Constants.index import tenant_media_base_url
 
 from Order.models import MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
 from Sale.serializers import ProductOrderSerializer
-from Service.models import ServiceGroup
+from Service.models import Service, ServiceGroup
 from TragetControl.models import StaffTarget, StoreTarget, TierStoreTarget
 from TragetControl.serializers import StaffTargetSerializers, StoreTargetSerializers, TierStoreTargetSerializers
 from Utility.Constants.Data.months import MONTH_DICT
@@ -60,12 +60,12 @@ class ServiceOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceOrder
         fields = ('__all__')
-        #fields = ['id', 'client','quantity', 'service','created_at' ,'user',
-                #   'duration', 'location', 'member', 'total_price',
-                #   'payment_type','tip','gst', 'order_type','created_at'
-                #   ]
 
-
+# class ServiceReportSerializer(serializers.ModelSerializer):
+    
+#     class Meta:
+#         model = Service
+#         fi
 
 class ReportsEmployeSerializer(serializers.ModelSerializer):    
     image = serializers.SerializerMethodField()
@@ -487,19 +487,23 @@ class StaffCommissionReport(serializers.ModelSerializer):
                         #total += int(ord.total_price)
                         #sale_value = ord.sold_quantity * 
                         data.update({
+                            'id': ord.id,
                             'item_sold': ord.service.name,
                             'ItemType': 'Service',
                             'Quantity': ord.sold_quantity,
                             'Sale_Value': ord.total_price,
-                            'Commission_Rate': ord.checkout.service_commission
+                            'Commission_Rate': ord.checkout.service_commission,
+                            'cerated_at': ord.created_at
                         })
                 else:
                     data.update({
+                            'id': ord.id,
                             'item_sold': ord.service.name,
                             'ItemType': 'Service',
                             'Quantity': ord.sold_quantity,
                             'Sale_Value': ord.total_price,
-                            'Commission_Rate': ord.checkout.service_commission
+                            'Commission_Rate': ord.checkout.service_commission,
+                            'cerated_at': ord.created_at
                         })
                                 
             return data         
@@ -531,19 +535,23 @@ class StaffCommissionReport(serializers.ModelSerializer):
                         #total += int(ord.total_price)
                         #sale_value = ord.sold_quantity * 
                         data.update({
+                            'id': ord.id,
                             'item_sold': ord.product.name,
                             'ItemType': 'Product',
                             'Quantity': ord.sold_quantity,
                             'Sale_Value': ord.total_price,
-                            'Commission_Rate': ord.checkout.service_commission
+                            'Commission_Rate': ord.checkout.service_commission,
+                            'cerated_at': ord.created_at
                         })
                 else:
                     data.update({
+                            'id': ord.id,
                             'item_sold': ord.product.name,
                             'ItemType': 'Product',
                             'Quantity': ord.sold_quantity,
                             'Sale_Value': ord.total_price,
-                            'Commission_Rate': ord.checkout.service_commission
+                            'Commission_Rate': ord.checkout.service_commission,
+                            'cerated_at': ord.created_at
                         })
                                 
             return data         
@@ -575,19 +583,23 @@ class StaffCommissionReport(serializers.ModelSerializer):
                         #total += int(ord.total_price)
                         #sale_value = ord.sold_quantity * 
                         data.update({
-                            'item_sold': ord.product.name,
+                            'id': ord.id,
+                            'item_sold': ord.voucher.name,
                             'ItemType': 'Product',
                             'Quantity': ord.sold_quantity,
                             'Sale_Value': ord.total_price,
-                            'Commission_Rate': ord.checkout.service_commission
+                            'Commission_Rate': ord.checkout.service_commission,
+                            'cerated_at': ord.created_at
                         })
                 else:
                     data.update({
-                            'item_sold': ord.product.name,
+                            'id': ord.id,
+                            'item_sold': ord.voucher.name,
                             'ItemType': 'Product',
                             'Quantity': ord.sold_quantity,
                             'Sale_Value': ord.total_price,
-                            'Commission_Rate': ord.checkout.service_commission
+                            'Commission_Rate': ord.checkout.service_commission,
+                            'cerated_at': ord.created_at,
                         })
                                 
             return data         
@@ -615,29 +627,36 @@ class StaffCommissionReport(serializers.ModelSerializer):
                    ]
         
 class ServiceGroupReport(serializers.ModelSerializer):
-    service_sale_price = serializers.SerializerMethodField(read_only=True)
+    # service_sale_price = serializers.SerializerMethodField(read_only=True)
+    # service = serializers.SerializerMethodField(read_only=True)
     
-    def get_service_sale_price(self, obj):
-        try:
-            month = self.context["month"]
-            year = self.context["year"]
-            total = 0
-            service_orders = ServiceOrder.objects.filter(
-                        is_deleted=False,
-                        service = str(obj.services),
-                        created_at__icontains = year
+    
+    # def get_location(self, obj):
+    #     loc = obj.location.all()
+    #     return LocationSerializer(loc, many =True ).data
+    
+    # def get_service_sale_price(self, obj):
+    #     try:
+    #         month = self.context["month"]
+    #         year = self.context["year"]
+    #         total = 0
+    #         service_orders = ServiceOrder.objects.filter(
+    #                     is_deleted=False,
+    #                     service = str(obj.services),
+    #                     created_at__icontains = year
                         
-                        )
-            for ord  in service_orders:
-                create = str(ord.created_at)
-                match = int(create.split(" ")[0].split("-")[1])
-                if int(month) == match:
-                    total += int(ord.total_price)
+    #                     )
+    #         for ord  in service_orders:
+    #             create = str(ord.created_at)
+    #             match = int(create.split(" ")[0].split("-")[1])
+    #             if int(month) == match:
+    #                 total += int(ord.total_price)
                                 
-            return total         
+    #         return total         
             
-        except Exception as err:
-            return str(err)
+    #     except Exception as err:
+    #         return str(err)
+        
     class Meta:
         model = ServiceGroup
-        fields = ['id','name','service_sale_price']
+        fields = ['id','name',]#'service_sale_price']
