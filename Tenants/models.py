@@ -88,7 +88,6 @@ class EmployeeTenantDetail(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='employee_tenant_detail', null=True, blank=True)
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='tenant_employee')
     
-    is_appointment = models.BooleanField(default=False)
     is_tenant_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
 

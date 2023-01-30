@@ -3467,7 +3467,27 @@ def update_workingschedule(request):
 @permission_classes([IsAuthenticated])
 def create_employe_account(request):
     employee_id = request.data.get('employee_id', None)
+    tenant_id = request.data.get('tenant_id', None)
     data = []
+    
+    if not all([employee_id,tenant_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'employee_id',
+                        'tenant_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
     try:
         employe = Employee.objects.get(id = employee_id)
     except Exception as err:
@@ -3484,12 +3504,27 @@ def create_employe_account(request):
             status=status.HTTP_400_BAD_REQUEST
         )  
     try:
+        tenant_id = Tenant.objects.get(id = tenant_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Invalid Tenat Id',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )  
+    
+    try:
         username = employe.email.split('@')[0]
         try:
             user_check = User.objects.get(username = username)
         except Exception as err:
             data.append(f'username user is client errors {str(err)}')
-            #data.append(f'username user is  {user_check}')
             pass
         else:
             username = f'{username} {len(User.objects.all())}'
@@ -3507,6 +3542,18 @@ def create_employe_account(request):
             )
     
     with tenant_context(Tenant.objects.get(schema_name = 'public')):
+        try:
+            username = employe.email.split('@')[0]
+            try:
+                user_check = User.objects.get(username = username)
+            except Exception as err:   
+                data.append(f'username user is client errors {str(err)}')
+                pass
+            else:
+                username = f'{username} {len(User.objects.all())}'
+                data.append(f'username user is {username}')
+        except Exception as err:
+            data.append(f'Employee errors {str(err)}')
         user = User.objects.create(
                 first_name = str(employe.full_name),
                 username = username,
@@ -3522,7 +3569,20 @@ def create_employe_account(request):
         
         user_client = EmployeeTenantDetail.objects.create(
             user = user,
-            
+            tenant = tenant_id,
             #client_id = client_id,
             is_everyone = True
         )
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : 'Saved Data',
+            'response' : {
+                'message' : 'Successfully Employee Created',
+                'error_message' : None,
+                'errors': data,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
