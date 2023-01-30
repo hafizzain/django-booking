@@ -130,6 +130,7 @@ def get_commission_reports_by_commission_details(request):
             
             
         # })
+        Append_data.append(test)
         
         ExceptionRecord.objects.create(
         text = test
