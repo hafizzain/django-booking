@@ -108,6 +108,8 @@ def get_commission_reports_by_commission_details(request):
     year = request.GET.get('year', None)
     range_end = request.GET.get('range_end', None)
     response_data = []
+    Append_data = [] 
+    newdata = {} 
     
     employee = Employee.objects.filter(is_deleted=False).order_by('-created_at')
     serialized = StaffCommissionReport (employee,  many=True, context={
@@ -120,7 +122,15 @@ def get_commission_reports_by_commission_details(request):
     response_data = serialized.data
     
     for da in response_data:
-        test =  da['service_sale_price']
+        test =  da['location'][0]
+        #newdata = {'employee':,'data':}
+        
+        # newdata.update({
+            
+            
+            
+        # })
+        
         ExceptionRecord.objects.create(
         text = test
     )
