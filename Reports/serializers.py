@@ -55,7 +55,7 @@ class ServiceReportSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Service
-        fields = ['id','name']
+        fields = ['id','name', 'sale']
 
 class ReportsEmployeSerializer(serializers.ModelSerializer):    
     image = serializers.SerializerMethodField()
@@ -621,7 +621,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
     service = serializers.SerializerMethodField(read_only=True)
     
     
-    def get_location(self, obj):
+    def get_service(self, obj):
         ser = obj.services.all()
         return ServiceReportSerializer(ser, many =True ).data
     
@@ -649,4 +649,4 @@ class ServiceGroupReport(serializers.ModelSerializer):
         
     class Meta:
         model = ServiceGroup
-        fields = ['id','name',]#'service_sale_price']
+        fields = ['id','name','service']#'service_sale_price']
