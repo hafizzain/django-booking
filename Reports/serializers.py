@@ -37,12 +37,12 @@ class AppointmentCheckoutReportSerializer(serializers.ModelSerializer):
 
 class ServiceReportSerializer(serializers.ModelSerializer):
     sale = serializers.SerializerMethodField(read_only=True)
-    location = serializers.SerializerMethodField(read_only=True)
+    #location = serializers.SerializerMethodField(read_only=True)
     
     
-    def get_location(self, obj):
-        loc = obj.location.all()
-        return LocationSerializer(loc, many =True ).data
+    # def get_location(self, obj):
+    #     loc = obj.location.all()
+    #     return LocationSerializer(loc, many =True ).data
     
     def get_sale(self, obj):
         data = []
@@ -66,7 +66,7 @@ class ServiceReportSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Service
-        fields = ['id','name', 'sale','location']
+        fields = ['id','name', 'sale']
 
 class ReportsEmployeSerializer(serializers.ModelSerializer):    
     image = serializers.SerializerMethodField()
@@ -585,6 +585,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                 
                 if range_start:
                     if range_start >= created_at  and created_at <= range_end:
+                        rate = ord.checkout.voucher_commission_type
                         #total += int(ord.total_price)
                         #sale_value = ord.sold_quantity * 
                         data.update({
@@ -594,10 +595,11 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'Quantity': ord.quantity,
                             'Sale_Value': ord.total_price,
                             'Commission_amount': ord.checkout.service_commission,
-                            'Commission_Rate': ord.checkout.voucher_commission_type,
+                            'Commission_Rate': rate if rate != 'null' else 0  ,
                             'cerated_at': ord.created_at
                         })
                 else:
+                    rate = ord.checkout.voucher_commission_type
                     data.update({
                             'id': ord.id,
                             'item_sold': ord.voucher.name,
@@ -605,7 +607,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'Quantity': ord.quantity,
                             'Sale_Value': ord.total_price,
                             'Commission_amount': ord.checkout.service_commission,
-                            'Commission_Rate': ord.checkout.voucher_commission_type,
+                            'Commission_Rate': rate if rate != 'null' else 0  ,
                             'cerated_at': ord.created_at,
                         })
                                 

@@ -7,6 +7,8 @@ from Employee.models import( CategoryCommission, EmployeDailySchedule, Employee 
                         , StaffGroupModulePermission, Attendance
                         ,Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation
                         )
+from Tenants.models import EmployeeTenantDetail, Tenant
+from django_tenants.utils import tenant_context
 from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSIONS_MODEL_FIELDS
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -3503,13 +3505,24 @@ def create_employe_account(request):
                 is_active = True,
                 mobile_number = str(employe.mobile_number),
             )
-    account_type = AccountType.objects.create(
-        user = user,
-        account_type = 'Employee'
-    )
     
-    user_client = ClientIdUser.objects.create(
-        user = user,
-        client_id = client_id,
-        is_everyone = True
-    )
+    with tenant_context(Tenant.objects.get(schema_name = 'public')):
+        user = User.objects.create(
+                first_name = str(employe.full_name),
+                username = username,
+                email = str(employe.email),
+                is_email_verified = True,
+                is_active = True,
+                mobile_number = str(employe.mobile_number),
+            )
+        account_type = AccountType.objects.create(
+            user = user,
+            account_type = 'Employee'
+        )
+        
+        user_client = EmployeeTenantDetail.objects.create(
+            user = user,
+            
+            #client_id = client_id,
+            is_everyone = True
+        )
