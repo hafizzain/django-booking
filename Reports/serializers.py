@@ -458,7 +458,7 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
 class StaffCommissionReport(serializers.ModelSerializer):
     service_sale_price = serializers.SerializerMethodField(read_only=True)
     product_sale_price = serializers.SerializerMethodField(read_only=True)
-    #service_sale_price = serializers.SerializerMethodField(read_only=True)
+    voucher_sale_price = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField(read_only=True)
     
@@ -550,6 +550,50 @@ class StaffCommissionReport(serializers.ModelSerializer):
         except Exception as err:
             return str(err)
     
+    def get_voucher_sale_price(self, obj):
+        try:
+            range_start = self.context["range_start"]
+            range_end = self.context["range_end"]
+            year = self.context["year"]
+            
+            if range_start:
+                range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
+                range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
+            
+            data = {}
+            service_orders = VoucherOrder.objects.filter(is_deleted=False, 
+                        member = obj,
+                        #created_at__icontains = year
+                        )
+            for ord  in service_orders:                
+                create = str(ord.created_at)
+                created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
+                
+                if range_start:
+                    if range_start >= created_at  and created_at <= range_end:
+                        #total += int(ord.total_price)
+                        #sale_value = ord.sold_quantity * 
+                        data.update({
+                            'item_sold': ord.product.name,
+                            'ItemType': 'Product',
+                            'Quantity': ord.sold_quantity,
+                            'Sale_Value': ord.total_price,
+                            'Commission_Rate': ord.checkout.service_commission
+                        })
+                else:
+                    data.update({
+                            'item_sold': ord.product.name,
+                            'ItemType': 'Product',
+                            'Quantity': ord.sold_quantity,
+                            'Sale_Value': ord.total_price,
+                            'Commission_Rate': ord.checkout.service_commission
+                        })
+                                
+            return data         
+            
+        except Exception as err:
+            return str(err)
+    
     def get_location(self, obj):
         loc = obj.location.all()
         return LocationSerializer(loc, many =True ).data
@@ -565,6 +609,8 @@ class StaffCommissionReport(serializers.ModelSerializer):
         return None
     class Meta:
         model = Employee
-        fields =  ['id', 'full_name', 'service_sale_price','product_sale_price','image','location' ]
+        fields =  ['id', 'full_name', 'service_sale_price',
+                   'product_sale_price','image','location','voucher_sale_price'
+                   ]
         
 
