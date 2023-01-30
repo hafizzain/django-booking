@@ -131,20 +131,20 @@ def get_commission_reports_by_commission_details(request):
         newdata = {
             'employee': name,
             'location': location,
-            'service_sale_price': service_sale_price,
+            'sale': service_sale_price,
             }
         Append_data.append(newdata)
         
         newdata = {
             'employee': name,
             'location': location,
-            'product_sale_price': product_sale_price,
+            'sale': product_sale_price,
             }
         Append_data.append(newdata)
         newdata = {
             'employee': name,
             'location': location,
-            'voucher_sale_price': voucher_sale_price,
+            'sale': voucher_sale_price,
             }
         Append_data.append(newdata)
     
