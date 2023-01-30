@@ -1256,7 +1256,11 @@ def create_sale_order(request):
         
         service_commission = service_commission,
         product_commission = product_commission,
-        voucher_commission = voucher_commission,      
+        voucher_commission = voucher_commission,   
+        
+        service_commission_type = service_commission_type,
+        product_commission_type = product_commission_type,
+        voucher_commission_type = voucher_commission_type ,  
         
         tip = tip
     )
@@ -1283,7 +1287,7 @@ def create_sale_order(request):
                         product = product,
                         user = request.user,
                         location = business_address,
-                        quantity = int(quantity), 
+                        #quantity = int(quantity), 
                         before_quantity = transfer.available_quantity      
                         )                    
                         sold = transfer.available_quantity - int(quantity)
