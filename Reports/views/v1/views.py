@@ -107,6 +107,7 @@ def get_commission_reports_by_commission_details(request):
     range_start = request.GET.get('range_start', None)
     year = request.GET.get('year', None)
     range_end = request.GET.get('range_end', None)
+    response_data = []
     
     employee = Employee.objects.filter(is_deleted=False).order_by('-created_at')
     serialized = StaffCommissionReport (employee,  many=True, context={
@@ -116,6 +117,14 @@ def get_commission_reports_by_commission_details(request):
         'year': year
         
         })
+    response_data = serialized.data
+    ExceptionRecord.objects.create(
+        text = str(response_data)
+    )
+    # for da in response_data:
+    #     da.service_sale_price
+    #     print()
+    
     return Response(
         {
             'status' : 200,
