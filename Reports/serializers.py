@@ -459,6 +459,8 @@ class StaffCommissionReport(serializers.ModelSerializer):
     service_sale_price = serializers.SerializerMethodField(read_only=True)
     product_sale_price = serializers.SerializerMethodField(read_only=True)
     #service_sale_price = serializers.SerializerMethodField(read_only=True)
+    image = serializers.SerializerMethodField()
+    location = serializers.SerializerMethodField(read_only=True)
     
     def get_service_sale_price(self, obj):
         try:
@@ -548,8 +550,21 @@ class StaffCommissionReport(serializers.ModelSerializer):
         except Exception as err:
             return str(err)
     
+    def get_location(self, obj):
+        loc = obj.location.all()
+        return LocationSerializer(loc, many =True ).data
+    
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request)
+                return f'{url}{obj.image}'
+            except:
+                return obj.image
+        return None
     class Meta:
         model = Employee
-        fields =  ['id', 'full_name', 'service_sale_price','product_sale_price' ]
+        fields =  ['id', 'full_name', 'service_sale_price','product_sale_price','image','location' ]
         
 
