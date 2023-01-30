@@ -595,7 +595,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'Quantity': ord.quantity,
                             'Sale_Value': ord.total_price,
                             'Commission_amount': ord.checkout.service_commission,
-                            'Commission_Rate': rate if rate != "null" else 0  ,
+                            'Commission_Rate': rate if rate != None else 0  ,
                             'cerated_at': ord.created_at
                         })
                 else:
