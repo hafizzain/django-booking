@@ -110,6 +110,7 @@ def get_commission_reports_by_commission_details(request):
     response_data = []
     Append_data = [] 
     newdata = {} 
+    data = []
     
     employee = Employee.objects.filter(is_deleted=False).order_by('-created_at')
     serialized = StaffCommissionReport (employee,  many=True, context={
@@ -125,11 +126,17 @@ def get_commission_reports_by_commission_details(request):
         location =  da['location']
         name = da['full_name']
         service_sale_price = da['service_sale_price']
+        product_sale_price = da['product_sale_price']
         newdata = {
             'employee': name,
             'location': location,
             'service_sale_price': service_sale_price,
-            #''                
+            }
+        Append_data.append(newdata)
+        newdata = {
+            'employee': name,
+            'location': location,
+            'product_sale_price': product_sale_price,
             }
         
         # newdata.update({
