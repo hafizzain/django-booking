@@ -128,3 +128,24 @@ def get_commission_reports_by_commission_details(request):
         },
         status=status.HTTP_200_OK
     )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_service_target_report(request):
+    month = request.GET.get('month', None)
+    year = request.GET.get('year', None)
+    
+    address = ServiceGroup.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = BusinesAddressReportSerializer(address, many=True, context={'request' : request, 'month': month, 'year': year})
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Business Address Report',
+                'error_message' : None,
+                'address' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )

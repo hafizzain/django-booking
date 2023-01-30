@@ -7,6 +7,7 @@ from Product.Constants.index import tenant_media_base_url
 
 from Order.models import MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
 from Sale.serializers import ProductOrderSerializer
+from Service.models import ServiceGroup
 from TragetControl.models import StaffTarget, StoreTarget, TierStoreTarget
 from TragetControl.serializers import StaffTargetSerializers, StoreTargetSerializers, TierStoreTargetSerializers
 from Utility.Constants.Data.months import MONTH_DICT
@@ -613,4 +614,30 @@ class StaffCommissionReport(serializers.ModelSerializer):
                    'product_sale_price','image','location','voucher_sale_price'
                    ]
         
-
+class ServiceGroupReport(serializers.ModelSerializer):
+    service_sale_price = serializers.SerializerMethodField(read_only=True)
+    
+    def get_service_sale_price(self, obj):
+        try:
+            month = self.context["month"]
+            year = self.context["year"]
+            total = 0
+            service_orders = ServiceOrder.objects.filter(
+                        is_deleted=False,
+                        service = str(obj.service),
+                        created_at__icontains = year
+                        
+                        )
+            for ord  in service_orders:
+                create = str(ord.created_at)
+                match = int(create.split(" ")[0].split("-")[1])
+                if int(month) == match:
+                    total += int(ord.total_price)
+                                
+            return total         
+            
+        except Exception as err:
+            return str(err)
+    
+    model = ServiceGroup
+    fields = ['id','name','service_sale_price']
