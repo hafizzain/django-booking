@@ -40,18 +40,23 @@ class ServiceReportSerializer(serializers.ModelSerializer):
     
     def get_sale(self, obj):
         data = []
-        service_orders = ServiceOrder.objects.filter(
-                        is_deleted=False,
-                        service = obj,
-                        #created_at__icontains = year
-                        )
-        serialized = ServiceOrderSerializer(service_orders, many = True)
-        data.extend(serialized.data)
-        
-        
-        appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')
-        serialized = AppointmentCheckoutReportSerializer(appointment_checkout, many = True)
-        data.extend(serialized.data)
+        try:
+            service_orders = ServiceOrder.objects.filter(
+                            is_deleted=False,
+                            service = obj,
+                            #created_at__icontains = year
+                            )
+            serialized = ServiceOrderSerializer(service_orders, many = True)
+            data.extend(serialized.data)
+            
+            
+            appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')
+            serialized = AppointmentCheckoutReportSerializer(appointment_checkout, many = True)
+            data.extend(serialized.data)
+            
+            return data
+        except Exception as err:
+            return str(err)
     
     class Meta:
         model = Service
