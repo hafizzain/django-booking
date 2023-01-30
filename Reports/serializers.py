@@ -635,7 +635,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
         try:
             month = self.context["month"]
             year = self.context["year"]
-            service_target = 0
+            ser_target = 0
             retail_target = 0
             data = {}
             
@@ -647,7 +647,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
                 create = str(ord.created_at)
                 match = int(create.split(" ")[0].split("-")[1])
                 if int(month) == match:
-                    service_target += int(ord.service_target)
+                    ser_target += int(ord.service_target)
                     #retail_target += int(ord.retail_target)
                     #return total
             # data.update({
@@ -655,7 +655,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
             #     'retail_target': retail_target
             # })
             
-            return service_target
+            return ser_target
             
         except Exception as err:
             return str(err)        
