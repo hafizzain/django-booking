@@ -624,7 +624,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
             total = 0
             service_orders = ServiceOrder.objects.filter(
                         is_deleted=False,
-                        service = str(obj.service),
+                        service = str(obj.services),
                         created_at__icontains = year
                         
                         )
