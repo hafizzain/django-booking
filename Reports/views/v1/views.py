@@ -144,7 +144,7 @@ def get_commission_reports_by_commission_details(request):
             'response' : {
                 'message' : 'All Employee Orders',
                 'error_message' : None,
-                'staff_report' : serialized.data
+                'staff_report' : Append_data
             }
         },
         status=status.HTTP_200_OK
