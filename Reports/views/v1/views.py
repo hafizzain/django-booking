@@ -123,12 +123,11 @@ def get_commission_reports_by_commission_details(request):
     
     for da in response_data:
         test =  da['location']
+        test = da['full_name']
         #newdata = {'employee':,'data':}
         
         # newdata.update({
-            
-            
-            
+              
         # })
         Append_data.extend(test)
         
