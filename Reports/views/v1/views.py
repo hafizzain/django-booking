@@ -118,12 +118,13 @@ def get_commission_reports_by_commission_details(request):
         
         })
     response_data = serialized.data
-    ExceptionRecord.objects.create(
-        text = str(response_data)
+    
+    for da in response_data:
+        test =  da.service_sale_price
+        ExceptionRecord.objects.create(
+        text = test
     )
-    # for da in response_data:
-    #     da.service_sale_price
-    #     print()
+        
     
     return Response(
         {
