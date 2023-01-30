@@ -28,12 +28,12 @@ class ServiceOrderSerializer(serializers.ModelSerializer):
     #         return None
     class Meta:
         model = ServiceOrder
-        fields = ('total_price', 'sold_quantity','current_price')
+        fields = ('total_price', 'sold_quantity','current_price', 'created_at')
         
 class AppointmentCheckoutReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentCheckout
-        fields = ['total_price']
+        fields = ['total_price', 'created_at']
 
 class ServiceReportSerializer(serializers.ModelSerializer):
     sale = serializers.SerializerMethodField(read_only=True)
