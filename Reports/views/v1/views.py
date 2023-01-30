@@ -124,9 +124,11 @@ def get_commission_reports_by_commission_details(request):
     for da in response_data:
         location =  da['location']
         name = da['full_name']
+        service_sale_price = da['service_sale_price']
         newdata = {
             'employee': name,
             'location': location,
+            'service_sale_price': service_sale_price,
             #''                
             }
         
