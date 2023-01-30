@@ -9,6 +9,6 @@ urlpatterns = [
     
     path('get_commission_reports_by_commission_details/', views.get_commission_reports_by_commission_details),
     
-    path('get_commission_reports_by_commission_details/', views.get_commission_reports_by_commission_details),
+    path('get_service_target_report/', views.get_service_target_report),
     
 ]

@@ -7,7 +7,7 @@ from Appointment.models import Appointment, AppointmentCheckout, AppointmentServ
 from Business.models import Business
 from Client.models import Client, Membership, Vouchers
 from Order.models import Checkout, MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
-from Reports.serializers import BusinesAddressReportSerializer, ComissionReportsEmployeSerializer, ReportsEmployeSerializer, StaffCommissionReport
+from Reports.serializers import BusinesAddressReportSerializer, ComissionReportsEmployeSerializer, ReportsEmployeSerializer, ServiceGroupReport, StaffCommissionReport
 from Sale.Constants.Custom_pag import CustomPagination
 from Utility.Constants.Data.months import MONTHS
 from Utility.models import Country, Currency, ExceptionRecord, State, City
@@ -136,7 +136,7 @@ def get_service_target_report(request):
     year = request.GET.get('year', None)
     
     address = ServiceGroup.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = BusinesAddressReportSerializer(address, many=True, context={'request' : request, 'month': month, 'year': year})
+    serialized = ServiceGroupReport(address, many=True, context={'request' : request, 'month': month, 'year': year})
     return Response(
         {
             'status' : 200,
