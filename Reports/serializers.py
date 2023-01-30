@@ -491,7 +491,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'id': ord.id,
                             'item_sold': ord.service.name,
                             'ItemType': 'Service',
-                            'Quantity': ord.sold_quantity,
+                            'Quantity': ord.quantity,
                             'Sale_Value': ord.total_price,
                             'Commission_amount': ord.checkout.service_commission,
                             'cerated_at': ord.created_at
@@ -501,7 +501,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'id': ord.id,
                             'item_sold': ord.service.name,
                             'ItemType': 'Service',
-                            'Quantity': ord.sold_quantity,
+                            'Quantity': ord.quantity,
                             'Sale_Value': ord.total_price,
                             'Commission_amount': ord.checkout.service_commission,
                             'cerated_at': ord.created_at
@@ -539,7 +539,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'id': ord.id,
                             'item_sold': ord.product.name,
                             'ItemType': 'Product',
-                            'Quantity': ord.sold_quantity,
+                            'Quantity': ord.quantity,
                             'Sale_Value': ord.total_price,
                             'Commission_amount': ord.checkout.service_commission,
                             'cerated_at': ord.created_at
@@ -549,7 +549,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'id': ord.id,
                             'item_sold': ord.product.name,
                             'ItemType': 'Product',
-                            'Quantity': ord.sold_quantity,
+                            'Quantity': ord.quantity,
                             'Sale_Value': ord.total_price,
                             'Commission_amount': ord.checkout.service_commission,
                             'cerated_at': ord.created_at
@@ -587,7 +587,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'id': ord.id,
                             'item_sold': ord.voucher.name,
                             'ItemType': 'Voucher',
-                            'Quantity': ord.sold_quantity,
+                            'Quantity': ord.quantity,
                             'Sale_Value': ord.total_price,
                             'Commission_amount': ord.checkout.service_commission,
                             'cerated_at': ord.created_at
@@ -597,7 +597,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'id': ord.id,
                             'item_sold': ord.voucher.name,
                             'ItemType': 'Voucher',
-                            'Quantity': ord.sold_quantity,
+                            'Quantity': ord.quantity,
                             'Sale_Value': ord.total_price,
                             'Commission_amount': ord.checkout.service_commission,
                             'cerated_at': ord.created_at,
