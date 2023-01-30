@@ -640,8 +640,8 @@ class ServiceGroupReport(serializers.ModelSerializer):
             data = {}
             
             service_target = ServiceTarget.objects.filter(
-                employee = obj,
-                 created_at__icontains = year                
+                service_group = obj,
+                created_at__icontains = year                
                 ) 
             for ord  in service_target:
                 create = str(ord.created_at)
