@@ -494,6 +494,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'Quantity': ord.quantity,
                             'Sale_Value': ord.total_price,
                             'Commission_amount': ord.checkout.service_commission,
+                            'Commission_Rate': ord.checkout.service_commission_type,
                             'cerated_at': ord.created_at
                         })
                 else:
@@ -504,6 +505,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'Quantity': ord.quantity,
                             'Sale_Value': ord.total_price,
                             'Commission_amount': ord.checkout.service_commission,
+                            'Commission_Rate': ord.checkout.service_commission_type,
                             'cerated_at': ord.created_at
                         })
                                 
@@ -542,6 +544,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'Quantity': ord.quantity,
                             'Sale_Value': ord.total_price,
                             'Commission_amount': ord.checkout.service_commission,
+                            'Commission_Rate': ord.checkout.product_commission_type,
                             'cerated_at': ord.created_at
                         })
                 else:
@@ -552,6 +555,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'Quantity': ord.quantity,
                             'Sale_Value': ord.total_price,
                             'Commission_amount': ord.checkout.service_commission,
+                            'Commission_Rate': ord.checkout.product_commission_type,
                             'cerated_at': ord.created_at
                         })
                                 
@@ -590,6 +594,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'Quantity': ord.quantity,
                             'Sale_Value': ord.total_price,
                             'Commission_amount': ord.checkout.service_commission,
+                            'Commission_Rate': ord.checkout.voucher_commission_type,
                             'cerated_at': ord.created_at
                         })
                 else:
@@ -600,6 +605,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'Quantity': ord.quantity,
                             'Sale_Value': ord.total_price,
                             'Commission_amount': ord.checkout.service_commission,
+                            'Commission_Rate': ord.checkout.voucher_commission_type,
                             'cerated_at': ord.created_at,
                         })
                                 
