@@ -3647,8 +3647,12 @@ def employee_login(request):
     ExceptionRecord.objects.create(
         text = f'nothing to find {str(user.id)}'
     )
-    
-    employee_tenant = EmployeeTenantDetail.objects.get(tenant__id = str(tenant_id))
+    try:
+        employee_tenant = EmployeeTenantDetail.objects.get(user_id = str(user.id))
+    except Exception as err:
+        pass
+        #return str(err)
+        
     with tenant_context(employee_tenant):
         user = authenticate(username=user.username, password=password)
         if user is None:
