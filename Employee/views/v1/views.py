@@ -3648,7 +3648,7 @@ def employee_login(request):
         text = f'nothing to find {str(user.id)}'
     )
     
-    employee_tenant = EmployeeTenantDetail.objects.get(tenant = str(tenant_id))
+    employee_tenant = EmployeeTenantDetail.objects.get(tenant__id = str(tenant_id))
     with tenant_context(employee_tenant):
         user = authenticate(username=user.username, password=password)
         if user is None:
