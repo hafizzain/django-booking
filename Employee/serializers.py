@@ -891,7 +891,7 @@ class UserEmployeeSerializer(serializers.ModelSerializer):
     def get_employee(self, obj):
         try:
             employee = Employee.objects.get(
-                email = obj.email,
+                email = str(obj.email),
             )
             return EmployeeInformationSerializer(employee).data
         except Exception as err:
