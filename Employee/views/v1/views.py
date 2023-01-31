@@ -3648,10 +3648,10 @@ def employee_login(request):
         text = f'nothing to find {str(user.id)}'
     )
     try:
-        employee_tenant = EmployeeTenantDetail.objects.get(user_id = str(user.id))
+        employee_tenant = EmployeeTenantDetail.objects.get(user = str(user))
     except Exception as err:
-        pass
-        #return str(err)
+        
+        return f'{str(err)} {str(user.id)}'
         
     with tenant_context(employee_tenant):
         user = authenticate(username=user.username, password=password)
