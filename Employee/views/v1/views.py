@@ -3545,6 +3545,10 @@ def create_employe_account(request):
                 is_active = True,
                 mobile_number = str(employe.mobile_number),
             )
+    account_type = AccountType.objects.create(
+            user = user,
+            account_type = 'Employee'
+        )
     user.set_password(password)
     user.save()
     
@@ -3568,16 +3572,10 @@ def create_employe_account(request):
                 is_email_verified = True,
                 is_active = True,
                 mobile_number = str(employe.mobile_number),
-            )
-        account_type = AccountType.objects.create(
-            user = user,
-            account_type = 'Employee'
-        )
-        
+            )        
         user_client = EmployeeTenantDetail.objects.create(
             user = user,
             tenant = tenant_id,
-            #client_id = client_id,
             is_tenant_staff = True
         )
         user.set_password(password)
@@ -3605,7 +3603,7 @@ def employee_login(request):
     
     data = []
     
-    if not all([email,username , password ]):
+    if not all([email, password ]):
         return Response(
             {
                 'status' : False,
@@ -3628,7 +3626,7 @@ def employee_login(request):
         user = User.objects.get(
             email=email,
             is_deleted=False,
-            user_account_type__account_type = 'Employee'
+            #user_account_type__account_type = 'Employee'
         )
         
     except Exception as err:
