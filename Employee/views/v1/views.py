@@ -3650,8 +3650,17 @@ def employee_login(request):
     try:
         employee_tenant = EmployeeTenantDetail.objects.get(user = str(user))
     except Exception as err:
-        
-        return f'{str(err)} {str(user.id)}'
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Authenticated',
+                    'data' : f'{str(err)} {str(user.id)}'
+                }
+            },
+            status=status.HTTP_200_OK
+        )
         
     with tenant_context(employee_tenant):
         user = authenticate(username=user.username, password=password)
