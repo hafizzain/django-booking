@@ -1,4 +1,6 @@
 from datetime import datetime, timedelta
+import random
+import string
 from time import strptime
 from django.shortcuts import render
 from Employee.models import( CategoryCommission, EmployeDailySchedule, Employee , EmployeeProfessionalInfo ,
@@ -28,7 +30,7 @@ from Service.models import Service
 from rest_framework import status
 from Business.models import Business, BusinessAddress
 from Utility.models import Country, ExceptionRecord, State, City
-from Authentication.models import AccountType, User
+from Authentication.models import AccountType, User, VerificationOTP
 from NStyle.Constants import StatusCodes
 import json
 from Utility.models import NstyleFile
@@ -38,6 +40,8 @@ from Utility.models import GlobalPermissionChoices
 from Permissions.models import EmployePermission
 from django.contrib.auth import authenticate, logout
 from rest_framework.authtoken.models import Token
+from Authentication.Constants import OTP
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -3624,7 +3628,7 @@ def employee_login(request):
         user_id = User.objects.get(
             email=email,
             is_deleted=False,
-            #user_account_type__account_type = 'Employee'
+            user_account_type__account_type = 'Employee'
         )
         
     except Exception as err:
@@ -3689,6 +3693,150 @@ def employee_login(request):
             },
             status=status.HTTP_200_OK
         )
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def verify_password(request):
+    email = request.data.get('email', None)
+    password = request.data.get('password', None)
+    code = request.data.get('code', None)
+
+    if not email or not password or not code:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'email',
+                        'password',
+                        'code',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        user_id = User.objects.get(
+            email=email,
+            is_deleted=False,
+            user_account_type__account_type = 'Employee'
+        )
         
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
+                'status_code_text' : 'INVALID_CREDENTIALS_4013',
+                'response' : {
+                    'message' : 'User does not exist with this email',
+                    'error_message' : str(err),
+                    'fields' : ['email']
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
     
+    try:
+        employee_tenant = EmployeeTenantDetail.objects.get(user__username = user_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Authenticated',
+                    'data' : str(err),
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+        
+    with tenant_context(employee_tenant.tenant):
+        try:
+            user = User.objects.get(email=email, is_active=True)
+        except Exception as err:
+            return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
+                'status_code_text' : 'INVALID_CREDENTIALS_4013',
+                'response' : {
+                    'message' : 'User does not exist with this email',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )   
+
+        try:
+            code = VerificationOTP.objects.get(user=user, code=code)
+        except Exception as err:
+            return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
+                'status_code_text' : 'INVALID_CREDENTIALS_4013',
+                'response' : {
+                    'message' : 'InValid Code',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+            
+        if not len(password) < 8:
+            user.set_password(password)
+            user.save()
+            return Response({
+                'success': True,
+                'response': {'message': 'Password reset successfully!'}},
+                status=status.HTTP_201_CREATED
+                )
+        else:
+            return Response({'success': False, 'response': {'message': 'Password should be 8 letters long!'}},
+                            status=status.HTTP_400_BAD_REQUEST)
+        
+        
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def forgot_password(request):
+    email = request.data.get('email', None)
+    code_for = 'Email'
+    try:
+        user = User.objects.get(email=email, is_active=True)
+    except Exception as err:
+        return Response(
+            {'success': False, 'response': {'message': 'User with the given email address does not exist!'}},
+            status=status.HTTP_404_NOT_FOUND)
+    try:
+        otp = VerificationOTP.objects.get(
+            code_for='Email' if code_for == 'Email' else 'Mobile' ,
+            user=user,
+        )
+        otp.delete()
+    except Exception as err:
+        print(err)
+        pass
+
+    try:
+        thrd = Thread(target=OTP.generate_user_otp, kwargs={'user' : user, 'code_for':f"{'Email' if code_for == 'Email' else 'Mobile'}"})
+        thrd.start()
+    except Exception as err:
+        pass
+    #     pass
+    # try:
+    #     email.send(fail_silently=False)
+    # except Exception as e:
+    #     return Response({'success': False,
+    #                      'message': 'There is an issue with Email Host Server'},
+    #                     status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+    return Response({'success': True,
+                     'message': 'Verification code has been sent to your provided Email'},
+                    status=status.HTTP_200_OK)
     
