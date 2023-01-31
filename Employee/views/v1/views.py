@@ -3678,7 +3678,7 @@ def employee_login(request):
         except Token.DoesNotExist:
            token = Token.objects.create(user=user)
             
-        serialized = UserEmployeeSerializer(user, context = {'tenant': employee_tenant.tenant.id, 'token': token.key })
+        serialized = UserEmployeeSerializer(user, context = {'tenant': employee_tenant.tenant, 'token': token.key })
     
     return Response(
             {
