@@ -3657,7 +3657,7 @@ def employee_login(request):
         )
         
     with tenant_context(employee_tenant.tenant):
-        user = authenticate(username=user.username, password=password)
+        user = authenticate(username=user_id.username, password=password)
         if user is None:
             return Response(
                 {
