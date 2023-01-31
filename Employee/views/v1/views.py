@@ -37,10 +37,7 @@ import csv
 from Utility.models import GlobalPermissionChoices
 from Permissions.models import EmployePermission
 from django.contrib.auth import authenticate, logout
-
-
-
-
+from rest_framework.authtoken.models import Token
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -3680,6 +3677,10 @@ def employee_login(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
+        try:
+            token = Token.objects.get(user=user)
+        except Token.DoesNotExist:
+            token = Token.objects.create(user=user)
         serialized = UserEmployeeSerializer(user, context = {'tenant': employee_tenant.id})
     
     return Response(
