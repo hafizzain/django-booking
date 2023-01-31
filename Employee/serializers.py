@@ -21,6 +21,7 @@ from .models import( EmployeDailySchedule, Employee, EmployeeProfessionalInfo ,
                EmployeeSelectedService, Vacation ,CategoryCommission
 )
 from Authentication.models import AccountType, User
+from django_tenants.utils import tenant_context
 
 
 class ServicesEmployeeSerializer(serializers.ModelSerializer):
@@ -890,14 +891,16 @@ class UserEmployeeSerializer(serializers.ModelSerializer):
         
     def get_employee(self, obj):
         try:
-            employee = Employee.objects.all()#get(
-            #     id = 'd35183df-02e4-495e-9b33-976fe16d61fe',
-            # )
-            return EmployeeInformationSerializer(employee, many = True).data
+            tenant = self.context["tenant"]
+            with tenant_context(tenant):
+                employee = Employee.objects.get(
+                    id = 'd35183df-02e4-495e-9b33-976fe16d61fe',
+                )
+                return EmployeeInformationSerializer(employee).data
         except Exception as err:
             return f'{str(obj.email)} {str(err)}'
         
     
     class Meta:
         model = User
-        fields = ['id', 'access_token', 'domain','employee']
+        fields = ['id', 'access_token', 'domain','employee', '']
