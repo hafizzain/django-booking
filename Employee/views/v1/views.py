@@ -3852,15 +3852,15 @@ def forgot_password(request):
             return Response(
                 {'success': False, 'response': {'message': 'User with the given email address does not exist!'}},
                 status=status.HTTP_404_NOT_FOUND)
-        try:
-            otp = VerificationOTP.objects.get(
-                code_for='Email' if code_for == 'Email' else 'Mobile' ,
-                user=user,
-            )
-            otp.delete()
-        except Exception as err:
-            print(err)
-            pass
+        # try:
+        #     otp = VerificationOTP.objects.get(
+        #         code_for='Email' if code_for == 'Email' else 'Mobile' ,
+        #         user=user,
+        #     )
+        #     otp.delete()
+        # except Exception as err:
+        #     print(err)
+        #     pass
 
         try:
             thrd = Thread(target=OTP.generate_user_otp, kwargs={'user' : user, 'code_for':f"{'Email' if code_for == 'Email' else 'Mobile'}"})
