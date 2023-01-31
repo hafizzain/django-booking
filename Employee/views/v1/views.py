@@ -3645,7 +3645,7 @@ def employee_login(request):
     for da in employee_tenant:
         data.append(da)
     try:
-        employee_tenant = EmployeeTenantDetail.objects.get(user__username__icontains = user_id.username)
+        employee_tenant = EmployeeTenantDetail.objects.get(user__username__icontains = 'jonathanchoat+2')
     except Exception as err:
         return Response(
             {
