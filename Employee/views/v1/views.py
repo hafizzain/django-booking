@@ -3673,8 +3673,11 @@ def employee_login(request):
             )
         try:
             token = Token.objects.get(user=user)
+            if token:
+                pass
         except Token.DoesNotExist:
             token = Token.objects.create(user=user)
+            
         serialized = UserEmployeeSerializer(user, context = {'tenant': employee_tenant.tenant.id})
     
     return Response(
