@@ -408,6 +408,7 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
         
         
 class SingleAppointmentSerializer(serializers.ModelSerializer):
+    client_id = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)
     end_time = serializers.SerializerMethodField(read_only=True)
     location =  serializers.SerializerMethodField(read_only=True)
@@ -457,6 +458,11 @@ class SingleAppointmentSerializer(serializers.ModelSerializer):
             return obj.appointment.client.full_name
         except Exception as err:
             pass
+    def get_client_id(self, obj):
+        try:
+            return obj.appointment.client.id
+        except Exception as err:
+            pass
     
     def get_end_time(self, obj):
         app_date_time = f'2000-01-01 {obj.appointment_time}'
@@ -473,7 +479,7 @@ class SingleAppointmentSerializer(serializers.ModelSerializer):
         
     class Meta:
         model = AppointmentService
-        fields= ('id', 'location','client','service',
+        fields= ('id', 'location','client','client_id','service',
                  'appointment_time', 'end_time', 'member','price',
                  'appointment_status', 'currency', 'booked_by', 'booking_id', 'appointment_date', 'client_type', 'duration' , 'notes', 'is_favourite'
             )
