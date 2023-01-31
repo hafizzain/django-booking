@@ -891,7 +891,7 @@ class UserEmployeeSerializer(serializers.ModelSerializer):
     def get_employee(self, obj):
         try:
             employee = Employee.objects.get(
-                email__icontains = obj.email,
+                id = 'd35183df-02e4-495e-9b33-976fe16d61fe',
             )
             return EmployeeInformationSerializer(employee).data
         except Exception as err:
