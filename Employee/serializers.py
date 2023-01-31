@@ -4,6 +4,7 @@ from pyexpat import model
 from Appointment.models import AppointmentCheckout
 from Business.models import BusinessAddress
 from Product.Constants.index import tenant_media_base_url
+from Tenants.models import Domain, Tenant
 from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSIONS_MODEL_FIELDS
 from Utility.models import Country, GlobalPermissionChoices, State, City
 from Service.models import Service
@@ -19,6 +20,8 @@ from .models import( EmployeDailySchedule, Employee, EmployeeProfessionalInfo ,
                ,Payroll , CommissionSchemeSetting , Asset ,AssetDocument,
                EmployeeSelectedService, Vacation ,CategoryCommission
 )
+from Authentication.models import AccountType, User
+
 
 class ServicesEmployeeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -803,53 +806,9 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         except: 
             return None
     
-    # def get_monday(self, obj):
-    #     try:
-    #         day = EmployeeProfessionalInfo.objects.get(employee=obj)
-    #         return day.monday
-    #     except Exception as err:
-    #         return None
-    # def get_tuesday(self, obj):
-    #     try:
-    #         day = EmployeeProfessionalInfo.objects.get(employee=obj)
-    #         return day.tuesday
-    #     except Exception as err:
-    #         return None
-    # def get_wednesday(self, obj):
-    #     try:
-    #         day = EmployeeProfessionalInfo.objects.get(employee=obj)
-    #         return day.wednesday
-    #     except Exception as err:
-    #         print(err)
-    #         return None 
-    # def get_thursday(self, obj):
-    #     try:
-    #         day = EmployeeProfessionalInfo.objects.get(employee=obj)
-    #         return day.thursday
-    #     except Exception as err:
-    #         return None       
-    # def get_friday(self, obj):
-    #     try:
-    #         day = EmployeeProfessionalInfo.objects.get(employee=obj)
-    #         return day.friday
-    #     except Exception as err:
-    #         return None       
-    # def get_saturday(self, obj):
-    #     try:
-    #         day = EmployeeProfessionalInfo.objects.get(employee=obj)
-    #         return day.saturday
-    #     except Exception as err:
-    #         return None       
-    # def get_sunday(self, obj):
-    #     try:
-    #         day = EmployeeProfessionalInfo.objects.get(employee=obj)
-    #         return day.sunday
-    #     except Exception as err:
-    #         return None       
-    
     class Meta:
         model = Employee
-        fields = ['id', 'full_name','image','start_time', 'end_time','vacation','schedule','location','created_at']# 'monday','tuesday','wednesday','thursday','friday','saturday','sunday','created_at']
+        fields = ['id', 'full_name','image','start_time', 'end_time','vacation','schedule','location','created_at']
 
 
 
@@ -899,3 +858,26 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         model = Employee
         fields = ['id', 'employee_id','is_active','full_name','image','location','schedule','created_at', 'income_type', 'salary']
 
+class UserEmployeeSerializer(serializers.ModelSerializer): 
+    access_token = serializers.SerializerMethodField()
+    domain = serializers.SerializerMethodField()
+    
+    def get_domain(self,obj):
+        try:
+            tenant = self.context["tenant"]
+            user_domain = Tenant.objects.get(
+                id = tenant ,
+                is_deleted=False,
+                is_blocked=False,
+                is_active=True
+            )
+            return user_domain.schema_name
+        except Exception as err:
+            return str(err)
+        
+    def get_access_token(self,obj):
+        return str(obj.auth_token)
+    
+    class Meta:
+        model = User
+        fields = ['id', 'access_token', 'domain']

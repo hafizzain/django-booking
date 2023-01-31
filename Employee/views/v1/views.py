@@ -17,7 +17,7 @@ from Employee.serializers import( EmployeSerializer , EmployeInformationsSeriali
                           , EmployPermissionSerializer,  EmployeModulesSerializer
                           ,  EmployeeMarketingSerializers, Payroll_WorkingScheduleSerializer, ScheduleSerializer, StaffGroupSerializers , 
                           StaffpermisionSerializers , AttendanceSerializers
-                          ,PayrollSerializers, VacationSerializer,singleEmployeeSerializer , CommissionSerializer
+                          ,PayrollSerializers, UserEmployeeSerializer, VacationSerializer,singleEmployeeSerializer , CommissionSerializer
                           , AssetSerializer, WorkingScheduleSerializer
                         
                           
@@ -36,6 +36,8 @@ from django.db.models import Q
 import csv
 from Utility.models import GlobalPermissionChoices
 from Permissions.models import EmployePermission
+from django.contrib.auth import authenticate, logout
+
 
 
 
@@ -3601,6 +3603,8 @@ def employee_login(request):
     username = request.data.get('username', None)
     password = request.data.get('password', None)
     
+    data = []
+    
     if not all([email,username , password ]):
         return Response(
             {
@@ -3641,5 +3645,36 @@ def employee_login(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    
+    employee_tenant = EmployeeTenantDetail.objects.get(user = user)
+    with tenant_context(employee_tenant):
+        user = authenticate(username=user.username, password=password)
+        if user is None:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
+                    'status_code_text' : 'INVALID_CREDENTIALS_4013',
+                    'response' : {
+                        'message' : 'Incorrect Password',
+                        'fields' : ['password']
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        serialized = UserEmployeeSerializer(user, context = {'tenant': employee_tenant.id})
+    
+    return Response(
+            {
+                'status' : False,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Authenticated',
+                    'data' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+        
     
     
