@@ -3729,7 +3729,7 @@ def resend_password(request):
         user_id = User.objects.get(
             email=email,
             is_deleted=False,
-            user_account_type__account_type = 'Employee'
+            #user_account_type__account_type = 'Employee'
         )
         
     except Exception as err:
