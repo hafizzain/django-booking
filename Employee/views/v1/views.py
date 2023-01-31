@@ -3705,7 +3705,7 @@ def employee_login(request):
 def resend_password(request):
     email = request.data.get('email', None)
     password = request.data.get('password', None)
-    code = request.data.get('code', None)
+    old_password = request.data.get('old_password', None)
 
     if not email or not password :
         return Response(
@@ -3779,13 +3779,32 @@ def resend_password(request):
             status=status.HTTP_404_NOT_FOUND
         ) 
         if not len(password) < 8:
-            user.set_password(password)
-            user.save()
-            return Response({
-                'success': True,
-                'response': {'message': 'Password reset successfully!'}},
-                status=status.HTTP_201_CREATED
-                )
+            if old_password is not None:
+                if old_password == user.password:
+                    user.set_password(password)
+                    user.save()
+                    return Response({
+                        'success': True,
+                        'response': {'message': 'Password reset successfully!'}},
+                        status=status.HTTP_200_OK
+                        )
+                     
+                else:
+                    return Response({
+                        'success': True,
+                        'response': {'message': 'Old password not same!'}},
+                        status=status.HTTP_404_NOT_FOUND
+                        )
+                
+                
+            else:
+                user.set_password(password)
+                user.save()
+                return Response({
+                    'success': True,
+                    'response': {'message': 'Password reset successfully!'}},
+                    status=status.HTTP_200_OK
+                    )
         else:
             return Response({'success': False, 'response': {'message': 'Password should be 8 letters long!'}},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -3975,3 +3994,4 @@ def verify_email(request):
         },
         status=status.HTTP_200_OK
     )
+
