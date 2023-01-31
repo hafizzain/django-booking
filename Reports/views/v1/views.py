@@ -188,7 +188,7 @@ def get_retail_target_report(request):
     month = request.GET.get('month', None)
     year = request.GET.get('year', None)
     
-    brand = Brand.objects.filter(is_deleted=False).order_by('-created_at')
+    brand = Brand.objects.filter(is_active=True).order_by('-created_at')
     serialized = ReportBrandSerializer(brand, many=True, context={'request' : request, 'month': month, 'year': year})
     return Response(
         {
