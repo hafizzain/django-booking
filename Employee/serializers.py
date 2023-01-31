@@ -3,7 +3,7 @@ from genericpath import exists
 from pyexpat import model
 from Appointment.models import AppointmentCheckout
 from Business.models import BusinessAddress
-from Product.Constants.index import tenant_media_base_url
+from Product.Constants.index import tenant_media_base_url, tenant_media_domain
 from Tenants.models import Domain, Tenant
 from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSIONS_MODEL_FIELDS
 from Utility.models import Country, GlobalPermissionChoices, State, City
@@ -812,6 +812,17 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         fields = ['id', 'full_name','image','start_time', 'end_time','vacation','schedule','location','created_at']
 
 class EmployeeInformationSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                tenant = self.context["tenant"]
+                url = tenant_media_domain(tenant.schema_name)
+                return f'{url}{obj.image}'
+            except:
+                return obj.image
+        return None
     
     class Meta:
         model = Employee
@@ -896,7 +907,7 @@ class UserEmployeeSerializer(serializers.ModelSerializer):
                     #id = 'd35183df-02e4-495e-9b33-976fe16d61fe',
                     email__icontains = obj.email,
                 )
-                return EmployeeInformationSerializer(employee).data
+                return EmployeeInformationSerializer(employee, context=self.context).data
         except Exception as err:
             return f'{str(obj.email)} {str(err)}'
         
