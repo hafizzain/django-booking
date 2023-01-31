@@ -690,7 +690,7 @@ class ReportBrandSerializer(serializers.ModelSerializer):
         retail_target = RetailTarget.objects.filter(
             brand = obj
             ).order_by('-created_at').distinct()
-        serializer = RetailTargetSerializers(retail_target, many = True)
+        return RetailTargetSerializers(retail_target, many = True).data
     
     def get_product_sale_price(self, obj):
         try:
