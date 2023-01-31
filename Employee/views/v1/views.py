@@ -41,6 +41,12 @@ from Permissions.models import EmployePermission
 from django.contrib.auth import authenticate, logout
 from rest_framework.authtoken.models import Token
 from Authentication.Constants import OTP
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.core.mail import EmailMultiAlternatives
+from django.utils.html import strip_tags
+from django.conf import settings
+
 
 
 @api_view(['POST'])
@@ -3852,6 +3858,37 @@ def forgot_password(request):
             return Response(
                 {'success': False, 'response': {'message': 'User with the given email address does not exist!'}},
                 status=status.HTTP_404_NOT_FOUND)
+        
+        random_digits_for_code = ''.join(random.SystemRandom().choice(string.digits + string.digits) for _ in range(4))
+        try:
+            get_otp = VerificationOTP.objects.get(
+                user=user,
+                code_for=code_for
+            )
+            get_otp.delete()
+        except:
+            pass
+
+        otp = VerificationOTP(
+            user=user,
+            code=random_digits_for_code,
+            code_for=code_for
+        )
+        otp.save()
+        
+        html_file = render_to_string("otp_email.html", {'user_name': user.username,'otp': otp, 'email':user.email})
+        text_content = strip_tags(html_file)
+    
+        email = EmailMultiAlternatives(
+            'Email Verification OTP',
+            text_content,
+            settings.EMAIL_HOST_USER,
+            to = [user.email]
+        )
+        
+        email.attach_alternative(html_file, "text/html")
+        email.send()
+            
         # try:
         #     otp = VerificationOTP.objects.get(
         #         code_for='Email' if code_for == 'Email' else 'Mobile' ,
@@ -3862,12 +3899,12 @@ def forgot_password(request):
         #     print(err)
         #     pass
 
-        try:
-            thrd = Thread(target=OTP.generate_user_otp, kwargs={'user' : user, 'code_for':f"{'Email' if code_for == 'Email' else 'Mobile'}"})
-            thrd.start()
-        except Exception as err:
-            pass
+        # try:
+        #     thrd = Thread(target=OTP.generate_user_otp, kwargs={'user' : user, 'code_for':f"{'Email' if code_for == 'Email' else 'Mobile'}"})
+        #     thrd.start()
+        # except Exception as err:
         #     pass
+
         # try:
         #     email.send(fail_silently=False)
         # except Exception as e:
