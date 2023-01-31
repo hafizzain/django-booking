@@ -218,7 +218,7 @@ def create_client(request):
     country= request.data.get('country', None)
     languages= request.data.get('language', None)
     
-    if not all([business_id, client_id, full_name ,gender , customer_note , languages]):
+    if not all([business_id, client_id, full_name ,gender  , languages]):
         return Response(
             {
                 'status' : False,
@@ -233,7 +233,6 @@ def create_client(request):
                         'full_name',
                         'gender', 
                         'languages',
-                        'customer_note'
                     ]
                 }
             },
