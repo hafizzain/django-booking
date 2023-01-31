@@ -680,3 +680,5 @@ class ServiceGroupReport(serializers.ModelSerializer):
     class Meta:
         model = ServiceGroup
         fields = ['id','name','service','service_target']#'service_sale_price']
+        
+#class 

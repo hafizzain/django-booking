@@ -23,7 +23,7 @@ from Employee.models import Employee, EmployeeSelectedService
 from Business.models import BusinessAddress
 from Service.models import PriceService, Service, ServiceGroup
 
-from Product.models import Product, ProductOrderStockReport, ProductStock
+from Product.models import Brand, Product, ProductOrderStockReport, ProductStock
 from django.db.models import Avg, Count, Min, Sum
 
 
@@ -181,3 +181,25 @@ def get_service_target_report(request):
         },
         status=status.HTTP_200_OK
     )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_service_target_report(request):
+    month = request.GET.get('month', None)
+    year = request.GET.get('year', None)
+    
+    address = Brand.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = ServiceGroupReport(address, many=True, context={'request' : request, 'month': month, 'year': year})
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Business Address Report',
+                'error_message' : None,
+                'sale' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
