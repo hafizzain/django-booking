@@ -26,7 +26,10 @@ class Tenant(TenantMixin):
     auto_drop_schema = True
 
     def __str__(self):
-        return f'{self.id} - {self.schema_name}'
+        try:
+            return f'{self.id} - {self.schema_name}'
+        except:
+            return f'{self.id}'
     
 class Domain(DomainMixin):
     id = models.CharField(max_length=200, default=uuid4, primary_key=True, unique=True, editable=False)
