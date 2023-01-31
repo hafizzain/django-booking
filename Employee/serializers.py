@@ -885,7 +885,6 @@ class UserEmployeeSerializer(serializers.ModelSerializer):
         try:
             token = self.context["token"]
             return token
-            #return str(obj.auth_token)
         except Exception as err:
             return str(err)
         
@@ -903,4 +902,4 @@ class UserEmployeeSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['id', 'access_token', 'domain','employee', '']
+        fields = ['id', 'access_token', 'domain','employee',]
