@@ -3644,7 +3644,7 @@ def employee_login(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-    employee_tenant = EmployeeTenantDetail.objects.get(user = str(user.id))
+    employee_tenant = EmployeeTenantDetail.objects.get(user = user.id)
     with tenant_context(employee_tenant):
         user = authenticate(username=user.username, password=password)
         if user is None:
