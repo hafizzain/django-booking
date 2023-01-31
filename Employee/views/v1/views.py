@@ -3659,7 +3659,7 @@ def employee_login(request):
     #             status=status.HTTP_404_NOT_FOUND
     #         )
     ExceptionRecord.objects.create(
-        text = str(user.id)
+        text = f'nothing to find {str(user.id)}'
     )
     
     employee_tenant = EmployeeTenantDetail.objects.get(user = user)
