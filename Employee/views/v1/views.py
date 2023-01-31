@@ -3651,7 +3651,7 @@ def employee_login(request):
     for da in employee_tenant:
         data.append(da.tenant)
     try:
-        employee_tenant = EmployeeTenantDetail.objects.get(user = str(user))
+        employee_tenant = EmployeeTenantDetail.objects.get(user__username = str(user))
     except Exception as err:
         return Response(
             {
