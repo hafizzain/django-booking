@@ -895,7 +895,7 @@ class UserEmployeeSerializer(serializers.ModelSerializer):
             )
             return EmployeeInformationSerializer(employee).data
         except Exception as err:
-            return str(err)
+            return f'{str(obj.email)} {str(err)}'
         
     
     class Meta:
