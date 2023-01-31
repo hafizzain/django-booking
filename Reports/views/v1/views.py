@@ -7,7 +7,7 @@ from Appointment.models import Appointment, AppointmentCheckout, AppointmentServ
 from Business.models import Business
 from Client.models import Client, Membership, Vouchers
 from Order.models import Checkout, MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
-from Reports.serializers import BusinesAddressReportSerializer, ComissionReportsEmployeSerializer, ReportsEmployeSerializer, ServiceGroupReport, StaffCommissionReport
+from Reports.serializers import BusinesAddressReportSerializer, ComissionReportsEmployeSerializer, ReportBrandSerializer, ReportsEmployeSerializer, ServiceGroupReport, StaffCommissionReport
 from Sale.Constants.Custom_pag import CustomPagination
 from Utility.Constants.Data.months import MONTHS
 from Utility.models import Country, Currency, ExceptionRecord, State, City
@@ -184,18 +184,18 @@ def get_service_target_report(request):
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_service_target_report(request):
+def get_retail_target_report(request):
     month = request.GET.get('month', None)
     year = request.GET.get('year', None)
     
-    address = Brand.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = ServiceGroupReport(address, many=True, context={'request' : request, 'month': month, 'year': year})
+    brand = Brand.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = ReportBrandSerializer(brand, many=True, context={'request' : request, 'month': month, 'year': year})
     return Response(
         {
             'status' : 200,
             'status_code' : '200',
             'response' : {
-                'message' : 'All Business Address Report',
+                'message' : 'All Brand Sale Report',
                 'error_message' : None,
                 'sale' : serialized.data
             }

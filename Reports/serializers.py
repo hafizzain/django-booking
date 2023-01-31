@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from Product.models import Brand
 from rest_framework import serializers
 from Appointment.models import AppointmentCheckout
 from Appointment.serializers import LocationSerializer
@@ -9,8 +10,8 @@ from Product.Constants.index import tenant_media_base_url
 from Order.models import MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
 from Sale.serializers import ProductOrderSerializer
 from Service.models import Service, ServiceGroup
-from TragetControl.models import ServiceTarget, StaffTarget, StoreTarget, TierStoreTarget
-from TragetControl.serializers import StaffTargetSerializers, StoreTargetSerializers, TierStoreTargetSerializers
+from TragetControl.models import RetailTarget, ServiceTarget, StaffTarget, StoreTarget, TierStoreTarget
+from TragetControl.serializers import RetailTargetSerializers, StaffTargetSerializers, StoreTargetSerializers, TierStoreTargetSerializers
 from Utility.Constants.Data.months import MONTH_DICT
 
 
@@ -681,4 +682,37 @@ class ServiceGroupReport(serializers.ModelSerializer):
         model = ServiceGroup
         fields = ['id','name','service','service_target']#'service_sale_price']
         
-#class 
+class ReportBrandSerializer(serializers.ModelSerializer): 
+    product_sale_price = serializers.SerializerMethodField(read_only=True)
+    brand_target = serializers.SerializerMethodField(read_only=True)
+
+    def get_brand_target(self, obj):
+        retail_target = RetailTarget.objects.filter(
+            brand = obj
+            ).order_by('-created_at').distinct()
+        serializer = RetailTargetSerializers(retail_target, many = True)
+    
+    def get_product_sale_price(self, obj):
+        try:
+            month = self.context["month"]
+            year = self.context["year"]
+            total = 0
+
+            service_orders = ProductOrder.objects.filter(
+                is_deleted=False, 
+                product__brand_products = obj,
+                created_at__icontains = year
+                )
+            for ord  in service_orders:
+                create = str(ord.created_at)
+                match = int(create.split(" ")[0].split("-")[1])
+                if int(month) == match:
+                    total += int(ord.total_price)
+            
+            return total
+                
+        except Exception as err:
+            return str(err)
+    class Meta:
+        model = Brand
+        fields = ['id','name', 'product_sale_price', 'brand_target']
