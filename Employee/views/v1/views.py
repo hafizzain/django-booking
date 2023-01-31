@@ -3649,7 +3649,7 @@ def employee_login(request):
     )
     employee_tenant = EmployeeTenantDetail.objects.all()
     for da in employee_tenant:
-        data.append(da.user)
+        data.append(da.tenant)
     try:
         employee_tenant = EmployeeTenantDetail.objects.get(user = str(user))
     except Exception as err:
@@ -3659,7 +3659,7 @@ def employee_login(request):
                 'status_code' : 200,
                 'response' : {
                     'message' : 'Authenticated',
-                    'data' : f'{str(err)} {str(user.id)} {user } {data}'
+                    'data' : f'{str(err)} {str(user.id)} {user} {data}'
                 }
             },
             status=status.HTTP_200_OK
