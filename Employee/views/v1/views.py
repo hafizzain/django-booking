@@ -3644,22 +3644,25 @@ def employee_login(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-    user_id = authenticate(username=user.username, password=password)
-    if user is None:
-            return Response(
-                {
-                    'status' : False,
-                    'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
-                    'status_code_text' : 'INVALID_CREDENTIALS_4013',
-                    'response' : {
-                        'message' : 'Incorrect Password',
-                        'fields' : ['password']
-                    }
-                },
-                status=status.HTTP_404_NOT_FOUND
-            )
+    # user_id = authenticate(username=user.username, password=password)
+    # if user is None:
+    #         return Response(
+    #             {
+    #                 'status' : False,
+    #                 'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
+    #                 'status_code_text' : 'INVALID_CREDENTIALS_4013',
+    #                 'response' : {
+    #                     'message' : 'Incorrect Password',
+    #                     'fields' : ['password']
+    #                 }
+    #             },
+    #             status=status.HTTP_404_NOT_FOUND
+    #         )
+    ExceptionRecord.objects.create(
+        text = str(user.id)
+    )
     
-    employee_tenant = EmployeeTenantDetail.objects.get(user = user_id)
+    employee_tenant = EmployeeTenantDetail.objects.get(user = user)
     with tenant_context(employee_tenant):
         user = authenticate(username=user.username, password=password)
         if user is None:
