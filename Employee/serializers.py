@@ -861,7 +861,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
 class UserEmployeeSerializer(serializers.ModelSerializer): 
     access_token = serializers.SerializerMethodField()
     domain = serializers.SerializerMethodField()
-    employee = serializers.SerializerMethodField()
+    #employee = serializers.SerializerMethodField()
     
     def get_domain(self,obj):
         try:
