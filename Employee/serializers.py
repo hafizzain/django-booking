@@ -890,10 +890,10 @@ class UserEmployeeSerializer(serializers.ModelSerializer):
         
     def get_employee(self, obj):
         try:
-            employee = Employee.objects.get(
-                id = 'd35183df-02e4-495e-9b33-976fe16d61fe',
-            )
-            return EmployeeInformationSerializer(employee).data
+            employee = Employee.objects.all()#get(
+            #     id = 'd35183df-02e4-495e-9b33-976fe16d61fe',
+            # )
+            return EmployeeInformationSerializer(employee, many = True).data
         except Exception as err:
             return f'{str(obj.email)} {str(err)}'
         
