@@ -810,7 +810,11 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         model = Employee
         fields = ['id', 'full_name','image','start_time', 'end_time','vacation','schedule','location','created_at']
 
-
+class EmployeeInformationSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Employee
+        fields = ['id', 'image','full_name', 'email', 'mobile_number','country','state','city', 'address', 'postal_code']
 
 class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):    
     schedule =  serializers.SerializerMethodField(read_only=True)    
@@ -861,7 +865,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
 class UserEmployeeSerializer(serializers.ModelSerializer): 
     access_token = serializers.SerializerMethodField()
     domain = serializers.SerializerMethodField()
-    #employee = serializers.SerializerMethodField()
+    employee = serializers.SerializerMethodField()
     
     def get_domain(self,obj):
         try:
@@ -883,6 +887,16 @@ class UserEmployeeSerializer(serializers.ModelSerializer):
             #return str(obj.auth_token)
         except Exception as err:
             return str(err)
+        
+    def get_employee(self, obj):
+        try:
+            employee = Employee.objects.get(
+                email = obj.email,
+            )
+            return EmployeeInformationSerializer(employee).data
+        except Exception as err:
+            return str(err)
+        
     
     class Meta:
         model = User
