@@ -74,5 +74,6 @@ urlpatterns = [
     
     #Create User Account
     path('create_employe_account/', views.create_employe_account),
+    path('create_employe_account/', views.create_employe_account),
     
 ]

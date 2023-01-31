@@ -3593,3 +3593,53 @@ def create_employe_account(request):
         },
         status=status.HTTP_200_OK
     )
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def employee_login(request):
+    email = request.data.get('email', None)
+    username = request.data.get('username', None)
+    password = request.data.get('password', None)
+    
+    if not all([email,username , password ]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'email',
+                        'password',
+                        'username',
+                        ],
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        user = User.objects.get(
+            email=email,
+            is_deleted=False,
+            user_account_type__account_type = 'Employee'
+        )
+        
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
+                'status_code_text' : 'INVALID_CREDENTIALS_4013',
+                'response' : {
+                    'message' : 'User does not exist with this email',
+                    'error_message' : str(err),
+                    'fields' : ['email']
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    
