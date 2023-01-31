@@ -3792,7 +3792,7 @@ def resend_password(request):
                 else:
                     return Response({
                         'success': True,
-                        'response': {'message': 'Old password not same!'}},
+                        'response': {'message': f'{user.password}Old password not same!'}},
                         status=status.HTTP_404_NOT_FOUND
                         )
                 
