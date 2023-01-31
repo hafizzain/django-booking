@@ -3780,7 +3780,8 @@ def resend_password(request):
         ) 
         if not len(password) < 8:
             if old_password is not None:
-                if old_password == user.password:
+                #if old_password == user.password:
+                if user.check_password(old_password):
                     user.set_password(password)
                     user.save()
                     return Response({
