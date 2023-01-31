@@ -3990,4 +3990,5 @@ def verify_email(request):
                 'error' : None   
             }
         },
+        status=status.HTTP_200_OK
     )
