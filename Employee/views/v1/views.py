@@ -3876,7 +3876,7 @@ def forgot_password(request):
         )
         otp.save()
         
-        html_file = render_to_string("otp_email.html", {'user_name': user.username,'otp': otp, 'email':user.email})
+        html_file = render_to_string("otp_email.html", {'user_name': user.username,'otp': otp.code, 'email':user.email})
         text_content = strip_tags(html_file)
     
         email = EmailMultiAlternatives(
