@@ -872,7 +872,7 @@ class UserEmployeeSerializer(serializers.ModelSerializer):
         try:
             tenant = self.context["tenant"]
             user_domain = Tenant.objects.get(
-                id = tenant ,
+                id = tenant.id ,
                 is_deleted=False,
                 is_blocked=False,
                 is_active=True
@@ -893,7 +893,8 @@ class UserEmployeeSerializer(serializers.ModelSerializer):
             tenant = self.context["tenant"]
             with tenant_context(tenant):
                 employee = Employee.objects.get(
-                    id = 'd35183df-02e4-495e-9b33-976fe16d61fe',
+                    #id = 'd35183df-02e4-495e-9b33-976fe16d61fe',
+                    email = obj.email,
                 )
                 return EmployeeInformationSerializer(employee).data
         except Exception as err:
