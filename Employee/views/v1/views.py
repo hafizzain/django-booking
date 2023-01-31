@@ -3621,7 +3621,7 @@ def employee_login(request):
         )
     
     try:
-        user = User.objects.get(
+        user_id = User.objects.get(
             email=email,
             is_deleted=False,
             #user_account_type__account_type = 'Employee'
@@ -3641,14 +3641,11 @@ def employee_login(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    ExceptionRecord.objects.create(
-        text = f'nothing to find {str(user.id)}'
-    )
     employee_tenant = EmployeeTenantDetail.objects.all()
     for da in employee_tenant:
         data.append(da)
     try:
-        employee_tenant = EmployeeTenantDetail.objects.get(user__username__icontains = user.username)
+        employee_tenant = EmployeeTenantDetail.objects.get(user__username__icontains = user_id.username)
     except Exception as err:
         return Response(
             {
@@ -3656,7 +3653,7 @@ def employee_login(request):
                 'status_code' : 200,
                 'response' : {
                     'message' : 'Authenticated',
-                    'data' : f'{str(err)} {str(user.id)} {user} {data}'
+                    'data' : f'{str(err)} {str(user_id.id)} {str(user_id.username)} {user_id} {data}'
                 }
             },
             status=status.HTTP_200_OK
