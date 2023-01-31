@@ -254,7 +254,6 @@ def verify_otp(request):
             print('ERROR Threading : ', err)
             pass
     except Exception as err:
-        print(err)
         return Response(
             {
                 'status' : False,
