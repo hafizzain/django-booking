@@ -3782,6 +3782,7 @@ def resend_password(request):
             if old_password is not None:
                 #if old_password == user.password:
                 if user.check_password(old_password):
+                #raise serializers.ValidationError("Old password does't match.")
                     user.set_password(password)
                     user.save()
                     return Response({
