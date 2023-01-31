@@ -3707,7 +3707,7 @@ def resend_password(request):
     password = request.data.get('password', None)
     code = request.data.get('code', None)
 
-    if not email or not password or not code:
+    if not email or not password :
         return Response(
             {
                 'status' : False,
@@ -3777,24 +3777,7 @@ def resend_password(request):
                 }
             },
             status=status.HTTP_404_NOT_FOUND
-        )   
-
-        try:
-            code = VerificationOTP.objects.get(user=user, code=code)
-        except Exception as err:
-            return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
-                'status_code_text' : 'INVALID_CREDENTIALS_4013',
-                'response' : {
-                    'message' : 'InValid Code',
-                    'error_message' : str(err),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
-            
+        ) 
         if not len(password) < 8:
             user.set_password(password)
             user.save()
