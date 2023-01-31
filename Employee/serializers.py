@@ -876,7 +876,10 @@ class UserEmployeeSerializer(serializers.ModelSerializer):
             return str(err)
         
     def get_access_token(self,obj):
-        return str(obj.auth_token)
+        try:
+            return str(obj.auth_token)
+        except Exception as err:
+            return str(err)
     
     class Meta:
         model = User
