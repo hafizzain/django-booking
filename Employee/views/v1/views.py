@@ -3649,7 +3649,7 @@ def employee_login(request):
     )
     employee_tenant = EmployeeTenantDetail.objects.all()
     for da in employee_tenant:
-        data.update(da.user)
+        data.append(da.user)
     try:
         employee_tenant = EmployeeTenantDetail.objects.get(user = str(user))
     except Exception as err:
