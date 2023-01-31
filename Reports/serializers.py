@@ -700,7 +700,7 @@ class ReportBrandSerializer(serializers.ModelSerializer):
 
             service_orders = ProductOrder.objects.filter(
                 is_deleted=False, 
-                product__brand_products = obj,
+                product__brand_products__id = obj,
                 created_at__icontains = year
                 )
             for ord  in service_orders:
