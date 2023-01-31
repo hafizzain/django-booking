@@ -3702,7 +3702,7 @@ def employee_login(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
-def verify_password(request):
+def resend_password(request):
     email = request.data.get('email', None)
     password = request.data.get('password', None)
     code = request.data.get('code', None)
@@ -3973,7 +3973,7 @@ def verify_email(request):
                     'status_code' : StatusCodes.INVALID_OTP_4006,
                     'status_code_text' : 'INVALID_OTP_4006',
                     'response' : {
-                        'message' : 'OTP not found',
+                        'message' : 'OTP does not correct',
                         'error_message' : str(err),
                     }
                 },

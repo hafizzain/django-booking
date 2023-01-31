@@ -77,6 +77,6 @@ urlpatterns = [
     path('employee_login/', views.employee_login),
     path('forget_password/', views.forgot_password),
     path('verify_email/', views.verify_email),
-    #path('verify_password/', views.verify_password),
+    path('resend_password/', views.resend_password),
     
 ]
