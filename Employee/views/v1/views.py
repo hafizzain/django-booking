@@ -3807,34 +3807,73 @@ def verify_password(request):
 def forgot_password(request):
     email = request.data.get('email', None)
     code_for = 'Email'
+    
     try:
-        user = User.objects.get(email=email, is_active=True)
+        user_id = User.objects.get(
+            email=email,
+            is_deleted=False,
+            user_account_type__account_type = 'Employee'
+        )
+        
     except Exception as err:
         return Response(
-            {'success': False, 'response': {'message': 'User with the given email address does not exist!'}},
-            status=status.HTTP_404_NOT_FOUND)
-    try:
-        otp = VerificationOTP.objects.get(
-            code_for='Email' if code_for == 'Email' else 'Mobile' ,
-            user=user,
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
+                'status_code_text' : 'INVALID_CREDENTIALS_4013',
+                'response' : {
+                    'message' : 'User does not exist with this email',
+                    'error_message' : str(err),
+                    'fields' : ['email']
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
         )
-        otp.delete()
-    except Exception as err:
-        print(err)
-        pass
-
+    
     try:
-        thrd = Thread(target=OTP.generate_user_otp, kwargs={'user' : user, 'code_for':f"{'Email' if code_for == 'Email' else 'Mobile'}"})
-        thrd.start()
+        employee_tenant = EmployeeTenantDetail.objects.get(user__username = user_id)
     except Exception as err:
-        pass
-    #     pass
-    # try:
-    #     email.send(fail_silently=False)
-    # except Exception as e:
-    #     return Response({'success': False,
-    #                      'message': 'There is an issue with Email Host Server'},
-    #                     status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Authenticated',
+                    'data' : str(err),
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+        
+    with tenant_context(employee_tenant.tenant):
+        try:
+            user = User.objects.get(email=email, is_active=True)
+        except Exception as err:
+            return Response(
+                {'success': False, 'response': {'message': 'User with the given email address does not exist!'}},
+                status=status.HTTP_404_NOT_FOUND)
+        try:
+            otp = VerificationOTP.objects.get(
+                code_for='Email' if code_for == 'Email' else 'Mobile' ,
+                user=user,
+            )
+            otp.delete()
+        except Exception as err:
+            print(err)
+            pass
+
+        try:
+            thrd = Thread(target=OTP.generate_user_otp, kwargs={'user' : user, 'code_for':f"{'Email' if code_for == 'Email' else 'Mobile'}"})
+            thrd.start()
+        except Exception as err:
+            pass
+        #     pass
+        # try:
+        #     email.send(fail_silently=False)
+        # except Exception as e:
+        #     return Response({'success': False,
+        #                      'message': 'There is an issue with Email Host Server'},
+        #                     status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
     return Response({'success': True,
                      'message': 'Verification code has been sent to your provided Email'},
