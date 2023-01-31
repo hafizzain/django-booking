@@ -886,4 +886,4 @@ class UserEmployeeSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['id', 'access_token', 'domain']
+        fields = ['id', 'access_token', 'domain','employee']
