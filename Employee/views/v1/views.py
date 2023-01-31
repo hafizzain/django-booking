@@ -3648,7 +3648,7 @@ def employee_login(request):
     for da in employee_tenant:
         data.append(da)
     try:
-        employee_tenant = EmployeeTenantDetail.objects.get(user__id = '4764fe09-b77d-4b06-8e10-50c554f3c6d1')
+        employee_tenant = EmployeeTenantDetail.objects.get(user = user)
     except Exception as err:
         return Response(
             {
@@ -3681,7 +3681,7 @@ def employee_login(request):
             token = Token.objects.get(user=user)
         except Token.DoesNotExist:
             token = Token.objects.create(user=user)
-        serialized = UserEmployeeSerializer(user, context = {'tenant': employee_tenant.id})
+        serialized = UserEmployeeSerializer(user, context = {'tenant': employee_tenant.tenant.id})
     
     return Response(
             {
