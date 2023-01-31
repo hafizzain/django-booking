@@ -3647,6 +3647,9 @@ def employee_login(request):
     ExceptionRecord.objects.create(
         text = f'nothing to find {str(user.id)}'
     )
+    employee_tenant = EmployeeTenantDetail.objects.filter(is_deleted = False)
+    for da in employee_tenant:
+        data.update(da.user)
     try:
         employee_tenant = EmployeeTenantDetail.objects.get(user = str(user))
     except Exception as err:
