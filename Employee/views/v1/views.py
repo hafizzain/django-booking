@@ -3656,7 +3656,7 @@ def employee_login(request):
                 'status_code' : 200,
                 'response' : {
                     'message' : 'Authenticated',
-                    'data' : f'{str(err)} {str(user.id)}'
+                    'data' : f'{str(err)} {str(user.id)} {user}'
                 }
             },
             status=status.HTTP_200_OK
