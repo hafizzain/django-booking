@@ -861,6 +861,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
 class UserEmployeeSerializer(serializers.ModelSerializer): 
     access_token = serializers.SerializerMethodField()
     domain = serializers.SerializerMethodField()
+    employee = serializers.SerializerMethodField()
     
     def get_domain(self,obj):
         try:
@@ -877,7 +878,9 @@ class UserEmployeeSerializer(serializers.ModelSerializer):
         
     def get_access_token(self,obj):
         try:
-            return str(obj.auth_token)
+            token = self.context["token"]
+            return token
+            #return str(obj.auth_token)
         except Exception as err:
             return str(err)
     
