@@ -275,6 +275,7 @@ def create_appointment(request):
         end_time = datetime_duration
         
         service_commission = 0
+        service_commission_type = ''
         
         try:
             commission = CommissionSchemeSetting.objects.get(employee = str(member))
