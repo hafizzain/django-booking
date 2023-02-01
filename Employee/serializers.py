@@ -842,7 +842,7 @@ class EmployeeInformationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Employee
-        fields = ['id', 'image','full_name', 'email', 'mobile_number','country','state','city', 'address', 'postal_code']
+        fields = ['id','business', 'image','full_name', 'email', 'mobile_number','country','state','city', 'address', 'postal_code']
 
 class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):    
     schedule =  serializers.SerializerMethodField(read_only=True)    
