@@ -96,9 +96,11 @@ class AppointmentService(models.Model):
     
     price = models.PositiveIntegerField(default=0, null=True, blank=True)
     
+    service_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
+    service_commission_type = models.CharField( max_length=50 , default = '')
+    
     end_time = models.TimeField(null=True, blank=True)
     details = models.CharField(max_length=255, null=True, blank=True)
-    
     
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
