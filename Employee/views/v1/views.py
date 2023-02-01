@@ -952,6 +952,10 @@ def update_employee(request):
     staff_id = request.data.get('staff_group', None) 
     location = request.data.get('location', None) 
     
+    country = request.data.get('country', None) 
+    city = request.data.get('city', None) 
+    state = request.data.get('state', None) 
+    
     working_days = []
     
     Errors = []
@@ -987,6 +991,7 @@ def update_employee(request):
             },
                 status=status.HTTP_404_NOT_FOUND
             )
+    
     try:
         staff = StaffGroup.objects.get(employees=id)
         staff.employees.remove(employee)
@@ -1027,6 +1032,24 @@ def update_employee(request):
     else:
         employee.is_active = False 
     employee.save()
+    
+    if country is not None:
+        try:
+            country= Country.objects.get(id=country)
+        except:
+            country = None
+            
+    if state is not None:
+        try:
+            state= State.objects.get(id=state)
+        except:
+            state = None
+            
+    if city is not None:
+        try:
+            city= City.objects.get(id=city)
+        except:
+            city = None
 
     Employe_Informations= EmployeeProfessionalInfo.objects.get(employee=employee)
     
