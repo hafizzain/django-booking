@@ -17,7 +17,7 @@ from Sale.serializers import MemberShipOrderSerializer, ProductOrderSerializer, 
 
 #from Service.models import Service
 from Service.models import Service
-from Employee.models import Employee, EmployeeSelectedService
+from Employee.models import CommissionSchemeSetting, Employee, EmployeeSelectedService
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
@@ -162,7 +162,9 @@ def create_appointment(request):
     
     payment_method = request.data.get('payment_method', None)
     discount_type = request.data.get('discount_type', None)
-
+    
+    Errors = []
+    
     if not all([ client_type, appointment_date, business_id  ]):
          return Response(
             {
@@ -219,18 +221,7 @@ def create_appointment(request):
         client = Client.objects.get(id=client)
     except Exception as err:
         client = None
-        # return Response(
-        #     {
-        #             'status' : False,
-        #             'status_code' : StatusCodes.INVALID_CLIENT_4032,
-        #             'response' : {
-        #             'message' : 'Client not found',
-        #             'error_message' : str(err),
-        #         }
-        #     }
-        # )
-    
-            
+       
     appointment = Appointment.objects.create(
             user = user,
             business=business,
@@ -282,6 +273,11 @@ def create_appointment(request):
         datetime_duration = app_date_time + timedelta(minutes=duration)
         datetime_duration = datetime_duration.strftime('%H:%M:%S')
         end_time = datetime_duration
+        
+        try:
+            commission = CommissionSchemeSetting.objects.get(employee = str(member))
+        except Exception as err:
+            Errors.append(str(err))
         
         try:
             voucher = Vouchers.objects.get(id = voucher_id )
