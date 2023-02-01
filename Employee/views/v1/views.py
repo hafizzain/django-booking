@@ -16,7 +16,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from Employee.serializers import( EmployeSerializer , EmployeInformationsSerializer
-                          , EmployPermissionSerializer,  EmployeModulesSerializer
+                          , EmployPermissionSerializer,  EmployeModulesSerializer, EmployeeInformationSerializer
                           ,  EmployeeMarketingSerializers, Payroll_WorkingScheduleSerializer, ScheduleSerializer, StaffGroupSerializers , 
                           StaffpermisionSerializers , AttendanceSerializers
                           ,PayrollSerializers, UserEmployeeSerializer, VacationSerializer,singleEmployeeSerializer , CommissionSerializer
@@ -3997,3 +3997,54 @@ def verify_email(request):
         status=status.HTTP_200_OK
     )
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_employee_device(request):
+    employee_id = request.GET.get('id', None)
+
+    if not all([employee_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Employee id are required',
+                    'fields' : [
+                        'id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try: 
+        employee_id = Employee.objects.get(id=employee_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                    'response' : {
+                        'message' : 'Employee Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    
+    serialized = EmployeeInformationSerializer(employee_id, context={'request' : request} )
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Employee',
+                'error_message' : None,
+                'employees' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )

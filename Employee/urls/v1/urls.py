@@ -78,5 +78,6 @@ urlpatterns = [
     path('forget_password/', views.forgot_password),
     path('verify_email/', views.verify_email),
     path('resend_password/', views.resend_password),
+    path('get_employee_device/', views.get_employee_device),
     
 ]

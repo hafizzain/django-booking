@@ -17,7 +17,7 @@ from Sale.serializers import MemberShipOrderSerializer, ProductOrderSerializer, 
 
 #from Service.models import Service
 from Service.models import Service
-from Employee.models import CommissionSchemeSetting, Employee, EmployeeSelectedService
+from Employee.models import CategoryCommission, CommissionSchemeSetting, Employee, EmployeeSelectedService
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
@@ -276,8 +276,16 @@ def create_appointment(request):
         
         try:
             commission = CommissionSchemeSetting.objects.get(employee = str(member))
+            category = CategoryCommission.objects.filter(commission = commission.id)
+            # for cat in category:
+            #     if cat.category_comission == 'Service':
+            #         if cat.from_value <= price and cat.to_value 
+                    
+            
         except Exception as err:
             Errors.append(str(err))
+            
+        
         
         try:
             voucher = Vouchers.objects.get(id = voucher_id )
