@@ -17,7 +17,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from Employee.serializers import( EmployeSerializer , EmployeInformationsSerializer
                           , EmployPermissionSerializer,  EmployeModulesSerializer, EmployeeInformationSerializer
-                          ,  EmployeeMarketingSerializers, Payroll_WorkingScheduleSerializer, ScheduleSerializer, StaffGroupSerializers , 
+                          ,  EmployeeMarketingSerializers, Payroll_WorkingScheduleSerializer, ScheduleSerializer, SingleEmployeeInformationSerializer, StaffGroupSerializers , 
                           StaffpermisionSerializers , AttendanceSerializers
                           ,PayrollSerializers, UserEmployeeSerializer, VacationSerializer,singleEmployeeSerializer , CommissionSerializer
                           , AssetSerializer, WorkingScheduleSerializer
@@ -4035,7 +4035,7 @@ def get_employee_device(request):
                 status=status.HTTP_404_NOT_FOUND
             )
     
-    serialized = EmployeeInformationSerializer(employee_id, context={'request' : request} )
+    serialized = SingleEmployeeInformationSerializer(employee_id, context={'request' : request} )
     return Response(
         {
             'status' : 200,

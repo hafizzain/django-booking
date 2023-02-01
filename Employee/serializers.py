@@ -811,6 +811,22 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         model = Employee
         fields = ['id', 'full_name','image','start_time', 'end_time','vacation','schedule','location','created_at']
 
+class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request)
+                return f'{url}{obj.image}'
+            except:
+                return obj.image
+        return None
+    
+    class Meta:
+        model = Employee
+        fields = ['id', 'image','full_name', 'email', 'mobile_number','country','state','city', 'address', 'postal_code']
 class EmployeeInformationSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     
