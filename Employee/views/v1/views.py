@@ -1036,18 +1036,24 @@ def update_employee(request):
     if country is not None:
         try:
             country= Country.objects.get(id=country)
+            employee.country = country
+            employee.save()
         except:
             country = None
             
     if state is not None:
         try:
             state= State.objects.get(id=state)
+            employee.state = state
+            employee.save()
         except:
             state = None
             
     if city is not None:
         try:
             city= City.objects.get(id=city)
+            employee.city = city
+            employee.save()
         except:
             city = None
 
