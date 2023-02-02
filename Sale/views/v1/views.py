@@ -50,13 +50,17 @@ from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSeria
 @permission_classes([AllowAny])
 def get_service(request):
     title = request.GET.get('title', None)
-    SORTED_OPTIONS = {
-        'default' : '-created_at',
-        'title': title
-    }
-    sorted_value = SORTED_OPTIONS.get(title, '-created_at')
-    service= Service.objects.filter(is_deleted=False, is_blocked=False).order_by(sorted_value).distinct()
-    serialized = ServiceSerializer(service,  many=True, context={'request' : request} )
+    # SORTED_OPTIONS = {
+    #     'default' : '-created_at',
+    #     'title': title
+    # }
+    # sorted_value = SORTED_OPTIONS.get(title, '-created_at')
+    if title:
+        service= Service.objects.filter(name__icontains = title , is_deleted=False, is_blocked=False).order_by('-created_at').distinct()
+        serialized = ServiceSerializer(service,  many=True, context={'request' : request} )
+    else:
+        service= Service.objects.filter( is_deleted=False, is_blocked=False).order_by('-created_at').distinct()
+        serialized = ServiceSerializer(service,  many=True, context={'request' : request} )
     return Response(
         {
             'status' : 200,
