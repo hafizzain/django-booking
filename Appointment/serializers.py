@@ -396,7 +396,7 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
         
     def get_service_id(self, obj):
         try:
-            return obj.service
+            return obj.service.id
         except Exception as err:
             return None
             
