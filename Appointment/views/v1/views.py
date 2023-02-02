@@ -88,7 +88,7 @@ def get_single_appointments(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_appointments_service(request):
-    appointment_id = request.GET.get('appointment_id', None) 
+    appointment_id = request.GET.get('appointment_group_id', None) 
     
     if not all([appointment_id]):
         return Response(
