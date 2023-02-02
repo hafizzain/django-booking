@@ -427,7 +427,7 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
     appointment_type = serializers.SerializerMethodField(read_only=True)
     appointment_status = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
-    service_name = serializers.SerializerMethodField(read_only=True)
+    srv_name = serializers.SerializerMethodField(read_only=True)
     
     def get_service(self, obj):
         try:
@@ -484,7 +484,7 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
         except Exception as err:
             return None
         
-    def get_service_name(self, obj):
+    def get_srv_name(self, obj):
         try:
             return obj.service.name
         except Exception as err:
@@ -505,7 +505,7 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentService
         fields= ('id', 'service', 'member', 'price', 'client', 
-                 'appointment_date', 'appointment_time', 'duration','service_name',
+                 'appointment_date', 'appointment_time', 'duration','srv_name',
                  'booked_by' , 'booking_id', 'appointment_type','client_can_book','slot_availible_for_online',
                  'appointment_status', 'location', 'created_at')
         
