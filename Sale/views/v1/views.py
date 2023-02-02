@@ -530,7 +530,7 @@ def create_servicegroup(request):
     allow_client_to_select_team_member = request.data.get('allow_client_to_select_team_member', None)
     
     servicegroup_error = []
-    if not all([business, name,service]):
+    if not all([business, name]):
         return Response(
             {
                 'status' : False,
@@ -577,18 +577,18 @@ def create_servicegroup(request):
         service_group.allow_client_to_select_team_member = False
     else:
         service_group.allow_client_to_select_team_member = True
-        
-    if type(service) == str:
-        service = json.loads(service)
-    elif type(service) == list:
-            pass
-        
-    for ser in service:
-        try:
-            services = Service.objects.get(id=ser)  
-            service_group.services.add(services)
-        except Exception as err:
-            servicegroup_error.append(str(err))
+    if service:
+        if type(service) == str:
+            service = json.loads(service)
+        elif type(service) == list:
+                pass
+            
+        for ser in service:
+            try:
+                services = Service.objects.get(id=ser)  
+                service_group.services.add(services)
+            except Exception as err:
+                servicegroup_error.append(str(err))
     service_group.save()
     serialized=ServiceGroupSerializer(service_group, context={'request' : request})
     return Response(
