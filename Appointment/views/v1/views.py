@@ -107,7 +107,7 @@ def get_appointments_service(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     try:
-        appointment = Appointment.objects.get(id=appointment_id, is_blocked=False, is_deleted=False )
+        appointment = Appointment.objects.get(id=appointment_id, is_deleted=False )
     except Exception as err:
         return Response(
                 {
