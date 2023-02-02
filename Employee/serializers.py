@@ -813,6 +813,11 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
 
 class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
+    location = serializers.SerializerMethodField()
+    
+    def get_location(self, obj):
+        loc = obj.location.all()
+        return LocationSerializer(loc, many =True ).data
     
     def get_image(self, obj):
         if obj.image:
@@ -826,7 +831,7 @@ class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Employee
-        fields = ['id', 'image','full_name', 'email', 'mobile_number','country','state','city', 'address', 'postal_code']
+        fields = ['id', 'image','location','full_name', 'email', 'mobile_number','country','state','city', 'address', 'postal_code']
 class EmployeeInformationSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     
