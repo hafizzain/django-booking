@@ -484,7 +484,7 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
         except Exception as err:
             return None
         
-    def get_service(self, obj):
+    def get_service_name(self, obj):
         try:
             return obj.service.name
         except Exception as err:
