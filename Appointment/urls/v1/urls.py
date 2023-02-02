@@ -8,6 +8,7 @@ urlpatterns = [
     path('get_all_appointments/',views.get_all_appointments),
     path('get_today_appointments/', views.get_today_appointments),
     path('get_single_appointments/', views.get_single_appointments),
+    path('get_appointments_service/', views.get_appointments_service),
     
     path('service_appointment_count/', views.service_appointment_count),
     

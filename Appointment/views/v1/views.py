@@ -87,6 +87,59 @@ def get_single_appointments(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
+def get_appointments_service(request):
+    appointment_id = request.GET.get('appointment_id', None) 
+    
+    if not all([appointment_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Appointment id is required',
+                    'fields' : [
+                        'appointment_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        appointment = Appointment.objects.get(id=appointment_id, is_blocked=False, is_deleted=False )
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_APPOINMENT_ID_4038,
+                    'status_code_text' : 'INVALID_APPOINMENT_ID_4038',
+                    'response' : {
+                        'message' : 'Appointment Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+    serialized = SingleNoteSerializer(appointment)
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'All Appointments',
+                'error_message' : None,
+                'appointment' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def get_today_appointments(request):
     today = date.today()
     today_appointment = AppointmentService.objects.filter(appointment_date__icontains = today, is_blocked=False )

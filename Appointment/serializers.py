@@ -407,6 +407,8 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
                  'appointment_status', 'location', 'created_at')
         
         
+
+        
 class SingleAppointmentSerializer(serializers.ModelSerializer):
     client_id = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)
@@ -495,20 +497,23 @@ class NoteSerializer(serializers.ModelSerializer):
 class SingleNoteSerializer(serializers.ModelSerializer):
     
     notes = serializers.SerializerMethodField(read_only=True)
+    appointmnet_service = serializers.SerializerMethodField(read_only=True)
     
     def get_notes(self, obj):
         try:
             note = AppointmentNotes.objects.get(appointment=obj)
-            print(note)
             serializers = NoteSerializer(note)
             return serializers.data
         except:
             return None
-            
-    
+        
+    def get_appointmnet_service(self, obj):
+            note = AppointmentService.objects.filter(appointment=obj)
+            return AllAppoinmentSerializer(note, many = True).data
+            #return serializers
     class Meta:
         model = Appointment
-        fields = ['id', 'client', 'notes']
+        fields = ['id', 'client', 'notes', 'appointmnet_service']
   
 class AppointmentServiceSeriailzer(serializers.ModelSerializer):
     class Meta:
