@@ -313,6 +313,9 @@ def create_appointment(request):
         date_time = appoinmnt['date_time']
         fav = appoinmnt.get('favourite', None)
         
+        client_can_book = appoinmnt.get('client_can_book', None)
+        slot_availible_for_online = appoinmnt.get('slot_availible_for_online', None)
+        
         voucher_id = appoinmnt.get('voucher', None)
         reward_id = appoinmnt.get('reward', None)
         membership_id = appoinmnt.get('membership', None)
@@ -411,6 +414,9 @@ def create_appointment(request):
             price = price,
             service_commission = service_commission,
             service_commission_type= service_commission_type,
+            
+            slot_availible_for_online = slot_availible_for_online,
+            client_can_book = client_can_book,
             # voucher = voucher,
             # reward = reward,
             # membership = membership,
@@ -448,6 +454,7 @@ def create_appointment(request):
                 'response' : {
                     'message' : 'Appointment Create!',
                     'error_message' : None,
+                    'error' : Errors,
                     'appointments' : serialized.data,
                 }
             },
