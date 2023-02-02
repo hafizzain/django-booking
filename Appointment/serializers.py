@@ -391,7 +391,7 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
         
     def get_member_id(self, obj):
         try:
-            return obj.member
+            return obj.member.id
         except Exception as err:
             return None
         
