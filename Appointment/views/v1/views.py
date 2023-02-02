@@ -332,6 +332,7 @@ def create_appointment(request):
         
         service_commission = 0
         service_commission_type = ''
+        toValue = 0
         
         try:
             commission = CommissionSchemeSetting.objects.get(employee = str(member))
