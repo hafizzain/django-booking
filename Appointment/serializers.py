@@ -419,6 +419,88 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
                  'appointment_date', 'appointment_time', 'duration','member_id',
                  'booked_by' , 'booking_id', 'appointment_type','client_can_book','slot_availible_for_online','service_id',
                  'appointment_status', 'location', 'created_at')
+class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
+    client = serializers.SerializerMethodField(read_only=True)
+    #price = serializers.SerializerMethodField(read_only=True)
+    booked_by = serializers.SerializerMethodField(read_only=True)
+    booking_id = serializers.SerializerMethodField(read_only=True)
+    appointment_type = serializers.SerializerMethodField(read_only=True)
+    appointment_status = serializers.SerializerMethodField(read_only=True)
+    location = serializers.SerializerMethodField(read_only=True)
+    
+    def get_location(self, obj):
+        try:
+            loc = BusinessAddress.objects.get(id = obj.business_address.id)
+            return LocationSerializer(loc).data
+        except Exception as err:
+            print(err)      
+    
+    def get_appointment_status(self, obj):
+        if obj.appointment_status == 'Appointment Booked' or  obj.appointment_status ==  'Arrived'  or obj.appointment_status == 'In Progress' :
+            return 'Upcomming'
+        
+        if obj.appointment_status == 'Paid' or obj.appointment_status == 'Done': 
+            return 'Completed'
+        
+        if obj.appointment_status == 'Cancel':
+            return 'Cancelled'
+            
+    def get_appointment_type(self, obj):
+        try:
+            return obj.appointment.client_type
+        except Exception as err:
+            return None
+            
+    def get_booked_by(self, obj):
+        return f'{obj.user.first_name} {obj.user.last_name}'
+    
+    def get_booking_id(self, obj):
+        id = str(obj.id).split('-')[0:2]
+        id = ''.join(id)
+        return id
+    
+    def get_client(self, obj):
+        try:
+            return obj.appointment.client.full_name
+        except Exception as err:
+            return None
+        
+    def get_member(self, obj):
+        try:
+            return obj.member.full_name
+        except Exception as err:
+            return None
+        
+    def get_member_id(self, obj):
+        try:
+            return obj.member.id
+        except Exception as err:
+            return None
+        
+    def get_service(self, obj):
+        try:
+            return obj.service.name
+        except Exception as err:
+            return None
+        
+    def get_service_id(self, obj):
+        try:
+            return obj.service.id
+        except Exception as err:
+            return None
+            
+    # def get_price(self, obj):
+    #     try:
+    #         return obj.service.price
+    #     except Exception as err:
+    #         return None
+    
+    class Meta:
+        model = AppointmentService
+        fields= ('id', 'service', 'member', 'price', 'client', 
+                 'appointment_date', 'appointment_time', 'duration',
+                 'booked_by' , 'booking_id', 'appointment_type','client_can_book','slot_availible_for_online',
+                 'appointment_status', 'location', 'created_at')
         
         
 
@@ -523,7 +605,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
         
     def get_appointmnet_service(self, obj):
             note = AppointmentService.objects.filter(appointment=obj)
-            return AllAppoinmentSerializer(note, many = True).data
+            return AllAppoinment_EmployeeSerializer(note, many = True).data
             #return serializers
     class Meta:
         model = Appointment
