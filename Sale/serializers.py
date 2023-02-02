@@ -9,13 +9,21 @@ from Business.models import BusinessAddress, BusinessTax
 from Order.models import Checkout, MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
 from django_tenants.utils import tenant_context
-from Utility.models import ExceptionRecord
+from Utility.models import Currency, ExceptionRecord
 
 from Product.models import ProductStock
 
 from Service.models import PriceService, Service, ServiceGroup
 
 class PriceServiceSerializers(serializers.ModelSerializer):
+    currency_name = serializers.SerializerMethodField(read_only=True)
+    
+    def get_currency_name(self, obj):
+        try:
+            currency = Currency.objects.get(id  = obj.currency.id)
+            return currency.code
+        except Exception as err:
+            return str(err)
     class Meta:
         model = PriceService
         fields = '__all__'
