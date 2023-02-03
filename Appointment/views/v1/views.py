@@ -201,13 +201,17 @@ def get_calendar_appointment(request):
     )
     
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def create_appointment(request):
-    user = request.user    
+    user = request.user  
+    ExceptionRecord.objects.craete(
+        text = f'str object{str(request.data)} request.body {str(request.body)}'
+    )
     business_id = request.data.get('business', None)
     appointments = request.data.get('appointments', None)
     appointment_date = request.data.get('appointment_date', None)
     text = request.data.get('appointment_notes', None)
+    business_address_id = request.data.get('business_address', None)
     #business_id, member, appointment_date, appointment_time, duration
 
     client = request.data.get('client', None)
@@ -217,7 +221,7 @@ def create_appointment(request):
     discount_type = request.data.get('discount_type', None)
     
     Errors = []
-    
+        
     if not all([ client_type, appointment_date, business_id  ]):
          return Response(
             {
@@ -253,8 +257,6 @@ def create_appointment(request):
             }
     
         )
-    
-    business_address_id = request.data.get('business_address', None)
 
     if business_address_id is not None:
         try:
@@ -288,6 +290,7 @@ def create_appointment(request):
         appointment.save()
     
     if type(appointments) == str:
+        appointments = appointments.replace("'" , '"')
         appointments = json.loads(appointments)
 
     elif type(appointments) == list:
@@ -350,8 +353,7 @@ def create_appointment(request):
                         else:
                             service_commission = int(cat.commission_percentage)
                             service_commission_type = str(service_commission) + cat.symbol
-                            
-                    
+                                            
         except Exception as err:
             Errors.append(str(err))
         
