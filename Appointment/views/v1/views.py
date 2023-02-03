@@ -204,9 +204,6 @@ def get_calendar_appointment(request):
 @permission_classes([IsAuthenticated])
 def create_appointment(request):
     user = request.user  
-    ExceptionRecord.objects.create(
-        text = f'str object{str(request.data)} request.body '
-    )
     business_id = request.data.get('business', None)
     appointments = request.data.get('appointments', None)
     appointment_date = request.data.get('appointment_date', None)
@@ -219,6 +216,10 @@ def create_appointment(request):
     
     payment_method = request.data.get('payment_method', None)
     discount_type = request.data.get('discount_type', None)
+    
+    ExceptionRecord.objects.create(
+        text = f'str object{str(request.data)} request.body {business_id}, {appointments} '
+    )
     
     Errors = []
         
