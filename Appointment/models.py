@@ -92,8 +92,8 @@ class AppointmentService(models.Model):
 
     duration = models.CharField(max_length=100, default='')
     
-    client_can_book = models.CharField(max_length=100, default='')
-    slot_availible_for_online = models.CharField(max_length=100, default='')
+    client_can_book = models.CharField(max_length=100, default='', null=True, blank=True)
+    slot_availible_for_online = models.CharField(max_length=100, default='', null=True, blank=True,)
     
     appointment_status = models.CharField(choices=BOOKED_CHOICES, max_length=100, default='Appointment Booked')
     tip = models.PositiveIntegerField(default=0, null=True, blank=True)
