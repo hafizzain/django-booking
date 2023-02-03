@@ -205,7 +205,7 @@ def get_calendar_appointment(request):
 def create_appointment(request):
     user = request.user  
     ExceptionRecord.objects.create(
-        text = f'str object{str(request.data)} request.body {str(request.body)}'
+        text = f'str object{str(request.data)} request.body '
     )
     business_id = request.data.get('business', None)
     appointments = request.data.get('appointments', None)
