@@ -301,12 +301,12 @@ def create_appointment(request):
         text = json.loads(text)
     else:
         pass
-    if text is not None:
-        for note in text:
-            AppointmentNotes.objects.create(
-                appointment=appointment,
-                text = note
-            )
+    # if text is not None:
+    #     for note in text:
+    #         AppointmentNotes.objects.create(
+    #             appointment=appointment,
+    #             text = note
+    #         )
     
     all_members = []
     for appoinmnt in appointments:
