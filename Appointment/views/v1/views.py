@@ -201,10 +201,10 @@ def get_calendar_appointment(request):
     )
     
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def create_appointment(request):
     user = request.user  
-    ExceptionRecord.objects.craete(
+    ExceptionRecord.objects.create(
         text = f'str object{str(request.data)} request.body {str(request.body)}'
     )
     business_id = request.data.get('business', None)
