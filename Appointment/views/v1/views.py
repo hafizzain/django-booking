@@ -297,10 +297,10 @@ def create_appointment(request):
     elif type(appointments) == list:
         pass
     
-    if type(text) == str:
-        text = json.loads(text)
-    else:
-        pass
+    # if type(text) == str:
+    #     text = json.loads(text)
+    # else:
+    #     pass
     # if text is not None:
     #     for note in text:
     #         AppointmentNotes.objects.create(
