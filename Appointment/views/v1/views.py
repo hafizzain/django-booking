@@ -542,6 +542,102 @@ def update_appointment(request):
         status=status.HTTP_200_OK
     )
     
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_appointment_service(request):
+    appointment_id = request.data.get('id', None)
+    appointments = request.data.get('appointments', None)
+    
+    errors = []
+    if appointment_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required.',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        appointment = Appointment.objects.get(id=appointment_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Appointment ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+        
+    if appointments is not None:
+        if type(appointments) == str:
+            appointments = json.loads(appointments)
+
+        elif type(appointments) == list:
+            pass
+        
+        for app in appointments:
+            appointment_date = app.get('appointment_date', None)
+            date_time = app.get('date_time', None)
+            service = app.get('service', None)
+            client_can_book = app.get('client_can_book', None)
+            slot_availible_for_online = app.get('slot_availible_for_online', None)
+            duration = app.get('duration', None)
+            price = app.get('price', None)
+            is_deleted = app.get('is_deleted', None)
+            member = app.get('member', None)
+            id = app.get('id', None)
+            try:
+                service_id =Service.objects.get(id=service)
+            except Exception as err:
+                errors.append(str(err))
+            try:
+                member_id =Employee.objects.get(id=member)
+            except Exception as err:
+                errors.append(str(err))
+            if id is not None:
+                try:
+                    service_appointment = AppointmentService.objects.get(id=id)
+                    if str(is_deleted) == "true":
+                        service_appointment.delete()
+                    service_appointment.appointment_date = appointment_date
+                    service_appointment.appointment_time = date_time
+                    service_appointment.service = service_id
+                    service_appointment.client_can_book = client_can_book
+                    service_appointment.slot_availible_for_online = slot_availible_for_online
+                    service_appointment.duration = duration
+                    service_appointment.price = price
+                    service_appointment.member = member_id
+                    service_appointment.save()                    
+                except Exception as err:
+                    errors.append(str(err))
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Update Appointment Successfully',
+                'error_message' : None,
+                'errors': errors,
+                #'Appointment' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_appointment(request):

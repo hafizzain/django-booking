@@ -2379,7 +2379,6 @@ def update_commision(request):
         
     if service_comission is not None:
         if type(service_comission) == str:
-            #product_comission = product_comission.replace("'" , '"')
             service_comission = json.loads(service_comission)
 
         elif type(service_comission) == list:
@@ -2393,9 +2392,6 @@ def update_commision(request):
             isDeleted = pro.get('isDeleted', None)
             symbol = pro.get('symbol', None)
             id = pro.get('id', None)
-            ExceptionRecord.objects.create(
-                        text = f'error to service_comission create {id} delete {isDeleted}'
-                    )
             if id is not None:
                 try:
                     commision_ser= CategoryCommission.objects.get(id=id)
@@ -2410,9 +2406,7 @@ def update_commision(request):
                     commision_ser.save()           
                     
                 except Exception as err:
-                    ExceptionRecord.objects.create(
-                        text = f'error to service_comission create {str(err)}'
-                    )
+                    pass
             else:
                 CategoryCommission.objects.create(
                     commission =  commission,
@@ -2425,7 +2419,6 @@ def update_commision(request):
                 
     if product_comission is not None:
         if type(product_comission) == str:
-            #product_comission = product_comission.replace("'" , '"')
             product_comission = json.loads(product_comission)
 
         elif type(product_comission) == list:
@@ -2439,9 +2432,6 @@ def update_commision(request):
             isDeleted = pro.get('isDeleted', None)
             symbol = pro.get('symbol', None)
             id = pro.get('id', None)
-            ExceptionRecord.objects.create(
-                        text = f'error to service_comission create {id} delete {isDeleted}'
-                    )
             if id is not None:
                 try:
                     commision_ser= CategoryCommission.objects.get(id=id)
@@ -2456,9 +2446,7 @@ def update_commision(request):
                     commision_ser.save()           
                     
                 except Exception as err:
-                    ExceptionRecord.objects.create(
-                        text = f'error to product_comission create {str(err)}'
-                    )
+                    pass
             else:
                 CategoryCommission.objects.create(
                     commission =  commission,
@@ -2484,9 +2472,6 @@ def update_commision(request):
             isDeleted = pro.get('isDeleted', None)
             symbol = pro.get('symbol', None)
             id = pro.get('id', None)
-            ExceptionRecord.objects.create(
-                        text = f'error to service_comission create {id} delete {isDeleted}'
-                    )
             if id is not None:
                 try:
                     commision_ser= CategoryCommission.objects.get(id=id)
@@ -2501,9 +2486,6 @@ def update_commision(request):
                     commision_ser.save()           
                     
                 except Exception as err:
-                    ExceptionRecord.objects.create(
-                        text = f'error to voucher_comission create {str(err)}'
-                    )
                     print(str(err))
             else:
                 CategoryCommission.objects.create(
@@ -2513,56 +2495,7 @@ def update_commision(request):
                     commission_percentage = commission_per,
                     symbol = symbol,
                     category_comission = 'Voucher',
-                )
-    
-    # if service_comission is not None:
-    #     from_value = service_comission['from_value'] #ser.get('from_value', None)
-    #     to_value = service_comission['to_value'] #ser.get('to_value', None)
-    #     commission_per = service_comission['commission_percentage'] #ser.get('commission', None)
-    #     id = service_comission['id'] #ser.get('commission', None)
-        
-    #     try:
-    #         category = CategoryCommission.objects.get(id  = id)
-    #         category.from_value = from_value
-    #         category.to_value = to_value
-    #         category.commission_percentage = commission_per
-    #         category.save()
-            
-    #     except Exception as err:
-    #         print(err)
-            
-    # if product_comission is not None:
-    #     from_value = product_comission['from_value'] #ser.get('from_value', None)
-    #     to_value = product_comission['to_value'] #ser.get('to_value', None)
-    #     commission_per = product_comission['commission_percentage'] #ser.get('commission', None)
-    #     id = product_comission['id'] #ser.get('commission', None)
-        
-    #     try:
-    #         category = CategoryCommission.objects.get(id  = id)
-    #         category.from_value = from_value
-    #         category.to_value = to_value
-    #         category.commission_percentage = commission_per
-    #         category.save()
-            
-    #     except Exception as err:
-    #         print(err)
-            
-    # if voucher_comission is not None:
-    #     from_value = voucher_comission['from_value'] #ser.get('from_value', None)
-    #     to_value = voucher_comission['to_value'] #ser.get('to_value', None)
-    #     commission_per = voucher_comission['commission_percentage'] #ser.get('commission', None)
-    #     id = voucher_comission['id'] #ser.get('commission', None)
-        
-    #     try:
-    #         category = CategoryCommission.objects.get(id  = id)
-    #         category.from_value = from_value
-    #         category.to_value = to_value
-    #         category.commission_percentage = commission_per
-    #         category.save()
-            
-    #     except Exception as err:
-    #         print(err)
-    
+                )    
     try:
         employee_id=Employee.objects.get(id=employee)
         commission.employee = employee_id
