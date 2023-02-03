@@ -1179,14 +1179,14 @@ def update_employee(request):
         empl_permission.save()
     except Exception as err:
         Errors.append(err)
-    
-    try:
-        employee.location.clear()
-        address=  BusinessAddress.objects.get(id = str(location))
-        employee.location.add(address)
-    except Exception as err:
-        Errors.append(err)
-        print(err)
+    if location is not None:
+        try:
+            employee.location.clear()
+            address=  BusinessAddress.objects.get(id = str(location))
+            employee.location.add(address)
+        except Exception as err:
+            Errors.append(err)
+            print(err)
     
     # if type(location) == str:
     #     location = json.loads(location)
