@@ -178,13 +178,16 @@ def get_appointments_device(request):
 
     
     try:
-        appointment = Appointment.objects.filter(appointment_services__member = employee )
+        appointment = Appointment.objects.get(appointment_services__member = employee )
         #appointment = Appointment.objects.filter(member = employee )
         # .prefetch_related(
         #     Prefetch('appointment_services', queryset=AppointmentService.objects.filter(member=employee))#[0]
         # )
         
         #prefetch_related('appointment_services')
+    except Appointment.MultipleObjectsReturned:
+        appointment = Appointment.objects.filter(appointment_services__member = employee )
+        
     except Exception as err:
         return Response(
                 {
