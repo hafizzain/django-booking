@@ -573,7 +573,7 @@ class BusiessAddressAppointmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BusinessAddress
-        fields = ['id', 'address_name']
+        fields = ['id', 'address_name', 'currency']
 class AppointmentServiceSerializer(serializers.ModelSerializer):
 
     class Meta:
