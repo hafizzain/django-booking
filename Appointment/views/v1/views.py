@@ -1573,8 +1573,8 @@ def get_employee_check_time(request):
                 if start_time >= daily_schedule.start_time_shift and start_time < daily_schedule.end_time_shift:
                     pass
                 else:
-                    st_time = convert_24_to_12(start_time)
-                    ed_time = convert_24_to_12(start_time)
+                    st_time = convert_24_to_12(str(start_time))
+                    ed_time = convert_24_to_12(str(tested))
                     return Response(
                     {
                         'status' : True,
@@ -1588,8 +1588,8 @@ def get_employee_check_time(request):
                     status=status.HTTP_200_OK
                 )
             else:
-                st_time = convert_24_to_12(start_time)
-                ed_time = convert_24_to_12(start_time)
+                st_time = convert_24_to_12(str(start_time))
+                ed_time = convert_24_to_12(str(tested))
                 return Response(
                 {
                     'status' : True,
@@ -1604,8 +1604,8 @@ def get_employee_check_time(request):
             )
                 
         except Exception as err:
-            st_time = convert_24_to_12(start_time)
-            ed_time = convert_24_to_12(start_time)
+            st_time = convert_24_to_12(str(start_time))
+            ed_time = convert_24_to_12(str(tested))
             return Response(
             {
                 'status' : True,
@@ -1632,8 +1632,8 @@ def get_employee_check_time(request):
                         
                     else:
                         #data.append(f'The selected staff is not available at this time  {employee.full_name}')
-                        st_time = convert_24_to_12(start_time)
-                        ed_time = convert_24_to_12(start_time)
+                        st_time = convert_24_to_12(str(start_time))
+                        ed_time = convert_24_to_12(str(tested))
                         data.append(f'{employee.full_name} isn’t available between {st_time} and {ed_time}, but your team member can still book appointments for them.')
                                                                 
                 else:
