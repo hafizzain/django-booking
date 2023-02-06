@@ -697,6 +697,15 @@ class CheckoutSerializer(serializers.ModelSerializer):
 
 class ServiceEmployeeSerializer(serializers.ModelSerializer):
     employee_name = serializers.SerializerMethodField(read_only=True)
+    location = serializers.SerializerMethodField(read_only=True)
+    
+    def get_location(self, obj):
+        try:
+            all_location = obj.location.all()
+            return LocationSerializer(all_location, many = True).data
+        except Exception as err:
+            print(err)
+            None
     
     def get_employee_name(self, obj):
         try:
@@ -706,4 +715,4 @@ class ServiceEmployeeSerializer(serializers.ModelSerializer):
             return str(err)   
     class Meta:
         model = EmployeeSelectedService
-        fields = ('id','employee','employee_name')
+        fields = ('id','employee','employee_name', 'location')
