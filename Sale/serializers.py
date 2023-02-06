@@ -513,7 +513,7 @@ class VoucherOrderSerializer(serializers.ModelSerializer):
             app_location = BusinessAddress.objects.get(id=obj.business_address.id)
             return LocationSerializer(app_location).data
         except Exception as err:
-            None
+            return str(err)
     
     def get_order_type(self, obj):
         return 'Voucher'
