@@ -1577,7 +1577,7 @@ def get_employee_check_time(request):
                         'status' : True,
                         'status_code' : 200,
                         'response' : {
-                            'message' : f'This time {employee.full_name} not Available',
+                            'message' : f'{employee.full_name} isn’t available on the selected date, but your team member can still book appointments for them.',
                             'error_message' : f'This Employee day off, {employee.full_name} date {date}',
                             'Availability': False
                         }
@@ -1590,7 +1590,7 @@ def get_employee_check_time(request):
                     'status' : True,
                     'status_code' : 200,
                     'response' : {
-                        'message' : f'This time {employee.full_name} not Available',
+                        'message' : f'{employee.full_name} isn’t available on the selected date, but your team member can still book appointments for them.',
                         'error_message' : f'This Employee day off, {employee.full_name} date {date}',
                         'Availability': False
                     }
@@ -1604,7 +1604,7 @@ def get_employee_check_time(request):
                 'status' : True,
                 'status_code' : 200,
                 'response' : {
-                    'message' : 'Employee Day Off',
+                    'message' : f'{employee.full_name} isn’t available on the selected date, but your team member can still book appointments for them.',
                     'error_message' : f'This Employee day off, {employee.full_name} date {date} {str(err)}',
                     'Availability': False
                 }
@@ -1624,7 +1624,8 @@ def get_employee_check_time(request):
                         data.append(f'Employees are free, employee name {employee.full_name}')
                         
                     else:
-                        data.append(f'The selected staff is not available at this time  {employee.full_name}')
+                        #data.append(f'The selected staff is not available at this time  {employee.full_name}')
+                        data.append(f'{employee.full_name} isn’t available between {start_time} and {end_time}, but your team member can still book appointments for them.')
                         Availability = False
                                                                 
                 else:
