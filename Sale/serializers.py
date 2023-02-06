@@ -81,6 +81,14 @@ class ServiceGroup_TenantSerializer(serializers.ModelSerializer):
 
 
 class LocationSerializer(serializers.ModelSerializer):
+    currency = serializers.SerializerMethodField()
+    
+    def get_currency(self, obj):
+        try:
+            currency = Currency.objects.get(id = obj.currency)
+            return currency.code
+        except Exception as err:
+            return str(err)
     class Meta:
         model = BusinessAddress
         fields = ['id','address_name', 'currency']
