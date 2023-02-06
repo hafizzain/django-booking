@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from Appointment.Constants.ConvertTime import convert_24_to_12
 
 from Appointment.Constants.Reschedule import reschedule_appointment
 from Appointment.Constants.AddAppointment import Add_appointment
@@ -1572,12 +1573,14 @@ def get_employee_check_time(request):
                 if start_time >= daily_schedule.start_time_shift and start_time < daily_schedule.end_time_shift:
                     pass
                 else:
+                    st_time = convert_24_to_12(start_time)
+                    ed_time = convert_24_to_12(start_time)
                     return Response(
                     {
                         'status' : True,
                         'status_code' : 200,
                         'response' : {
-                            'message' : f'{employee.full_name} isn’t available on the selected date {start_time} and {end_time}, but your team member can still book appointments for them.',
+                            'message' : f'{employee.full_name} isn’t available on the selected date {st_time} and {ed_time}, but your team member can still book appointments for them.',
                             'error_message' : f'This Employee day off, {employee.full_name} date {date}',
                             'Availability': False
                         }
@@ -1585,12 +1588,14 @@ def get_employee_check_time(request):
                     status=status.HTTP_200_OK
                 )
             else:
+                st_time = convert_24_to_12(start_time)
+                ed_time = convert_24_to_12(start_time)
                 return Response(
                 {
                     'status' : True,
                     'status_code' : 200,
                     'response' : {
-                        'message' : f'{employee.full_name} isn’t available on the selected date {start_time} and {end_time}, but your team member can still book appointments for them.',
+                        'message' : f'{employee.full_name} isn’t available on the selected date {st_time} and {ed_time}, but your team member can still book appointments for them.',
                         'error_message' : f'This Employee day off, {employee.full_name} date {date}',
                         'Availability': False
                     }
@@ -1599,12 +1604,14 @@ def get_employee_check_time(request):
             )
                 
         except Exception as err:
+            st_time = convert_24_to_12(start_time)
+            ed_time = convert_24_to_12(start_time)
             return Response(
             {
                 'status' : True,
                 'status_code' : 200,
                 'response' : {
-                    'message' : f'{employee.full_name} isn’t available on the selected date {start_time} and {end_time}, but your team member can still book appointments for them.',
+                    'message' : f'{employee.full_name} isn’t available on the selected date {st_time} and {ed_time}, but your team member can still book appointments for them.',
                     'error_message' : f'This Employee day off, {employee.full_name} date {date} {str(err)}',
                     'Availability': False
                 }
@@ -1625,7 +1632,9 @@ def get_employee_check_time(request):
                         
                     else:
                         #data.append(f'The selected staff is not available at this time  {employee.full_name}')
-                        data.append(f'{employee.full_name} isn’t available between {start_time} and {end_time}, but your team member can still book appointments for them.')
+                        st_time = convert_24_to_12(start_time)
+                        ed_time = convert_24_to_12(start_time)
+                        data.append(f'{employee.full_name} isn’t available between {st_time} and {ed_time}, but your team member can still book appointments for them.')
                                                                 
                 else:
                     data.append(f'Employees are free, employee name: {employee.full_name}')
