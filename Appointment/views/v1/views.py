@@ -1573,8 +1573,8 @@ def get_employee_check_time(request):
                 if start_time >= daily_schedule.start_time_shift and start_time < daily_schedule.end_time_shift:
                     pass
                 else:
-                    st_time = convert_24_to_12(str(start_time))
-                    ed_time = convert_24_to_12(str(tested))
+                    # st_time = convert_24_to_12(str(start_time))
+                    # ed_time = convert_24_to_12(str(tested))
                     return Response(
                     {
                         'status' : True,
@@ -1588,14 +1588,15 @@ def get_employee_check_time(request):
                     status=status.HTTP_200_OK
                 )
             else:
-                st_time = convert_24_to_12(str(start_time))
-                ed_time = convert_24_to_12(str(tested))
+                # st_time = convert_24_to_12(str(start_time))
+                # ed_time = convert_24_to_12(str(tested))
                 return Response(
                 {
                     'status' : True,
                     'status_code' : 200,
                     'response' : {
-                        'message' : f'{employee.full_name} isn’t available on the selected date {st_time} and {ed_time}, but your team member can still book appointments for them.',
+                        #'message' : f'{employee.full_name} isn’t available on the selected date {st_time} and {ed_time}, but your team member can still book appointments for them.',
+                        'message' : f'{employee.full_name} isn’t available on the selected date, but your team member can still book appointments for them.',
                         'error_message' : f'This Employee day off, {employee.full_name} date {date}',
                         'Availability': False
                     }
@@ -1604,14 +1605,15 @@ def get_employee_check_time(request):
             )
                 
         except Exception as err:
-            st_time = convert_24_to_12(str(start_time))
-            ed_time = convert_24_to_12(str(tested))
+            # st_time = convert_24_to_12(str(start_time))
+            # ed_time = convert_24_to_12(str(tested))
             return Response(
             {
                 'status' : True,
                 'status_code' : 200,
                 'response' : {
-                    'message' : f'{employee.full_name} isn’t available on the selected date {st_time} and {ed_time}, but your team member can still book appointments for them.',
+                    #'message' : f'{employee.full_name} isn’t available on the selected date {st_time} and {ed_time}, but your team member can still book appointments for them.',
+                    'message' : f'{employee.full_name} isn’t available on the selected date, but your team member can still book appointments for them.',
                     'error_message' : f'This Employee day off, {employee.full_name} date {date} {str(err)}',
                     'Availability': False
                 }
