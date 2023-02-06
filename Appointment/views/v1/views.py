@@ -1143,7 +1143,6 @@ def service_appointment_count(request):
             status=status.HTTP_201_CREATED
     ) 
     
-
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_service_employee(request):
@@ -1182,6 +1181,44 @@ def get_service_employee(request):
                     'message' : 'Appointment Checkout Create!',
                     'error_message' : None,
                     'data' : employee_ids,
+                    
+                }
+            },
+            status=status.HTTP_201_CREATED
+    ) 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_employees_for_selected_service(request):
+    service = request.GET.get('service', None)
+    if service is None :
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'service id is required',
+                    'fields' : [
+                        'service',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    Employee =  EmployeeSelectedService.objects.filter(service = service)
+    serializer =  ServiceEmployeeSerializer(Employee, many = True)
+        
+    #test = data['employee']
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Employee Selected Service!',
+                    'error_message' : None,
+                    'data' : serializer.data,
                     
                 }
             },

@@ -9,7 +9,7 @@ from Appointment.models import Appointment, AppointmentCheckout, AppointmentNote
 from Business.models import BusinessAddress
 from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer
 from Client.serializers import ClientAppointmentSerializer
-from Employee.models import Employee, EmployeeSelectedService
+from Employee.models import Employee, EmployeeProfessionalInfo, EmployeeSelectedService
 from Service.models import PriceService, Service
 from datetime import datetime, timedelta
 from Product.Constants.index import tenant_media_base_url
@@ -429,6 +429,14 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
     srv_name = serializers.SerializerMethodField(read_only=True)
     employee_list = serializers.SerializerMethodField(read_only=True)
+    designation = serializers.SerializerMethodField(read_only=True)
+    
+    def get_designation(self, obj):        
+        try:
+            designation = EmployeeProfessionalInfo.objects.get(employee=obj.member.id)
+            return designation.designation 
+        except: 
+            return None
     
     def get_employee_list(self,obj):
         Employee =  EmployeeSelectedService.objects.filter(service = obj.service.id)
@@ -509,7 +517,7 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = AppointmentService
-        fields= ('id', 'service', 'member', 'price', 'client', 
+        fields= ('id', 'service', 'member', 'price', 'client', 'designation',
                  'appointment_date', 'appointment_time', 'duration','srv_name',
                  'booked_by' , 'booking_id', 'appointment_type','client_can_book','slot_availible_for_online',
                  'appointment_status', 'location','employee_list', 'created_at')

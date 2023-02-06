@@ -24,12 +24,12 @@ urlpatterns = [
     path('create_blockTime/', views.create_blockTime),
     path('update_block_time/', views.update_blocktime),
     path('delete_block_time/', views.delete_block_time),
-    
     #checkout
     path('create_checkout/', views.create_checkout),
     
     #Service Employee
     path('get_service_employee/', views.get_service_employee),
+    path('get_employees_for_selected_service/', views.get_employees_for_selected_service),
     
     #Search by client 
     path('get_client_sale/', views.get_client_sale),
