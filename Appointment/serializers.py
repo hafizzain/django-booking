@@ -701,10 +701,10 @@ class ServiceEmployeeSerializer(serializers.ModelSerializer):
     
     def get_location(self, obj):
         try:
-            all_location = obj.location.all()
+            all_location = obj.employee.location.all()
             return LocationSerializer(all_location, many = True).data
         except Exception as err:
-            print(err)
+            return str(err)
             None
     
     def get_employee_name(self, obj):
