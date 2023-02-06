@@ -85,7 +85,7 @@ class LocationSerializer(serializers.ModelSerializer):
     
     def get_currency(self, obj):
         try:
-            currency = Currency.objects.get(id = obj.currency)
+            currency = Currency.objects.get(id = obj.currency.id)
             return currency.code
         except Exception as err:
             return str(err)

@@ -570,7 +570,14 @@ class BusinessVendorSerializer(serializers.ModelSerializer):
         ]
 
 class BusiessAddressAppointmentSerializer(serializers.ModelSerializer):
-
+    currency = serializers.SerializerMethodField()
+    
+    def get_currency(self, obj):
+        try:
+            currency = Currency.objects.get(id = obj.currency.id)
+            return currency.code
+        except Exception as err:
+            return str(err)
     class Meta:
         model = BusinessAddress
         fields = ['id', 'address_name', 'currency']
