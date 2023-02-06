@@ -376,6 +376,7 @@ def create_appointment(request):
         pass
     if text:
         if type(text) == str:
+            text = text.replace("'" , '"')
             text = json.loads(text)
         else:
             pass
