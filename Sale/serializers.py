@@ -508,15 +508,23 @@ class VoucherOrderSerializer(serializers.ModelSerializer):
     order_type  = serializers.SerializerMethodField(read_only=True)
     voucher_price  = serializers.SerializerMethodField(read_only=True)
     
+    def get_location(self, obj):
+        try:
+            app_location = BusinessAddress.objects.get(id=obj.business_address.id)
+            return LocationSerializer(app_location).data
+        except Exception as err:
+            None
+    
     def get_order_type(self, obj):
         return 'Voucher'
     
-    def get_location(self, obj):
-        try:
-            serializers = LocationSerializer(obj.location).data
-            return serializers
-        except Exception as err:
-            return None
+    # def get_location(self, obj):
+        
+    #     try:
+    #         serializers = LocationSerializer(obj.location).data
+    #         return serializers
+    #     except Exception as err:
+    #         return None
     
     def get_member(self, obj):
         try:
