@@ -1577,7 +1577,7 @@ def get_employee_check_time(request):
                         'status' : True,
                         'status_code' : 200,
                         'response' : {
-                            'message' : f'{employee.full_name} isn’t available on the selected date, but your team member can still book appointments for them.',
+                            'message' : f'{employee.full_name} isn’t available on the selected date {start_time} and {end_time}, but your team member can still book appointments for them.',
                             'error_message' : f'This Employee day off, {employee.full_name} date {date}',
                             'Availability': False
                         }
@@ -1590,7 +1590,7 @@ def get_employee_check_time(request):
                     'status' : True,
                     'status_code' : 200,
                     'response' : {
-                        'message' : f'{employee.full_name} isn’t available on the selected date, but your team member can still book appointments for them.',
+                        'message' : f'{employee.full_name} isn’t available on the selected date {start_time} and {end_time}, but your team member can still book appointments for them.',
                         'error_message' : f'This Employee day off, {employee.full_name} date {date}',
                         'Availability': False
                     }
@@ -1604,7 +1604,7 @@ def get_employee_check_time(request):
                 'status' : True,
                 'status_code' : 200,
                 'response' : {
-                    'message' : f'{employee.full_name} isn’t available on the selected date, but your team member can still book appointments for them.',
+                    'message' : f'{employee.full_name} isn’t available on the selected date {start_time} and {end_time}, but your team member can still book appointments for them.',
                     'error_message' : f'This Employee day off, {employee.full_name} date {date} {str(err)}',
                     'Availability': False
                 }
