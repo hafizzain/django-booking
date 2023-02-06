@@ -642,7 +642,7 @@ class ServiceClientSaleSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
     
     def get_location(self, obj):
-        return LocationServiceSerializer(obj.business_address.id, many = True).data
+        return LocationServiceSerializer(obj.business_address, many = True).data
     
     def get_member(self, obj):
         try:
