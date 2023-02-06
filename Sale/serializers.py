@@ -510,7 +510,7 @@ class VoucherOrderSerializer(serializers.ModelSerializer):
     
     def get_location(self, obj):
         try:
-            app_location = BusinessAddress.objects.get(id=obj.location.id)
+            app_location = BusinessAddress.objects.get(id=obj.location)
             return LocationSerializer(app_location).data
         except Exception as err:
             return str(err)
