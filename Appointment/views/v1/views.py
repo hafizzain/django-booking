@@ -296,12 +296,7 @@ def create_appointment(request):
     client_type = request.data.get('client_type', None)
     
     payment_method = request.data.get('payment_method', None)
-    discount_type = request.data.get('discount_type', None)
-    
-    ExceptionRecord.objects.create(
-        text = f'str object{str(request.data)} request.body {business_id}, {appointments} '
-    )
-    
+    discount_type = request.data.get('discount_type', None)    
     Errors = []
         
     if not all([ client_type, appointment_date, business_id  ]):
