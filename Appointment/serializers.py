@@ -3,6 +3,7 @@ from getopt import error
 from pkgutil import read_code
 from pyexpat import model
 from re import A
+from Sale.serializers import LocationServiceSerializer
 from rest_framework import serializers
 from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Appointment.models import Appointment, AppointmentCheckout, AppointmentNotes, AppointmentService
@@ -638,6 +639,10 @@ class ServiceClientSaleSerializer(serializers.ModelSerializer):
     service = serializers.SerializerMethodField(read_only=True)
     booked_by = serializers.SerializerMethodField(read_only=True)
     member = serializers.SerializerMethodField(read_only=True)
+    location = serializers.SerializerMethodField(read_only=True)
+    
+    def get_location(self, obj):
+        return LocationServiceSerializer(obj.business_address.id, many = True).data
     
     def get_member(self, obj):
         try:
@@ -658,7 +663,7 @@ class ServiceClientSaleSerializer(serializers.ModelSerializer):
             print(err)
     class Meta:
         model = AppointmentService
-        fields = ['id','service', 'created_at','booked_by','duration',
+        fields = ['id','service', 'created_at','booked_by','duration','location',
                   'price','appointment_status','member', 'is_favourite']
         
 class CheckoutSerializer(serializers.ModelSerializer):
