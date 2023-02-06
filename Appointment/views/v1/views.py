@@ -32,6 +32,8 @@ from Appointment.serializers import  CheckoutSerializer, AppoinmentSerializer, S
 from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
 from Utility.models import ExceptionRecord
+from django.db.models import Prefetch
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -99,8 +101,8 @@ def get_appointments_service(request):
                 'response' : {
                     'message' : 'Invalid Data!',
                     'error_message' : 'Appointment id is required',
-                    'fields' : [
-                        'appointment_id',
+                'fields' : [
+                            'appointment_id',
                     ]
                 }
             },
@@ -108,6 +110,81 @@ def get_appointments_service(request):
         )
     try:
         appointment = Appointment.objects.get(id=appointment_id, is_deleted=False )
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_APPOINMENT_ID_4038,
+                    'status_code_text' : 'INVALID_APPOINMENT_ID_4038',
+                    'response' : {
+                        'message' : 'Appointment Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+    serialized = SingleNoteSerializer(appointment)
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'All Appointments',
+                'error_message' : None,
+                'appointment' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_appointments_device(request):
+    employee_id = request.GET.get('employee_id', None) 
+    
+    if not all([employee_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Employee id is required',
+                'fields' : [
+                            'employee_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        employee = Employee.objects.get(id = employee_id,  is_deleted=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                    'response' : {
+                        'message' : 'Employee Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+    
+    try:
+        appointment = Appointment.objects.filter(appointment_services__member = employee )
+        #appointment = Appointment.objects.filter(member = employee )
+        # .prefetch_related(
+        #     Prefetch('appointment_services', queryset=AppointmentService.objects.filter(member=employee))#[0]
+        # )
+        
+        #prefetch_related('appointment_services')
     except Exception as err:
         return Response(
                 {
@@ -209,6 +286,7 @@ def create_appointment(request):
     appointment_date = request.data.get('appointment_date', None)
     text = request.data.get('appointment_notes', None)
     business_address_id = request.data.get('business_address', None)
+    member = request.data.get('member', None)
     #business_id, member, appointment_date, appointment_time, duration
 
     client = request.data.get('client', None)
@@ -296,17 +374,17 @@ def create_appointment(request):
 
     elif type(appointments) == list:
         pass
-    
-    # if type(text) == str:
-    #     text = json.loads(text)
-    # else:
-    #     pass
-    # if text is not None:
-    #     for note in text:
-    #         AppointmentNotes.objects.create(
-    #             appointment=appointment,
-    #             text = note
-    #         )
+    if text:
+        if type(text) == str:
+            text = json.loads(text)
+        else:
+            pass
+        if text is not None:
+            for note in text:
+                AppointmentNotes.objects.create(
+                    appointment=appointment,
+                    text = note
+                )
     
     all_members = []
     for appoinmnt in appointments:
