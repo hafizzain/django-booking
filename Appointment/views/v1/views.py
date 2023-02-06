@@ -17,7 +17,7 @@ from Sale.serializers import MemberShipOrderSerializer, ProductOrderSerializer, 
 
 #from Service.models import Service
 from Service.models import Service
-from Employee.models import CategoryCommission, CommissionSchemeSetting, Employee, EmployeeSelectedService
+from Employee.models import CategoryCommission, CommissionSchemeSetting, EmployeDailySchedule, Employee, EmployeeSelectedService
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
@@ -1191,6 +1191,7 @@ def get_service_employee(request):
             },
             status=status.HTTP_201_CREATED
     ) 
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_employees_for_selected_service(request):
@@ -1532,4 +1533,127 @@ def create_appointment_client(request):
                     }
                 },
                 status=status.HTTP_201_CREATED
+        )
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def get_employee_check_time(request):                  
+    emp_id = request.data.get('member_id', None)
+    duration = request.data.get('duration', None)
+    start_time = request.data.get('app_time', None)
+    date = request.data.get('date', None)
+    
+    dtime = datetime.strptime(start_time, "%H:%M:%S")
+    start_time = dtime.time()
+    
+    dt = datetime.strptime(date, "%Y-%m-%d")
+    date = dt.date()
+    
+    app_date_time = f'2000-01-01 {start_time}'
+
+    duration = DURATION_CHOICES[duration]
+    app_date_time = datetime.fromisoformat(app_date_time)
+    datetime_duration = app_date_time + timedelta(minutes=duration)
+    datetime_duration = datetime_duration.strftime('%H:%M:%S')
+    tested = datetime.strptime(datetime_duration ,'%H:%M:%S').time()
+    end_time = datetime_duration
+    
+    EmployeDaily = False
+    data = []
+        
+    try:
+        employee = Employee.objects.get(
+                id = emp_id,
+                ) 
+        try:
+            daily_schedule = EmployeDailySchedule.objects.get(
+                employee = employee,
+                is_vacation = False,
+                date = date,
+                )      
+            if start_time >= daily_schedule.start_time and start_time < daily_schedule.end_time :
+                pass
+            elif daily_schedule.start_time_shift != None:
+                if start_time >= daily_schedule.start_time_shift and start_time < daily_schedule.end_time_shift:
+                    pass
+                else:
+                    return Response(
+                    {
+                        'status' : True,
+                        'status_code' : 200,
+                        'response' : {
+                            'message' : f'This time {employee.full_name} not Available',
+                            'error_message' : f'This Employee day off, {employee.full_name} date {date}',
+                            'Availability': False
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                {
+                    'status' : True,
+                    'status_code' : 200,
+                    'response' : {
+                        'message' : f'This time {employee.full_name} not Available',
+                        'error_message' : f'This Employee day off, {employee.full_name} date {date}',
+                        'Availability': False
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+                
+        except Exception as err:
+            return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Employee Day Off',
+                    'error_message' : f'This Employee day off, {employee.full_name} date {date} {str(err)}',
+                    'Availability': False
+                }
+            },
+            status=status.HTTP_200_OK
+        )                               
+        try:
+            av_staff_ids = AppointmentService.objects.filter(
+                member__id = employee.id,
+                appointment_date = date,
+                is_blocked = False,
+            )
+            
+            for ser in av_staff_ids:
+                if tested <= ser.appointment_time:# or start_time >= ser.end_time:
+                    if start_time >= ser.end_time:
+                        data.append(f'Employees are free, employee name {employee.full_name}')
+                        
+                    else:
+                        data.append(f'The selected staff is not available at this time  {employee.full_name}')
+                        Availability = False
+                                                                
+                else:
+                    data.append(f'Employees are free, employee name: {employee.full_name}')
+                    
+            if len(av_staff_ids) == 0:
+                data.append(f'Employees are free, you can proceed further employee name {employee.full_name}')
+                                    
+        except Exception as err:
+            data.append(f'the employe{employee}, start_time {str(err)}')
+    except Exception as err:
+        data.append(f'the Error  {str(err)},  Employee Not Available on this time')
+                    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'The selected staff is not available at this time',
+                    'error_message' : None,
+                    'employee':data,
+                    'Availability': Availability,
+                }
+            },
+            status=status.HTTP_200_OK
         )
