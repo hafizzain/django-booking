@@ -642,8 +642,11 @@ class ServiceClientSaleSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
     
     def get_location(self, obj):
-        return LocationServiceSerializer(obj.business_address, many = True).data
-    
+        try:
+            return LocationServiceSerializer(obj.business_address, many = True).data
+        except Exception as err:
+            return str(err)
+        
     def get_member(self, obj):
         try:
             emp = Employee.objects.get(id  = obj.member.id)
