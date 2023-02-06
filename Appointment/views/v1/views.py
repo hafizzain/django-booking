@@ -378,7 +378,7 @@ def create_appointment(request):
         if type(text) == str:
             text = text.replace("'" , '"')
             text = json.loads(text)
-        else:
+        elif type(text) == list:
             pass
         if text is not None:
             for note in text:
