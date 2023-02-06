@@ -1404,6 +1404,7 @@ def create_sale_order(request):
                     payment_type =payment_type,
                     client_type = client_type,
                     quantity = quantity,
+                    location = business_address,
                 )
             except Exception as err:
                 return Response(
@@ -1460,6 +1461,7 @@ def create_sale_order(request):
                     payment_type =payment_type,
                     client_type = client_type,
                     quantity = quantity,
+                    location = business_address,
 
                 )
                 checkout.voucher_commission = voucher_commission
