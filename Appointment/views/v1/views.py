@@ -377,18 +377,23 @@ def create_appointment(request):
 
     elif type(appointments) == list:
         pass
-    # if text:
-    #     if type(text) == str:
-    #         text = text.replace("'" , '"')
-    #         text = json.loads(text)
-    #     elif type(text) == list:
-    #         pass
-    #     if text is not None:
-    #         for note in text:
-    #             AppointmentNotes.objects.create(
-    #                 appointment=appointment,
-    #                 text = note
-    #             )
+    if text:
+        if type(text) == str:
+            try:
+                text = text.replace("'" , '"')
+                text = json.loads(text)
+            except:
+                AppointmentNotes.objects.create(
+                    appointment=appointment,
+                    text = text
+                )
+        elif type(text) == list:
+            pass
+            for note in text:
+                AppointmentNotes.objects.create(
+                    appointment=appointment,
+                    text = note
+                )
     
     all_members = []
     for appoinmnt in appointments:
