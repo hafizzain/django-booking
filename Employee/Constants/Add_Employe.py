@@ -14,30 +14,31 @@ def add_employee(emp_name, emp_email, template,busines_name ,mobile_number , ten
     #     ExceptionRecord.objects.create(
     #         text='Tenant is None'
     #     )
-    url = f'http://nstyle-developers.localhost:3000/set-password?user_id={user.id}&hash={tenant_id}'
-    #url = f'http://nstyle-developers.midtechdxb.com/set-password?user_id={user.id}&hash={tenant_id}'
-    
-    try:
-        html_file = render_to_string("EmployeeEmail/employee_create.html", {'name': emp_name,'t_name': template , 'bes_name':busines_name, 'url': url })
-        text_content = strip_tags(html_file)
-        
-        email = EmailMultiAlternatives(
-            'Employee Created',
-            text_content,
-            settings.EMAIL_HOST_USER,
-            to = [emp_email],
-        
-        )
-        email.attach_alternative(html_file, "text/html")
-        email.send()
-        print('email sended')
-    
-    except Exception as err:
-        ExceptionRecord.objects.create(
-            text=str(err)
-        )
-
     with tenant_context(Tenant.objects.get(schema_name = 'public')):
+        url = f'http://nstyle-developers.localhost:3000/set-password?user_id={user.id}&hash={tenant_id}'
+        #url = f'http://nstyle-developers.midtechdxb.com/set-password?user_id={user.id}&hash={tenant_id}'
+        
+        try:
+            html_file = render_to_string("EmployeeEmail/employee_create.html", {'name': emp_name,'t_name': template , 'bes_name':busines_name, 'url': url })
+            text_content = strip_tags(html_file)
+            
+            email = EmailMultiAlternatives(
+                'Employee Created',
+                text_content,
+                settings.EMAIL_HOST_USER,
+                to = [emp_email],
+            
+            )
+            email.attach_alternative(html_file, "text/html")
+            email.send()
+            print('email sended')
+        
+        except Exception as err:
+            ExceptionRecord.objects.create(
+                text=str(err)
+            )
+
+    
         try:
             username = emp_email.split('@')[0]
             try:
