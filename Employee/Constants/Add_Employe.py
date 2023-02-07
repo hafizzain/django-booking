@@ -46,7 +46,7 @@ def add_employee(emp_name, emp_email, template,busines_name ,mobile_number , ten
     url = f'http://nstyle-developers.midtechdxb.com/set-password/{user.id}/hash/{tenant_id}'
     
     try:
-        html_file = render_to_string("EmployeeEmail/client_create.html", {'name': emp_name,'t_name': template , 'bes_name':busines_name })
+        html_file = render_to_string("EmployeeEmail/client_create.html", {'name': emp_name,'t_name': template , 'bes_name':busines_name, 'url': url })
         text_content = strip_tags(html_file)
         
         email = EmailMultiAlternatives(
