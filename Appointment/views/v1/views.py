@@ -676,8 +676,13 @@ def update_appointment_service(request):
             status=status.HTTP_404_NOT_FOUND
         )
     if client:
-        appointment.client = client
-        appointment.save()
+        try:
+            client = Client.objects.get(id=client)
+            appointment.client = client
+            appointment.save()
+        except Exception as err:
+            client = None
+        
     if client_type:
         appointment.client_type = client_type
         appointment.save()
