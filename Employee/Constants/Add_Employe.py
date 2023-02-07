@@ -14,35 +14,6 @@ def add_employee(emp_name, emp_email, template,busines_name ,mobile_number , ten
     #     ExceptionRecord.objects.create(
     #         text='Tenant is None'
     #     )
-
-    # with tenant_context(tenant):
-    try:
-        username = emp_email.split('@')[0]
-        try:
-            user_check = User.objects.get(username = username)
-        except Exception as err:
-            #data.append(f'username user is client errors {str(err)}')
-            pass
-        else:
-            username = f'{username} {len(User.objects.all())}'
-
-    except Exception as err:
-        pass
-
-    user = User.objects.create(
-        first_name = emp_name,
-        username = username,
-        email = emp_email ,
-        is_email_verified = True,
-        is_active = True,
-        mobile_number = mobile_number,
-    )
-    account_type = AccountType.objects.create(
-            user = user,
-            account_type = 'Employee'
-        )
-    # user.set_password(password)
-    # user.save()
     url = f'http://nstyle-developers.localhost:3000/set-password?user_id={user.id}&hash={tenant_id}'
     #url = f'http://nstyle-developers.midtechdxb.com/set-password?user_id={user.id}&hash={tenant_id}'
     

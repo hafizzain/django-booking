@@ -579,6 +579,24 @@ def create_employee(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    
+    try:
+        employe = Employee.objects.get(email__icontains = email)
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : f'Employee Already exist with this {email}!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as err:
+        pass
+    
     if len(salary) > 7:
         return Response(
             {
@@ -741,7 +759,36 @@ def create_employee(request):
     data.update(employee_serialized.data)
 
     template = 'Employee'
+    
+    try:
+        try:
+            username = email.split('@')[0]
+            try:
+                user_check = User.objects.get(username = username)
+            except Exception as err:
+                #data.append(f'username user is client errors {str(err)}')
+                pass
+            else:
+                username = f'{username} {len(User.objects.all())}'
 
+        except Exception as err:
+            pass
+
+        user = User.objects.create(
+            first_name = full_name,
+            username = username,
+            email = email ,
+            is_email_verified = True,
+            is_active = True,
+            mobile_number = mobile_number,
+        )
+        account_type = AccountType.objects.create(
+                user = user,
+                account_type = 'Employee'
+            )
+    except Exception as err:
+        pass        
+    
     try:
         thrd = Thread(target=add_employee, args=[full_name, email , mobile_number, template, business.business_name, tenant_id, domain])
         thrd.start()
