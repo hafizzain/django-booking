@@ -358,7 +358,7 @@ class ProductOrderSerializer(serializers.ModelSerializer):
         
     def get_product_price(self, obj):
         try:
-            return obj.product.full_price
+            return obj.product.cost_price
         except Exception as err:
             return None
     

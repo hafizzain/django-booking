@@ -514,6 +514,8 @@ def create_employee(request):
     
     full_name= request.data.get('full_name', None)
     employee_id= request.data.get('employee_id', None)
+    tenant_id= request.data.get('tenant_id', None)
+    domain= request.data.get('domain', None)
     
     email= request.data.get('email', None)
     image = request.data.get('image', None)
@@ -730,7 +732,6 @@ def create_employee(request):
     empl_permission.save()
     
     try:
-        print(location)
         location_id = BusinessAddress.objects.get(id=str(location))  
         employee.location.add(location_id)
     except Exception as err:
@@ -742,7 +743,7 @@ def create_employee(request):
     template = 'Employee'
 
     try:
-        thrd = Thread(target=add_employee, args=[full_name, email , template, business.business_name,])
+        thrd = Thread(target=add_employee, args=[full_name, email , mobile_number, template, business.business_name, tenant_id, domain])
         thrd.start()
     except Exception as err:
         pass
@@ -3514,6 +3515,11 @@ def employee_login(request):
         )
         
     with tenant_context(employee_tenant.tenant):
+        user_id = User.objects.get(
+            email=email,
+            is_deleted=False,
+            #user_account_type__account_type = 'Employee'
+        )
         user = authenticate(username=user_id.username, password=password)
         if user is None:
             return Response(
@@ -3523,7 +3529,7 @@ def employee_login(request):
                     'status_code_text' : 'INVALID_CREDENTIALS_4013',
                     'response' : {
                         'message' : 'Incorrect Password',
-                        'fields' : f'password {user_id.username} pass {password}'
+                        'fields' : 'Password' #f'password {user_id.username} pass {password}'
                     }
                 },
                 status=status.HTTP_404_NOT_FOUND
