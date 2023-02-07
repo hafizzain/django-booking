@@ -16,8 +16,7 @@ def add_employee(emp_name, emp_email, template,busines_name , tenant = None):
     # with tenant_context(tenant):
 
         try:
-
-                html_file = render_to_string("EmployeeEmail/employee_create.html", {'name': emp_name,'t_name': template , 'bes_name':busines_name })
+                html_file = render_to_string("EmployeeEmail/client_create.html", {'name': emp_name,'t_name': template , 'bes_name':busines_name })
                 text_content = strip_tags(html_file)
                 
                 email = EmailMultiAlternatives(

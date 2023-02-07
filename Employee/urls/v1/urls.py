@@ -83,6 +83,4 @@ urlpatterns = [
     path('get_employee_device/', views.get_employee_device),
     path('get_single_employee_vacation/', views.get_single_employee_vacation),
     
-    
-    
 ]

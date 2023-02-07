@@ -636,19 +636,7 @@ def create_employee(request):
         staff = StaffGroup.objects.get(id=staff_id)
     except Exception as err:
         staff = None
-        # return Response(
-        #     {
-        #         'status' : True,
-        #         'status_code' : StatusCodes.INVALID_NOT_FOUND_StAFF_GROUP_ID_4023,
-        #         'status_code_text' :'INVALID_NOT_FOUND_StAFF_GROUP_ID_4023' ,
-        #         'response' : {
-        #             'message' : 'Invalid Staff Group Id !',
-        #             'error_message' : str(err),
-        #         }
-        #     },
-        #     status=status.HTTP_404_NOT_FOUND
-        # )
-
+        
     employee= Employee.objects.create(
         user=user,
         business=business,
@@ -691,13 +679,6 @@ def create_employee(request):
            # start_time = start_time , end_time = end_time, 
             maximum_discount = maximum_discount,
             salary=salary, designation = designation )
-    # employee_mp = EmployeeModulePermission.objects.create(employee=employee)
-    # employee_p_setting = EmployeePermissionSetting.objects.create(employee = employee)
-    # employee_marketing = EmployeeMarketingPermission.objects.create(employee= employee)
-    
-    ser_error=[] 
-    working_days = []
-    off_days = []
     
     employee_p_info.monday = True if 'monday' in request.data else False
     employee_p_info.tuesday = True if 'tuesday' in request.data else False
@@ -707,77 +688,6 @@ def create_employee(request):
     employee_p_info.saturday = True if 'saturday' in request.data else False
     employee_p_info.sunday = True if 'sunday' in request.data else False
     
-    # monday = request.data.get('monday', None)
-    # tuesday = request.data.get('tuesday', None)
-    # wednesday = request.data.get('wednesday', None)
-    # thursday = request.data.get('thursday', None)
-    # friday = request.data.get('friday', None)
-    # saturday = request.data.get('saturday', None)
-    # sunday = request.data.get('sunday', None)
-    
-    # if monday is not None:
-    #     working_days.append('Monday')
-    # else:
-    #     off_days.append('Monday')
-    # if tuesday is not None:
-    #     working_days.append('Tuesday')
-    # else:
-    #     off_days.append('Tuesday')
-    # if wednesday is not None:
-    #     working_days.append('Wednesday')
-    # else:
-    #     off_days.append('Wednesday')
-    # if thursday is not None:
-    #     working_days.append('Thursday')
-    # else:
-    #     off_days.append('Thursday')
-    # if friday is not None:
-    #     working_days.append('Friday')
-    # else:
-    #     off_days.append('Friday')
-    # if saturday is not None:
-    #     working_days.append('Saturday')
-    # else:
-    #     off_days.append('Saturday')
-    # if sunday is not None:
-    #     working_days.append('Sunday')
-    # else:
-    #     off_days.append('Sunday')
-        
-    
-    # if type(working_days) == str:
-    #         working_days = json.loads(working_days)
-
-    # elif type(working_days) == list:
-    #         pass
-    # now = datetime.now()
-    # today = now.date()
-    
-    # for i, day in enumerate(working_days):
-        
-    #     if i == 0:
-    #         date = now + timedelta(days=i)
-    #     else:
-    #         date = date + timedelta(days=1)
-    #     EmployeDailySchedule.objects.create(
-    #         user=user,
-    #         business=business,
-    #         employee = employee,
-    #         day = day,
-    #         date = date,
-    #     )
-        
-    # for i, day in enumerate(off_days):
-    #     date = date + timedelta(days=1)
-    #     EmployeDailySchedule.objects.create(
-    #         user=user,
-    #         business=business,
-    #         employee = employee,
-    #         day = day,
-    #         date = date,
-    #         is_off = True
-    #     )
-            
     if type(services_id) == str:
         services_id = json.loads(services_id)
     else:
@@ -827,34 +737,6 @@ def create_employee(request):
     except Exception as err:
             employees_error.append(str(err))
     
-    # if type(location) == str:
-    #         location = json.loads(location)
-
-    # elif type(location) == list:
-    #         pass
-        
-    # for loc in location:
-    #     try:
-    #         location_id = BusinessAddress.objects.get(id=loc)  
-    #         print(location_id)
-    #         employee.location.add(location_id)
-    #     except Exception as err:
-    #         employees_error.append(str(err))
-
-    # serialized = EmployPermissionSerializer(employee_p_setting, data=request.data)
-    # if serialized.is_valid():
-    #     serialized.save()
-    #     data.update(serialized.data)
-
-    # serialized = EmployeModulesSerializer(employee_mp, data=request.data)
-    # if serialized.is_valid():
-    #     serialized.save()
-    #     data.update(serialized.data)
-
-    # serialized = EmployeeMarketingSerializers(employee_marketing, data=request.data)
-    # if serialized.is_valid():
-    #     serialized.save()
-    #     data.update(serialized.data)
     employee_serialized = EmployeSerializer(employee , context={'request' : request, })
     data.update(employee_serialized.data)
 
