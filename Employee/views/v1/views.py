@@ -3523,7 +3523,7 @@ def employee_login(request):
                     'status_code_text' : 'INVALID_CREDENTIALS_4013',
                     'response' : {
                         'message' : 'Incorrect Password',
-                        'fields' : f'password {user_id.username}'
+                        'fields' : f'password {user_id.username} pass {password}'
                     }
                 },
                 status=status.HTTP_404_NOT_FOUND
