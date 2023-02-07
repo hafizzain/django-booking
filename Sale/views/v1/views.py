@@ -1278,6 +1278,7 @@ def create_sale_order(request):
         sale_type = id['selection_type']
         service_id = id['id']
         quantity = id['quantity']
+        price = id['price']
         
         if sale_type == 'PRODUCT':
             try:
@@ -1326,6 +1327,7 @@ def create_sale_order(request):
                     payment_type= payment_type,
                     client_type = client_type,
                     quantity = quantity,
+                    current_price = price,
                 )
                 product_order.sold_quantity += 1 # product_stock.sold_quantity
                 product_order.save()
@@ -1364,7 +1366,7 @@ def create_sale_order(request):
                     payment_type=payment_type,
                     client_type = client_type,
                     quantity = quantity,
-
+                    current_price = price,
                     
                 )
                 checkout.service_commission = service_commission
@@ -1405,6 +1407,7 @@ def create_sale_order(request):
                     client_type = client_type,
                     quantity = quantity,
                     location = business_address,
+                    current_price = price,
                 )
             except Exception as err:
                 return Response(
@@ -1462,6 +1465,7 @@ def create_sale_order(request):
                     client_type = client_type,
                     quantity = quantity,
                     location = business_address,
+                    current_price = price,
 
                 )
                 checkout.voucher_commission = voucher_commission
