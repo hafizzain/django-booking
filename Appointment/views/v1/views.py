@@ -547,6 +547,71 @@ def create_appointment(request):
             },
             status=status.HTTP_201_CREATED
     )
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_appointment_device(request):
+    appointment_id = request.data.get('id', None)
+    appointments = request.data.get('appointments', None)
+    appointments_service_id = request.data.get('appointments_service_id', None)
+    
+    if appointment_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required.',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        appointment = Appointment.objects.get(id=appointment_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Appointment ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    if appointments_service_id is not None:
+        if type(appointments_service_id) == str:
+            appointments_service_id = json.loads(appointments_service_id)
+
+        elif type(appointments_service_id) == list:
+            pass
+        for id in appointments_service_id:
+            try:
+                service_appointment = AppointmentService.objects.get(id=appointment_service_id)
+            except Exception as err:
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : 404,
+                        'status_code_text' : '404',
+                        'response' : {
+                            'message' : 'Invalid Appointment ID!',
+                            'error_message' : str(err),
+                        }
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+    
+    
+    
  
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
