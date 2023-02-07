@@ -19,7 +19,7 @@ urlpatterns = [
     path('delete_appointment/', views.delete_appointment),
     path('update_appointment/', views.update_appointment),
     path('update_appointment_service/', views.update_appointment_service),
-    path('update_appointment_device/', views.update_appointment_device),
+    #path('update_appointment_device/', views.update_appointment_device),
     
     #block time
     path('create_blockTime/', views.create_blockTime),
