@@ -9,7 +9,7 @@ from Utility.models import ExceptionRecord
 from django_tenants.utils import tenant_context
 from django.conf import settings
 
-def add_employee(emp_name, emp_email, template,busines_name ,mobile_number , tenant_id ,domain ,tenant = None):
+def add_employee(emp_name, emp_email, template,busines_name ,mobile_number , tenant_id ,domain,user ,tenant = None):
     # if tenant is None:
     #     ExceptionRecord.objects.create(
     #         text='Tenant is None'
