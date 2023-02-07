@@ -732,7 +732,6 @@ def create_employee(request):
     try:
         print(location)
         location_id = BusinessAddress.objects.get(id=str(location))  
-        print(location_id)
         employee.location.add(location_id)
     except Exception as err:
             employees_error.append(str(err))
@@ -3429,6 +3428,10 @@ def create_employe_account(request):
             tenant = tenant_id,
             is_tenant_staff = True
         )
+        account_type = AccountType.objects.create(
+            user = user,
+            account_type = 'Employee'
+        )
         user.set_password(password)
         user.save()
     return Response(
@@ -3504,7 +3507,7 @@ def employee_login(request):
                 'status_code' : 200,
                 'response' : {
                     'message' : 'Authenticated',
-                    'data' : f'{str(err)} {str(user_id.id)} {str(user_id.username)} {user_id} {data}'
+                    'data' : f'{str(err)} {str(user_id.id)} {str(user_id)} {user_id} {data}'
                 }
             },
             status=status.HTTP_200_OK
@@ -3520,7 +3523,7 @@ def employee_login(request):
                     'status_code_text' : 'INVALID_CREDENTIALS_4013',
                     'response' : {
                         'message' : 'Incorrect Password',
-                        'fields' : ['password']
+                        'fields' : f'password {user_id.username}'
                     }
                 },
                 status=status.HTTP_404_NOT_FOUND
