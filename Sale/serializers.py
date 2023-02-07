@@ -358,7 +358,7 @@ class ProductOrderSerializer(serializers.ModelSerializer):
         
     def get_product_price(self, obj):
         try:
-            return obj.product.cost_price
+            return obj.current_price
         except Exception as err:
             return None
     
@@ -394,7 +394,7 @@ class ProductOrderSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ProductOrder
-        fields = ['id', 'client','quantity','status','created_at', 
+        fields = ['id', 'client','quantity','status','created_at',
                   'location', 'member', 'tip', 'total_price' , 'payment_type','product_price',
                   'product_name', 'gst', 'order_type', 'sold_quantity','product_details' ]
           
