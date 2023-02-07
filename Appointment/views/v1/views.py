@@ -633,9 +633,11 @@ def update_appointment(request):
 def update_appointment_service(request):
     appointment_id = request.data.get('id', None)
     appointments = request.data.get('appointments', None)
-    ExceptionRecord.objects.create(
-        text = f'{request.data}'
-    )
+    client_type = request.data.get('client_type', None)
+    appointment_notes = request.data.get('appointment_notes', None)
+    appointment_date = request.data.get('appointment_date', None)
+    client = request.data.get('client', None)
+    
     errors = []
     if appointment_id is None: 
        return Response(
@@ -669,6 +671,22 @@ def update_appointment_service(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    if client:
+        appointment.client = client
+        appointment.save()
+    if client_type:
+        appointment.client_type = client_type
+        appointment.save()
+    if appointment_notes:
+        notes = AppointmentNotes.objects.filter(appointment =appointment )
+        for no in notes:
+            no.delete()
+        notes =  AppointmentNotes.objects.create(
+            appointment =appointment ,
+            text = appointment_notes 
+        )
+            
+                
         
     if appointments is not None:
         if type(appointments) == str:
@@ -685,7 +703,6 @@ def update_appointment_service(request):
             slot_availible_for_online = app.get('slot_availible_for_online', None)
             duration = app.get('duration', None)
             price = app.get('price', None)
-            is_deleted = app.get('is_deleted', None)
             member = app.get('member', None)
             id = app.get('id', None)
             try:
@@ -699,6 +716,7 @@ def update_appointment_service(request):
             if id is not None:
                 try:
                     service_appointment = AppointmentService.objects.get(id=id)
+                    is_deleted = app.get('is_deleted', None)
                     if str(is_deleted) == "true":
                         service_appointment.delete()
                     service_appointment.appointment_date = appointment_date

@@ -793,7 +793,7 @@ def create_employee(request):
         thrd = Thread(target=add_employee, args=[full_name, email , mobile_number, template, business.business_name, tenant_id, domain])
         thrd.start()
     except Exception as err:
-        pass
+        employees_error.append(str(err))
     
     return Response(
         {
