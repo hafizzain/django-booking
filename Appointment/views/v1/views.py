@@ -678,16 +678,17 @@ def update_appointment_service(request):
         appointment.client_type = client_type
         appointment.save()
     if appointment_notes:
-        notes = AppointmentNotes.objects.filter(appointment =appointment )
-        for no in notes:
-            no.delete()
-        notes =  AppointmentNotes.objects.create(
-            appointment =appointment ,
-            text = appointment_notes 
-        )
+        try:
+            notes = AppointmentNotes.objects.filter(appointment =appointment )
+            for no in notes:
+                no.delete()
+            notes =  AppointmentNotes.objects.create(
+                appointment =appointment ,
+                text = appointment_notes 
+            )
+        except Exception as err:
+            errors.append(str(err))
             
-                
-        
     if appointments is not None:
         if type(appointments) == str:
             appointments = json.loads(appointments)
