@@ -1725,6 +1725,7 @@ def get_employee_check_availability_list(request):
     for check in check_availability:                  
         emp_id = check.get('member', None)
         duration = check.get('duration', None)
+        duration_res = check.get('duration', None)
         start_time = check.get('date_time', None)
         
         srv_name = check.get('srv_name', None)
@@ -1776,7 +1777,7 @@ def get_employee_check_availability_list(request):
                             'date_time': start_time,
                             'client_can_book': client_can_book,
                             'slot_availible_for_online': slot_availible_for_online,
-                            'duration': duration,
+                            'duration': duration_res,
                             'srv_name': srv_name,
                             'price': price,
                             'srv_duration': srv_duration,
@@ -1796,7 +1797,7 @@ def get_employee_check_availability_list(request):
                             'date_time': start_time,
                             'client_can_book': client_can_book,
                             'slot_availible_for_online': slot_availible_for_online,
-                            'duration': duration,
+                            'duration': duration_res,
                             'srv_name': srv_name,
                             'price': price,
                             'srv_duration': srv_duration,
@@ -1815,7 +1816,7 @@ def get_employee_check_availability_list(request):
                             'date_time': start_time,
                             'client_can_book': client_can_book,
                             'slot_availible_for_online': slot_availible_for_online,
-                            'duration': duration,
+                            'duration': duration_res,
                             'srv_name': srv_name,
                             'price': price,
                             'srv_duration': srv_duration,
@@ -1826,6 +1827,7 @@ def get_employee_check_availability_list(request):
                             'message': f'{employee.full_name} isn’t available on the selected date, but your team member can still book appointments for them.',                            
                         })
                 data_list.append(data_object)
+                continue
                 #pass   
                                  
             try:
@@ -1847,7 +1849,7 @@ def get_employee_check_availability_list(request):
                                 'date_time': start_time,
                                 'client_can_book': client_can_book,
                                 'slot_availible_for_online': slot_availible_for_online,
-                                'duration': duration,
+                                'duration': duration_res,
                                 'srv_name': srv_name,
                                 'price': price,
                                 'srv_duration': srv_duration,
