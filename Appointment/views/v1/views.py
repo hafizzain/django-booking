@@ -1826,7 +1826,7 @@ def get_employee_check_availability_list(request):
                             'message': f'{employee.full_name} isn’t available on the selected date, but your team member can still book appointments for them.',                            
                         })
                 data_list.append(data_object)
-                continue   
+                pass   
                                  
             try:
                 av_staff_ids = AppointmentService.objects.filter(
