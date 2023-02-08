@@ -1724,7 +1724,7 @@ def get_employee_check_availability_list(request):
     for check in check_availability:                  
         emp_id = check.get('member', None)
         duration = check.get('duration', None)
-        date_time = check.get('date_time', None)
+        start_time = check.get('date_time', None)
         
         srv_name = check.get('srv_name', None)
         price = check.get('price', None)
@@ -1774,7 +1774,7 @@ def get_employee_check_availability_list(request):
                         pass
                     else:
                         data_object.update({
-                            'date_time': date_time,
+                            'date_time': start_time,
                             'client_can_book': client_can_book,
                             'slot_availible_for_online': slot_availible_for_online,
                             'duration': duration,
@@ -1794,7 +1794,7 @@ def get_employee_check_availability_list(request):
                     st_time = convert_24_to_12(str(start_time))
                     ed_time = convert_24_to_12(str(tested))
                     data_object.update({
-                            'date_time': date_time,
+                            'date_time': start_time,
                             'client_can_book': client_can_book,
                             'slot_availible_for_online': slot_availible_for_online,
                             'duration': duration,
@@ -1813,7 +1813,7 @@ def get_employee_check_availability_list(request):
                     
             except Exception as err:
                 data_object.update({
-                            'date_time': date_time,
+                            'date_time': start_time,
                             'client_can_book': client_can_book,
                             'slot_availible_for_online': slot_availible_for_online,
                             'duration': duration,
@@ -1845,7 +1845,7 @@ def get_employee_check_availability_list(request):
                             st_time = convert_24_to_12(str(start_time))
                             ed_time = convert_24_to_12(str(tested))
                             data_object.update({
-                                'date_time': date_time,
+                                'date_time': start_time,
                                 'client_can_book': client_can_book,
                                 'slot_availible_for_online': slot_availible_for_online,
                                 'duration': duration,
