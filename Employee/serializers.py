@@ -944,9 +944,13 @@ class Payroll_Working_deviceScheduleSerializer(serializers.ModelSerializer):
             return None
 
     def get_schedule(self, obj):
-        schedule =  EmployeDailySchedule.objects.filter(employee= obj )            
-        return WorkingSchedulePayrollSerializer(schedule, many = True,context=self.context).data
-    
+        total_price = 0
+        schedule =  EmployeDailySchedule.objects.filter(employee= obj )#.values_list('field1', flat=True)            
+        serializer  = WorkingSchedulePayrollSerializer(schedule, many = True,context=self.context).data
+        for dt in serializer:
+            total_price += dt['total_hours']
+        return total_price
+        
     def get_working_day(self, obj):
         range_start = self.context["range_start"]
         range_end = self.context["range_end"]
