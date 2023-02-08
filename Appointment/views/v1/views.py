@@ -728,7 +728,7 @@ def update_appointment_service(request):
                 try:
                     service_appointment = AppointmentService.objects.get(id=str(id))
                     ExceptionRecord.objects.create(
-                        text = f'{is_deleted} id {service_appointment}'
+                        text = f'{is_deleted == True} id {service_appointment}'
                     )
                     #if str(is_deleted) == "true":
                     if is_deleted == True:
