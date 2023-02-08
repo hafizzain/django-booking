@@ -23,6 +23,7 @@ urlpatterns = [
     
     #Attendence
     path('get_attendence/', views.get_attendence),
+    path('get_attendence_device/', views.get_attendence_device),
     path('create_attendence/', views.create_attendence),
     path('update_attendence/', views.update_attendence),
     path('delete_attendence/', views.delete_attendence),

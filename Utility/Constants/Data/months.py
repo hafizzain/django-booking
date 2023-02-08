@@ -15,7 +15,7 @@ MONTH_DICT = {
         7 : 'July',
         8 : 'August',
         9 : 'September',
-        1 : 'October',
-        1 : 'November',
-        1 : 'December',
+        10 : 'October',
+        11 : 'November',
+        12 : 'December',
 }

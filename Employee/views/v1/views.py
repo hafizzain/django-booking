@@ -17,7 +17,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from Employee.serializers import( EmployeSerializer , EmployeInformationsSerializer
                           , EmployPermissionSerializer,  EmployeModulesSerializer, EmployeeInformationSerializer
-                          ,  EmployeeMarketingSerializers, Payroll_Working_deviceScheduleSerializer, Payroll_WorkingScheduleSerializer, ScheduleSerializer, SingleEmployeeInformationSerializer, StaffGroupSerializers , 
+                          ,  EmployeeMarketingSerializers, Payroll_Working_device_attendence_ScheduleSerializer, Payroll_Working_deviceScheduleSerializer, Payroll_WorkingScheduleSerializer, ScheduleSerializer, SingleEmployeeInformationSerializer, StaffGroupSerializers , 
                           StaffpermisionSerializers , AttendanceSerializers
                           ,PayrollSerializers, UserEmployeeSerializer, VacationSerializer,singleEmployeeSerializer , CommissionSerializer
                           , AssetSerializer, WorkingScheduleSerializer
@@ -1540,6 +1540,64 @@ def get_attendence(request):
     all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
     serialized = Payroll_WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request,} )
     
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Attendance',
+                'error_message' : None,
+                'attendance' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_attendence_device(request):
+    employee_id = request.GET.get('employee_id', None)
+    start_date = request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
+
+    if not all([employee_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Employee id are required',
+                    'fields' : [
+                        'employee_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try: 
+        employee_id = Employee.objects.get(id=employee_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                    'response' : {
+                        'message' : 'Employee Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    
+    all_employe= Employee.objects.get(id = employee_id.id, is_deleted=False, is_blocked=False)#.order_by('-created_at')
+    serialized = Payroll_Working_device_attendence_ScheduleSerializer(all_employe, context={
+                        'request' : request, 
+                        'range_start': start_date, 
+                        'range_end': end_date, 
+            })
     return Response(
         {
             'status' : 200,

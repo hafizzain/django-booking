@@ -895,6 +895,25 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         model = Employee
         fields = ['id', 'employee_id','is_active','full_name','image','location',
                   'schedule','created_at', 'income_type', 'salary']
+class Payroll_Working_device_attendence_ScheduleSerializer(serializers.ModelSerializer):    
+    schedule =  serializers.SerializerMethodField(read_only=True)    
+    
+    def get_schedule(self, obj):
+        range_start = self.context["range_start"]
+        range_end = self.context["range_end"]
+        total = 0
+        
+        if range_start:
+            range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
+            range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
+        schedule =  EmployeDailySchedule.objects.filter(employee= obj, ) 
+                   
+        return WorkingSchedulePayrollSerializer(schedule, many = True,context=self.context).data
+    
+    class Meta:
+        model = Employee
+        fields = ['id', 'employee_id','is_active','full_name',
+                  'schedule','created_at',]
 class Payroll_Working_deviceScheduleSerializer(serializers.ModelSerializer):    
     schedule =  serializers.SerializerMethodField(read_only=True)    
     image = serializers.SerializerMethodField()
@@ -936,6 +955,13 @@ class Payroll_Working_deviceScheduleSerializer(serializers.ModelSerializer):
         if range_start:
             range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
             range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
+        else:
+            range_end = datetime.now().date()
+            month = range_end.month
+            year = range_end.year
+            range_start = f'{year}-{month}-01'
+            range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
+            
         schedule =  EmployeDailySchedule.objects.filter(employee= obj, is_vacation = False )
         for dt in schedule:
             create = str(dt.created_at)
@@ -952,6 +978,12 @@ class Payroll_Working_deviceScheduleSerializer(serializers.ModelSerializer):
         if range_start:
             range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
             range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
+        else:
+            range_end = datetime.now().date()
+            month = range_end.month
+            year = range_end.year
+            range_start = f'{year}-{month}-01'
+            range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
         schedule =  EmployeDailySchedule.objects.filter(employee= obj, is_vacation = True )
         for dt in schedule:
             create = str(dt.created_at)
