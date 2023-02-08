@@ -733,6 +733,7 @@ def update_appointment_service(request):
                     #if str(is_deleted) == "true":
                     if is_deleted == True:
                         service_appointment.delete()
+                        continue
                     service_appointment.appointment_date = appointment_date
                     service_appointment.appointment_time = date_time
                     service_appointment.service = service_id
