@@ -40,4 +40,5 @@ urlpatterns = [
     
     #Employee Check Availabilty
     path('get_employee_check_time/', views.get_employee_check_time),
+    path('get_employee_check_availability_lsit/', views.get_employee_check_availability_lsit),
 ]
