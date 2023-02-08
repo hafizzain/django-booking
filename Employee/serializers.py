@@ -973,7 +973,7 @@ class Payroll_Working_deviceScheduleSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Employee
-        fields = ['id', 'employee_id','is_active','full_name','image','location','working_day','off_day'
+        fields = ['id', 'employee_id','is_active','full_name','image','location','working_day','off_day',
                   'schedule','created_at', 'income_type', 'salary']
 
 class UserEmployeeSerializer(serializers.ModelSerializer): 
