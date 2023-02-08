@@ -913,7 +913,10 @@ class Payroll_Working_device_attendence_ScheduleSerializer(serializers.ModelSeri
             range_start = f'{year}-{month}-01'
             range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
             
-        schedule =  EmployeDailySchedule.objects.filter(employee= obj, created_at__gte =  range_start ) 
+        schedule =  EmployeDailySchedule.objects.filter(employee= obj, 
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+            ) 
                    
         return WorkingSchedulePayrollSerializer(schedule, many = True,context=self.context).data
     
