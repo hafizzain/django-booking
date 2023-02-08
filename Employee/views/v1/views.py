@@ -4188,6 +4188,10 @@ def set_password(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
+    try:
+        token = Token.objects.get(user=user)
+    except Token.DoesNotExist:
+        token = Token.objects.create(user=user)
     user.set_password(password)
     user.save()
     with tenant_context(Tenant.objects.get(schema_name = 'public')):
@@ -4205,6 +4209,10 @@ def set_password(request):
                     },
                     status=status.HTTP_404_NOT_FOUND
                 )
+        try:
+            token = Token.objects.get(user=user)
+        except Token.DoesNotExist:
+            token = Token.objects.create(user=user)
         user.set_password(password)
         user.save()
         
