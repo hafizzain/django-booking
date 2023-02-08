@@ -1694,7 +1694,7 @@ def get_employee_check_time(request):
     
 @api_view(['POST'])
 @permission_classes([AllowAny])
-def get_employee_check_availability_lsit(request):
+def get_employee_check_availability_list(request):
     check_availability = request.data.get('check_availability', None)
     
     if check_availability is None:
