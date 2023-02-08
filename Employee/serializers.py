@@ -903,17 +903,18 @@ class Payroll_Working_device_attendence_ScheduleSerializer(serializers.ModelSeri
         range_end = self.context["range_end"]
         
         if range_start:
-            range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
-            range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
+            range_start = datetime.strptime(range_start, "%Y-%m-%d")#.date()
+            range_end = datetime.strptime(range_end, "%Y-%m-%d")#.date()
         else:
-            range_end = datetime.now().date()
+            range_end = datetime.now()#.date()
             month = range_end.month
             year = range_end.year
             range_start = f'{year}-{month}-01'
-            range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
+            range_start = datetime.strptime(range_start, "%Y-%m-%d")#.date()
         
         #return f'range_start{range_start} range_end{range_end}' 
-        schedule =  EmployeDailySchedule.objects.filter(employee= obj, 
+        schedule =  EmployeDailySchedule.objects.filter(
+            employee= obj, 
             created_at__gte =  range_start ,
             created_at__lte = range_end
             ) 
