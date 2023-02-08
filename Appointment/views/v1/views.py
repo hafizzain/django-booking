@@ -1755,9 +1755,8 @@ def get_employee_check_availability_list(request):
         
         data = []
         data_list = []
-            
+        data_object = {}    
         try:
-            data_object = {}
             employee = Employee.objects.get(
                     id = emp_id,
                     ) 
@@ -1824,8 +1823,7 @@ def get_employee_check_availability_list(request):
                             'appointment_date': date,
                             'index': index,
                             'service': service,
-                            'message':' Tedasdfukad a;dofga vasofiyaios'
-                            #'message': f'{employee.full_name} isn’t available on the selected date, but your team member can still book appointments for them.',                            
+                            'message': f'{employee.full_name} isn’t available on the selected date, but your team member can still book appointments for them.',                            
                         })
                 data_list.append(data_object)
                 continue   
