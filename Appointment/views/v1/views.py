@@ -1720,6 +1720,7 @@ def get_employee_check_availability_list(request):
         pass
               
     data = []
+    data_list = []
     
     for check in check_availability:                  
         emp_id = check.get('member', None)
@@ -1753,10 +1754,9 @@ def get_employee_check_availability_list(request):
         tested = datetime.strptime(datetime_duration ,'%H:%M:%S').time()
         end_time = datetime_duration
         
-        data = []
-        data_list = []
-        data_object = {}    
+            
         try:
+            data_object = {}
             employee = Employee.objects.get(
                     id = emp_id,
                     ) 
