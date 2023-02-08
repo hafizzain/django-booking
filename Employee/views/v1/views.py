@@ -17,7 +17,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from Employee.serializers import( EmployeSerializer , EmployeInformationsSerializer
                           , EmployPermissionSerializer,  EmployeModulesSerializer, EmployeeInformationSerializer
-                          ,  EmployeeMarketingSerializers, Payroll_WorkingScheduleSerializer, ScheduleSerializer, SingleEmployeeInformationSerializer, StaffGroupSerializers , 
+                          ,  EmployeeMarketingSerializers, Payroll_Working_deviceScheduleSerializer, Payroll_WorkingScheduleSerializer, ScheduleSerializer, SingleEmployeeInformationSerializer, StaffGroupSerializers , 
                           StaffpermisionSerializers , AttendanceSerializers
                           ,PayrollSerializers, UserEmployeeSerializer, VacationSerializer,singleEmployeeSerializer , CommissionSerializer
                           , AssetSerializer, WorkingScheduleSerializer
@@ -1768,25 +1768,6 @@ def get_payrolls(request):
         status=status.HTTP_200_OK
     )
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def get_payrol_working(request):
-    all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
-    serialized = Payroll_WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request,} )
-   
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Employee',
-                'error_message' : None,
-                'employees' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
-
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_payroll(request):
@@ -1920,6 +1901,133 @@ def create_payroll(request):
             },
             status=status.HTTP_201_CREATED
         ) 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_payrol_working(request):
+    all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
+    serialized = Payroll_WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request,} )
+   
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Employee',
+                'error_message' : None,
+                'employees' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_payrol_working_device(request):
+    employee_id = request.GET.get('employee_id', None)
+    start_date = request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
+
+    if not all([employee_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Employee id are required',
+                    'fields' : [
+                        'employee_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try: 
+        employee_id = Employee.objects.get(id=employee_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                    'response' : {
+                        'message' : 'Employee Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    all_employe= Employee.objects.get(id = employee_id.id, is_deleted=False, is_blocked=False)#.order_by('-created_at')
+    serialized = Payroll_Working_deviceScheduleSerializer(all_employe,  many=True, context={
+                        'request' : request, 
+                        'range_start': start_date, 
+                        'range_end': end_date, 
+            })
+   
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Employee',
+                'error_message' : None,
+                'employees' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_payroll(request):
+    payroll_id = request.data.get('payroll_id', None)
+    if payroll_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'payroll_id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        payroll = Payroll.objects.get(id=payroll_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Payroll ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    payroll.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Payroll deleted successful',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

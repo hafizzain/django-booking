@@ -893,7 +893,88 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Employee
-        fields = ['id', 'employee_id','is_active','full_name','image','location','schedule','created_at', 'income_type', 'salary']
+        fields = ['id', 'employee_id','is_active','full_name','image','location',
+                  'schedule','created_at', 'income_type', 'salary']
+class Payroll_Working_deviceScheduleSerializer(serializers.ModelSerializer):    
+    schedule =  serializers.SerializerMethodField(read_only=True)    
+    image = serializers.SerializerMethodField()
+    income_type = serializers.SerializerMethodField(read_only=True)
+    salary = serializers.SerializerMethodField(read_only=True)
+    #employe_id = serializers.SerializerMethodField(read_only=True)
+    
+    location = serializers.SerializerMethodField(read_only=True)
+    working_day = serializers.SerializerMethodField(read_only=True)
+    off_day = serializers.SerializerMethodField(read_only=True)
+    
+    def get_location(self, obj):
+        loc = obj.location.all()
+        return LocationSerializer(loc, many =True ).data
+    
+    def get_salary(self, obj):        
+        try:
+            income_info = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return income_info.salary 
+        except: 
+            return None
+        
+    def get_income_type(self, obj):
+        try:
+            income_info = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return income_info.income_type 
+        except: 
+            return None
+
+    def get_schedule(self, obj):
+        schedule =  EmployeDailySchedule.objects.filter(employee= obj )            
+        return WorkingSchedulePayrollSerializer(schedule, many = True,context=self.context).data
+    
+    def get_working_day(self, obj):
+        range_start = self.context["range_start"]
+        range_end = self.context["range_end"]
+        total = 0
+        
+        if range_start:
+            range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
+            range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
+        schedule =  EmployeDailySchedule.objects.filter(employee= obj, is_vacation = False )
+        for dt in schedule:
+            create = str(dt.created_at)
+            created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
+            if created_at >= range_start  and created_at <= range_end:
+                total += 1
+        return total
+    
+    def get_off_day(self, obj):
+        range_start = self.context["range_start"]
+        range_end = self.context["range_end"]
+        total = 0
+        
+        if range_start:
+            range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
+            range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
+        schedule =  EmployeDailySchedule.objects.filter(employee= obj, is_vacation = True )
+        for dt in schedule:
+            create = str(dt.created_at)
+            created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
+            if created_at >= range_start  and created_at <= range_end:
+                total += 1
+        return total
+    
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request)
+                return f'{url}{obj.image}'
+            except:
+                return obj.image
+        return None
+    
+    
+    class Meta:
+        model = Employee
+        fields = ['id', 'employee_id','is_active','full_name','image','location','working_day','off_day'
+                  'schedule','created_at', 'income_type', 'salary']
 
 class UserEmployeeSerializer(serializers.ModelSerializer): 
     access_token = serializers.SerializerMethodField()
