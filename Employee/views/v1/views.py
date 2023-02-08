@@ -4001,3 +4001,56 @@ def get_single_employee_vacation(request):
         },
         status=status.HTTP_200_OK
     )
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def set_password(request):
+    user_id = request.data.get('user_id', None) 
+    password = request.data.get('password', None)
+        
+    try:
+        user = User.objects.get(id = user_id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code_text' : 'INVALID_USER_ID',
+                    'response' : {
+                        'message' : 'User Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    user.set_password(password)
+    user.save()
+    with tenant_context(Tenant.objects.get(schema_name = 'public')):
+        try:
+            user = User.objects.get(email = user.email)
+        except Exception as err:
+            return Response(
+                    {
+                        'status' : False,
+                        'status_code_text' : 'INVALID_USER_EMAIL',
+                        'response' : {
+                            'message' : 'User Not Found',
+                            'error_message' : str(err),
+                        }
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        user.set_password(password)
+        user.save()
+        
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Password Set Successfully!',
+                'error_message' : None,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+            

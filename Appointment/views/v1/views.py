@@ -725,7 +725,7 @@ def update_appointment_service(request):
                 errors.append(str(err))
             if id is not None:
                 try:
-                    service_appointment = AppointmentService.objects.get(id=id)
+                    service_appointment = AppointmentService.objects.get(id=str(id))
                     is_deleted = app.get('is_deleted', None)
                     if str(is_deleted) == "true":
                         service_appointment.delete()
