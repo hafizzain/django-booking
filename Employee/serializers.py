@@ -901,7 +901,6 @@ class Payroll_Working_device_attendence_ScheduleSerializer(serializers.ModelSeri
     def get_schedule(self, obj):
         range_start = self.context["range_start"]
         range_end = self.context["range_end"]
-        total = 0
         
         if range_start:
             range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
@@ -912,13 +911,14 @@ class Payroll_Working_device_attendence_ScheduleSerializer(serializers.ModelSeri
             year = range_end.year
             range_start = f'{year}-{month}-01'
             range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
-            
-        schedule =  EmployeDailySchedule.objects.filter(employee= obj, 
-            created_at__gte =  range_start ,
-            created_at__lte = range_end
-            ) 
+        
+        return f'range_start{range_start} range_end{range_end}' 
+        # schedule =  EmployeDailySchedule.objects.filter(employee= obj, 
+        #     created_at__gte =  range_start ,
+        #     created_at__lte = range_end
+        #     ) 
                    
-        return WorkingSchedulePayrollSerializer(schedule, many = True,context=self.context).data
+        #return WorkingSchedulePayrollSerializer(schedule, many = True,context=self.context).data
     
     class Meta:
         model = Employee

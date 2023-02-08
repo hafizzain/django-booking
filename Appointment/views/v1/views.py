@@ -638,10 +638,6 @@ def update_appointment_service(request):
     appointment_date = request.data.get('appointment_date', None)
     client = request.data.get('client', None)
     
-    ExceptionRecord.objects.create(
-        text = f'{request.data}'
-    )
-    
     errors = []
     if appointment_id is None: 
        return Response(
