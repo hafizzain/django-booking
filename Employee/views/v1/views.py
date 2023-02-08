@@ -1959,7 +1959,7 @@ def get_payrol_working_device(request):
                 status=status.HTTP_404_NOT_FOUND
             )
     all_employe= Employee.objects.get(id = employee_id.id, is_deleted=False, is_blocked=False)#.order_by('-created_at')
-    serialized = Payroll_Working_deviceScheduleSerializer(all_employe,  many=True, context={
+    serialized = Payroll_Working_deviceScheduleSerializer(all_employe, context={
                         'request' : request, 
                         'range_start': start_date, 
                         'range_end': end_date, 
