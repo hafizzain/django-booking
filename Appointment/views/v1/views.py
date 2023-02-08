@@ -727,6 +727,9 @@ def update_appointment_service(request):
             if id is not None:
                 try:
                     service_appointment = AppointmentService.objects.get(id=str(id))
+                    ExceptionRecord.objects.create(
+                        text = f'{is_deleted} id {service_appointment}'
+                    )
                     if str(is_deleted) == "true":
                         service_appointment.delete()
                     service_appointment.appointment_date = appointment_date
