@@ -714,6 +714,7 @@ def update_appointment_service(request):
             duration = app.get('duration', None)
             price = app.get('price', None)
             member = app.get('member', None)
+            is_deleted = app.get('is_deleted', None)
             id = app.get('id', None)
             try:
                 service_id =Service.objects.get(id=service)
@@ -726,7 +727,6 @@ def update_appointment_service(request):
             if id is not None:
                 try:
                     service_appointment = AppointmentService.objects.get(id=str(id))
-                    is_deleted = app.get('is_deleted', None)
                     if str(is_deleted) == "true":
                         service_appointment.delete()
                     service_appointment.appointment_date = appointment_date

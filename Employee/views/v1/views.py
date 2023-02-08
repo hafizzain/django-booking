@@ -4009,7 +4009,7 @@ def set_password(request):
     password = request.data.get('password', None)
         
     try:
-        user = User.objects.get(id = user_id)
+        user = User.objects.get(id = str(user_id))
     except Exception as err:
         return Response(
                 {
