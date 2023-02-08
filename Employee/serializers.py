@@ -746,7 +746,7 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
             return f'{time_diff}'
         
         except Exception as err:
-            return 0
+            return '00:00:00'
          
     class Meta:
         model = EmployeDailySchedule
