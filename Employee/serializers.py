@@ -906,7 +906,14 @@ class Payroll_Working_device_attendence_ScheduleSerializer(serializers.ModelSeri
         if range_start:
             range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
             range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
-        schedule =  EmployeDailySchedule.objects.filter(employee= obj, ) 
+        else:
+            range_end = datetime.now().date()
+            month = range_end.month
+            year = range_end.year
+            range_start = f'{year}-{month}-01'
+            range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
+            
+        schedule =  EmployeDailySchedule.objects.filter(employee= obj, created_at__gte =  range_start ) 
                    
         return WorkingSchedulePayrollSerializer(schedule, many = True,context=self.context).data
     
