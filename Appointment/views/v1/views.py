@@ -1724,7 +1724,7 @@ def get_employee_check_time(request):
                 'status_code' : 200,
                 'status_code_text' : '200',
                 'response' : {
-                    'message' : 'Employee Availability',
+                    'message' : '',
                     'error_message' : None,
                     'employee':data,
                 }
