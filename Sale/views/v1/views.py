@@ -1178,6 +1178,10 @@ def create_sale_order(request):
     client_type = request.data.get('client_type', None)
     ids = request.data.get('ids', None)
     
+    service_total_price = request.data.get('service_total_price', None)
+    product_total_price = request.data.get('product_total_price', None)
+    voucher_total_price = request.data.get('voucher_total_price', None)
+    
     service_commission = request.data.get('service_commission', None)
     product_commission = request.data.get('product_commission', None)
     voucher_commission = request.data.get('voucher_commission', None)
@@ -1267,6 +1271,10 @@ def create_sale_order(request):
         # service_commission = service_commission,
         # product_commission = product_commission,
         # voucher_commission = voucher_commission,   
+        
+        voucher_total_price = voucher_total_price,
+        service_total_price = service_total_price,
+        product_total_price = product_total_price,
         
         service_commission_type = service_commission_type,
         product_commission_type = product_commission_type,
