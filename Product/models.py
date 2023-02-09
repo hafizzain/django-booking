@@ -133,6 +133,7 @@ class ProductStock(models.Model):
     location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, related_name='location_product_stocks')
     
     #quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0, verbose_name='Total Quantity')
+    order_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
     available_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
     sold_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
 

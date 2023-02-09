@@ -903,6 +903,7 @@ def add_product(request):
                         product = product,
                         location = loc,
                         available_quantity = current_stock,
+                        order_quantity = current_stock,
                         low_stock = low_stock, 
                         reorder_quantity = reorder_quantity,
                         alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
@@ -1899,6 +1900,10 @@ def update_orderstockproduct(request):
             reorder_quantity =int(quantity), 
             before_quantity = added_product.available_quantity  
             )
+        already_qunatity = int(added_product.order_quantity) - int(rec_quantity)
+        
+        added_product.low_stock = already_qunatity
+        added_product.reorder_quantity = already_qunatity
         added_product.available_quantity += int(rec_quantity)
         added_product.save()
         stock_cunsumed.after_quantity = added_product.available_quantity
