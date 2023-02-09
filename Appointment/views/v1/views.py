@@ -1668,7 +1668,8 @@ def get_employee_check_time(request):
                         data.append(f'{employee.full_name} isn’t available between {st_time} and {ed_time}, but your team member can still book appointments for them.')
                                                                 
                 else:
-                    data.append(f'Employees are free, employee name: {employee.full_name}')
+                    data.append(f'The selected staff is not available at this time  {employee.full_name}')
+                    Availability = False
                     
             if len(av_staff_ids) == 0:
                 data.append(f'Employees are free, you can proceed further employee name {employee.full_name}')
