@@ -1272,9 +1272,9 @@ def create_sale_order(request):
         # product_commission = product_commission,
         # voucher_commission = voucher_commission,   
         
-        voucher_total_price = voucher_total_price,
-        service_total_price = service_total_price,
-        product_total_price = product_total_price,
+        total_voucher_price = voucher_total_price,
+        total_service_price = service_total_price,
+        total_product_price = product_total_price,
         
         service_commission_type = service_commission_type,
         product_commission_type = product_commission_type,
