@@ -64,7 +64,7 @@ class TargetsAcheivedSerializer(serializers.ModelSerializer):
             targets =  StaffTarget.objects.get(
                 employee = obj.id,
                 year__gte =  range_start ,
-                year__lte =  range_start ,
+                year__lte =  range_end ,
                 )
             total_targets = int(targets.service_target) + int(targets.retail_target)
         except Exception as err:

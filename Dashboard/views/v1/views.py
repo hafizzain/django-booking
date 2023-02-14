@@ -1,8 +1,7 @@
 from django.conf import settings
 from operator import ge
 from Utility.Constants.Data.months import  FIXED_MONTHS
-from Dashboard.serializers import TargetsAcheivedSerializer
-from Dashboard.serializers import EmployeeDashboradSerializer
+from Dashboard.serializers import TargetsAcheivedSerializer,EmployeeDashboradSerializer
 from Employee.models import Employee
 from TragetControl.models import StaffTarget
 from rest_framework.decorators import api_view, permission_classes
@@ -265,11 +264,11 @@ def get_acheived_target_report(request):
     #     acheived_time = StaffTarget.objects.filter(employee_id__id = employee_id)
     
     acheived=0
-    if targets == True:
+    if targets is not None:
         for target in targets :
             s = target.service_target
             r = target.retail_target
-            a=acheived + s + r
+            a = acheived + s + r
         newdata = {
                 'acheived_target': a,
                 }
