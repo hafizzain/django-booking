@@ -262,11 +262,15 @@ def get_commission_reports_by_commission_details(request):
             service_commission = da['service_commission']
             voucher_commission = da['voucher_commission']
             product_commission = da['product_commission']
+            voucher_commission_type = da['voucher_commission_type']
+            product_commission_type = da['product_commission_type']
+            service_commission_type = da['service_commission_type']
             
             newdata = {
                 'employee': name,
                 'location': location,
                 'commission': service_commission,
+                'commission_rate': service_commission_type,
                 'sale': service_sale_price,
                 }
             Append_data.append(newdata)
@@ -275,6 +279,7 @@ def get_commission_reports_by_commission_details(request):
                 'employee': name,
                 'location': location,
                 'commission': product_commission,
+                'commission_rate': product_commission_type,
                 'sale': product_sale_price,
                 }
             Append_data.append(newdata)
@@ -282,6 +287,7 @@ def get_commission_reports_by_commission_details(request):
                 'employee': name,
                 'location': location,
                 'commission': voucher_commission,
+                'commission_rate': voucher_commission_type,
                 'sale': voucher_sale_price,
                 }
             Append_data.append(newdata)

@@ -683,7 +683,8 @@ class CheckoutSerializer(serializers.ModelSerializer):
         model = Checkout
         fields = ['id', 'product', 'service', 'membership',
                   'voucher','client','location','member','created_at','payment_type', 'tip',
-                  'service_commission', 'voucher_commission', 'product_commission'
+                  'service_commission', 'voucher_commission', 'product_commission', 'service_commission_type',
+                  'product_commission_type','voucher_commission_type'
                   ]
 
 class ParentBusinessTax_RateSerializer(serializers.ModelSerializer):
@@ -703,6 +704,10 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
     order_type  = serializers.SerializerMethodField(read_only=True)
     member  = serializers.SerializerMethodField(read_only=True)
     service  = serializers.SerializerMethodField(read_only=True)
+    price  = serializers.SerializerMethodField(read_only=True)
+    
+    #price  = serializers.SerializerMethodField(read_only=True)
+    #price  = serializers.SerializerMethodField(read_only=True)
     
     def get_service(self, obj):
         try:
@@ -719,6 +724,14 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
         try:
             cli = f"{obj.appointment.client.full_name}"
             return cli
+
+        except Exception as err:
+            print(err)
+            
+    def get_price(self, obj):
+        try:
+            #cli = f"{obj.appointment.client.full_name}"
+            return obj.appointment_service.price
 
         except Exception as err:
             print(err)
