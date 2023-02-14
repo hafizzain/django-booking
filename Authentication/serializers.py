@@ -83,6 +83,17 @@ class UserTenantLoginSerializer(serializers.ModelSerializer):
     domain = serializers.SerializerMethodField()
     is_tenant = serializers.SerializerMethodField()
     access_token = serializers.SerializerMethodField()
+    employee = serializers.SerializerMethodField()
+    
+    def get_employee(self, obj):
+        try:
+            employee = self.context["employee"]
+            if employee:
+                return True
+            else:
+                return False
+        except:
+            pass
     
     def get_access_token(self,obj):
         return str(obj.auth_token)
@@ -108,7 +119,7 @@ class UserTenantLoginSerializer(serializers.ModelSerializer):
             return None
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'email', 
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'employee',
                   'domain', 'is_tenant', 'access_token','joined_at', ]
         
 class UserSerializerByClient(serializers.ModelSerializer):

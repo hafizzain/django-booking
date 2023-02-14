@@ -1,5 +1,6 @@
 
 
+from Tenants.models import EmployeeTenantDetail
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -11,7 +12,7 @@ from Authentication.serializers import  UserTenantLoginSerializer
 from Authentication.models import User
 
 from NStyle.Constants import StatusCodes
-
+from django_tenants.utils import tenant_context
 
 
 @api_view(['POST'])
@@ -20,7 +21,8 @@ def login(request):
     email = request.data.get('email', None)
     social_account = request.data.get('social_account', False)
     password = request.data.get('password', None)
-
+    employee = False
+    
     if social_account:
         social_platform = request.data.get('social_platform', None)
         social_id = request.data.get('social_id', None)
@@ -157,8 +159,26 @@ def login(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-
-    serialized = UserTenantLoginSerializer(user)
+    try:
+        user = User.objects.get(
+            email=email,
+            is_deleted=False,
+            user_account_type__account_type = 'Employee'
+        )
+        employee = True
+    except Exception as err:
+        employee = False
+    if employee:
+        employe_user = EmployeeTenantDetail.objects.get(user = user)
+        with tenant_context(employe_user.tenant):
+            user = User.objects.get(
+                email=email,
+                is_deleted=False,
+                user_account_type__account_type = 'Employee'
+            )
+            serialized = UserTenantLoginSerializer(user, context={'employee' : True, })
+    else:
+        serialized = UserTenantLoginSerializer(user, context={'employee' : False, })
     return Response(
             {
                 'status' : True,
