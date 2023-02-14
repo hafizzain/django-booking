@@ -257,6 +257,7 @@ def get_commission_reports_by_commission_details(request):
         service_sale_price = da['service']
         product_sale_price = da['product']
         voucher_sale_price = da['voucher']
+        #voucher_sale_price = da['voucher']
         
         newdata = {
             'employee': name,

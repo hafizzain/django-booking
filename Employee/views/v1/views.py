@@ -596,18 +596,6 @@ def create_employee(request):
             )
         except Exception as err:
             pass
-                # return Response(
-                #     {
-                #         'status' : False,
-                #         'status_code' : 404,
-                #         'status_code_text' : '404',
-                #         'response' : {
-                #             'message' : f'User Already exist with this {str(err)}!',
-                #             'error_message' : str(err),
-                #         }
-                #     },
-                #     status=status.HTTP_404_NOT_FOUND
-                # )
     
     if len(salary) > 7:
         return Response(
