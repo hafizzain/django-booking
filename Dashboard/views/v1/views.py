@@ -1,5 +1,7 @@
 from django.conf import settings
 from operator import ge
+from Utility.Constants.Data.months import  FIXED_MONTHS
+from Dashboard.serializers import TargetsAcheivedSerializer
 from Dashboard.serializers import EmployeeDashboradSerializer
 from Employee.models import Employee
 from TragetControl.models import StaffTarget
@@ -11,6 +13,7 @@ from Appointment.models import Appointment, AppointmentCheckout
 from Client.models import Client
 from NStyle.Constants import StatusCodes
 from Business.models import Business, BusinessAddress
+from Product.models import ProductStock
 
 from datetime import datetime
 from datetime import timedelta
@@ -191,6 +194,116 @@ def get_dashboard_targets(request):
         },
         status=status.HTTP_200_OK
     )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_acheived_target_report(request):
+    
+    employee_id = request.GET.get('employee_id', None)
+    Append_data = [] 
+    newdata = {}
+    start_month =  request.GET.get('start_month', None)
+    end_month = request.GET.get('end_month', None)
+    start_year = request.GET.get('start_year', None)
+    end_year = request.GET.get('end_year', None)
+
+
+
+
+    if not all([employee_id, start_month, start_year, end_month, end_year]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required',
+                    'fields' : [
+                        'employee_id',
+                        'month',
+                        'year',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try: 
+        employee_id = Employee.objects.get(id=employee_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                    'response' : {
+                        'message' : 'Employee Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+    
+    start_index = FIXED_MONTHS.index(start_month) # 1
+    end_index = FIXED_MONTHS.index(end_month) # 9
+    
+    # fix_months = 9-1 = 8
+    fix_months = FIXED_MONTHS[start_index : end_index]
+
+    targets = StaffTarget.objects.filter(
+        employee_id = employee_id,
+        is_deleted=False,
+
+        
+        month__in = fix_months, # 8
+        
+        year__gte = start_year,
+        year__lte = end_year,
+
+        is_deleted=False
+    )
+ 
+    # if duration is not None:
+    #     today = datetime.today()
+    #     day = today - timedelta(days=int(duration))
+    #     acheived_time = StaffTarget.objects.filter(employee_id__id = employee_id, created_at__gte = day)
+    # else:
+    #     acheived_time = StaffTarget.objects.filter(employee_id__id = employee_id)
+    
+    acheived=0
+    if targets == True:
+        for target in targets :
+            s = target.service_target
+            r = target.retail_target
+            a=acheived + s + r
+        newdata = {
+                'acheived_target': a,
+                }
+        Append_data.append(newdata)
+
+    serialized = TargetsAcheivedSerializer(employee_id, context={
+                        'request' : request, 
+                        'start_year': start_year,
+                        'end_year' : end_year, 
+                        'start_month' : start_month,
+                        'end_month' : end_month, 
+                        }),
+    return Response(
+            {
+                'status' : 200,
+                'status_code' : '200',
+                'response' : {
+                    'message' : 'achieved Target',
+                    'error_message' : None,
+                    'employees' : Append_data,
+                    'data' : serialized.data,
+                    # 'duration_time' : acheived_time,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
     
     
     
