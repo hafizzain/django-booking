@@ -9,5 +9,6 @@ urlpatterns = [
     #clients
     path('get_appointments_client/', views.get_appointments_client),
     path('get_dashboard_targets/', views.get_dashboard_targets),
+    path('get_acheived_target_report/', views.get_acheived_target_report),
 
 ]
