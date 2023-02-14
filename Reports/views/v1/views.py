@@ -218,6 +218,8 @@ def get_commission_reports_by_commission_details(request):
     # serialized = ProductOrderSerializer(result_page,  many=True)
     
     data=[]
+    Append_data = [] 
+    newdata = {} 
     if range_start:
         range_start = datetime.strptime(range_start, "%Y-%m-%d")#.date()
         range_end = datetime.strptime(range_end, "%Y-%m-%d")
@@ -249,6 +251,33 @@ def get_commission_reports_by_commission_details(request):
         serialized = AppointmentCheckoutSerializer(appointment_checkout, many = True)
         data.extend(serialized.data)
         
+    for da in data:
+        location =  da['location']
+        name = da['member']
+        service_sale_price = da['service']
+        product_sale_price = da['product']
+        voucher_sale_price = da['voucher']
+        
+        newdata = {
+            'employee': name,
+            'location': location,
+            'sale': service_sale_price,
+            }
+        Append_data.append(newdata)
+        
+        newdata = {
+            'employee': name,
+            'location': location,
+            'sale': product_sale_price,
+            }
+        Append_data.append(newdata)
+        newdata = {
+            'employee': name,
+            'location': location,
+            'sale': voucher_sale_price,
+            }
+        Append_data.append(newdata)
+        
     return Response(
         {
             'status' : 200,
@@ -256,7 +285,7 @@ def get_commission_reports_by_commission_details(request):
             'response' : {
                 'message' : 'All Sale Orders',
                 'error_message' : None,
-                'sales' : data
+                'sales' : Append_data
             }
         },
         status=status.HTTP_200_OK
