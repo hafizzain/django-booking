@@ -198,19 +198,15 @@ def get_dashboard_targets(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_acheived_target_report(request):
-    
     employee_id = request.GET.get('employee_id', None)
-    Append_data = [] 
-    newdata = {}
     start_month =  request.GET.get('start_month', None)
     end_month = request.GET.get('end_month', None)
-    start_year = request.GET.get('start_year', None)
-    end_year = request.GET.get('end_year', None)
+    start_year = request.GET.get('start_year', 1900)
+    end_year = request.GET.get('end_year', 3000)
+    Append_data = [] 
+    newdata = {}
 
-
-
-
-    if not all([employee_id, start_month, start_year, end_month, end_year]):
+    if not all([employee_id]):
         return Response(
             {
                 'status' : False,
@@ -244,25 +240,21 @@ def get_acheived_target_report(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-
-    
-    start_index = FIXED_MONTHS.index(start_month) # 1
-    end_index = FIXED_MONTHS.index(end_month) # 9
-    
     # fix_months = 9-1 = 8
-    fix_months = FIXED_MONTHS[start_index : end_index]
+    if start_month is not None and end_month is not None :
+
+        start_index = FIXED_MONTHS.index(start_month) # 1
+        end_index = FIXED_MONTHS.index(end_month) # 9
+
+        fix_months = FIXED_MONTHS[start_index : end_index]
+    else:
+        fix_months = FIXED_MONTHS
 
     targets = StaffTarget.objects.filter(
-        employee_id = employee_id,
-        is_deleted=False,
-
-        
+        employee_id = employee_id,is_deleted=False,
         month__in = fix_months, # 8
-        
         year__gte = start_year,
         year__lte = end_year,
-
-        is_deleted=False
     )
  
     # if duration is not None:
