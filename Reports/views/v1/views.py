@@ -257,11 +257,14 @@ def get_commission_reports_by_commission_details(request):
         service_sale_price = da['service']
         product_sale_price = da['product']
         voucher_sale_price = da['voucher']
-        #voucher_sale_price = da['voucher']
+        service_commission = da['service_commission']
+        voucher_commission = da['voucher_commission']
+        product_commission = da['product_commission']
         
         newdata = {
             'employee': name,
             'location': location,
+            'commission': service_commission,
             'sale': service_sale_price,
             }
         Append_data.append(newdata)
@@ -269,12 +272,14 @@ def get_commission_reports_by_commission_details(request):
         newdata = {
             'employee': name,
             'location': location,
+            'commission': product_commission,
             'sale': product_sale_price,
             }
         Append_data.append(newdata)
         newdata = {
             'employee': name,
             'location': location,
+            'commission': voucher_commission,
             'sale': voucher_sale_price,
             }
         Append_data.append(newdata)
