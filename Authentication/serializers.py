@@ -1,5 +1,7 @@
 
 
+from Employee.models import Employee
+from Employee.serializers import EmployeSerializer
 from rest_framework import serializers
 from Authentication.models import AccountType, User
 from Tenants.models import ClientIdUser, Domain, Tenant
@@ -84,6 +86,7 @@ class UserTenantLoginSerializer(serializers.ModelSerializer):
     is_tenant = serializers.SerializerMethodField()
     access_token = serializers.SerializerMethodField()
     employee = serializers.SerializerMethodField()
+    employee_permission = serializers.SerializerMethodField()
     
     def get_employee(self, obj):
         try:
@@ -94,6 +97,14 @@ class UserTenantLoginSerializer(serializers.ModelSerializer):
                 return False
         except:
             pass
+        
+    def get_employee_permission(self, obj):
+        try:
+            emp = Employee.objects.get(email = obj.email)
+            return EmployeSerializer(emp).data#context={'request' : request, })
+            
+        except:
+            return None
     
     def get_access_token(self,obj):
         return str(obj.auth_token)
@@ -119,7 +130,7 @@ class UserTenantLoginSerializer(serializers.ModelSerializer):
             return None
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'employee',
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'employee', 'employee_permission',
                   'domain', 'is_tenant', 'access_token','joined_at', ]
         
 class UserSerializerByClient(serializers.ModelSerializer):
