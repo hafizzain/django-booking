@@ -1,5 +1,5 @@
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 from django.shortcuts import render
 
 from rest_framework import status
@@ -100,66 +100,66 @@ def get_store_target_report(request):
         status=status.HTTP_200_OK
     )
     
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def get_commission_reports_by_commission_details(request):
-    month = request.GET.get('month', None)
-    range_start = request.GET.get('range_start', None)
-    year = request.GET.get('year', None)
-    range_end = request.GET.get('range_end', None)
-    response_data = []
-    Append_data = [] 
-    newdata = {} 
+# @api_view(['GET'])
+# @permission_classes([AllowAny])
+# def get_commission_reports_by_commission_details(request):
+#     month = request.GET.get('month', None)
+#     range_start = request.GET.get('range_start', None)
+#     year = request.GET.get('year', None)
+#     range_end = request.GET.get('range_end', None)
+#     response_data = []
+#     Append_data = [] 
+#     newdata = {} 
         
-    employee = Employee.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = StaffCommissionReport (employee,  many=True, context={
-        'request' : request, 
-        'range_start': range_start, 
-        'range_end': range_end, 
-        'year': year
+#     employee = Employee.objects.filter(is_deleted=False).order_by('-created_at')
+#     serialized = StaffCommissionReport (employee,  many=True, context={
+#         'request' : request, 
+#         'range_start': range_start, 
+#         'range_end': range_end, 
+#         'year': year
         
-        })
-    response_data = serialized.data
+#         })
+#     response_data = serialized.data
     
-    for da in response_data:
-        location =  da['location']
-        name = da['full_name']
-        service_sale_price = da['service_sale_price']
-        product_sale_price = da['product_sale_price']
-        voucher_sale_price = da['voucher_sale_price']
+#     for da in response_data:
+#         location =  da['location']
+#         name = da['full_name']
+#         service_sale_price = da['service_sale_price']
+#         product_sale_price = da['product_sale_price']
+#         voucher_sale_price = da['voucher_sale_price']
         
-        newdata = {
-            'employee': name,
-            'location': location,
-            'sale': service_sale_price,
-            }
-        Append_data.append(newdata)
+#         newdata = {
+#             'employee': name,
+#             'location': location,
+#             'sale': service_sale_price,
+#             }
+#         Append_data.append(newdata)
         
-        newdata = {
-            'employee': name,
-            'location': location,
-            'sale': product_sale_price,
-            }
-        Append_data.append(newdata)
-        newdata = {
-            'employee': name,
-            'location': location,
-            'sale': voucher_sale_price,
-            }
-        Append_data.append(newdata)
+#         newdata = {
+#             'employee': name,
+#             'location': location,
+#             'sale': product_sale_price,
+#             }
+#         Append_data.append(newdata)
+#         newdata = {
+#             'employee': name,
+#             'location': location,
+#             'sale': voucher_sale_price,
+#             }
+#         Append_data.append(newdata)
     
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Employee Orders',
-                'error_message' : None,
-                'staff_report' : Append_data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+#     return Response(
+#         {
+#             'status' : 200,
+#             'status_code' : '200',
+#             'response' : {
+#                 'message' : 'All Employee Orders',
+#                 'error_message' : None,
+#                 'staff_report' : Append_data
+#             }
+#         },
+#         status=status.HTTP_200_OK
+#     )
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -198,6 +198,65 @@ def get_retail_target_report(request):
                 'message' : 'All Brand Sale Report',
                 'error_message' : None,
                 'sale' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_commission_reports_by_commission_details(request):
+    range_start = request.GET.get('range_start', None)
+    year = request.GET.get('year', None)
+    range_end = request.GET.get('range_end', None)
+    
+    # #pagination
+    
+    # paginator = CustomPagination()
+    # paginator.page_size = 1
+    # result_page = paginator.paginate_queryset(product_order, request)
+    # serialized = ProductOrderSerializer(result_page,  many=True)
+    
+    data=[]
+    if range_start:
+        range_start = datetime.strptime(range_start, "%Y-%m-%d")#.date()
+        range_end = datetime.strptime(range_end, "%Y-%m-%d")
+        checkout_order = Checkout.objects.filter(
+            is_deleted=False,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+            ).order_by('-created_at')
+        serialized = CheckoutSerializer(checkout_order,  many=True, context={
+            'request' : request, 
+            })
+        data.extend(serialized.data)
+            
+        appointment_checkout = AppointmentCheckout.objects.filter(
+            appointment_service__appointment_status = 'Done',
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+            )
+        serialized = AppointmentCheckoutSerializer(appointment_checkout, many = True)
+        data.extend(serialized.data)
+    else:
+        checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
+        serialized = CheckoutSerializer(checkout_order,  many=True, context={
+            'request' : request, 
+            })
+        data.extend(serialized.data)
+            
+        appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')
+        serialized = AppointmentCheckoutSerializer(appointment_checkout, many = True)
+        data.extend(serialized.data)
+        
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Sale Orders',
+                'error_message' : None,
+                'sales' : data
             }
         },
         status=status.HTTP_200_OK

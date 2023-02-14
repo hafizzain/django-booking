@@ -509,7 +509,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'item_sold': ord.service.name,
                             'ItemType': 'Service',
                             'Quantity': ord.quantity,
-                            'Sale_Value': ord.total_price,
+                            'Sale_Value': ord.checkout.total_service_price,
                             'Commission_amount': ord.checkout.service_commission,
                             'Commission_Rate': rate if rate != "null" else 0  ,
                             'cerated_at': ord.created_at
@@ -521,7 +521,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'item_sold': ord.service.name,
                             'ItemType': 'Service',
                             'Quantity': ord.quantity,
-                            'Sale_Value': ord.total_price,
+                            'Sale_Value': ord.checkout.total_service_price,
                             'Commission_amount': ord.checkout.service_commission,
                             'Commission_Rate': rate if rate != "null"  else 0  ,
                             'cerated_at': ord.created_at
