@@ -638,9 +638,9 @@ def login(request):
                 token = Token.objects.get(user=user)
             except Token.DoesNotExist:
                 token = Token.objects.create(user=user)
-            serialized = UserLoginSerializer(user, context={'employee' : True, 'request' : request, 'token' : token })
+            serialized = UserLoginSerializer(user, context={'employee' : True, 'request' : request, 'token' : token.key })
             s_data = dict(serialized.data)
-            s_data['access_token'] = str(tnt_token.key)
+            #s_data['access_token'] = str(tnt_token.key)
             
     else:
         serialized = UserLoginSerializer(user, context={'employee' : False, })

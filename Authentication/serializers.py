@@ -46,8 +46,8 @@ class UserLoginSerializer(serializers.ModelSerializer):
             token = self.context["token"]
             if token:
                 return token
-        except :
-                return str(obj.auth_token)
+        except:
+            return str(obj.auth_token)
 
     def get_domain(self,obj):
         try:
