@@ -506,6 +506,57 @@ def generate_id(request):
         status=status.HTTP_200_OK
     )
     
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def check_email_employees(request): 
+    email = request.GET.get('email', None)
+
+    if not all([email]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Employee id are required',
+                    'fields' : [
+                        'email',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    with tenant_context(Tenant.objects.get(schema_name = 'public')):
+        try:
+            employe = User.objects.get(email__icontains = email)
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 404,
+                    'status_code_text' : '404',
+                    'response' : {
+                        'message' : f'User Already exist with this {email}!',
+                        'error_message' : None,
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as err:
+            pass
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Single Employee',
+                'error_message' : None,
+                'employee' : False
+            }
+        },
+        status=status.HTTP_200_OK
+    )
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -1165,6 +1216,59 @@ def delete_all_employees(request):
     for empl in all_employees:
         empl.delete()
     return Response({'deleted' : True})
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def import_staff_group(request): 
+    user = request.user
+    staff_csv = request.data.get('file', None)
+    business_id = request.data.get('business', None)
+    
+    try:
+            business=Business.objects.get(id=business_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                'response' : {
+                'message' : 'Business not found',
+                'error_message' : str(err),
+            }
+            }
+        )
+    
+    file = NstyleFile.objects.create(
+        file = staff_csv
+    )
+    with open( file.file.path , 'r', encoding='utf-8') as imp_file:
+        for index, row in enumerate(imp_file):
+            if index == 0:
+                continue
+            row = row.split(',')
+            row = row
+            
+            if len(row) < 2:
+                continue
+            name = row[0].strip('"')
+            active=row[1].replace('\n', '').strip('"')
+            
+            if active == 'Active':
+                active = True
+            else:
+                active = False
+                
+                
+            staff_group= StaffGroup.objects.create(
+                user=user,
+                business= business, 
+                name= name,
+                is_active=active,
+            )
+            
+    file.delete()
+    return Response({'Status' : 'Success'})
+            
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
