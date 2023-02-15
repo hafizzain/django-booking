@@ -72,4 +72,4 @@ class TargetsAcheivedSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Employee
-        fields=['id', 'full_name','achieve_target','range_start','range_end'  ]
+        fields=['id','range_start','range_end',  ]
