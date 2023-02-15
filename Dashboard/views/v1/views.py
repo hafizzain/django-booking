@@ -1,7 +1,7 @@
 from django.conf import settings
 from operator import ge
 from Utility.Constants.Data.months import  FIXED_MONTHS
-from Dashboard.serializers import TargetsAcheivedSerializer,EmployeeDashboradSerializer
+#from Dashboard.serializers import TargetsAcheivedSerializer,EmployeeDashboradSerializer
 from Employee.models import Employee
 from TragetControl.models import StaffTarget
 from rest_framework.decorators import api_view, permission_classes
@@ -202,8 +202,6 @@ def get_acheived_target_report(request):
     end_month = request.GET.get('end_month', None)
     start_year = request.GET.get('start_year', 1900)
     end_year = request.GET.get('end_year', 3000)
-    Append_data = [] 
-    newdata = {}
 
     if not all([employee_id]):
         return Response(
@@ -239,7 +237,6 @@ def get_acheived_target_report(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-    # fix_months = 9-1 = 8
     if start_month is not None and end_month is not None :
 
         start_index = FIXED_MONTHS.index(start_month) # 1
@@ -255,32 +252,13 @@ def get_acheived_target_report(request):
         year__gte = start_year,
         year__lte = end_year,
     )
- 
-    # if duration is not None:
-    #     today = datetime.today()
-    #     day = today - timedelta(days=int(duration))
-    #     acheived_time = StaffTarget.objects.filter(employee_id__id = employee_id, created_at__gte = day)
-    # else:
-    #     acheived_time = StaffTarget.objects.filter(employee_id__id = employee_id)
-    
     acheived=0
-    if targets is not None:
+    if len(targets) >0:
         for target in targets :
             s = target.service_target
             r = target.retail_target
-            a = acheived + s + r
-        newdata = {
-                'acheived_target': a,
-                }
-        Append_data.append(newdata)
+            acheived = acheived + s + r
 
-    serialized = TargetsAcheivedSerializer(employee_id, context={
-                        'request' : request, 
-                        'start_year': start_year,
-                        'end_year' : end_year, 
-                        'start_month' : start_month,
-                        'end_month' : end_month, 
-                        }),
     return Response(
             {
                 'status' : 200,
@@ -288,9 +266,8 @@ def get_acheived_target_report(request):
                 'response' : {
                     'message' : 'achieved Target',
                     'error_message' : None,
-                    'employees' : Append_data,
-                    'data' : serialized.data,
-                    # 'duration_time' : acheived_time,
+                    'employee_id' : employee_id,
+                    'total_achieved_targets' : acheived ,
                 }
             },
             status=status.HTTP_200_OK
