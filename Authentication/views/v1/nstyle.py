@@ -661,7 +661,7 @@ def login(request):
                 'response' : {
                     'message' : 'Authenticated',
                     #'data' : serialized.data
-                    'data' : s_data
+                    'data' : employee
                 }
             },
             status=status.HTTP_200_OK
