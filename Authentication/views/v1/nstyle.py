@@ -528,7 +528,7 @@ def login(request):
     #     employee = True 
     try:
         user = User.objects.get(
-            email__icontans =email,
+            email__icontains =email,
             is_deleted=False,
             user_account_type__account_type = 'Employee'
         )
