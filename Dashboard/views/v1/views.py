@@ -247,7 +247,7 @@ def get_acheived_target_report(request):
         fix_months = FIXED_MONTHS
 
     targets = StaffTarget.objects.filter(
-        employee_id = employee_id,is_deleted=False,
+        employee_id = employee_id,
         month__in = fix_months, # 8
         year__gte = start_year,
         year__lte = end_year,
