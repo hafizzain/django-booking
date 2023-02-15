@@ -473,6 +473,7 @@ def login(request):
     social_account = request.data.get('social_account', False)
     password = request.data.get('password', None)
     
+    user = None
     employee = False
     if social_account:
         social_platform = request.data.get('social_platform', None)
@@ -520,14 +521,8 @@ def login(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    # else:
-    #     user = User.objects.get(
-    #         email__icontans =email,
-    #         is_deleted=False,
-    #         user_account_type__account_type = 'Employee'
-    #     )[0]
-    #     employee = True 
-    if len(user) < 0:
+        
+    if user != None:
         try:
             user = User.objects.get(
                 email =email,
