@@ -35,7 +35,7 @@ class UserLoginSerializer(serializers.ModelSerializer):
     def get_employee_permission(self, obj):
         try:
             
-            emp = Employee.objects.get(email__icontains = str(obj.email))
+            emp = Employee.objects.get(email = str(obj.email))
             return EmployeSerializer(emp, context=self.context).data#context={'request' : request, })
             
         except Exception as err:

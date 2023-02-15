@@ -656,8 +656,8 @@ def login(request):
                 'status_code' : 200,
                 'response' : {
                     'message' : 'Authenticated',
-                    'data' : employee
-                    #'data' : s_data
+                    #'data' : employee
+                    'data' : s_data
                 }
             },
             status=status.HTTP_200_OK
