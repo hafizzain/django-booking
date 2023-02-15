@@ -1,7 +1,7 @@
 from django.conf import settings
 from operator import ge
 from Utility.Constants.Data.months import  FIXED_MONTHS
-#from Dashboard.serializers import TargetsAcheivedSerializer,EmployeeDashboradSerializer
+from Dashboard.serializers import EmployeeDashboradSerializer
 from Employee.models import Employee
 from TragetControl.models import StaffTarget
 from rest_framework.decorators import api_view, permission_classes
@@ -223,7 +223,7 @@ def get_acheived_target_report(request):
         )
     
     try: 
-        employee_id = Employee.objects.get(id=employee_id, is_deleted=False)
+        employee_id = Employee.objects.get(id=employee_id,)
     except Exception as err:
         return Response(
                 {
@@ -247,7 +247,7 @@ def get_acheived_target_report(request):
         fix_months = FIXED_MONTHS
 
     targets = StaffTarget.objects.filter(
-        employee_id = employee_id,is_deleted=False,
+        employee_id = employee_id,
         month__in = fix_months, # 8
         year__gte = start_year,
         year__lte = end_year,
