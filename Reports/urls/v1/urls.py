@@ -7,8 +7,7 @@ urlpatterns = [
     path('get_commission_reports_by_staff/', views.get_commission_reports_by_staff),
     path('get_store_target_report/', views.get_store_target_report),
     
-    path('get_commission_reports_by_commission_details/', views.get_commission_reports_by_commission_details),
-    
+    path('get_commission_reports_by_commission_details/', views.get_commission_reports_by_commission_details),    
     path('get_service_target_report/', views.get_service_target_report),
     path('get_retail_target_report/', views.get_retail_target_report),
     

@@ -23,6 +23,7 @@ urlpatterns = [
     
     #Attendence
     path('get_attendence/', views.get_attendence),
+    path('get_attendence_device/', views.get_attendence_device),
     path('create_attendence/', views.create_attendence),
     path('update_attendence/', views.update_attendence),
     path('delete_attendence/', views.delete_attendence),
@@ -32,6 +33,7 @@ urlpatterns = [
     path('create_payroll/', views.create_payroll),
     path('get_payrolls/', views.get_payrolls),
     path('get_payrol_working/', views.get_payrol_working),
+    path('get_payrol_working_device/', views.get_payrol_working_device),
     path('delete_payroll/', views.delete_payroll),
     
     #commssion
@@ -78,5 +80,12 @@ urlpatterns = [
     path('forget_password/', views.forgot_password),
     path('verify_email/', views.verify_email),
     path('resend_password/', views.resend_password),
+    
+    #Employee Mobile app
+    path('get_employee_device/', views.get_employee_device),
+    path('get_single_employee_vacation/', views.get_single_employee_vacation),
+    
+    #Set_passeord
+    path('set_password/', views.set_password),
     
 ]

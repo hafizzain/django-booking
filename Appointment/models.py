@@ -42,6 +42,8 @@ class Appointment(models.Model):
 
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client_appointments', null=True, blank=True)
     business_address = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='appointment_address')
+    member = models.ForeignKey(Employee, on_delete=models.SET_NULL, related_name='employee_appointments_lg', null=True, blank=True)
+
     
     client_type= models.CharField(choices=TYPE_CHOICES, max_length=50, null=True, blank=True, )
     discount_type = models.CharField(max_length=50, choices= DISCOUNT_CHOICES, null=True, blank=True)
@@ -91,14 +93,20 @@ class AppointmentService(models.Model):
     appointment_time = models.TimeField(verbose_name='Appointment Start Time')
 
     duration = models.CharField(max_length=100, default='')
+    
+    client_can_book = models.CharField(max_length=100, default='', null=True, blank=True)
+    slot_availible_for_online = models.CharField(max_length=100, default='', null=True, blank=True,)
+    
     appointment_status = models.CharField(choices=BOOKED_CHOICES, max_length=100, default='Appointment Booked')
     tip = models.PositiveIntegerField(default=0, null=True, blank=True)
     
     price = models.PositiveIntegerField(default=0, null=True, blank=True)
     
+    service_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
+    service_commission_type = models.CharField( max_length=50 , default = '')
+    
     end_time = models.TimeField(null=True, blank=True)
     details = models.CharField(max_length=255, null=True, blank=True)
-    
     
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)

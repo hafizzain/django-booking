@@ -49,8 +49,18 @@ from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSeria
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_service(request):
-    service= Service.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
-    serialized = ServiceSerializer(service,  many=True, context={'request' : request} )
+    title = request.GET.get('title', None)
+    # SORTED_OPTIONS = {
+    #     'default' : '-created_at',
+    #     'title': title
+    # }
+    # sorted_value = SORTED_OPTIONS.get(title, '-created_at')
+    if title:
+        service= Service.objects.filter(name__icontains = title , is_deleted=False, is_blocked=False).order_by('-created_at').distinct()
+        serialized = ServiceSerializer(service,  many=True, context={'request' : request} )
+    else:
+        service= Service.objects.filter( is_deleted=False, is_blocked=False).order_by('-created_at').distinct()
+        serialized = ServiceSerializer(service,  many=True, context={'request' : request} )
     return Response(
         {
             'status' : 200,
@@ -520,7 +530,7 @@ def create_servicegroup(request):
     allow_client_to_select_team_member = request.data.get('allow_client_to_select_team_member', None)
     
     servicegroup_error = []
-    if not all([business, name,service]):
+    if not all([business, name]):
         return Response(
             {
                 'status' : False,
@@ -567,18 +577,18 @@ def create_servicegroup(request):
         service_group.allow_client_to_select_team_member = False
     else:
         service_group.allow_client_to_select_team_member = True
-        
-    if type(service) == str:
-        service = json.loads(service)
-    elif type(service) == list:
-            pass
-        
-    for ser in service:
-        try:
-            services = Service.objects.get(id=ser)  
-            service_group.services.add(services)
-        except Exception as err:
-            servicegroup_error.append(str(err))
+    if service:
+        if type(service) == str:
+            service = json.loads(service)
+        elif type(service) == list:
+                pass
+            
+        for ser in service:
+            try:
+                services = Service.objects.get(id=ser)  
+                service_group.services.add(services)
+            except Exception as err:
+                servicegroup_error.append(str(err))
     service_group.save()
     serialized=ServiceGroupSerializer(service_group, context={'request' : request})
     return Response(
@@ -1168,6 +1178,10 @@ def create_sale_order(request):
     client_type = request.data.get('client_type', None)
     ids = request.data.get('ids', None)
     
+    service_total_price = request.data.get('service_total_price', None)
+    product_total_price = request.data.get('product_total_price', None)
+    voucher_total_price = request.data.get('voucher_total_price', None)
+    
     service_commission = request.data.get('service_commission', None)
     product_commission = request.data.get('product_commission', None)
     voucher_commission = request.data.get('voucher_commission', None)
@@ -1258,6 +1272,10 @@ def create_sale_order(request):
         # product_commission = product_commission,
         # voucher_commission = voucher_commission,   
         
+        total_voucher_price = voucher_total_price,
+        total_service_price = service_total_price,
+        total_product_price = product_total_price,
+        
         service_commission_type = service_commission_type,
         product_commission_type = product_commission_type,
         voucher_commission_type = voucher_commission_type ,  
@@ -1268,6 +1286,7 @@ def create_sale_order(request):
         sale_type = id['selection_type']
         service_id = id['id']
         quantity = id['quantity']
+        price = id['price']
         
         if sale_type == 'PRODUCT':
             try:
@@ -1316,6 +1335,7 @@ def create_sale_order(request):
                     payment_type= payment_type,
                     client_type = client_type,
                     quantity = quantity,
+                    current_price = price,
                 )
                 product_order.sold_quantity += 1 # product_stock.sold_quantity
                 product_order.save()
@@ -1354,7 +1374,7 @@ def create_sale_order(request):
                     payment_type=payment_type,
                     client_type = client_type,
                     quantity = quantity,
-
+                    current_price = price,
                     
                 )
                 checkout.service_commission = service_commission
@@ -1394,6 +1414,8 @@ def create_sale_order(request):
                     payment_type =payment_type,
                     client_type = client_type,
                     quantity = quantity,
+                    location = business_address,
+                    current_price = price,
                 )
             except Exception as err:
                 return Response(
@@ -1450,6 +1472,8 @@ def create_sale_order(request):
                     payment_type =payment_type,
                     client_type = client_type,
                     quantity = quantity,
+                    location = business_address,
+                    current_price = price,
 
                 )
                 checkout.voucher_commission = voucher_commission

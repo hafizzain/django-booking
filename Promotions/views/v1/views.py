@@ -5481,3 +5481,7 @@ def delete_packagesdiscount(request):
         },
         status=status.HTTP_200_OK
     )
+
+# @api_view(['DELETE'])
+# @permission_classes([IsAuthenticated])
+# def get_availability_date(request):

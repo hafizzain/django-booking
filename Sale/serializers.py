@@ -9,13 +9,21 @@ from Business.models import BusinessAddress, BusinessTax
 from Order.models import Checkout, MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
 from django_tenants.utils import tenant_context
-from Utility.models import ExceptionRecord
+from Utility.models import Currency, ExceptionRecord
 
 from Product.models import ProductStock
 
 from Service.models import PriceService, Service, ServiceGroup
 
 class PriceServiceSerializers(serializers.ModelSerializer):
+    currency_name = serializers.SerializerMethodField(read_only=True)
+    
+    def get_currency_name(self, obj):
+        try:
+            currency = Currency.objects.get(id  = obj.currency.id)
+            return currency.code
+        except Exception as err:
+            return str(err)
     class Meta:
         model = PriceService
         fields = '__all__'
@@ -73,9 +81,17 @@ class ServiceGroup_TenantSerializer(serializers.ModelSerializer):
 
 
 class LocationSerializer(serializers.ModelSerializer):
+    currency = serializers.SerializerMethodField()
+    
+    def get_currency(self, obj):
+        try:
+            currency = Currency.objects.get(id = obj.currency.id)
+            return currency.code
+        except Exception as err:
+            return str(err)
     class Meta:
         model = BusinessAddress
-        fields = ['id','address_name']
+        fields = ['id','address_name', 'currency']
         
 class ClientSerializer(serializers.ModelSerializer):
     
@@ -325,6 +341,21 @@ class ProductOrderSerializer(serializers.ModelSerializer):
     order_type  = serializers.SerializerMethodField(read_only=True)
     product_details  = serializers.SerializerMethodField(read_only=True)
     product_price  = serializers.SerializerMethodField(read_only=True)
+    
+    price  = serializers.SerializerMethodField(read_only=True)
+    name  = serializers.SerializerMethodField(read_only=True)
+    
+    def get_name(self, obj):
+        try:
+            return obj.product.name
+        except Exception as err:
+            return None
+        
+    def get_price(self, obj):
+        try:
+            return obj.current_price
+        except Exception as err:
+            return None
 
     #item_sold = serializers.SerializerMethodField(read_only=True)
     
@@ -342,7 +373,7 @@ class ProductOrderSerializer(serializers.ModelSerializer):
         
     def get_product_price(self, obj):
         try:
-            return obj.product.full_price
+            return obj.current_price
         except Exception as err:
             return None
     
@@ -378,8 +409,8 @@ class ProductOrderSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ProductOrder
-        fields = ['id', 'client','quantity','status','created_at', 
-                  'location', 'member', 'tip', 'total_price' , 'payment_type','product_price',
+        fields = ['id', 'client','quantity','status','created_at',
+                  'location', 'member', 'tip', 'total_price' , 'payment_type','product_price','price','name',
                   'product_name', 'gst', 'order_type', 'sold_quantity','product_details' ]
           
 class ServiceOrderSerializer(serializers.ModelSerializer):
@@ -389,6 +420,9 @@ class ServiceOrderSerializer(serializers.ModelSerializer):
     member  = serializers.SerializerMethodField(read_only=True)
     user  = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
+    
+    price  = serializers.SerializerMethodField(read_only=True)
+    name  = serializers.SerializerMethodField(read_only=True)
     
     def get_order_type(self, obj):
         return 'Service'
@@ -426,10 +460,23 @@ class ServiceOrderSerializer(serializers.ModelSerializer):
             return obj.user.full_name
         except Exception as err:
             return None
+    
+    def get_name(self, obj):
+        try:
+            return obj.service.name
+        except Exception as err:
+            return None
+        
+    def get_price(self, obj):
+        try:
+            return obj.service.price
+        except Exception as err:
+            return None
+    
     class Meta:
         model = ServiceOrder
         fields = ['id', 'client','quantity', 'service','created_at' ,'user',
-                  'duration', 'location', 'member', 'total_price',
+                  'duration', 'location', 'member', 'total_price','name','price',
                   'payment_type','tip','gst', 'order_type','created_at'
                   ]
         
@@ -437,19 +484,22 @@ class MemberShipOrderSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
     member  = serializers.SerializerMethodField(read_only=True)
     membership  = serializers.SerializerMethodField(read_only=True)
-    #location = serializers.SerializerMethodField(read_only=True)
+    location = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
     membership_price  = serializers.SerializerMethodField(read_only=True)
+    
+    price  = serializers.SerializerMethodField(read_only=True)
+    name  = serializers.SerializerMethodField(read_only=True)
     
     def get_order_type(self, obj):
         return 'Membership'
     
-    # def get_location(self, obj):
-    #     try:
-    #         serializers = LocationSerializer(obj.location).data
-    #         return serializers
-    #     except Exception as err:
-    #         return None
+    def get_location(self, obj):
+        try:
+            serializers = LocationSerializer(obj.location).data
+            return serializers
+        except Exception as err:
+            return None
     
     def get_member(self, obj):
         try:
@@ -470,8 +520,18 @@ class MemberShipOrderSerializer(serializers.ModelSerializer):
             return obj.membership.name
         except Exception as err:
             return None
+    def get_name(self, obj):
+        try:
+            return obj.membership.name
+        except Exception as err:
+            return None
         
     def get_membership_price(self, obj):
+        try:
+            return obj.membership.price
+        except Exception as err:
+            return None
+    def get_price(self, obj):
         try:
             return obj.membership.price
         except Exception as err:
@@ -481,7 +541,7 @@ class MemberShipOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = MemberShipOrder
         fields =['id', 'membership','order_type' ,'client','member','quantity'
-                 ,'location' ,'start_date', 'end_date','status', 'total_price', 
+                 ,'location' ,'start_date', 'end_date','status', 'total_price', 'name','price',
                  'payment_type','membership_price', 'created_at' ]
         
 class VoucherOrderSerializer(serializers.ModelSerializer):
@@ -491,16 +551,26 @@ class VoucherOrderSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
     voucher_price  = serializers.SerializerMethodField(read_only=True)
+    price  = serializers.SerializerMethodField(read_only=True)
+    name  = serializers.SerializerMethodField(read_only=True)
+    
+    def get_location(self, obj):
+        try:
+            app_location = BusinessAddress.objects.filter(id=str(obj.location))
+            return LocationSerializer(app_location, many = True).data
+        except Exception as err:
+            return str(err)
     
     def get_order_type(self, obj):
         return 'Voucher'
     
-    def get_location(self, obj):
-        try:
-            serializers = LocationSerializer(obj.location).data
-            return serializers
-        except Exception as err:
-            return None
+    # def get_location(self, obj):
+        
+    #     try:
+    #         serializers = LocationSerializer(obj.location).data
+    #         return serializers
+    #     except Exception as err:
+    #         return None
     
     def get_member(self, obj):
         try:
@@ -521,7 +591,18 @@ class VoucherOrderSerializer(serializers.ModelSerializer):
             return obj.voucher.name
         except Exception as err:
             return None
+        
+    def get_name(self, obj):
+        try:
+            return obj.voucher.name
+        except Exception as err:
+            return None
     def get_voucher_price(self, obj):
+        try:
+            return obj.voucher.price
+        except Exception as err:
+            return None
+    def get_price(self, obj):
         try:
             return obj.voucher.price
         except Exception as err:
@@ -532,7 +613,7 @@ class VoucherOrderSerializer(serializers.ModelSerializer):
         model = VoucherOrder
         fields =['id', 'voucher', 'client' , 'location' , 
                  'member' ,'start_date', 'end_date','status','quantity',
-                 'total_price', 'payment_type' , 'order_type','voucher_price', 'created_at' ]
+                 'total_price', 'payment_type' , 'order_type','voucher_price','price', 'name','created_at' ]
     
 
         
@@ -602,8 +683,8 @@ class CheckoutSerializer(serializers.ModelSerializer):
         model = Checkout
         fields = ['id', 'product', 'service', 'membership',
                   'voucher','client','location','member','created_at','payment_type', 'tip',
-                  'service_commission', 'voucher_commission', 'product_commission'
-                  
+                  'service_commission', 'voucher_commission', 'product_commission', 'service_commission_type',
+                  'product_commission_type','voucher_commission_type'
                   ]
 
 class ParentBusinessTax_RateSerializer(serializers.ModelSerializer):
@@ -623,6 +704,10 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
     order_type  = serializers.SerializerMethodField(read_only=True)
     member  = serializers.SerializerMethodField(read_only=True)
     service  = serializers.SerializerMethodField(read_only=True)
+    price  = serializers.SerializerMethodField(read_only=True)
+    
+    #price  = serializers.SerializerMethodField(read_only=True)
+    #price  = serializers.SerializerMethodField(read_only=True)
     
     def get_service(self, obj):
         try:
@@ -639,6 +724,14 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
         try:
             cli = f"{obj.appointment.client.full_name}"
             return cli
+
+        except Exception as err:
+            print(err)
+            
+    def get_price(self, obj):
+        try:
+            #cli = f"{obj.appointment.client.full_name}"
+            return obj.appointment_service.price
 
         except Exception as err:
             print(err)

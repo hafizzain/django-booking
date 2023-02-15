@@ -73,4 +73,8 @@ urlpatterns = [
     path('create_packagesdiscount/', views.create_packagesdiscount),
     path('update_packagesdiscount/', views.update_packagesdiscount),
     path('delete_packagesdiscount/', views.delete_packagesdiscount),
+    
+    #Get Avalablity Dates
+    #path('get_availability_date/', views.get_spend_some_amount),
+
 ]

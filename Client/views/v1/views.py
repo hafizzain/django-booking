@@ -1,4 +1,5 @@
 from threading import Thread
+from Client.Constants.Add_Employe import add_client
 from Employee.Constants.Add_Employe import add_employee
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -322,7 +323,7 @@ def create_client(request):
     serialized= ClientSerializer(client, context={'request' : request})
     template = 'Client'
     try:
-        thrd = Thread(target=add_employee, args=[full_name, email , template, business.business_name,])
+        thrd = Thread(target=add_client, args=[full_name, email , template, business.business_name,])
         thrd.start()
     except Exception as err:
         pass

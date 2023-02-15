@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from Product.models import Brand
 from rest_framework import serializers
-from Appointment.models import AppointmentCheckout
+from Appointment.models import AppointmentCheckout, AppointmentService
 from Appointment.serializers import LocationSerializer
 from Business.models import BusinessAddress
 from Employee.models import Employee
@@ -271,7 +271,22 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                     #total += int(ord.total_price)
                 else:
                     total += int(ord.total_price)
-                                
+                    
+            # service_appointment = AppointmentService.objects.filter(is_deleted=False, 
+            #             member = obj,
+            #             #created_at__icontains = year
+            #             )
+            # for ord  in service_appointment:                
+            #     create = str(ord.created_at)
+            #     created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
+                
+            #     if range_start:
+            #         if range_start >= created_at  and created_at <= range_end:
+            #             total += int(ord.total_price)
+            #         else:
+            #             total += int(ord.total_price)
+            
+                      
             return total         
             
         except Exception as err:
@@ -494,7 +509,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'item_sold': ord.service.name,
                             'ItemType': 'Service',
                             'Quantity': ord.quantity,
-                            'Sale_Value': ord.total_price,
+                            'Sale_Value': ord.checkout.total_service_price,
                             'Commission_amount': ord.checkout.service_commission,
                             'Commission_Rate': rate if rate != "null" else 0  ,
                             'cerated_at': ord.created_at
@@ -506,7 +521,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'item_sold': ord.service.name,
                             'ItemType': 'Service',
                             'Quantity': ord.quantity,
-                            'Sale_Value': ord.total_price,
+                            'Sale_Value': ord.checkout.total_service_price,
                             'Commission_amount': ord.checkout.service_commission,
                             'Commission_Rate': rate if rate != "null"  else 0  ,
                             'cerated_at': ord.created_at
@@ -547,7 +562,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'ItemType': 'Product',
                             'Quantity': ord.quantity,
                             'Sale_Value': ord.total_price,
-                            'Commission_amount': ord.checkout.service_commission,
+                            'Commission_amount': ord.checkout.product_commission,
                             'Commission_Rate': rate if rate != None else 0  ,
                             'cerated_at': ord.created_at
                         })
@@ -559,7 +574,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'ItemType': 'Product',
                             'Quantity': ord.quantity,
                             'Sale_Value': ord.total_price,
-                            'Commission_amount': ord.checkout.service_commission,
+                            'Commission_amount': ord.checkout.product_commission,
                             'Commission_Rate': rate if rate != None else 0  ,
                             'cerated_at': ord.created_at
                         })
@@ -599,7 +614,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'ItemType': 'Voucher',
                             'Quantity': ord.quantity,
                             'Sale_Value': ord.total_price,
-                            'Commission_amount': ord.checkout.service_commission,
+                            'Commission_amount': ord.checkout.voucher_commission,
                             'Commission_Rate': rate if rate != None else 0  ,
                             'cerated_at': ord.created_at
                         })
@@ -611,7 +626,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
                             'ItemType': 'Voucher',
                             'Quantity': ord.quantity,
                             'Sale_Value': ord.total_price,
-                            'Commission_amount': ord.checkout.service_commission,
+                            'Commission_amount': ord.checkout.voucher_commission,
                             'Commission_Rate': rate if rate != None else 0  ,
                             'cerated_at': ord.created_at,
                         })

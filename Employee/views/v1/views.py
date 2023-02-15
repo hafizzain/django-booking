@@ -16,8 +16,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from Employee.serializers import( EmployeSerializer , EmployeInformationsSerializer
-                          , EmployPermissionSerializer,  EmployeModulesSerializer
-                          ,  EmployeeMarketingSerializers, Payroll_WorkingScheduleSerializer, ScheduleSerializer, StaffGroupSerializers , 
+                          , EmployPermissionSerializer,  EmployeModulesSerializer, EmployeeInformationSerializer
+                          ,  EmployeeMarketingSerializers, Payroll_Working_device_attendence_ScheduleSerializer, Payroll_Working_deviceScheduleSerializer, Payroll_WorkingScheduleSerializer, ScheduleSerializer, SingleEmployeeInformationSerializer, StaffGroupSerializers , 
                           StaffpermisionSerializers , AttendanceSerializers
                           ,PayrollSerializers, UserEmployeeSerializer, VacationSerializer,singleEmployeeSerializer , CommissionSerializer
                           , AssetSerializer, WorkingScheduleSerializer
@@ -514,6 +514,8 @@ def create_employee(request):
     
     full_name= request.data.get('full_name', None)
     employee_id= request.data.get('employee_id', None)
+    tenant_id= request.data.get('tenant_id', None)
+    domain= request.data.get('domain', None)
     
     email= request.data.get('email', None)
     image = request.data.get('image', None)
@@ -577,6 +579,24 @@ def create_employee(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    with tenant_context(Tenant.objects.get(schema_name = 'public')):
+        try:
+            employe = User.objects.get(email__icontains = email)
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 404,
+                    'status_code_text' : '404',
+                    'response' : {
+                        'message' : f'User Already exist with this {email}!',
+                        'error_message' : None,
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as err:
+            pass
+    
     if len(salary) > 7:
         return Response(
             {
@@ -636,19 +656,7 @@ def create_employee(request):
         staff = StaffGroup.objects.get(id=staff_id)
     except Exception as err:
         staff = None
-        # return Response(
-        #     {
-        #         'status' : True,
-        #         'status_code' : StatusCodes.INVALID_NOT_FOUND_StAFF_GROUP_ID_4023,
-        #         'status_code_text' :'INVALID_NOT_FOUND_StAFF_GROUP_ID_4023' ,
-        #         'response' : {
-        #             'message' : 'Invalid Staff Group Id !',
-        #             'error_message' : str(err),
-        #         }
-        #     },
-        #     status=status.HTTP_404_NOT_FOUND
-        # )
-
+        
     employee= Employee.objects.create(
         user=user,
         business=business,
@@ -691,13 +699,6 @@ def create_employee(request):
            # start_time = start_time , end_time = end_time, 
             maximum_discount = maximum_discount,
             salary=salary, designation = designation )
-    # employee_mp = EmployeeModulePermission.objects.create(employee=employee)
-    # employee_p_setting = EmployeePermissionSetting.objects.create(employee = employee)
-    # employee_marketing = EmployeeMarketingPermission.objects.create(employee= employee)
-    
-    ser_error=[] 
-    working_days = []
-    off_days = []
     
     employee_p_info.monday = True if 'monday' in request.data else False
     employee_p_info.tuesday = True if 'tuesday' in request.data else False
@@ -707,77 +708,6 @@ def create_employee(request):
     employee_p_info.saturday = True if 'saturday' in request.data else False
     employee_p_info.sunday = True if 'sunday' in request.data else False
     
-    # monday = request.data.get('monday', None)
-    # tuesday = request.data.get('tuesday', None)
-    # wednesday = request.data.get('wednesday', None)
-    # thursday = request.data.get('thursday', None)
-    # friday = request.data.get('friday', None)
-    # saturday = request.data.get('saturday', None)
-    # sunday = request.data.get('sunday', None)
-    
-    # if monday is not None:
-    #     working_days.append('Monday')
-    # else:
-    #     off_days.append('Monday')
-    # if tuesday is not None:
-    #     working_days.append('Tuesday')
-    # else:
-    #     off_days.append('Tuesday')
-    # if wednesday is not None:
-    #     working_days.append('Wednesday')
-    # else:
-    #     off_days.append('Wednesday')
-    # if thursday is not None:
-    #     working_days.append('Thursday')
-    # else:
-    #     off_days.append('Thursday')
-    # if friday is not None:
-    #     working_days.append('Friday')
-    # else:
-    #     off_days.append('Friday')
-    # if saturday is not None:
-    #     working_days.append('Saturday')
-    # else:
-    #     off_days.append('Saturday')
-    # if sunday is not None:
-    #     working_days.append('Sunday')
-    # else:
-    #     off_days.append('Sunday')
-        
-    
-    # if type(working_days) == str:
-    #         working_days = json.loads(working_days)
-
-    # elif type(working_days) == list:
-    #         pass
-    # now = datetime.now()
-    # today = now.date()
-    
-    # for i, day in enumerate(working_days):
-        
-    #     if i == 0:
-    #         date = now + timedelta(days=i)
-    #     else:
-    #         date = date + timedelta(days=1)
-    #     EmployeDailySchedule.objects.create(
-    #         user=user,
-    #         business=business,
-    #         employee = employee,
-    #         day = day,
-    #         date = date,
-    #     )
-        
-    # for i, day in enumerate(off_days):
-    #     date = date + timedelta(days=1)
-    #     EmployeDailySchedule.objects.create(
-    #         user=user,
-    #         business=business,
-    #         employee = employee,
-    #         day = day,
-    #         date = date,
-    #         is_off = True
-    #     )
-            
     if type(services_id) == str:
         services_id = json.loads(services_id)
     else:
@@ -820,51 +750,50 @@ def create_employee(request):
     empl_permission.save()
     
     try:
-        print(location)
         location_id = BusinessAddress.objects.get(id=str(location))  
-        print(location_id)
         employee.location.add(location_id)
     except Exception as err:
             employees_error.append(str(err))
     
-    # if type(location) == str:
-    #         location = json.loads(location)
-
-    # elif type(location) == list:
-    #         pass
-        
-    # for loc in location:
-    #     try:
-    #         location_id = BusinessAddress.objects.get(id=loc)  
-    #         print(location_id)
-    #         employee.location.add(location_id)
-    #     except Exception as err:
-    #         employees_error.append(str(err))
-
-    # serialized = EmployPermissionSerializer(employee_p_setting, data=request.data)
-    # if serialized.is_valid():
-    #     serialized.save()
-    #     data.update(serialized.data)
-
-    # serialized = EmployeModulesSerializer(employee_mp, data=request.data)
-    # if serialized.is_valid():
-    #     serialized.save()
-    #     data.update(serialized.data)
-
-    # serialized = EmployeeMarketingSerializers(employee_marketing, data=request.data)
-    # if serialized.is_valid():
-    #     serialized.save()
-    #     data.update(serialized.data)
     employee_serialized = EmployeSerializer(employee , context={'request' : request, })
     data.update(employee_serialized.data)
 
     template = 'Employee'
-
+    
     try:
-        thrd = Thread(target=add_employee, args=[full_name, email , template, business.business_name,])
+        try:
+            username = email.split('@')[0]
+            try:
+                user_check = User.objects.get(username = username)
+            except Exception as err:
+                #data.append(f'username user is client errors {str(err)}')
+                pass
+            else:
+                username = f'{username} {len(User.objects.all())}'
+
+        except Exception as err:
+            pass
+
+        user = User.objects.create(
+            first_name = full_name,
+            username = username,
+            email = email ,
+            is_email_verified = True,
+            is_active = True,
+            mobile_number = mobile_number,
+        )
+        account_type = AccountType.objects.create(
+                user = user,
+                account_type = 'Employee'
+            )
+    except Exception as err:
+        pass        
+    
+    try:
+        thrd = Thread(target=add_employee, args=[full_name, email , mobile_number, template, business.business_name, tenant_id, domain, user])
         thrd.start()
     except Exception as err:
-        pass
+        employees_error.append(str(err))
     
     return Response(
         {
@@ -952,6 +881,10 @@ def update_employee(request):
     staff_id = request.data.get('staff_group', None) 
     location = request.data.get('location', None) 
     
+    country = request.data.get('country', None) 
+    city = request.data.get('city', None) 
+    state = request.data.get('state', None) 
+    
     working_days = []
     
     Errors = []
@@ -987,6 +920,7 @@ def update_employee(request):
             },
                 status=status.HTTP_404_NOT_FOUND
             )
+    
     try:
         staff = StaffGroup.objects.get(employees=id)
         staff.employees.remove(employee)
@@ -1027,6 +961,30 @@ def update_employee(request):
     else:
         employee.is_active = False 
     employee.save()
+    
+    if country is not None:
+        try:
+            country= Country.objects.get(id=country)
+            employee.country = country
+            employee.save()
+        except:
+            country = None
+            
+    if state is not None:
+        try:
+            state= State.objects.get(id=state)
+            employee.state = state
+            employee.save()
+        except:
+            state = None
+            
+    if city is not None:
+        try:
+            city= City.objects.get(id=city)
+            employee.city = city
+            employee.save()
+        except:
+            city = None
 
     Employe_Informations= EmployeeProfessionalInfo.objects.get(employee=employee)
     
@@ -1150,14 +1108,14 @@ def update_employee(request):
         empl_permission.save()
     except Exception as err:
         Errors.append(err)
-    
-    try:
-        employee.location.clear()
-        address=  BusinessAddress.objects.get(id = str(location))
-        employee.location.add(address)
-    except Exception as err:
-        Errors.append(err)
-        print(err)
+    if location is not None:
+        try:
+            employee.location.clear()
+            address=  BusinessAddress.objects.get(id = str(location))
+            employee.location.add(address)
+        except Exception as err:
+            Errors.append(err)
+            print(err)
     
     # if type(location) == str:
     #     location = json.loads(location)
@@ -1594,6 +1552,64 @@ def get_attendence(request):
         },
         status=status.HTTP_200_OK
     )
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_attendence_device(request):
+    employee_id = request.GET.get('employee_id', None)
+    start_date = request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
+
+    if not all([employee_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Employee id are required',
+                    'fields' : [
+                        'employee_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try: 
+        employee_id = Employee.objects.get(id=employee_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                    'response' : {
+                        'message' : 'Employee Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    
+    all_employe= Employee.objects.get(id = employee_id.id, is_deleted=False, is_blocked=False)#.order_by('-created_at')
+    serialized = Payroll_Working_device_attendence_ScheduleSerializer(all_employe, context={
+                        'request' : request, 
+                        'range_start': start_date, 
+                        'range_end': end_date, 
+            })
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Attendance',
+                'error_message' : None,
+                'attendance' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
     
 @api_view(['POST'])
@@ -1810,25 +1826,6 @@ def get_payrolls(request):
         status=status.HTTP_200_OK
     )
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def get_payrol_working(request):
-    all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
-    serialized = Payroll_WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request,} )
-   
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Employee',
-                'error_message' : None,
-                'employees' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
-
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_payroll(request):
@@ -1962,6 +1959,133 @@ def create_payroll(request):
             },
             status=status.HTTP_201_CREATED
         ) 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_payrol_working(request):
+    all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
+    serialized = Payroll_WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request,} )
+   
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Employee',
+                'error_message' : None,
+                'employees' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_payrol_working_device(request):
+    employee_id = request.GET.get('employee_id', None)
+    start_date = request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
+
+    if not all([employee_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Employee id are required',
+                    'fields' : [
+                        'employee_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try: 
+        employee_id = Employee.objects.get(id=employee_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                    'response' : {
+                        'message' : 'Employee Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    all_employe= Employee.objects.get(id = employee_id.id, is_deleted=False, is_blocked=False)#.order_by('-created_at')
+    serialized = Payroll_Working_deviceScheduleSerializer(all_employe, context={
+                        'request' : request, 
+                        'range_start': start_date, 
+                        'range_end': end_date, 
+            })
+   
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Employee',
+                'error_message' : None,
+                'employees' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_payroll(request):
+    payroll_id = request.data.get('payroll_id', None)
+    if payroll_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'payroll_id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        payroll = Payroll.objects.get(id=payroll_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Payroll ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    payroll.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Payroll deleted successful',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -2350,7 +2474,6 @@ def update_commision(request):
         
     if service_comission is not None:
         if type(service_comission) == str:
-            #product_comission = product_comission.replace("'" , '"')
             service_comission = json.loads(service_comission)
 
         elif type(service_comission) == list:
@@ -2364,9 +2487,6 @@ def update_commision(request):
             isDeleted = pro.get('isDeleted', None)
             symbol = pro.get('symbol', None)
             id = pro.get('id', None)
-            ExceptionRecord.objects.create(
-                        text = f'error to service_comission create {id} delete {isDeleted}'
-                    )
             if id is not None:
                 try:
                     commision_ser= CategoryCommission.objects.get(id=id)
@@ -2381,9 +2501,7 @@ def update_commision(request):
                     commision_ser.save()           
                     
                 except Exception as err:
-                    ExceptionRecord.objects.create(
-                        text = f'error to service_comission create {str(err)}'
-                    )
+                    pass
             else:
                 CategoryCommission.objects.create(
                     commission =  commission,
@@ -2396,7 +2514,6 @@ def update_commision(request):
                 
     if product_comission is not None:
         if type(product_comission) == str:
-            #product_comission = product_comission.replace("'" , '"')
             product_comission = json.loads(product_comission)
 
         elif type(product_comission) == list:
@@ -2410,9 +2527,6 @@ def update_commision(request):
             isDeleted = pro.get('isDeleted', None)
             symbol = pro.get('symbol', None)
             id = pro.get('id', None)
-            ExceptionRecord.objects.create(
-                        text = f'error to service_comission create {id} delete {isDeleted}'
-                    )
             if id is not None:
                 try:
                     commision_ser= CategoryCommission.objects.get(id=id)
@@ -2427,9 +2541,7 @@ def update_commision(request):
                     commision_ser.save()           
                     
                 except Exception as err:
-                    ExceptionRecord.objects.create(
-                        text = f'error to product_comission create {str(err)}'
-                    )
+                    pass
             else:
                 CategoryCommission.objects.create(
                     commission =  commission,
@@ -2455,9 +2567,6 @@ def update_commision(request):
             isDeleted = pro.get('isDeleted', None)
             symbol = pro.get('symbol', None)
             id = pro.get('id', None)
-            ExceptionRecord.objects.create(
-                        text = f'error to service_comission create {id} delete {isDeleted}'
-                    )
             if id is not None:
                 try:
                     commision_ser= CategoryCommission.objects.get(id=id)
@@ -2472,9 +2581,6 @@ def update_commision(request):
                     commision_ser.save()           
                     
                 except Exception as err:
-                    ExceptionRecord.objects.create(
-                        text = f'error to voucher_comission create {str(err)}'
-                    )
                     print(str(err))
             else:
                 CategoryCommission.objects.create(
@@ -2484,56 +2590,7 @@ def update_commision(request):
                     commission_percentage = commission_per,
                     symbol = symbol,
                     category_comission = 'Voucher',
-                )
-    
-    # if service_comission is not None:
-    #     from_value = service_comission['from_value'] #ser.get('from_value', None)
-    #     to_value = service_comission['to_value'] #ser.get('to_value', None)
-    #     commission_per = service_comission['commission_percentage'] #ser.get('commission', None)
-    #     id = service_comission['id'] #ser.get('commission', None)
-        
-    #     try:
-    #         category = CategoryCommission.objects.get(id  = id)
-    #         category.from_value = from_value
-    #         category.to_value = to_value
-    #         category.commission_percentage = commission_per
-    #         category.save()
-            
-    #     except Exception as err:
-    #         print(err)
-            
-    # if product_comission is not None:
-    #     from_value = product_comission['from_value'] #ser.get('from_value', None)
-    #     to_value = product_comission['to_value'] #ser.get('to_value', None)
-    #     commission_per = product_comission['commission_percentage'] #ser.get('commission', None)
-    #     id = product_comission['id'] #ser.get('commission', None)
-        
-    #     try:
-    #         category = CategoryCommission.objects.get(id  = id)
-    #         category.from_value = from_value
-    #         category.to_value = to_value
-    #         category.commission_percentage = commission_per
-    #         category.save()
-            
-    #     except Exception as err:
-    #         print(err)
-            
-    # if voucher_comission is not None:
-    #     from_value = voucher_comission['from_value'] #ser.get('from_value', None)
-    #     to_value = voucher_comission['to_value'] #ser.get('to_value', None)
-    #     commission_per = voucher_comission['commission_percentage'] #ser.get('commission', None)
-    #     id = voucher_comission['id'] #ser.get('commission', None)
-        
-    #     try:
-    #         category = CategoryCommission.objects.get(id  = id)
-    #         category.from_value = from_value
-    #         category.to_value = to_value
-    #         category.commission_percentage = commission_per
-    #         category.save()
-            
-    #     except Exception as err:
-    #         print(err)
-    
+                )    
     try:
         employee_id=Employee.objects.get(id=employee)
         commission.employee = employee_id
@@ -3585,6 +3642,10 @@ def create_employe_account(request):
             tenant = tenant_id,
             is_tenant_staff = True
         )
+        account_type = AccountType.objects.create(
+            user = user,
+            account_type = 'Employee'
+        )
         user.set_password(password)
         user.save()
     return Response(
@@ -3660,13 +3721,18 @@ def employee_login(request):
                 'status_code' : 200,
                 'response' : {
                     'message' : 'Authenticated',
-                    'data' : f'{str(err)} {str(user_id.id)} {str(user_id.username)} {user_id} {data}'
+                    'data' : f'{str(err)} {str(user_id.id)} {str(user_id)} {user_id} {data}'
                 }
             },
             status=status.HTTP_200_OK
         )
         
     with tenant_context(employee_tenant.tenant):
+        user_id = User.objects.get(
+            email=email,
+            is_deleted=False,
+            #user_account_type__account_type = 'Employee'
+        )
         user = authenticate(username=user_id.username, password=password)
         if user is None:
             return Response(
@@ -3676,7 +3742,7 @@ def employee_login(request):
                     'status_code_text' : 'INVALID_CREDENTIALS_4013',
                     'response' : {
                         'message' : 'Incorrect Password',
-                        'fields' : ['password']
+                        'fields' : 'Password' #f'password {user_id.username} pass {password}'
                     }
                 },
                 status=status.HTTP_404_NOT_FOUND
@@ -3997,3 +4063,168 @@ def verify_email(request):
         status=status.HTTP_200_OK
     )
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_employee_device(request):
+    employee_id = request.GET.get('id', None)
+
+    if not all([employee_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Employee id are required',
+                    'fields' : [
+                        'id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try: 
+        employee_id = Employee.objects.get(id=employee_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                    'response' : {
+                        'message' : 'Employee Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    
+    serialized = SingleEmployeeInformationSerializer(employee_id, context={'request' : request} )
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Employee',
+                'error_message' : None,
+                'employees' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_single_employee_vacation(request):
+    employee_id = request.GET.get('id', None)
+
+    if not all([employee_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Employee id are required',
+                    'fields' : [
+                        'id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try: 
+        employee_id = Employee.objects.get(id=employee_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                    'response' : {
+                        'message' : 'Employee Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    #all_employe= Employee.objects.get(is_deleted=False, is_blocked=False).order_by('-created_at')
+    serialized = WorkingScheduleSerializer(employee_id, context={'request' : request,} )
+   
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Employee',
+                'error_message' : None,
+                'employees' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def set_password(request):
+    user_id = request.data.get('user_id', None) 
+    password = request.data.get('password', None)
+        
+    try:
+        user = User.objects.get(id = str(user_id))
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code_text' : 'INVALID_USER_ID',
+                    'response' : {
+                        'message' : 'User Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    try:
+        token = Token.objects.get(user=user)
+    except Token.DoesNotExist:
+        token = Token.objects.create(user=user)
+    user.set_password(password)
+    user.save()
+    with tenant_context(Tenant.objects.get(schema_name = 'public')):
+        try:
+            user = User.objects.get(email = user.email)
+        except Exception as err:
+            return Response(
+                    {
+                        'status' : False,
+                        'status_code_text' : 'INVALID_USER_EMAIL',
+                        'response' : {
+                            'message' : 'User Not Found',
+                            'error_message' : str(err),
+                        }
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        try:
+            token = Token.objects.get(user=user)
+        except Token.DoesNotExist:
+            token = Token.objects.create(user=user)
+        user.set_password(password)
+        user.save()
+        
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Password Set Successfully!',
+                'error_message' : None,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+            

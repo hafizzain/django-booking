@@ -1,5 +1,9 @@
 from django.conf import settings
 from operator import ge
+from Utility.Constants.Data.months import  FIXED_MONTHS
+from Dashboard.serializers import EmployeeDashboradSerializer
+from Employee.models import Employee
+from TragetControl.models import StaffTarget
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -8,6 +12,7 @@ from Appointment.models import Appointment, AppointmentCheckout
 from Client.models import Client
 from NStyle.Constants import StatusCodes
 from Business.models import Business, BusinessAddress
+from Product.models import ProductStock
 
 from datetime import datetime
 from datetime import timedelta
@@ -131,4 +136,145 @@ def get_appointments_client(request):
         },
         status=status.HTTP_200_OK
     )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_dashboard_targets(request):
+    employee_id = request.data.get('employee_id', None)
+    start_date = request.data.get('start_date', None)
+    end_date = request.data.get('end_date', None)
+
+    if not all([employee_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Employee id are required',
+                    'fields' : [
+                        'employee_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try: 
+        employee_id = Employee.objects.get(id=employee_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                    'response' : {
+                        'message' : 'Employee Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    serialized = EmployeeDashboradSerializer(employee_id, context={
+                        'request' : request, 
+                        'range_start': start_date, 
+                        'range_end': end_date, 
+            })
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Employee',
+                'error_message' : None,
+                'employee' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_acheived_target_report(request):
+    employee_id = request.GET.get('employee_id', None)
+    start_month =  request.GET.get('start_month', None)
+    end_month = request.GET.get('end_month', None)
+    start_year = request.GET.get('start_year', 1900)
+    end_year = request.GET.get('end_year', 3000)
+
+    if not all([employee_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required',
+                    'fields' : [
+                        'employee_id',
+                        'start_month',
+                        'start_year',
+                        'end_month',
+                        'end_year',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try: 
+        employee = Employee.objects.get(id=employee_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                    'response' : {
+                        'message' : 'Employee Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    if start_month is not None and end_month is not None :
+
+        start_index = FIXED_MONTHS.index(start_month) # 1
+        end_index = FIXED_MONTHS.index(end_month) # 9
+
+        fix_months = FIXED_MONTHS[start_index : end_index]
+    else:
+        fix_months = FIXED_MONTHS
+        print(fix_months)
+    
+    targets = StaffTarget.objects.filter(
+        employee_id = employee_id,
+        month__in = fix_months, # 8
+        year__gte = start_year,
+        year__lte = end_year,
+    )
+    acheived=0
+    if len(targets) >0:
+        for target in targets :
+            s = target.service_target
+            r = target.retail_target
+            acheived = acheived + s + r
+    print(acheived)
+    return Response(
+            {
+                'status' : 200,
+                'status_code' : '200',
+                'response' : {
+                    'message' : 'achieved Target',
+                    'error_message' : None,
+                    'employee_id' : employee_id,
+                    'total_achieved_targets' : acheived,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    
+    
     

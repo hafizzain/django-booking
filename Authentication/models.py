@@ -148,8 +148,6 @@ class NewsLetterDetail(models.Model):
     def __str__(self):
         return str(self.id)
 
-
-
 class VerificationOTP(models.Model):
     CODE_TYPE = [
         ('Email' , 'Email'),

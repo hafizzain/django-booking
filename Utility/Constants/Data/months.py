@@ -1,5 +1,5 @@
-# MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
-#           "July", 'August', 'September', 'October', 'November', 'December']
+FIXED_MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
+           "July", 'August', 'September', 'October', 'November', 'December']
 
 
 MONTHS = {0: {'value': 'January'}, 1: {'value': 'February'}, 2: {'value': 'March'}, 3: {'value': 'April'}, 4: {'value': 'May'}, 5: {'value': 'June'}, 6: {
@@ -15,7 +15,7 @@ MONTH_DICT = {
         7 : 'July',
         8 : 'August',
         9 : 'September',
-        1 : 'October',
-        1 : 'November',
-        1 : 'December',
+        10 : 'October',
+        11 : 'November',
+        12 : 'December',
 }

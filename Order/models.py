@@ -41,6 +41,11 @@ class Checkout(models.Model):
     
     tip = models.PositiveBigIntegerField(default = 0)
     
+    total_service_price = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
+    total_product_price = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
+    total_voucher_price = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
+    total_membership_price = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
+    
     service_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
     product_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
     voucher_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
