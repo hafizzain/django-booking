@@ -214,8 +214,10 @@ def get_acheived_target_report(request):
                     'error_message' : 'All fields are required',
                     'fields' : [
                         'employee_id',
-                        'month',
-                        'year',
+                        'start_month',
+                        'start_year',
+                        'end_month',
+                        'end_year',
                     ]
                 }
             },
@@ -223,7 +225,7 @@ def get_acheived_target_report(request):
         )
     
     try: 
-        employee_id = Employee.objects.get(id=employee_id,)
+        employee = Employee.objects.get(id=employee_id, is_deleted=False)
     except Exception as err:
         return Response(
                 {
@@ -245,7 +247,8 @@ def get_acheived_target_report(request):
         fix_months = FIXED_MONTHS[start_index : end_index]
     else:
         fix_months = FIXED_MONTHS
-
+        print(fix_months)
+    
     targets = StaffTarget.objects.filter(
         employee_id = employee_id,
         month__in = fix_months, # 8
@@ -258,7 +261,7 @@ def get_acheived_target_report(request):
             s = target.service_target
             r = target.retail_target
             acheived = acheived + s + r
-
+    print(acheived)
     return Response(
             {
                 'status' : 200,
@@ -267,7 +270,7 @@ def get_acheived_target_report(request):
                     'message' : 'achieved Target',
                     'error_message' : None,
                     'employee_id' : employee_id,
-                    'total_achieved_targets' : acheived ,
+                    'total_achieved_targets' : acheived,
                 }
             },
             status=status.HTTP_200_OK

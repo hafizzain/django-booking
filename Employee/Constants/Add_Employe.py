@@ -37,8 +37,7 @@ def add_employee(emp_name, emp_email, mobile_number , template,busines_name , te
             ExceptionRecord.objects.create(
                 text=str(err)
             )
-
-    
+        
         try:
             username = emp_email.split('@')[0]
             try:
