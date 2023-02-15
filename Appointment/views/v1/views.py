@@ -1086,7 +1086,7 @@ def create_checkout(request):
         #     status=status.HTTP_404_NOT_FOUND
         # )
     try:
-        appointments = Appointment.objects.get(id=service_appointment.appointment.id)
+        appointments = Appointment.objects.get(id=appointment)
     except Exception as err:
         #appointments = None
         return Response(
