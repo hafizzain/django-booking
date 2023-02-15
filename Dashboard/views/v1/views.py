@@ -223,7 +223,7 @@ def get_acheived_target_report(request):
         )
     
     try: 
-        employee_id = Employee.objects.get(id=employee_id, is_deleted=False)
+        employee_id = Employee.objects.get(id=employee_id,)
     except Exception as err:
         return Response(
                 {
