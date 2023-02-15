@@ -662,7 +662,7 @@ def login(request):
                 'response' : {
                     'message' : 'Authenticated',
                     #'data' : serialized.data
-                    'data' : employee
+                    'data' : s_data
                 }
             },
             status=status.HTTP_200_OK
