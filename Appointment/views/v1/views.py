@@ -1084,20 +1084,19 @@ def create_checkout(request):
     try:
         appointments = Appointment.objects.get(id=service_appointment.appointment.id)
     except Exception as err:
-        appointments = None
-    print(appointments)
-        # return Response(
-        #     {
-        #         'status' : False,
-        #         'status_code' : 404,
-        #         'status_code_text' : '404',
-        #         'response' : {
-        #             'message' : 'Invalid Appointment ID!',
-        #             'error_message' : str(err),
-        #         }
-        #     },
-        #     status=status.HTTP_404_NOT_FOUND
-        # )
+        #appointments = None
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Appointment ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
     try:
         business_address=BusinessAddress.objects.get(id=business_address)
     except Exception as err:

@@ -142,7 +142,8 @@ class EmployeSerializer(serializers.ModelSerializer):
     friday =  serializers.SerializerMethodField(read_only=True)
     saturday =  serializers.SerializerMethodField(read_only=True)
     sunday =  serializers.SerializerMethodField(read_only=True)
-    
+    permissions = serializers.SerializerMethodField()
+     
     staff_group = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
     schedule = serializers.SerializerMethodField(read_only=True)
@@ -235,7 +236,7 @@ class EmployeSerializer(serializers.ModelSerializer):
         except Exception as err:
             return None
      
-    permissions = serializers.SerializerMethodField()
+   
 
     def get_permissions(self, obj):
         try:

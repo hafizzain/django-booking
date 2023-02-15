@@ -127,7 +127,7 @@ class ProductStockSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductStock
         fields = ['id', 'location', 'low_stock', 'current_stock', 'product',
-                  'reorder_quantity', 'available_quantity',
+                  'reorder_quantity', 'available_quantity','sold_quantity',
                   'sellable_quantity','consumable_quantity' , 'amount', 'unit' ,
                   'alert_when_stock_becomes_lowest', 'sold_quantity','turnover','status_text','status','is_active' ]
 
