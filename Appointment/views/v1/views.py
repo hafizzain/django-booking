@@ -1102,7 +1102,7 @@ def create_checkout(request):
             status=status.HTTP_404_NOT_FOUND
         )
     try:
-        business_address=BusinessAddress.objects.get(id=business_address)
+        business_address=BusinessAddress.objects.get(id = str(business_address))
     except Exception as err:
         business_address = None
     
