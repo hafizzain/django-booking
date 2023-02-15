@@ -278,11 +278,11 @@ def create_tenant(request=None, user=None, data=None):
                 t_token = create_tenant_user_token(tenant_user=t_user, tenant=user_tenant)
             except:
                 pass
-            NewsLetterDetail.objects.create(
-                user = t_user,
-                terms_condition=data.get('terms_condition', True),
-                is_subscribed=data.get('terms_condition', False)
-            )
+            # NewsLetterDetail.objects.create(
+            #     user = t_user,
+            #     terms_condition=data.get('terms_condition', True),
+            #     is_subscribed=data.get('terms_condition', False)
+            # )
 
             try:
                 create_tenant_account_type(tenant_user=t_user, tenant=user_tenant, account_type=data['account_type'])
@@ -312,4 +312,3 @@ def create_tenant(request=None, user=None, data=None):
             except:
                 pass
             
-

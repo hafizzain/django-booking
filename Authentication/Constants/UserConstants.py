@@ -67,10 +67,10 @@ def complete_user_account(request, user=None, data=None):
             ExceptionRecord.objects.create(text=f'error from create_tenant_thread \n{str(error)}')
 
     user.save()
-    NewsLetterDetail.objects.create(
-        user = user,
-        terms_condition=data.get('terms_condition', True),
-        is_subscribed=data.get('terms_condition', False)
-    )
+    # NewsLetterDetail.objects.create(
+    #     user = user,
+    #     terms_condition=data.get('terms_condition', True),
+    #     is_subscribed=data.get('terms_condition', False)
+    # )
     create_user_account_type(user=user, account_type=account_type)
     AuthTokenConstants.create_user_token(user=user)
