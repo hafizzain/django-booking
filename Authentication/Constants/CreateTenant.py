@@ -68,10 +68,14 @@ def create_tenant_profile(tenant_user=None, data=None, tenant=None):
     tnt_start_time = datetime.datetime.now()
 
     with tenant_context(tenant):
-        time_diff = datetime.datetime.now() - tnt_start_time
+
+        time_end = datetime.datetime.now()
+        time_diff = time_end - tnt_start_time
+
+        total_seconds = time_diff.total_seconds()
 
         ExceptionRecord.objects.create(
-            text = f'SWITCH TENANT TIME DIFF . {time_diff.total_seconds()} Seconds'
+            text = f'SWITCH TENANT TIME DIFF . {total_seconds} Seconds'
         )
                 
         user_profile = Profile.objects.create(
