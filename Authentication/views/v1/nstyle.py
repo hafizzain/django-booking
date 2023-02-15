@@ -634,6 +634,10 @@ def login(request):
                 is_deleted=False,
                 user_account_type__account_type = 'Employee'
             )
+            try:
+                token = Token.objects.get(user=user)
+            except Token.DoesNotExist:
+                token = Token.objects.create(user=user)
             serialized = UserLoginSerializer(user, context={'employee' : True, 'request' : request })
             s_data = dict(serialized.data)
             
