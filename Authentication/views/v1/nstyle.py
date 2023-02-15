@@ -619,6 +619,7 @@ def login(request):
             status=status.HTTP_404_NOT_FOUND
         )
     if employee:
+        s_data['id'] = None
         employe_user = EmployeeTenantDetail.objects.get(user = user)
         with tenant_context(employe_user.tenant):
             user = User.objects.get(
