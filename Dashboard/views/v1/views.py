@@ -1,7 +1,6 @@
 from django.conf import settings
 from operator import ge
 from Utility.Constants.Data.months import  FIXED_MONTHS
-
 from Dashboard.serializers import EmployeeDashboradSerializer
 from Employee.models import Employee
 from TragetControl.models import StaffTarget
@@ -215,8 +214,10 @@ def get_acheived_target_report(request):
                     'error_message' : 'All fields are required',
                     'fields' : [
                         'employee_id',
-                        'month',
-                        'year',
+                        'start_month',
+                        'start_year',
+                        'end_month',
+                        'end_year',
                     ]
                 }
             },
@@ -224,7 +225,7 @@ def get_acheived_target_report(request):
         )
     
     try: 
-        employee_id = Employee.objects.get(id=employee_id,)
+        employee = Employee.objects.get(id=employee_id, is_deleted=False)
     except Exception as err:
         return Response(
                 {
@@ -246,7 +247,8 @@ def get_acheived_target_report(request):
         fix_months = FIXED_MONTHS[start_index : end_index]
     else:
         fix_months = FIXED_MONTHS
-
+        print(fix_months)
+    
     targets = StaffTarget.objects.filter(
         employee_id = employee_id,
         month__in = fix_months, # 8
@@ -259,7 +261,7 @@ def get_acheived_target_report(request):
             s = target.service_target
             r = target.retail_target
             acheived = acheived + s + r
-
+    print(acheived)
     return Response(
             {
                 'status' : 200,
