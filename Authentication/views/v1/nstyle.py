@@ -8,7 +8,7 @@ from Authentication.Constants.UserConstants import create_user_account_type, com
 # from django.contrib.auth.models import User
 from Authentication.models import User, VerificationOTP
 from Tenants.Constants.tenant_constants import set_schema, verify_tenant_email_mobile
-from Tenants.models import Tenant, Domain
+from Tenants.models import EmployeeTenantDetail, Tenant, Domain
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
@@ -472,7 +472,8 @@ def login(request):
     email = request.data.get('email', None)
     social_account = request.data.get('social_account', False)
     password = request.data.get('password', None)
-
+    
+    employee = False
     if social_account:
         social_platform = request.data.get('social_platform', None)
     
@@ -503,7 +504,7 @@ def login(request):
             email=email,
             is_deleted=False
         ).exclude(user_account_type__account_type = 'Everyone')[0]
-        
+    
     except Exception as err:
         return Response(
             {
@@ -518,6 +519,13 @@ def login(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    else:
+        user = User.objects.filter(
+            email=email,
+            is_deleted=False,
+            user_account_type__account_type = 'Employee'
+        )    
+        employee = True   
 
 
     if not social_account and not user.is_active:
@@ -602,18 +610,29 @@ def login(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-
-    serialized = UserLoginSerializer(user)
-    s_data = dict(serialized.data)
-    s_data['id'] = None
-    s_data['access_token'] = None
-    try:
-        with tenant_context(Tenant.objects.get(user=user)):
-            tnt_token = Token.objects.get(user__username=user.username)
-            s_data['id'] = str(tnt_token.user.id)
-            s_data['access_token'] = str(tnt_token.key)
-    except:
-        pass
+    if employee:
+        employe_user = EmployeeTenantDetail.objects.get(user = user)
+        with tenant_context(employe_user.tenant):
+            user = User.objects.get(
+                email=email,
+                is_deleted=False,
+                user_account_type__account_type = 'Employee'
+            )
+            serialized = UserLoginSerializer(user, context={'employee' : True, })
+            s_data = dict(serialized.data)
+            
+    else:
+        serialized = UserLoginSerializer(user, context={'employee' : False, })
+        s_data = dict(serialized.data)
+        s_data['id'] = None
+        s_data['access_token'] = None
+        try:
+            with tenant_context(Tenant.objects.get(user=user)):
+                tnt_token = Token.objects.get(user__username=user.username)
+                s_data['id'] = str(tnt_token.user.id)
+                s_data['access_token'] = str(tnt_token.key)
+        except:
+            pass
 
 
     return Response(
@@ -622,6 +641,7 @@ def login(request):
                 'status_code' : 200,
                 'response' : {
                     'message' : 'Authenticated',
+                    #'data' : serialized.data
                     'data' : s_data
                 }
             },

@@ -19,7 +19,27 @@ class UserSerializer(serializers.ModelSerializer):
 class UserLoginSerializer(serializers.ModelSerializer):
     access_token = serializers.SerializerMethodField()
     domain = serializers.SerializerMethodField()
-
+    employee = serializers.SerializerMethodField()
+    employee_permission = serializers.SerializerMethodField()
+    
+    def get_employee(self, obj):
+        try:
+            employee = self.context["employee"]
+            if employee:
+                return True
+            else:
+                return False
+        except:
+            pass
+        
+    def get_employee_permission(self, obj):
+        try:
+            emp = Employee.objects.get(email = obj.email)
+            return EmployeSerializer(emp).data#context={'request' : request, })
+            
+        except:
+            return None
+    
     def get_access_token(self,obj):
         return str(obj.auth_token)
 
@@ -40,7 +60,7 @@ class UserLoginSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'domain',
-            'access_token'
+            'access_token',  'employee', 'employee_permission',
         ]
 
 class UserTenantSerializer(serializers.ModelSerializer):
@@ -85,26 +105,6 @@ class UserTenantLoginSerializer(serializers.ModelSerializer):
     domain = serializers.SerializerMethodField()
     is_tenant = serializers.SerializerMethodField()
     access_token = serializers.SerializerMethodField()
-    employee = serializers.SerializerMethodField()
-    employee_permission = serializers.SerializerMethodField()
-    
-    def get_employee(self, obj):
-        try:
-            employee = self.context["employee"]
-            if employee:
-                return True
-            else:
-                return False
-        except:
-            pass
-        
-    def get_employee_permission(self, obj):
-        try:
-            emp = Employee.objects.get(email = obj.email)
-            return EmployeSerializer(emp).data#context={'request' : request, })
-            
-        except:
-            return None
     
     def get_access_token(self,obj):
         return str(obj.auth_token)
@@ -130,7 +130,7 @@ class UserTenantLoginSerializer(serializers.ModelSerializer):
             return None
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'employee', 'employee_permission',
+        fields = ['id', 'username', 'first_name', 'last_name', 'email',
                   'domain', 'is_tenant', 'access_token','joined_at', ]
         
 class UserSerializerByClient(serializers.ModelSerializer):
