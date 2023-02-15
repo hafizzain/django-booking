@@ -1024,7 +1024,7 @@ def delete_block_time(request):
 @permission_classes([IsAuthenticated])
 def create_checkout(request):
     appointment = request.data.get('appointment', None)
-    appointments = request.data.get('appointments', None)
+    appointment_service_obj = request.data.get('appointment_service_obj', None)
     appointment_service = request.data.get('appointment_service', None)
     
     payment_method = request.data.get('payment_method', None)
@@ -1075,12 +1075,12 @@ def create_checkout(request):
         business_address=BusinessAddress.objects.get(id = str(business_address))
     except Exception as err:
         business_address = None
-    if type(appointments) == str:
-            appointments = json.loads(appointments)
+    if type(appointment_service_obj) == str:
+            appointment_service_obj = json.loads(appointment_service_obj)
 
-    elif type(appointments) == list:
+    elif type(appointment_service_obj) == list:
         pass
-    for app in appointments:
+    for app in appointment_service_obj:
         id = app.get('id', None)
         try:
             service_appointment = AppointmentService.objects.get(id=id)
