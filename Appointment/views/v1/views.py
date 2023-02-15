@@ -1024,6 +1024,7 @@ def delete_block_time(request):
 @permission_classes([IsAuthenticated])
 def create_checkout(request):
     appointment = request.data.get('appointment', None)
+    appointments = request.data.get('appointments', None)
     appointment_service = request.data.get('appointment_service', None)
     
     payment_method = request.data.get('payment_method', None)
@@ -1043,48 +1044,17 @@ def create_checkout(request):
         members=Employee.objects.get(id=member)
     except Exception as err:
         members = None
-        # return Response(
-        #     {
-        #             'status' : False,
-        #             'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
-        #             'response' : {
-        #             'message' : 'Employee not found',
-        #             'error_message' : str(err),
-        #         }
-        #     },
-        #     status=status.HTTP_404_NOT_FOUND
-        # )
+    
     try:
         services=Service.objects.get(id=service)
     except Exception as err:
         services = None
-        # return Response(
-        #     {
-        #             'status' : False,
-        #             'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
-        #             'response' : {
-        #             'message' : 'Service not found',
-        #             'error_message' : str(err),
-        #         }
-        #     },
-        #     status=status.HTTP_404_NOT_FOUND
-        # )
+        
     try:
         service_appointment = AppointmentService.objects.get(id=appointment_service)
     except Exception as err:
         service_appointment = None
-        # return Response(
-        #     {
-        #         'status' : False,
-        #         'status_code' : 404,
-        #         'status_code_text' : '404',
-        #         'response' : {
-        #             'message' : 'Invalid Appointment ID!',
-        #             'error_message' : str(err),
-        #         }
-        #     },
-        #     status=status.HTTP_404_NOT_FOUND
-        # )
+       
     try:
         appointments = Appointment.objects.get(id=appointment)
     except Exception as err:
@@ -1105,7 +1075,20 @@ def create_checkout(request):
         business_address=BusinessAddress.objects.get(id = str(business_address))
     except Exception as err:
         business_address = None
-    
+    if type(appointments) == str:
+            appointments = json.loads(appointments)
+
+    elif type(appointments) == list:
+        pass
+    for app in appointments:
+        id = app.get('id', None)
+        try:
+            service_appointment = AppointmentService.objects.get(id=id)
+            service_appointment.appointment_status= 'Done'
+            service_appointment.save()
+        except Exception as err:
+            pass
+        
     checkout =AppointmentCheckout.objects.create(
         appointment = appointments,
         appointment_service = service_appointment,
