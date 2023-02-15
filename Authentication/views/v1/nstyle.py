@@ -502,47 +502,37 @@ def login(request):
     
     connection.set_schema_to_public()
     try:
-        user = User.objects.filter(
-            email=email,
-            is_deleted=False
-        ).exclude(user_account_type__account_type = 'Everyone')[0]
-    
-    except Exception as err:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
-                'status_code_text' : 'INVALID_CREDENTIALS_4013',
-                'response' : {
-                    'message' : 'User does not exist with this email',
-                    'error_message' : str(err),
-                    'fields' : ['email']
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
+        user = User.objects.get(
+            email =email,
+            is_deleted=False,
+            user_account_type__account_type = 'Employee'
         )
+        employee = True
+    except Exception as err: 
+        pass
         
     if user == None:
         try:
-            user = User.objects.get(
-                email =email,
-                is_deleted=False,
-                user_account_type__account_type = 'Employee'
-            )
-            employee = True
-        except Exception as err: 
+            user = User.objects.filter(
+                email=email,
+                is_deleted=False
+            ).exclude(user_account_type__account_type = 'Everyone')[0]
+        
+        except Exception as err:
             return Response(
-                    {
-                        'status' : False,
-                        'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
-                        'status_code_text' : 'INVALID_CREDENTIALS_4013',
-                        'response' : {
-                            'message' : f'testing phase {str(err)}',
-                        }
-                    },
-                    status=status.HTTP_404_NOT_FOUND
-                )
-    
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
+                    'status_code_text' : 'INVALID_CREDENTIALS_4013',
+                    'response' : {
+                        'message' : 'User does not exist with this email',
+                        'error_message' : str(err),
+                        'fields' : ['email']
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
     if not social_account and not user.is_active:
         return Response(
             {
