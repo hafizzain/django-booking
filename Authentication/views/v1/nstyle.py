@@ -618,18 +618,18 @@ def login(request):
     if employee:
         #s_data['id'] = None
         employe_user = EmployeeTenantDetail.objects.get(user = user)
-        # with tenant_context(employe_user.tenant):
-        #     user = User.objects.get(
-        #         email=email,
-        #         is_deleted=False,
-        #         user_account_type__account_type = 'Employee'
-        #     )
-        #     try:
-        #         token = Token.objects.get(user=user)
-        #     except Token.DoesNotExist:
-        #         token = Token.objects.create(user=user)
-        #     serialized = UserLoginSerializer(user, context={'employee' : True, 'request' : request, 'token' : token.key })
-        #     s_data = dict(serialized.data)
+        with tenant_context(employe_user.tenant):
+            user = User.objects.get(
+                email=email,
+                is_deleted=False,
+                user_account_type__account_type = 'Employee'
+            )
+            try:
+                token = Token.objects.get(user=user)
+            except Token.DoesNotExist:
+                token = Token.objects.create(user=user)
+            serialized = UserLoginSerializer(user, context={'employee' : True, 'request' : request, 'token' : token.key })
+            s_data = dict(serialized.data)
             #s_data['access_token'] = str(tnt_token.key)
             
     else:
@@ -652,8 +652,8 @@ def login(request):
                 'status_code' : 200,
                 'response' : {
                     'message' : 'Authenticated',
-                    'data' : employe_user.tenant
-                    #'data' : s_data
+                    #'data' : employe_user.tenant
+                    'data' : s_data
                 }
             },
             status=status.HTTP_200_OK
