@@ -37,35 +37,35 @@ def add_employee(emp_name, emp_email, mobile_number , template,busines_name , te
             ExceptionRecord.objects.create(
                 text=str(err)
             )
-        # try:
-        #     try:
-        #         username = emp_email.split('@')[0]
-        #         try:
-        #             user_check = User.objects.get(username = username)
-        #         except Exception as err:   
-        #             pass
-        #         else:
-        #             username = f'{username} {len(User.objects.all())}'
-        #     except Exception as err:
-        #         pass
-        #     user = User.objects.create(
-        #             first_name = emp_name,
-        #             username = username,
-        #             email = emp_email,
-        #             is_email_verified = True,
-        #             is_active = True,
-        #             mobile_number = mobile_number,
-        #         )        
-        #     user_client = EmployeeTenantDetail.objects.create(
-        #         user = user,
-        #         tenant = tenant_id,
-        #         is_tenant_staff = True
-        #     )
-        #     account_type = AccountType.objects.create(
-        #         user = user,
-        #         account_type = 'Employee'
-        #     )
-        # except Exception as err:
-        #     ExceptionRecord.objects.create(
-        #         text=str(err)
-        #     )
+        try:
+            try:
+                username = emp_email.split('@')[0]
+                try:
+                    user_check = User.objects.get(username = username)
+                except Exception as err:   
+                    pass
+                else:
+                    username = f'{username} {len(User.objects.all())}'
+            except Exception as err:
+                pass
+            user = User.objects.create(
+                    first_name = emp_name,
+                    username = username,
+                    email = emp_email,
+                    is_email_verified = True,
+                    is_active = True,
+                    mobile_number = mobile_number,
+                )        
+            user_client = EmployeeTenantDetail.objects.create(
+                user = user,
+                tenant = tenant_id,
+                is_tenant_staff = True
+            )
+            account_type = AccountType.objects.create(
+                user = user,
+                account_type = 'Employee'
+            )
+        except Exception as err:
+            ExceptionRecord.objects.create(
+                text=str(err)
+            )
