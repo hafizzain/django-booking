@@ -533,8 +533,18 @@ def login(request):
             user_account_type__account_type = 'Employee'
         )
         employee = True
-    except: 
-        pass
+    except Exception as err: 
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
+                    'status_code_text' : 'INVALID_CREDENTIALS_4013',
+                    'response' : {
+                        'message' : f'testing phase {str(err)}',
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
     
     if not social_account and not user.is_active:
         return Response(
