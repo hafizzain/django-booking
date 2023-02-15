@@ -630,7 +630,7 @@ def login(request):
                 token = Token.objects.create(user=user)
             serialized = UserLoginSerializer(user, context={'employee' : True,
                                     'request' : request,
-                                    'token' : token.ke,
+                                    'token' : token.key,
                                     'tenant' : employe_user.tenant.schema_name
                                     })
             s_data = dict(serialized.data)
