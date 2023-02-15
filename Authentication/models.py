@@ -106,6 +106,8 @@ class User(AbstractBaseUser):
         return self.user_account_type.account_type
 
 
+
+
 class AccountType(models.Model):
     ACCOUNT_TYPES = [
         ('Everyone', 'Everyone'),
