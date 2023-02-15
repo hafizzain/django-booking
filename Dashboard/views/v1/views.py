@@ -83,7 +83,6 @@ def get_dashboard_day_wise(request):
     for app in appointment:
         
         create_at = str(app.created_at)
-        print(create_at.split(" ")[0] )
         if (create_at.split(" ")[0] == date ):
             appointments_count +=1
             if app.total_price is not None:

@@ -1,12 +1,16 @@
 from dataclasses import field
 from pyexpat import model
 from rest_framework import serializers
+from Appointment.models import AppointmentCheckout
 from Client.models import Client, Membership
 
-from Employee.models import Employee, EmployeeSelectedService
-from Business.models import BusinessAddress
+from Employee.models import Employee, EmployeeProfessionalInfo, EmployeeSelectedService
+from Business.models import BusinessAddress, BusinessTax
 from Order.models import Checkout, MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
-from Product.Constants.index import tenant_media_base_url
+from Product.Constants.index import tenant_media_base_url, tenant_media_domain
+from django_tenants.utils import tenant_context
+from Utility.models import ExceptionRecord
+
 from Product.models import ProductStock
 
 from Service.models import PriceService, Service, ServiceGroup
@@ -15,6 +19,24 @@ class PriceServiceSerializers(serializers.ModelSerializer):
     class Meta:
         model = PriceService
         fields = '__all__'
+        
+class ServiceSearchSerializer(serializers.ModelSerializer):
+    priceservice = serializers.SerializerMethodField(read_only=True)
+    employees = serializers.SerializerMethodField(read_only=True)
+    
+    def get_employees(self, obj):
+        emp = EmployeeSelectedService.objects.filter(service = obj) 
+        return EmployeeSelected_TenantServiceSerializer(emp, many = True, context=self.context).data
+    
+    def get_priceservice(self, obj):
+        try:
+            ser = PriceService.objects.filter(service = obj)
+            return PriceServiceSerializers(ser, many = True).data
+        except Exception as err:
+            pass
+    class Meta:
+        model = Service
+        fields = ['id','name', 'location', 'client_can_book', 'employees','priceservice', 'slot_availible_for_online']
         
 class ServiceGroupSerializer(serializers.ModelSerializer):
     
@@ -25,16 +47,29 @@ class ServiceGroupSerializer(serializers.ModelSerializer):
         return obj.is_active
     
     def get_services(self, obj):
-        try:
             all_service = obj.services.all()
             #ser = Service.objects.get(id = obj.services)
-            return ServiceSearchSerializer(all_service, many = True).data
-        except Exception as err:
-            print(str(err))
+            return ServiceSearchSerializer(all_service, many = True, context=self.context).data
     
     class Meta:
         model = ServiceGroup
-        fields = ['id', 'business', 'name', 'services', 'status']
+        fields = ['id', 'business', 'name', 'services', 'status', 'allow_client_to_select_team_member']
+class ServiceGroup_TenantSerializer(serializers.ModelSerializer):
+    
+    services  = serializers.SerializerMethodField(read_only=True)
+    status  = serializers.SerializerMethodField(read_only=True)
+
+    def get_status(self, obj):
+        return obj.is_active
+    
+    def get_services(self, obj):
+            all_service = obj.services.all()
+            #ser = Service.objects.get(id = obj.services)
+            return ServiceSearchSerializer(all_service, many = True).data
+    
+    class Meta:
+        model = ServiceGroup
+        fields = ['id', 'business', 'name', 'services', 'status', 'allow_client_to_select_team_member']
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -64,28 +99,151 @@ class MemberSerializer(serializers.ModelSerializer):
         model = Employee
         fields = ['id','full_name', 'image' ]
         
-class ServiceSearchSerializer(serializers.ModelSerializer):
-    priceservice = serializers.SerializerMethodField(read_only=True)
+class MemberlocationSerializer(serializers.ModelSerializer):
+    location = serializers.SerializerMethodField()
     
-    def get_priceservice(self, obj):
+    def get_location(self, obj):
         try:
-            ser = PriceService.objects.filter(service = obj)
-            return PriceServiceSerializers(ser, many = True).data
+            #ser = BusinessAddress.objects.filter(id = obj.location).filter(service = obj).first()
+            all_location = obj.location.filter(is_deleted=False).first()
+            return LocationSerializer(all_location).data
         except Exception as err:
-            pass
+            return str(err)
+    
     class Meta:
-        model = Service
-        fields = ['id','name', 'location', 'client_can_book', 'priceservice', 'slot_availible_for_online']
-
+        model = Employee
+        fields = ['id','full_name', 'location' ]
 class EmployeeSelectedServiceSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField(read_only=True)
+    image = serializers.SerializerMethodField()
+    designation = serializers.SerializerMethodField()
+    location = serializers.SerializerMethodField()
+    
+    def get_location(self, obj):
+        #def get_location(self, obj):
+        try:
+            all_location = obj.employee.location.filter(is_deleted=False).first()
+            return LocationSerializer(all_location).data
+        except Exception as err:
+            return str(err)
+        # try:
+        #     ser = Employee.objects.get(id = obj.employee.id)
+        #     return MemberlocationSerializer(ser).data
+        # except Exception as err:
+        #     return str(err)
     
     def get_full_name(self, obj):
         return obj.employee.full_name
     
+    def get_designation(self, obj):
+        try:
+            emp = EmployeeProfessionalInfo.objects.get(employee = obj.employee.id)
+            return emp.designation
+        except Exception as err:
+            print(err)
+    
+    def get_image(self, obj):
+        try:
+            request = self.context["request"]
+            url = tenant_media_base_url(request)
+            img = Employee.objects.get(id = obj.employee.id)
+            return f'{url}{img.image}'
+        except Exception as err:
+            print(str(err))
+    
     class Meta:
         model = EmployeeSelectedService
-        fields = ['id', 'service', 'employee', 'level', 'full_name']
+        fields = ['id', 'service', 'employee', 'level', 'full_name', 'designation','image', 'location']     
+
+class EmployeeSelected_TenantServiceSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField(read_only=True)
+    status = serializers.SerializerMethodField(read_only=True)
+    image = serializers.SerializerMethodField()
+    designation = serializers.SerializerMethodField()
+    location = serializers.SerializerMethodField()
+    
+    def get_location(self, obj):
+        try:
+            all_location = obj.employee.location.filter(is_deleted=False).first()
+            return LocationSerializer(all_location).data
+        except Exception as err:
+            return str(err)
+    
+    def get_full_name(self, obj):
+        return obj.employee.full_name
+    
+    def get_status(self, obj):
+        return obj.employee.is_active
+    
+    def get_designation(self, obj):
+        try:
+            emp = EmployeeProfessionalInfo.objects.get(employee = obj.employee.id)
+            return emp.designation
+        except Exception as err:
+            print(err)
+    
+    def get_image(self, obj):
+        try:
+            tenant = self.context["tenant"]
+            url = tenant_media_domain(tenant)
+            img = Employee.objects.get(id = obj.employee.id)
+            return f'{url}{img.image}'
+        except Exception as err:
+            print(str(err))
+    
+    class Meta:
+        model = EmployeeSelectedService
+        fields = ['id', 'service', 'employee', 'level', 'full_name', 'designation','image','status', 'location']
+class Employee_TenantServiceSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField(read_only=True)
+    image = serializers.SerializerMethodField()
+    designation = serializers.SerializerMethodField()
+    location = serializers.SerializerMethodField()
+    
+    def get_location(self, obj):
+        try:
+            ser = BusinessAddress.objects.filter(id = obj.employee.location.id)[0]
+            return LocationSerializer(ser).data
+        except Exception as err:
+            pass
+    
+    def get_full_name(self, obj):
+        return obj.employee.full_name
+    
+    def get_designation(self, obj):
+        try:
+            emp = EmployeeProfessionalInfo.objects.get(employee = obj.employee.id)
+            return emp.designation
+        except Exception as err:
+            print(err)
+    
+    def get_image(self, obj):
+        try:
+            request = self.context["request"]
+            url = tenant_media_base_url(request)
+            img = Employee.objects.get(id = obj.employee.id)
+            return f'{url}{img.image}'
+        except Exception as err:
+            print(str(err))
+        # try:    
+        #     print(obj.employee.image)
+        #     if obj.employee.image:
+        #         try:
+        #             print('test')
+        #             request = self.context["request"]
+        #             url = tenant_media_base_url(request)
+        #             return f'{url}{obj.employee.image}'
+        #         except Exception as err:
+        #             print(err)
+        #             return obj.employee.image
+                    
+        #     return None
+        # except Exception as err:
+        #     print(err)
+    
+    class Meta:
+        model = EmployeeSelectedService
+        fields = ['id', 'service', 'employee', 'level', 'full_name', 'designation','image', 'location']
 
 class LocationServiceSerializer(serializers.ModelSerializer):
     class Meta:
@@ -128,7 +286,7 @@ class ServiceSerializer(serializers.ModelSerializer):
     
     def get_employees(self, obj):
         emp = EmployeeSelectedService.objects.filter(service = obj) 
-        return EmployeeSelectedServiceSerializer(emp, many = True).data
+        return EmployeeSelectedServiceSerializer(emp, many = True, context=self.context).data
         
     
     def get_location(self, obj):
@@ -166,6 +324,7 @@ class ProductOrderSerializer(serializers.ModelSerializer):
     product_name  = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
     product_details  = serializers.SerializerMethodField(read_only=True)
+    product_price  = serializers.SerializerMethodField(read_only=True)
 
     #item_sold = serializers.SerializerMethodField(read_only=True)
     
@@ -178,6 +337,12 @@ class ProductOrderSerializer(serializers.ModelSerializer):
     def get_product_details(self, obj):
         try:
             return obj.product.description
+        except Exception as err:
+            return None
+        
+    def get_product_price(self, obj):
+        try:
+            return obj.product.full_price
         except Exception as err:
             return None
     
@@ -214,7 +379,7 @@ class ProductOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductOrder
         fields = ['id', 'client','quantity','status','created_at', 
-                  'location', 'member', 'tip', 'total_price' , 'payment_type',
+                  'location', 'member', 'tip', 'total_price' , 'payment_type','product_price',
                   'product_name', 'gst', 'order_type', 'sold_quantity','product_details' ]
           
 class ServiceOrderSerializer(serializers.ModelSerializer):
@@ -263,7 +428,10 @@ class ServiceOrderSerializer(serializers.ModelSerializer):
             return None
     class Meta:
         model = ServiceOrder
-        fields = ['id', 'client','quantity', 'service','created_at' ,'user', 'duration', 'location', 'member', 'total_price', 'payment_type','tip','gst', 'order_type','created_at']
+        fields = ['id', 'client','quantity', 'service','created_at' ,'user',
+                  'duration', 'location', 'member', 'total_price',
+                  'payment_type','tip','gst', 'order_type','created_at'
+                  ]
         
 class MemberShipOrderSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
@@ -271,6 +439,7 @@ class MemberShipOrderSerializer(serializers.ModelSerializer):
     membership  = serializers.SerializerMethodField(read_only=True)
     #location = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
+    membership_price  = serializers.SerializerMethodField(read_only=True)
     
     def get_order_type(self, obj):
         return 'Membership'
@@ -301,11 +470,19 @@ class MemberShipOrderSerializer(serializers.ModelSerializer):
             return obj.membership.name
         except Exception as err:
             return None
+        
+    def get_membership_price(self, obj):
+        try:
+            return obj.membership.price
+        except Exception as err:
+            return None
     # ,'location' ,'start_date', 'end_date','status', 'total_price', 'payment_type', 'order_type'
     
     class Meta:
         model = MemberShipOrder
-        fields =['id', 'membership','order_type' ,'client','member','location' ,'start_date', 'end_date','status', 'total_price', 'payment_type' ]
+        fields =['id', 'membership','order_type' ,'client','member','quantity'
+                 ,'location' ,'start_date', 'end_date','status', 'total_price', 
+                 'payment_type','membership_price', 'created_at' ]
         
 class VoucherOrderSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
@@ -313,6 +490,7 @@ class VoucherOrderSerializer(serializers.ModelSerializer):
     voucher = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
+    voucher_price  = serializers.SerializerMethodField(read_only=True)
     
     def get_order_type(self, obj):
         return 'Voucher'
@@ -343,11 +521,18 @@ class VoucherOrderSerializer(serializers.ModelSerializer):
             return obj.voucher.name
         except Exception as err:
             return None
+    def get_voucher_price(self, obj):
+        try:
+            return obj.voucher.price
+        except Exception as err:
+            return None
     
     
     class Meta:
         model = VoucherOrder
-        fields =['id', 'voucher', 'client' , 'location' , 'member' ,'start_date', 'end_date','status', 'total_price', 'payment_type' , 'order_type']
+        fields =['id', 'voucher', 'client' , 'location' , 
+                 'member' ,'start_date', 'end_date','status','quantity',
+                 'total_price', 'payment_type' , 'order_type','voucher_price', 'created_at' ]
     
 
         
@@ -357,6 +542,31 @@ class CheckoutSerializer(serializers.ModelSerializer):
     membership  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
     voucher  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
     
+    client = serializers.SerializerMethodField(read_only=True)
+    member  = serializers.SerializerMethodField(read_only=True)
+    location = serializers.SerializerMethodField(read_only=True)
+    
+    def get_client(self, obj):
+        try:
+            serializers = ClientSerializer(obj.client).data
+            return serializers
+        except Exception as err:
+            return None
+        
+    def get_member(self, obj):
+        try:
+            serializers = MemberSerializer(obj.member,context=self.context ).data
+            return serializers
+        except Exception as err:
+            return None
+    
+    def get_location(self, obj):
+        try:
+            serializers = LocationSerializer(obj.location).data
+            return serializers
+        except Exception as err:
+            return None
+        
     def get_membership(self, obj):
         try:
             check = MemberShipOrder.objects.filter(checkout =  obj)
@@ -390,4 +600,96 @@ class CheckoutSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Checkout
-        fields = ['id', 'product', 'service', 'membership', 'voucher']
+        fields = ['id', 'product', 'service', 'membership',
+                  'voucher','client','location','member','created_at','payment_type', 'tip',
+                  'service_commission', 'voucher_commission', 'product_commission'
+                  
+                  ]
+
+class ParentBusinessTax_RateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessTax
+        fields = ['id', 'name', 'parent_tax', 'tax_rate', 'tax_type', 'is_active']  
+
+class ParentBusinessTaxSerializer(serializers.ModelSerializer):
+    parent_tax = ParentBusinessTax_RateSerializer(many=True, read_only=True)
+    class Meta:
+        model = BusinessTax
+        fields = ['id', 'name', 'parent_tax', 'tax_rate', 'location', 'tax_type', 'is_active']      
+        
+class AppointmentCheckoutSerializer(serializers.ModelSerializer):
+    location = serializers.SerializerMethodField(read_only=True)
+    client = serializers.SerializerMethodField(read_only=True)
+    order_type  = serializers.SerializerMethodField(read_only=True)
+    member  = serializers.SerializerMethodField(read_only=True)
+    service  = serializers.SerializerMethodField(read_only=True)
+    
+    def get_service(self, obj):
+        try:
+            cli = f"{obj.service.name}"
+            return cli
+
+        except Exception as err:
+            print(err)
+            
+    def get_order_type(self, obj):
+        return 'Appointment'
+    
+    def get_client(self, obj):
+        try:
+            cli = f"{obj.appointment.client.full_name}"
+            return cli
+
+        except Exception as err:
+            print(err)
+            
+    def get_member(self, obj):
+        try:
+            cli = f"{obj.appointment_service.member.full_name}"
+            return cli
+
+        except Exception as err:
+            print(err)
+    
+    def get_location(self, obj):
+        try:
+            serializers = LocationSerializer(obj.business_address).data
+            return serializers
+        
+        except Exception as err:
+            return None
+    class Meta:
+        model = AppointmentCheckout
+        fields = ('__all__')
+        
+
+class BusinessTaxSerializer(serializers.ModelSerializer):
+    parent_tax = ParentBusinessTaxSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = BusinessTax
+        exclude = ('created_at','user')
+class EmployeeBusinessSerializer(serializers.ModelSerializer):
+    parent_tax = ParentBusinessTaxSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = Employee
+        exclude = ('created_at','user')
+    
+class BusinessAddressSerializer(serializers.ModelSerializer):
+    tax = serializers.SerializerMethodField(read_only=True)
+    
+    
+    def get_tax(self, obj):
+        try:
+            tax = BusinessTax.objects.get(location = obj)
+            return BusinessTaxSerializer(tax).data
+        except Exception as err:
+            ExceptionRecord.objects.create(
+                text = f'error happen on busiens serializer line 660 {str(err)}'
+            )
+            print(err)
+            
+    class Meta:
+        model = BusinessAddress
+        fields = ['id', 'address_name','tax']

@@ -15,6 +15,10 @@ urlpatterns = [
     path('v1/sale/', include('Sale.urls.v1.urls')),
     path('v1/Dashboard/', include('Dashboard.urls.v1.urls')),
     path('v1/CRM/', include('CRM.urls.v1.urls')),
+    path('v1/targetcontrol/', include('TragetControl.urls.v1.urls')),
+    path('v1/customer/', include('Customer.urls.v1.urls')),
+    path('v1/promotions/', include('Promotions.urls.v1.urls')),
+    path('v1/reports/', include('Reports.urls.v1.urls')),
     path('Emailtemplate/', views.EmailTemplate),
     
 

@@ -1,7 +1,4 @@
 from datetime import timedelta
-from http import client
-import imp
-import re
 from django.shortcuts import render
 
 from rest_framework import status
@@ -11,7 +8,7 @@ from Client.models import Client, Membership, Vouchers
 from Order.models import Checkout, MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
 from Sale.Constants.Custom_pag import CustomPagination
 from Utility.Constants.Data.months import MONTHS
-from Utility.models import Country, State, City
+from Utility.models import Country, Currency, ExceptionRecord, State, City
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
@@ -20,15 +17,15 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from Employee.models import Employee, EmployeeSelectedService
+from Employee.models import CategoryCommission, CommissionSchemeSetting, Employee, EmployeeSelectedService
 from Business.models import BusinessAddress
 from Service.models import PriceService, Service, ServiceGroup
 
-from Product.models import Product
+from Product.models import Product, ProductOrderStockReport, ProductStock
 from django.db.models import Avg, Count, Min, Sum
 
 
-from Sale.serializers import CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
+from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
 
 
 # @api_view(['GET'])
@@ -48,12 +45,12 @@ from Sale.serializers import CheckoutSerializer, MemberShipOrderSerializer, Prod
 #     result_page = paginator.paginate_queryset(jobapply, request)
 #     serializer = GetJobSerializer(result_page, many=True)
 #     return paginator.get_paginated_response(serializer.data)
-
+    
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_service(request):
     service= Service.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
-    serialized = ServiceSerializer(service,  many=True, )
+    serialized = ServiceSerializer(service,  many=True, context={'request' : request} )
     return Response(
         {
             'status' : 200,
@@ -157,10 +154,17 @@ def create_service(request):
         client_can_book=client_can_book,
         slot_availible_for_online=slot_availible_for_online,
         
-        enable_team_comissions =enable_team_comissions,
+        #enable_team_comissions =enable_team_comissions,
         enable_vouchers=enable_vouchers,
         
     )
+    if enable_team_comissions is not None:
+        service_obj.enable_team_comissions = True
+    else:
+        service_obj.enable_team_comissions = False
+        
+    service_obj.save()
+    
     employees_error = []
     if is_package is not None:
         service_obj.is_package = True
@@ -238,9 +242,16 @@ def create_service(request):
             try:
                 duration = ser['duration']
                 price = ser['price']
+                currency = ser['currency']
+                
+                try:
+                    currency_id = Currency.objects.get(id = currency)
+                except Exception as err:
+                    pass
                 
                 price_service = PriceService.objects.create(
                     service = service_obj ,
+                    currency = currency_id,
                     duration = duration,
                     price = price,
                 )
@@ -248,7 +259,7 @@ def create_service(request):
                 employees_error.append(str(err))
         
     
-    service_serializers= ServiceSerializer(service_obj)
+    service_serializers= ServiceSerializer(service_obj, context={'request' : request})
     
     return Response(
             {
@@ -359,9 +370,6 @@ def update_service(request):
         )
         
     error = []
-    
-    
-    
     if location is not None:
         if type(location) == str:
             location = json.loads(location)
@@ -389,14 +397,10 @@ def update_service(request):
                 error.append(str(err))
     
     if employeeslist is not None:
-        
         if type(employeeslist) == str:
             employeeslist = json.loads(employeeslist)
         elif type(employeeslist) == list:
             pass
-        
-        print(type(employeeslist))
-       # service_id.employee.clear()
         all_pending_services = EmployeeSelectedService.objects.filter(service=service_id).exclude(employee__in=employeeslist)
         for empl_service in all_pending_services:
             empl_service.delete()
@@ -412,7 +416,6 @@ def update_service(request):
                 #service_id.employee.add(employe)
             except Exception as err:
                 error.append(str(err))
-    #service_id.save()
     try:
         print(staffgroup_id)
         all_prev_ser_grops = ServiceGroup.objects.filter(services=service_id)
@@ -427,6 +430,7 @@ def update_service(request):
     except Exception as err:
         error.append(str(err)) 
     
+    
     if priceservice is not None:
         if type(priceservice) == str:
             priceservice = priceservice.replace("'" , '"')
@@ -435,33 +439,43 @@ def update_service(request):
             pass
         for ser in priceservice:
             s_service_id = ser.get('id', None)
-            #service_id_price = ser.get('service', None)
             duration = ser.get('duration', None)
             price = ser.get('price', None)
+            currency = ser.get('currency', None)
+            is_deleted = ser.get('is_deleted', None)
+            try:
+                currency_id = Currency.objects.get(id = currency)
+            except Exception as err:
+                pass
+                
             if s_service_id is not None:
                 try: 
                     price_service = PriceService.objects.get(id=ser['id'])
-                    is_deleted = ser.get('is_deleted', None)
-                    if is_deleted is not None:
+                    
+                    if bool(is_deleted) == True:
                         price_service.delete()
                         continue
                     servic = Service.objects.get(id=ser['service'])
                     price_service.service = servic
                     price_service.duration = ser['duration']
                     price_service.price = ser['price']
+                    price_service.currency = currency_id
                     price_service.save()
                     
                 except Exception as err:
                     error.append(str(err))
                     print(err)
             else:
-                #
-                ser = Service.objects.get(id=id)
-                PriceService.objects.create(
-                    service=ser,
-                    duration = duration,
-                    price=price
-                )
+                if bool(is_deleted) == True:
+                    pass
+                else:
+                    ser = Service.objects.get(id=id)
+                    PriceService.objects.create(
+                        service=ser,
+                        duration = duration,
+                        price=price,
+                        currency = currency_id
+                    )
 
     serializer= ServiceSerializer(service_id, context={'request' : request} , data=request.data, partial=True)
     if serializer.is_valid():
@@ -503,6 +517,7 @@ def create_servicegroup(request):
     name = request.data.get('name', None)
     service = request.data.get('service', None)
     is_status = request.data.get('status', None)
+    allow_client_to_select_team_member = request.data.get('allow_client_to_select_team_member', None)
     
     servicegroup_error = []
     if not all([business, name,service]):
@@ -547,6 +562,11 @@ def create_servicegroup(request):
         service_group.is_active = False
     else:
         service_group.is_active = True
+        
+    if allow_client_to_select_team_member is None:
+        service_group.allow_client_to_select_team_member = False
+    else:
+        service_group.allow_client_to_select_team_member = True
         
     if type(service) == str:
         service = json.loads(service)
@@ -650,6 +670,10 @@ def update_servicegroup(request):
     error = []
     service=request.data.get('service', None)
     id = request.data.get('id', None)
+    
+    is_status = request.data.get('status', None)
+    allow_client_to_select_team_member = request.data.get('allow_client_to_select_team_member', None)
+    
     if id is None: 
         return Response(
         {
@@ -680,6 +704,17 @@ def update_servicegroup(request):
             },
                 status=status.HTTP_404_NOT_FOUND
         )
+        
+    if is_status is None:
+        service_id.is_active = False
+    else:
+        service_id.is_active = True
+        
+    if allow_client_to_select_team_member is None:
+        service_id.allow_client_to_select_team_member = False
+    else:
+        service_id.allow_client_to_select_team_member = True
+        
     if service is not None:
         if type(service) == str:
             service = json.loads(service)
@@ -718,7 +753,7 @@ def update_servicegroup(request):
                 'status' : False,
                 'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
                 'response' : {
-                    'message' : 'Invialid Data',
+                    'message' : 'Invalid Data',
                     'error_message' : str(serializer.errors),
                 }
             },
@@ -737,23 +772,28 @@ def get_all_sale_orders(request):
     # serialized = ProductOrderSerializer(result_page,  many=True)
     
     data=[]
-    # checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
-    # serialized = CheckoutSerializer(checkout_order,  many=True, context={'request' : request})
+    checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = CheckoutSerializer(checkout_order,  many=True, context={'request' : request})
+    data.extend(serialized.data)
+    
+    # product_order = ProductOrder.objects.filter(is_deleted=False).order_by('-created_at')
+    # serialized = ProductOrderSerializer(product_order,  many=True, context={'request' : request})
     # data.extend(serialized.data)
-    product_order = ProductOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = ProductOrderSerializer(product_order,  many=True, context={'request' : request})
-    data.extend(serialized.data)
     
-    service_orders = ServiceOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = ServiceOrderSerializer(service_orders,  many=True, context={'request' : request})
-    data.extend(serialized.data)
+    # service_orders = ServiceOrder.objects.filter(is_deleted=False).order_by('-created_at')
+    # serialized = ServiceOrderSerializer(service_orders,  many=True, context={'request' : request})
+    # data.extend(serialized.data)
     
-    membership_order = MemberShipOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = MemberShipOrderSerializer(membership_order,  many=True, context={'request' : request} )
-    data.extend(serialized.data)
+    # membership_order = MemberShipOrder.objects.filter(is_deleted=False).order_by('-created_at')
+    # serialized = MemberShipOrderSerializer(membership_order,  many=True, context={'request' : request} )
+    # data.extend(serialized.data)
     
-    voucher_orders = VoucherOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = VoucherOrderSerializer(voucher_orders,  many=True, context={'request' : request})
+    # voucher_orders = VoucherOrder.objects.filter(is_deleted=False).order_by('-created_at')
+    # serialized = VoucherOrderSerializer(voucher_orders,  many=True, context={'request' : request})
+    # data.extend(serialized.data)
+    
+    appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')
+    serialized = AppointmentCheckoutSerializer(appointment_checkout, many = True)
     data.extend(serialized.data)
     
     return Response(
@@ -1041,7 +1081,59 @@ def get_total_revenue(request):
         status=status.HTTP_200_OK
     )
  
- 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_location_tax(request):
+    location_id = request.GET.get('location_id', None)
+    if location_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'location_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        location = BusinessAddress.objects.get(id=location_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Business Location Not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    serialized = BusinessAddressSerializer(location, context = {'request' : request, })
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'All Business Tax!',
+                    'error_message' : None,
+                    'tax' : serialized.data
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+    
+        
+        
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_sale_checkout(request): 
@@ -1076,6 +1168,13 @@ def create_sale_order(request):
     client_type = request.data.get('client_type', None)
     ids = request.data.get('ids', None)
     
+    service_commission = request.data.get('service_commission', None)
+    product_commission = request.data.get('product_commission', None)
+    voucher_commission = request.data.get('voucher_commission', None)
+    
+    service_commission_type = request.data.get('service_commission_type', None)
+    product_commission_type = request.data.get('product_commission_type', None)
+    voucher_commission_type = request.data.get('voucher_commission_type', None)
     
     #product_id = request.data.get('product', None)
     
@@ -1119,8 +1218,7 @@ def create_sale_order(request):
         client = Client.objects.get(id = client_id)
     except Exception as err:
         client =  None
-        
-        
+                
     try:
         member=Employee.objects.get(id = member_id)
     except Exception as err:
@@ -1154,48 +1252,57 @@ def create_sale_order(request):
         location = business_address,
         member = member ,
         client_type = client_type,
-        payment_type = payment_type
+        payment_type = payment_type,
         
+        # service_commission = service_commission,
+        # product_commission = product_commission,
+        # voucher_commission = voucher_commission,   
+        
+        service_commission_type = service_commission_type,
+        product_commission_type = product_commission_type,
+        voucher_commission_type = voucher_commission_type ,  
+        
+        tip = tip
     )
-    for id in ids:
+    for id in ids:          
         sale_type = id['selection_type']
         service_id = id['id']
         quantity = id['quantity']
         
         if sale_type == 'PRODUCT':
-            #for pro in ids:
             try:
                 product = Product.objects.get(id = service_id)
-                product_stock = product.product_stock.all().first()
-                available = 0
-                # print(product_stock.consumable_quantity)
-                # print(product_stock.sellable_quantity)
-                
-                if product_stock.consumable_quantity is not None:
-                    available += product_stock.consumable_quantity
+                # commission = CommissionSchemeSetting.objects.filter(
+                #     employee = member,
+                #     categorycommission__from_value = total_price,
+                #     categorycommission__commission__category_comission = 'Retail'
+                #     )
 
-                if product_stock.sellable_quantity is not None:
-                    available += product_stock.sellable_quantity
-                    
-                #available = int(product_stock.consumable_quantity) + int(product_stock.sellable_quantity)
+                try:
+                    transfer = ProductStock.objects.get(product__id=product.id, location = business_address.id)
+                    if transfer.available_quantity > int(quantity):
+                        stock_transfer = ProductOrderStockReport.objects.create(
+                        report_choice = 'Sold',
+                        product = product,
+                        user = request.user,
+                        location = business_address,
+                        #quantity = int(quantity), 
+                        before_quantity = transfer.available_quantity      
+                        )                    
+                        sold = transfer.available_quantity - int(quantity)
+                        transfer.available_quantity = sold
+                        transfer.sold_quantity += int(quantity)
+                        transfer.save()
+                        
+                        stock_transfer.after_quantity = sold
+                        stock_transfer.save()
+                        
+                    else:
+                        errors.append('Available quantity issue')
                 
-                if available  == 0:
-                    return Response(
-                    {
-                        'status' : False,
-                        #'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
-                        'response' : {
-                        'message' : 'consumable_quantity and sellable_quantity not Avaiable',
-                        'error_message' : "available_quantity", 
-                        }
-                    },
-                status=status.HTTP_400_BAD_REQUEST
-                )                    
-                #product_stock.available_quantity -=1
-                    
-                product_stock.sold_quantity += 1
-                #print(product_stock)
-                product_stock.save()
+                except Exception as err:
+                    errors.append(str(err))
+
                 product_order = ProductOrder.objects.create(
                     user = user,
                     client = client,
@@ -1210,8 +1317,10 @@ def create_sale_order(request):
                     client_type = client_type,
                     quantity = quantity,
                 )
-                product_order.sold_quantity =  product_stock.sold_quantity
+                product_order.sold_quantity += 1 # product_stock.sold_quantity
                 product_order.save()
+                checkout.product_commission = product_commission
+                checkout.save()
             except Exception as err:
                 return Response(
                     {
@@ -1226,14 +1335,6 @@ def create_sale_order(request):
             )
                         
         elif sale_type == 'SERVICE':
-            
-            # if type(service_id) == str:
-            #     service_id = json.loads(service_id)
-
-            # elif type(service_id) == list:
-            #     pass
-            
-           # for servics in ids:
             try:
                 service = Service.objects.get(id = service_id)
                 service_price = PriceService.objects.filter(service = service_id).first()
@@ -1256,6 +1357,8 @@ def create_sale_order(request):
 
                     
                 )
+                checkout.service_commission = service_commission
+                checkout.save()
             except Exception as err:
                 return Response(
                     {
@@ -1269,28 +1372,7 @@ def create_sale_order(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
             
-            # serialized = ServiceOrderSerializer(service_order)
-            # return Response(
-            #     {
-            #         'status' : True,
-            #         'status_code' : 201,
-            #         'response' : {
-            #             'message' : 'Service Order Sale Created!',
-            #             'error_message' : None,
-            #             'sale' : serialized.data
-            #         }
-            #     },
-            #     status=status.HTTP_201_CREATED
-            # )
-            
         elif sale_type == 'MEMBERSHIP':
-            # if type(membership_id) == str:
-            #     membership_id = json.loads(membership_id)
-
-            # elif type(membership_id) == list:
-            #     pass
-            
-            #for membership in ids:
             try:
                 membership = Membership.objects.get(id = service_id)
                 validity = int(membership.valid_for.split(" ")[0])
@@ -1370,6 +1452,8 @@ def create_sale_order(request):
                     quantity = quantity,
 
                 )
+                checkout.voucher_commission = voucher_commission
+                checkout.save()
             except Exception as err:
                 return Response(
                     {
@@ -1382,25 +1466,7 @@ def create_sale_order(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-        # else:
-        #     return Response(
-        #     {
-        #         'status' : False,
-        #         'status_code' : StatusCodes.MISSING_FIELDS_4001,
-        #         'status_code_text' : 'MISSING_FIELDS_4001',
-        #         'response' : {
-        #             'message' : 'Invalid Data!',
-        #             'error_message' : 'selection_type fields missing choice one',
-        #             'fields' : [
-        #                   'PRODUCT',
-        #                   'SERVICE', 
-        #                   'MEMBERSHIP', 
-        #                   'VOUCHER', 
-        #                     ]
-        #         }
-        #     },
-        #     status=status.HTTP_400_BAD_REQUEST
-        # )
+    
     serialized = CheckoutSerializer(checkout, context = {'request' : request, })
     
     return Response(
@@ -1409,8 +1475,8 @@ def create_sale_order(request):
                 'status_code' : 201,
                 'response' : {
                     'message' : 'Product Order Sale Created!',
-                    'error_message' : None,
-                    'sale' : serialized.data
+                    'error_message' : errors,
+                    'sale' : serialized.data,
                 }
             },
             status=status.HTTP_201_CREATED

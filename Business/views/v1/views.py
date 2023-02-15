@@ -1,6 +1,7 @@
 
 
 
+from datetime import datetime, time, timedelta
 import email
 from django.conf import settings
 from operator import ge
@@ -8,23 +9,33 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from Appointment.Constants.durationchoice import DURATION_CHOICES
+from Authentication.serializers import UserTenantLoginSerializer
 
-from Business.models import BusinessType
-from Business.serializers.v1_serializers import OpeningHoursSerializer,AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer
+from Business.models import BusinessAddressMedia, BusinessType
+from Business.serializers.v1_serializers import BusinessAddress_CustomerSerializer, EmployeAppointmentServiceSerializer, EmployeTenatSerializer, OpeningHoursSerializer,AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer
+from Client.models import Client
+from Employee.models import EmployeDailySchedule, Employee
 
 from NStyle.Constants import StatusCodes
 
+from Appointment.models import AppointmentService
 from Authentication.models import User
 from Business.models import Business, BusinessSocial, BusinessAddress, BusinessOpeningHour, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BookingSetting, BusinessPaymentMethod, BusinessTax, BusinessVendor
+from Product.models import Product, ProductStock
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
+from Service.models import Service, ServiceGroup
 from Tenants.models import Domain, Tenant
-from Utility.models import Country, Currency, Language, NstyleFile, Software, State, City
+from Utility.models import Country, Currency, ExceptionRecord, Language, NstyleFile, Software, State, City
 from Utility.serializers import LanguageSerializer
 import json
 from django.db.models import Q
 
 from django_tenants.utils import tenant_context
+
+from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, EmployeeBusinessSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -259,6 +270,11 @@ def get_business_by_domain(request):
     try:
         domain_name = f'{domain_name}.{settings.BACKEND_DOMAIN_NAME}'
         domain = None
+        try :
+           tenant_id = Tenant.objects.get(domain = domain_name )
+           id = tenant_id.id
+        except Exception as err:
+            pass
         with tenant_context(Tenant.objects.get(schema_name = 'public')):
             domain = Domain.objects.get(domain=domain_name)
 
@@ -301,6 +317,7 @@ def get_business_by_domain(request):
                     'business' : {
                         'id' : str(user_business.id),
                         'business_name' : str(user_business.business_name),
+                        'tenant_id' : str(id),
                         # 'logo' : user_business.logo if user_business.logo else None ,
                     }
                 }
@@ -548,10 +565,13 @@ def get_business_locations(request, business_id):
         is_deleted=False,
         is_closed=False,
         is_active=True
-    ).order_by('-created_at')
+    ).order_by('-created_at').distinct()
+    # all_products = BusinessAddress.objects.filter(is_deleted=True)
+    # for i in all_products:
+    #     i.delete()
     data = []
     if len(business_addresses) > 0:
-        serialized = BusinessAddress_GetSerializer(business_addresses, many=True)
+        serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
         data = serialized.data
 
     return Response(
@@ -586,6 +606,7 @@ def add_business_location(request):
     mobile_number = request.data.get('mobile_number', None)
     
     banking = request.data.get('banking',None)
+    currency = request.data.get('currency',None)
     
     start_time = request.data.get('start_time', None)
     close_time = request.data.get('close_time', None)
@@ -647,6 +668,8 @@ def add_business_location(request):
         )
     
     try:
+        if currency is not None:
+            currency_id = Currency.objects.get( id = currency, is_deleted=False, is_active=True )
         if country is not None:
             country = Country.objects.get( id=country, is_deleted=False, is_active=True )
         if state is not None:
@@ -675,6 +698,7 @@ def add_business_location(request):
         email= email,
         mobile_number=mobile_number,
         country=country,
+        currency = currency_id,
         state=state,
         city=city,
         banking = banking,
@@ -737,7 +761,33 @@ def add_business_location(request):
     # if serialized.is_valid():
     #     serialized.save()
     #     data.update(serialized.data)
-    serialized = BusinessAddress_GetSerializer(business_address)
+    try:
+        all_product = Product.objects.all()
+        
+        for pro in all_product:
+            product = Product.objects.get(
+            id=pro.id,
+            is_deleted = False,
+            )
+            stock  = ProductStock.objects.create(
+                    user = user,
+                    business = business,
+                    product = product,
+                    location = business_address,
+                    available_quantity = 0,
+                    low_stock = 0, 
+                    reorder_quantity = 0,
+                    #alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
+                    #is_active = stock_status,
+            )
+    except Exception as err:
+        print(str(err))
+        ExceptionRecord.objects.create(
+            text = f'{str(err) } line number 761'
+        )
+    
+    
+    serialized = BusinessAddress_GetSerializer(business_address, context={'request' : request})
     # if serialized.is_valid():
     #     serialized.save()
     #     data.update(serialized.data)
@@ -885,18 +935,54 @@ def update_location(request):
         business_address.mobile_number= request.data.get('mobile_number', business_address.mobile_number)
         business_address.email= request.data.get('email', business_address.email)
         business_address.banking= request.data.get('banking', business_address.banking)
+        business_address.service_avaiable= request.data.get('service_avaiable', business_address.service_avaiable)
+        business_address.location_name= request.data.get('location_name', business_address.location_name)
+        business_address.description= request.data.get('description', business_address.description)
              
         country = request.data.get('country', None)
         state = request.data.get('state', None)
         city = request.data.get('city', None)
+        currency = request.data.get('currency', None)
+        images = request.data.get('images', None)
+        is_publish = request.data.get('is_publish', None)
+        
+        if is_publish is not None:
+            business_address.is_publish = True
+        else:
+            business_address.is_publish = False
+            
+        
+        if images is not None:
+            try:
+                image = BusinessAddressMedia.objects.get(business = business_address.business,business_address = business_address,)
+                image.delete()
+            except:
+                pass
+            images = BusinessAddressMedia.objects.create(
+                user = user,
+                business = business_address.business,
+                business_address = business_address,
+                image = images
+            )
 
         try:
+            if currency is not None:
+                currency_id = Currency.objects.get( id = currency, is_deleted=False, is_active=True )
+                business_address.currency = currency_id
+                business_address.save()
+                
             if country is not None:
                 country = Country.objects.get( id=country, is_deleted=False, is_active=True )
+                business_address.country = country
+                business_address.save()
             if state is not None:
                 state = State.objects.get( id=state, is_deleted=False, is_active=True )
+                business_address.state = state
+                business_address.save()
             if city is not None:
                 city = City.objects.get( id=city, is_deleted=False, is_active=True )
+                business_address.city = city
+                business_address.save()
         except Exception as err:
             return Response(
                 {
@@ -932,16 +1018,17 @@ def update_location(request):
             
             print(day)
             s_day = opening_day.get(day.lower(), None)
-            print(s_day)
             if s_day is not None:
                 bds_schedule.start_time = s_day['start_time']
                 bds_schedule.close_time = s_day['end_time']
+                bds_schedule.is_closed = False
+
             else:
                 bds_schedule.is_closed = True
 
             bds_schedule.save()
 
-        serialized = BusinessAddress_GetSerializer(business_address)
+        serialized = BusinessAddress_GetSerializer(business_address, context={'request' : request})
 
         return Response(
                 {
@@ -1784,7 +1871,7 @@ def update_payment_method(request):
         )
     payment_method.method_type = method_type
     payment_method.save()
-    serialized = PaymentMethodSerializer(payment_method)
+    serialized = PaymentMethodSerializer(payment_method, context={'request':request})
 
     return Response(
             {
@@ -1966,22 +2053,22 @@ def add_business_tax(request):
     if tax_type == 'Group':
         # all_errors.append({'type' : str(type(tax_ids))})
         # all_errors.append({'tax_ids' : tax_ids})
-        if type(tax_ids) == str :
-            ids_data = json.loads(tax_ids)
-        else:
-            ids_data = tax_ids
-        for id in ids_data:
-            #all_errors.append(str(id))
-            try:
-                get_p_tax = BusinessTax.objects.get(id=id)
-                business_tax.parent_tax.add(get_p_tax)
-            except Exception as err:
-                all_errors.append(str(err))
-
+        if tax_ids is not None:
+            if type(tax_ids) == str :
+                ids_data = json.loads(tax_ids)
+            else:
+                ids_data = tax_ids
+            for id in ids_data:
+                #all_errors.append(str(id))
+                try:
+                    get_p_tax = BusinessTax.objects.get(id=id)
+                    business_tax.parent_tax.add(get_p_tax)
+                except Exception as err:
+                    all_errors.append(str(err))
 
     # parent_tax = 
     business_tax.save()
-    serialized = BusinessTaxSerializer(business_tax)
+    serialized = BusinessTaxSerializer(business_tax,context={'request':request} )
     return Response(
             {
                 'status' : True,
@@ -2136,7 +2223,7 @@ def update_business_tax(request):
 
     # parent_tax = 
     business_tax.save()
-    serialized = BusinessTaxSerializer(business_tax)
+    serialized = BusinessTaxSerializer(business_tax , context={'request':request} )
     return Response(
             {
                 'status' : True,
@@ -2260,7 +2347,7 @@ def get_business_taxes(request):
             )
 
     all_taxes = BusinessTax.objects.filter(business=business, is_active=True)
-    serialized = BusinessTaxSerializer(all_taxes, many=True)
+    serialized = BusinessTaxSerializer(all_taxes, many=True, context={'request':request})
     return Response(
             {
                 'status' : True,
@@ -2701,4 +2788,948 @@ def search_business_vendor(request):
         },
         status=status.HTTP_200_OK
     )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_domain_business_address(request):   
+    tenant_id = request.GET.get('hash', None)
+    data = []
+    service_group = []
     
+    if tenant_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'hash',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    
+    try:
+        tenant = Tenant.objects.get(id = tenant_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Invalid Tenant Id',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )                 
+    with tenant_context(tenant):
+        user_business = Business.objects.filter(
+            is_deleted=False,
+            is_active=True,
+            is_blocked=False
+        )                
+        if len(user_business) > 0:
+            user_business = user_business[0]
+        else:
+            raise Exception('0 Business found')
+        try:
+            business_addresses = BusinessAddress.objects.filter(
+                business = str(user_business.id),
+                is_deleted=False,
+                is_closed=False,
+                is_active=True
+            ).order_by('-created_at').distinct()
+        except Exception as err:
+            print(err)
+            
+        
+        if len(business_addresses) > 0:
+            serialized = BusinessAddress_CustomerSerializer(business_addresses, many=True,context={
+                                                            'tenant' : tenant.schema_name})
+            data = serialized.data
+        else:
+            raise Exception('0 business addresses found')
+        try:
+            services_group= ServiceGroup.objects.filter(
+                business = str(user_business.id)
+                ,is_deleted=False,
+                is_blocked=False).order_by('-created_at')
+        except Exception as err:
+            print(err)    
+        
+        
+        if len(services_group) > 0:
+            serialized = ServiceGroupSerializer(services_group,  many=True, context={'request' : request, 'tenant' : tenant.schema_name} )     
+            service_group = serialized.data
+        else:
+            raise Exception('0 business addresses found')
+                
+    #     else :
+    #         raise Exception('Business Not Exist')
+    # except Exception as err:
+    #     return Response(
+    #         {
+    #             'status' : False,
+    #             'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+    #             'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+    #             'response' : {
+    #                 'message' : 'Business Not Found',
+    #                 'error_message' : str(err),
+    #             }
+    #         },
+    #         status=status.HTTP_404_NOT_FOUND
+    #     )
+            
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Business All Locations',
+                    'error_message' : None,
+                    'count' : len(data),
+                    'locations' : data,
+                    'service_group': service_group,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def get_check_availability(request):                  
+    check_availability = request.data.get('check_availability', None)
+    tenant_id = request.data.get('hash', None)
+    
+    Availability = True
+    if tenant_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'hash',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        tenant = Tenant.objects.get(id = tenant_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Invalid Tenant Id',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    if type(check_availability) == str:
+        check_availability = json.loads(check_availability)
+    else:
+        pass
+              
+    data = []
+    with tenant_context(tenant):
+        for check in check_availability:
+            emp_id = check.get('member_id', None)
+            duration = check.get('duration', None)
+            start_time = check.get('app_time', None)
+            date = check.get('date', None)
+            
+            dtime = datetime.strptime(start_time, "%H:%M:%S")
+            start_time = dtime.time()
+            
+            dt = datetime.strptime(date, "%Y-%m-%d")
+            date = dt.date()
+            
+            app_date_time = f'2000-01-01 {start_time}'
+        
+            duration = DURATION_CHOICES[duration]
+            app_date_time = datetime.fromisoformat(app_date_time)
+            datetime_duration = app_date_time + timedelta(minutes=duration)
+            datetime_duration = datetime_duration.strftime('%H:%M:%S')
+            tested = datetime.strptime(datetime_duration ,'%H:%M:%S').time()
+            end_time = datetime_duration
+            
+            EmployeDaily = False
+                
+            try:
+                employee = Employee.objects.get(
+                        id = emp_id, 
+                        #employedailyschedule__is_vacation = False,
+                        #employedailyschedule__created_at__lte = dt,
+                        # employedailyschedule__start_time__gte = start_time,
+                        # employedailyschedule__end_time__lte = start_time
+                        ) 
+                try:
+                    daily_schedule = EmployeDailySchedule.objects.get(
+                        employee = employee,
+                        is_vacation = False,
+                        date = date,
+                        )      
+                    if start_time >= daily_schedule.start_time and start_time < daily_schedule.end_time :
+                        pass
+                    elif daily_schedule.start_time_shift != None:
+                        if start_time >= daily_schedule.start_time_shift and start_time < daily_schedule.end_time_shift:
+                            pass
+                        else:
+                            return Response(
+                            {
+                                'status' : True,
+                                'status_code' : 200,
+                                'response' : {
+                                    'message' : f'This time {employee.full_name} not Available',
+                                    'error_message' : f'This Employee day off, {employee.full_name} date {date}',
+                                    'Availability': False
+                                }
+                            },
+                            status=status.HTTP_200_OK
+                        )
+                    else:
+                        return Response(
+                        {
+                            'status' : True,
+                            'status_code' : 200,
+                            'response' : {
+                                'message' : f'This time {employee.full_name} not Available',
+                                'error_message' : f'This Employee day off, {employee.full_name} date {date}',
+                                'Availability': False
+                            }
+                        },
+                        status=status.HTTP_200_OK
+                    )
+                        
+                except Exception as err:
+                    return Response(
+                    {
+                        'status' : True,
+                        'status_code' : 200,
+                        'response' : {
+                            'message' : 'Employee Day Off',
+                            'error_message' : f'This Employee day off, {employee.full_name} date {date} {str(err)}',
+                            'Availability': False
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
+                    
+                    
+                # if EmployeDaily:
+                #     data.append(f'Employees daily schedule not Available {employee.full_name}')
+                               
+                try:
+                    av_staff_ids = AppointmentService.objects.filter(
+                        member__id = employee.id,
+                        appointment_date = date,
+                        # appointment_time__gte = start_time, # 1:00
+                        # end_time__lte = start_time, # 1:40
+                        # member__employee_employedailyschedule__date = date,
+                        # member__employee_employedailyschedule__start_time__gte = start_time,
+                        # member__employee_employedailyschedule__end_time__lte = start_time,
+                        is_blocked = False,
+                    )#.values_list('member__id', flat=True)
+                    
+                    for ser in av_staff_ids:
+                        #data.append(f'{av_staff_ids} type {type(start_time)}, tested {ser.appointment_time}')
+                        if tested <= ser.appointment_time:# or start_time >= ser.end_time:
+                            if start_time >= ser.end_time:
+                                data.append(f'Employees are free, employee name {employee.full_name}')
+                                
+                            else:
+                                data.append(f'The selected staff is not available at this time  {employee.full_name}')
+                                Availability = False
+                                                                        
+                        else:
+                            data.append(f'Employees are free, employee name: {employee.full_name}')
+                            
+                    if len(av_staff_ids) == 0:
+                        data.append(f'Employees are free, you can proceed further employee name {employee.full_name}')
+                        #data.append(f'{av_staff_ids} type {type(datetime_duration)}, ')
+                    
+                except Exception as err:
+                    data.append(f'the employe{employee}, start_time {str(err)}')
+            except Exception as err:
+                data.append(f'the Error  {str(err)},  Employee Not Available on this time')
+                    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'The selected staff is not available at this time',
+                    'error_message' : None,
+                    'employee':data,
+                    'Availability': Availability,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+        
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def get_employee_appointment(request):
+    
+    tenant_id = request.data.get('hash', None)
+    business_id = request.data.get('business', None)    
+    appointment_date = request.data.get('appointment_date', None)    
+    start_time = request.data.get('start_time', None)    
+    #employee_list = request.data.get('emp_list', None)
+    
+    if tenant_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'hash',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        tenant = Tenant.objects.get(id = str(tenant_id))
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Invalid Tenant Id',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    data = []
+    error = []
+    
+    dtime = datetime.strptime(start_time, "%H:%M:%S")
+    start_time = dtime.time()
+    
+    dt = datetime.strptime(appointment_date, "%Y-%m-%d")
+    date = dt.date()
+    # if type(employee_list) == str:
+    #     employee_list = json.loads(employee_list)
+    # else:
+    #     pass
+    
+    with tenant_context(tenant):
+        
+        try:
+            business=BusinessAddress.objects.get(id=business_id)
+        except Exception as err:
+            return Response(
+            {
+                'status' : True,
+                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                'status_code_text' :'BUSINESS_NOT_FOUND_4015' ,
+                'response' : {
+                    'message' : 'Business Address not found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+        employee = Employee.objects.filter(
+            is_deleted=False, 
+            location__id = business.id, 
+            #employee_employedailyschedule__is_vacation = False,
+            #employee_selected_service__service__id = str(service),
+        )
+        for emp in employee:
+            serializer = EmployeeBusinessSerializer(emp)
+            data.append(serializer.data)
+            # try:
+            #     daily_schedule = EmployeDailySchedule.objects.get(
+            #         employee = emp.id,
+            #         is_vacation = False,
+            #         date = date,
+            #     )  
+            #     if start_time >= daily_schedule.start_time and start_time < daily_schedule.end_time :
+            #         serializer = EmployeeBusinessSerializer(emp)
+            #         data.append(serializer.data)
+            #     elif daily_schedule.start_time_shift != None:
+            #         if start_time >= daily_schedule.start_time_shift and start_time < daily_schedule.end_time_shift:
+            #             serializer = EmployeeBusinessSerializer(emp)
+            #             data.append(serializer.data)
+            #         else:
+            #             pass
+            #         #     return Response(
+            #         #     {
+            #         #         'status' : True,
+            #         #         'status_code' : 200,
+            #         #         'response' : {
+            #         #             'message' : f'This time {employee.full_name} not Available',
+            #         #             'error_message' : f'This Employee day off, {employee.full_name} date {date}',
+            #         #             'Availability': False
+            #         #         }
+            #         #     },
+            #         #     status=status.HTTP_200_OK
+            #         # )
+            #     else:
+            #         pass
+            #     #     return Response(
+            #     #     {
+            #     #         'status' : True,
+            #     #         'status_code' : 200,
+            #     #         'response' : {
+            #     #             'message' : f'This time {employee.full_name} not Available',
+            #     #             'error_message' : f'This Employee day off, {employee.full_name} date {date}',
+            #     #             'Availability': False
+            #     #         }
+            #     #     },
+            #     #     status=status.HTTP_200_OK
+            #     # )
+            # except Exception as err:
+            #     pass
+            
+        # serializer = EmployeeBusinessSerializer(employee)
+        # data.append(serializer.data)
+        
+        # for check in employee_list:
+        #     date = check.get('date', None)
+        #     start_time = check.get('app_time', None)
+        #     duration = check.get('duration', None)
+        #     service = check.get('service', None)
+            
+        #     dtime = datetime.strptime(start_time, "%H:%M:%S")
+        #     start_time = dtime.time()
+            
+        #     app_date_time = f'2000-01-01 {start_time}'
+                
+        #     duration = DURATION_CHOICES[duration]
+        #     app_date_time = datetime.fromisoformat(app_date_time)
+        #     datetime_duration = app_date_time + timedelta(minutes=duration)
+        #     datetime_duration = datetime_duration.strftime('%H:%M:%S')
+        #     tested = datetime.strptime(datetime_duration ,'%H:%M:%S').time()
+        #     end_time = datetime_duration
+            
+        #     # try:
+        #     #     service_id=Service.objects.get(id=str(service))
+        #     # except Exception as err:
+        #     #     #service_id = ''
+        #     #     pass
+        # #     return Response(
+        # #     {
+        # #         'status' : True,
+        # #         'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+        # #         'status_code_text' :'BUSINESS_NOT_FOUND_4015' ,
+        # #         'response' : {
+        # #             'message' : 'Business Address not found!',
+        # #             'error_message' : str(err),
+        # #         }
+        # #     },
+        # #     status=status.HTTP_404_NOT_FOUND
+        # # )
+
+        #     employee = Employee.objects.get(is_deleted=False, 
+        #         location__id = business.id, 
+        #         #employee_employedailyschedule__is_vacation = False,
+        #         #employee_selected_service__service__id = str(service),
+        #         )#.order_by('-created_at')
+            
+        #     try:
+        #         av_staff_ids = AppointmentService.objects.filter(
+        #             member__id = employee.id,
+        #             appointment_date = date,
+        #             # appointment_time__gte = start_time, # 1:00
+        #             # end_time__lte = start_time, # 1:40
+        #             # member__employee_employedailyschedule__date = date,
+        #             member__employee_employedailyschedule__start_time__gte = start_time,
+        #             member__employee_employedailyschedule__end_time__lte = start_time,
+        #             is_blocked = False,
+        #         )#.values_list('member__id', flat=True)
+                
+        #         for ser in av_staff_ids:
+        #             #data.append(f'{av_staff_ids} type {type(start_time)}, tested {ser.appointment_time}')
+        #             if tested <= ser.appointment_time:# or start_time >= ser.end_time:
+        #                 if start_time >= ser.end_time:
+        #                     serializer = EmployeeBusinessSerializer(employee)
+        #                     data.append(serializer.data)
+        #                     #data.append(f'Employees are free, employee name {employee.full_name}')
+                            
+        #                 else:
+        #                     #data.append(f'The selected staff is not available at this time  {employee.full_name}')
+        #                     Availability = False
+                                                                    
+        #             else:
+        #                 serializer = EmployeeBusinessSerializer(employee)
+        #                 data.append(serializer.data)
+        #                 #data.append(f'Employees are free, employee name: {employee.full_name}')
+                        
+        #         if len(av_staff_ids) == 0:
+        #             serializer = EmployeeBusinessSerializer(employee)
+        #             data.append(serializer.data)
+        #             #data.append(f'Employees are free, you can proceed further employee name {employee.full_name}')
+                    
+        #             #data.append(f'{av_staff_ids} type {type(datetime_duration)}, ')
+                    
+        #     except Exception as err:
+        #         pass
+                #data.append(f'the employe{employee}, start_time {str(err)}')
+        
+        # for emp in all_emp:
+        
+        #     #data.append(emp)
+        #     serializer = EmployeeBusinessSerializer(emp)
+        #     data.append(serializer.data)
+       
+        # for emp in all_emp:
+        #     availability = AppointmentService.objects.filter(
+        #         #member__id__in = empl_list,
+        #         #business = ,
+        #         member__id = emp.id,
+        #         appointment_date = date,
+        #         is_blocked = False,
+        #         # appointment_time__lte = start_time, # 1:00
+        #         # end_time__gte = start_time,
+        #     )
+            # for ser in availability:
+            #     #data.append(f'{av_staff_ids} type {type(start_time)}, tested {ser.appointment_time}')
+            #     if tested <= ser.appointment_time:# or start_time >= ser.end_time:
+            #         if start_time >= ser.end_time:
+            #             serializer = EmployeeBusinessSerializer(emp)
+            #             data.append(serializer.data)
+            #             #data.append(f'Employees are free, employee name {employee.full_name}')
+                        
+            #         else:
+            #             pass
+            #             data.append(f'The selected staff is not available at this time  {employee.full_name}')
+            #             #Availability = False
+                                                                
+            #     else:
+            #         data.append(f'Employees are free, employee name: {employee.full_name}')
+                            
+            # if len(availability) >= 0 or len(availability) <= 3 :
+            #     serializer = EmployeeBusinessSerializer(emp)
+            #     data.append(serializer.data)
+                
+            #     return Response(
+            #     {
+            #         'status' : True,
+            #         'status_code' : 200,
+            #         'status_code_text' : '200',
+            #         'response' : {
+            #             'message' : 'Employees are free',
+            #             'error_message' : None,
+            #             'employee':serializer.data
+            #         }
+            #     },
+            #     status=status.HTTP_200_OK
+            # )
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Employees are free',
+                    'error_message' : None,
+                    'error': error,
+                    'employee': data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def create_client_business(request):
+    tenant_id = request.data.get('hash', None)
+    name = request.data.get('full_name', None)
+    email = request.data.get('email', None)
+    number = request.data.get('mobile_number', None)
+    password = request.data.get('password', None)
+    
+    business_id= request.data.get('business', None)
+    
+    data = []
+    
+    if tenant_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'hash',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+        
+    try:
+        tenant = Tenant.objects.get(id = tenant_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Invalid Tenat Id',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )    
+    
+    with tenant_context(tenant):
+       
+        try:
+            business=Business.objects.get(id=business_id)
+        except Exception as err:
+            return Response(
+            {
+                'status' : True,
+                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                'status_code_text' :'BUSINESS_NOT_FOUND_4015' ,
+                'response' : {
+                    'message' : 'Business not found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+        try:
+            client = Client.objects.get(mobile_number__icontains = number )
+        except Exception as err:
+            client = ''
+            pass
+        if len(client) > 0:
+            data.append(f'Client Phone number already exist {client.full_name}')
+        else:
+            client  = Client.objects.create(
+                #user = tenant.user,
+                business = business,
+                full_name = name,
+                mobile_number=number,
+                email = email,
+            )
+            data.append(f'Client Created Successfully {client.full_name}')
+    try:
+        username = email.split('@')[0]
+        user = User.objects.create(
+            first_name = name,
+            username = username,
+            email = email,
+            is_email_verified = True,
+            is_active = True,
+            mobile_number = number,
+        )
+        user.set_password(password)
+        user.save()
+    except Exception as err:
+        return Response(
+            {
+                'status' : True,
+                'status_code_text' :'BUSINESS_NOT_FOUND_4015' ,
+                'response' : {
+                    'message' : 'User not found!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+            
+    serialized = UserTenantLoginSerializer(user)
+     
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Client Create Successfully',
+                'error_message' : None,
+                'client': serialized.data,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def employee_availability(request):                  
+    employee = request.data.get('employee', None)
+    tenant_id = request.data.get('hash', None)
+    date = request.data.get('date', None)
+    
+    if tenant_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'hash',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        tenant = Tenant.objects.get(id = tenant_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Invalid Tenant Id',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    if type(employee) == str:
+        employee = json.loads(employee)
+    else:
+        pass
+              
+    data = []
+    dt = datetime.strptime(date, "%Y-%m-%d")
+    date = dt.date()
+            
+    with tenant_context(tenant):
+        for check in employee:
+            emp_id = check.get('member_id', None)
+            
+            try:
+                employee = Employee.objects.get(id = emp_id)                
+                av_staff_ids = AppointmentService.objects.filter(
+                    
+                    member__id = employee.id,
+                    appointment_date = date,
+                    is_blocked = False,
+                ) #.values_list('member__id', flat=True)
+                serilizer =  EmployeAppointmentServiceSerializer(av_staff_ids, many = True)
+                data.extend(serilizer.data)
+            except Exception as err:
+                pass
+                    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Employees Check Availability',
+                    'error_message' : None,
+                    'employee':data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_tenant_business_taxes(request):
+    tenant_id = request.GET.get('hash', None)
+    business_id = request.GET.get('business', None)
+    
+    if tenant_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'hash',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        tenant = Tenant.objects.get(id = tenant_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Invalid Tenant Id',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )            
+    data = []
+    with tenant_context(tenant):
+        try:
+            business = Business.objects.get(id=business_id, is_deleted=False, is_active=True, is_blocked=False)
+        except Exception as err:
+            return Response(
+                    {
+                        'status' : False,
+                        'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                        'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                        'response' : {
+                            'message' : 'Business Not Found',
+                            'error_message' : str(err),
+                        }
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+        all_taxes = BusinessTax.objects.filter(business=business, is_active=True)
+        serialized = BusinessTaxSerializer(all_taxes, many=True, context={'request':request})
+        data.append(serialized.data)
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Business Taxes!',
+                    'error_message' : None,
+                    'tax' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_tenant_address_taxes(request):
+    tenant_id = request.GET.get('hash', None)
+    location_id = request.GET.get('location_id', None)
+    data = []
+    if tenant_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Following fields are required',
+                    'fields' : [
+                        'hash',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        tenant = Tenant.objects.get(id = tenant_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
+                'response' : {
+                    'message' : 'Invalid Tenant Id',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )            
+    
+    data = []
+    with tenant_context(tenant):
+        try:
+            location = BusinessAddress.objects.get(id=location_id, is_deleted=False)
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 404,
+                    'status_code_text' : 'OBJECT_NOT_FOUND',
+                    'response' : {
+                        'message' : 'Business Location Not found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        serialized = BusinessAddressSerializer(location, context = {'request' : request, })
+        data.append(serialized.data)
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Address Taxes!',
+                    'error_message' : None,
+                    'tax' : data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_common_tenant(request):  
+    tenant_id = '14c286c6-c36c-4c7a-aa51-545efcd8738d'#request.GET.get('hash', None)
+    business_location = '6febd650-50ba-4719-aaf2-02bccebb7856'
+    business = '38a86f91-f0cb-4673-a68c-11645d0046b4'
+    address = 'MR lahore'
+    address_name = 'Multan Road, Samanabad Town, Lahore, Pakistan'
+    
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Tenant Details!',
+                    'error_message' : None,
+                    'hash' : tenant_id,
+                    'business' : business,
+                    'business_location' : business_location,
+                    'address' : address,
+                    'address_name' : address_name,
+                }
+            },
+            status=status.HTTP_200_OK
+        )

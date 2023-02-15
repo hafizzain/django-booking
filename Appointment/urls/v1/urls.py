@@ -29,5 +29,7 @@ urlpatterns = [
     
     #Search by client 
     path('get_client_sale/', views.get_client_sale),
-
+    
+    #Create Client Book Appointment
+    path('create_appointment_client/', views.create_appointment_client),
 ]

@@ -31,10 +31,14 @@ urlpatterns = [
     #Payroll
     path('create_payroll/', views.create_payroll),
     path('get_payrolls/', views.get_payrolls),
+    path('get_payrol_working/', views.get_payrol_working),
     path('delete_payroll/', views.delete_payroll),
     
     #commssion
     path('get_commission/', views.get_commission),
+    path('get_employee_commission/', views.get_employee_commission),
+    path('create_commission/', views.create_commission),
+    path('delete_commission/', views.delete_commission),
     path('update_commision/', views.update_commision),
     
     #Create Asset
@@ -48,6 +52,31 @@ urlpatterns = [
     path('single_employee_schedule/', views.single_employee_schedule),
     
     #Generate ID
-    path('generate_id/', views.generate_id)
+    path('generate_id/', views.generate_id),
+    
+    #Vacations For Employee
+    # path('create_vacation/', views.create_vacation),
+    # path('get_vacation/', views.get_vacation),
+    # path('delete_vacation/', views.delete_vacation),
+    # path('update_vacation/', views.update_vacation),
+    
+    path('create_vacation/', views.create_vacation_emp),
+    path('get_vacation/', views.get_workingschedule),
+    path('delete_vacation/', views.delete_workingschedule),
+    path('update_vacation/', views.update_workingschedule),
+    
+    #Working Schecule for Employee
+    path('create_workingschedule/', views.create_workingschedule),
+   # path('get_workingschedule/', views.get_workingschedule),
+    path('get_workingschedule/', views.working_schedule),
+    path('delete_workingschedule/', views.delete_workingschedule), 
+    path('update_workingschedule/', views.update_workingschedule), 
+    
+    #Create User Account
+    path('create_employe_account/', views.create_employe_account),
+    path('employee_login/', views.employee_login),
+    path('forget_password/', views.forgot_password),
+    path('verify_email/', views.verify_email),
+    path('resend_password/', views.resend_password),
     
 ]

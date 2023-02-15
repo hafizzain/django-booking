@@ -1,6 +1,8 @@
 from cmath import cos
+from threading import Thread
 from django.http import HttpResponse
-from Utility.models import NstyleFile, ExceptionRecord
+from Product.Constants.Add_Product import add_product_remaing
+from Utility.models import Currency, NstyleFile, ExceptionRecord
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -15,13 +17,76 @@ from rest_framework.settings import api_settings
 
 from NStyle.Constants import StatusCodes
 
-from Product.models import ( Category, Brand , Product, ProductMedia, ProductStock
+from Product.models import ( Category, Brand, CurrencyRetailPrice , Product, ProductMedia, ProductOrderStockReport, ProductStock
                             , OrderStock, OrderStockProduct, ProductConsumption, ProductStockTransfer
                            )
 from Business.models import Business, BusinessAddress, BusinessVendor
-from Product.serializers import (CategorySerializer, BrandSerializer, ProductSerializer, ProductStockSerializer, ProductWithStockSerializer
+from Product.serializers import (CategorySerializer, BrandSerializer, ProductOrderStockReportSerializer, ProductSerializer, ProductStockSerializer, ProductWithStockSerializer
                                  ,OrderSerializer , OrderProductSerializer, ProductConsumptionSerializer, ProductStockTransferSerializer
                                  )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_test_api(request):
+    product_id = request.data.get('product_id', None)
+    from_location_id = request.data.get('from_location_id', None)
+    # service_id = "ed9b3e32-4f1f-469a-a065-ea9805ee0edc"
+    # location = "fef70b9b-c42d-4b3e-bf54-f4d1b5513f6b"
+    # product = Product.objects.get(id = service_id)
+    # product_stock = product.product_stock.all()#.first()
+    # available = 0
+    # for i in product_stock:
+    #     print(location, i.location)
+    #     if location == str(i.location):
+    #         print(i.available_quantity)
+    # #data = product_stock.available_quantity
+    # data = 1
+    # print(data)
+    data = []
+    location_ids = ['c7dfffd8-f399-48bf-9165-3fe26f565992','340b2c1f-ff66-4327-9cfe-692dff48ca40','8f8b22c9-8410-46b8-b0c7-f520a1480357']
+    product = Product.objects.get(id = 'c7dfffd8-f399-48bf-9165-3fe26f565992')#filter(is_deleted = False).exclude(id__in = location_ids)
+    data.append(str(product.id))
+    product = Product.objects.get(id = '340b2c1f-ff66-4327-9cfe-692dff48ca40')#filter(is_deleted = False).exclude(id__in = location_ids)
+    data.append(str(product))
+    
+    try:
+        thrd = Thread(target=add_product_remaing, args=[], kwargs={'product' : product, 'tenant' : request.tenant})
+        thrd.start()
+    except Exception as err:
+        ExceptionRecord.objects.create(
+            text=str(err)
+        )
+    
+        #data =  ProductStockTransfer.objects.filter(product = i).aggregate(Sum('quantity'))
+    #print(data)
+    
+    # product = Product.objects.filter(is_deleted = False).exclude(id__in = data)
+    # for i in product:
+    #     print('test')
+    
+    # try:
+    #     added = ProductStock.objects.get(product__id=product_id, location = str(from_location_id) )
+    #     print(added)
+    #     # sold = added.available_quantity - 3
+    #     # added.available_quantity = sold
+    #     # added.save()
+    #     # print(sold)
+    #     # print(added.available_quantity)
+    # except Exception as err:
+    #     print(err)
+    data = 'test'
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Service',
+                'error_message' : None,
+                'service' : data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
 
 @api_view(['GET'])
@@ -621,6 +686,9 @@ def add_product(request):
     is_active = request.data.get('is_active', True)
     medias = request.data.getlist('product_images', None)
     
+    #RetailPrice
+    currency_retail_price = request.data.get('currency_retail_price', None)
+    
     # location = request.data.get('location', None)
 
     # Product Stock Details 
@@ -638,7 +706,7 @@ def add_product(request):
     
     product_error = []
 
-    if not all([name,medias, brand_id, category_id, cost_price, full_price, sell_price, sku,  stock_status ]):
+    if not all([name,medias, brand_id, category_id, cost_price, sku,  stock_status ]):
         return Response(
             {
                 'status' : False,
@@ -665,11 +733,11 @@ def add_product(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     if stock_status is not None:
-        stock_status = json.loads(stock_status)
+        stock_status = False #json.loads(stock_status)
     else: 
         stock_status = True
     if alert_when_stock_becomes_lowest  is not None:
-        alert_when_stock_becomes_lowest= json.loads(alert_when_stock_becomes_lowest)
+        alert_when_stock_becomes_lowest= True #json.loads(alert_when_stock_becomes_lowest)
     else:
         alert_when_stock_becomes_lowest= False
     try:
@@ -734,7 +802,7 @@ def add_product(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    
+    location_ids = []
     product = Product.objects.create(
         user = user,
         business = business,
@@ -744,9 +812,9 @@ def add_product(request):
         product_type = product_type,
         name = name,
         cost_price = cost_price,
-        full_price = full_price,
-        sell_price = sell_price,
-        product_size=product_size,
+        #full_price = full_price,
+        #sell_price = sell_price,
+        #product_size=product_size,
         tax_rate = tax_rate,
         short_description = short_description,
         description = description,
@@ -779,7 +847,33 @@ def add_product(request):
             image=img,
             is_cover = True
         )
-    
+    if currency_retail_price is not None:
+        if type(currency_retail_price) == str:
+            currency_retail_price = currency_retail_price.replace("'" , '"')
+            currency_retail_price = json.loads(currency_retail_price)
+
+        elif type(currency_retail_price) == list:
+            pass
+        
+        for retail in currency_retail_price:
+            #currency_id = retail['currency']
+            #price = retail['retail_price']
+            
+            try:
+                currency_id= Currency.objects.get(id=retail['currency'])
+                
+                CurrencyRetailPrice.objects.create(
+                user = user,
+                business = business,
+                product = product,
+                currency = currency_id,
+                retail_price =  retail['retail_price'] ,
+            )
+            except Exception as err:
+                print(str(err))
+                ExceptionRecord.objects.create(is_resolved = False, text=f'currency not found product line 866  ' )
+            
+                    
     location_quantities = request.data.get('location_quantities', None)
     if location_quantities is not None:
         if type(location_quantities) == str:
@@ -796,10 +890,12 @@ def add_product(request):
             if all([location_id, current_stock, low_stock, reorder_quantity]):
                 try:
                     loc = BusinessAddress.objects.get(id = location_id)
+                    ExceptionRecord.objects.create(text=loc)
+                    location_ids.append(str(loc))
                 except Exception as err:
                     ExceptionRecord.objects.create(text=str(err))
-    
                     pass
+                
                 else:
                     product_stock = ProductStock.objects.create(
                         user = user,
@@ -812,10 +908,33 @@ def add_product(request):
                         alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
                         is_active = stock_status,
                     )
-                    ExceptionRecord.objects.create(is_resolved = True, text='Created')
 
             else:
                 ExceptionRecord.objects.create(text=f'fields not all {location_id}, {current_stock}, {low_stock}, {reorder_quantity}')
+                
+        try:
+            location_remaing = BusinessAddress.objects.filter(is_deleted = False).exclude(id__in = location_ids)
+            for i, location_id in enumerate(location_remaing):
+                ProductStock.objects.create(
+                        user = user,
+                        business = business,
+                        product = product,
+                        location = location_id,
+                        available_quantity = 0,
+                        low_stock = 0, 
+                        reorder_quantity = 0,
+                        alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
+                        is_active = stock_status,
+                    )
+        #         try:
+        #             thrd = Thread(target=add_product_remaing, args=[], kwargs={'product' : product, 'business' : business, 'location': location_id})
+        #             thrd.start()
+        #         except Exception as err:
+        #             ExceptionRecord.objects.create(
+        #                 text=str(err)
+        # )
+        except Exception as err:
+            product_error.append(str(err))
 
     else:
         ExceptionRecord.objects.create(text='No Location Quantities Find')
@@ -839,11 +958,16 @@ def add_product(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_product(request):
+    user = request.user
     product_id = request.data.get('product', None)
     vendor_id = request.data.get('vendor', None)
     category_id = request.data.get('category', None)
     brand_id = request.data.get('brand', None)
     location = request.data.get('location', None)
+    
+    currency_retail_price = request.data.get('currency_retail_price', None)
+    
+    error = []
 
     if not all([product_id, category_id, brand_id]):
         return Response(
@@ -903,6 +1027,8 @@ def update_product(request):
     
     product = Product.objects.get(
         id=product_id,
+        is_deleted = False,
+        
     )
     images = request.data.getlist('product_images', None)
 
@@ -936,16 +1062,56 @@ def update_product(request):
         except Exception as err:
             print(err)
             
-    all_stocks = ProductStock.objects.filter(product=product)
-    for stk in all_stocks:
-        stk.delete()
+    # all_stocks = ProductStock.objects.filter(product=product)
+    # for stk in all_stocks:
+    #     stk.delete()
+    
+    if currency_retail_price is not None:
+        if type(currency_retail_price) == str:
+            currency_retail_price = currency_retail_price.replace("'" , '"')
+            currency_retail_price = json.loads(currency_retail_price)
+
+        elif type(currency_retail_price) == list:
+            pass
+        
+        for retail in currency_retail_price:
+            currency_id = retail['currency']
+            id = retail.get('id', None)
+            price = retail['retail_price']
+            
+            if id is not None:
+                try:
+                    currency_retail = CurrencyRetailPrice.objects.get(id=retail['id'])
+                    is_deleted = retail.get('is_deleted', None)
+                    if bool(is_deleted) == True:
+                        currency_retail.delete()
+                        continue
+                    currency_id= Currency.objects.get(id=retail['currency'])
+                    currency_retail.currency = currency_id
+                    currency_retail.retail_price = retail['retail_price']
+                    currency_retail.save()
+                except Exception as err:
+                    error.append(str(err))
+                    print(err)
+            else:
+                currency_id= Currency.objects.get(id=retail['currency'])
+                
+                CurrencyRetailPrice.objects.create(
+                user = user,
+                business = product.business,
+                product = product,
+                currency = currency_id,
+                retail_price =  retail['retail_price'] ,
+                )
+            
+                
 
     location_quantities = request.data.get('location_quantities', None)
     if location_quantities is not None:
         if type(location_quantities) == str:
-            ExceptionRecord.objects.create(is_resolved = True, text='Location Quantities was string and gonna convert')
+            #ExceptionRecord.objects.create(is_resolved = True, text='Location Quantities was string and gonna convert')
             location_quantities = json.loads(location_quantities)
-            ExceptionRecord.objects.create(is_resolved = True, text='Converted')
+            #ExceptionRecord.objects.create(is_resolved = True, text='Converted')
         
         for loc_quan in location_quantities:
             location_id = loc_quan.get('id', None)
@@ -953,26 +1119,39 @@ def update_product(request):
             low_stock = loc_quan.get('low_stock', None)
             reorder_quantity = loc_quan.get('reorder_quantity', None)
 
-            if all([location_id, current_stock, low_stock, reorder_quantity]):
+            if all([location_id, ]):
                 try:
                     loc = BusinessAddress.objects.get(id = location_id)
                 except Exception as err:
                     ExceptionRecord.objects.create(text=str(err))
     
                     pass
-                else:
-                    product_stock = ProductStock.objects.create(
-                        user = request.user,
-                        business = product.business,
-                        product = product,
-                        location = loc,
-                        available_quantity = current_stock,
-                        low_stock = low_stock, 
-                        reorder_quantity = reorder_quantity,
-                        alert_when_stock_becomes_lowest = True,
-                        is_active = True
-                    )
-                    ExceptionRecord.objects.create(is_resolved = True, text='Created')
+                try:
+                    product_stock = ProductStock.objects.get(product = product.id, location = loc.id )
+                except Exception as err:
+                    ExceptionRecord.objects.create(text=str(err))
+                
+                if reorder_quantity is not None:
+                    product_stock.reorder_quantity += int(reorder_quantity) 
+                    product_stock.save()
+                product_stock.available_quantity = int(current_stock)
+                product_stock.low_stock = int(low_stock)
+                product_stock.save()
+                
+                
+                # else:
+                #     product_stock = ProductStock.objects.create(
+                #         user = request.user,
+                #         business = product.business,
+                #         product = product,
+                #         location = loc,
+                #         available_quantity = current_stock,
+                #         low_stock = low_stock, 
+                #         reorder_quantity = reorder_quantity,
+                #         alert_when_stock_becomes_lowest = True,
+                #         is_active = True
+                #     )
+                #     ExceptionRecord.objects.create(is_resolved = True, text ='Created')
 
             else:
                 ExceptionRecord.objects.create(text=f'fields not all {location_id}, {current_stock}, {low_stock}, {reorder_quantity}')
@@ -997,7 +1176,7 @@ def update_product(request):
                 'status_code' : 200,
                 'response' : {
                     'message' : 'Product Updated!',
-                    'error_message' : None,
+                    'error_message' : error,
                     'product' : data
                 }
             },
@@ -1142,7 +1321,7 @@ def search_product(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_stocks(request):
-    all_stocks = Product.objects.filter(is_active=True, is_deleted=False, product_stock__gt=0 )
+    all_stocks = Product.objects.filter(is_active=True, is_deleted=False, product_stock__gt=0 ).order_by('-created_at').distinct()
     serialized = ProductWithStockSerializer(all_stocks, many=True, context={'request' : request})
     return Response(
         {
@@ -1310,7 +1489,7 @@ def create_orderstock(request):
     business = request.data.get('business', None)
     
     vendor = request.data.get('vendor', None)
-    from_location = request.data.get('from_location',None)
+    #from_location = request.data.get('from_location',None)
     to_location = request.data.get('to_location',None)
     orstock_status = request.data.get('status',None)
     rec_quantity = request.data.get('rec_quantity',None)
@@ -1319,7 +1498,7 @@ def create_orderstock(request):
     #quantity = request.data.get('quantity',None)
     
     
-    if not all([business, orstock_status, vendor, from_location, to_location]):
+    if not all([business, orstock_status, vendor, to_location]):
         return Response(
             {
                 'status' : False,
@@ -1365,7 +1544,7 @@ def create_orderstock(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
     try:
-        from_location = BusinessAddress.objects.get(id=from_location)
+        #from_location = BusinessAddress.objects.get(id=from_location)
         to_location = BusinessAddress.objects.get(id=to_location)
     except Exception as err:
             return Response(
@@ -1384,15 +1563,13 @@ def create_orderstock(request):
         user=user,
         business=business_id, 
         vendor = vendor_id,
-        from_location= from_location,
+        #from_location= from_location,
         to_location= to_location,
         status =orstock_status,
-        rec_quantity= rec_quantity
+        #rec_quantity= rec_quantity
     )
-    print(type(products))
     if type(products) == str:
         products = products.replace("'" , '"')
-        print(products)
         products = json.loads(products)
         pass
     else:
@@ -1421,12 +1598,10 @@ def create_orderstock(request):
             status=status.HTTP_201_CREATED
         ) 
  
- 
- 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_orderstock(request):
-    order_stocks = OrderStock.objects.filter(is_deleted = False, order_stock__product__is_deleted=False).order_by('-created_at')
+    order_stocks = OrderStock.objects.filter(is_deleted = False, order_stock__product__is_deleted=False).order_by('-created_at').distinct()
     serialized = OrderSerializer(order_stocks, many=True, context={'request' : request})
     return Response(
         {
@@ -1445,8 +1620,8 @@ def get_orderstock(request):
 @permission_classes([IsAuthenticated])
 def update_orderstock(request):
     order_id = request.data.get('order_id', None)
-    #products = request.data.get('products', [])
-    
+    products = request.data.get('products', None)
+    error = []
     if order_id is None:
             return Response(
             {
@@ -1479,6 +1654,39 @@ def update_orderstock(request):
                 },
                    status=status.HTTP_404_NOT_FOUND
               )
+    if products is not None:
+        if type(products) == str:
+            products = products.replace("'" , '"')
+            products = json.loads(products)
+
+        for pro in products:
+            id = pro.get('id', None)
+            product_id = pro.get('product_id', None)
+            is_deleted = pro.get('isDeleted', None)
+            quantity = pro['quantity']     
+            if id is not None:
+                try:
+                    pro_stock = OrderStockProduct.objects.get(id=id)
+                    if is_deleted == 'True':
+                        pro_stock.delete()
+                        continue
+                    
+                    else:
+                        pro_stock.quantity = quantity
+                        pro_stock.save()
+                except Exception as err:
+                    error.append(str(err))     
+            else:
+                try:
+                    pro = Product.objects.get(id=product_id)
+                except Product.DoesNotExist:
+                    None
+                OrderStockProduct.objects.create(
+                    order = order_stock,
+                    product = pro,
+                    quantity = quantity
+                )
+    
     # if type(products) == str:
     #     products = products.replace("'" , '"')
     #     print(products)
@@ -1522,7 +1730,8 @@ def update_orderstock(request):
                 'response' : {
                     'message' : ' OrderStock updated successfully',
                     'error_message' : None,
-                    'stock' :serializer.data
+                    'stock' :serializer.data,
+                    'Error':error,
                 }
             },
             status=status.HTTP_200_OK
@@ -1544,7 +1753,7 @@ def delete_orderstock(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'All fields are required.',
                     'fields' : [
-                        'product',
+                        'id',
                     ]
                 }
             },
@@ -1579,6 +1788,158 @@ def delete_orderstock(request):
         status=status.HTTP_200_OK
     )
 
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_orderstockproduct(request):
+    user = request.user
+    stockproduct_id = request.data.get('stockproduct_id', None)
+    note = request.data.get('note', None)
+    rec_quantity = request.data.get('rec_quantity', None)
+    quantity = request.data.get('quantity', None)
+    product_id = request.data.get('product_id', None)
+    to_location = request.data.get('to_location', None)
+    vendor_id = request.data.get('vendor_id', None)
+    error = []
+    if stockproduct_id is None:
+            return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'User id is required',
+                    'fields' : [
+                        'order_id',
+                    ]
+                }
+            },
+             status=status.HTTP_400_BAD_REQUEST
+           )
+        
+    try:
+        order_stock = OrderStockProduct.objects.get(id=stockproduct_id)
+    except Exception as err:
+              return Response(
+             {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_ORDER_STOCK_ID_4038,
+                    'status_code_text' : 'INVALID_ORDER_STOCK_ID_4038',
+                        'response' : {
+                            'message' : 'Order Stock Product Not Found',
+                            'error_message' : str(err),
+                    }
+                },
+                   status=status.HTTP_404_NOT_FOUND
+              )
+    if note is not None:
+        order_stock.note = note
+        order_stock.save()
+    if rec_quantity is not None:
+        order_stock.rec_quantity = rec_quantity
+        order_stock.save()
+    
+    try:
+        product = Product.objects.get(id=product_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Product Not found',
+                    'error_message' : str(err),
+                    
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    try:
+        location = BusinessAddress.objects.get(id=to_location)
+    except:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Location Not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    try:
+        vendor=BusinessVendor.objects.get(id=vendor_id)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.VENDOR_NOT_FOUND_4019,
+                    'response' : {
+                    'message' : 'Vendor not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    
+    
+    try:
+        added_product = ProductStock.objects.get(product__id=product.id, location = location.id )
+        stock_cunsumed = ProductOrderStockReport.objects.create(
+            report_choice = 'Purchase',
+            product = product,
+            user = user,
+            vendor = vendor,            
+            location = location,
+            quantity = int(rec_quantity), 
+            reorder_quantity =int(quantity), 
+            before_quantity = added_product.available_quantity  
+            )
+        added_product.available_quantity += int(rec_quantity)
+        added_product.save()
+        stock_cunsumed.after_quantity = added_product.available_quantity
+        stock_cunsumed.save()
+        
+    except Exception as err:
+        ExceptionRecord.objects.create(
+            is_resolved = True, 
+            text= f'Issue raised in orderstockproduct quantity line 1795 {str(err)}'
+        )
+    
+    serializer = OrderProductSerializer(order_stock, data=request.data, partial=True, context={'request' : request})
+    if serializer.is_valid():
+           serializer.save()
+    else: 
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+                'response' : {
+                    'message' : 'Invialid Data',
+                    'error_message' : str(serializer.errors),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+        
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : ' OrderStockProduct updated successfully',
+                    'error_message' : None,
+                    'stock' :serializer.data,
+                    'Error':error,
+                }
+            },
+            status=status.HTTP_200_OK
+           )
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -1646,6 +2007,44 @@ def add_product_consumption(request):
         location = location,
         quantity = quantity
     )
+    try:
+        consumed = ProductStock.objects.get(product__id=product.id, location = location.id )
+        if consumed.available_quantity >= int(quantity):
+            stock_cunsumed = ProductOrderStockReport.objects.create(
+            report_choice = 'Consumed',
+            product = product,
+            user = request.user,
+            #location = product_location,
+            consumed_location = location,
+            quantity = int(quantity), 
+            before_quantity = consumed.available_quantity     
+            )
+            sold = consumed.available_quantity - int(quantity)
+            consumed.available_quantity = sold
+            #consumed.sold_quantity += int(quantity)
+            consumed.save()
+            stock_cunsumed.after_quantity = sold
+            stock_cunsumed.save()
+        else:
+            return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'available_quantity_less_then',
+                'response' : {
+                    'message' : 'Available_quantity less then quantity',
+                    'error_message' : 'Quantity Error',
+                    
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as err:
+        ExceptionRecord.objects.create(
+            is_resolved = True, 
+            text= str(err)
+        )
+    
 
     serialized = ProductConsumptionSerializer(cunsumption_obj)
 
@@ -1669,6 +2068,7 @@ def add_product_consumption(request):
 def update_product_consumptions(request):
     
     consumption_id = request.data.get('consumption_id', None)
+    user = request.user
 
     if not all([consumption_id]):
         return Response(
@@ -1742,13 +2142,42 @@ def update_product_consumptions(request):
                 }
             },
             status=status.HTTP_404_NOT_FOUND
-        )
+        
+    )
     
     product_con.product = product
     product_con.location = location
     product_con.quantity = quantity
     product_con.save()
-
+    
+    try:
+        consumed = ProductStock.objects.get(product__id=product, location = location )
+        if consumed.available_quantity > int(quantity):
+            sold = consumed.available_quantity - int(quantity)
+            consumed.available_quantity = sold
+            #consumed.sold_quantity += int(quantity)
+            consumed.save()
+            
+        else:
+            return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'available_quantity_less_then',
+                'response' : {
+                    'message' : 'Available_quantity less then quantity',
+                    'error_message' : 'Quantity Error',
+                    
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as err:
+        ExceptionRecord.objects.create(
+            is_resolved = True, 
+            text= str(err)
+        )
+    
     serialized = ProductConsumptionSerializer(product_con)
     return Response(
         {
@@ -1762,7 +2191,6 @@ def update_product_consumptions(request):
         },
         status=status.HTTP_200_OK
     )
-
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
@@ -1843,6 +2271,7 @@ def add_product_stock_transfer(request):
     from_location_id = request.data.get('from_location', None)
     to_location_id = request.data.get('to_location', None)
     quantity = request.data.get('quantity', None)
+    note = request.data.get('note', None)
 
     if not all([product_id, from_location_id, to_location_id, quantity]):
         return Response(
@@ -1884,6 +2313,7 @@ def add_product_stock_transfer(request):
     try:
         from_location = BusinessAddress.objects.get(id=from_location_id)
         to_location = BusinessAddress.objects.get(id=to_location_id)
+        #product_location = BusinessAddress.objects.get(id=product.location.id)
     except Exception as err:
         return Response(
             {
@@ -1903,9 +2333,58 @@ def add_product_stock_transfer(request):
         product = product,
         from_location = from_location,
         to_location = to_location,
-        quantity = quantity
+        quantity = quantity,
+        note = note,
     )
-
+    try:
+        transfer = ProductStock.objects.get(product__id=product.id, location = from_location )
+        if transfer.available_quantity >= int(quantity):
+            stock_transfer = ProductOrderStockReport.objects.create(
+            report_choice = 'Transfer_from',
+            product = product,
+            user = request.user,
+            #location = product_location,
+            from_location = from_location,
+            quantity = int(quantity), 
+            before_quantity = transfer.available_quantity      
+            )
+            sold = transfer.available_quantity - int(quantity)
+            transfer.available_quantity = sold
+            #transfer.sold_quantity += int(quantity)
+            transfer.save()
+            stock_transfer.after_quantity = sold
+            stock_transfer.save()
+            
+        try :
+            transfer = ProductStock.objects.get(product__id=product.id, location = to_location )
+            stock_transfer = ProductOrderStockReport.objects.create(
+            report_choice = 'Transfer_to',
+            product = product,
+            user = request.user,
+            #location = product_location,
+            to_location = to_location,
+            quantity = int(quantity), 
+            before_quantity = transfer.available_quantity      
+            )
+            sold = transfer.available_quantity + int(quantity)
+            transfer.available_quantity = sold
+            transfer.save()
+            
+            stock_transfer.after_quantity = sold
+            stock_transfer.save()
+            
+        except Exception as err:
+            ExceptionRecord.objects.create(
+            is_resolved = True, 
+            text= f'added id to location {str(err)}'
+            )
+        
+    except Exception as err:
+        ExceptionRecord.objects.create(
+            is_resolved = True, 
+            text= f'transfer id from location {str(err)}'
+        )
+    
     serialized = ProductStockTransferSerializer(cunsumption_obj)
 
     return Response(
@@ -1921,12 +2400,10 @@ def add_product_stock_transfer(request):
         status=status.HTTP_201_CREATED
     )
 
-
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_product_stock_transfers(request):
-    stock_tranfers = ProductStockTransfer.objects.filter(is_deleted=False)
+    stock_tranfers = ProductStockTransfer.objects.filter(is_deleted=False).order_by('-created_at').distinct()
     serialized = ProductStockTransferSerializer(stock_tranfers, many=True)
     return Response(
         {
@@ -2031,6 +2508,7 @@ def update_product_stock_transfer(request):
         from_location_id = request.data.get('from_location',  stock_transfer.from_location.id)
         to_location_id = request.data.get('to_location',  stock_transfer.to_location.id)
         quantity = request.data.get('quantity',  stock_transfer.quantity)
+        note = request.data.get('note',  stock_transfer.note)
         try:
             product = Product.objects.get(id=product_id)
         except Exception as err:
@@ -2069,6 +2547,7 @@ def update_product_stock_transfer(request):
         stock_transfer.from_location = from_location
         stock_transfer.to_location = to_location
         stock_transfer.quantity = quantity
+        stock_transfer.note = note
         stock_transfer.save()
 
         serialized = ProductStockTransferSerializer(stock_transfer)
@@ -2085,3 +2564,21 @@ def update_product_stock_transfer(request):
             },
             status=status.HTTP_200_OK
         )
+        
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_product_stock_report(request):
+    stock_report = ProductOrderStockReport.objects.filter(is_deleted=False).order_by('-created_at').distinct()
+    serialized = ProductOrderStockReportSerializer(stock_report, many=True)
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Product Stock Reports',
+                'error_message' : None,
+                'product_stock_report' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )

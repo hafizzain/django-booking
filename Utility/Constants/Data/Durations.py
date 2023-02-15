@@ -1,4 +1,3 @@
-
 DURATION_CHOICES_DATA = {
     '30 Min' : 30,
     '60 Min' : 60,

@@ -43,7 +43,9 @@ urlpatterns = [
     path('get_orderstock/', views.get_orderstock),
     path('update_orderstock/', views.update_orderstock),
     path('delete_orderstock/', views.delete_orderstock),
-
+    
+    #Update stockproduct order
+    path('update_orderstockproduct/', views.update_orderstockproduct),    
 
     path('add_product_consumption/', views.add_product_consumption),
     path('get_product_consumptions/', views.get_product_consumptions),
@@ -55,4 +57,10 @@ urlpatterns = [
     path('get_product_stock_transfers/', views.get_product_stock_transfers),
     path('delete_product_stock_transfer/', views.delete_product_stock_transfer),
     path('update_product_stock_transfer/', views.update_product_stock_transfer),
+    
+    #Inventory Reports
+    path('get_product_stock_report/', views.get_product_stock_report),
+    
+    #Testing Api
+    path('get_test_api/', views.get_test_api)
 ]

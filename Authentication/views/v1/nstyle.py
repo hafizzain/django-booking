@@ -254,7 +254,6 @@ def verify_otp(request):
             print('ERROR Threading : ', err)
             pass
     except Exception as err:
-        print(err)
         return Response(
             {
                 'status' : False,
@@ -500,10 +499,10 @@ def login(request):
     
     connection.set_schema_to_public()
     try:
-        user = User.objects.get(
+        user = User.objects.filter(
             email=email,
             is_deleted=False
-        )
+        ).exclude(user_account_type__account_type = 'Everyone')[0]
         
     except Exception as err:
         return Response(

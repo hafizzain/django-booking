@@ -1,18 +1,33 @@
-
-
-
 from cmath import e
 from dataclasses import field
-from locale import currency
 from pyexpat import model
-from Utility.models import Currency
+from Appointment.models import AppointmentService
+from Employee.models import EmployeDailySchedule, Employee
+from Utility.models import Currency, ExceptionRecord, State, Country,City
 from rest_framework import serializers
+from datetime import datetime, timedelta
 
-from Business.models import BookingSetting, BusinessType, Business, BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BusinessPaymentMethod, BusinessTax, BusinessVendor,BusinessOpeningHour
+
+from Business.models import BookingSetting, BusinessAddressMedia, BusinessType, Business, BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BusinessPaymentMethod, BusinessTax, BusinessVendor,BusinessOpeningHour
 from Authentication.serializers import UserSerializer
 from django.conf import settings
 
-from Product.Constants.index  import tenant_media_base_url
+from Product.Constants.index  import tenant_media_base_url, tenant_media_domain
+
+class CountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        exclude = ['is_deleted', 'created_at', 'unique_code', 'key']
+    
+class StateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = State
+        exclude = ['is_deleted', 'created_at', 'unique_code', 'key']
+        
+class CitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        exclude = ['is_deleted', 'created_at', 'unique_code', 'key']
 
 class BusinessTypeSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
@@ -161,22 +176,127 @@ class Business_PutSerializer(serializers.ModelSerializer):
         ]
 
 
+class BusinessAddressMediaSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request)
+                return f'{url}{obj.image}'
+            except:
+                return obj.image
+        return None
+    class Meta:
+        model= BusinessAddressMedia
+        fields= ['id', 'image']
+        
 class OpeningHoursSerializer(serializers.ModelSerializer):
     
     class Meta:
         model= BusinessOpeningHour
         fields= '__all__'
+class CurrencySerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model= Currency
+        fields= '__all__'
 
+class ParentBusinessTax_RateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessTax
+        fields = ['id', 'name', 'parent_tax', 'tax_rate', 'tax_type', 'is_active']
+
+class ParentBusinessTaxSerializer(serializers.ModelSerializer):
+    # parent_tax = serializers.SerializerMethodField(read_only=True)
+    
+    # def get_parent_tax(self, obj):
+    #     try:
+    #         tax = obj.parent_tax.all()
+    #         # ser = BusinessTax.objects.filter(service = obj).first()
+    #         return tax.tax_rate
+    #     except Exception as err:
+    #         pass
+    parent_tax = ParentBusinessTax_RateSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = BusinessTax
+        fields = ['id', 'name', 'parent_tax', 'tax_rate', 'location', 'tax_type', 'is_active']
+
+class BusinessTaxBusinessAddressSerializer(serializers.ModelSerializer):
+
+    parent_tax = ParentBusinessTaxSerializer(many=True, read_only=True)
+    #location = BusinessAddress_GetSerializer()
+    class Meta:
+        model = BusinessTax
+        fields = ['id', 'name', 'parent_tax',
+                  'tax_rate', 'location', 'tax_type', 'is_active']
+        
 class BusinessAddress_GetSerializer(serializers.ModelSerializer):
     #opening_hours= OpeningHoursSerializer(read_only=True)
     opening_hours = serializers.SerializerMethodField(read_only=True)
     start_time=  serializers.SerializerMethodField(read_only=True)
     close_time= serializers.SerializerMethodField(read_only=True)
+    currency = serializers.SerializerMethodField(read_only=True)
+    images = serializers.SerializerMethodField(read_only=True)
+    
+    country = serializers.SerializerMethodField(read_only=True)
+    state = serializers.SerializerMethodField(read_only=True)
+    city = serializers.SerializerMethodField(read_only=True)
+    businesstax = serializers.SerializerMethodField(read_only=True)
+
+    def get_businesstax(self, obj):
+        try:
+            tax = BusinessTax.objects.get(location = obj)
+            return BusinessTaxBusinessAddressSerializer(tax).data
+        except Exception as err:
+            print(err)
+    
+    def get_country(self, obj):
+        try:
+            return CountrySerializer(obj.country).data
+        except Country.DoesNotExist:
+            return None
+    
+    def get_state(self, obj):
+        try:
+            return StateSerializer(obj.state).data
+        except State.DoesNotExist:
+            return None
+    
+    def get_city(self, obj):
+        try:
+            return CitySerializer(obj.city).data
+        except City.DoesNotExist:
+            return None    
+    
+    def get_images(self, obj):
+        try:
+            image = BusinessAddressMedia.objects.get(business_address = obj)
+            if image.image:
+                try:
+                    request = self.context["request"]
+                    url = tenant_media_base_url(request)
+                    return f'{url}{image.image}'
+                except:
+                    return image.image
+            return None
+            #return BusinessAddressMediaSerializer(image, context=self.context).data
+        except Exception as err:
+            print(err)
+            
+    def get_currency(self, obj):
+        try:
+            currency = Currency.objects.get(id=obj.currency.id)
+            return CurrencySerializer(currency).data
+        
+        except Exception as err:
+            print(err)
     
     def get_opening_hours(self, obj):
         try:
-            location = BusinessOpeningHour.objects.filter(business_address=obj)
-            #print(location)
+            location = BusinessOpeningHour.objects.filter(business_address=obj).order_by('-created_at')
             return OpeningHoursSerializer(location, many=True).data
         
         except BusinessOpeningHour.DoesNotExist:
@@ -209,6 +329,114 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
             'country',
             'state',
             'city',
+            'currency',
+            'email',
+            'mobile_number',
+            'address',
+            'address_name',
+            'postal_code',
+            'website',
+            'businesstax',
+            'is_primary',
+            'banking',
+            'start_time',
+            'close_time',
+            'service_avaiable',
+            'location_name',
+            'images',
+            'opening_hours',
+            'is_deleted',
+            'is_publish',
+            'description',
+        ]
+class BusinessAddress_CustomerSerializer(serializers.ModelSerializer):
+    #opening_hours= OpeningHoursSerializer(read_only=True)
+    opening_hours = serializers.SerializerMethodField(read_only=True)
+    start_time=  serializers.SerializerMethodField(read_only=True)
+    close_time= serializers.SerializerMethodField(read_only=True)
+    currency = serializers.SerializerMethodField(read_only=True)
+    images = serializers.SerializerMethodField(read_only=True)
+    
+    country = serializers.SerializerMethodField(read_only=True)
+    state = serializers.SerializerMethodField(read_only=True)
+    city = serializers.SerializerMethodField(read_only=True)
+    
+    def get_country(self, obj):
+        try:
+            return CountrySerializer(obj.country).data
+        except Country.DoesNotExist:
+            return None
+    def get_state(self, obj):
+        try:
+            return StateSerializer(obj.state).data
+        except State.DoesNotExist:
+            return None
+    
+    def get_city(self, obj):
+        try:
+            return CitySerializer(obj.city).data
+        except City.DoesNotExist:
+            return None    
+    
+    def get_images(self, obj):
+        try:
+            image = BusinessAddressMedia.objects.get(business_address = obj)
+            if image.image:
+                try:
+                    tenant = self.context["tenant"]
+                    url = tenant_media_domain(tenant)
+                    return f'{url}{image.image}'
+                except:
+                    return image.image
+            return None
+            #return BusinessAddressMediaSerializer(image, context=self.context).data
+        except Exception as err:
+            print(err)
+            
+    def get_currency(self, obj):
+        try:
+            currency = Currency.objects.get(id=obj.currency.id)
+            return CurrencySerializer(currency).data
+        
+        except Exception as err:
+            print(err)
+    
+    def get_opening_hours(self, obj):
+        try:
+            location = BusinessOpeningHour.objects.filter(business_address=obj).order_by('-created_at')
+            return OpeningHoursSerializer(location, many=True).data
+        
+        except BusinessOpeningHour.DoesNotExist:
+            return None
+
+    def get_start_time(self, obj):
+        try:
+            location = BusinessOpeningHour.objects.get(
+                business_address=obj,
+                day__iexact = 'Monday'
+            )
+            return location.start_time
+        except BusinessOpeningHour.DoesNotExist:
+            return None
+            
+    def get_close_time(self, obj):
+        try:
+            location = BusinessOpeningHour.objects.get(
+                business_address=obj,
+                day__iexact = 'Monday'
+            )
+            return location.close_time
+        except BusinessOpeningHour.DoesNotExist:
+            return None
+
+    class Meta:
+        model = BusinessAddress
+        fields = [
+            'id',
+            'country',
+            'state',
+            'city',
+            'currency',
             'email',
             'mobile_number',
             'address',
@@ -219,8 +447,13 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
             'banking',
             'start_time',
             'close_time',
+            'service_avaiable',
+            'location_name',
+            'images',
             'opening_hours',
-            'is_deleted'
+            'is_deleted',
+            'is_publish',
+            'description',
         ]
 
 class BusinessThemeSerializer(serializers.ModelSerializer):
@@ -308,21 +541,15 @@ class PaymentMethodSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessPaymentMethod
         fields = ['id', 'method_type', 'is_active']
-
-class ParentBusinessTaxSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BusinessTax
-        fields = ['id', 'name', 'parent_tax', 'tax_rate', 'location', 'tax_type', 'is_active']
-
+        
 class BusinessTaxSerializer(serializers.ModelSerializer):
 
     parent_tax = ParentBusinessTaxSerializer(many=True, read_only=True)
     location = BusinessAddress_GetSerializer()
     class Meta:
         model = BusinessTax
-        fields = ['id', 'name', 'parent_tax', 'tax_rate', 'location', 'tax_type', 'is_active']
-
-
+        fields = ['id', 'name', 'parent_tax',
+                  'tax_rate', 'location', 'tax_type', 'is_active']
 class BusinessVendorSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessVendor
@@ -347,3 +574,69 @@ class BusiessAddressAppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessAddress
         fields = ['id', 'address_name']
+class AppointmentServiceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = AppointmentService
+        fields = '__all__'
+class ScheduleSerializer(serializers.ModelSerializer):
+    # employee = serializers.SerializerMethodField(read_only=True)
+    
+    # def get_employee(self, obj):
+    #     try:
+    #         data = Employee.objects.get(id = str(obj.employee))
+    #         return EmployeeNameSerializer(data, context=self.context).data
+    #     except Exception as err:
+    #         print(err)
+         
+    class Meta:
+        model = EmployeDailySchedule
+        fields = '__all__'
+        
+class EmployeTenatSerializer(serializers.ModelSerializer):
+    appointmemt = serializers.SerializerMethodField(read_only=True)
+    schedule =  serializers.SerializerMethodField(read_only=True)
+    
+    def get_schedule(self, obj):
+        schedule =  EmployeDailySchedule.objects.filter(employee= obj )
+        return ScheduleSerializer(schedule, many = True,context=self.context).data
+    
+    def get_appointmemt(self, obj):
+        service = AppointmentService.objects.filter(member = obj,is_deleted = False).order_by('-created_at')
+        for ser in service:
+            date = datetime.strptime(self.context["date"], "%Y-%m-%d")
+            start_time = self.context["start_time"]
+            app_date = ser.appointment_date
+            app_time = ser.appointment_time
+            duration = ser.duration
+            cal_duration = str(duration).split(' ')[0]
+            
+            ExceptionRecord.objects.create(
+                text = f'user {cal_duration} database date {start_time}'
+            )
+            
+            app_date_time = f'2000-01-01 {app_time}'
+
+            app_date_time = datetime.fromisoformat(app_date_time)
+            datetime_duration = app_date_time + timedelta(minutes=int(cal_duration))
+            datetime_duration = datetime_duration.strftime('%H:%M:%S')
+            end_time = datetime_duration
+            
+            
+            if date.date() == app_date:
+                if end_time == start_time and end_time :
+                    return f'Date are same{end_time}'
+            else:
+                return 'create emmployee'
+             
+        return AppointmentServiceSerializer(service, many = True).data
+    
+    class Meta:
+        model = Employee
+        fields = '__all__'
+        
+class EmployeAppointmentServiceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = AppointmentService
+        fields = ( 'appointment_time', 'end_time')

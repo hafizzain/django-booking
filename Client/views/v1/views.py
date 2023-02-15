@@ -9,8 +9,8 @@ from Service.models import Service
 from Business.models import Business
 from Product.models import Product
 from Utility.models import Country, Language, State, City
-from Client.models import Client, ClientGroup, DiscountMembership, Subscription , Rewards , Promotion , Membership , Vouchers
-from Client.serializers import ClientSerializer, ClientGroupSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer
+from Client.models import Client, ClientGroup, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers
+from Client.serializers import ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer
 from Utility.models import NstyleFile
 
 import json
@@ -218,7 +218,7 @@ def create_client(request):
     country= request.data.get('country', None)
     languages= request.data.get('language', None)
     
-    if not all([business_id, client_id, full_name ,gender , customer_note , languages]):
+    if not all([business_id, client_id, full_name ,gender  , languages]):
         return Response(
             {
                 'status' : False,
@@ -233,7 +233,6 @@ def create_client(request):
                         'full_name',
                         'gender', 
                         'languages',
-                        'customer_note'
                     ]
                 }
             },
@@ -2144,3 +2143,208 @@ def update_vouchers(request):
         status=status.HTTP_200_OK
         )
     
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_loyalty(request):
+    user = request.user
+    business_id = request.data.get('business', None)
+    name = request.data.get('name', None)
+    loyaltytype = request.data.get('loyaltytype', None)
+    amount_spend = request.data.get('amount_spend', None)
+    number_points = request.data.get('number_points', None)
+    earn_points = request.data.get('earn_points', None)
+    total_earn_from_points = request.data.get('total_earn_from_points', None)
+    
+    if not all([business_id , name , loyaltytype ,amount_spend, number_points, earn_points]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                          'name',
+                          'loyaltytype',
+                          'amount_spend' ,
+                          'number_points',
+                          'earn_points', 
+                            ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        business=Business.objects.get(id=business_id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    loyalty = LoyaltyPoints.objects.create(
+        user = user,
+        business = business,
+        name =name,
+        loyaltytype = loyaltytype,
+        amount_spend =amount_spend,
+        number_points = number_points,
+        earn_points = earn_points,
+        total_earn_from_points = total_earn_from_points,
+    )
+    
+    serialized = LoyaltyPointsSerializer(loyalty)
+       
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'LoyaltyPoints Create!',
+                    'error_message' : None,
+                    'loyalty' : serialized.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_loyalty(request):
+    all_loyalty= LoyaltyPoints.objects.filter(is_deleted = False).order_by('-created_at')
+    serialized = LoyaltyPointsSerializer(all_loyalty, many= True)
+       
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Loyalty',
+                'error_message' : None,
+                'loyalty' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_loyalty(request):
+    loyalty_id = request.data.get('id', None)
+    if loyalty_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        loyalty = LoyaltyPoints.objects.get(id=loyalty_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid loyalty ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    loyalty.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Loyalty deleted successfully',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+    
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_loyalty(request):
+    id = request.data.get('id', None)
+    if id is None: 
+        return Response(
+        {
+            'status' : False,
+            'status_code' : StatusCodes.MISSING_FIELDS_4001,
+            'status_code_text' : 'MISSING_FIELDS_4001',
+            'response' : {
+                'message' : 'Invalid Data!',
+                'error_message' : 'ID are required.',
+                'fields' : [
+                    'id'                         
+                ]
+            }
+        },
+        status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        loyalty = LoyaltyPoints.objects.get(id=id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code_text' : 'INVALID_LOYALTY_ID',
+                'response' : {
+                    'message' : 'Loyalty Not Found',
+                    'error_message' : str(err),
+                }
+            },
+                status=status.HTTP_404_NOT_FOUND
+        )
+    serializer = LoyaltyPointsSerializer(loyalty, data=request.data, partial=True)
+    if not serializer.is_valid():
+        return Response(
+                {
+            'status' : False,
+            'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+            'response' : {
+                'message' : 'Loyalty Serializer Invalid',
+                'error_message' : str(serializer.errors),
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+        )
+    serializer.save()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Update loyalty Successfully',
+                'error_message' : None,
+                'voucher' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+        )
