@@ -525,7 +525,17 @@ def login(request):
     #         is_deleted=False,
     #         user_account_type__account_type = 'Employee'
     #     )[0]
-    #     employee = True   
+    #     employee = True 
+    try:
+        user = User.objects.get(
+            email__icontans =email,
+            is_deleted=False,
+            user_account_type__account_type = 'Employee'
+        )
+        employee = True
+    except: 
+        pass
+    
     if not social_account and not user.is_active:
         return Response(
             {
