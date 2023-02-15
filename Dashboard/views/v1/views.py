@@ -1,11 +1,8 @@
 from django.conf import settings
 from operator import ge
 from Utility.Constants.Data.months import  FIXED_MONTHS
-<<<<<<< HEAD
+
 from Dashboard.serializers import EmployeeDashboradSerializer
-=======
-from Dashboard.serializers import TargetsAcheivedSerializer,EmployeeDashboradSerializer
->>>>>>> staging
 from Employee.models import Employee
 from TragetControl.models import StaffTarget
 from rest_framework.decorators import api_view, permission_classes
