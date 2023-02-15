@@ -1,5 +1,8 @@
 from django.conf import settings
 from operator import ge
+
+from TragetControl.models import TierStoreTarget
+from Order.models import ProductOrder
 from Utility.Constants.Data.months import  FIXED_MONTHS
 from Dashboard.serializers import EmployeeDashboradSerializer
 from Employee.models import Employee
@@ -214,10 +217,10 @@ def get_acheived_target_report(request):
                     'error_message' : 'All fields are required',
                     'fields' : [
                         'employee_id',
-                        'start_month',
-                        'start_year',
-                        'end_month',
-                        'end_year',
+                        # 'start_month',
+                        # 'start_year',
+                        # 'end_month',
+                        # 'end_year',
                     ]
                 }
             },
@@ -277,4 +280,93 @@ def get_acheived_target_report(request):
         )
     
     
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_dashboard_target_overview(request):
+    employee_id = request.GET.get('employee_id', None)
+
+
+    if not all([employee_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required',
+                    'fields' : [
+                        'employee_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
     
+    try: 
+        employee = Employee.objects.get(id=employee_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                    'response' : {
+                        'message' : 'Employee Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    service_target = TierStoreTarget.objects.filter('service_target',None)
+    retail_target = TierStoreTarget.objects.filter('retail_target',None)
+    voucher_target = TierStoreTarget.objects.filter('voucher_target',None)
+    membership_target = TierStoreTarget.objects.filter('membership_target',None)
+
+    achieved_target_member = ProductOrder.objects.filter(member = employee)
+
+    targets = TierStoreTarget.objects.filter(
+        employee_id = employee_id,
+        service_target = service_target, # 8
+        retail_target = retail_target,
+        voucher_target = voucher_target,
+        membership_target = membership_target,
+    )
+    total_set=0
+    
+    print(service_target)
+    print(retail_target)
+    print(voucher_target)
+    print(membership_target)
+
+    achieved_target= len(achieved_target_member)
+
+    for target in targets :
+        s = target.service_target
+        r = target.retail_target
+        v = target.voucher_target
+        m = target.membership_target
+        total_set = total_set + s + r + v + m
+        achieved_target = achieved_target + s + r + v + m
+
+    print(total_set)
+    print(achieved_target)
+
+    return Response(
+            {
+                'status' : 200,
+                'status_code' : '200',
+                'response' : {
+                    'message' : 'Employee Id recieved',
+                    'error_message' : None,
+                    'employee_id' : employee_id,
+                    'total_set' : total_set,
+                    'achieved_target' : achieved_target,
+                    'service_target' : service_target,
+                    'retail_target' : retail_target,
+                    'voucher_target' : voucher_target,
+                    'membership_target' : membership_target,
+                }
+            },
+            status=status.HTTP_200_OK
+        )

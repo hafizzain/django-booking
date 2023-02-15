@@ -75,3 +75,10 @@ class EmployeeDashboradSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = Employee
 #         fields=['id','range_start','range_end',]
+
+class GraphDataSerializer(serializers.ModelSerializer):
+    
+    GraphData = serializers.SerializerMethodField(read_only=True)
+    class Meta:
+        model = StaffTarget
+        fields = ('service_target','retail_target','voucher_target', 'membership_target','total_set')
