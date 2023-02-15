@@ -65,8 +65,15 @@ def create_tenant_profile(tenant_user=None, data=None, tenant=None):
     if tenant_user is None or tenant is None:
         return None
 
+    tnt_start_time = datetime.datetime.now()
 
     with tenant_context(tenant):
+        time_diff = datetime.datetime.now() - tnt_start_time
+
+        ExceptionRecord.objects.create(
+            text = f'SWITCH TENANT TIME DIFF . {time_diff.total_seconds()} Seconds'
+        )
+                
         user_profile = Profile.objects.create(
             user = tenant_user,
             is_active=True
