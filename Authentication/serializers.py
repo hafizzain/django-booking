@@ -29,16 +29,16 @@ class UserLoginSerializer(serializers.ModelSerializer):
                 return True
             else:
                 return False
-        except:
-            pass
+        except Exception as err:
+            return str(err)
         
     def get_employee_permission(self, obj):
         try:
             emp = Employee.objects.get(email = obj.email)
             return EmployeSerializer(emp).data#context={'request' : request, })
             
-        except:
-            return None
+        except Exception as err:
+            return str(err)
     
     def get_access_token(self,obj):
         return str(obj.auth_token)
