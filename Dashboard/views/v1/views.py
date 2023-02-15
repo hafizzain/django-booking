@@ -270,7 +270,7 @@ def get_acheived_target_report(request):
                     'message' : 'achieved Target',
                     'error_message' : None,
                     'employee_id' : employee_id,
-                    'total_achieved_targets' : acheived ,
+                    'total_achieved_targets' : acheived,
                 }
             },
             status=status.HTTP_200_OK
