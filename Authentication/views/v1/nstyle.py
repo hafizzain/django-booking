@@ -476,6 +476,7 @@ def login(request):
     employee = False
     if social_account:
         social_platform = request.data.get('social_platform', None)
+    s_data = {}
     
     if not email or (not social_account and not password ) or (social_account and not social_platform ):
         return Response(
@@ -629,7 +630,7 @@ def login(request):
             status=status.HTTP_404_NOT_FOUND
         )
     if employee:
-        s_data['id'] = None
+        #s_data['id'] = None
         employe_user = EmployeeTenantDetail.objects.get(user = user)
         with tenant_context(employe_user.tenant):
             user = User.objects.get(
