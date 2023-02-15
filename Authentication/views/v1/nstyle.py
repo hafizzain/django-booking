@@ -522,7 +522,7 @@ def login(request):
             status=status.HTTP_404_NOT_FOUND
         )
         
-    if user != None:
+    if user == None:
         try:
             user = User.objects.get(
                 email =email,
