@@ -23,7 +23,7 @@ class UserAdmin(admin.ModelAdmin):
         'is_tenant_user'
     ]
 
-    list_filter = ['is_email_verified', 'is_mobile_verified', 'is_tenant_user']
+    list_filter = ['is_email_verified', 'is_mobile_verified']
     
     def is_tenant_user(self, user_obj):
         try:
