@@ -638,7 +638,7 @@ def login(request):
                 is_deleted=False,
                 user_account_type__account_type = 'Employee'
             )
-            serialized = UserLoginSerializer(user, context={'employee' : True, })
+            serialized = UserLoginSerializer(user, context={'employee' : True, 'request' : request })
             s_data = dict(serialized.data)
             
     # else:
