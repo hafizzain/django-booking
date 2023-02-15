@@ -42,7 +42,12 @@ class UserLoginSerializer(serializers.ModelSerializer):
             return str(err)
     
     def get_access_token(self,obj):
-        return str(obj.auth_token)
+        try:
+            token = self.context["token"]
+            if token:
+                return token
+        except :
+                return str(obj.auth_token)
 
     def get_domain(self,obj):
         try:
