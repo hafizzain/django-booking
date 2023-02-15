@@ -6,6 +6,7 @@ from Tenants.models import Tenant, Domain
 from Business.models import Business, BusinessPaymentMethod, BusinessType
 from Profile.models import Profile
 from Utility.Constants.add_data_db import add_business_types, add_countries, add_software_types, add_states, add_cities, add_currencies, add_languages
+from Utility.models import ExceptionRecord
 from Utility.models import GlobalPermissionChoices
 
 from rest_framework.authtoken.models import Token
@@ -17,6 +18,8 @@ from Authentication.Constants import AuthTokenConstants
 from Authentication.Constants.UserConstants import create_user_account_type
 from threading import Thread
 from Service.models import Service
+
+import datetime
 
 
 def create_tenant_user(tenant=None, data=None):
@@ -203,6 +206,8 @@ def add_data_to_tenant_thread(tenant=None):
     if tenant is None:
         return
 
+    time_start = datetime.datetime.now()
+
     try:
         print('gonna create DB data')
         add_currencies(tenant=tenant)
@@ -210,11 +215,25 @@ def add_data_to_tenant_thread(tenant=None):
         add_countries(tenant=tenant)
         add_states(tenant=tenant)
         add_cities(tenant=tenant)
+    
     except Exception as err:
         print(err)
+    else:
+
+        time_end = datetime.datetime.now()
+        time_diff = time_end - time_start
+
+        total_seconds = time_diff.total_seconds()
+
+        ExceptionRecord.objects.create(
+            text = f'ADD DATA TO TENANT DB TIME DIFF . {total_seconds} Seconds'
+        )
+            
 
 
 def create_tenant(request=None, user=None, data=None):
+    time_start = datetime.datetime.now()
+    
     if user is None or data is None:
         return
     
@@ -311,4 +330,13 @@ def create_tenant(request=None, user=None, data=None):
                 thrd.start()
             except:
                 pass
+    
+    time_end = datetime.datetime.now()
+    time_diff = time_end - time_start
+
+    total_seconds = time_diff.total_seconds()
+
+    ExceptionRecord.objects.create(
+        text = f'CREATE TENANT TIME DIFF . {total_seconds} Seconds'
+    )
             

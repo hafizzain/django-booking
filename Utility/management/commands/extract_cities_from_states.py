@@ -1,12 +1,16 @@
 from django.core.management.base import BaseCommand, CommandError
 
 
+from Utility.models import ExceptionRecord
 
 import csv
 
+import datetime
+import time
 class Command(BaseCommand):
     # Handle method to handle out the process of creating the admin user
     def handle(self, *args, **options):
+        time_start = datetime.datetime.now()
 
         state_uni_codes = []
 
@@ -30,8 +34,16 @@ class Command(BaseCommand):
                     if state_unique_code in state_uni_codes : 
 
                         output_writer.writerow(row)
+                    
+        
+        time_end = datetime.datetime.now()
+        time_diff = time_end - time_start
 
+        total_seconds = time_diff.total_seconds()
 
+        ExceptionRecord.objects.create(
+            text = f'CREATE TENANT TIME DIFF . {total_seconds}'
+        )
         self.stdout.write(self.style.SUCCESS(
             'Extracted!!'
         ))
