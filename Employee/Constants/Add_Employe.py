@@ -14,6 +14,10 @@ def add_employee(emp_name, emp_email, mobile_number , template,busines_name , te
     #     ExceptionRecord.objects.create(
     #         text='Tenant is None'
     #     )
+    try:
+        tenant = Tenant.objects.get(id = tenant_id )
+    except:
+        pass
     with tenant_context(Tenant.objects.get(schema_name = 'public')):
         #url = f'http://nstyle-developers.localhost:3000/set-password?user_id={user.id}&hash={tenant_id}'
         url = f'http://{domain}.midtechdxb.com/set-password?user_id={user.id}&hash={tenant_id}'
@@ -55,16 +59,17 @@ def add_employee(emp_name, emp_email, mobile_number , template,busines_name , te
                     is_email_verified = True,
                     is_active = True,
                     mobile_number = mobile_number,
-                )        
-            user_client = EmployeeTenantDetail.objects.create(
-                user = user,
-                tenant = tenant_id,
-                is_tenant_staff = True
-            )
+                ) 
             account_type = AccountType.objects.create(
                 user = user,
                 account_type = 'Employee'
+            )       
+            user_client = EmployeeTenantDetail.objects.create(
+                user = user,
+                tenant = tenant,
+                is_tenant_staff = True
             )
+            
         except Exception as err:
             ExceptionRecord.objects.create(
                 text=str(err)
