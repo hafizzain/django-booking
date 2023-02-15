@@ -269,16 +269,7 @@ def create_tenant(request=None, user=None, data=None):
         except:
             pass
         
-        try:
-            thrd = Thread(target=add_business_types, kwargs={'tenant' : user_tenant})
-            thrd.start()
-        except:
-            pass
-        try:
-            thrd = Thread(target=add_software_types, kwargs={'tenant' : user_tenant})
-            thrd.start()
-        except:
-            pass
+        
 
         t_user = create_tenant_user(tenant=user_tenant, data=data)
         
@@ -322,6 +313,17 @@ def create_tenant(request=None, user=None, data=None):
             try:
                 payment_thrd = Thread(target=default_payment_method, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
                 payment_thrd.start()
+            except:
+                pass
+
+            try:
+                thrd = Thread(target=add_business_types, kwargs={'tenant' : user_tenant})
+                thrd.start()
+            except:
+                pass
+            try:
+                thrd = Thread(target=add_software_types, kwargs={'tenant' : user_tenant})
+                thrd.start()
             except:
                 pass
             
