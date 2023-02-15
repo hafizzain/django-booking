@@ -1119,8 +1119,8 @@ def create_checkout(request):
         total_price =total_price,
         
     )
-    checkout.business_address = service_appointment.business_address
-    checkout.save()
+    # checkout.business_address = service_appointment.business_address
+    # checkout.save()
     
     serialized = CheckoutSerializer(checkout)
     return Response(
