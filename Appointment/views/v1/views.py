@@ -1211,6 +1211,100 @@ def create_checkout(request):
             },
             status=status.HTTP_201_CREATED
     ) 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_checkout_device(request):
+    appointment = request.data.get('appointment', None)
+    appointment_service = request.data.get('appointment_service', None)
+    
+    payment_method = request.data.get('payment_method', None)
+    service = request.data.get('service', None)
+    member = request.data.get('member', None)
+    business_address = request.data.get('business_address', None)
+    
+    tip = request.data.get('tip', None)
+    gst = request.data.get('gst', None)
+    service_price = request.data.get('service_price', None)
+    total_price = request.data.get('total_price', None)
+    
+    # if not all([]){
+        
+    # }
+    try:
+        members=Employee.objects.get(id=member)
+    except Exception as err:
+        members = None
+    
+    try:
+        services=Service.objects.get(id=service)
+    except Exception as err:
+        services = None
+        
+    try:
+        service_appointment = AppointmentService.objects.get(id=appointment_service)
+    except Exception as err:
+        service_appointment = None
+       
+    try:
+        appointments = Appointment.objects.get(id=appointment)
+    except Exception as err:
+        #appointments = None
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Appointment ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    try:
+        service_appointment = AppointmentService.objects.filter(id=appointments.id)
+    except Exception as err:
+        service_appointment = None
+    
+    try:
+        business_address=BusinessAddress.objects.get(id = str(business_address))
+    except Exception as err:
+        business_address = None
+    
+    for ser in service_appointment:
+        ser.appointment_status= 'Done'
+        ser.save()
+        
+    checkout =AppointmentCheckout.objects.create(
+        appointment = appointments,
+        appointment_service = service_appointment,
+        payment_method =payment_method,
+        service= services,
+        member=members,
+        business_address=business_address,
+        tip = tip,
+        gst = gst,
+        service_price =service_price,
+        total_price =total_price,
+        
+    )
+    # checkout.business_address = service_appointment.business_address
+    # checkout.save()
+    
+    serialized = CheckoutSerializer(checkout)
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Appointment Checkout Created!',
+                    'error_message' : None,
+                    'checkout' : serialized.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+    ) 
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
