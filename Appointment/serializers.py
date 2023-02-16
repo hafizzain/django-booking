@@ -263,7 +263,12 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                     if ((dt['range_start'] <= appointment_time and dt['range_end'] >= end_time) and dt['date'] == app_date):
                         find_values.append(dt)
                     else:
+                        new_end_time = end_time
                         pass
+                    
+                    if str(dt['range_end']) == str(appointment_time) and dt['date'] == app_date:
+                        find_values.append(dt)
+                        new_end_time = end_time
 
                     # if str(dt['range_end']) == str(appointment_time) and dt['date'] == app_date:
                     #     find_values.append(dt)
