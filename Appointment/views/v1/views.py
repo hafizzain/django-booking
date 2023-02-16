@@ -1215,7 +1215,7 @@ def create_checkout(request):
 @permission_classes([IsAuthenticated])
 def create_checkout_device(request):
     appointment = request.data.get('appointment', None)
-    appointment_service = request.data.get('appointment_service', None)
+    #appointment_service = request.data.get('appointment_service', None)
     
     payment_method = request.data.get('payment_method', None)
     service = request.data.get('service', None)
@@ -1240,10 +1240,10 @@ def create_checkout_device(request):
     except Exception as err:
         services = None
         
-    try:
-        service_appointment = AppointmentService.objects.get(id=appointment_service)
-    except Exception as err:
-        service_appointment = None
+    # try:
+    #     service_appointment = AppointmentService.objects.get(id=appointment_service)
+    # except Exception as err:
+    #     service_appointment = None
        
     try:
         appointments = Appointment.objects.get(id=appointment)
@@ -1278,7 +1278,7 @@ def create_checkout_device(request):
         
     checkout =AppointmentCheckout.objects.create(
         appointment = appointments,
-        appointment_service = service_appointment,
+       # appointment_service = service_appointment,
         payment_method =payment_method,
         service= services,
         member=members,
