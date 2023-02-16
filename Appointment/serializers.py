@@ -291,8 +291,14 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                     current_obj = find_values[0]
                     if new_start_time is not None:
                         current_obj['range_start'] = new_start_time
+                        ExceptionRecord.objects.create(
+                            text = f"tested abcs{current_obj}"
+                        )
                     if new_end_time is not None:
                         current_obj['range_end'] = new_end_time
+                        ExceptionRecord.objects.create(
+                            text = f"tested 123{current_obj}"
+                        )
 
                     current_obj['ids'].append(app_id)
                 else:
