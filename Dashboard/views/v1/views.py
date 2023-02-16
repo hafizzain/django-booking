@@ -1,8 +1,8 @@
 from django.conf import settings
 from operator import ge
+from Order.models import ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder
+# from TragetControl.models import TierStoreTarget
 
-from TragetControl.models import TierStoreTarget
-from Order.models import ProductOrder
 from Utility.Constants.Data.months import  FIXED_MONTHS
 from Dashboard.serializers import EmployeeDashboradSerializer
 from Employee.models import Employee
@@ -323,8 +323,8 @@ def get_dashboard_target_overview(request):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-    # service_targets = TierStoreTarget.objects.filter(service_target = 'service_target')
-    # retail_targets = TierStoreTarget.objects.filter(retail_target = 'retail_target')
+    # service_target = StaffTarget.objects.filter(employee = employee_id)
+    # retail_target = StaffTarget.objects.filter(employee = employee_id)
     # voucher_targets = TierStoreTarget.objects.filter(voucher_target = 'voucher_target')
     # membership_targets = TierStoreTarget.objects.filter(membership_target = 'membership_target')
 
@@ -346,8 +346,16 @@ def get_dashboard_target_overview(request):
         year__gte = start_year,
         year__lte = end_year,
     )
+
+    voucher_target = VoucherOrder.objects.filter(member = employee_id)
+    # # service_target = ServiceOrder.objects.filter(user = employee_id)
+    # # retail_target = StaffTarget.objects.filter(user = employee_id)
+    membership_target = MemberShipOrder.objects.filter(member = employee_id)
+
     s=0
     r=0
+    # v = voucher_target.count
+    # m = membership_target.count
     total_set = 0
     achieved_target= len(achieved_target_member)
 
@@ -363,6 +371,10 @@ def get_dashboard_target_overview(request):
 
     print(total_set)
     print(achieved_target)
+    print(s)
+    print(r)
+    # print(v)
+    # print(m)
 
     
     return Response(
@@ -377,7 +389,8 @@ def get_dashboard_target_overview(request):
                     'achieved_target' : achieved_target,
                     'service_target' : s,
                     'retail_target' : r,
-                    
+                    'voucher_target' : voucher_target,
+                    'membership_target' : membership_target,
                 }
             },
             status=status.HTTP_200_OK
