@@ -627,6 +627,103 @@ def update_appointment(request):
         },
         status=status.HTTP_200_OK
     )
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_appointment_device(request):
+    appointment_id = request.data.get('id', None)
+    appointment_status = request.data.get('appointment_status', None)
+    if appointment_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required.',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        appointment = Appointment.objects.get(id=appointment_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Appointment ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    try:
+        appointment_service = AppointmentService.objects.filter(appointment = appointment.id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Appointment Service ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    for ser in appointment_service:
+        ser.appointment_status = 'In Progress'
+        ser.save()
+    # serializer = UpdateAppointmentSerializer(service_appointment , data=request.data, partial=True)
+    # if not serializer.is_valid():
+    #     return Response(
+    #             {
+    #         'status' : False,
+    #         'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+    #         'response' : {
+    #             'message' : 'Appointment Serializer Invalid',
+    #             'error_message' : str(serializer.errors),
+    #         }
+    #     },
+    #     status=status.HTTP_404_NOT_FOUND
+    #     )
+    # serializer.save()
+    # if appointment_status == 'Cancel':
+    #     try:
+    #         thrd = Thread(target=cancel_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant} )
+    #         thrd.start()
+    #     except Exception as err:
+    #         print(err)
+    #         pass
+        
+    # else :
+    #     try:
+    #         thrd = Thread(target=reschedule_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant})
+    #         thrd.start()
+    #     except Exception as err:
+    #         print(err)
+    #         pass
+        
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Update Appointment Successfully',
+                'error_message' : None,
+                #'Appointment' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
     
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -637,10 +734,6 @@ def update_appointment_service(request):
     appointment_notes = request.data.get('appointment_notes', None)
     appointment_date = request.data.get('appointment_date', None)
     client = request.data.get('client', None)
-    
-    ExceptionRecord.objects.create(
-        text = f'{request.data}'
-    )
     
     errors = []
     if appointment_id is None: 
