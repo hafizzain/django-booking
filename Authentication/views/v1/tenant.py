@@ -286,8 +286,8 @@ def get_user(request):
                 
         except Exception as err:
             return str(err)
-    else:
-        permisson.update(employee)
+    # else:
+    #     permisson.update(employee)
     serialized = UserTenantLoginSerializer(user)
     return Response(
             {
