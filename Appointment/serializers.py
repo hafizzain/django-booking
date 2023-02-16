@@ -254,7 +254,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                     if ((dt['range_start'] >= appointment_time and dt['range_end'] <= end_time) and dt['date'] == app_date):
                         
                         ExceptionRecord.objects.create(
-                            text = f'tested successfully'
+                            text = f"tested successfully{dt['range_end']}"
                         )
                         find_values.append(dt)
                     else:
