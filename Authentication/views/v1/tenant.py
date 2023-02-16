@@ -159,26 +159,8 @@ def login(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    try:
-        user = User.objects.get(
-            email=email,
-            is_deleted=False,
-            user_account_type__account_type = 'Employee'
-        )
-        employee = True
-    except Exception as err:
-        employee = False
-    if employee:
-        employe_user = EmployeeTenantDetail.objects.get(user = user)
-        with tenant_context(employe_user.tenant):
-            user = User.objects.get(
-                email=email,
-                is_deleted=False,
-                user_account_type__account_type = 'Employee'
-            )
-            serialized = UserTenantLoginSerializer(user, context={'employee' : True, })
-    else:
-        serialized = UserTenantLoginSerializer(user, context={'employee' : False, })
+        
+    serialized = UserTenantLoginSerializer(user, context={'employee' : False, })
     return Response(
             {
                 'status' : True,
@@ -197,6 +179,7 @@ def login(request):
 @permission_classes([AllowAny])
 def get_user(request):
     user_id = request.GET.get('user', None)
+    #employee = request.GET.get('employee', None)
 
     if user_id is None:
         return Response(
