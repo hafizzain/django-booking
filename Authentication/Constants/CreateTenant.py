@@ -260,7 +260,11 @@ def create_tenant(request=None, user=None, data=None):
             domain=f'{td_name}.{settings.BACKEND_DOMAIN_NAME}',
             schema_name=td_name
         )
-
+        
+        ExceptionRecord.objects.create(
+            text = f'Check domain errors . {user_tenant} line 272 craete_tenat'
+    )
+        
         Domain.objects.create(
             user=user,
             schema_name=td_name,
