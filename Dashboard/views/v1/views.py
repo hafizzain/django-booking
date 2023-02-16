@@ -347,15 +347,15 @@ def get_dashboard_target_overview(request):
         year__lte = end_year,
     )
 
-    voucher_target = VoucherOrder.objects.filter(member = employee_id)
+    voucher_target = VoucherOrder.objects.filter(member = employee)
     # # service_target = ServiceOrder.objects.filter(user = employee_id)
     # # retail_target = StaffTarget.objects.filter(user = employee_id)
-    membership_target = MemberShipOrder.objects.filter(member = employee_id)
+    membership_target = MemberShipOrder.objects.filter(member = employee)
 
     s=0
     r=0
-    # v = voucher_target.count
-    # m = membership_target.count
+    v = voucher_target.count()
+    m = membership_target.count()
     total_set = 0
     achieved_target= len(achieved_target_member)
 
@@ -373,8 +373,8 @@ def get_dashboard_target_overview(request):
     print(achieved_target)
     print(s)
     print(r)
-    # print(v)
-    # print(m)
+    print(v)
+    print(m)
 
     
     return Response(
@@ -389,8 +389,8 @@ def get_dashboard_target_overview(request):
                     'achieved_target' : achieved_target,
                     'service_target' : s,
                     'retail_target' : r,
-                    'voucher_target' : voucher_target,
-                    'membership_target' : membership_target,
+                    'voucher_target' : v,
+                    'membership_target' : m,
                 }
             },
             status=status.HTTP_200_OK
