@@ -637,7 +637,8 @@ def login(request):
             #s_data['access_token'] = str(tnt_token.key)
             
     else:
-        serialized = UserLoginSerializer(user, context={'employee' : False, })
+        serialized = UserLoginSerializer(user, context={'employee' : False,
+                            'tenant' : None})
         s_data = dict(serialized.data)
         s_data['id'] = None
         s_data['access_token'] = None
