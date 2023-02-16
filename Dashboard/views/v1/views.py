@@ -402,7 +402,7 @@ def get_total_tips(request):
     total_tips = 0
     
     checkout_order = Checkout.objects.filter(is_deleted=False).values_list('tip', flat=True)
-        
+    
     appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done').values_list('tip', flat=True)
 
     
@@ -413,7 +413,7 @@ def get_total_tips(request):
             'response' : {
                 'message' : 'All Sale Orders',
                 'error_message' : None,
-                'sales' : total_tips
+                'sales' : checkout_order
             }
         },
         status=status.HTTP_200_OK
