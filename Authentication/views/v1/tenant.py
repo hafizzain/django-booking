@@ -295,7 +295,7 @@ def get_user(request):
                 'response' : {
                     'message' : 'Authenticated',
                     'data' : serialized.data,
-                    'permission' : permisson
+                    'permissions' : permisson
                 }
             },
             status=status.HTTP_200_OK
