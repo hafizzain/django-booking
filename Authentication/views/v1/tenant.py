@@ -1,5 +1,7 @@
 
 
+from Employee.models import Employee
+from Employee.serializers import EmployeSerializer
 from Tenants.models import EmployeeTenantDetail
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -179,7 +181,8 @@ def login(request):
 @permission_classes([AllowAny])
 def get_user(request):
     user_id = request.GET.get('user', None)
-    #employee = request.GET.get('employee', None)
+    employee = request.GET.get('employee', None)
+    permisson = []
 
     if user_id is None:
         return Response(
@@ -271,7 +274,20 @@ def get_user(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-
+    if employee:
+        try:
+            emp = Employee.objects.get(email = str(user.email))
+            serialized = EmployeSerializer(emp, context={'request' : request, }) #context={'request' : request, })
+            response_data = serialized.data
+            
+            for da in response_data:
+                permissions = da['permissions']
+                
+                permisson.append(permissions)
+                
+        except Exception as err:
+            return str(err)
+    
     serialized = UserTenantLoginSerializer(user)
     return Response(
             {
@@ -279,7 +295,8 @@ def get_user(request):
                 'status_code' : 200,
                 'response' : {
                     'message' : 'Authenticated',
-                    'data' : serialized.data
+                    'data' : serialized.data,
+                    'permission' : permisson
                 }
             },
             status=status.HTTP_200_OK
