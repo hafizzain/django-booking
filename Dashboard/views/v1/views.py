@@ -398,7 +398,7 @@ def get_dashboard_target_overview(request):
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_all_sale_orders(request):
+def get_total_tips(request):
     total_tips = 0
     
     checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
