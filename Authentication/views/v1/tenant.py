@@ -280,7 +280,6 @@ def get_user(request):
             serialized = EmployeSerializer(emp, context={'request' : request, }) #context={'request' : request, })
             response_data = serialized.data
             
-            #for da in response_data:
             permissions = response_data['permissions']
             
             permisson.append(permissions)
