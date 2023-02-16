@@ -208,7 +208,7 @@ def get_business(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    if employee == 'true':
+    if str(employee) == 'true':
         try:
             user = User.objects.get(id = user)
             emp = Employee.objects.get(email = user.email )
