@@ -665,7 +665,7 @@ def update_appointment_device(request):
             status=status.HTTP_404_NOT_FOUND
         )
     try:
-        appointment_service = AppointmentService.objects.filter(appointment = appointment.id)
+        appointment_service = AppointmentService.objects.filter(appointment = str(appointment.id))
     except Exception as err:
         return Response(
             {
