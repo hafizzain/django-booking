@@ -269,7 +269,7 @@ def create_tenant(request=None, user=None, data=None):
         )
     except Exception as err:
         ExceptionRecord.objects.create(
-            text = f'Check domain errors . {str(err)} line 272 craete_tenat'
+            text = f'Check domain errors . {str(err)} {user_tenant} line 272 craete_tenat'
     )
 
 
