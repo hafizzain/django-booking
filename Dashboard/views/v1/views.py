@@ -283,8 +283,12 @@ def get_acheived_target_report(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_dashboard_target_overview(request):
-    employee_id = request.GET.get('employee_id', None)
 
+    employee_id = request.GET.get('employee_id', None)
+    start_month =  request.GET.get('start_month', None)
+    end_month = request.GET.get('end_month', None)
+    start_year = request.GET.get('start_year', 1900)
+    end_year = request.GET.get('end_year', 3000)
 
     if not all([employee_id]):
         return Response(
@@ -318,26 +322,31 @@ def get_dashboard_target_overview(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-    service_target = TierStoreTarget.objects.filter('service_target',None)
-    retail_target = TierStoreTarget.objects.filter('retail_target',None)
-    voucher_target = TierStoreTarget.objects.filter('voucher_target',None)
-    membership_target = TierStoreTarget.objects.filter('membership_target',None)
 
-    achieved_target_member = ProductOrder.objects.filter(member = employee)
+    service_targets = TierStoreTarget.objects.filter(service_target = 'service_targets')
+    retail_targets = TierStoreTarget.objects.filter(retail_target = 'retail_targets')
+    voucher_targets = TierStoreTarget.objects.filter(voucher_target = 'voucher_targets')
+    membership_targets = TierStoreTarget.objects.filter(membership_target = 'membership_targets')
 
-    targets = TierStoreTarget.objects.filter(
+    achieved_target_member = ProductOrder.objects.filter(member = employee_id)
+
+    targets = StaffTarget.objects.filter(
         employee_id = employee_id,
-        service_target = service_target, # 8
-        retail_target = retail_target,
-        voucher_target = voucher_target,
-        membership_target = membership_target,
+        month__in = fix_months, # 8
+        year__gte = start_year,
+        year__lte = end_year,
     )
-    total_set=0
-    
-    print(service_target)
-    print(retail_target)
-    print(voucher_target)
-    print(membership_target)
+
+    if start_month is not None and end_month is not None :
+
+        start_index = FIXED_MONTHS.index(start_month) # 1
+        end_index = FIXED_MONTHS.index(end_month) # 9
+
+        fix_months = FIXED_MONTHS[start_index : end_index]
+    else:
+        fix_months = FIXED_MONTHS
+        print(fix_months)
+
 
     achieved_target= len(achieved_target_member)
 
@@ -347,11 +356,12 @@ def get_dashboard_target_overview(request):
         v = target.voucher_target
         m = target.membership_target
         total_set = total_set + s + r + v + m
-        achieved_target = achieved_target + s + r + v + m
+        achieved_target = achieved_target + s + r
 
     print(total_set)
     print(achieved_target)
 
+    
     return Response(
             {
                 'status' : 200,
@@ -362,10 +372,10 @@ def get_dashboard_target_overview(request):
                     'employee_id' : employee_id,
                     'total_set' : total_set,
                     'achieved_target' : achieved_target,
-                    'service_target' : service_target,
-                    'retail_target' : retail_target,
-                    'voucher_target' : voucher_target,
-                    'membership_target' : membership_target,
+                    'service_target' : service_targets,
+                    'retail_target' : retail_targets,
+                    'voucher_target' : voucher_targets,
+                    'membership_target' : membership_targets,
                 }
             },
             status=status.HTTP_200_OK
