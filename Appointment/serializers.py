@@ -3,7 +3,7 @@ from getopt import error
 from pkgutil import read_code
 from pyexpat import model
 from re import A
-from Sale.serializers import LocationServiceSerializer
+#from Sale.serializers import LocationServiceSerializer
 from rest_framework import serializers
 from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Appointment.models import Appointment, AppointmentCheckout, AppointmentNotes, AppointmentService
