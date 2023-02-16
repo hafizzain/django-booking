@@ -52,7 +52,7 @@ class UserLoginSerializer(serializers.ModelSerializer):
     def get_domain(self,obj):
         try:
             tenant = self.context["tenant"]
-            if tenant:
+            if tenant != None:
                 return tenant
             else:
                 user_domain = Domain.objects.get(
