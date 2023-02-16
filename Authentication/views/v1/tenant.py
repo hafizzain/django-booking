@@ -182,7 +182,7 @@ def login(request):
 def get_user(request):
     user_id = request.GET.get('user', None)
     employee = request.GET.get('employee', None)
-    permisson = []
+    permisson = {}
 
     if user_id is None:
         return Response(
@@ -282,7 +282,7 @@ def get_user(request):
             
             permissions = response_data['permissions']
             
-            permisson.extend(permissions)
+            permisson.update(permissions)
                 
         except Exception as err:
             return str(err)
