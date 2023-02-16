@@ -706,7 +706,7 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
     service  = serializers.SerializerMethodField(read_only=True)
     price  = serializers.SerializerMethodField(read_only=True)
     
-    #price  = serializers.SerializerMethodField(read_only=True)
+    appointment_service  = serializers.SerializerMethodField(read_only=True)
     #price  = serializers.SerializerMethodField(read_only=True)
     
     def get_service(self, obj):

@@ -534,14 +534,14 @@ def check_email_employees(request):
             return Response(
                 {
                     'status' : False,
-                    'status_code' : 404,
-                    'status_code_text' : '404',
+                    'status_code' : 200,
+                    'status_code_text' : '200',
                     'response' : {
                         'message' : f'User Already exist with this {email}!',
                         'error_message' : None,
                     }
                 },
-                status=status.HTTP_404_NOT_FOUND
+                status=status.HTTP_200_OK
             )
         except Exception as err:
             pass
