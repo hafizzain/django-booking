@@ -712,7 +712,7 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
     #price  = serializers.SerializerMethodField(read_only=True)
     
     def get_appointment_service(self, obj):
-        service = AppointmentService.objects.complex_filter(appointment = obj.appointment)
+        service = AppointmentService.objects.filter(appointment = obj.appointment)
         return UpdateAppointmentSerializer(service, many = True).data
     
     def get_service(self, obj):
