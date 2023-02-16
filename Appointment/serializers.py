@@ -257,7 +257,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                             text = f"tested successfully{dt['range_end']}"
                         )
                         find_values.append(dt)
-                    elif (dt['range_end'] >= appointment_time and dt['date'] == app_date ):
+                    elif (dt['range_end'] == appointment_time and dt['date'] == app_date ):
                         find_values.append(dt)
                         
                     else :
