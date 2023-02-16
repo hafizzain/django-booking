@@ -287,8 +287,8 @@ def get_dashboard_target_overview(request):
     employee_id = request.GET.get('employee_id', None)
     start_month =  request.GET.get('start_month', None)
     end_month = request.GET.get('end_month', None)
-    start_year = request.GET.get('start_year', 1900)
-    end_year = request.GET.get('end_year', 3000)
+    start_year = request.GET.get('start_year', '1900-01-01')
+    end_year = request.GET.get('end_year', '3000-12-30')
 
     if not all([employee_id]):
         return Response(
@@ -350,6 +350,8 @@ def get_dashboard_target_overview(request):
     r=0
     total_set = 0
     achieved_target= len(achieved_target_member)
+
+    print(targets)
 
     for target in targets :
         s = target.service_target
