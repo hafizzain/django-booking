@@ -3735,6 +3735,42 @@ def get_tenant_address_taxes(request):
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
+def get_address_taxes_device(request):
+    location_id = request.GET.get('location_id', None)
+    data= []
+    try:
+        location = BusinessAddress.objects.get(id=location_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Business Location Not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    serialized = BusinessAddressSerializer(location, context = {'request' : request, })
+    data.append(serialized.data)
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Address Taxes!',
+                    'error_message' : None,
+                    'tax' : data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def get_common_tenant(request):  
     tenant_id = '14c286c6-c36c-4c7a-aa51-545efcd8738d'#request.GET.get('hash', None)
     business_location = '6febd650-50ba-4719-aaf2-02bccebb7856'

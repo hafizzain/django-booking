@@ -69,6 +69,8 @@ urlpatterns = [
     path('get_tenant_business_taxes/', views.get_tenant_business_taxes),
     path('get_tenant_address_taxes/', views.get_tenant_address_taxes),
     
+    path('get_address_taxes_device/', views.get_address_taxes_device),
+    
     #Tenant Detail
     path('get_common_tenant/', views.get_common_tenant),
 ]

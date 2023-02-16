@@ -1,6 +1,6 @@
 from django.conf import settings
 from operator import ge
-from Order.models import ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder
+from Order.models import Checkout, ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder
 # from TragetControl.models import TierStoreTarget
 
 from Utility.Constants.Data.months import  FIXED_MONTHS
