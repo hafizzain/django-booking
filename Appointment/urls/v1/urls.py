@@ -11,6 +11,7 @@ urlpatterns = [
     path('get_appointments_service/', views.get_appointments_service),
     
     path('get_appointments_device/', views.get_appointments_device),
+    path('update_appointment_device/', views.update_appointment_device),
 
     path('service_appointment_count/', views.service_appointment_count),
     
