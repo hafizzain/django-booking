@@ -274,7 +274,7 @@ def get_user(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    if employee:
+    if str(employee) == 'true':
         try:
             emp = Employee.objects.get(email = str(user.email))
             serialized = EmployeSerializer(emp, context={'request' : request, }) #context={'request' : request, })
@@ -286,7 +286,8 @@ def get_user(request):
                 
         except Exception as err:
             return str(err)
-    
+    else:
+        permisson.update(employee)
     serialized = UserTenantLoginSerializer(user)
     return Response(
             {
