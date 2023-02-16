@@ -352,15 +352,12 @@ def get_dashboard_target_overview(request):
     # # retail_target = StaffTarget.objects.filter(user = employee_id)
     membership_target = MemberShipOrder.objects.filter(member = employee)
 
-    
     s=0
     r=0
     v = voucher_target.count()
     m = membership_target.count()
     total_set = 0
     achieved_target= len(achieved_target_member)
-
-    
 
     print(targets)
 
@@ -386,15 +383,16 @@ def get_dashboard_target_overview(request):
     s2=0
     r1=0
     r2=0
+
     for target in targets :
         v1 = target.voucher_target.acheived_target.count()
-        v2 = target.voucher_target.service_target.count()
+        v2 = target.voucher_target.total_set.count()
         m1 = target.membership_target.acheived_target.count()
-        m2 = target.membership_target.service_target.count()
+        m2 = target.membership_target.total_set.count()
         s1 = target.service_target.acheived_target.count()
-        s2 = target.service_target.service_target.count()
+        s2 = target.service_target.total_set.count()
         r1 = target.retail_target.acheived_target.count()
-        r2 = target.retail_target.service_target.count()
+        r2 = target.retail_target.total_set.count()
         
     return Response(
             {
