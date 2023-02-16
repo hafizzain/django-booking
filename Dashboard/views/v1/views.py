@@ -401,13 +401,10 @@ def get_dashboard_target_overview(request):
 def get_total_tips(request):
     total_tips = 0
     
-    checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = CheckoutSerializer(checkout_order,  many=True, context={'request' : request})
-    data.extend(serialized.data)
-    
-    appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')
-    serialized = AppointmentCheckoutSerializer(appointment_checkout, many = True)
-    data.extend(serialized.data)
+    checkout_order = Checkout.objects.filter(is_deleted=False).values_list('tip', flat=True)
+        
+    appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done').values_list('tip', flat=True)
+
     
     return Response(
         {
@@ -416,7 +413,7 @@ def get_total_tips(request):
             'response' : {
                 'message' : 'All Sale Orders',
                 'error_message' : None,
-                'sales' : data
+                'sales' : total_tips
             }
         },
         status=status.HTTP_200_OK
