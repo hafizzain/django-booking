@@ -728,11 +728,16 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
     
     def get_client(self, obj):
         try:
-            cli = f"{obj.appointment.client.full_name}"
-            return cli
-
+            serializers = ClientSerializer(obj.client).data
+            return serializers
         except Exception as err:
-            print(err)
+            return None
+        # try:
+        #     cli = f"{obj.appointment.client.full_name}"
+        #     return cli
+
+        # except Exception as err:
+        #     print(err)
             
     def get_price(self, obj):
         try:
