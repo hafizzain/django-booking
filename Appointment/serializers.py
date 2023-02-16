@@ -42,6 +42,15 @@ class ServiceSaleSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'price_service']
 
 class UpdateAppointmentSerializer(serializers.ModelSerializer):
+    service_name  = serializers.SerializerMethodField(read_only=True)
+    
+    def get_service_name(self, obj):
+        try:
+            cli = f"{obj.service.name}"
+            return cli
+
+        except Exception as err:
+            print(err)
     class Meta:
         model = AppointmentService
         fields = '__all__'
