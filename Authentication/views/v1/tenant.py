@@ -282,7 +282,7 @@ def get_user(request):
             
             permissions = response_data['permissions']
             
-            permisson.append(permissions)
+            permisson.extend(permissions)
                 
         except Exception as err:
             return str(err)
