@@ -1,7 +1,9 @@
 from dataclasses import field
 from pyexpat import model
+from Appointment.serializers import UpdateAppointmentSerializer
+from Business.serializers.v1_serializers import AppointmentServiceSerializer
 from rest_framework import serializers
-from Appointment.models import AppointmentCheckout
+from Appointment.models import Appointment, AppointmentCheckout, AppointmentService
 from Client.models import Client, Membership
 
 from Employee.models import Employee, EmployeeProfessionalInfo, EmployeeSelectedService
@@ -708,6 +710,10 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
     
     appointment_service  = serializers.SerializerMethodField(read_only=True)
     #price  = serializers.SerializerMethodField(read_only=True)
+    
+    def get_appointment_service(self, obj):
+        service = AppointmentService.objects.get(appointment = obj.appointment)
+        return UpdateAppointmentSerializer(service, many = True)
     
     def get_service(self, obj):
         try:
