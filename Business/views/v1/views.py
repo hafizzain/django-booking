@@ -190,6 +190,7 @@ def create_user_business(request):
 @permission_classes([IsAuthenticated])
 def get_business(request):
     user = request.GET.get('user', None)
+    employee = request.GET.get('employee', None)
 
     if user is None:
         return Response(
@@ -207,28 +208,55 @@ def get_business(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    if employee == 'true':
+        try:
+            user = User.objects.get(id = user)
+            emp = Employee.objects.get(email = user.email )
+        except:
+            pass
+        try:
+            user_business = Business.objects.get(
+                user=emp.user.id,
+                is_deleted=False,
+                is_active=True,
+                is_blocked=False
+            )
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                    'response' : {
+                        'message' : 'Business Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
     
-    try:
-        user_business = Business.objects.get(
-            user=user,
-            is_deleted=False,
-            is_active=True,
-            is_blocked=False
-        )
-    except Exception as err:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
-                'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
-                'response' : {
-                    'message' : 'Business Not Found',
-                    'error_message' : str(err),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
-    
+    else:
+        try:
+            user_business = Business.objects.get(
+                user=user,
+                is_deleted=False,
+                is_active=True,
+                is_blocked=False
+            )
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                    'response' : {
+                        'message' : 'Business Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
     serialized = Business_GetSerializer(user_business , context={'request' : request})
 
     return Response(
