@@ -133,7 +133,7 @@ def get_single_client(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_client(request):
-    all_client=Client.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
+    all_client=Client.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at').distinct()
     serialized = ClientSerializer(all_client, many=True,  context={'request' : request})
     return Response(
         {
