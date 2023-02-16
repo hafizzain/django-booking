@@ -728,7 +728,7 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
     
     def get_client(self, obj):
         try:
-            serializers = ClientSerializer(obj.client).data
+            serializers = ClientSerializer(obj.appointment.client).data
             return serializers
         except Exception as err:
             return None
@@ -749,11 +749,16 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
             
     def get_member(self, obj):
         try:
-            cli = f"{obj.appointment_service.member.full_name}"
-            return cli
-
+            serializers = MemberSerializer(obj.member,context=self.context ).data
+            return serializers
         except Exception as err:
-            print(err)
+            return None
+        # try:
+        #     cli = f"{obj.appointment_service.member.full_name}"
+        #     return cli
+
+        # except Exception as err:
+        #     print(err)
     
     def get_location(self, obj):
         try:
