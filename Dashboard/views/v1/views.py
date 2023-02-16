@@ -1,5 +1,8 @@
 from django.conf import settings
 from operator import ge
+from Order.models import ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder
+# from TragetControl.models import TierStoreTarget
+
 from Utility.Constants.Data.months import  FIXED_MONTHS
 from Dashboard.serializers import EmployeeDashboradSerializer
 from Employee.models import Employee
@@ -214,10 +217,10 @@ def get_acheived_target_report(request):
                     'error_message' : 'All fields are required',
                     'fields' : [
                         'employee_id',
-                        'start_month',
-                        'start_year',
-                        'end_month',
-                        'end_year',
+                        # 'start_month',
+                        # 'start_year',
+                        # 'end_month',
+                        # 'end_year',
                     ]
                 }
             },
@@ -277,4 +280,118 @@ def get_acheived_target_report(request):
         )
     
     
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_dashboard_target_overview(request):
+
+    employee_id = request.GET.get('employee_id', None)
+    start_month =  request.GET.get('start_month', None)
+    end_month = request.GET.get('end_month', None)
+    start_year = request.GET.get('start_year', '1900-01-01')
+    end_year = request.GET.get('end_year', '3000-12-30')
+
+    if not all([employee_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required',
+                    'fields' : [
+                        'employee_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
     
+    try: 
+        employee = Employee.objects.get(id=employee_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                    'response' : {
+                        'message' : 'Employee Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+    # service_target = StaffTarget.objects.filter(employee = employee_id)
+    # retail_target = StaffTarget.objects.filter(employee = employee_id)
+    # voucher_targets = TierStoreTarget.objects.filter(voucher_target = 'voucher_target')
+    # membership_targets = TierStoreTarget.objects.filter(membership_target = 'membership_target')
+
+    achieved_target_member = ProductOrder.objects.filter(member = employee_id)
+
+    if start_month is not None and end_month is not None :
+
+        start_index = FIXED_MONTHS.index(start_month) # 1
+        end_index = FIXED_MONTHS.index(end_month) # 9
+
+        fix_months = FIXED_MONTHS[start_index : end_index]
+    else:
+        fix_months = FIXED_MONTHS
+        print(fix_months)
+    
+    targets = StaffTarget.objects.filter(
+        employee_id = employee_id,
+        month__in = fix_months, # 8
+        year__gte = start_year,
+        year__lte = end_year,
+    )
+
+    voucher_target = VoucherOrder.objects.filter(member = employee)
+    # # service_target = ServiceOrder.objects.filter(user = employee_id)
+    # # retail_target = StaffTarget.objects.filter(user = employee_id)
+    membership_target = MemberShipOrder.objects.filter(member = employee)
+
+    s=0
+    r=0
+    v = voucher_target.count()
+    m = membership_target.count()
+    total_set = 0
+    achieved_target= len(achieved_target_member)
+
+    print(targets)
+
+    for target in targets :
+        s = target.service_target
+        r = target.retail_target
+        # v = target.voucher_target
+        # m = target.membership_target
+        total_set = total_set + s + r 
+        achieved_target = achieved_target + s + r
+
+    print(total_set)
+    print(achieved_target)
+    print(s)
+    print(r)
+    print(v)
+    print(m)
+
+    
+    return Response(
+            {
+                'status' : 200,
+                'status_code' : '200',
+                'response' : {
+                    'message' : 'Employee Id recieved',
+                    'error_message' : None,
+                    'employee_id' : employee_id,
+                    'total_set' : total_set,
+                    'achieved_target' : achieved_target,
+                    'service_target' : s,
+                    'retail_target' : r,
+                    'voucher_target' : v,
+                    'membership_target' : m,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
