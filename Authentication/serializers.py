@@ -51,13 +51,17 @@ class UserLoginSerializer(serializers.ModelSerializer):
 
     def get_domain(self,obj):
         try:
-            user_domain = Domain.objects.get(
-                user=obj,
-                is_deleted=False,
-                is_blocked=False,
-                is_active=True
-            )
-            return user_domain.schema_name
+            tenant = self.context["tenant"]
+            if tenant:
+                return tenant
+            else:
+                user_domain = Domain.objects.get(
+                    user=obj,
+                    is_deleted=False,
+                    is_blocked=False,
+                    is_active=True
+                )
+                return user_domain.schema_name
         except Exception as err:
             return None
 
