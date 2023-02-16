@@ -539,6 +539,7 @@ def check_email_employees(request):
                     'response' : {
                         'message' : f'User Already exist with this {email}!',
                         'error_message' : None,
+                        'employee' : True
                     }
                 },
                 status=status.HTTP_200_OK
