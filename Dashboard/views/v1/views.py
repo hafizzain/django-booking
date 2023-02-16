@@ -323,19 +323,12 @@ def get_dashboard_target_overview(request):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-    service_targets = TierStoreTarget.objects.filter(service_target = 'service_targets')
-    retail_targets = TierStoreTarget.objects.filter(retail_target = 'retail_targets')
-    voucher_targets = TierStoreTarget.objects.filter(voucher_target = 'voucher_targets')
-    membership_targets = TierStoreTarget.objects.filter(membership_target = 'membership_targets')
+    # service_targets = TierStoreTarget.objects.filter(service_target = 'service_target')
+    # retail_targets = TierStoreTarget.objects.filter(retail_target = 'retail_target')
+    # voucher_targets = TierStoreTarget.objects.filter(voucher_target = 'voucher_target')
+    # membership_targets = TierStoreTarget.objects.filter(membership_target = 'membership_target')
 
     achieved_target_member = ProductOrder.objects.filter(member = employee_id)
-
-    targets = StaffTarget.objects.filter(
-        employee_id = employee_id,
-        month__in = fix_months, # 8
-        year__gte = start_year,
-        year__lte = end_year,
-    )
 
     if start_month is not None and end_month is not None :
 
@@ -346,16 +339,24 @@ def get_dashboard_target_overview(request):
     else:
         fix_months = FIXED_MONTHS
         print(fix_months)
-
-
+    
+    targets = StaffTarget.objects.filter(
+        employee_id = employee_id,
+        month__in = fix_months, # 8
+        year__gte = start_year,
+        year__lte = end_year,
+    )
+    s=0
+    r=0
+    total_set = 0
     achieved_target= len(achieved_target_member)
 
     for target in targets :
         s = target.service_target
         r = target.retail_target
-        v = target.voucher_target
-        m = target.membership_target
-        total_set = total_set + s + r + v + m
+        # v = target.voucher_target
+        # m = target.membership_target
+        total_set = total_set + s + r 
         achieved_target = achieved_target + s + r
 
     print(total_set)
@@ -372,10 +373,9 @@ def get_dashboard_target_overview(request):
                     'employee_id' : employee_id,
                     'total_set' : total_set,
                     'achieved_target' : achieved_target,
-                    'service_target' : service_targets,
-                    'retail_target' : retail_targets,
-                    'voucher_target' : voucher_targets,
-                    'membership_target' : membership_targets,
+                    'service_target' : s,
+                    'retail_target' : r,
+                    
                 }
             },
             status=status.HTTP_200_OK
