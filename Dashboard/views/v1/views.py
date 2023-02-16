@@ -395,3 +395,29 @@ def get_dashboard_target_overview(request):
             },
             status=status.HTTP_200_OK
         )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_all_sale_orders(request):
+    total_tips = 0
+    
+    checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = CheckoutSerializer(checkout_order,  many=True, context={'request' : request})
+    data.extend(serialized.data)
+    
+    appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')
+    serialized = AppointmentCheckoutSerializer(appointment_checkout, many = True)
+    data.extend(serialized.data)
+    
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Sale Orders',
+                'error_message' : None,
+                'sales' : data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
