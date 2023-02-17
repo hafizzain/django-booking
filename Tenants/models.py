@@ -45,6 +45,14 @@ class Domain(DomainMixin):
     updated_at = models.DateTimeField(auto_now_add=now , null=True, blank=True)
 
 
+    @property
+    def user_username(self):
+        if self.user and self.user.username:
+            return str(self.user.username)
+        
+        return '-------'
+
+
     def __str__(self):
         return str(self.id)
 

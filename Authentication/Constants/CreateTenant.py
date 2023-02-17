@@ -6,6 +6,7 @@ from Tenants.models import Tenant, Domain
 from Business.models import Business, BusinessPaymentMethod, BusinessType
 from Profile.models import Profile
 from Utility.Constants.add_data_db import add_business_types, add_countries, add_software_types, add_states, add_cities, add_currencies, add_languages
+from Utility.models import ExceptionRecord
 from Utility.models import GlobalPermissionChoices
 
 from rest_framework.authtoken.models import Token
@@ -17,6 +18,8 @@ from Authentication.Constants import AuthTokenConstants
 from Authentication.Constants.UserConstants import create_user_account_type
 from threading import Thread
 from Service.models import Service
+
+import datetime
 
 
 def create_tenant_user(tenant=None, data=None):
@@ -62,8 +65,15 @@ def create_tenant_profile(tenant_user=None, data=None, tenant=None):
     if tenant_user is None or tenant is None:
         return None
 
+    tnt_start_time = datetime.datetime.now()
 
     with tenant_context(tenant):
+        time_diff = datetime.datetime.now() - tnt_start_time
+
+        ExceptionRecord.objects.create(
+            text = f'SWITCH TENANT TIME DIFF . {time_diff.total_seconds()} Seconds'
+        )
+                
         user_profile = Profile.objects.create(
             user = tenant_user,
             is_active=True
@@ -203,6 +213,8 @@ def add_data_to_tenant_thread(tenant=None):
     if tenant is None:
         return
 
+    time_start = datetime.datetime.now()
+
     try:
         print('gonna create DB data')
         add_currencies(tenant=tenant)
@@ -210,11 +222,25 @@ def add_data_to_tenant_thread(tenant=None):
         add_countries(tenant=tenant)
         add_states(tenant=tenant)
         add_cities(tenant=tenant)
+    
     except Exception as err:
         print(err)
+    else:
+
+        time_end = datetime.datetime.now()
+        time_diff = time_end - time_start
+
+        total_seconds = time_diff.total_seconds()
+
+        ExceptionRecord.objects.create(
+            text = f'ADD DATA TO TENANT DB TIME DIFF . {total_seconds} Seconds'
+        )
+            
 
 
 def create_tenant(request=None, user=None, data=None):
+    time_start = datetime.datetime.now()
+    
     if user is None or data is None:
         return
     
@@ -227,18 +253,27 @@ def create_tenant(request=None, user=None, data=None):
         td_name = td_name + f'-{int(all_domains_length)}'
     except:
         pass
-    user_tenant = Tenant.objects.create(
-        user=user,
-        name=td_name,
-        domain=f'{td_name}.{settings.BACKEND_DOMAIN_NAME}',
-        schema_name=td_name
+    try:
+        user_tenant = Tenant.objects.create(
+            user=user,
+            name=td_name,
+            domain=f'{td_name}.{settings.BACKEND_DOMAIN_NAME}',
+            schema_name=td_name
+        )
+        
+        ExceptionRecord.objects.create(
+            text = f'Check domain errors . {user_tenant} line 272 craete_tenat'
     )
-
-    Domain.objects.create(
-        user=user,
-        schema_name=td_name,
-        domain=f'{td_name}.{settings.BACKEND_DOMAIN_NAME}',
-        tenant=user_tenant,
+        
+        Domain.objects.create(
+            user=user,
+            schema_name=td_name,
+            domain=f'{td_name}.{settings.BACKEND_DOMAIN_NAME}',
+            tenant=user_tenant,
+        )
+    except Exception as err:
+        ExceptionRecord.objects.create(
+            text = f'Check domain errors . {str(err)} {user_tenant} line 272 craete_tenat'
     )
 
 
@@ -250,17 +285,6 @@ def create_tenant(request=None, user=None, data=None):
         except:
             pass
         
-        try:
-            thrd = Thread(target=add_business_types, kwargs={'tenant' : user_tenant})
-            thrd.start()
-        except:
-            pass
-        try:
-            thrd = Thread(target=add_software_types, kwargs={'tenant' : user_tenant})
-            thrd.start()
-        except:
-            pass
-
         t_user = create_tenant_user(tenant=user_tenant, data=data)
         
         if t_user is not None:
@@ -278,11 +302,11 @@ def create_tenant(request=None, user=None, data=None):
                 t_token = create_tenant_user_token(tenant_user=t_user, tenant=user_tenant)
             except:
                 pass
-            NewsLetterDetail.objects.create(
-                user = t_user,
-                terms_condition=data.get('terms_condition', True),
-                is_subscribed=data.get('terms_condition', False)
-            )
+            # NewsLetterDetail.objects.create(
+            #     user = t_user,
+            #     terms_condition=data.get('terms_condition', True),
+            #     is_subscribed=data.get('terms_condition', False)
+            # )
 
             try:
                 create_tenant_account_type(tenant_user=t_user, tenant=user_tenant, account_type='Business')#data['account_type'])
@@ -305,11 +329,30 @@ def create_tenant(request=None, user=None, data=None):
                 payment_thrd.start()
             except:
                 pass
+
+            try:
+                thrd = Thread(target=add_business_types, kwargs={'tenant' : user_tenant})
+                thrd.start()
+            except:
+                pass
+            try:
+                thrd = Thread(target=add_software_types, kwargs={'tenant' : user_tenant})
+                thrd.start()
+            except:
+                pass
             
             try:
                 thrd = Thread(target=add_data_to_tenant_thread, kwargs={'tenant' : user_tenant})
                 thrd.start()
             except:
                 pass
-            
+    
+    time_end = datetime.datetime.now()
+    time_diff = time_end - time_start
 
+    total_seconds = time_diff.total_seconds()
+
+    ExceptionRecord.objects.create(
+        text = f'CREATE TENANT TIME DIFF . {total_seconds} Seconds'
+    )
+            

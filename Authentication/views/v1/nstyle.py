@@ -8,7 +8,7 @@ from Authentication.Constants.UserConstants import create_user_account_type, com
 # from django.contrib.auth.models import User
 from Authentication.models import User, VerificationOTP
 from Tenants.Constants.tenant_constants import set_schema, verify_tenant_email_mobile
-from Tenants.models import Tenant, Domain
+from Tenants.models import EmployeeTenantDetail, Tenant, Domain
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
@@ -472,9 +472,12 @@ def login(request):
     email = request.data.get('email', None)
     social_account = request.data.get('social_account', False)
     password = request.data.get('password', None)
-
+    
+    user = None
+    employee = False
     if social_account:
         social_platform = request.data.get('social_platform', None)
+    s_data = {}
     
     if not email or (not social_account and not password ) or (social_account and not social_platform ):
         return Response(
@@ -499,27 +502,37 @@ def login(request):
     
     connection.set_schema_to_public()
     try:
-        user = User.objects.filter(
-            email=email,
-            is_deleted=False
-        ).exclude(user_account_type__account_type = 'Everyone')[0]
-        
-    except Exception as err:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
-                'status_code_text' : 'INVALID_CREDENTIALS_4013',
-                'response' : {
-                    'message' : 'User does not exist with this email',
-                    'error_message' : str(err),
-                    'fields' : ['email']
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
+        user = User.objects.get(
+            email =email,
+            is_deleted=False,
+            user_account_type__account_type = 'Employee'
         )
-
-
+        employee = True
+    except Exception as err: 
+        pass
+        
+    if user == None:
+        try:
+            user = User.objects.filter(
+                email=email,
+                is_deleted=False
+            ).exclude(user_account_type__account_type = 'Everyone')[0]
+        
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
+                    'status_code_text' : 'INVALID_CREDENTIALS_4013',
+                    'response' : {
+                        'message' : 'User does not exist with this email',
+                        'error_message' : str(err),
+                        'fields' : ['email']
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
     if not social_account and not user.is_active:
         return Response(
             {
@@ -602,18 +615,40 @@ def login(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-
-    serialized = UserLoginSerializer(user)
-    s_data = dict(serialized.data)
-    s_data['id'] = None
-    s_data['access_token'] = None
-    try:
-        with tenant_context(Tenant.objects.get(user=user)):
-            tnt_token = Token.objects.get(user__username=user.username)
-            s_data['id'] = str(tnt_token.user.id)
-            s_data['access_token'] = str(tnt_token.key)
-    except:
-        pass
+    if employee:
+        #s_data['id'] = None
+        employe_user = EmployeeTenantDetail.objects.get(user = user)
+        with tenant_context(employe_user.tenant):
+            user = User.objects.get(
+                email=email,
+                is_deleted=False,
+                user_account_type__account_type = 'Employee'
+            )
+            try:
+                token = Token.objects.get(user=user)
+            except Token.DoesNotExist:
+                token = Token.objects.create(user=user)
+            serialized = UserLoginSerializer(user, context={'employee' : True,
+                                    'request' : request,
+                                    'token' : token.key,
+                                    'tenant' : employe_user.tenant.schema_name
+                                    })
+            s_data = dict(serialized.data)
+            #s_data['access_token'] = str(tnt_token.key)
+            
+    else:
+        serialized = UserLoginSerializer(user, context={'employee' : False,
+                            'tenant' : None})
+        s_data = dict(serialized.data)
+        s_data['id'] = None
+        s_data['access_token'] = None
+        try:
+            with tenant_context(Tenant.objects.get(user=user)):
+                tnt_token = Token.objects.get(user__username=user.username)
+                s_data['id'] = str(tnt_token.user.id)
+                s_data['access_token'] = str(tnt_token.key)
+        except:
+            pass
 
 
     return Response(
@@ -622,6 +657,7 @@ def login(request):
                 'status_code' : 200,
                 'response' : {
                     'message' : 'Authenticated',
+                    #'data' : employee
                     'data' : s_data
                 }
             },

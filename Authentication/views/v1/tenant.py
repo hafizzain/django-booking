@@ -1,5 +1,7 @@
 
 
+from Employee.models import Employee
+from Employee.serializers import EmployeSerializer
 from Tenants.models import EmployeeTenantDetail
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -159,26 +161,8 @@ def login(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    try:
-        user = User.objects.get(
-            email=email,
-            is_deleted=False,
-            user_account_type__account_type = 'Employee'
-        )
-        employee = True
-    except Exception as err:
-        employee = False
-    if employee:
-        employe_user = EmployeeTenantDetail.objects.get(user = user)
-        with tenant_context(employe_user.tenant):
-            user = User.objects.get(
-                email=email,
-                is_deleted=False,
-                user_account_type__account_type = 'Employee'
-            )
-            serialized = UserTenantLoginSerializer(user, context={'employee' : True, })
-    else:
-        serialized = UserTenantLoginSerializer(user, context={'employee' : False, })
+        
+    serialized = UserTenantLoginSerializer(user, context={'employee' : False, })
     return Response(
             {
                 'status' : True,
@@ -197,6 +181,8 @@ def login(request):
 @permission_classes([AllowAny])
 def get_user(request):
     user_id = request.GET.get('user', None)
+    employee = request.GET.get('employee', None)
+    permisson = {}
 
     if user_id is None:
         return Response(
@@ -288,7 +274,20 @@ def get_user(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-
+    if str(employee) == 'true':
+        try:
+            emp = Employee.objects.get(email = str(user.email))
+            serialized = EmployeSerializer(emp, context={'request' : request, }) #context={'request' : request, })
+            response_data = serialized.data
+            
+            permissions = response_data['permissions']
+            
+            permisson.update(permissions)
+                
+        except Exception as err:
+            return str(err)
+    # else:
+    #     permisson.update(employee)
     serialized = UserTenantLoginSerializer(user)
     return Response(
             {
@@ -296,7 +295,8 @@ def get_user(request):
                 'status_code' : 200,
                 'response' : {
                     'message' : 'Authenticated',
-                    'data' : serialized.data
+                    'data' : serialized.data,
+                    'permissions' : permisson
                 }
             },
             status=status.HTTP_200_OK

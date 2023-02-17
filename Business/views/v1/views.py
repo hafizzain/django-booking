@@ -190,6 +190,7 @@ def create_user_business(request):
 @permission_classes([IsAuthenticated])
 def get_business(request):
     user = request.GET.get('user', None)
+    employee = request.GET.get('employee', None)
 
     if user is None:
         return Response(
@@ -207,28 +208,55 @@ def get_business(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    if str(employee) == 'true':
+        try:
+            user = User.objects.get(id = user)
+            emp = Employee.objects.get(email = user.email )
+        except:
+            pass
+        try:
+            user_business = Business.objects.get(
+                user=emp.user.id,
+                is_deleted=False,
+                is_active=True,
+                is_blocked=False
+            )
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                    'response' : {
+                        'message' : 'Business Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
     
-    try:
-        user_business = Business.objects.get(
-            user=user,
-            is_deleted=False,
-            is_active=True,
-            is_blocked=False
-        )
-    except Exception as err:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
-                'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
-                'response' : {
-                    'message' : 'Business Not Found',
-                    'error_message' : str(err),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
-    
+    else:
+        try:
+            user_business = Business.objects.get(
+                user=user,
+                is_deleted=False,
+                is_active=True,
+                is_blocked=False
+            )
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                    'response' : {
+                        'message' : 'Business Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
     serialized = Business_GetSerializer(user_business , context={'request' : request})
 
     return Response(
@@ -3691,6 +3719,42 @@ def get_tenant_address_taxes(request):
             )
         serialized = BusinessAddressSerializer(location, context = {'request' : request, })
         data.append(serialized.data)
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Address Taxes!',
+                    'error_message' : None,
+                    'tax' : data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_address_taxes_device(request):
+    location_id = request.GET.get('location_id', None)
+    data= []
+    try:
+        location = BusinessAddress.objects.get(id=location_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Business Location Not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    serialized = BusinessAddressSerializer(location, context = {'request' : request, })
+    data.append(serialized.data)
     return Response(
             {
                 'status' : True,
