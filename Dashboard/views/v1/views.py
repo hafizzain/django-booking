@@ -2,7 +2,7 @@ from django.conf import settings
 from operator import ge
 
 
-from Order.models import ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder
+from Order.models import ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder,Checkout
 # from TragetControl.models import TierStoreTarget
 
 from Utility.Constants.Data.months import  FIXED_MONTHS
@@ -501,34 +501,35 @@ def get_total_comission(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
+    service=0
+    retail=0
+    voucher=0
 
-    services = CategoryCommission.objects.filter(
-        commission = employee_id, 
+    services = Checkout.objects.filter(
+        service_commission = employee_id, 
     )
-    retail = CategoryCommission.objects.filter(
-        commission = employee_id, 
+    retails = Checkout.objects.filter(
+        product_commission = employee_id, 
     )
-    voucher = CategoryCommission.objects.filter(
-        commission = employee_id, 
+    vouchers = Checkout.objects.filter(
+        voucher_commission = employee_id, 
     )
 
     service_comission = services.values_list('category_comission', flat=True)
     print(service_comission)
     sum_service_comission = sum(service_comission)
 
-    retail_comission = retail.values_list('category_comission', flat=True)
+    retail_comission = retails.values_list('category_comission', flat=True)
     print(retail_comission)
     sum_retail_comission = sum(retail_comission)
 
-    voucher_comission = voucher.values_list('category_comission', flat=True)
+    voucher_comission = vouchers.values_list('category_comission', flat=True)
     print(voucher_comission)
     sum_voucher_comission = sum(voucher_comission)
 
     sum_total_commision=sum([sum_voucher_comission,sum_retail_comission,sum_service_comission])
 
     
-        
-
     return Response(
             {
                 'status' : 200,
