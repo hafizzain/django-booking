@@ -2,6 +2,7 @@ from django.conf import settings
 from operator import ge
 
 
+from Order.models import ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder,Checkout
 from Order.models import Checkout, ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder
 # from TragetControl.models import TierStoreTarget
 
@@ -458,110 +459,95 @@ def get_dashboard_target_overview(request):
             status=status.HTTP_200_OK
         )
 
-
-
-
-
-
-
-
-
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def get_total_comission(request):
+# @api_view(['GET'])
+# @permission_classes([AllowAny])
+# def get_total_comission(request):
     
-    employee_id = request.GET.get('employee_id', None)
-    # start_month =  request.GET.get('start_month', None)
-    # end_month = request.GET.get('end_month', None)
-    # start_year = request.GET.get('start_year', '1900-01-01')
-    # end_year = request.GET.get('end_year', '3000-12-30')
-    duration = request.GET.get('duration', None)
-
-    if not all([employee_id ]):
-        return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.MISSING_FIELDS_4001,
-                'status_code_text' : 'MISSING_FIELDS_4001',
-                'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : 'All fields are required',
-                    'fields' : [
-                        'employee_id',
-                    ]
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
+#     employee_id = request.GET.get('employee_id', None)
+#     # start_month =  request.GET.get('start_month', None)
+#     # end_month = request.GET.get('end_month', None)
+#     # start_year = request.GET.get('start_year', '1900-01-01')
+#     # end_year = request.GET.get('end_year', '3000-12-30')
     
-    try: 
-        employee = Employee.objects.get(id=employee_id, is_deleted=False)
-    except Exception as err:
-        return Response(
-                {
-                    'status' : False,
-                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
-                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
-                    'response' : {
-                        'message' : 'Employee Not Found',
-                        'error_message' : str(err),
-                    }
-                },
-                status=status.HTTP_404_NOT_FOUND
-            )
 
-    # if start_month is not None and end_month is not None :
-
-    #     start_index = FIXED_MONTHS.index(start_month) # 1
-    #     end_index = FIXED_MONTHS.index(end_month) # 9
-
-    #     fix_months = FIXED_MONTHS[start_index : end_index]
-    # else:
-    #     fix_months = FIXED_MONTHS
-    #     print(fix_months)
+#     if not all([employee_id ]):
+#         return Response(
+#             {
+#                 'status' : False,
+#                 'status_code' : StatusCodes.MISSING_FIELDS_4001,
+#                 'status_code_text' : 'MISSING_FIELDS_4001',
+#                 'response' : {
+#                     'message' : 'Invalid Data!',
+#                     'error_message' : 'All fields are required',
+#                     'fields' : [
+#                         'employee_id',
+#                     ]
+#                 }
+#             },
+#             status=status.HTTP_400_BAD_REQUEST
+#         )
     
-    # targets = CategoryCommission.objects.filter(
-    #     commission = employee_id,
-    #     month__in = fix_months, # 8
-    #     year__gte = start_year,
-    #     year__lte = end_year,
-    # )
+#     try: 
+#         employee = Employee.objects.get(id=employee_id, is_deleted=False)
+#     except Exception as err:
+#         return Response(
+#                 {
+#                     'status' : False,
+#                     'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+#                     'status_code_text' : 'INVALID_EMPLOYEE_4025',
+#                     'response' : {
+#                         'message' : 'Employee Not Found',
+#                         'error_message' : str(err),
+#                     }
+#                 },
+#                 status=status.HTTP_404_NOT_FOUND
+#             )
+#     service=0
+#     retail=0
+#     voucher=0
 
-    service_comission = CategoryCommission.object.filter(Service =employee_id)
-    retail_comission = CategoryCommission.object.filter(Retail =employee_id)
-    voucher_comission = CategoryCommission.object.filter(Voucher =employee_id)
+#     services = Checkout.objects.filter(
+#         service_commission = employee_id, 
+#     )
+#     retails = Checkout.objects.filter(
+#         product_commission = employee_id, 
+#     )
+#     vouchers = Checkout.objects.filter(
+#         voucher_commission = employee_id, 
+#     )
 
-    total_commision=0
-    if duration is not None:
-        today = datetime.today()
-        day = today - timedelta(days=int(duration))
-        
-    for commission in day :
-        c1=commission.service_comission
-        c2=commission.retail_comission
-        c3=commission.voucher_comission
+#     service_comission = services.values_list('category_comission', flat=True)
+#     print(service_comission)
+#     sum_service_comission = sum(service_comission)
 
-        total_commision = c1 + c2 + c3  
-        
+#     retail_comission = retails.values_list('category_comission', flat=True)
+#     print(retail_comission)
+#     sum_retail_comission = sum(retail_comission)
 
-    return Response(
-            {
-                'status' : 200,
-                'status_code' : '200',
-                'response' : {
-                    'message' : 'Employee Id recieved',
-                    'error_message' : None,
-                    'employee_id' : employee_id,
-                    'total_commision' : total_commision,
-                    'service_comission' : service_comission,
-                    'retail_comission' : retail_comission,
-                    'voucher_comission' : voucher_comission,
+#     voucher_comission = vouchers.values_list('category_comission', flat=True)
+#     print(voucher_comission)
+#     sum_voucher_comission = sum(voucher_comission)
+
+#     sum_total_commision=sum([sum_voucher_comission,sum_retail_comission,sum_service_comission])
+
+    
+#     return Response(
+#             {
+#                 'status' : 200,
+#                 'status_code' : '200',
+#                 'response' : {
+#                     'message' : 'Employee Id recieved',
+#                     'error_message' : None,
+#                     'employee_id' : employee_id,
+#                     'total_commision' : sum_total_commision,
+#                     'service_comission' : sum_service_comission,
+#                     'retail_comission' : sum_retail_comission,
+#                     'voucher_comission' : sum_voucher_comission,
                     
-                }
-            },
-            status=status.HTTP_200_OK
-        )
+#                 }
+#             },
+#             status=status.HTTP_200_OK
+#         )
 
     
 @api_view(['GET'])
@@ -617,6 +603,98 @@ def get_total_tips(request):
                 'message' : 'All Sale Orders',
                 'error_message' : None,
                 'sales' : total_tips
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_total_comission(request):
+    employee_id = request.GET.get('employee_id', None)
+    range_start =  request.GET.get('range_start', None)
+    range_end = request.GET.get('range_end', None)
+    
+    sum_total_commision = 0
+    total_service_comission = 0
+    total_product_comission = 0
+    total_voucher_comission = 0
+
+    if range_start:
+        range_start = datetime.strptime(range_start, "%Y-%m-%d")#.date()
+        range_end = datetime.strptime(range_end, "%Y-%m-%d")#
+
+        service_commission = Checkout.objects.filter(
+            is_deleted=False,
+            member__id = employee_id,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+            ).values_list('service_commission', flat=True)
+        total_service_comission += sum(service_commission)
+
+        product_commission = Checkout.objects.filter(
+            is_deleted=False,
+            member__id = employee_id,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+            ).values_list('product_commission', flat=True)
+        total_product_comission += sum(product_commission)
+
+        voucher_commission = Checkout.objects.filter(
+            is_deleted=False,
+            member__id = employee_id,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+            ).values_list('voucher_commission', flat=True)
+        total_voucher_comission += sum(voucher_commission)
+        
+        
+
+        sum_total_commision = sum([total_service_comission,total_product_comission,total_voucher_comission])
+
+
+        
+    else:
+        service_commission = Checkout.objects.filter(
+            is_deleted=False,
+            member__id = employee_id,
+            # created_at__gte =  range_start ,
+            # created_at__lte = range_end
+            ).values_list('service_commission', flat=True)
+        total_service_comission += sum(service_commission)
+
+        product_commission = Checkout.objects.filter(
+            is_deleted=False,
+            member__id = employee_id,
+            # created_at__gte =  range_start ,
+            # created_at__lte = range_end
+            ).values_list('product_commission', flat=True)
+        total_product_comission += sum(product_commission)
+
+        voucher_commission = Checkout.objects.filter(
+            is_deleted=False,
+            member__id = employee_id,
+            # created_at__gte =  range_start ,
+            # created_at__lte = range_end
+            ).values_list('voucher_commission', flat=True)
+        total_voucher_comission += sum(voucher_commission)
+        
+        
+
+        sum_total_commision = sum([total_service_comission,total_product_comission,total_voucher_comission])
+    
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Commision Orders',
+                'error_message' : None,
+                'total commsion' : sum_total_commision,
+                'Service': total_service_comission,
+                'Retail' : total_product_comission,
+                'Voucher' : total_voucher_comission,
             }
         },
         status=status.HTTP_200_OK
