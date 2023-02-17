@@ -11,6 +11,7 @@ urlpatterns = [
     path('get_appointments_service/', views.get_appointments_service),
     
     path('get_appointments_device/', views.get_appointments_device),
+    path('update_appointment_device/', views.update_appointment_device),
 
     path('service_appointment_count/', views.service_appointment_count),
     
@@ -27,6 +28,7 @@ urlpatterns = [
     path('delete_block_time/', views.delete_block_time),
     #checkout
     path('create_checkout/', views.create_checkout),
+    path('create_checkout_device/', views.create_checkout_device),
     
     #Service Employee
     path('get_service_employee/', views.get_service_employee),

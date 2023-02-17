@@ -627,6 +627,103 @@ def update_appointment(request):
         },
         status=status.HTTP_200_OK
     )
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_appointment_device(request):
+    appointment_id = request.data.get('id', None)
+    appointment_status = request.data.get('appointment_status', None)
+    if appointment_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required.',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+          
+    try:
+        appointment = Appointment.objects.get(id=appointment_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Appointment ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    try:
+        appointment_service = AppointmentService.objects.filter(appointment = str(appointment.id))
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Appointment Service ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    for ser in appointment_service:
+        ser.appointment_status = 'In Progress'
+        ser.save()
+    # serializer = UpdateAppointmentSerializer(service_appointment , data=request.data, partial=True)
+    # if not serializer.is_valid():
+    #     return Response(
+    #             {
+    #         'status' : False,
+    #         'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+    #         'response' : {
+    #             'message' : 'Appointment Serializer Invalid',
+    #             'error_message' : str(serializer.errors),
+    #         }
+    #     },
+    #     status=status.HTTP_404_NOT_FOUND
+    #     )
+    # serializer.save()
+    # if appointment_status == 'Cancel':
+    #     try:
+    #         thrd = Thread(target=cancel_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant} )
+    #         thrd.start()
+    #     except Exception as err:
+    #         print(err)
+    #         pass
+        
+    # else :
+    #     try:
+    #         thrd = Thread(target=reschedule_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant})
+    #         thrd.start()
+    #     except Exception as err:
+    #         print(err)
+    #         pass
+        
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Update Appointment Successfully',
+                'error_message' : None,
+                #'Appointment' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
     
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -1020,6 +1117,7 @@ def delete_block_time(request):
 @permission_classes([IsAuthenticated])
 def create_checkout(request):
     appointment = request.data.get('appointment', None)
+    appointment_service_obj = request.data.get('appointment_service_obj', None)
     appointment_service = request.data.get('appointment_service', None)
     
     payment_method = request.data.get('payment_method', None)
@@ -1039,50 +1137,19 @@ def create_checkout(request):
         members=Employee.objects.get(id=member)
     except Exception as err:
         members = None
-        # return Response(
-        #     {
-        #             'status' : False,
-        #             'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
-        #             'response' : {
-        #             'message' : 'Employee not found',
-        #             'error_message' : str(err),
-        #         }
-        #     },
-        #     status=status.HTTP_404_NOT_FOUND
-        # )
+    
     try:
         services=Service.objects.get(id=service)
     except Exception as err:
         services = None
-        # return Response(
-        #     {
-        #             'status' : False,
-        #             'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
-        #             'response' : {
-        #             'message' : 'Service not found',
-        #             'error_message' : str(err),
-        #         }
-        #     },
-        #     status=status.HTTP_404_NOT_FOUND
-        # )
+        
     try:
         service_appointment = AppointmentService.objects.get(id=appointment_service)
     except Exception as err:
         service_appointment = None
-        # return Response(
-        #     {
-        #         'status' : False,
-        #         'status_code' : 404,
-        #         'status_code_text' : '404',
-        #         'response' : {
-        #             'message' : 'Invalid Appointment ID!',
-        #             'error_message' : str(err),
-        #         }
-        #     },
-        #     status=status.HTTP_404_NOT_FOUND
-        # )
+       
     try:
-        appointments = Appointment.objects.get(id=service_appointment.appointment.id)
+        appointments = Appointment.objects.get(id=appointment)
     except Exception as err:
         #appointments = None
         return Response(
@@ -1098,10 +1165,23 @@ def create_checkout(request):
             status=status.HTTP_404_NOT_FOUND
         )
     try:
-        business_address=BusinessAddress.objects.get(id=business_address)
+        business_address=BusinessAddress.objects.get(id = str(business_address))
     except Exception as err:
         business_address = None
-    
+    if type(appointment_service_obj) == str:
+            appointment_service_obj = json.loads(appointment_service_obj)
+
+    elif type(appointment_service_obj) == list:
+        pass
+    for app in appointment_service_obj:
+        id = app.get('id', None)
+        try:
+            service_appointment = AppointmentService.objects.get(id=id)
+            service_appointment.appointment_status= 'Done'
+            service_appointment.save()
+        except Exception as err:
+            pass
+        
     checkout =AppointmentCheckout.objects.create(
         appointment = appointments,
         appointment_service = service_appointment,
@@ -1115,8 +1195,102 @@ def create_checkout(request):
         total_price =total_price,
         
     )
-    checkout.business_address = service_appointment.business_address
-    checkout.save()
+    # checkout.business_address = service_appointment.business_address
+    # checkout.save()
+    
+    serialized = CheckoutSerializer(checkout)
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Appointment Checkout Created!',
+                    'error_message' : None,
+                    'checkout' : serialized.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+    ) 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_checkout_device(request):
+    appointment = request.data.get('appointment', None)
+    #appointment_service = request.data.get('appointment_service', None)
+    
+    payment_method = request.data.get('payment_method', None)
+    service = request.data.get('service', None)
+    member = request.data.get('member', None)
+    business_address = request.data.get('business_address', None)
+    
+    tip = request.data.get('tip', None)
+    gst = request.data.get('gst', None)
+    service_price = request.data.get('service_price', None)
+    total_price = request.data.get('total_price', None)
+    
+    # if not all([]){
+        
+    # }
+    try:
+        members=Employee.objects.get(id=member)
+    except Exception as err:
+        members = None
+    
+    try:
+        services=Service.objects.get(id=service)
+    except Exception as err:
+        services = None
+        
+    # try:
+    #     service_appointment = AppointmentService.objects.get(id=appointment_service)
+    # except Exception as err:
+    #     service_appointment = None
+       
+    try:
+        appointments = Appointment.objects.get(id=appointment)
+    except Exception as err:
+        #appointments = None
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Appointment ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    try:
+        service_appointment = AppointmentService.objects.filter(id=appointments.id)
+    except Exception as err:
+        service_appointment = None
+    
+    try:
+        business_address=BusinessAddress.objects.get(id = str(business_address))
+    except Exception as err:
+        business_address = None
+    
+    for ser in service_appointment:
+        ser.appointment_status= 'Done'
+        ser.save()
+        
+    checkout =AppointmentCheckout.objects.create(
+        appointment = appointments,
+       # appointment_service = service_appointment,
+        payment_method =payment_method,
+        service= services,
+        member=members,
+        business_address=business_address,
+        tip = tip,
+        gst = gst,
+        service_price =service_price,
+        total_price =total_price,
+        
+    )
+    # checkout.business_address = service_appointment.business_address
+    # checkout.save()
     
     serialized = CheckoutSerializer(checkout)
     return Response(

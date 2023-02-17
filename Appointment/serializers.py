@@ -3,7 +3,7 @@ from getopt import error
 from pkgutil import read_code
 from pyexpat import model
 from re import A
-from Sale.serializers import LocationServiceSerializer
+#from Sale.serializers import LocationServiceSerializer
 from rest_framework import serializers
 from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Appointment.models import Appointment, AppointmentCheckout, AppointmentNotes, AppointmentService
@@ -42,6 +42,15 @@ class ServiceSaleSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'price_service']
 
 class UpdateAppointmentSerializer(serializers.ModelSerializer):
+    service_name  = serializers.SerializerMethodField(read_only=True)
+    
+    def get_service_name(self, obj):
+        try:
+            cli = f"{obj.service.name}"
+            return cli
+
+        except Exception as err:
+            print(err)
     class Meta:
         model = AppointmentService
         fields = '__all__'
@@ -242,19 +251,24 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                 new_end_time = None
 
                 for dt in selected_data:
-                    if ((dt['range_start'] >= appointment_time and dt['range_end'] <= end_time) and dt['date'] == app_date):
+                    if ((dt['range_start'] >= appointment_time and dt['range_end'] <= end_time)) and dt['date'] == app_date:
                         
                         ExceptionRecord.objects.create(
-                            text = f'tested successfully'
+                            text = f"tested successfully{dt['range_end']}"
                         )
                         find_values.append(dt)
-                    else:
+                    elif (dt['range_end'] == appointment_time and dt['date'] == app_date ):
+                        find_values.append(dt)
+                        
+                    else :
                         new_start_time = appointment_time
                     
                     if ((dt['range_start'] <= appointment_time and dt['range_end'] >= end_time) and dt['date'] == app_date):
                         find_values.append(dt)
                     else:
+                        new_end_time = end_time
                         pass
+                    
 
                     # if str(dt['range_end']) == str(appointment_time) and dt['date'] == app_date:
                     #     find_values.append(dt)
@@ -282,8 +296,14 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                     current_obj = find_values[0]
                     if new_start_time is not None:
                         current_obj['range_start'] = new_start_time
+                        ExceptionRecord.objects.create(
+                            text = f"tested abcs{current_obj}"
+                        )
                     if new_end_time is not None:
                         current_obj['range_end'] = new_end_time
+                        ExceptionRecord.objects.create(
+                            text = f"tested 123{current_obj}"
+                        )
 
                     current_obj['ids'].append(app_id)
                 else:
@@ -431,6 +451,7 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
     srv_name = serializers.SerializerMethodField(read_only=True)
     employee_list = serializers.SerializerMethodField(read_only=True)
     designation = serializers.SerializerMethodField(read_only=True)
+    status = serializers.SerializerMethodField(read_only=True)
     
     def get_designation(self, obj):        
         try:
@@ -465,7 +486,9 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
         
         if obj.appointment_status == 'Cancel':
             return 'Cancelled'
-            
+    def get_status(self, obj):
+        return obj.appointment_status
+    
     def get_appointment_type(self, obj):
         try:
             return obj.appointment.client_type
@@ -519,7 +542,7 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentService
         fields= ('id', 'service', 'member', 'price', 'client', 'designation',
-                 'appointment_date', 'appointment_time', 'duration','srv_name',
+                 'appointment_date', 'appointment_time', 'duration','srv_name','status',
                  'booked_by' , 'booking_id', 'appointment_type','client_can_book','slot_availible_for_online',
                  'appointment_status', 'location','employee_list', 'created_at', 'is_deleted')
         

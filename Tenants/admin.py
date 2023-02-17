@@ -30,6 +30,7 @@ class DomainAdmin(admin.ModelAdmin):
         'id',
         'domain',
         'domain_schema_name',
+        'user_username',
         'is_active',
         'is_deleted',
         'is_blocked',

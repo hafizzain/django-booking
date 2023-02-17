@@ -13,10 +13,12 @@ urlpatterns = [
     path('import_employee/', views.import_employee),
 
     path('delete_all_employees/', views.delete_all_employees),
+    path('check_email_employees/', views.check_email_employees),
     
 
     #Staff GROUP URLS 
     path('create_staff_group/', views.create_staff_group),
+    path('import_staff_group/', views.import_staff_group),
     path('get_staff_group/', views.get_staff_group),
     path('update_staff_group/', views.update_staff_group),
     path('delete_staff_group/', views.delete_staff_group),

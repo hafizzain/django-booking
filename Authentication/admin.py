@@ -3,6 +3,7 @@ from django.contrib import admin
 from .models import User, AccountType, NewsLetterDetail, VerificationOTP
 
 
+from Tenants.models import Tenant, Domain
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
@@ -18,8 +19,23 @@ class UserAdmin(admin.ModelAdmin):
         'is_staff', 
         'is_superuser', 
         'is_mobile_verified', 
-        'is_email_verified'
+        'is_email_verified',
+        'is_tenant_user'
     ]
+
+    list_filter = ['is_email_verified', 'is_mobile_verified']
+    
+    def is_tenant_user(self, user_obj):
+        try:
+            Domain.objects.get(
+                user = user_obj
+            )
+        except:
+            return False
+        else:
+            return True
+
+    is_tenant_user.boolean = True
 
 
 @admin.register(AccountType)
