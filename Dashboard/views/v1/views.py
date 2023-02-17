@@ -458,15 +458,6 @@ def get_dashboard_target_overview(request):
             status=status.HTTP_200_OK
         )
 
-
-
-
-
-
-
-
-
-
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_total_comission(request):
@@ -476,7 +467,7 @@ def get_total_comission(request):
     # end_month = request.GET.get('end_month', None)
     # start_year = request.GET.get('start_year', '1900-01-01')
     # end_year = request.GET.get('end_year', '3000-12-30')
-    duration = request.GET.get('duration', None)
+    
 
     if not all([employee_id ]):
         return Response(
@@ -511,38 +502,31 @@ def get_total_comission(request):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-    # if start_month is not None and end_month is not None :
+    services = CategoryCommission.objects.filter(
+        commission = employee_id, 
+    )
+    retail = CategoryCommission.objects.filter(
+        commission = employee_id, 
+    )
+    voucher = CategoryCommission.objects.filter(
+        commission = employee_id, 
+    )
 
-    #     start_index = FIXED_MONTHS.index(start_month) # 1
-    #     end_index = FIXED_MONTHS.index(end_month) # 9
+    service_comission = services.values_list('category_comission', flat=True)
+    print(service_comission)
+    sum_service_comission = sum(service_comission)
 
-    #     fix_months = FIXED_MONTHS[start_index : end_index]
-    # else:
-    #     fix_months = FIXED_MONTHS
-    #     print(fix_months)
+    retail_comission = retail.values_list('category_comission', flat=True)
+    print(retail_comission)
+    sum_retail_comission = sum(retail_comission)
+
+    voucher_comission = voucher.values_list('category_comission', flat=True)
+    print(voucher_comission)
+    sum_voucher_comission = sum(voucher_comission)
+
+    sum_total_commision=sum([sum_voucher_comission,sum_retail_comission,sum_service_comission])
+
     
-    # targets = CategoryCommission.objects.filter(
-    #     commission = employee_id,
-    #     month__in = fix_months, # 8
-    #     year__gte = start_year,
-    #     year__lte = end_year,
-    # )
-
-    service_comission = CategoryCommission.object.filter(Service =employee_id)
-    retail_comission = CategoryCommission.object.filter(Retail =employee_id)
-    voucher_comission = CategoryCommission.object.filter(Voucher =employee_id)
-
-    total_commision=0
-    if duration is not None:
-        today = datetime.today()
-        day = today - timedelta(days=int(duration))
-        
-    for commission in day :
-        c1=commission.service_comission
-        c2=commission.retail_comission
-        c3=commission.voucher_comission
-
-        total_commision = c1 + c2 + c3  
         
 
     return Response(
@@ -553,10 +537,10 @@ def get_total_comission(request):
                     'message' : 'Employee Id recieved',
                     'error_message' : None,
                     'employee_id' : employee_id,
-                    'total_commision' : total_commision,
-                    'service_comission' : service_comission,
-                    'retail_comission' : retail_comission,
-                    'voucher_comission' : voucher_comission,
+                    'total_commision' : sum_total_commision,
+                    'service_comission' : sum_service_comission,
+                    'retail_comission' : sum_retail_comission,
+                    'voucher_comission' : sum_voucher_comission,
                     
                 }
             },
