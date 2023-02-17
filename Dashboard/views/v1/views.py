@@ -1,11 +1,13 @@
 from django.conf import settings
 from operator import ge
+
+
 from Order.models import ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder
 # from TragetControl.models import TierStoreTarget
 
 from Utility.Constants.Data.months import  FIXED_MONTHS
 from Dashboard.serializers import EmployeeDashboradSerializer
-from Employee.models import Employee
+from Employee.models import Employee,CategoryCommission,CommissionSchemeSetting
 from TragetControl.models import StaffTarget
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -327,7 +329,7 @@ def get_dashboard_target_overview(request):
     # retail_target = StaffTarget.objects.filter(employee = employee_id)
     # voucher_targets = TierStoreTarget.objects.filter(voucher_target = 'voucher_target')
     # membership_targets = TierStoreTarget.objects.filter(membership_target = 'membership_target')
-
+                    
     achieved_target_member = ProductOrder.objects.filter(member = employee_id)
 
     if start_month is not None and end_month is not None :
@@ -347,52 +349,75 @@ def get_dashboard_target_overview(request):
         year__lte = end_year,
     )
 
-    voucher_target = VoucherOrder.objects.filter(member = employee)
-    # # service_target = ServiceOrder.objects.filter(user = employee_id)
-    # # retail_target = StaffTarget.objects.filter(user = employee_id)
-    membership_target = MemberShipOrder.objects.filter(member = employee)
+    service_targets = ServiceOrder.objects.filter(
+        service = employee_id,
+        
+    )
+    membership_targets = MemberShipOrder.objects.filter(
+        membership = employee_id,
+        
+    )
+    voucher_targets = VoucherOrder.objects.filter(
+        voucher = employee_id,
+        
+    )
+    
 
-    s=0
-    r=0
-    v = voucher_target.count()
-    m = membership_target.count()
-    total_set = 0
-    achieved_target= len(achieved_target_member)
 
-    print(targets)
 
-    for target in targets :
-        s = target.service_target
-        r = target.retail_target
-        # v = target.voucher_target
-        # m = target.membership_target
-        total_set = total_set + s + r 
-        achieved_target = achieved_target + s + r
 
-    print(total_set)
-    print(achieved_target)
-    print(s)
-    print(r)
-    print(v)
-    print(m)
-    v1=0
-    v2=0
-    m1=0
-    m2=0
-    s1=0
-    s2=0
-    r1=0
-    r2=0
 
-    for target in targets :
-        v1 = target.voucher_target.acheived_target.count()
-        v2 = target.voucher_target.total_set.count()
-        m1 = target.membership_target.acheived_target.count()
-        m2 = target.membership_target.total_set.count()
-        s1 = target.service_target.acheived_target.count()
-        s2 = target.service_target.total_set.count()
-        r1 = target.retail_target.acheived_target.count()
-        r2 = target.retail_target.total_set.count()
+    all_service_targets = targets.values_list('service_target', flat=True)
+    print(all_service_targets)
+    sum_service_targets = sum(all_service_targets)
+
+    all_retail_target = targets.values_list('retail_target', flat=True)
+    print(all_retail_target)
+    sum_retail_target = sum(all_retail_target)
+
+    
+    sum_total_set=sum([sum_retail_target,sum_service_targets])
+    
+    all_achieved_voucher_target = voucher_targets.values_list('voucher', flat=True)
+    print(all_achieved_voucher_target)
+    sum_acheived_voucher_target = sum(all_achieved_voucher_target)
+
+    all_acheived_service_target = service_targets.values_list('service', flat=True)
+    print(all_acheived_service_target)
+    sum_acheived_service_target = sum(all_acheived_service_target)
+
+    all_acheived_retail_target = targets.values_list('retail_target', flat=True)
+    print(all_acheived_retail_target)
+    sum_acheived_retail_target = sum(all_acheived_retail_target)
+
+    all_acheived_membership_target = membership_targets.values_list('membership', flat=True)
+    print(all_acheived_membership_target)
+    sum_acheived_membership_target = sum(all_acheived_membership_target)
+
+    all_acheived_voucher_target = voucher_targets.values_list('voucher', flat=True)
+    print(all_acheived_voucher_target)
+    sum_acheived_voucher_target = sum(all_acheived_voucher_target)
+
+    sum_total_acheived=sum([sum_acheived_voucher_target,sum_acheived_membership_target,sum_retail_target,sum_service_targets,])
+
+    # v1=0
+    # v2=0
+    # m1=0
+    # m2=0
+    # s1=0
+    # s2=0
+    # r1=0
+    # r2=0
+
+    # for target in targets :
+    #     v1 = target.voucher_target.acheived_target.count()
+    #     v2 = target.voucher_target.total_set.count()
+    #     m1 = target.membership_target.acheived_target.count()
+    #     m2 = target.membership_target.total_set.count()
+    #     s1 = target.service_target.acheived_target.count()
+    #     s2 = target.service_target.total_set.count()
+    #     r1 = target.retail_target.acheived_target.count()
+    #     r2 = target.retail_target.total_set.count()
         
     return Response(
             {
@@ -402,17 +427,140 @@ def get_dashboard_target_overview(request):
                     'message' : 'Employee Id recieved',
                     'error_message' : None,
                     'employee_id' : employee_id,
-                    'total_set' : total_set,
-                    'achieved_target' : achieved_target,
-                    'service_target_set' : s1,
-                    'service_target_acheived' : s2,
-                    'retail_target_set' : r1,
-                    'retail_target_acheived' : r2,
-                    'voucher_target_set' : v1,
-                    'voucher_target_acheived' : v2,
-                    'membership_target_set' : m1,
-                    'membership_target_acheived' : m2,
+                    # 'total_set' : sum_total_set,
+                    # 'achieved_target' : sum_acheived_target,
+
+                    # 'service_target_set' : sum_service_targets,
+                    # 'service_target_acheived' : sum_acheived_service_target,
+
+                    # 'retail_target_set' : sum_retail_target,
+                    # 'retail_target_acheived' : sum_acheived_retail_target,
+
+                    # 'voucher_target_set' : sum_voucher_target,
+                    # 'voucher_target_acheived' : sum_acheived_voucher_target,
+
+                    # 'membership_target_set' : sum_membership_target,
+                    # 'membership_target_acheived' : sum_acheived_membership_target,
+                    'set' : {
+                        'service' : sum_service_targets,
+                        'retail' : sum_retail_target,
+                        'total' : sum_total_set
+                    },
+                    'acheived' : {
+                        'membership' : sum_acheived_membership_target,
+                        'voucher' : sum_acheived_voucher_target,
+                        'service' : sum_acheived_service_target,
+                        'retail' : sum_acheived_retail_target,
+                        'total' : sum_total_acheived
+                    }
                 }
             },
             status=status.HTTP_200_OK
         )
+
+
+
+
+
+
+
+
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_total_comission(request):
+    
+    employee_id = request.GET.get('employee_id', None)
+    # start_month =  request.GET.get('start_month', None)
+    # end_month = request.GET.get('end_month', None)
+    # start_year = request.GET.get('start_year', '1900-01-01')
+    # end_year = request.GET.get('end_year', '3000-12-30')
+    duration = request.GET.get('duration', None)
+
+    if not all([employee_id ]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required',
+                    'fields' : [
+                        'employee_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try: 
+        employee = Employee.objects.get(id=employee_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                    'response' : {
+                        'message' : 'Employee Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+    # if start_month is not None and end_month is not None :
+
+    #     start_index = FIXED_MONTHS.index(start_month) # 1
+    #     end_index = FIXED_MONTHS.index(end_month) # 9
+
+    #     fix_months = FIXED_MONTHS[start_index : end_index]
+    # else:
+    #     fix_months = FIXED_MONTHS
+    #     print(fix_months)
+    
+    # targets = CategoryCommission.objects.filter(
+    #     commission = employee_id,
+    #     month__in = fix_months, # 8
+    #     year__gte = start_year,
+    #     year__lte = end_year,
+    # )
+
+    service_comission = CategoryCommission.object.filter(Service =employee_id)
+    retail_comission = CategoryCommission.object.filter(Retail =employee_id)
+    voucher_comission = CategoryCommission.object.filter(Voucher =employee_id)
+
+    total_commision=0
+    if duration is not None:
+        today = datetime.today()
+        day = today - timedelta(days=int(duration))
+        
+    for commission in day :
+        c1=commission.service_comission
+        c2=commission.retail_comission
+        c3=commission.voucher_comission
+
+        total_commision = c1 + c2 + c3  
+        
+
+    return Response(
+            {
+                'status' : 200,
+                'status_code' : '200',
+                'response' : {
+                    'message' : 'Employee Id recieved',
+                    'error_message' : None,
+                    'employee_id' : employee_id,
+                    'total_commision' : total_commision,
+                    'service_comission' : service_comission,
+                    'retail_comission' : retail_comission,
+                    'voucher_comission' : voucher_comission,
+                    
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
+    
