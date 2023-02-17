@@ -257,18 +257,27 @@ def create_tenant(request=None, user=None, data=None):
         td_name = td_name + f'-{int(all_domains_length)}'
     except:
         pass
-    user_tenant = Tenant.objects.create(
-        user=user,
-        name=td_name,
-        domain=f'{td_name}.{settings.BACKEND_DOMAIN_NAME}',
-        schema_name=td_name
+    try:
+        user_tenant = Tenant.objects.create(
+            user=user,
+            name=td_name,
+            domain=f'{td_name}.{settings.BACKEND_DOMAIN_NAME}',
+            schema_name=td_name
+        )
+        
+        ExceptionRecord.objects.create(
+            text = f'Check domain errors . {user_tenant} line 272 craete_tenat'
     )
-
-    Domain.objects.create(
-        user=user,
-        schema_name=td_name,
-        domain=f'{td_name}.{settings.BACKEND_DOMAIN_NAME}',
-        tenant=user_tenant,
+        
+        Domain.objects.create(
+            user=user,
+            schema_name=td_name,
+            domain=f'{td_name}.{settings.BACKEND_DOMAIN_NAME}',
+            tenant=user_tenant,
+        )
+    except Exception as err:
+        ExceptionRecord.objects.create(
+            text = f'Check domain errors . {str(err)} {user_tenant} line 272 craete_tenat'
     )
 
 
@@ -280,8 +289,6 @@ def create_tenant(request=None, user=None, data=None):
         except:
             pass
         
-        
-
         t_user = create_tenant_user(tenant=user_tenant, data=data)
         
         if t_user is not None:

@@ -43,35 +43,3 @@ class EmployeeDashboradSerializer(serializers.ModelSerializer):
         model = Employee
         fields=['id', 'full_name','achieve_target',  ]
 
-
-# class TargetsAcheivedSerializer(serializers.ModelSerializer):
-#     achieve_target = serializers.SerializerMethodField(read_only=True)
-    
-#     def get_achieve_target(self, obj):
-        
-#         range_start = self.context.GET.get("range_start", None)
-#         range_end = self.context.GET.get("range_end", None)
-
-#         if range_start is not None:
-#             range_start = datetime.strptime(range_start, "%Y-%m-%d")
-#             range_end = datetime.strptime(range_end, "%Y-%m-%d")
-#         else:
-#             range_end = datetime.now()
-#             month = range_end.month
-#             year = range_end.year
-#             range_start = f'{year}-{month}-01'
-#             range_start = datetime.strptime(range_start, "%Y-%m-%d")
-#         try:
-#             targets =  StaffTarget.objects.get(
-#                 employee = obj.id,
-#                 year__gte =  range_start ,
-#                 year__lte =  range_end ,
-#                 )
-#             acheived_targets = int(targets.achieve_target) + int(targets.service_target) + int(targets.retail_target)
-#         except Exception as err:
-#             return str(err)
-#         return None
-    
-#     class Meta:
-#         model = Employee
-#         fields=['id','range_start','range_end',]
