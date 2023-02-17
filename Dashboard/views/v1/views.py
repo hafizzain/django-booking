@@ -399,13 +399,47 @@ def get_dashboard_target_overview(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_total_tips(request):
+    employee_id = request.GET.get('employee_id', None)
+    range_start =  request.GET.get('range_start', None)
+    range_end = request.GET.get('range_end', None)
     total_tips = 0
     
-    checkout_order = Checkout.objects.filter(is_deleted=False).values_list('tip', flat=True)
-    total_tips += sum(checkout_order)
+    if range_start:
+        range_start = datetime.strptime(range_start, "%Y-%m-%d")#.date()
+        range_end = datetime.strptime(range_end, "%Y-%m-%d")#
     
-    appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done').values_list('tip', flat=True)
+        checkout_order = Checkout.objects.filter(
+            is_deleted=False,
+            member__id = employee_id,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+            ).values_list('tip', flat=True)
+        total_tips += sum(checkout_order)
+        
+        appointment_checkout = AppointmentCheckout.objects.filter(
+            appointment_service__appointment_status = 'Done',
+            member__id = employee_id,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+            ).values_list('tip', flat=True)
+        total_tips += sum(appointment_checkout)
+        
+    else:
+        checkout_order = Checkout.objects.filter(
+            is_deleted=False,
+            member__id = employee_id,
+            # created_at__gte =  range_start ,
+            # created_at__lte = range_end
+            ).values_list('tip', flat=True)
+        total_tips += sum(checkout_order)
 
+        appointment_checkout = AppointmentCheckout.objects.filter(
+            appointment_service__appointment_status = 'Done',
+            member__id = employee_id,
+            # created_at__gte =  range_start,
+            # created_at__lte = range_end
+            ).values_list('tip', flat=True)
+        total_tips += sum(appointment_checkout)
     
     return Response(
         {
