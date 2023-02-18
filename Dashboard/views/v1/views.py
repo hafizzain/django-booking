@@ -1,9 +1,7 @@
 from django.conf import settings
 from operator import ge
 
-
-from Order.models import ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder,Checkout
-from Order.models import Checkout, ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder
+from Order.models import Checkout, ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder,Order
 # from TragetControl.models import TierStoreTarget
 
 from Utility.Constants.Data.months import  FIXED_MONTHS
@@ -680,8 +678,6 @@ def get_total_comission(request):
             ).values_list('voucher_commission', flat=True)
         total_voucher_comission += sum(voucher_commission)
         
-        
-
         sum_total_commision = sum([total_service_comission,total_product_comission,total_voucher_comission])
     
     return Response(
@@ -695,6 +691,86 @@ def get_total_comission(request):
                 'Service': total_service_comission,
                 'Retail' : total_product_comission,
                 'Voucher' : total_voucher_comission,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_total_sales(request):
+    employee_id = request.GET.get('employee_id', None)
+    range_start =  request.GET.get('range_start', None)
+    range_end = request.GET.get('range_end', None)
+    sum_total_sales = 0
+    total_service_sales = 0
+    total_membership_sales = 0
+    total_voucher_sales = 0
+    
+    if range_start:
+        range_start = datetime.strptime(range_start, "%Y-%m-%d")#.date()
+        range_end = datetime.strptime(range_end, "%Y-%m-%d")#
+
+        service_sales = ServiceOrder.objects.filter(
+            is_deleted=False,
+            service = employee_id,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+            ).values_list('service', flat=True)
+        total_service_sales += sum(service_sales)
+
+        membership_sales = MemberShipOrder.objects.filter(
+            is_deleted=False,
+            membership = employee_id,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+            
+            ).values_list('membership', flat=True)
+        total_membership_sales += sum(membership_sales)
+
+        voucher_sales = VoucherOrder.objects.filter(
+            is_deleted=False,
+            voucher = employee_id,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+            ).values_list('voucher', flat=True)
+        total_voucher_sales += sum(voucher_sales)
+
+        sum_total_sales = sum([total_service_sales,total_membership_sales,total_voucher_sales])
+    else:
+
+        service_sales = ServiceOrder.objects.filter(
+            is_deleted=False,
+            service = employee_id,
+            
+            ).values_list('service', flat=True)
+        total_service_sales += sum(service_sales)
+
+        membership_sales = MemberShipOrder.objects.filter(
+            is_deleted=False,
+            membership = employee_id,
+            
+            ).values_list('membership', flat=True)
+        total_membership_sales += sum(membership_sales)
+
+        voucher_sales = VoucherOrder.objects.filter(
+            is_deleted=False,
+            voucher = employee_id,
+
+            ).values_list('voucher', flat=True)
+        total_voucher_sales += sum(voucher_sales)
+        
+        sum_total_sales = sum([total_service_sales,total_membership_sales,total_voucher_sales])
+
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Sale Orders',
+                'error_message' : None,
+                'total_sales' : sum_total_sales
+                
             }
         },
         status=status.HTTP_200_OK
