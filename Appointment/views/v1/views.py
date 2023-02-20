@@ -1265,7 +1265,7 @@ def create_checkout_device(request):
     count = []
     
     try:
-        service_appointment = AppointmentService.objects.filter(id=appointments.id)
+        service_appointment = AppointmentService.objects.filter(appointment = str(appointments))
         count.append(len(service_appointment))
         for ser in service_appointment:
             ser.appointment_status 
