@@ -1266,7 +1266,7 @@ def create_checkout_device(request):
     try:
         service_appointment = AppointmentService.objects.filter(appointment = str(appointments))
         for ser in service_appointment:
-            ser.appointment_status = 'Paid'
+            ser.appointment_status = 'Done'
             ser.save()
             
     except Exception as err:
