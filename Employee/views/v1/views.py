@@ -788,19 +788,22 @@ def create_employee(request):
     
     empl_permission = EmployePermission.objects.create(employee=employee)
     for permit in ALL_PERMISSIONS:
-        value = request.data.get(permit, None)
-        if value is not None:
-            if type(value) == str:
-                value = json.loads(value)
-            for opt in value:
-                try:
-                    option = GlobalPermissionChoices.objects.get(text=opt)
-                    PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
-                except Exception as err:
+        try:
+            value = request.data.get(permit, None)
+            if value is not None:
+                if type(value) == str:
+                    value = json.loads(value)
+                for opt in value:
+                    try:
+                        option = GlobalPermissionChoices.objects.get(text=opt)
+                        PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
+                    except Exception as err:
+                        employees_error.append(str(value))
+                    
+                employees_error.append(value)
+        except Exception as err:
                     employees_error.append(str(value))
                 
-            employees_error.append(value)
-                    
     employees_error.append("str(value)")
 
     empl_permission.save()
