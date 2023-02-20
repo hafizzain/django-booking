@@ -787,27 +787,19 @@ def create_employee(request):
         data.update(serialized.data)
     
     empl_permission = EmployePermission.objects.create(employee=employee)
-    try:
-        for permit in ALL_PERMISSIONS:
-        
-            value = request.data.get(permit, None)
-            employees_error.append(value)
-            if value is not None:
-                if type(value) == str:
-                    value = json.loads(value)
-                for opt in value:
-                    try:
-                        option = GlobalPermissionChoices.objects.get(text=opt)
-                        PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
-                    except Exception as err:
-                        employees_error.append(str(value))
-                    
-                
-    except Exception as err:
-        employees_error.append(str(value))
-                
-    employees_error.append("str(value)")
-
+    for permit in ALL_PERMISSIONS:
+    
+        value = request.data.get(permit, None)
+        employees_error.append(value)
+        if value is not None:
+            if type(value) == str:
+                value = json.loads(value)
+            for opt in value:
+                try:
+                    option = GlobalPermissionChoices.objects.get(text=opt)
+                    PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
+                except Exception as err:
+                    employees_error.append(str(value))
     empl_permission.save()
     
     try:
