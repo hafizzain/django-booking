@@ -720,7 +720,20 @@ def get_total_sales(request):
     sale_oct = 0
     sale_nov = 0
     sale_dec = 0
-    
+    data = {  
+    'sale_jan' : 0,
+    'sale_feb' : 0,
+    'sale_mar' : 0,
+    'sale_apr' : 0,
+    'sale_may' : 0,
+    'sale_jun' : 0,
+    'sale_july' : 0,
+    'sale_aug' : 0,
+    'sale_sep' : 0,
+    'sale_oct' : 0,
+    'sale_nov' : 0,
+    'sale_dec' : 0,
+    }
     if start_month is not None and end_month is not None :
 
         start_index = FIXED_MONTHS.index(start_month) # 1
@@ -799,7 +812,7 @@ def get_total_sales(request):
         sale_oct = int(create_at.split(" ")[0].split("-")[1])
         sale_nov = int(create_at.split(" ")[0].split("-")[1])
         sale_dec = int(create_at.split(" ")[0].split("-")[1])
-
+        
         if( sale_jan == 0 ):
             
             data['sale_jan'] +=1
