@@ -798,6 +798,9 @@ def create_employee(request):
                     PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
                 except Exception as err:
                     employees_error.append(str(value))
+                
+            employees_error.append(value)
+                    
     employees_error.append("str(value)")
 
     empl_permission.save()
