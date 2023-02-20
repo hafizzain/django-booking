@@ -109,7 +109,6 @@ class CategoryDiscountSerializers(serializers.ModelSerializer):
 class FreeServiceSerializers(serializers.ModelSerializer):
     is_deleted = serializers.SerializerMethodField(read_only=True)
     
-    
     def get_is_deleted(self, obj):
         if obj.is_deleted == True:
             return 'True'

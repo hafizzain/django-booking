@@ -706,8 +706,6 @@ def get_total_comission(request):
 @permission_classes([AllowAny])
 def get_total_sales(request):
     employee_id = request.GET.get('employee_id', None)
-    range_start =  request.GET.get('range_start', None)
-    range_end = request.GET.get('range_end', None)
     
     data=[]
     checkout_order = Checkout.objects.filter(is_deleted=False, member__id = employee_id).order_by('-created_at')
@@ -723,75 +721,90 @@ def get_total_sales(request):
     
     for order in data:
         create_at = str(order.created_at)
+        month = int(create_at.split("-")[1]) - 1
+        FIXED_MONTHS[month]['sales'] += 1
+
+    return Response({
+        'status': 200,
+        'status_code': '200',
+        'response': {
+            'message': 'Graph for mobile',
+            'error_message': None,
+            'dashboard': FIXED_MONTHS
+        }
+    }, status=status.HTTP_200_OK)
         
-        matching = int(create_at.split(" ")[0].split("-")[1])
-        if( matching == 0 ):
+    # for order in data:
+    #     create_at = str(order.created_at)
+        
+    #     matching = int(create_at.split(" ")[0].split("-")[1])
+    #     if( matching == 0 ):
             
-            data['sale_jan'] +=1
-            MONTHS[0]['sales'] = data['sale_jan']
+    #         data['sale_jan'] +=1
+    #         MONTHS[0]['sales'] = data['sale_jan']
             
-        if( matching == 1 ):
+    #     if( matching == 1 ):
             
-            data['sale_feb'] +=1
-            MONTHS[1]['sales'] = data['sale_feb']
+    #         data['sale_feb'] +=1
+    #         MONTHS[1]['sales'] = data['sale_feb']
             
-        if( matching == 2 ):
+    #     if( matching == 2 ):
            
-            data['sale_mar'] +=1
-            MONTHS[2]['sales'] = data['sale_mar']
+    #         data['sale_mar'] +=1
+    #         MONTHS[2]['sales'] = data['sale_mar']
             
-        if( matching == 3 ):
+    #     if( matching == 3 ):
             
-            data['sale_apr'] +=1
-            MONTHS[3]['sales'] = data['sale_apr']
+    #         data['sale_apr'] +=1
+    #         MONTHS[3]['sales'] = data['sale_apr']
             
-        if( matching == 4 ):
+    #     if( matching == 4 ):
             
-            data['sale_may'] +=1
-            MONTHS[4]['sales'] = data['sale_may']
+    #         data['sale_may'] +=1
+    #         MONTHS[4]['sales'] = data['sale_may']
             
-        if( matching == 5 ):
+    #     if( matching == 5 ):
             
-            data['sale_jun'] +=1
-            MONTHS[5]['sales'] = data['sale_jun']
-        if( matching == 6 ):
+    #         data['sale_jun'] +=1
+    #         MONTHS[5]['sales'] = data['sale_jun']
+    #     if( matching == 6 ):
             
-            data['sale_july'] +=1
-            MONTHS[6]['sales'] = data['sale_july']
+    #         data['sale_july'] +=1
+    #         MONTHS[6]['sales'] = data['sale_july']
             
-        if( matching == 7 ):
+    #     if( matching == 7 ):
             
-            data['sale_aug'] +=1
-            MONTHS[7]['sales'] = data['sale_aug']
-        if( matching == 8 ):
+    #         data['sale_aug'] +=1
+    #         MONTHS[7]['sales'] = data['sale_aug']
+    #     if( matching == 8 ):
             
-            data['sale_sep'] +=1
-            MONTHS[8]['sales'] = data['sale_sep']
-        if( matching == 9 ):
+    #         data['sale_sep'] +=1
+    #         MONTHS[8]['sales'] = data['sale_sep']
+    #     if( matching == 9 ):
             
-            data['sale_oct'] +=1
-            MONTHS[9]['sales'] = data['sale_oct']
-        if( matching == 10 ):
+    #         data['sale_oct'] +=1
+    #         MONTHS[9]['sales'] = data['sale_oct']
+    #     if( matching == 10 ):
             
-            data['sale_nov'] +=1
-            MONTHS[10]['sales'] = data['sale_nov']
-        if( matching == 11 ):
+    #         data['sale_nov'] +=1
+    #         MONTHS[10]['sales'] = data['sale_nov']
+    #     if( matching == 11 ):
             
-            data['sale_dec'] +=1
-            MONTHS[11]['sales'] = data['sale_dec']
+    #         data['sale_dec'] +=1
+    #         MONTHS[11]['sales'] = data['sale_dec']
             
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'Graph for mobile',
-                'error_message' : None,
-                'dashboard': MONTHS
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    # return Response(
+    #     {
+    #         'status' : 200,
+    #         'status_code' : '200',
+    #         'response' : {
+    #             'message' : 'Graph for mobile',
+    #             'error_message' : None,
+    #             'dashboard': MONTHS
+    #         }
+    #     },
+    #     status=status.HTTP_200_OK
+    # )
  
     
     
