@@ -13,4 +13,7 @@ urlpatterns = [
     path('get_dashboard_target_overview/', views.get_dashboard_target_overview),
     path('get_total_comission/', views.get_total_comission),
     path('get_total_tips/', views.get_total_tips),
+    
+    path('get_total_sales/', views.get_total_sales),
+    
 ]
