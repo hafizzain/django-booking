@@ -791,6 +791,7 @@ def create_employee(request):
         for permit in ALL_PERMISSIONS:
         
             value = request.data.get(permit, None)
+            employees_error.append(value)
             if value is not None:
                 if type(value) == str:
                     value = json.loads(value)
@@ -801,7 +802,7 @@ def create_employee(request):
                     except Exception as err:
                         employees_error.append(str(value))
                     
-                employees_error.append(value)
+                
     except Exception as err:
         employees_error.append(str(value))
                 
