@@ -1,9 +1,15 @@
 from django.conf import settings
 from operator import ge
-from Order.models import Checkout, ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder,Order
+# from TragetControl.models import TierStoreTarget
+from Utility.Constants.Data.months import  FIXED_MONTHS,MONTHS
+from Appointment.serializers import CheckoutSerializer
+
+from Order.models import Checkout, ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder
+from Sale.serializers import AppointmentCheckoutSerializer
 # from TragetControl.models import TierStoreTarget
 
-from Utility.Constants.Data.months import  FIXED_MONTHS,MONTHS
+from Utility.Constants.Data.months import  FIXED_MONTHS, MONTHS
+
 from Dashboard.serializers import EmployeeDashboradSerializer
 from Employee.models import Employee,CategoryCommission,CommissionSchemeSetting
 from TragetControl.models import StaffTarget
@@ -556,8 +562,8 @@ def get_total_tips(request):
     total_tips = 0
     
     if range_start:
-        range_start = datetime.strptime(range_start, "%Y-%m-%d")#.date()
-        range_end = datetime.strptime(range_end, "%Y-%m-%d")#
+        range_start = datetime.strptime(range_start, "%Y-%m-%d")
+        range_end = datetime.strptime(range_end, "%Y-%m-%d")
     
         checkout_order = Checkout.objects.filter(
             is_deleted=False,
@@ -699,201 +705,88 @@ def get_total_comission(request):
 @permission_classes([AllowAny])
 def get_total_sales(request):
     employee_id = request.GET.get('employee_id', None)
-    # range_start =  request.GET.get('range_start', None)
-    # range_end = request.GET.get('range_end', None)
-    start_month = request.GET.get('start_month', None)
-    end_month = request.GET.get('end_month', None)
-    sum_total_sales = 0
-    total_service_sales = 0
-    total_membership_sales = 0
-    total_voucher_sales = 0
-    order=0
-    sale_jan = 0
-    sale_feb = 0
-    sale_mar = 0
-    sale_apr = 0
-    sale_may = 0
-    sale_jun = 0
-    sale_july = 0
-    sale_aug = 0
-    sale_sep = 0
-    sale_oct = 0
-    sale_nov = 0
-    sale_dec = 0
-    data = {  
-    'sale_jan' : 0,
-    'sale_feb' : 0,
-    'sale_mar' : 0,
-    'sale_apr' : 0,
-    'sale_may' : 0,
-    'sale_jun' : 0,
-    'sale_july' : 0,
-    'sale_aug' : 0,
-    'sale_sep' : 0,
-    'sale_oct' : 0,
-    'sale_nov' : 0,
-    'sale_dec' : 0,
-    }
-    if start_month is not None and end_month is not None :
 
-        start_index = FIXED_MONTHS.index(start_month) # 1
-        end_index = FIXED_MONTHS.index(end_month) # 9
-        fix_months = FIXED_MONTHS[start_index : end_index]
-
-        service_sales = ServiceOrder.objects.filter(
-            is_deleted=False,
-            service = employee_id,
-            # created_at__gte =  range_start ,
-            # created_at__lte = range_end
-            month__in = fix_months,
-            ).values_list('service', flat=True)
-        total_service_sales += sum(service_sales)
-
-        membership_sales = MemberShipOrder.objects.filter(
-            is_deleted=False,
-            membership = employee_id,
-            # created_at__gte =  range_start ,
-            # created_at__lte = range_end
-            month__in = fix_months,
-            ).values_list('membership', flat=True)
-        total_membership_sales += sum(membership_sales)
-
-        voucher_sales = VoucherOrder.objects.filter(
-            is_deleted=False,
-            voucher = employee_id,
-            # created_at__gte =  range_start ,
-            # created_at__lte = range_end
-            month__in = fix_months,
-            ).values_list('voucher', flat=True)
-        total_voucher_sales += sum(voucher_sales)
-
-        sum_total_sales = sum([total_service_sales,total_membership_sales,total_voucher_sales])
-
-        
-    else:
-
-        service_sales = ServiceOrder.objects.filter(
-            is_deleted=False,
-            service = employee_id,
-            ).values_list('service', flat=True)
-        total_service_sales += sum(service_sales)
-
-        membership_sales = MemberShipOrder.objects.filter(
-            is_deleted=False,
-            membership = employee_id,
-            ).values_list('membership', flat=True)
-        total_membership_sales += sum(membership_sales)
-
-        voucher_sales = VoucherOrder.objects.filter(
-            is_deleted=False,
-            voucher = employee_id,
-            ).values_list('voucher', flat=True)
-        total_voucher_sales += sum(voucher_sales)
-        
-        sum_total_sales = sum([total_service_sales,total_membership_sales,total_voucher_sales])
-            
-            
-        # fix_months = FIXED_MONTHS.count()
-        # print(fix_months)
-
-    orders = Order.objects.filter(is_deleted=False)
-    for order in orders:
+    
+    data=[]
+    checkout_order = Checkout.objects.filter(is_deleted=False, member__id = employee_id).order_by('-created_at')
+    serialized = CheckoutSerializer(checkout_order,  many=True, context={'request' : request})
+    data.extend(serialized.data)
+    
+    appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done', member__id = employee_id)
+    serialized = AppointmentCheckoutSerializer(appointment_checkout, 
+                                               many = True, 
+                                               context={'request' : request
+                            })
+    data.extend(serialized.data)
+    
+    for order in data:
         create_at = str(order.created_at)
         
-        sale_jan = int(create_at.split(" ")[0].split("-")[1])
-        sale_feb = int(create_at.split(" ")[0].split("-")[1])
-        sale_mar = int(create_at.split(" ")[0].split("-")[1])
-        sale_apr = int(create_at.split(" ")[0].split("-")[1])
-        sale_may = int(create_at.split(" ")[0].split("-")[1])
-        sale_jun = int(create_at.split(" ")[0].split("-")[1])
-        sale_july = int(create_at.split(" ")[0].split("-")[1])
-        sale_aug = int(create_at.split(" ")[0].split("-")[1])
-        sale_sep = int(create_at.split(" ")[0].split("-")[1])
-        sale_oct = int(create_at.split(" ")[0].split("-")[1])
-        sale_nov = int(create_at.split(" ")[0].split("-")[1])
-        sale_dec = int(create_at.split(" ")[0].split("-")[1])
-        
-        if( sale_jan == 0 ):
-            
+        matching = int(create_at.split(" ")[0].split("-")[1])
+        if( matching == 0 ):
             data['sale_jan'] +=1
             MONTHS[0]['sales'] = data['sale_jan']
-            
-        if( sale_feb == 1 ):
-            
+
+        if( matching == 1 ):
             data['sale_feb'] +=1
             MONTHS[1]['sales'] = data['sale_feb']
-            
-        if( sale_mar == 2 ):
-           
+
+        if( matching == 2 ):
             data['sale_mar'] +=1
             MONTHS[2]['sales'] = data['sale_mar']
-            
-        if( sale_apr == 3 ):
-            
+
+        if( matching == 3 ):
             data['sale_apr'] +=1
             MONTHS[3]['sales'] = data['sale_apr']
-            
-        if( sale_may == 4 ):
+
+        if( matching == 4 ):
             
             data['sale_may'] +=1
             MONTHS[4]['sales'] = data['sale_may']
             
-        if( sale_jun == 5 ):
+        if( matching == 5 ):
             
             data['sale_jun'] +=1
             MONTHS[5]['sales'] = data['sale_jun']
-        if( sale_july == 6 ):
-            
+
+        if( matching == 6 ):
+        
             data['sale_july'] +=1
             MONTHS[6]['sales'] = data['sale_july']
-            
-        if( sale_aug == 7 ):
+
+        if( matching == 7 ):
             
             data['sale_aug'] +=1
             MONTHS[7]['sales'] = data['sale_aug']
-        if( sale_sep == 8 ):
+        if( matching == 8 ):
             
             data['sale_sep'] +=1
             MONTHS[8]['sales'] = data['sale_sep']
-        if( sale_oct == 9 ):
+        if( matching == 9 ):
             
             data['sale_oct'] +=1
             MONTHS[9]['sales'] = data['sale_oct']
-        if( sale_nov == 10 ):
+        if( matching == 10 ):
             
             data['sale_nov'] +=1
             MONTHS[10]['sales'] = data['sale_nov']
-        if( sale_dec == 11 ):
+        if( matching == 11 ):
             
             data['sale_dec'] +=1
             MONTHS[11]['sales'] = data['sale_dec']
+            
 
     return Response(
         {
             'status' : 200,
             'status_code' : '200',
             'response' : {
-                'message' : 'All Sale Orders',
+                'message' : 'Graph for mobile',
                 'error_message' : None,
-                'total_sales' : sum_total_sales,
-                # 'dashboard': MONTHS,
-                # 'start_months' : fix_months,
-                'data' : {
-                    'january' : sale_jan,
-                    'feburary' : sale_feb,
-                    'march' : sale_mar,
-                    'april' : sale_apr,
-                    'may' : sale_may,
-                    'june' : sale_jun,
-                    'july' : sale_july,
-                    'august' : sale_aug,
-                    'september' : sale_sep,
-                    'octuber' : sale_oct,
-                    'november' : sale_nov,
-                    'december' : sale_dec,
-                }
+                'dashboard': MONTHS
+
             }
         },
         status=status.HTTP_200_OK
     )
-    
+
