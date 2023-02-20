@@ -1264,6 +1264,9 @@ def create_checkout_device(request):
     
     try:
         service_appointment = AppointmentService.objects.filter(id=appointments.id)
+        for ser in service_appointment:
+            ser.appointment_status = 'Done'
+            ser.save()
     except Exception as err:
         return Response(
             {
@@ -1283,10 +1286,6 @@ def create_checkout_device(request):
     except Exception as err:
         business_address = None
     
-    for ser in service_appointment:
-        ser.appointment_status= 'Done'
-        ser.save()
-        
     checkout =AppointmentCheckout.objects.create(
         appointment = appointments,
        # appointment_service = service_appointment,
