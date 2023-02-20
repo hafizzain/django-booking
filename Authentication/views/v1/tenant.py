@@ -288,7 +288,7 @@ def get_user(request):
             return str(err)
     # else:
     #     permisson.update(employee)
-    serialized = UserTenantLoginSerializer(user)
+    serialized = UserTenantLoginSerializer(user, context={'employee' : employee, })
     return Response(
             {
                 'status' : True,
@@ -296,7 +296,7 @@ def get_user(request):
                 'response' : {
                     'message' : 'Authenticated',
                     'data' : serialized.data,
-                    'permissions' : permisson
+                    'permissions' : permisson,
                 }
             },
             status=status.HTTP_200_OK
