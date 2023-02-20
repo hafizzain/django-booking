@@ -1262,10 +1262,16 @@ def create_checkout_device(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
+    count = []
+    
     try:
         service_appointment = AppointmentService.objects.filter(id=appointments.id)
+        count.append(len(service_appointment))
         for ser in service_appointment:
+            ser.appointment_status 
+            count.append(ser.appointment_status )
             ser.appointment_status = 'Paid'
+            count.append(ser.appointment_status )
             ser.save()
             
     except Exception as err:
@@ -1312,6 +1318,7 @@ def create_checkout_device(request):
                     'message' : 'Appointment Checkout Created!',
                     'error_message' : None,
                     'checkout' : serialized.data,
+                    'count': count
                 }
             },
             status=status.HTTP_201_CREATED
