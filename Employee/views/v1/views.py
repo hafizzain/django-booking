@@ -787,8 +787,9 @@ def create_employee(request):
         data.update(serialized.data)
     
     empl_permission = EmployePermission.objects.create(employee=employee)
-    for permit in ALL_PERMISSIONS:
-        try:
+    try:
+        for permit in ALL_PERMISSIONS:
+        
             value = request.data.get(permit, None)
             if value is not None:
                 if type(value) == str:
@@ -801,8 +802,8 @@ def create_employee(request):
                         employees_error.append(str(value))
                     
                 employees_error.append(value)
-        except Exception as err:
-                    employees_error.append(str(value))
+    except Exception as err:
+        employees_error.append(str(value))
                 
     employees_error.append("str(value)")
 
