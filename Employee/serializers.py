@@ -252,7 +252,8 @@ class EmployeSerializer(serializers.ModelSerializer):
                         returned_value[permit].append(opt.text)
                 return returned_value
             except Exception as err:
-                return str(err)
+                pass
+                #return str(err)
 
     def get_monday(self, obj):
         try:
