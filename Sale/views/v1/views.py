@@ -803,7 +803,7 @@ def get_all_sale_orders(request):
     # data.extend(serialized.data)
     
     appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')
-    serialized = AppointmentCheckoutSerializer(appointment_checkout, many = True)
+    serialized = AppointmentCheckoutSerializer(appointment_checkout, many = True, context={'request' : request})
     data.extend(serialized.data)
     
     return Response(
