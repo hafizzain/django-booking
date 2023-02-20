@@ -797,7 +797,7 @@ def create_employee(request):
                     option = GlobalPermissionChoices.objects.get(text=opt)
                     PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
                 except Exception as err:
-                    employees_error.append(str(err))
+                    employees_error.append(str(value))
 
     empl_permission.save()
     
