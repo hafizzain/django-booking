@@ -700,39 +700,45 @@ def get_total_comission(request):
 @permission_classes([AllowAny])
 def get_total_sales(request):
     employee_id = request.GET.get('employee_id', None)
-    range_start =  request.GET.get('range_start', None)
-    range_end = request.GET.get('range_end', None)
+    # range_start =  request.GET.get('range_start', None)
+    # range_end = request.GET.get('range_end', None)
+    start_month = request.GET.get('start_month', None)
+    end_month = request.GET.get('end_month', None)
     sum_total_sales = 0
     total_service_sales = 0
     total_membership_sales = 0
     total_voucher_sales = 0
     
-    if range_start:
-        range_start = datetime.strptime(range_start, "%Y-%m-%d")#.date()
-        range_end = datetime.strptime(range_end, "%Y-%m-%d")#
+    if start_month is not None and end_month is not None :
+
+        start_index = FIXED_MONTHS.index(start_month) # 1
+        end_index = FIXED_MONTHS.index(end_month) # 9
+        fix_months = FIXED_MONTHS[start_index : end_index]
 
         service_sales = ServiceOrder.objects.filter(
             is_deleted=False,
             service = employee_id,
-            created_at__gte =  range_start ,
-            created_at__lte = range_end
+            # created_at__gte =  range_start ,
+            # created_at__lte = range_end
+            month__in = fix_months,
             ).values_list('service', flat=True)
         total_service_sales += sum(service_sales)
 
         membership_sales = MemberShipOrder.objects.filter(
             is_deleted=False,
             membership = employee_id,
-            created_at__gte =  range_start ,
-            created_at__lte = range_end
-            
+            # created_at__gte =  range_start ,
+            # created_at__lte = range_end
+            month__in = fix_months,
             ).values_list('membership', flat=True)
         total_membership_sales += sum(membership_sales)
 
         voucher_sales = VoucherOrder.objects.filter(
             is_deleted=False,
             voucher = employee_id,
-            created_at__gte =  range_start ,
-            created_at__lte = range_end
+            # created_at__gte =  range_start ,
+            # created_at__lte = range_end
+            month__in = fix_months,
             ).values_list('voucher', flat=True)
         total_voucher_sales += sum(voucher_sales)
 
@@ -742,26 +748,24 @@ def get_total_sales(request):
         service_sales = ServiceOrder.objects.filter(
             is_deleted=False,
             service = employee_id,
-            
             ).values_list('service', flat=True)
         total_service_sales += sum(service_sales)
 
         membership_sales = MemberShipOrder.objects.filter(
             is_deleted=False,
             membership = employee_id,
-            
             ).values_list('membership', flat=True)
         total_membership_sales += sum(membership_sales)
 
         voucher_sales = VoucherOrder.objects.filter(
             is_deleted=False,
             voucher = employee_id,
-
             ).values_list('voucher', flat=True)
         total_voucher_sales += sum(voucher_sales)
         
         sum_total_sales = sum([total_service_sales,total_membership_sales,total_voucher_sales])
-
+        fix_months = FIXED_MONTHS
+        # print(fix_months)
     return Response(
         {
             'status' : 200,
@@ -769,8 +773,8 @@ def get_total_sales(request):
             'response' : {
                 'message' : 'All Sale Orders',
                 'error_message' : None,
-                'total_sales' : sum_total_sales
-                
+                'total_sales' : sum_total_sales,
+                'start_months' : fix_months
             }
         },
         status=status.HTTP_200_OK
