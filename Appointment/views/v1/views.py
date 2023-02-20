@@ -1265,7 +1265,18 @@ def create_checkout_device(request):
     try:
         service_appointment = AppointmentService.objects.filter(id=appointments.id)
     except Exception as err:
-        service_appointment = None
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Service Appointment ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
     
     try:
         business_address=BusinessAddress.objects.get(id = str(business_address))
