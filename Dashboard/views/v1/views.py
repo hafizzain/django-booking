@@ -1,10 +1,9 @@
 from django.conf import settings
 from operator import ge
-
 from Order.models import Checkout, ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder,Order
 # from TragetControl.models import TierStoreTarget
 
-from Utility.Constants.Data.months import  FIXED_MONTHS
+from Utility.Constants.Data.months import  FIXED_MONTHS,MONTHS
 from Dashboard.serializers import EmployeeDashboradSerializer
 from Employee.models import Employee,CategoryCommission,CommissionSchemeSetting
 from TragetControl.models import StaffTarget
@@ -708,6 +707,19 @@ def get_total_sales(request):
     total_service_sales = 0
     total_membership_sales = 0
     total_voucher_sales = 0
+    order=0
+    sale_jan = 0
+    sale_feb = 0
+    sale_mar = 0
+    sale_apr = 0
+    sale_may = 0
+    sale_jun = 0
+    sale_july = 0
+    sale_aug = 0
+    sale_sep = 0
+    sale_oct = 0
+    sale_nov = 0
+    sale_dec = 0
     
     if start_month is not None and end_month is not None :
 
@@ -743,6 +755,8 @@ def get_total_sales(request):
         total_voucher_sales += sum(voucher_sales)
 
         sum_total_sales = sum([total_service_sales,total_membership_sales,total_voucher_sales])
+
+        
     else:
 
         service_sales = ServiceOrder.objects.filter(
@@ -764,8 +778,83 @@ def get_total_sales(request):
         total_voucher_sales += sum(voucher_sales)
         
         sum_total_sales = sum([total_service_sales,total_membership_sales,total_voucher_sales])
-        fix_months = FIXED_MONTHS
+            
+            
+        # fix_months = FIXED_MONTHS.count()
         # print(fix_months)
+
+    orders = Order.objects.filter(is_deleted=False)
+    for order in orders:
+        create_at = str(order.created_at)
+        
+        sale_jan = int(create_at.split(" ")[0].split("-")[1])
+        sale_feb = int(create_at.split(" ")[0].split("-")[1])
+        sale_mar = int(create_at.split(" ")[0].split("-")[1])
+        sale_apr = int(create_at.split(" ")[0].split("-")[1])
+        sale_may = int(create_at.split(" ")[0].split("-")[1])
+        sale_jun = int(create_at.split(" ")[0].split("-")[1])
+        sale_july = int(create_at.split(" ")[0].split("-")[1])
+        sale_aug = int(create_at.split(" ")[0].split("-")[1])
+        sale_sep = int(create_at.split(" ")[0].split("-")[1])
+        sale_oct = int(create_at.split(" ")[0].split("-")[1])
+        sale_nov = int(create_at.split(" ")[0].split("-")[1])
+        sale_dec = int(create_at.split(" ")[0].split("-")[1])
+
+        if( sale_jan == 0 ):
+            
+            data['sale_jan'] +=1
+            MONTHS[0]['sales'] = data['sale_jan']
+            
+        if( sale_feb == 1 ):
+            
+            data['sale_feb'] +=1
+            MONTHS[1]['sales'] = data['sale_feb']
+            
+        if( sale_mar == 2 ):
+           
+            data['sale_mar'] +=1
+            MONTHS[2]['sales'] = data['sale_mar']
+            
+        if( sale_apr == 3 ):
+            
+            data['sale_apr'] +=1
+            MONTHS[3]['sales'] = data['sale_apr']
+            
+        if( sale_may == 4 ):
+            
+            data['sale_may'] +=1
+            MONTHS[4]['sales'] = data['sale_may']
+            
+        if( sale_jun == 5 ):
+            
+            data['sale_jun'] +=1
+            MONTHS[5]['sales'] = data['sale_jun']
+        if( sale_july == 6 ):
+            
+            data['sale_july'] +=1
+            MONTHS[6]['sales'] = data['sale_july']
+            
+        if( sale_aug == 7 ):
+            
+            data['sale_aug'] +=1
+            MONTHS[7]['sales'] = data['sale_aug']
+        if( sale_sep == 8 ):
+            
+            data['sale_sep'] +=1
+            MONTHS[8]['sales'] = data['sale_sep']
+        if( sale_oct == 9 ):
+            
+            data['sale_oct'] +=1
+            MONTHS[9]['sales'] = data['sale_oct']
+        if( sale_nov == 10 ):
+            
+            data['sale_nov'] +=1
+            MONTHS[10]['sales'] = data['sale_nov']
+        if( sale_dec == 11 ):
+            
+            data['sale_dec'] +=1
+            MONTHS[11]['sales'] = data['sale_dec']
+
     return Response(
         {
             'status' : 200,
@@ -774,8 +863,24 @@ def get_total_sales(request):
                 'message' : 'All Sale Orders',
                 'error_message' : None,
                 'total_sales' : sum_total_sales,
-                'start_months' : fix_months
+                # 'dashboard': MONTHS,
+                # 'start_months' : fix_months,
+                'data' : {
+                    'january' : sale_jan,
+                    'feburary' : sale_feb,
+                    'march' : sale_mar,
+                    'april' : sale_apr,
+                    'may' : sale_may,
+                    'june' : sale_jun,
+                    'july' : sale_july,
+                    'august' : sale_aug,
+                    'september' : sale_sep,
+                    'octuber' : sale_oct,
+                    'november' : sale_nov,
+                    'december' : sale_dec,
+                }
             }
         },
         status=status.HTTP_200_OK
     )
+    
