@@ -364,34 +364,36 @@ def get_dashboard_target_overview(request):
             created_at__lte = range_end
         ).values_list('membership_targets', flat=True)
         all_membership_targets += sum(membership_targets)
-    
-        all_service_targets = targets.values_list('service_targets', flat=True)
-        print(all_service_targets)
-        sum_service_targets = sum(all_service_targets)
 
-        all_retail_target = targets.values_list('retail_targets', flat=True)
-        print(all_retail_target)
-        sum_retail_target = sum(all_retail_target)
+        sum_total_set = sum([retail_targets,service_targets])
 
-        sum_total_set = sum([sum_retail_target,sum_service_targets])
+        # all_service_targets = targets.values_list('service_targets', flat=True)
+        # print(all_service_targets)
+        # sum_service_targets = sum(all_service_targets)
+
+        # all_retail_target = targets.values_list('retail_targets', flat=True)
+        # print(all_retail_target)
+        # sum_retail_target = sum(all_retail_target)
+
+        # sum_total_set = sum([sum_retail_target,sum_service_targets])
         
-        all_achieved_voucher_target = voucher_targets.values_list('voucher', flat=True)
+        all_achieved_voucher_target = voucher_targets.values_list('total_price', flat=True)
         print(all_achieved_voucher_target)
         sum_acheived_voucher_target = sum(all_achieved_voucher_target)
 
-        all_acheived_service_target = service_targets.values_list('service', flat=True)
+        all_acheived_service_target = service_targets.values_list('total_price', flat=True)
         print(all_acheived_service_target)
         sum_acheived_service_target = sum(all_acheived_service_target)
 
-        all_acheived_retail_target = targets.values_list('retail_targets', flat=True)
+        all_acheived_retail_target = targets.values_list('total_price', flat=True)
         print(all_acheived_retail_target)
         sum_acheived_retail_target = sum(all_acheived_retail_target)
 
-        all_acheived_membership_target = membership_targets.values_list('membership', flat=True)
+        all_acheived_membership_target = membership_targets.values_list('total_price', flat=True)
         print(all_acheived_membership_target)
         sum_acheived_membership_target = sum(all_acheived_membership_target)
 
-        all_acheived_voucher_target = voucher_targets.values_list('voucher', flat=True)
+        all_acheived_voucher_target = voucher_targets.values_list('total_price', flat=True)
         print(all_acheived_voucher_target)
         sum_acheived_voucher_target = sum(all_acheived_voucher_target)
 
