@@ -820,8 +820,8 @@ def get_total_sales_device(request):
     serialized = CheckoutSerializer(checkout_order, many=True, context={'request': request})
     data.extend(serialized.data)
     
-    checkout_order = Order.objects.filter(is_deleted=False, member__id=employee_id).order_by('-created_at')
-    for total in appointment_checkout:
+    checkout_orders = Order.objects.filter(is_deleted=False, member__id=employee_id).order_by('-created_at')
+    for total in checkout_orders:
         total_sale +=  int(total.total_price)
         
     appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status='Done', member__id=employee_id)
