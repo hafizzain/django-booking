@@ -852,18 +852,20 @@ def get_total_sales_device(request):
 
     dashboard_data = []
 
-    months = ["January"
-            "February"
-            "March"
-            "April"
-            "May"
-            "June"
-            "July"
-            "August"
-            "September"
-            "October"
-            "November"
-            "December"]
+    months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    ]
 
     checkout_orders = Checkout.objects.filter(
         is_deleted=False, 
