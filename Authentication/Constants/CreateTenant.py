@@ -125,76 +125,81 @@ def create_tenant_account_type(tenant_user=None, tenant=None, account_type='Busi
 
 def create_employee(tenant=None, user = None, business=None):
      if tenant is not None and user is not None and business is not None:
-        country_id = 'United Arab Emirates'
-        currency_id = 'United Arab Emirates'
-        domain = tenant.domain
-        template = 'Employee'
-        with tenant_context(tenant):
-            try:
-                country = Country.objects.get(name__icontains = country_id)
-                currency = Currency.objects.get(name__icontains = currency_id)
-            except Exception as err:
-                pass
-
-            business_address = BusinessAddress.objects.create(
-                business = business,
-                user = user,
-                address = 'ABCD',
-                address_name = 'ABCD Address',
-                email= user.email,
-                mobile_number= user.mobile_number,
-                country=country,
-                currency = currency,
-                is_primary = False,
-                is_active = True,
-                is_deleted = False,
-                is_closed = False,
-            )
-            
-            employee = Employee.objects.create(
-                user=user,
-                business=business,
-                full_name = user.full_name,
-                email= user.email,
-                country = country,
-                address = 'Dubai Marina',
-                is_active =True,
-                
-            )
-            employee.location.add(business_address)
-            employee.save()
-            
-            
-            try:
-                username = user.email.split('@')[0]
+        try:
+            country_id = 'United Arab Emirates'
+            currency_id = 'Dirham'
+            domain = tenant.domain
+            template = 'Employee'
+            with tenant_context(tenant):
                 try:
-                    user_check = User.objects.get(username = username)
+                    country = Country.objects.get(name__icontains = country_id)
+                    currency = Currency.objects.get(name__icontains = currency_id)
                 except Exception as err:
-                    #data.append(f'username user is client errors {str(err)}')
                     pass
-                else:
-                    username = f'{username} {len(User.objects.all())}'
 
-            except Exception as err:
-                pass
-            
-            user = User.objects.create(
-                first_name = user.full_name,
-                username = username,
-                email = user.email ,
-                is_email_verified = True,
-                is_active = True,
-                mobile_number = user.mobile_number,
-            )
-            account_type = AccountType.objects.create(
+                business_address = BusinessAddress.objects.create(
+                    business = business,
                     user = user,
-                    account_type = 'Employee'
+                    address = 'ABCD',
+                    address_name = 'ABCD Address',
+                    email= user.email,
+                    mobile_number= user.mobile_number,
+                    country=country,
+                    currency = currency,
+                    is_primary = False,
+                    is_active = True,
+                    is_deleted = False,
+                    is_closed = False,
                 )
-            try:
-                thrd = Thread(target=add_employee, args=[user.full_name, user.email , user.mobile_number, template, business.business_name, tenant, domain, user])
-                thrd.start()
-            except Exception as err:
-                pass
+                
+                employee = Employee.objects.create(
+                    user=user,
+                    business=business,
+                    full_name = user.full_name,
+                    email= user.email,
+                    country = country,
+                    address = 'Dubai Marina',
+                    is_active =True,
+                    
+                )
+                employee.location.add(business_address)
+                employee.save()
+                
+                
+                try:
+                    username = user.email.split('@')[0]
+                    try:
+                        user_check = User.objects.get(username = username)
+                    except Exception as err:
+                        #data.append(f'username user is client errors {str(err)}')
+                        pass
+                    else:
+                        username = f'{username} {len(User.objects.all())}'
+
+                except Exception as err:
+                    pass
+                
+                user = User.objects.create(
+                    first_name = user.full_name,
+                    username = username,
+                    email = user.email ,
+                    is_email_verified = True,
+                    is_active = True,
+                    mobile_number = user.mobile_number,
+                )
+                account_type = AccountType.objects.create(
+                        user = user,
+                        account_type = 'Employee'
+                    )
+                try:
+                    thrd = Thread(target=add_employee, args=[user.full_name, user.email , user.mobile_number, template, business.business_name, tenant, domain, user])
+                    thrd.start()
+                except Exception as err:
+                    pass
+        except Exception as err:
+            ExceptionRecord.objects.create(
+                text = f'errors in some create employee {str(err)}'
+            )
                                     
 def create_global_permission(tenant=None, user = None, business=None):
     if tenant is not None and user is not None and business is not None:
