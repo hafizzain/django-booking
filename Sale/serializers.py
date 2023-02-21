@@ -8,7 +8,7 @@ from Client.models import Client, Membership
 
 from Employee.models import Employee, EmployeeProfessionalInfo, EmployeeSelectedService
 from Business.models import BusinessAddress, BusinessTax
-from Order.models import Checkout, MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
+from Order.models import Checkout, MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
 from django_tenants.utils import tenant_context
 from Utility.models import Currency, ExceptionRecord
@@ -802,3 +802,9 @@ class BusinessAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessAddress
         fields = ['id', 'address_name','tax']
+        
+class OrderSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model =  Order
+        fields = ('__all__')
