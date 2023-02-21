@@ -8,7 +8,7 @@ from Order.models import Checkout, ProductOrder,VoucherOrder,MemberShipOrder,Ser
 from Sale.serializers import AppointmentCheckoutSerializer
 # from TragetControl.models import TierStoreTarget
 
-from Utility.Constants.Data.months import  FIXED_MONTHS, MONTHS
+from Utility.Constants.Data.months import  FIXED_MONTHS, MONTH_DICT, MONTHS, MONTHS_DEVICE
 from Dashboard.serializers import EmployeeDashboradSerializer
 from Employee.models import Employee,CategoryCommission,CommissionSchemeSetting
 from TragetControl.models import StaffTarget
@@ -708,6 +708,19 @@ def get_total_sales(request):
     employee_id = request.GET.get('employee_id', None)
     
     data=[]
+    sale_jan = 0
+    sale_feb = 0
+    sale_mar = 0
+    sale_apr = 0
+    sale_may = 0
+    sale_jun = 0
+    sale_july = 0
+    sale_aug = 0
+    sale_sep = 0
+    sale_oct = 0
+    sale_nov = 0
+    sale_dec = 0
+    
     checkout_order = Checkout.objects.filter(is_deleted=False, member__id = employee_id).order_by('-created_at')
     serialized = CheckoutSerializer(checkout_order,  many=True, context={'request' : request})
     data.extend(serialized.data)
@@ -718,93 +731,82 @@ def get_total_sales(request):
                                                context={'request' : request
                             })
     data.extend(serialized.data)
-    
+                
     for order in data:
         create_at = str(order.created_at)
-        month = int(create_at.split("-")[1]) - 1
-        FIXED_MONTHS[month]['sales'] += 1
-
-    return Response({
-        'status': 200,
-        'status_code': '200',
-        'response': {
-            'message': 'Graph for mobile',
-            'error_message': None,
-            'dashboard': FIXED_MONTHS
-        }
-    }, status=status.HTTP_200_OK)
         
-    # for order in data:
-    #     create_at = str(order.created_at)
-        
-    #     matching = int(create_at.split(" ")[0].split("-")[1])
-    #     if( matching == 0 ):
+        matching = int(create_at.split(" ")[0].split("-")[1])
+        if( matching == 0 ):
             
-    #         data['sale_jan'] +=1
-    #         MONTHS[0]['sales'] = data['sale_jan']
+            sale_jan +=1
+            MONTHS_DEVICE[0] = ( 'January', sale_jan )
             
-    #     if( matching == 1 ):
+        if( matching == 1 ):
             
-    #         data['sale_feb'] +=1
-    #         MONTHS[1]['sales'] = data['sale_feb']
+            sale_feb += 1
+            MONTHS_DEVICE[1] = ('February', sale_feb)
             
-    #     if( matching == 2 ):
+        if( matching == 2 ):
            
-    #         data['sale_mar'] +=1
-    #         MONTHS[2]['sales'] = data['sale_mar']
+            sale_mar += 1
+            MONTHS_DEVICE[2] = ('March', sale_mar)
             
-    #     if( matching == 3 ):
+        if( matching == 3 ):
             
-    #         data['sale_apr'] +=1
-    #         MONTHS[3]['sales'] = data['sale_apr']
+            sale_apr += 1
+            MONTHS_DEVICE[3] = ('April', sale_apr)
             
-    #     if( matching == 4 ):
+        if( matching == 4 ):
             
-    #         data['sale_may'] +=1
-    #         MONTHS[4]['sales'] = data['sale_may']
+            sale_may += 1
+            MONTHS_DEVICE[4] = ('May', sale_may)
             
-    #     if( matching == 5 ):
+        if( matching == 5 ):
             
-    #         data['sale_jun'] +=1
-    #         MONTHS[5]['sales'] = data['sale_jun']
-    #     if( matching == 6 ):
+            sale_jun += 1
+            MONTHS_DEVICE[5] = ('June', sale_jun)
+        if( matching == 6 ):
             
-    #         data['sale_july'] +=1
-    #         MONTHS[6]['sales'] = data['sale_july']
+            sale_july += 1
+            MONTHS_DEVICE[6] = ('July', sale_july)
             
-    #     if( matching == 7 ):
+        if( matching == 7 ):
             
-    #         data['sale_aug'] +=1
-    #         MONTHS[7]['sales'] = data['sale_aug']
-    #     if( matching == 8 ):
+            sale_aug += 1
+            MONTHS_DEVICE[7] = ('August', sale_aug)
             
-    #         data['sale_sep'] +=1
-    #         MONTHS[8]['sales'] = data['sale_sep']
-    #     if( matching == 9 ):
+        if( matching == 8 ):
             
-    #         data['sale_oct'] +=1
-    #         MONTHS[9]['sales'] = data['sale_oct']
-    #     if( matching == 10 ):
+            sale_sep += 1
+            MONTHS_DEVICE[8] = ('September', sale_sep)
             
-    #         data['sale_nov'] +=1
-    #         MONTHS[10]['sales'] = data['sale_nov']
-    #     if( matching == 11 ):
+        if( matching == 9 ):
             
-    #         data['sale_dec'] +=1
-    #         MONTHS[11]['sales'] = data['sale_dec']
+            sale_oct += 1
+            MONTHS_DEVICE[9] = ('October', sale_oct)
             
-    # return Response(
-    #     {
-    #         'status' : 200,
-    #         'status_code' : '200',
-    #         'response' : {
-    #             'message' : 'Graph for mobile',
-    #             'error_message' : None,
-    #             'dashboard': MONTHS
-    #         }
-    #     },
-    #     status=status.HTTP_200_OK
-    # )
+        if( matching == 10 ):
+            
+            sale_nov += 1
+            MONTHS_DEVICE[10] = ('November', sale_nov)
+            
+        if( matching == 11 ):
+            
+            sale_dec += 1
+            MONTHS_DEVICE[11] = ('December', sale_dec)
+            
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Graph for mobile',
+                'error_message' : None,
+                'dashboard': MONTHS
+            }
+        },
+        status=status.HTTP_200_OK
+    )
  
     
     
