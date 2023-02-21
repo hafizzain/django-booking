@@ -815,9 +815,12 @@ def get_total_sales_device(request):
     employee_id = request.GET.get('employee_id', None)
 
     data = []
+    total_sale = 0
     sales_by_month = {i: {'month': MONTHS[i]['value'], 'count': 0} for i in range(12)}
 
     checkout_order = Checkout.objects.filter(is_deleted=False, member__id=employee_id).order_by('-created_at')
+    for i in checkout_order:
+        total_sale  += int(i.checkout.total_price)
     serialized = CheckoutSerializer(checkout_order, many=True, context={'request': request})
     data.extend(serialized.data)
 
@@ -839,7 +842,8 @@ def get_total_sales_device(request):
             'response': {
                 'message': 'Graph for mobile',
                 'error_message': None,
-                'dashboard': dashboard_data
+                'dashboard': dashboard_data,
+                'total' :  total_sale
             }
         },
         status=status.HTTP_200_OK
