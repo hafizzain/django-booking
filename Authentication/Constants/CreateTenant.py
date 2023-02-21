@@ -258,16 +258,36 @@ def create_tenant(request=None, user=None, data=None):
     except:
         pass
     try:
-        user_tenant = Tenant.objects.create(
-            user=user,
-            name=td_name,
-            domain=f'{td_name}.{settings.BACKEND_DOMAIN_NAME}',
-            schema_name=td_name
+        user_domain_name = f'{td_name}.{settings.BACKEND_DOMAIN_NAME}'
+        all_tenants = Tenant.objects.filter(
+            user__isnull = True,
+            is_active = False
         )
+        if len(all_tenants) > 0:
+            user_tenant = all_tenants[0]
+            # user_tenant = Tenant.objects.create(
+            #     user=user,
+            #     name=td_name,
+            #     domain=f'{td_name}.{settings.BACKEND_DOMAIN_NAME}',
+            #     schema_name=td_name
+            # )
+            user_tenant.user = user
+            user_tenant.domain = user_domain_name
+            user_tenant.save()
+        else:
+            ExceptionRecord.objects.create(
+                text = f'Tenant was not found DUMMY'
+            )
+            user_tenant = Tenant.objects.create(
+                user=user,
+                name=td_name,
+                domain = user_domain_name,
+                schema_name=td_name
+            )
         
         ExceptionRecord.objects.create(
             text = f'Check domain errors . {user_tenant} line 272 craete_tenat'
-    )
+        )
         
         Domain.objects.create(
             user=user,
