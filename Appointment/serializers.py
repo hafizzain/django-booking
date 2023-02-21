@@ -3,6 +3,7 @@ from getopt import error
 from pkgutil import read_code
 from pyexpat import model
 from re import A
+from Client.models import Client
 #from Sale.serializers import LocationServiceSerializer
 from rest_framework import serializers
 from Appointment.Constants.durationchoice import DURATION_CHOICES
@@ -635,8 +636,17 @@ class NoteSerializer(serializers.ModelSerializer):
 class SingleNoteSerializer(serializers.ModelSerializer):
     
     notes = serializers.SerializerMethodField(read_only=True)
+    customer_note = serializers.SerializerMethodField(read_only=True)
     appointmnet_service = serializers.SerializerMethodField(read_only=True)
     
+    def get_customer_note(self, obj):
+        try:
+            note = Client.objects.get(id=obj.client)
+            return note.customer_note
+            #serializers = NoteSerializer(note)
+        except:
+            return None
+        
     def get_notes(self, obj):
         try:
             note = AppointmentNotes.objects.get(appointment=obj)
@@ -651,7 +661,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
             #return serializers
     class Meta:
         model = Appointment
-        fields = ['id', 'client', 'notes', 'business_address','client_type','appointmnet_service']
+        fields = ['id', 'client', 'notes', 'business_address','client_type','appointmnet_service', 'customer_note']
   
 class AppointmentServiceSeriailzer(serializers.ModelSerializer):
     class Meta:
