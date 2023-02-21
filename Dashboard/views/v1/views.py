@@ -802,7 +802,7 @@ def get_total_sales(request):
             'response' : {
                 'message' : 'Graph for mobile',
                 'error_message' : None,
-                'dashboard': MONTHS
+                'dashboard': MONTHS_DEVICE
             }
         },
         status=status.HTTP_200_OK
