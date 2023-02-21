@@ -831,7 +831,7 @@ def get_total_sales_device(request):
     data.extend(serialized.data)
     
     try:
-        for order in data:
+        for order in serialized.data:
             created_at = order.created_at
             month = created_at.month
             sales_by_month[month]['count'] += 1
