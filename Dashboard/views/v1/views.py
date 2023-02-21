@@ -808,5 +808,39 @@ def get_total_sales(request):
         status=status.HTTP_200_OK
     )
  
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_total_sales_device(request):
     
-    
+    employee_id = request.GET.get('employee_id', None)
+
+    data = []
+    sales_by_month = {i: {'month': MONTHS[i]['value'], 'count': 0} for i in range(12)}
+
+    checkout_order = Checkout.objects.filter(is_deleted=False, member__id=employee_id).order_by('-created_at')
+    serialized = CheckoutSerializer(checkout_order, many=True, context={'request': request})
+    data.extend(serialized.data)
+
+    appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status='Done', member__id=employee_id)
+    serialized = AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request})
+    data.extend(serialized.data)
+
+    for order in data:
+        created_at = order.created_at
+        month = created_at.month
+        sales_by_month[month]['count'] += 1
+
+    dashboard_data = [{'month': sales_by_month[i]['month'], 'count': sales_by_month[i]['count']} for i in range(12)]
+
+    return Response(
+        {
+            'status': 200,
+            'status_code': '200',
+            'response': {
+                'message': 'Graph for mobile',
+                'error_message': None,
+                'dashboard': dashboard_data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
