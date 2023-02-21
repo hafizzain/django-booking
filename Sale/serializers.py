@@ -805,6 +805,13 @@ class BusinessAddressSerializer(serializers.ModelSerializer):
         
 class OrderSerializer(serializers.ModelSerializer):
     
+    created_at = serializers.SerializerMethodField(read_only=True)
+    
+    def get_created_at(self, obj):
+        try:
+            return obj.created_at
+        except:
+            return None
     class Meta:
         model =  Order
         fields = ('__all__')
