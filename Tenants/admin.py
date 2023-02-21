@@ -9,14 +9,26 @@ from .models import EmployeeTenantDetail, Tenant, Domain, TenantDetail, ClientTe
 class TenantAdmin(admin.ModelAdmin):
     list_display = [
         'id',
-        'domain',
+        'domain_name',
         'schema_name',
         'username',
         'is_active',
+        'is_ready',
         'is_deleted',
         'is_blocked',
         'created_at',
     ]
+
+    list_filter = ['is_ready', 'is_active']
+    search_fields = ['id', 'domain', 'schema_name']
+
+    def domain_name(self, obj):
+        if obj.domain:
+            this_domain = str(obj.domain)
+            this_domain = this_domain.split('.')
+            return f'{this_domain[0]}'
+        else :
+            return '--------------' 
 
     def username(self, obj):
         try:

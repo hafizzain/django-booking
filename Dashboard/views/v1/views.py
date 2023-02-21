@@ -2,8 +2,11 @@ from django.conf import settings
 from operator import ge
 from Appointment.serializers import CheckoutSerializer
 from Order.models import Checkout, ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder
-from Sale.serializers import AppointmentCheckoutSerializer
 from Utility.Constants.Data.months import  FIXED_MONTHS, MONTHS
+from Order.models import Order, ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder,Checkout
+from Sale.serializers import AppointmentCheckoutSerializer, CheckoutSerializer, OrderSerializer
+from Utility.Constants.Data.months import  FIXED_MONTHS, MONTH_DICT, MONTHS, MONTHS_DEVICE
+
 from Dashboard.serializers import EmployeeDashboradSerializer
 from Employee.models import Employee,CategoryCommission,CommissionSchemeSetting
 from TragetControl.models import StaffTarget
@@ -515,85 +518,65 @@ def get_total_comission(request):
         status=status.HTTP_200_OK
     )
 
-# @api_view(['GET'])
-# @permission_classes([AllowAny])
-# def get_total_sales(request):
-#     employee_id = request.GET.get('employee_id', None)
-
-#     data=[]
-#     checkout_order = Checkout.objects.filter(is_deleted=False, member__id = employee_id).order_by('-created_at')
-#     serialized = CheckoutSerializer(checkout_order,  many=True, context={'request' : request})
-#     data.extend(serialized.data)
-
-#     appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done', member__id = employee_id)
-#     serialized = AppointmentCheckoutSerializer(appointment_checkout, 
-#                                                many = True, 
-#                                                context={'request' : request
-#                             })
-#     data.extend(serialized.data)
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_total_sales_device(request):
+    employee_id = request.GET.get('employee_id', None)
+    total_sales = 0
     
-#     for order in data:
-#         create_at = str(order.created_at)
+    months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    ]
+
+    checkout_orders = Checkout.objects.filter(
+        is_deleted=False, 
+        member__id=employee_id,
+    ).values_list('created_at__month', flat=True)
+
+
+    apps_checkouts = AppointmentCheckout.objects.filter(
+        is_deleted=False, 
+        member__id=employee_id,
+    ).values_list('created_at__month', flat=True)
+
+    checkout_orders = list(checkout_orders)
+    apps_checkouts = list(apps_checkouts)
+
+    dashboard_data = []
+    for index, month in enumerate(months):
+        i = index + 1
+        count = checkout_orders.count(i)
+        count_app = checkout_orders.count(i)
         
-#         matching = int(create_at.split(" ")[0].split("-")[1])
-#         if( matching == 0 ):
-#             data['sale_jan'] +=1
-#             MONTHS[0]['sales'] = data['sale_jan']
+        total_sales += count + count_app
 
-#         if( matching == 1 ):
-#             data['sale_feb'] +=1
-#             MONTHS[1]['sales'] = data['sale_feb']
+        dashboard_data.append({
+            'month' : month,
+            'count' : count + count_app
+        })
 
-#         if( matching == 2 ):
-#             data['sale_mar'] +=1
-#             MONTHS[2]['sales'] = data['sale_mar']
-
-#         if( matching == 3 ):
-#             data['sale_apr'] +=1
-#             MONTHS[3]['sales'] = data['sale_apr']
-
-#         if( matching == 4 ):
-#             data['sale_may'] +=1
-#             MONTHS[4]['sales'] = data['sale_may']
-            
-#         if( matching == 5 ):
-#             data['sale_jun'] +=1
-#             MONTHS[5]['sales'] = data['sale_jun']
-
-#         if( matching == 6 ):
-#             data['sale_july'] +=1
-#             MONTHS[6]['sales'] = data['sale_july']
-
-#         if( matching == 7 ):
-#             data['sale_aug'] +=1
-#             MONTHS[7]['sales'] = data['sale_aug']
-        
-#         if( matching == 8 ):
-#             data['sale_sep'] +=1
-#             MONTHS[8]['sales'] = data['sale_sep']
-        
-#         if( matching == 9 ):    
-#             data['sale_oct'] +=1
-#             MONTHS[9]['sales'] = data['sale_oct']
-        
-#         if( matching == 10 ):    
-#             data['sale_nov'] +=1
-#             MONTHS[10]['sales'] = data['sale_nov']
-        
-#         if( matching == 11 ):  
-#             data['sale_dec'] +=1
-#             MONTHS[11]['sales'] = data['sale_dec']
-            
-#     return Response(
-#         {
-#             'status' : 200,
-#             'status_code' : '200',
-#             'response' : {
-#                 'message' : 'Graph for mobile',
-#                 'error_message' : None,
-#                 'dashboard': MONTHS
-#             }
-#         },
-#         status=status.HTTP_200_OK
-#     )
+    return Response(
+        {
+            'status': 200,
+            'status_code': '200',
+            'response': {
+                'message': 'Graph for mobile',
+                'error_message': None,
+                'dashboard': dashboard_data,
+                'total_sales': total_sales
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
