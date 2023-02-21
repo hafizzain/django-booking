@@ -273,6 +273,7 @@ def create_tenant(request=None, user=None, data=None):
             # )
             user_tenant.user = user
             user_tenant.domain = user_domain_name
+            user_tenant.is_active = True
             user_tenant.save()
         else:
             ExceptionRecord.objects.create(
