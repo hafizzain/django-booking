@@ -816,11 +816,11 @@ def get_total_sales_device(request):
     total_sale = 0
     sales_by_month = {i: {'month': MONTHS[i]['value'], 'count': 0} for i in range(12)}
 
-    checkout_order = Order.objects.filter(is_deleted=False, member__id=employee_id).order_by('-created_at')
-    for i in checkout_order:
-        total_sale  += int(i.total_price)
-    serialized = OrderSerializer(checkout_order, many=True, context={'request': request})
-    data.extend(serialized.data)
+    # checkout_order = Order.objects.filter(is_deleted=False, member__id=employee_id).order_by('-created_at')
+    # for i in checkout_order:
+    #     total_sale  += int(i.total_price)
+    # serialized = OrderSerializer(checkout_order, many=True, context={'request': request})
+    # data.extend(serialized.data)
 
     appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status='Done', member__id=employee_id)
     serialized = AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request})
