@@ -407,7 +407,7 @@ def create_tenant(request=None, user=None, data=None):
             # except:
             #     pass
             try:
-                service_thrd = Thread(target=create_global_permission, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+                service_thrd = Thread(target=create_employee, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
                 service_thrd.start()
             except:
                 pass
