@@ -844,7 +844,7 @@ def get_total_sales_device(request):
             'status_code' : '200',
             'response' : {
                 'message' : 'Graph for mobile',
-                'error_message' : str(err),
+                'error_message' : data#str(err),
             }
         },
         status=status.HTTP_200_OK
