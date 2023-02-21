@@ -16,8 +16,7 @@ from Client.models import Client
 from NStyle.Constants import StatusCodes
 from Business.models import Business, BusinessAddress
 from Product.models import ProductStock
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime,timedelta
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -43,13 +42,8 @@ def get_busines_client_appointment(request):
         )
     revenue = 0
     appointment = 0
-        
-    #client_count = Client.objects.filter(client_appointments__business_address__id = business_id).prefetch_related('client_appointments__business_address')
     client_count = Client.objects.prefetch_related('client_appointments__business_address').filter(client_appointments__business_address__id = business_id).count()
  
-    # checkouts = AppointmentCheckout.objects.filter(business_address__id = business_id).values_list('total_price', flat=True)
-    # check = [int(ck) for ck in checkouts]
-    # checkouts = sum(check)
     if duration is not None:
         today = datetime.today()
         day = today - timedelta(days=int(duration))
@@ -81,14 +75,11 @@ def get_busines_client_appointment(request):
 def get_dashboard_day_wise(request):
     date = request.GET.get('date', None)
     #date = '2022-10-22'
-    
     total_revenue = 0
     appointments_count = 0
     total_client = 0
-    
     appointment = AppointmentCheckout.objects.filter(is_deleted=False)
     for app in appointment:
-        
         create_at = str(app.created_at)
         if (create_at.split(" ")[0] == date ):
             appointments_count +=1
@@ -111,7 +102,6 @@ def get_dashboard_day_wise(request):
                 'revenue' : total_revenue,
                 'appointments_count': appointments_count,
                 'total_client': total_client,
-        
             }
         },
         status=status.HTTP_200_OK
@@ -121,9 +111,7 @@ def get_dashboard_day_wise(request):
 @permission_classes([AllowAny])
 def get_appointments_client(request):
     businesaddress= request.data.get('businesaddress', None)
-    
     appointment = AppointmentCheckout.objects.filter(appointment_service__business_address= businesaddress)
-    
     for i in appointment:
         print(i)
     print('hello')
@@ -163,7 +151,6 @@ def get_dashboard_targets(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    
     try: 
         employee_id = Employee.objects.get(id=employee_id, is_deleted=False)
     except Exception as err:
@@ -217,13 +204,11 @@ def get_acheived_target_report(request):
                     'error_message' : 'All fields are required',
                     'fields' : [
                         'employee_id',
-
                     ]
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    
     try: 
         employee = Employee.objects.get(id=employee_id, is_deleted=False)
     except Exception as err:
@@ -240,10 +225,8 @@ def get_acheived_target_report(request):
                 status=status.HTTP_404_NOT_FOUND
             )
     if start_month is not None and end_month is not None :
-
         start_index = FIXED_MONTHS.index(start_month) # 1
         end_index = FIXED_MONTHS.index(end_month) # 9
-
         fix_months = FIXED_MONTHS[start_index : end_index]
     else:
         fix_months = FIXED_MONTHS
@@ -302,7 +285,6 @@ def get_dashboard_target_overview(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    
     try: 
         employee = Employee.objects.get(id=employee_id, is_deleted=False)
     except Exception as err:
@@ -318,14 +300,11 @@ def get_dashboard_target_overview(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-                    
     achieved_target_member = ProductOrder.objects.filter(member = employee_id)
 
     if start_month is not None and end_month is not None :
-
         start_index = FIXED_MONTHS.index(start_month) # 1
         end_index = FIXED_MONTHS.index(end_month) # 9
-
         fix_months = FIXED_MONTHS[start_index : end_index]
     else:
         fix_months = FIXED_MONTHS
@@ -337,18 +316,14 @@ def get_dashboard_target_overview(request):
         year__gte = start_year,
         year__lte = end_year,
     )
-
     service_targets = ServiceOrder.objects.filter(
         service = employee_id,
-        
     )
     membership_targets = MemberShipOrder.objects.filter(
         membership = employee_id,
-        
     )
     voucher_targets = VoucherOrder.objects.filter(
         voucher = employee_id,
-        
     )
 
     all_service_targets = targets.values_list('service_target', flat=True)
@@ -383,7 +358,6 @@ def get_dashboard_target_overview(request):
 
     sum_total_acheived=sum([sum_acheived_voucher_target,sum_acheived_membership_target,sum_retail_target,sum_service_targets,])
 
-        
     return Response(
             {
                 'status' : 200,
@@ -442,14 +416,12 @@ def get_total_tips(request):
         checkout_order = Checkout.objects.filter(
             is_deleted=False,
             member__id = employee_id,
-
             ).values_list('tip', flat=True)
         total_tips += sum(checkout_order)
 
         appointment_checkout = AppointmentCheckout.objects.filter(
             appointment_service__appointment_status = 'Done',
             member__id = employee_id,
-
             ).values_list('tip', flat=True)
         total_tips += sum(appointment_checkout)
     
@@ -472,7 +444,6 @@ def get_total_comission(request):
     employee_id = request.GET.get('employee_id', None)
     range_start =  request.GET.get('range_start', None)
     range_end = request.GET.get('range_end', None)
-    
     sum_total_commision = 0
     total_service_comission = 0
     total_product_comission = 0
@@ -505,31 +476,27 @@ def get_total_comission(request):
             created_at__lte = range_end
             ).values_list('voucher_commission', flat=True)
         total_voucher_comission += sum(voucher_commission)
-
         sum_total_commision = sum([total_service_comission,total_product_comission,total_voucher_comission])
         
     else:
         service_commission = Checkout.objects.filter(
             is_deleted=False,
             member__id = employee_id,
-
             ).values_list('service_commission', flat=True)
         total_service_comission += sum(service_commission)
 
         product_commission = Checkout.objects.filter(
             is_deleted=False,
             member__id = employee_id,
-
             ).values_list('product_commission', flat=True)
         total_product_comission += sum(product_commission)
 
         voucher_commission = Checkout.objects.filter(
             is_deleted=False,
             member__id = employee_id,
-
             ).values_list('voucher_commission', flat=True)
-        total_voucher_comission += sum(voucher_commission)
         
+        total_voucher_comission += sum(voucher_commission)
         sum_total_commision = sum([total_service_comission,total_product_comission,total_voucher_comission])
     
     return Response(
@@ -548,88 +515,85 @@ def get_total_comission(request):
         status=status.HTTP_200_OK
     )
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def get_total_sales(request):
-    employee_id = request.GET.get('employee_id', None)
+# @api_view(['GET'])
+# @permission_classes([AllowAny])
+# def get_total_sales(request):
+#     employee_id = request.GET.get('employee_id', None)
 
-    data=[]
-    checkout_order = Checkout.objects.filter(is_deleted=False, member__id = employee_id).order_by('-created_at')
-    serialized = CheckoutSerializer(checkout_order,  many=True, context={'request' : request})
-    data.extend(serialized.data)
+#     data=[]
+#     checkout_order = Checkout.objects.filter(is_deleted=False, member__id = employee_id).order_by('-created_at')
+#     serialized = CheckoutSerializer(checkout_order,  many=True, context={'request' : request})
+#     data.extend(serialized.data)
+
+#     appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done', member__id = employee_id)
+#     serialized = AppointmentCheckoutSerializer(appointment_checkout, 
+#                                                many = True, 
+#                                                context={'request' : request
+#                             })
+#     data.extend(serialized.data)
     
-    appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done', member__id = employee_id)
-    serialized = AppointmentCheckoutSerializer(appointment_checkout, 
-                                               many = True, 
-                                               context={'request' : request
-                            })
-    data.extend(serialized.data)
-    
-    for order in data:
-        create_at = str(order.created_at)
+#     for order in data:
+#         create_at = str(order.created_at)
         
-        matching = int(create_at.split(" ")[0].split("-")[1])
-        if( matching == 0 ):
-            data['sale_jan'] +=1
-            MONTHS[0]['sales'] = data['sale_jan']
+#         matching = int(create_at.split(" ")[0].split("-")[1])
+#         if( matching == 0 ):
+#             data['sale_jan'] +=1
+#             MONTHS[0]['sales'] = data['sale_jan']
 
-        if( matching == 1 ):
-            data['sale_feb'] +=1
-            MONTHS[1]['sales'] = data['sale_feb']
+#         if( matching == 1 ):
+#             data['sale_feb'] +=1
+#             MONTHS[1]['sales'] = data['sale_feb']
 
-        if( matching == 2 ):
-            data['sale_mar'] +=1
-            MONTHS[2]['sales'] = data['sale_mar']
+#         if( matching == 2 ):
+#             data['sale_mar'] +=1
+#             MONTHS[2]['sales'] = data['sale_mar']
 
-        if( matching == 3 ):
-            data['sale_apr'] +=1
-            MONTHS[3]['sales'] = data['sale_apr']
+#         if( matching == 3 ):
+#             data['sale_apr'] +=1
+#             MONTHS[3]['sales'] = data['sale_apr']
 
-        if( matching == 4 ):
+#         if( matching == 4 ):
+#             data['sale_may'] +=1
+#             MONTHS[4]['sales'] = data['sale_may']
             
-            data['sale_may'] +=1
-            MONTHS[4]['sales'] = data['sale_may']
-            
-        if( matching == 5 ):
-            
-            data['sale_jun'] +=1
-            MONTHS[5]['sales'] = data['sale_jun']
+#         if( matching == 5 ):
+#             data['sale_jun'] +=1
+#             MONTHS[5]['sales'] = data['sale_jun']
 
-        if( matching == 6 ):
+#         if( matching == 6 ):
+#             data['sale_july'] +=1
+#             MONTHS[6]['sales'] = data['sale_july']
+
+#         if( matching == 7 ):
+#             data['sale_aug'] +=1
+#             MONTHS[7]['sales'] = data['sale_aug']
         
-            data['sale_july'] +=1
-            MONTHS[6]['sales'] = data['sale_july']
+#         if( matching == 8 ):
+#             data['sale_sep'] +=1
+#             MONTHS[8]['sales'] = data['sale_sep']
+        
+#         if( matching == 9 ):    
+#             data['sale_oct'] +=1
+#             MONTHS[9]['sales'] = data['sale_oct']
+        
+#         if( matching == 10 ):    
+#             data['sale_nov'] +=1
+#             MONTHS[10]['sales'] = data['sale_nov']
+        
+#         if( matching == 11 ):  
+#             data['sale_dec'] +=1
+#             MONTHS[11]['sales'] = data['sale_dec']
+            
+#     return Response(
+#         {
+#             'status' : 200,
+#             'status_code' : '200',
+#             'response' : {
+#                 'message' : 'Graph for mobile',
+#                 'error_message' : None,
+#                 'dashboard': MONTHS
+#             }
+#         },
+#         status=status.HTTP_200_OK
+#     )
 
-        if( matching == 7 ):
-            
-            data['sale_aug'] +=1
-            MONTHS[7]['sales'] = data['sale_aug']
-        if( matching == 8 ):
-            
-            data['sale_sep'] +=1
-            MONTHS[8]['sales'] = data['sale_sep']
-        if( matching == 9 ):
-            
-            data['sale_oct'] +=1
-            MONTHS[9]['sales'] = data['sale_oct']
-        if( matching == 10 ):
-            
-            data['sale_nov'] +=1
-            MONTHS[10]['sales'] = data['sale_nov']
-        if( matching == 11 ):
-            
-            data['sale_dec'] +=1
-            MONTHS[11]['sales'] = data['sale_dec']
-            
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'Graph for mobile',
-                'error_message' : None,
-                'dashboard': MONTHS
-            }
-        },
-        status=status.HTTP_200_OK
-    )
