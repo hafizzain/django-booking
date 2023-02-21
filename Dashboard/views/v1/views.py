@@ -829,13 +829,26 @@ def get_total_sales_device(request):
         total_sale +=  int(total.total_price)
     serialized = AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request})
     data.extend(serialized.data)
+    
+    try:
+        for order in data:
+            created_at = order.created_at
+            month = created_at.month
+            sales_by_month[month]['count'] += 1
 
-    for order in data:
-        created_at = order.created_at
-        month = created_at.month
-        sales_by_month[month]['count'] += 1
-
-    dashboard_data = [{'month': sales_by_month[i]['month'], 'count': sales_by_month[i]['count']} for i in range(12)]
+        dashboard_data = [{'month': sales_by_month[i]['month'], 'count': sales_by_month[i]['count']} for i in range(12)]
+    except Exception as err:
+        return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Graph for mobile',
+                'error_message' : str(err),
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
     return Response(
         {
