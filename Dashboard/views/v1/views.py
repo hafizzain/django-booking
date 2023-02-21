@@ -810,8 +810,8 @@ def get_total_sales(request):
 @permission_classes([AllowAny])
 def get_total_sales_device(request):
     employee_id = request.GET.get('employee_id', None)
-
-
+    total_sales = 0
+    
     months = [
         "January",
         "February",
@@ -846,6 +846,8 @@ def get_total_sales_device(request):
         i = index + 1
         count = checkout_orders.count(i)
         count_app = checkout_orders.count(i)
+        
+        total_sales = count + count_app
 
         dashboard_data.append({
             'month' : month,
@@ -860,6 +862,7 @@ def get_total_sales_device(request):
                 'message': 'Graph for mobile',
                 'error_message': None,
                 'dashboard': dashboard_data,
+                'total_sales': total_sales
             }
         },
         status=status.HTTP_200_OK
