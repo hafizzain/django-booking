@@ -128,7 +128,7 @@ class UserTenantLoginSerializer(serializers.ModelSerializer):
     #         return str(err)
     def get_employee(self, obj):
         try:
-            employee = self.context["employee"]
+            employee = self.context['employee']
             if employee:
                 return True
             else:
