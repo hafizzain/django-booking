@@ -872,14 +872,23 @@ def get_total_sales_device(request):
         member__id=employee_id,
     ).values_list('created_at__month', flat=True)
 
+
+    apps_checkouts = AppointmentCheckout.objects.filter(
+        is_deleted=False, 
+        member__id=employee_id,
+    ).values_list('created_at__month', flat=True)
+
     checkout_orders = list(checkout_orders)
+    apps_checkouts = list(apps_checkouts)
 
     for index, month in enumerate(months):
         i = index + 1
         count = checkout_orders.count(i)
+        count_app = checkout_orders.count(i)
+        
         dashboard_data.append({
             'month' : month,
-            'count' : count
+            'count' : count + count_app
         })
 
 
