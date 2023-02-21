@@ -19,6 +19,8 @@ class TenantAdmin(admin.ModelAdmin):
         'created_at',
     ]
 
+    list_filter = ['is_ready', 'is_active']
+
     def username(self, obj):
         try:
             return str(obj.user.username)
