@@ -33,3 +33,6 @@ def CreateDummyTenants():
             add_countries(tenant=tenant)
             add_states(tenant=tenant)
             add_cities(tenant=tenant)
+            
+        tenant.is_ready = True
+        tenant.save()

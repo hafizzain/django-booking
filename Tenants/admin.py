@@ -13,6 +13,7 @@ class TenantAdmin(admin.ModelAdmin):
         'schema_name',
         'username',
         'is_active',
+        'is_ready',
         'is_deleted',
         'is_blocked',
         'created_at',
