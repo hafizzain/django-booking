@@ -243,7 +243,6 @@ def add_data_to_tenant_thread(tenant=None):
 
 
 def create_tenant(request=None, user=None, data=None):
-    time_start = datetime.datetime.now()
     
     if user is None or data is None:
         return
@@ -265,30 +264,18 @@ def create_tenant(request=None, user=None, data=None):
         )
         if len(all_tenants) > 0:
             user_tenant = all_tenants[0]
-            # user_tenant = Tenant.objects.create(
-            #     user=user,
-            #     name=td_name,
-            #     domain=f'{td_name}.{settings.BACKEND_DOMAIN_NAME}',
-            #     schema_name=td_name
-            # )
+            
             user_tenant.user = user
             user_tenant.domain = user_domain_name
             user_tenant.is_active = True
             user_tenant.save()
         else:
-            ExceptionRecord.objects.create(
-                text = f'Tenant was not found DUMMY'
-            )
             user_tenant = Tenant.objects.create(
                 user=user,
                 name=td_name,
                 domain = user_domain_name,
                 schema_name=td_name
             )
-        
-        ExceptionRecord.objects.create(
-            text = f'Check domain errors . {user_tenant} line 272 craete_tenat'
-        )
         
         Domain.objects.create(
             user=user,
@@ -355,29 +342,20 @@ def create_tenant(request=None, user=None, data=None):
             except:
                 pass
 
-            try:
-                thrd = Thread(target=add_business_types, kwargs={'tenant' : user_tenant})
-                thrd.start()
-            except:
-                pass
-            try:
-                thrd = Thread(target=add_software_types, kwargs={'tenant' : user_tenant})
-                thrd.start()
-            except:
-                pass
+            # try:
+            #     thrd = Thread(target=add_business_types, kwargs={'tenant' : user_tenant})
+            #     thrd.start()
+            # except:
+            #     pass
+            # try:
+            #     thrd = Thread(target=add_software_types, kwargs={'tenant' : user_tenant})
+            #     thrd.start()
+            # except:
+            #     pass
             
-            try:
-                thrd = Thread(target=add_data_to_tenant_thread, kwargs={'tenant' : user_tenant})
-                thrd.start()
-            except:
-                pass
-    
-    time_end = datetime.datetime.now()
-    time_diff = time_end - time_start
-
-    total_seconds = time_diff.total_seconds()
-
-    ExceptionRecord.objects.create(
-        text = f'CREATE TENANT TIME DIFF . {total_seconds} Seconds'
-    )
+            # try:
+            #     thrd = Thread(target=add_data_to_tenant_thread, kwargs={'tenant' : user_tenant})
+            #     thrd.start()
+            # except:
+            #     pass
             

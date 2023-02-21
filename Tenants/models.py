@@ -17,6 +17,7 @@ class Tenant(TenantMixin):
     business_id = models.CharField(default='', max_length=1000, null=True, blank=True)
 
     is_active = models.BooleanField(default=True)
+    is_ready = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
