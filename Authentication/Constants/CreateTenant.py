@@ -260,7 +260,8 @@ def create_tenant(request=None, user=None, data=None):
         user_domain_name = f'{td_name}.{settings.BACKEND_DOMAIN_NAME}'
         all_tenants = Tenant.objects.filter(
             user__isnull = True,
-            is_active = False
+            is_active = False,
+            is_ready = True
         )
         if len(all_tenants) > 0:
             user_tenant = all_tenants[0]
