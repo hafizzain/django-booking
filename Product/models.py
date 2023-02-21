@@ -135,6 +135,7 @@ class ProductStock(models.Model):
     #quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0, verbose_name='Total Quantity')
     available_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
     sold_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
+    consumed_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
 
     low_stock = models.PositiveIntegerField(default=0)
     reorder_quantity = models.PositiveIntegerField(default=0)
