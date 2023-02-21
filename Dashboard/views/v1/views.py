@@ -1,11 +1,9 @@
 from django.conf import settings
 from operator import ge
-from Appointment.serializers import CheckoutSerializer
 
-
-from Order.models import ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder,Checkout
+from Order.models import Order, ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder,Checkout
 from Order.models import Checkout, ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder
-from Sale.serializers import AppointmentCheckoutSerializer
+from Sale.serializers import AppointmentCheckoutSerializer, CheckoutSerializer, OrderSerializer
 # from TragetControl.models import TierStoreTarget
 
 from Utility.Constants.Data.months import  FIXED_MONTHS, MONTH_DICT, MONTHS, MONTHS_DEVICE
@@ -808,5 +806,60 @@ def get_total_sales(request):
         status=status.HTTP_200_OK
     )
  
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_total_sales_device(request):
     
+    employee_id = request.GET.get('employee_id', None)
+
+    data = []
+    total_sale = 0
+    sales_by_month = {i: {'month': MONTHS[i]['value'], 'count': 0} for i in range(12)}
+
+    checkout_order = Checkout.objects.filter(is_deleted=False, member__id=employee_id)
+    serialized = CheckoutSerializer(checkout_order, many=True, context={'request': request})
+    data.extend(serialized.data)
     
+    # checkout_orders = Order.objects.filter(is_deleted=False, member__id=employee_id)
+    # for total in checkout_orders:
+    #     total_sale +=  int(total.total_price)
+        
+    appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status='Done', member__id=employee_id)
+    for total in appointment_checkout:
+        total_sale +=  int(total.total_price)
+    serialized = AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request})
+    data.extend(serialized.data)
+    
+    try:
+        for order in serialized.data:
+            created_at = order.created_at
+            month = created_at.month
+            sales_by_month[month]['count'] += 1
+
+        dashboard_data = [{'month': sales_by_month[i]['month'], 'count': sales_by_month[i]['count']} for i in range(12)]
+    except Exception as err:
+        return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Graph for mobile',
+                'error_message' : data#str(err),
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+    return Response(
+        {
+            'status': 200,
+            'status_code': '200',
+            'response': {
+                'message': 'Graph for mobile',
+                'error_message': None,
+                'dashboard': dashboard_data,
+                'total_sale' :  total_sale
+            }
+        },
+        status=status.HTTP_200_OK
+    )
