@@ -26,7 +26,7 @@ class TenantAdmin(admin.ModelAdmin):
         if obj.domain:
             this_domain = str(obj.domain)
             this_domain = this_domain.split('.')
-            return f'{this_domain}'
+            return f'{this_domain[0]}'
         else :
             return '--------------' 
 
