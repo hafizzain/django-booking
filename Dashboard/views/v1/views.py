@@ -847,7 +847,7 @@ def get_total_sales_device(request):
         count = checkout_orders.count(i)
         count_app = checkout_orders.count(i)
         
-        total_sales = count + count_app
+        total_sales += count + count_app
 
         dashboard_data.append({
             'month' : month,
