@@ -741,56 +741,56 @@ def get_total_sales(request):
             sale_jan +=1
             MONTHS_DEVICE[0] = ( 'January', sale_jan )
             
-        if( matching == 1 ):
+        elif( matching == 1 ):
             
             sale_feb += 1
             MONTHS_DEVICE[1] = ('February', sale_feb)
             
-        if( matching == 2 ):
+        elif( matching == 2 ):
            
             sale_mar += 1
             MONTHS_DEVICE[2] = ('March', sale_mar)
             
-        if( matching == 3 ):
+        elif( matching == 3 ):
             
             sale_apr += 1
             MONTHS_DEVICE[3] = ('April', sale_apr)
             
-        if( matching == 4 ):
+        elif( matching == 4 ):
             
             sale_may += 1
             MONTHS_DEVICE[4] = ('May', sale_may)
             
-        if( matching == 5 ):
+        elif( matching == 5 ):
             
             sale_jun += 1
             MONTHS_DEVICE[5] = ('June', sale_jun)
-        if( matching == 6 ):
+        elif( matching == 6 ):
             
             sale_july += 1
             MONTHS_DEVICE[6] = ('July', sale_july)
             
-        if( matching == 7 ):
+        elif( matching == 7 ):
             
             sale_aug += 1
             MONTHS_DEVICE[7] = ('August', sale_aug)
             
-        if( matching == 8 ):
+        elif( matching == 8 ):
             
             sale_sep += 1
             MONTHS_DEVICE[8] = ('September', sale_sep)
             
-        if( matching == 9 ):
+        elif( matching == 9 ):
             
             sale_oct += 1
             MONTHS_DEVICE[9] = ('October', sale_oct)
             
-        if( matching == 10 ):
+        elif( matching == 10 ):
             
             sale_nov += 1
             MONTHS_DEVICE[10] = ('November', sale_nov)
             
-        if( matching == 11 ):
+        elif( matching == 11 ):
             
             sale_dec += 1
             MONTHS_DEVICE[11] = ('December', sale_dec)
