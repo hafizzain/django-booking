@@ -3,7 +3,7 @@ from operator import ge
 from Appointment.serializers import CheckoutSerializer
 
 
-from Order.models import ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder,Checkout
+from Order.models import Order, ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder,Checkout
 from Order.models import Checkout, ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder
 from Sale.serializers import AppointmentCheckoutSerializer
 # from TragetControl.models import TierStoreTarget
@@ -818,9 +818,9 @@ def get_total_sales_device(request):
     total_sale = 0
     sales_by_month = {i: {'month': MONTHS[i]['value'], 'count': 0} for i in range(12)}
 
-    checkout_order = Checkout.objects.filter(is_deleted=False, member__id=employee_id).order_by('-created_at')
+    checkout_order = Order.objects.filter(is_deleted=False, member__id=employee_id).order_by('-created_at')
     for i in checkout_order:
-        total_sale  += int(i.checkout.total_price)
+        total_sale  += int(i.total_price)
     serialized = CheckoutSerializer(checkout_order, many=True, context={'request': request})
     data.extend(serialized.data)
 
