@@ -816,13 +816,17 @@ def get_total_sales_device(request):
     total_sale = 0
     sales_by_month = {i: {'month': MONTHS[i]['value'], 'count': 0} for i in range(12)}
 
-    # checkout_order = Order.objects.filter(is_deleted=False, member__id=employee_id).order_by('-created_at')
-    # for i in checkout_order:
-    #     total_sale  += int(i.total_price)
-    # serialized = OrderSerializer(checkout_order, many=True, context={'request': request})
-    # data.extend(serialized.data)
-
+    checkout_order = Checkout.objects.filter(is_deleted=False, member__id=employee_id).order_by('-created_at')
+    serialized = CheckoutSerializer(checkout_order, many=True, context={'request': request})
+    data.extend(serialized.data)
+    
+    checkout_order = Order.objects.filter(is_deleted=False, member__id=employee_id).order_by('-created_at')
+    for total in appointment_checkout:
+        total_sale +=  int(total.total_price)
+        
     appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status='Done', member__id=employee_id)
+    for total in appointment_checkout:
+        total_sale +=  int(total.total_price)
     serialized = AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request})
     data.extend(serialized.data)
 
@@ -841,7 +845,7 @@ def get_total_sales_device(request):
                 'message': 'Graph for mobile',
                 'error_message': None,
                 'dashboard': dashboard_data,
-                'total' :  total_sale
+                'total_sale' :  total_sale
             }
         },
         status=status.HTTP_200_OK
