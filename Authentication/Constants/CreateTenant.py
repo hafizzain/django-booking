@@ -342,16 +342,16 @@ def create_tenant(request=None, user=None, data=None):
             except:
                 pass
 
-            try:
-                thrd = Thread(target=add_business_types, kwargs={'tenant' : user_tenant})
-                thrd.start()
-            except:
-                pass
-            try:
-                thrd = Thread(target=add_software_types, kwargs={'tenant' : user_tenant})
-                thrd.start()
-            except:
-                pass
+            # try:
+            #     thrd = Thread(target=add_business_types, kwargs={'tenant' : user_tenant})
+            #     thrd.start()
+            # except:
+            #     pass
+            # try:
+            #     thrd = Thread(target=add_software_types, kwargs={'tenant' : user_tenant})
+            #     thrd.start()
+            # except:
+            #     pass
             
             # try:
             #     thrd = Thread(target=add_data_to_tenant_thread, kwargs={'tenant' : user_tenant})
