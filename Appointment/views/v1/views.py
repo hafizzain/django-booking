@@ -1262,20 +1262,32 @@ def create_checkout_device(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
+    
     try:
-        service_appointment = AppointmentService.objects.filter(id=appointments.id)
+        service_appointment = AppointmentService.objects.filter(appointment = str(appointments))
+        for ser in service_appointment:
+            ser.appointment_status = 'Done'
+            ser.save()
+            
     except Exception as err:
-        service_appointment = None
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Service Appointment ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
     
     try:
         business_address=BusinessAddress.objects.get(id = str(business_address))
     except Exception as err:
         business_address = None
     
-    for ser in service_appointment:
-        ser.appointment_status= 'Done'
-        ser.save()
-        
     checkout =AppointmentCheckout.objects.create(
         appointment = appointments,
        # appointment_service = service_appointment,

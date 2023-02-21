@@ -245,11 +245,15 @@ class EmployeSerializer(serializers.ModelSerializer):
             return {}
         else:
             returned_value = {}
-            for permit in ALL_PERMISSIONS:
-                returned_value[permit] = []
-                for opt in PERMISSIONS_MODEL_FIELDS[permit](permission).all():
-                    returned_value[permit].append(opt.text)
-            return returned_value
+            try:            
+                for permit in ALL_PERMISSIONS:
+                    returned_value[permit] = []
+                    for opt in PERMISSIONS_MODEL_FIELDS[permit](permission).all():
+                        returned_value[permit].append(opt.text)
+                return returned_value
+            except Exception as err:
+                pass
+                #return str(err)
 
     def get_monday(self, obj):
         try:
