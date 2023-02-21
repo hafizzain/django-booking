@@ -1,7 +1,7 @@
 
 
 
-from Utility.models import Tenant
+from Tenants.models import Tenant
 
 from django.conf import settings
 from Authentication.Constants.CreateTenant import add_business_types, add_software_types, add_data_to_tenant_thread
@@ -33,6 +33,6 @@ def CreateDummyTenants():
             add_countries(tenant=tenant)
             add_states(tenant=tenant)
             add_cities(tenant=tenant)
-            
+
         tenant.is_ready = True
         tenant.save()
