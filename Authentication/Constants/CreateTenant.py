@@ -126,6 +126,10 @@ def create_tenant_account_type(tenant_user=None, tenant=None, account_type='Busi
 def create_employee(tenant=None, user = None, business=None):
      if tenant is not None and user is not None and business is not None:
         try:
+            ExceptionRecord.objects.create(
+                text = f'errors in some test employee {str(tenant)}'
+            )
+              
             country_id = 'United Arab Emirates'
             currency_id = 'Dirham'
             domain = tenant.domain
