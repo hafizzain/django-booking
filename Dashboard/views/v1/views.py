@@ -267,10 +267,13 @@ def get_acheived_target_report(request):
 def get_dashboard_target_overview(request):
 
     employee_id = request.GET.get('employee_id', None)
-    start_month =  request.GET.get('start_month', None)
-    end_month = request.GET.get('end_month', None)
-    start_year = request.GET.get('start_year', '1900-01-01')
-    end_year = request.GET.get('end_year', '3000-12-30')
+    range_start =  request.GET.get('range_start', None)
+    range_end = request.GET.get('range_end', None)
+    # employee_id = request.GET.get('employee_id', None)
+    # start_month =  request.GET.get('start_month', None)
+    # end_month = request.GET.get('end_month', None)
+    # start_year = request.GET.get('start_year', '1900-01-01')
+    # end_year = request.GET.get('end_year', '3000-12-30')
 
     if not all([employee_id]):
         return Response(
@@ -304,62 +307,95 @@ def get_dashboard_target_overview(request):
                 status=status.HTTP_404_NOT_FOUND
             )
     achieved_target_member = ProductOrder.objects.filter(member = employee_id)
-
-    if start_month is not None and end_month is not None :
-        start_index = FIXED_MONTHS.index(start_month) # 1
-        end_index = FIXED_MONTHS.index(end_month) # 9
-        fix_months = FIXED_MONTHS[start_index : end_index]
-    else:
-        fix_months = FIXED_MONTHS
-        print(fix_months)
+    sum_service_targets=0
+    sum_retail_target= 0
+    sum_total_set = 0
+    sum_acheived_voucher_target = 0
+    sum_acheived_service_target = 0
+    sum_acheived_retail_target = 0
+    sum_acheived_membership_target = 0
+    sum_acheived_voucher_target = 0
+    sum_total_acheived = 0
     
-    targets = StaffTarget.objects.filter(
-        employee_id = employee_id,
-        month__in = fix_months, # 8
-        year__gte = start_year,
-        year__lte = end_year,
-    )
-    service_targets = ServiceOrder.objects.filter(
-        service = employee_id,
-    )
-    membership_targets = MemberShipOrder.objects.filter(
-        membership = employee_id,
-    )
-    voucher_targets = VoucherOrder.objects.filter(
-        voucher = employee_id,
-    )
+    if range_start:
+        range_start = datetime.strptime(range_start, "%Y-%m-%d")
+        range_end = datetime.strptime(range_end, "%Y-%m-%d")
 
-    all_service_targets = targets.values_list('service_target', flat=True)
-    print(all_service_targets)
-    sum_service_targets = sum(all_service_targets)
+        appointment_checkout = AppointmentCheckout.objects.filter(
+            appointment_service__appointment_status = 'Done',
+            member__id = employee_id,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+            ).values_list('total_price', flat=True)
+        sum_total_acheived += sum(appointment_checkout)
 
-    all_retail_target = targets.values_list('retail_target', flat=True)
-    print(all_retail_target)
-    sum_retail_target = sum(all_retail_target)
 
-    sum_total_set=sum([sum_retail_target,sum_service_targets])
+        targets = StaffTarget.objects.filter(
+            is_deleted=False,
+            member__id = employee_id,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+            ).values_list('service_target , retail_target', flat=True)
+        
+        service_targets = ServiceOrder.objects.filter(
+            member = employee_id,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+        ).values_list('service_target', flat=True)
+        all_service_targets += sum(service_targets)
+
+        retail_targets = ProductOrder.objects.filter(
+            member = employee_id,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+        ).values_list('retail_targets', flat=True)
+        all_retail_targets += sum(retail_targets)
+        
+        voucher_targets = VoucherOrder.objects.filter(
+            member = employee_id,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+        ).values_list('voucher_targets', flat=True)
+        all_voucher_targets += sum(voucher_targets)
+
+        membership_targets = MemberShipOrder.objects.filter(
+            member = employee_id,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+        ).values_list('membership_targets', flat=True)
+        all_membership_targets += sum(membership_targets)
     
-    all_achieved_voucher_target = voucher_targets.values_list('voucher', flat=True)
-    print(all_achieved_voucher_target)
-    sum_acheived_voucher_target = sum(all_achieved_voucher_target)
+        all_service_targets = targets.values_list('service_targets', flat=True)
+        print(all_service_targets)
+        sum_service_targets = sum(all_service_targets)
 
-    all_acheived_service_target = service_targets.values_list('service', flat=True)
-    print(all_acheived_service_target)
-    sum_acheived_service_target = sum(all_acheived_service_target)
+        all_retail_target = targets.values_list('retail_targets', flat=True)
+        print(all_retail_target)
+        sum_retail_target = sum(all_retail_target)
 
-    all_acheived_retail_target = targets.values_list('retail_target', flat=True)
-    print(all_acheived_retail_target)
-    sum_acheived_retail_target = sum(all_acheived_retail_target)
+        sum_total_set = sum([sum_retail_target,sum_service_targets])
+        
+        all_achieved_voucher_target = voucher_targets.values_list('voucher', flat=True)
+        print(all_achieved_voucher_target)
+        sum_acheived_voucher_target = sum(all_achieved_voucher_target)
 
-    all_acheived_membership_target = membership_targets.values_list('membership', flat=True)
-    print(all_acheived_membership_target)
-    sum_acheived_membership_target = sum(all_acheived_membership_target)
+        all_acheived_service_target = service_targets.values_list('service', flat=True)
+        print(all_acheived_service_target)
+        sum_acheived_service_target = sum(all_acheived_service_target)
 
-    all_acheived_voucher_target = voucher_targets.values_list('voucher', flat=True)
-    print(all_acheived_voucher_target)
-    sum_acheived_voucher_target = sum(all_acheived_voucher_target)
+        all_acheived_retail_target = targets.values_list('retail_targets', flat=True)
+        print(all_acheived_retail_target)
+        sum_acheived_retail_target = sum(all_acheived_retail_target)
 
-    sum_total_acheived=sum([sum_acheived_voucher_target,sum_acheived_membership_target,sum_retail_target,sum_service_targets,])
+        all_acheived_membership_target = membership_targets.values_list('membership', flat=True)
+        print(all_acheived_membership_target)
+        sum_acheived_membership_target = sum(all_acheived_membership_target)
+
+        all_acheived_voucher_target = voucher_targets.values_list('voucher', flat=True)
+        print(all_acheived_voucher_target)
+        sum_acheived_voucher_target = sum(all_acheived_voucher_target)
+
+        sum_total_acheived=sum([sum_acheived_voucher_target,sum_acheived_membership_target,sum_retail_target,sum_service_targets,])
 
     return Response(
             {
@@ -544,7 +580,6 @@ def get_total_sales_device(request):
         member__id=employee_id,
     ).values_list('created_at__month', flat=True)
 
-
     apps_checkouts = AppointmentCheckout.objects.filter(
         is_deleted=False, 
         member__id=employee_id,
@@ -579,4 +614,3 @@ def get_total_sales_device(request):
         },
         status=status.HTTP_200_OK
     )
-
