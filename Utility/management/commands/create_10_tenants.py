@@ -1,24 +1,22 @@
 from django.core.management.base import BaseCommand, CommandError
 
 
-from Tenants.models import Tenant
-from django.conf import settings
+from threading import Thread
 
+from Utility.Constants.Tenant.create_dummy_tenants import CreateDummyTenants
 
 class Command(BaseCommand):
     # Handle method to handle out the process of creating the admin user
     def handle(self, *args, **options):
-        for i in range(10):
-            name = f'NDT-{i}'
-            print('Creating Dummy Tenant ... ', end='')
-            tenant_name = f'NDT-Dummy-Tenant-{i}'
-            Tenant.objects.create(
-                name = name,
-                domain=f'{tenant_name}.{settings.BACKEND_DOMAIN_NAME}',
-                schema_name = tenant_name,
-                is_active = False
-            )
-            print('Created')
-        self.stdout.write(self.style.SUCCESS(
-            'Tenants Created Successfully!!'
-        ))
+        try:
+            thrd = Thread(target=CreateDummyTenants)
+            thrd.start()
+        except Exception as err:
+            self.stdout.write(self.style.ERROR(
+                str(err)
+            ))
+            
+        else:
+            self.stdout.write(self.style.SUCCESS(
+                'Your Tenants Request Accepted Successfully, You will get Notify when tenants will be created!!'
+            ))
