@@ -1,3 +1,5 @@
+from Sale.serializers import PriceServiceSerializers
+from Service.models import PriceService
 from rest_framework import serializers
 
 from Business.models import BusinessAddress, BusinessTax
@@ -108,6 +110,14 @@ class CategoryDiscountSerializers(serializers.ModelSerializer):
         fields = '__all__'
 class FreeServiceSerializers(serializers.ModelSerializer):
     is_deleted = serializers.SerializerMethodField(read_only=True)
+    priceservice = serializers.SerializerMethodField(read_only=True)
+    
+    def get_priceservice(self, obj):
+        try:
+            ser = PriceService.objects.filter(service = obj)
+            return PriceServiceSerializers(ser, many = True).data
+        except Exception as err:
+            pass
     
     
     def get_is_deleted(self, obj):

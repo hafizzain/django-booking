@@ -1042,7 +1042,7 @@ class UserEmployeeSerializer(serializers.ModelSerializer):
                 is_blocked=False,
                 is_active=True
             )
-            return user_domain.schema_name
+            return user_domain.domain
         except Exception as err:
             return str(err)
         

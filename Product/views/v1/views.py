@@ -2026,6 +2026,7 @@ def add_product_consumption(request):
             )
             sold = consumed.available_quantity - int(quantity)
             consumed.available_quantity = sold
+            consumed.consumed_quantity +=  int(quantity)
             #consumed.sold_quantity += int(quantity)
             consumed.save()
             stock_cunsumed.after_quantity = sold

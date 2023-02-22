@@ -2,11 +2,13 @@
 
 
 from Authentication.Constants.Domain import ssl_sub_domain
+from Employee.Constants.Add_Employe import add_employee
+from Employee.models import Employee
 from Tenants.models import Tenant, Domain
-from Business.models import Business, BusinessPaymentMethod, BusinessType
+from Business.models import Business, BusinessAddress, BusinessPaymentMethod, BusinessType
 from Profile.models import Profile
 from Utility.Constants.add_data_db import add_business_types, add_countries, add_software_types, add_states, add_cities, add_currencies, add_languages
-from Utility.models import ExceptionRecord
+from Utility.models import Country, Currency, ExceptionRecord
 from Utility.models import GlobalPermissionChoices
 
 from rest_framework.authtoken.models import Token
@@ -121,8 +123,90 @@ def create_tenant_account_type(tenant_user=None, tenant=None, account_type='Busi
             account_type= account_type#account_type.capitalize()
         )
 
-def create_global_permission(tenant=None, user = None, business=None):
+def create_employee(tenant=None, user = None, business=None):
      if tenant is not None and user is not None and business is not None:
+        try:
+            ExceptionRecord.objects.create(
+                text = f'errors in some test employee {str(tenant)}'
+            )
+              
+            country_id = 'United Arab Emirates'
+            currency_id = 'Dirham'
+            domain = tenant.domain
+            template = 'Employee'
+            with tenant_context(tenant):
+                try:
+                    country = Country.objects.get(name__icontains = country_id)
+                    currency = Currency.objects.get(name__icontains = currency_id)
+                except Exception as err:
+                    pass
+
+                business_address = BusinessAddress.objects.create(
+                    business = business,
+                    user = user,
+                    address = 'ABCD',
+                    address_name = 'ABCD Address',
+                    email= user.email,
+                    mobile_number= user.mobile_number,
+                    country=country,
+                    currency = currency,
+                    is_primary = False,
+                    is_active = True,
+                    is_deleted = False,
+                    is_closed = False,
+                )
+                
+                employee = Employee.objects.create(
+                    user=user,
+                    business=business,
+                    full_name = user.full_name,
+                    email= user.email,
+                    country = country,
+                    address = 'Dubai Marina',
+                    is_active =True,
+                    
+                )
+                employee.location.add(business_address)
+                employee.save()
+                
+                
+                try:
+                    username = user.email.split('@')[0]
+                    try:
+                        user_check = User.objects.get(username = username)
+                    except Exception as err:
+                        #data.append(f'username user is client errors {str(err)}')
+                        pass
+                    else:
+                        username = f'{username} {len(User.objects.all())}'
+
+                except Exception as err:
+                    pass
+                
+                user = User.objects.create(
+                    first_name = user.full_name,
+                    username = username,
+                    email = user.email ,
+                    is_email_verified = True,
+                    is_active = True,
+                    mobile_number = user.mobile_number,
+                )
+                account_type = AccountType.objects.create(
+                        user = user,
+                        account_type = 'Employee'
+                    )
+                try:
+                    thrd = Thread(target=add_employee, args=[user.full_name, user.email , user.mobile_number, template, business.business_name, tenant, domain, user])
+                    thrd.start()
+                except Exception as err:
+                    pass
+        except Exception as err:
+            ExceptionRecord.objects.create(
+                text = f'errors in some create employee {str(err)}'
+            )
+                                    
+def create_global_permission(tenant=None, user = None, business=None):
+    if tenant is not None and user is not None and business is not None:
         with tenant_context(tenant):
             permission = [
     
@@ -263,20 +347,20 @@ def create_tenant(request=None, user=None, data=None):
             is_active = False,
             is_ready = True
         )
-        if len(all_tenants) > 0:
-            user_tenant = all_tenants[0]
+        # if len(all_tenants) > 0:
+        #     user_tenant = all_tenants[0]
             
-            user_tenant.user = user
-            user_tenant.domain = user_domain_name
-            user_tenant.is_active = True
-            user_tenant.save()
-        else:
-            user_tenant = Tenant.objects.create(
-                user=user,
-                name=td_name,
-                domain = user_domain_name,
-                schema_name=td_name
-            )
+        #     user_tenant.user = user
+        #     user_tenant.domain = user_domain_name
+        #     user_tenant.is_active = True
+        #     user_tenant.save()
+        # else:
+        user_tenant = Tenant.objects.create(
+            user=user,
+            name=td_name,
+            domain = user_domain_name,
+            schema_name=td_name
+        )
         
         Domain.objects.create(
             user=user,
@@ -286,7 +370,7 @@ def create_tenant(request=None, user=None, data=None):
         )
     except Exception as err:
         ExceptionRecord.objects.create(
-            text = f'Check domain errors . {str(err)} {user_tenant} line 272 craete_tenat'
+            text = f'Check domain errors . {str(err)} {user_tenant} line 400 create_tenant'
     )
 
 
@@ -331,6 +415,12 @@ def create_tenant(request=None, user=None, data=None):
             #     service_thrd.start()
             # except:
             #     pass
+            try:
+                service_thrd = Thread(target=create_employee, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+                service_thrd.start()
+            except:
+                pass
+           
             try:
                 service_thrd = Thread(target=create_global_permission, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
                 service_thrd.start()
