@@ -213,8 +213,8 @@ def create_client(tenant=None, user = None, business=None):
     if tenant is not None and user is not None and business is not None:
         with tenant_context(tenant):
             try:
-                languages = 'english'
-                language_id = Language.objects.get(id=languages)
+                languages = 'English'
+                language_id = Language.objects.get(name__iexact=languages)
             except Exception as err:
                 ExceptionRecord.objects.create(
                 text = f'create client languages not found {str(err)}'
