@@ -448,24 +448,7 @@ def create_tenant(request=None, user=None, data=None):
             #     service_thrd.start()
             # except:
             #     pass
-            try:
-                service_thrd = Thread(target=create_employee, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
-                service_thrd.start()
-            except:
-                pass
-            
-            try:
-                service_thrd = Thread(target=create_client, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
-                service_thrd.start()
-            except:
-                pass
-            
-            try:
-                service_thrd = Thread(target=create_ServiceGroup, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
-                service_thrd.start()
-            except:
-                pass
-           
+                       
             try:
                 service_thrd = Thread(target=create_global_permission, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
                 service_thrd.start()
@@ -489,9 +472,26 @@ def create_tenant(request=None, user=None, data=None):
             # except:
             #     pass
             
-            # try:
-            #     thrd = Thread(target=add_data_to_tenant_thread, kwargs={'tenant' : user_tenant})
-            #     thrd.start()
-            # except:
-            #     pass
+            try:
+                thrd = Thread(target=add_data_to_tenant_thread, kwargs={'tenant' : user_tenant})
+                thrd.start()
+            except:
+                pass
             
+            try:
+                service_thrd = Thread(target=create_employee, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+                service_thrd.start()
+            except:
+                pass
+            
+            try:
+                service_thrd = Thread(target=create_client, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+                service_thrd.start()
+            except:
+                pass
+            
+            try:
+                service_thrd = Thread(target=create_ServiceGroup, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+                service_thrd.start()
+            except:
+                pass
