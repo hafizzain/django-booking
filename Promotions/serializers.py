@@ -117,7 +117,7 @@ class FreeServiceSerializers(serializers.ModelSerializer):
             ser = PriceService.objects.filter(service = obj)
             return PriceServiceSerializers(ser, many = True).data
         except Exception as err:
-            pass
+            return str(err)
     
     def get_is_deleted(self, obj):
         if obj.is_deleted == True:
