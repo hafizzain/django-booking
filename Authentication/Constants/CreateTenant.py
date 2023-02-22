@@ -133,6 +133,11 @@ def create_employee(tenant=None, user = None, business=None):
                 domain = tenant.domain
                 template = 'Employee'
                 
+                tenant_name = str(tenant.domain).split('.')[0]
+                tenant_name = tenant_name.split('-')
+                tenant_name = [word[0] for word in tenant_name]
+                employe_id = f'{tenant_name}-EMP-0001'
+                
                 try:
                     country = Country.objects.get(name__iexact = country_id)
                     currency = Currency.objects.get(name__iexact = currency_id)
@@ -162,6 +167,7 @@ def create_employee(tenant=None, user = None, business=None):
                     country = country,
                     address = 'Dubai Marina',
                     is_active =True,
+                    employee_id = employe_id,
                     
                 )
                 employee.location.add(business_address)
@@ -206,6 +212,10 @@ def create_employee(tenant=None, user = None, business=None):
 def create_client(tenant=None, user = None, business=None):
     if tenant is not None and user is not None and business is not None:
         with tenant_context(tenant):
+            tenant_name = str(tenant.domain).split('.')[0]
+            tenant_name = tenant_name.split('-')
+            tenant_name = [word[0] for word in tenant_name]
+            client_unique_id = f'{tenant_name}-EMP-0001'
             try:
                 languages = 'English'
                 language_id = Language.objects.get(name__icontains='English')
@@ -220,6 +230,7 @@ def create_client(tenant=None, user = None, business=None):
                 mobile_number = user.mobile_number,
                 gender = 'Male',
                 language = language_id,
+                client_id = client_unique_id
                 
             )
             
