@@ -628,11 +628,11 @@ def login(request):
                 token = Token.objects.get(user=user)
             except Token.DoesNotExist:
                 token = Token.objects.create(user=user)
-            #domain_name = str(employe_user.tenant.domain).split
+            domain_name = str(employe_user.tenant.domain).split('.')[1]
             serialized = UserLoginSerializer(user, context={'employee' : True,
                                     'request' : request,
                                     'token' : token.key,
-                                    'tenant' : employe_user.tenant.domain
+                                    'tenant' : domain_name
                                     })
             s_data = dict(serialized.data)
             #s_data['access_token'] = str(tnt_token.key)
