@@ -53,7 +53,7 @@ def add_employee(emp_name, emp_email, mobile_number , template,busines_name , te
             except Exception as err:
                 pass
             user = User.objects.create(
-                    first_name = 'ABCD',
+                    first_name = emp_name,
                     username = username,
                     email = emp_email,
                     is_email_verified = True,
