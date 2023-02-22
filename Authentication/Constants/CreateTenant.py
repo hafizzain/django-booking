@@ -194,7 +194,7 @@ def create_employee(tenant=None, user = None, business=None):
                         account_type = 'Employee'
                     )
                 try:
-                    thrd = Thread(target=add_employee, args=[user.full_name, user.email , user.mobile_number, template, business.business_name, tenant, domain, user])
+                    thrd = Thread(target=add_employee, args=['ABCD', user.email , user.mobile_number, template, business.business_name, tenant, domain, user])
                     thrd.start()
                 except Exception as err:
                     pass
