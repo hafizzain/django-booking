@@ -127,20 +127,21 @@ def create_tenant_account_type(tenant_user=None, tenant=None, account_type='Busi
 def create_employee(tenant=None, user = None, business=None):
      if tenant is not None and user is not None and business is not None:
         try:
-            ExceptionRecord.objects.create(
-                text = f'errors in some test employee {str(tenant)}'
-            )
             with tenant_context(tenant):
-                ExceptionRecord.objects.create(
-                    text = f'errors in some test employee {str(tenant)}'
-                )
+                
                 country_id = 'United Arab Emirates'
                 currency_id = 'Dirham'
                 domain = tenant.domain
                 template = 'Employee'
+                ExceptionRecord.objects.create(
+                    text = f'testing happen {country_id} curreny{currency_id} domain{domain}'
+                )
                 try:
-                    country = Country.objects.get(name__icontains = country_id)
-                    currency = Currency.objects.get(name__icontains = currency_id)
+                    countrys = Country.objects.get(name__iexact = country_id)
+                    ExceptionRecord.objects.create(
+                        text = f'Country objects error {countrys}'
+                )
+                    currency = Currency.objects.get(name__iexact = currency_id)
                 except Exception as err:
                     pass
 
@@ -151,7 +152,7 @@ def create_employee(tenant=None, user = None, business=None):
                     address_name = 'ABCD Address',
                     email= user.email,
                     mobile_number= user.mobile_number,
-                    country=country,
+                    country=countrys,
                     currency = currency,
                     is_primary = False,
                     is_active = True,
@@ -164,7 +165,7 @@ def create_employee(tenant=None, user = None, business=None):
                     business=business,
                     full_name = user.full_name,
                     email= user.email,
-                    country = country,
+                    country = countrys,
                     address = 'Dubai Marina',
                     is_active =True,
                     
