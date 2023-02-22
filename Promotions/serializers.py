@@ -114,7 +114,7 @@ class FreeServiceSerializers(serializers.ModelSerializer):
     
     def get_priceservice(self, obj):
         try:
-            ser = PriceService.objects.filter(service = obj)
+            ser = PriceService.objects.filter(service = obj.service)
             return PriceServiceSerializers(ser, many = True).data
         except Exception as err:
             return str(err)
