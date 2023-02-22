@@ -19,8 +19,8 @@ def add_employee(emp_name, emp_email, mobile_number , template,busines_name , te
     except:
         pass
     with tenant_context(Tenant.objects.get(schema_name = 'public')):
-        url = f'http://{domain}.localhost:3000/set-password?user_id={user.id}&hash={tenant_id}'
-        #url = f'http://{domain}.midtechdxb.com/set-password?user_id={user.id}&hash={tenant_id}'
+        #url = f'http://{domain}.localhost:3000/set-password?user_id={user.id}&hash={tenant_id}'
+        url = f'http://{domain}.midtechdxb.com/set-password?user_id={user.id}&hash={tenant_id}'
         
         try:
             html_file = render_to_string("EmployeeEmail/employee_create.html", {'name': emp_name,'t_name': template , 'bes_name':busines_name, 'url': url })

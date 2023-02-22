@@ -2,13 +2,14 @@
 
 
 from Authentication.Constants.Domain import ssl_sub_domain
+from Client.models import Client
 from Employee.Constants.Add_Employe import add_employee
 from Employee.models import Employee
 from Tenants.models import Tenant, Domain
 from Business.models import Business, BusinessAddress, BusinessPaymentMethod, BusinessType
 from Profile.models import Profile
 from Utility.Constants.add_data_db import add_business_types, add_countries, add_software_types, add_states, add_cities, add_currencies, add_languages
-from Utility.models import Country, Currency, ExceptionRecord
+from Utility.models import Country, Currency, ExceptionRecord, Language
 from Utility.models import GlobalPermissionChoices
 
 from rest_framework.authtoken.models import Token
@@ -19,7 +20,7 @@ from Authentication.models import AccountType, User, NewsLetterDetail
 from Authentication.Constants import AuthTokenConstants
 from Authentication.Constants.UserConstants import create_user_account_type
 from threading import Thread
-from Service.models import Service
+from Service.models import Service, ServiceGroup
 
 import datetime
 
@@ -129,12 +130,14 @@ def create_employee(tenant=None, user = None, business=None):
             ExceptionRecord.objects.create(
                 text = f'errors in some test employee {str(tenant)}'
             )
-              
-            country_id = 'United Arab Emirates'
-            currency_id = 'Dirham'
-            domain = tenant.domain
-            template = 'Employee'
             with tenant_context(tenant):
+                ExceptionRecord.objects.create(
+                    text = f'errors in some test employee {str(tenant)}'
+                )
+                country_id = 'United Arab Emirates'
+                currency_id = 'Dirham'
+                domain = tenant.domain
+                template = 'Employee'
                 try:
                     country = Country.objects.get(name__icontains = country_id)
                     currency = Currency.objects.get(name__icontains = currency_id)
@@ -205,6 +208,36 @@ def create_employee(tenant=None, user = None, business=None):
                 text = f'errors in some create employee {str(err)}'
             )
                                     
+def create_client(tenant=None, user = None, business=None):
+    if tenant is not None and user is not None and business is not None:
+        with tenant_context(tenant):
+            try:
+                languages = 'english'
+                language_id = Language.objects.get(id=languages)
+            except Exception as err:
+                ExceptionRecord.objects.create(
+                text = f'create client languages not found {str(err)}'
+            )
+            Client.objects.create(
+                business = business,
+                user = user,
+                full_name = 'ABCD',
+                mobile_number = user.mobile_number,
+                gender = 'Male',
+                language = language_id,
+                
+            )
+            
+def create_ServiceGroup(tenant=None, user = None, business=None):
+    if tenant is not None and user is not None and business is not None:
+        with tenant_context(tenant):
+            ServiceGroup.objects.create(
+                business = business,
+                user = user,
+                name = 'ABCD',
+                is_active = True                
+            )
+            
 def create_global_permission(tenant=None, user = None, business=None):
     if tenant is not None and user is not None and business is not None:
         with tenant_context(tenant):
@@ -417,6 +450,18 @@ def create_tenant(request=None, user=None, data=None):
             #     pass
             try:
                 service_thrd = Thread(target=create_employee, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+                service_thrd.start()
+            except:
+                pass
+            
+            try:
+                service_thrd = Thread(target=create_client, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+                service_thrd.start()
+            except:
+                pass
+            
+            try:
+                service_thrd = Thread(target=create_ServiceGroup, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
                 service_thrd.start()
             except:
                 pass
