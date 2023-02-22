@@ -48,7 +48,9 @@ class Appointment(models.Model):
     client_type= models.CharField(choices=TYPE_CHOICES, max_length=50, null=True, blank=True, )
     discount_type = models.CharField(max_length=50, choices= DISCOUNT_CHOICES, null=True, blank=True)
     payment_method = models.CharField(max_length=100, choices= PAYMENT_CHOICES, default='', null=True, blank=True)  
-
+    
+    extra_price  = models.PositiveIntegerField(default=0, null=True, blank=True)
+    
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
