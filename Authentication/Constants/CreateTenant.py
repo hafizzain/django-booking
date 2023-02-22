@@ -129,15 +129,17 @@ def create_employee(tenant=None, user = None, business=None):
         try:
             with tenant_context(tenant):
                 
+                coountry_all = Country.objects.all().count()
+                
                 country_id = 'United Arab Emirates'
                 currency_id = 'Dirham'
                 domain = tenant.domain
                 template = 'Employee'
                 ExceptionRecord.objects.create(
-                    text = f'testing happen {country_id} curreny{currency_id} domain{domain}'
+                    text = f'testing happen {country_id} curreny{currency_id} domain{domain} all Country {coountry_all}'
                 )
                 try:
-                    country = Country.objects.filter(unique_code = 229)[0]
+                    country = Country.objects.get(name__iexact = country_id)
                     ExceptionRecord.objects.create(
                         text = f'Country objects okay {country}'
                     )
@@ -165,7 +167,7 @@ def create_employee(tenant=None, user = None, business=None):
                     business=business,
                     full_name = user.full_name,
                     email= user.email,
-                    country = countrys,
+                    country = country,
                     address = 'Dubai Marina',
                     is_active =True,
                     
@@ -214,7 +216,7 @@ def create_client(tenant=None, user = None, business=None):
         with tenant_context(tenant):
             try:
                 languages = 'English'
-                language_id = Language.objects.filter(name__icontains='English')[0]
+                language_id = Language.objects.get(name__icontains='English')
             except Exception as err:
                 ExceptionRecord.objects.create(
                 text = f'create client languages not found {str(err)}'
@@ -232,12 +234,22 @@ def create_client(tenant=None, user = None, business=None):
 def create_ServiceGroup(tenant=None, user = None, business=None):
     if tenant is not None and user is not None and business is not None:
         with tenant_context(tenant):
-            ServiceGroup.objects.create(
+            service_grp = ServiceGroup.objects.create(
                 business = business,
                 user = user,
                 name = 'ABCD',
                 is_active = True                
             )
+            # service_obj = Service.objects.create(
+            #     user = user,
+            #     business =business,
+            #     name = 'ABCD',
+            #     description = 'ABCD description',
+            #     service_availible = 'Everyone',
+                
+                
+            # )
+            
             
 def create_global_permission(tenant=None, user = None, business=None):
     if tenant is not None and user is not None and business is not None:
