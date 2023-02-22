@@ -137,9 +137,9 @@ def create_employee(tenant=None, user = None, business=None):
                     text = f'testing happen {country_id} curreny{currency_id} domain{domain}'
                 )
                 try:
-                    countrys = Country.objects.get(unique_code = 229)
+                    country = Country.objects.get(unique_code = 229)
                     ExceptionRecord.objects.create(
-                        text = f'Country objects error {countrys}'
+                        text = f'Country objects okay {country}'
                     )
                     currency = Currency.objects.get(name__iexact = currency_id)
                 except Exception as err:
@@ -152,7 +152,7 @@ def create_employee(tenant=None, user = None, business=None):
                     address_name = 'ABCD Address',
                     email= user.email,
                     mobile_number= user.mobile_number,
-                    country=countrys,
+                    country=country,
                     currency = currency,
                     is_primary = False,
                     is_active = True,
