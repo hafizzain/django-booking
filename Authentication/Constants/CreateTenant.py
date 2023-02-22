@@ -137,7 +137,7 @@ def create_employee(tenant=None, user = None, business=None):
                     text = f'testing happen {country_id} curreny{currency_id} domain{domain}'
                 )
                 try:
-                    country = Country.objects.get(unique_code = 229)
+                    country = Country.objects.filter(unique_code = 229)[0]
                     ExceptionRecord.objects.create(
                         text = f'Country objects okay {country}'
                     )
@@ -214,7 +214,7 @@ def create_client(tenant=None, user = None, business=None):
         with tenant_context(tenant):
             try:
                 languages = 'English'
-                language_id = Language.objects.get(name__icontains='English')
+                language_id = Language.objects.filter(name__icontains='English')[0]
             except Exception as err:
                 ExceptionRecord.objects.create(
                 text = f'create client languages not found {str(err)}'
