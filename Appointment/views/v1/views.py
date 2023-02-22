@@ -291,6 +291,7 @@ def create_appointment(request):
     text = request.data.get('appointment_notes', None)
     business_address_id = request.data.get('business_address', None)
     member = request.data.get('member', None)
+    extra_price = request.data.get('extra_price', None)
     #business_id, member, appointment_date, appointment_time, duration
 
     client = request.data.get('client', None)
@@ -362,6 +363,7 @@ def create_appointment(request):
             client_type=client_type,
             payment_method=payment_method,
             discount_type=discount_type,
+            extra_price = extra_price,
         )
     if business_address_id is not None:
         appointment.business_address = business_address
