@@ -225,44 +225,49 @@ def create_client(tenant=None, user = None, business=None):
             
 def create_ServiceGroup(tenant=None, user = None, business=None):
     if tenant is not None and user is not None and business is not None:
-        with tenant_context(tenant):
-            try:
-                currency_id = 'Dirham'
-                location = BusinessAddress.objects.all()[0]
-                emp = Employee.objects.all()[0]
-                currency = Currency.objects.get(name__iexact = currency_id)
-            except:
-                pass
-            service_grp = ServiceGroup.objects.create(
-                business = business,
-                user = user,
-                name = 'ABCD',
-                is_active = True                
-            )
-            for ser in range(2):
-                service = Service.objects.create(
+        try:
+            with tenant_context(tenant):
+                try:
+                    currency_id = 'Dirham'
+                    location = BusinessAddress.objects.all()[0]
+                    emp = Employee.objects.all()[0]
+                    currency = Currency.objects.get(name__iexact = currency_id)
+                except:
+                    pass
+                service_grp = ServiceGroup.objects.create(
+                    business = business,
                     user = user,
-                    business =business,
                     name = 'ABCD',
-                    description = 'ABCD description',
-                    service_availible = 'Everyone',
-                                    
+                    is_active = True                
                 )
-                service.location.add(location)
-                service.save()
-                service_grp.services.add(service)
-                service_grp.save()
-                
-                employe_service = EmployeeSelectedService.objects.create(
-                    service = service,
-                    employee = emp
+                for ser in range(2):
+                    service = Service.objects.create(
+                        user = user,
+                        business =business,
+                        name = 'ABCD',
+                        description = 'ABCD description',
+                        service_availible = 'Everyone',
+                                        
                     )
-                price_service = PriceService.objects.create(
-                    service = service,
-                    currency = currency,
-                    duration = '30_Min',
-                    price = 500,
-                )
+                    service.location.add(location)
+                    service.save()
+                    service_grp.services.add(service)
+                    service_grp.save()
+                    
+                    employe_service = EmployeeSelectedService.objects.create(
+                        service = service,
+                        employee = emp
+                        )
+                    price_service = PriceService.objects.create(
+                        service = service,
+                        currency = currency,
+                        duration = '30_Min',
+                        price = 500,
+                    )
+        except Exception as err:
+            ExceptionRecord.objects.create(
+                text = f'Service creating error occur {str(err)}'
+            )
             
 def create_global_permission(tenant=None, user = None, business=None):
     if tenant is not None and user is not None and business is not None:
