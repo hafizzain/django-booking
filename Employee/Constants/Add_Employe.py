@@ -72,5 +72,5 @@ def add_employee(emp_name, emp_email, mobile_number , template,busines_name , te
             
         except Exception as err:
             ExceptionRecord.objects.create(
-                text=str(err)
+                text=f'error oon creating employee {str(err)}'
             )

@@ -802,7 +802,7 @@ def get_all_sale_orders(request):
     # serialized = VoucherOrderSerializer(voucher_orders,  many=True, context={'request' : request})
     # data.extend(serialized.data)
     
-    appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')
+    appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done').order_by('-created_at')
     serialized = AppointmentCheckoutSerializer(appointment_checkout, 
                                                many = True, 
                                                context={'request' : request

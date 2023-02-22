@@ -509,7 +509,7 @@ def login(request):
         )
         employee = True
     except Exception as err: 
-        pass
+        user = None
         
     if user == None:
         try:

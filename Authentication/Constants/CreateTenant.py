@@ -4,7 +4,7 @@
 from Authentication.Constants.Domain import ssl_sub_domain
 from Client.models import Client
 from Employee.Constants.Add_Employe import add_employee
-from Employee.models import Employee
+from Employee.models import Employee, EmployeeSelectedService
 from Tenants.models import Tenant, Domain
 from Business.models import Business, BusinessAddress, BusinessPaymentMethod, BusinessType
 from Profile.models import Profile
@@ -20,7 +20,7 @@ from Authentication.models import AccountType, User, NewsLetterDetail
 from Authentication.Constants import AuthTokenConstants
 from Authentication.Constants.UserConstants import create_user_account_type
 from threading import Thread
-from Service.models import Service, ServiceGroup
+from Service.models import PriceService, Service, ServiceGroup
 
 import datetime
 
@@ -121,28 +121,20 @@ def create_tenant_account_type(tenant_user=None, tenant=None, account_type='Busi
     with tenant_context(tenant):
         return AccountType.objects.create(
             user=tenant_user,
-            account_type= account_type#account_type.capitalize()
+            account_type= 'Business'#account_type
         )
 
 def create_employee(tenant=None, user = None, business=None):
      if tenant is not None and user is not None and business is not None:
         try:
-            with tenant_context(tenant):
-                
-                coountry_all = Country.objects.all().count()
-                
+            with tenant_context(tenant):                
                 country_id = 'United Arab Emirates'
                 currency_id = 'Dirham'
                 domain = tenant.domain
                 template = 'Employee'
-                ExceptionRecord.objects.create(
-                    text = f'testing happen {country_id} curreny{currency_id} domain{domain} all Country {coountry_all}'
-                )
+                
                 try:
                     country = Country.objects.get(name__iexact = country_id)
-                    ExceptionRecord.objects.create(
-                        text = f'Country objects okay {country}'
-                    )
                     currency = Currency.objects.get(name__iexact = currency_id)
                 except Exception as err:
                     pass
@@ -234,22 +226,43 @@ def create_client(tenant=None, user = None, business=None):
 def create_ServiceGroup(tenant=None, user = None, business=None):
     if tenant is not None and user is not None and business is not None:
         with tenant_context(tenant):
+            try:
+                currency_id = 'Dirham'
+                location = BusinessAddress.objects.all()[0]
+                emp = Employee.objects.all()[0]
+                currency = Currency.objects.get(name__iexact = currency_id)
+            except:
+                pass
             service_grp = ServiceGroup.objects.create(
                 business = business,
                 user = user,
                 name = 'ABCD',
                 is_active = True                
             )
-            # service_obj = Service.objects.create(
-            #     user = user,
-            #     business =business,
-            #     name = 'ABCD',
-            #     description = 'ABCD description',
-            #     service_availible = 'Everyone',
+            for ser in range(2):
+                service = Service.objects.create(
+                    user = user,
+                    business =business,
+                    name = 'ABCD',
+                    description = 'ABCD description',
+                    service_availible = 'Everyone',
+                                    
+                )
+                service.location.add(location)
+                service.save()
+                service_grp.services.add(service)
+                service_grp.save()
                 
-                
-            # )
-            
+                employe_service = EmployeeSelectedService.objects.create(
+                    service = service,
+                    employee = emp
+                    )
+                price_service = PriceService.objects.create(
+                    service = service,
+                    currency = currency,
+                    duration = '30_Min',
+                    price = 500,
+                )
             
 def create_global_permission(tenant=None, user = None, business=None):
     if tenant is not None and user is not None and business is not None:
