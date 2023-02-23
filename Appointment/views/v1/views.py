@@ -552,9 +552,11 @@ def create_appointment(request):
                                         
     except Exception as err:
         Errors.append(str(err))
-        
-    #appointment.extra_price = total_price_app,
-    appointment.service_commission = service_commission,    
+    integer_value_price = round(total_price_app[0])
+    integer_value_ser = round(service_commission[0])
+    
+    appointment.extra_price = integer_value_price,
+    appointment.service_commission = integer_value_ser,    
     appointment.service_commission_type = service_commission_type, 
     appointment.save() 
     
