@@ -430,29 +430,29 @@ def create_appointment(request):
         datetime_duration = datetime_duration.strftime('%H:%M:%S')
         end_time = datetime_duration
         
-        service_commission = 0
-        service_commission_type = ''
-        toValue = 0
+        # service_commission = 0
+        # service_commission_type = ''
+        # toValue = 0
         
-        try:
-            commission = CommissionSchemeSetting.objects.get(employee = str(member))
-            category = CategoryCommission.objects.filter(commission = commission.id)
-            for cat in category:
-                try:
-                    toValue = int(cat.to_value)
-                except :
-                    sign  = cat.to_value
-                if cat.category_comission == 'Service':
-                    if (int(cat.from_value) <= price and  price <  toValue) or (int(cat.from_value) <= price and sign ):
-                        if cat.symbol == '%':
-                            service_commission = price * int(cat.commission_percentage) / 100
-                            service_commission_type = str(service_commission_type) + cat.symbol
-                        else:
-                            service_commission = int(cat.commission_percentage)
-                            service_commission_type = str(service_commission) + cat.symbol
+        # try:
+        #     commission = CommissionSchemeSetting.objects.get(employee = str(member))
+        #     category = CategoryCommission.objects.filter(commission = commission.id)
+        #     for cat in category:
+        #         try:
+        #             toValue = int(cat.to_value)
+        #         except :
+        #             sign  = cat.to_value
+        #         if cat.category_comission == 'Service':
+        #             if (int(cat.from_value) <= price and  price <  toValue) or (int(cat.from_value) <= price and sign ):
+        #                 if cat.symbol == '%':
+        #                     service_commission = price * int(cat.commission_percentage) / 100
+        #                     service_commission_type = str(service_commission_type) + cat.symbol
+        #                 else:
+        #                     service_commission = int(cat.commission_percentage)
+        #                     service_commission_type = str(service_commission) + cat.symbol
                                             
-        except Exception as err:
-            Errors.append(str(err))
+        # except Exception as err:
+        #     Errors.append(str(err))
         
         try:
             voucher = Vouchers.objects.get(id = voucher_id )
@@ -513,8 +513,8 @@ def create_appointment(request):
             service = service,
             member = member,
             price = price,
-            service_commission = service_commission,
-            service_commission_type= service_commission_type,
+            # service_commission = service_commission,
+            # service_commission_type= service_commission_type,
             
             slot_availible_for_online = slot_availible_for_online,
             client_can_book = client_can_book,
