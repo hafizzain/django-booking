@@ -277,7 +277,7 @@ def get_business(request):
 @permission_classes([AllowAny])
 def get_business_by_domain(request):
     domain_name = request.GET.get('domain', None)
-
+    id = ''
     if domain_name is None:
         return Response(
             {
@@ -302,12 +302,24 @@ def get_business_by_domain(request):
            tenant_id = Tenant.objects.get(domain__icontains = domain_name )
            id = tenant_id.id
         except Exception as err:
-            pass
+            return Response(
+            {
+                'status' : False,
+                'status_code_text' : 'Tenants Not Found',
+                'response' : {
+                    'message' : 'Tenants Not Found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+            
         with tenant_context(Tenant.objects.get(schema_name = 'public')):
             domain = Domain.objects.get(domain__icontains =domain_name)
 
         if domain is not None:
             with tenant_context(domain.tenant):
+                id = domain.tenant.id
                 user_business = Business.objects.filter(
                     is_deleted=False,
                     is_active=True,
@@ -345,7 +357,7 @@ def get_business_by_domain(request):
                     'business' : {
                         'id' : str(user_business.id),
                         'business_name' : str(user_business.business_name),
-                        # 'tenant_id' : str(id),
+                        'tenant_id' : str(id),
                         # 'logo' : user_business.logo if user_business.logo else None ,
                     }
                 }
