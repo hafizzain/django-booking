@@ -561,9 +561,9 @@ def create_appointment(request):
             text = f'price{total_price_app} {type(total_price_app)}ser-con {service_commission} error {str(err)}'
         )
     
-    appointment.extra_price = total_price_app,
-    appointment.service_commission = int(service_commission),    
-    appointment.service_commission_type = service_commission_type, 
+    appointment.extra_price = total_price_app
+    appointment.service_commission = int(service_commission)
+    appointment.service_commission_type = service_commission_type
     appointment.save() 
     
     serialized = AppoinmentSerializer(appointment)
