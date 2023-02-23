@@ -747,10 +747,14 @@ def create_employee(request):
         except:
             pass
     
-    employee_p_info = EmployeeProfessionalInfo.objects.create(employee=employee,
-           # start_time = start_time , end_time = end_time, 
+    employee_p_info = EmployeeProfessionalInfo.objects.create(
+            employee=employee,
+            # start_time = start_time , end_time = end_time, 
             maximum_discount = maximum_discount,
-            salary=salary, designation = designation )
+            salary=salary, 
+            designation = designation,
+            income_type = income_type,
+        )
     
     employee_p_info.monday = True if 'monday' in request.data else False
     employee_p_info.tuesday = True if 'tuesday' in request.data else False

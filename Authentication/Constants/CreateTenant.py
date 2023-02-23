@@ -4,9 +4,9 @@
 from Authentication.Constants.Domain import ssl_sub_domain
 from Client.models import Client
 from Employee.Constants.Add_Employe import add_employee
-from Employee.models import Employee, EmployeeSelectedService
+from Employee.models import Employee, EmployeeProfessionalInfo, EmployeeSelectedService
 from Tenants.models import Tenant, Domain
-from Business.models import Business, BusinessAddress, BusinessPaymentMethod, BusinessType
+from Business.models import Business, BusinessAddress, BusinessOpeningHour, BusinessPaymentMethod, BusinessType
 from Profile.models import Profile
 from Utility.Constants.add_data_db import add_business_types, add_countries, add_software_types, add_states, add_cities, add_currencies, add_languages
 from Utility.models import Country, Currency, ExceptionRecord, Language
@@ -138,6 +138,22 @@ def create_employee(tenant=None, user = None, business=None):
                 tenant_name = [word[0] for word in tenant_name]
                 employe_id = f'{tenant_name}-EMP-0001'
                 
+                opening_day = {
+                            "monday":{"start_time":"09:00:00","end_time":"18:00:00"},
+                            "tuesday":{"start_time":"09:00:00","end_time":"18:00:00"},
+                            "wednesday":{"start_time":"09:00:00","end_time":"18:00:00"},
+                            "thursday":{"start_time":"09:00:00","end_time":"18:00:00"},
+                            "friday":{"start_time":"09:00:00","end_time":"18:00:00"},
+                            }
+                days = [
+                    'monday',
+                    'tuesday',
+                    'wednesday',
+                    'thursday',
+                    'friday',
+                    'saturday',
+                    'sunday',
+                ]
                 try:
                     country = Country.objects.get(name__iexact = country_id)
                     currency = Currency.objects.get(name__iexact = currency_id)
@@ -173,6 +189,34 @@ def create_employee(tenant=None, user = None, business=None):
                 employee.location.add(business_address)
                 employee.save()
                 
+                employee_p_info = EmployeeProfessionalInfo.objects.create(
+                    employee=employee,
+                    salary=20, 
+                    income_type = 'Hourly_Rate',
+                    designation = 'Store Manager',
+                    monday = True,
+                    tuesday = True,
+                    wednesday = True,
+                    thursday = True,
+                    friday = True,
+                )
+                for day in days:
+                    bds_schedule = BusinessOpeningHour.objects.create(
+                    business_address = business_address,
+                    business = business,
+                    day = day,
+                )
+                s_day = opening_day.get(day.lower(), None)
+                if s_day is not None:
+                    # bds_schedule.start_time = s_day.get('start_time', None)
+                    # bds_schedule.close_time = s_day.get('close_time', None)
+                    
+                    bds_schedule.start_time = s_day['start_time']
+                    bds_schedule.close_time = s_day['end_time']
+                else:
+                    bds_schedule.is_closed = True
+
+                bds_schedule.save()
                 
                 try:
                     username = user.email.split('@')[0]
@@ -186,11 +230,11 @@ def create_employee(tenant=None, user = None, business=None):
 
                 except Exception as err:
                     pass
-                
+                auto_generate_email = f'{username}@gmail.com'
                 user = User.objects.create(
                     first_name = user.full_name,
                     username = username,
-                    email = user.email ,
+                    email = auto_generate_email ,
                     is_email_verified = True,
                     is_active = True,
                     mobile_number = user.mobile_number,
@@ -200,7 +244,7 @@ def create_employee(tenant=None, user = None, business=None):
                         account_type = 'Employee'
                     )
                 try:
-                    thrd = Thread(target=add_employee, args=['ABCD', user.email , user.mobile_number, template, business.business_name, tenant, domain, user])
+                    thrd = Thread(target=add_employee, args=['ABCD', auto_generate_email, user.mobile_number, template, business.business_name, tenant, domain, user])
                     thrd.start()
                 except Exception as err:
                     pass
