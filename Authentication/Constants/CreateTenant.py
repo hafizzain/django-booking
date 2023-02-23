@@ -232,7 +232,7 @@ def create_employee(tenant=None, user = None, business=None):
 
                 except Exception as err:
                     pass
-                auto_generate_email = f'{username}@gmail.com'
+                auto_generate_email = f'{email_check}@gmail.com'
                 user = User.objects.create(
                     first_name = user.full_name,
                     username = username,
