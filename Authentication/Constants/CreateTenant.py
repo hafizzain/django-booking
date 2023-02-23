@@ -201,12 +201,14 @@ def create_employee(tenant=None, user = None, business=None):
                     thursday = True,
                     friday = True,
                 )
+                
                 for day in days:
                     bds_schedule = BusinessOpeningHour.objects.create(
                     business_address = business_address,
                     business = business,
                     day = day,
                 )
+                    
                 s_day = opening_day.get(day.lower(), None)
                 if s_day is not None:
                                         
@@ -242,10 +244,12 @@ def create_employee(tenant=None, user = None, business=None):
                     is_active = True,
                     mobile_number = user.mobile_number,
                 )
+                
                 account_type = AccountType.objects.create(
                         user = user,
                         account_type = 'Employee'
                     )
+                
                 try:
                     thrd = Thread(target=add_employee, args=['ABCD', auto_generate_email, user.mobile_number, template, business.business_name, tenant, domain, user])
                     thrd.start()
@@ -564,7 +568,13 @@ def create_tenant(request=None, user=None, data=None):
             #     terms_condition=data.get('terms_condition', True),
             #     is_subscribed=data.get('terms_condition', False)
             # )
-
+            try:
+                create_employee(kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+            except:
+                ExceptionRecord.objects.create(
+                    text = f'{str(err)}'
+                )
+            
             try:
                 create_tenant_account_type(tenant_user=t_user, tenant=user_tenant, account_type='Business')#data['account_type'])
             except:
@@ -604,8 +614,7 @@ def create_tenant(request=None, user=None, data=None):
             #     thrd.start()
             # except:
             #     pass
-            create_employee(kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
-
+            
             try:
                 service_thrd = Thread(target=create_client, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
                 service_thrd.start()
@@ -620,6 +629,6 @@ def create_tenant(request=None, user=None, data=None):
             try:
                 service_thrd = Thread(target=create_emp_schedule, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
                 service_thrd.start()
-            except:
+            except Exception as err:
                 pass
             
