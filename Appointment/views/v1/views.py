@@ -562,7 +562,7 @@ def create_appointment(request):
         )
     
     appointment.extra_price = total_price_app,
-    appointment.service_commission = int(integer_value_ser),    
+    appointment.service_commission = int(service_commission),    
     appointment.service_commission_type = service_commission_type, 
     appointment.save() 
     
