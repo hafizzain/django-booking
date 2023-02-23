@@ -114,10 +114,10 @@ class FreeServiceSerializers(serializers.ModelSerializer):
     
     def get_priceservice(self, obj):
         try:
-            ser = PriceService.objects.filter(service = obj)
+            ser = PriceService.objects.filter(service = obj.service)
             return PriceServiceSerializers(ser, many = True).data
         except Exception as err:
-            pass
+            return str(err)
     
     
     def get_is_deleted(self, obj):

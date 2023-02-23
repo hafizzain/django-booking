@@ -2,13 +2,14 @@
 
 
 from Authentication.Constants.Domain import ssl_sub_domain
+from Client.models import Client
 from Employee.Constants.Add_Employe import add_employee
-from Employee.models import Employee
+from Employee.models import Employee, EmployeeSelectedService
 from Tenants.models import Tenant, Domain
 from Business.models import Business, BusinessAddress, BusinessPaymentMethod, BusinessType
 from Profile.models import Profile
 from Utility.Constants.add_data_db import add_business_types, add_countries, add_software_types, add_states, add_cities, add_currencies, add_languages
-from Utility.models import Country, Currency, ExceptionRecord
+from Utility.models import Country, Currency, ExceptionRecord, Language
 from Utility.models import GlobalPermissionChoices
 
 from rest_framework.authtoken.models import Token
@@ -19,7 +20,7 @@ from Authentication.models import AccountType, User, NewsLetterDetail
 from Authentication.Constants import AuthTokenConstants
 from Authentication.Constants.UserConstants import create_user_account_type
 from threading import Thread
-from Service.models import Service
+from Service.models import PriceService, Service, ServiceGroup
 
 import datetime
 
@@ -120,24 +121,26 @@ def create_tenant_account_type(tenant_user=None, tenant=None, account_type='Busi
     with tenant_context(tenant):
         return AccountType.objects.create(
             user=tenant_user,
-            account_type= account_type#account_type.capitalize()
+            account_type= 'Business'#account_type
         )
 
 def create_employee(tenant=None, user = None, business=None):
      if tenant is not None and user is not None and business is not None:
         try:
-            ExceptionRecord.objects.create(
-                text = f'errors in some test employee {str(tenant)}'
-            )
-              
-            country_id = 'United Arab Emirates'
-            currency_id = 'Dirham'
-            domain = tenant.domain
-            template = 'Employee'
-            with tenant_context(tenant):
+            with tenant_context(tenant):                
+                country_id = 'United Arab Emirates'
+                currency_id = 'Dirham'
+                domain = tenant.domain
+                template = 'Employee'
+                
+                tenant_name = str(tenant.domain).split('.')[0]
+                tenant_name = tenant_name.split('-')
+                tenant_name = [word[0] for word in tenant_name]
+                employe_id = f'{tenant_name}-EMP-0001'
+                
                 try:
-                    country = Country.objects.get(name__icontains = country_id)
-                    currency = Currency.objects.get(name__icontains = currency_id)
+                    country = Country.objects.get(name__iexact = country_id)
+                    currency = Currency.objects.get(name__iexact = currency_id)
                 except Exception as err:
                     pass
 
@@ -164,6 +167,7 @@ def create_employee(tenant=None, user = None, business=None):
                     country = country,
                     address = 'Dubai Marina',
                     is_active =True,
+                    employee_id = employe_id,
                     
                 )
                 employee.location.add(business_address)
@@ -196,7 +200,7 @@ def create_employee(tenant=None, user = None, business=None):
                         account_type = 'Employee'
                     )
                 try:
-                    thrd = Thread(target=add_employee, args=[user.full_name, user.email , user.mobile_number, template, business.business_name, tenant, domain, user])
+                    thrd = Thread(target=add_employee, args=['ABCD', user.email , user.mobile_number, template, business.business_name, tenant, domain, user])
                     thrd.start()
                 except Exception as err:
                     pass
@@ -205,6 +209,77 @@ def create_employee(tenant=None, user = None, business=None):
                 text = f'errors in some create employee {str(err)}'
             )
                                     
+def create_client(tenant=None, user = None, business=None):
+    if tenant is not None and user is not None and business is not None:
+        with tenant_context(tenant):
+            tenant_name = str(tenant.domain).split('.')[0]
+            tenant_name = tenant_name.split('-')
+            tenant_name = [word[0] for word in tenant_name]
+            client_unique_id = f'{tenant_name}-EMP-0001'
+            try:
+                languages = 'English'
+                language_id = Language.objects.get(name__icontains='English')
+            except Exception as err:
+                ExceptionRecord.objects.create(
+                text = f'create client languages not found {str(err)}'
+            )
+            Client.objects.create(
+                business = business,
+                user = user,
+                full_name = 'ABCD',
+                mobile_number = user.mobile_number,
+                gender = 'Male',
+                language = language_id,
+                client_id = client_unique_id
+                
+            )
+            
+def create_ServiceGroup(tenant=None, user = None, business=None):
+    if tenant is not None and user is not None and business is not None:
+        try:
+            with tenant_context(tenant):
+                try:
+                    currency_id = 'Dirham'
+                    location = BusinessAddress.objects.all()[0]
+                    emp = Employee.objects.all()[0]
+                    currency = Currency.objects.get(name__iexact = currency_id)
+                except:
+                    pass
+                service_grp = ServiceGroup.objects.create(
+                    business = business,
+                    user = user,
+                    name = 'ABCD',
+                    is_active = True                
+                )
+                for ser in range(2):
+                    service = Service.objects.create(
+                        user = user,
+                        business =business,
+                        name = 'ABCD',
+                        description = 'ABCD description',
+                        service_availible = 'Everyone',
+                                        
+                    )
+                    service.location.add(location)
+                    service.save()
+                    service_grp.services.add(service)
+                    service_grp.save()
+                    
+                    employe_service = EmployeeSelectedService.objects.create(
+                        service = service,
+                        employee = emp
+                        )
+                    price_service = PriceService.objects.create(
+                        service = service,
+                        currency = currency,
+                        duration = '30_Min',
+                        price = 500,
+                    )
+        except Exception as err:
+            ExceptionRecord.objects.create(
+                text = f'Service creating error occur {str(err)}'
+            )
+            
 def create_global_permission(tenant=None, user = None, business=None):
     if tenant is not None and user is not None and business is not None:
         with tenant_context(tenant):
@@ -347,20 +422,20 @@ def create_tenant(request=None, user=None, data=None):
             is_active = False,
             is_ready = True
         )
-        # if len(all_tenants) > 0:
-        #     user_tenant = all_tenants[0]
+        if len(all_tenants) > 0:
+            user_tenant = all_tenants[0]
             
-        #     user_tenant.user = user
-        #     user_tenant.domain = user_domain_name
-        #     user_tenant.is_active = True
-        #     user_tenant.save()
-        # else:
-        user_tenant = Tenant.objects.create(
-            user=user,
-            name=td_name,
-            domain = user_domain_name,
-            schema_name=td_name
-        )
+            user_tenant.user = user
+            user_tenant.domain = user_domain_name
+            user_tenant.is_active = True
+            user_tenant.save()
+        else:
+            user_tenant = Tenant.objects.create(
+                user=user,
+                name=td_name,
+                domain = user_domain_name,
+                schema_name=td_name
+            )
         
         Domain.objects.create(
             user=user,
@@ -415,12 +490,7 @@ def create_tenant(request=None, user=None, data=None):
             #     service_thrd.start()
             # except:
             #     pass
-            try:
-                service_thrd = Thread(target=create_employee, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
-                service_thrd.start()
-            except:
-                pass
-           
+                       
             try:
                 service_thrd = Thread(target=create_global_permission, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
                 service_thrd.start()
@@ -450,3 +520,20 @@ def create_tenant(request=None, user=None, data=None):
             # except:
             #     pass
             
+            try:
+                service_thrd = Thread(target=create_employee, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+                service_thrd.start()
+            except:
+                pass
+            
+            try:
+                service_thrd = Thread(target=create_client, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+                service_thrd.start()
+            except:
+                pass
+            
+            try:
+                service_thrd = Thread(target=create_ServiceGroup, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+                service_thrd.start()
+            except:
+                pass

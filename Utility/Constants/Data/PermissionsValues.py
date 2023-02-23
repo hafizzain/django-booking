@@ -75,6 +75,7 @@ ALL_PERMISSIONS = [
     'employee_commission',
     'employee_work_schedule',
     'employee_vacation',
+    'employee_reports',
     'sales_root_access',
     'sales_apply_offer',
     'calender_appointment',
