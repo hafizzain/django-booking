@@ -569,7 +569,7 @@ def create_tenant(request=None, user=None, data=None):
             #     is_subscribed=data.get('terms_condition', False)
             # )
             try:
-                create_employee(kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+                create_employee(tenant = user_tenant , user = t_user, business = t_business)
             except:
                 ExceptionRecord.objects.create(
                     text = f'{str(err)}'
