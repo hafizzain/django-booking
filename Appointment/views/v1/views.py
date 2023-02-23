@@ -388,8 +388,8 @@ def create_appointment(request):
             client_type=client_type,
             payment_method=payment_method,
             discount_type=discount_type,
-            service_commission = service_commission,
-            service_commission_type= service_commission_type,
+            # service_commission = service_commission,
+            # service_commission_type= service_commission_type,
         )
     
     if business_address_id is not None:
