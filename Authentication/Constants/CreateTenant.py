@@ -136,8 +136,8 @@ def create_employee(tenant=None, user = None, business=None):
                 
                 tenant_name = str(tenant.domain).split('.')[0]
                 tenant_name = tenant_name.split('-')
-                tenant_name = [word[0] for word in tenant_name]
-                employe_id = f'{tenant_name}-EMP-0001'
+                tenant_name = [word[0].upper() for word in tenant_name if word]  # Use upper() to capitalize letters and add a check to skip empty strings
+                employe_id = f'{" ".join(tenant_name)}-EMP-0001'
                 
                 opening_day = {
                             "monday":{"start_time":"09:00:00","end_time":"18:00:00"},
@@ -264,8 +264,9 @@ def create_client(tenant=None, user = None, business=None):
         with tenant_context(tenant):
             tenant_name = str(tenant.domain).split('.')[0]
             tenant_name = tenant_name.split('-')
-            tenant_name = [word[0] for word in tenant_name]
-            client_unique_id = f'{tenant_name}-EMP-0001'
+            tenant_name = [word[0].upper() for word in tenant_name if word]  # Use upper() to capitalize letters and add a check to skip empty strings
+            client_unique_id = f'{" ".join(tenant_name)}-CLI-0001'
+            
             try:
                 languages = 'English'
                 language_id = Language.objects.get(name__icontains='English')
