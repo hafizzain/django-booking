@@ -345,7 +345,7 @@ def get_business_by_domain(request):
                     'business' : {
                         'id' : str(user_business.id),
                         'business_name' : str(user_business.business_name),
-                        'tenant_id' : str(id),
+                        # 'tenant_id' : str(id),
                         # 'logo' : user_business.logo if user_business.logo else None ,
                     }
                 }
