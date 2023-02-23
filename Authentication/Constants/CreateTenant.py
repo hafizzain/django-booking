@@ -201,12 +201,14 @@ def create_employee(tenant=None, user = None, business=None):
                     thursday = True,
                     friday = True,
                 )
+                
                 for day in days:
                     bds_schedule = BusinessOpeningHour.objects.create(
                     business_address = business_address,
                     business = business,
                     day = day,
                 )
+                    
                 s_day = opening_day.get(day.lower(), None)
                 if s_day is not None:
                                         
@@ -242,10 +244,12 @@ def create_employee(tenant=None, user = None, business=None):
                     is_active = True,
                     mobile_number = user.mobile_number,
                 )
+                
                 account_type = AccountType.objects.create(
                         user = user,
                         account_type = 'Employee'
                     )
+                
                 try:
                     thrd = Thread(target=add_employee, args=['ABCD', auto_generate_email, user.mobile_number, template, business.business_name, tenant, domain, user])
                     thrd.start()
