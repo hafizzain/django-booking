@@ -604,8 +604,10 @@ def create_tenant(request=None, user=None, data=None):
             #     thrd.start()
             # except:
             #     pass
-            create_employee(kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
-
+            try:
+                create_employee(kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+            except:
+                pass
             try:
                 service_thrd = Thread(target=create_client, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
                 service_thrd.start()
