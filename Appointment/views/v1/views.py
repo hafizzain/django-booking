@@ -500,6 +500,7 @@ def create_appointment(request):
                 }
             }
         )
+        
         total_price_app += price
         appointment_service = AppointmentService.objects.create(
             user = user,
@@ -523,6 +524,7 @@ def create_appointment(request):
             # promotion = promotion
             # tip=tip,
         )
+        
         if fav is not None:
             appointment_service.is_favourite = True
             appointment_service.save()
@@ -552,7 +554,7 @@ def create_appointment(request):
         Errors.append(str(err))
         
     #appointment.extra_price = total_price_app,
-    appointment.service_commission = service_commission,    
+    #appointment.service_commission = service_commission,    
     appointment.service_commission_type = service_commission_type, 
     appointment.save() 
     
