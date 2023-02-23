@@ -2214,7 +2214,7 @@ def update_business_tax(request):
 
     try:
         business_tax = BusinessTax.objects.get(
-            id=str(tax_id),
+            id = tax_id,
             user = user,
             business=business,
         )
