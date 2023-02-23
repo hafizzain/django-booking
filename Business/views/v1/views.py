@@ -319,7 +319,6 @@ def get_business_by_domain(request):
 
         if domain is not None:
             with tenant_context(domain.tenant):
-                id = domain.tenant.id
                 user_business = Business.objects.filter(
                     is_deleted=False,
                     is_active=True,
