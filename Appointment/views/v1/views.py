@@ -305,10 +305,10 @@ def create_appointment(request):
     service_commission_type = ''
     toValue = 0
     total_price_app= 0
-    try:
-        total_price_app += int(extra_price)
-    except ValueError:
-        total_price_app += 0
+    # try:
+    #     total_price_app += int(extra_price)
+    # except ValueError:
+    #     total_price_app += 0
         
     if not all([ client_type, appointment_date, business_id  ]):
          return Response(
@@ -364,25 +364,6 @@ def create_appointment(request):
         client = Client.objects.get(id=client)
     except Exception as err:
         client = None
-    try:
-        commission = CommissionSchemeSetting.objects.get(employee = str(member))
-        category = CategoryCommission.objects.filter(commission = commission.id)
-        for cat in category:
-            try:
-                toValue = int(cat.to_value)
-            except :
-                sign  = cat.to_value
-            if cat.category_comission == 'Service':
-                if (int(cat.from_value) <= price and  price <  toValue) or (int(cat.from_value) <= price and sign ):
-                    if cat.symbol == '%':
-                        service_commission = price * int(cat.commission_percentage) / 100
-                        service_commission_type = str(service_commission_type) + cat.symbol
-                    else:
-                        service_commission = int(cat.commission_percentage)
-                        service_commission_type = str(service_commission) + cat.symbol
-                                        
-    except Exception as err:
-        Errors.append(str(err))
         
     appointment = Appointment.objects.create(
             user = user,
@@ -549,6 +530,7 @@ def create_appointment(request):
         if business_address_id is not None:
             appointment_service.business_address = business_address
             appointment_service.save()
+    
     try:
         commission = CommissionSchemeSetting.objects.get(employee = str(member))
         category = CategoryCommission.objects.filter(commission = commission.id)
