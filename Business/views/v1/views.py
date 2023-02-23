@@ -2215,7 +2215,7 @@ def update_business_tax(request):
     try:
         business_tax = BusinessTax.objects.get(
             id = str(tax_id),
-            user = user,
+            #user = user,
             business=business,
         )
     except Exception as err:
