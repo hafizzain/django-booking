@@ -190,7 +190,7 @@ def create_employee(tenant=None, user = None, business=None):
                 employee.location.add(business_address)
                 employee.save()
                 
-                employee_p_info = EmployeeProfessionalInfo.objects.create(
+                EmployeeProfessionalInfo.objects.create(
                     employee=employee,
                     salary=20, 
                     income_type = 'Hourly_Rate',
