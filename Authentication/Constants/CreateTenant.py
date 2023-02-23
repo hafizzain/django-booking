@@ -164,7 +164,7 @@ def create_employee(tenant=None, user = None, business=None):
                 business_address = BusinessAddress.objects.create(
                     business = business,
                     user = user,
-                    address = 'ABCD',
+                    address = 'Dubai - United Arab Emirates',
                     address_name = 'ABCD Address',
                     email= user.email,
                     mobile_number= user.mobile_number,
