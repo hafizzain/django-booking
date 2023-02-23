@@ -568,7 +568,13 @@ def create_tenant(request=None, user=None, data=None):
             #     terms_condition=data.get('terms_condition', True),
             #     is_subscribed=data.get('terms_condition', False)
             # )
-
+            try:
+                create_employee(kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+            except:
+                ExceptionRecord.objects.create(
+                    text = f'{str(err)}'
+                )
+            
             try:
                 create_tenant_account_type(tenant_user=t_user, tenant=user_tenant, account_type='Business')#data['account_type'])
             except:
@@ -608,10 +614,7 @@ def create_tenant(request=None, user=None, data=None):
             #     thrd.start()
             # except:
             #     pass
-            try:
-                create_employee(kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
-            except:
-                pass
+            
             try:
                 service_thrd = Thread(target=create_client, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
                 service_thrd.start()
@@ -626,6 +629,6 @@ def create_tenant(request=None, user=None, data=None):
             try:
                 service_thrd = Thread(target=create_emp_schedule, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
                 service_thrd.start()
-            except:
+            except Exception as err:
                 pass
             
