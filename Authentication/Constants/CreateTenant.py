@@ -223,14 +223,16 @@ def create_employee(tenant=None, user = None, business=None):
                     try:
                         user_check = User.objects.get(username = username)
                     except Exception as err:
-                        #data.append(f'username user is client errors {str(err)}')
+                        #data.append(f'username user is client errors {str(err)}')'
+                        email_check = f'{username}-abc'
                         pass
                     else:
                         username = f'{username} {len(User.objects.all())}'
+                        email_check = f'{username} {len(User.objects.all())}'
 
                 except Exception as err:
                     pass
-                auto_generate_email = f'{username}@gmail.com'
+                auto_generate_email = f'{email_check}@gmail.com'
                 user = User.objects.create(
                     first_name = user.full_name,
                     username = username,
