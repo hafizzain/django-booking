@@ -819,6 +819,23 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
 class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField()
+    employee_permission = serializers.SerializerMethodField()
+    
+    def get_employee_permission(self, obj):
+        try:
+            permission = EmployePermission.objects.get(employee=obj)
+        except:
+            return {}
+        else:
+            returned_value = {}
+            try:            
+                for permit in ALL_PERMISSIONS:
+                    returned_value[permit] = []
+                    for opt in PERMISSIONS_MODEL_FIELDS[permit](permission).all():
+                        returned_value[permit].append(opt.text)
+                return returned_value
+            except Exception as err:
+                pass
     
     def get_location(self, obj):
         loc = obj.location.all()
@@ -836,7 +853,8 @@ class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Employee
-        fields = ['id', 'image','location','full_name', 'email', 'mobile_number','country','state','city', 'address', 'postal_code']
+        fields = ['id', 'image','location','full_name', 'email', 
+                  'mobile_number','country','state','city', 'address', 'postal_code', 'employee_permission']
 class EmployeeInformationSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     
