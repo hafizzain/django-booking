@@ -208,16 +208,15 @@ def create_employee(tenant=None, user = None, business=None):
                     business = business,
                     day = day,
                 )
-                    
-                s_day = opening_day.get(day.lower(), None)
-                if s_day is not None:
-                                        
-                    bds_schedule.start_time = s_day['start_time']
-                    bds_schedule.close_time = s_day['end_time']
-                    bds_schedule.save()
-                    
-                else:
-                    bds_schedule.is_closed = True
+                    s_day = opening_day.get(day.lower(), None)
+                    if s_day is not None:
+                                            
+                        bds_schedule.start_time = s_day['start_time']
+                        bds_schedule.close_time = s_day['end_time']
+                        bds_schedule.save()
+                        
+                    else:
+                        bds_schedule.is_closed = True
 
                 bds_schedule.save()
                 
@@ -251,7 +250,7 @@ def create_employee(tenant=None, user = None, business=None):
                     )
                 
                 try:
-                    thrd = Thread(target=add_employee, args=['ABCD', auto_generate_email, user.mobile_number, template, business.business_name, tenant, domain, user])
+                    thrd = Thread(target=add_employee, args=['ABCD', auto_generate_email, user.mobile_number, template, business.business_name, tenant.id, domain, user])
                     thrd.start()
                 except Exception as err:
                     pass
@@ -281,7 +280,8 @@ def create_client(tenant=None, user = None, business=None):
                 mobile_number = user.mobile_number,
                 gender = 'Male',
                 language = language_id,
-                client_id = client_unique_id
+                client_id = client_unique_id,
+                is_active = True
                 
             )
    
@@ -356,7 +356,8 @@ def create_emp_schedule(tenant=None, user = None, business=None):
                         date = next_date,
                         is_vacation = False,
                         is_leave = False,
-                        is_off = False                
+                        is_off = False,
+                        is_active = True                                     
                 )
                             
         except Exception as err:
