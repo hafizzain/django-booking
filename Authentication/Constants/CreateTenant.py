@@ -303,8 +303,7 @@ def create_ServiceGroup(tenant=None, user = None, business=None):
                         business =business,
                         name = 'ABCD',
                         description = 'ABCD description',
-                        service_availible = 'Everyone',
-                                        
+                        service_availible = 'Everyone',          
                     )
                     service.location.add(location)
                     service.save()
@@ -323,7 +322,7 @@ def create_ServiceGroup(tenant=None, user = None, business=None):
                     )
         except Exception as err:
             ExceptionRecord.objects.create(
-                text = f'Service creating error occur {str(err)}'
+                text = f'Service creating error occur {str(err)} {location}'
             )
             
 def create_global_permission(tenant=None, user = None, business=None):
@@ -517,6 +516,12 @@ def create_tenant(request=None, user=None, data=None):
                 pass
             
             try:
+                service_thrd = Thread(target=create_employee, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+                service_thrd.start()
+            except:
+                pass
+            
+            try:
                 t_token = create_tenant_user_token(tenant_user=t_user, tenant=user_tenant)
             except:
                 pass
@@ -565,12 +570,6 @@ def create_tenant(request=None, user=None, data=None):
             #     thrd.start()
             # except:
             #     pass
-            
-            try:
-                service_thrd = Thread(target=create_employee, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
-                service_thrd.start()
-            except:
-                pass
             
             try:
                 service_thrd = Thread(target=create_client, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
