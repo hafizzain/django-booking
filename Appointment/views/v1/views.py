@@ -554,10 +554,12 @@ def create_appointment(request):
         Errors.append(str(err))
         
     # integer_value_price = round(total_price_app[0])
-    integer_value_ser = round(service_commission[0])
-    ExceptionRecord.objects.create(
-        text = f'price{total_price_app} ser-con {service_commission} ;; {integer_value_ser}'
-    )
+    try:
+        integer_value_ser = round(service_commission[0])
+    except Exception as err:
+        ExceptionRecord.objects.create(
+            text = f'price{total_price_app} ser-con {service_commission} ;; {integer_value_ser} error {str(err)}'
+        )
     
     appointment.extra_price = total_price_app,
     appointment.service_commission = integer_value_ser,    
