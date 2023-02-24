@@ -300,15 +300,19 @@ def create_ServiceGroup(tenant=None, user = None, business=None):
                 service_grp = ServiceGroup.objects.create(
                     business = business,
                     user = user,
-                    name = 'ABCD',
+                    name = 'Hair Care',
                     is_active = True                
                 )
                 for ser in range(2):
+                    if int(ser) == 0:
+                        ser_name = 'Hair color'
+                    else:
+                        ser_name = 'Hair cut'
                     service = Service.objects.create(
                         user = user,
                         business =business,
-                        name = 'ABCD',
-                        description = 'ABCD description',
+                        name = ser_name,
+                        description = f'{ser_name} description',
                         service_availible = 'Everyone',          
                     )
                     service.location.add(location)
