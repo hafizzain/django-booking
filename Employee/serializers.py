@@ -15,7 +15,7 @@ from datetime import datetime, timedelta
 from rest_framework import serializers
 from .models import( EmployeDailySchedule, Employee, EmployeeProfessionalInfo ,
                EmployeePermissionSetting, EmployeeModulePermission 
-               , EmployeeMarketingPermission,
+               , EmployeeMarketingPermission, SallarySlipPayrol,
                StaffGroup, StaffGroupModulePermission, Attendance
                ,Payroll , CommissionSchemeSetting , Asset ,AssetDocument,
                EmployeeSelectedService, Vacation ,CategoryCommission
@@ -494,6 +494,17 @@ class EmployPayrollSerializers(serializers.ModelSerializer):
             
          ]        
 
+class SallarySlipPayrolSerializers(serializers.ModelSerializer):
+    employee = EmployPayrollSerializers(read_only=True)
+    class Meta:
+        model = SallarySlipPayrol
+        fields = [
+            'id',
+            'created_at',
+            'month' ,
+            'employee',
+            ]
+        
 class PayrollSerializers(serializers.ModelSerializer):
     employee = EmployPayrollSerializers(read_only=True)
     class Meta:
