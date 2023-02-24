@@ -335,7 +335,9 @@ def get_dashboard_target_overview(request):
             member__id = employee_id,
             created_at__gte =  range_start ,
             created_at__lte = range_end
-            ).values_list('service_target , retail_target', flat=True)
+            )
+        targets.values_list('service_target', flat=True)
+        targets.values_list('retail_target', flat=True)
         
         service_targets = ServiceOrder.objects.filter(
             member = employee_id,
