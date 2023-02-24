@@ -501,7 +501,7 @@ def create_appointment(request):
             }
         )
         
-        total_price_app += price
+        total_price_app += int(price)
         appointment_service = AppointmentService.objects.create(
             user = user,
             business = business,
