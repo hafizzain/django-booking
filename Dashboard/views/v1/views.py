@@ -726,18 +726,28 @@ def get_total_sales_device(request):
         member__id=employee_id,
     ).values_list('created_at__month', flat=True)
     
-    for price in checkout_orders:
-        total_price += int(price.total_service_price)
-        total_price += int(price.total_product_price)
-        total_price += int(price.total_voucher_price)
-        total_price += int(price.total_membership_price)
-    
     apps_checkouts = AppointmentCheckout.objects.filter(
         is_deleted=False, 
         member__id=employee_id,
     ).values_list('created_at__month', flat=True)
     
-    for price in apps_checkouts:
+    checkout_orders_total = Checkout.objects.filter(
+        is_deleted=False, 
+        member__id=employee_id,
+    )
+    
+    apps_checkouts_total = AppointmentCheckout.objects.filter(
+        is_deleted=False, 
+        member__id=employee_id,
+    )
+    
+    for price in checkout_orders_total:
+        total_price += int(price.total_service_price)
+        total_price += int(price.total_product_price)
+        total_price += int(price.total_voucher_price)
+        total_price += int(price.total_membership_price)
+    
+    for price in apps_checkouts_total:
         total_price += int(price.total_price)
 
     checkout_orders = list(checkout_orders)
@@ -764,7 +774,7 @@ def get_total_sales_device(request):
                 'message': 'Graph for mobile',
                 'error_message': None,
                 'dashboard': dashboard_data,
-                'total_sales': total_sales
+                'total_sales': total_price
             }
         },
         status=status.HTTP_200_OK
