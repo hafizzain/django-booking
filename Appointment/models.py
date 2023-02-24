@@ -58,6 +58,7 @@ class Appointment(models.Model):
     
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
+    is_checkout = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
 
 
