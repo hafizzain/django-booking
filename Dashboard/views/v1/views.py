@@ -704,7 +704,7 @@ def get_total_comission(request):
 @permission_classes([AllowAny])
 def get_total_sales_device(request):
     employee_id = request.GET.get('employee_id', None)
-    total_sales = 0
+    total_price = 0
     
     months = [
         "January",
@@ -725,12 +725,20 @@ def get_total_sales_device(request):
         is_deleted=False, 
         member__id=employee_id,
     ).values_list('created_at__month', flat=True)
-
-
+    
+    for price in checkout_orders:
+        total_price += price.total_service_price
+        total_price += price.total_product_price
+        total_price += price.total_voucher_price
+        total_price += price.total_membership_price
+    
     apps_checkouts = AppointmentCheckout.objects.filter(
         is_deleted=False, 
         member__id=employee_id,
     ).values_list('created_at__month', flat=True)
+    
+    for price in apps_checkouts:
+        total_price += price.total_price
 
     checkout_orders = list(checkout_orders)
     apps_checkouts = list(apps_checkouts)
@@ -741,7 +749,7 @@ def get_total_sales_device(request):
         count = checkout_orders.count(i)
         count_app = checkout_orders.count(i)
         
-        total_sales += count + count_app
+        #total_sales += count + count_app
 
         dashboard_data.append({
             'month' : month,
