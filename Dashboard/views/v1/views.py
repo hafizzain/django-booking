@@ -727,10 +727,10 @@ def get_total_sales_device(request):
     ).values_list('created_at__month', flat=True)
     
     for price in checkout_orders:
-        total_price += price.total_service_price
-        total_price += price.total_product_price
-        total_price += price.total_voucher_price
-        total_price += price.total_membership_price
+        total_price += int(price.total_service_price)
+        total_price += int(price.total_product_price)
+        total_price += int(price.total_voucher_price)
+        total_price += int(price.total_membership_price)
     
     apps_checkouts = AppointmentCheckout.objects.filter(
         is_deleted=False, 
@@ -738,7 +738,7 @@ def get_total_sales_device(request):
     ).values_list('created_at__month', flat=True)
     
     for price in apps_checkouts:
-        total_price += price.total_price
+        total_price += int(price.total_price)
 
     checkout_orders = list(checkout_orders)
     apps_checkouts = list(apps_checkouts)
