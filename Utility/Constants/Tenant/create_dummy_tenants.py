@@ -17,7 +17,8 @@ def CreateDummyTenants():
 
         name = f'NST-{count}'
 
-        tenant_name = f'NStyle-Tenancy-{count}'
+        tenant_name = f'NStyle-Tenancy0-{count}'
+        
         tenant = Tenant.objects.create(
             name = name,
             domain=f'{tenant_name}.{settings.BACKEND_DOMAIN_NAME}',
