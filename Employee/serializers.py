@@ -15,7 +15,7 @@ from datetime import datetime, timedelta
 from rest_framework import serializers
 from .models import( EmployeDailySchedule, Employee, EmployeeProfessionalInfo ,
                EmployeePermissionSetting, EmployeeModulePermission 
-               , EmployeeMarketingPermission,
+               , EmployeeMarketingPermission, SallarySlipPayrol,
                StaffGroup, StaffGroupModulePermission, Attendance
                ,Payroll , CommissionSchemeSetting , Asset ,AssetDocument,
                EmployeeSelectedService, Vacation ,CategoryCommission
@@ -494,6 +494,25 @@ class EmployPayrollSerializers(serializers.ModelSerializer):
             
          ]        
 
+class SallarySlipPayrolSerializers(serializers.ModelSerializer):
+    employee = EmployPayrollSerializers(read_only=True)
+    class Meta:
+        model = SallarySlipPayrol
+        fields = [
+            'id',
+            'created_at',
+            'month' ,
+            'employee',
+            ]
+class SallarySlipPayrol_EmployeSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = SallarySlipPayrol
+        fields = [
+            'id',
+            'created_at',
+            'month' ,
+            ]
+        
 class PayrollSerializers(serializers.ModelSerializer):
     employee = EmployPayrollSerializers(read_only=True)
     class Meta:
@@ -880,6 +899,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     #employe_id = serializers.SerializerMethodField(read_only=True)
     
     location = serializers.SerializerMethodField(read_only=True)
+    sallaryslip = serializers.SerializerMethodField(read_only=True)
     
     def get_location(self, obj):
         loc = obj.location.all()
@@ -903,6 +923,10 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         schedule =  EmployeDailySchedule.objects.filter(employee= obj )            
         return WorkingSchedulePayrollSerializer(schedule, many = True,context=self.context).data
     
+    def get_sallaryslip(self, obj):
+        sallary =  SallarySlipPayrol.objects.filter(employee= obj )            
+        return SallarySlipPayrol_EmployeSerializers(sallary, many = True,context=self.context).data
+    
     def get_image(self, obj):
         if obj.image:
             try:
@@ -916,7 +940,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Employee
-        fields = ['id', 'employee_id','is_active','full_name','image','location',
+        fields = ['id', 'employee_id','is_active','full_name','image','location','sallaryslip',
                   'schedule','created_at', 'income_type', 'salary']
 class Payroll_Working_device_attendence_ScheduleSerializer(serializers.ModelSerializer):    
     schedule =  serializers.SerializerMethodField(read_only=True)    

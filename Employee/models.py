@@ -207,6 +207,17 @@ class Payroll(models.Model):
     
     def __str__(self):
         return str(self.id)
+class SallarySlipPayrol(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_sallary_slip')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_employee_sallary_slip')
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_sallary_slip')
+    
+    month = models.DateTimeField(null = True)
+    created_at = models.DateTimeField(auto_now_add=now)
+    
+    def __str__(self):
+        return str(self.id)
 
 
 class CommissionSchemeSetting(models.Model):

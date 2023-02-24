@@ -22,6 +22,7 @@ def CreateDummyTenants():
         new_id = new_id[0]
 
         tenant_name = f'NStyle-Tenancy-{count}-{new_id}'
+        
         tenant = Tenant.objects.create(
             name = name,
             domain=f'{tenant_name}.{settings.BACKEND_DOMAIN_NAME}',

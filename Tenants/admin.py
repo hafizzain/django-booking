@@ -61,7 +61,15 @@ class TenantDetailAdmin(admin.ModelAdmin):
         'is_tenant_staff',
         'is_tenant_superuser',
     ]
+@admin.register(EmployeeTenantDetail)
+class EmployeeTenantDetailAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'user',
+        'tenant',
+        'is_tenant_staff',
+    ]
     
 admin.site.register(ClientTenantAppDetail)
 admin.site.register(ClientIdUser)
-admin.site.register(EmployeeTenantDetail)
+#admin.site.register(EmployeeTenantDetail)
