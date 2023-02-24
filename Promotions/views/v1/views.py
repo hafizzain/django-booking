@@ -501,55 +501,55 @@ def update_directorflat(request):
 @permission_classes([AllowAny])
 def get_discount_and_promotions(request):
     data = []
-    
+    ##Done
     flatordirect = DirectOrFlatDiscount.objects.filter(is_deleted=False).distinct()
     serialized = AvailOfferDirectOrFlatDiscountSerializers(flatordirect,  many=True, context={'request' : request})
     data.extend(serialized.data)
-    
+    #Done
     specific_group = SpecificGroupDiscount.objects.filter(is_deleted=False).distinct()
     serialized = AvailOfferSpecificGroupDiscountSerializers(specific_group,  many=True, context={'request' : request})
     data.extend(serialized.data)
-    
+    #Done
     purchase_discount = PurchaseDiscount.objects.filter(is_deleted=False).distinct()
     serialized = AvailOfferPurchaseDiscountSerializers(purchase_discount,  many=True, context={'request' : request})
     data.extend(serialized.data)
-    
+    #Done
     specificbrand = SpecificBrand.objects.filter(is_deleted=False).distinct()
     serialized = AvailOfferSpecificBrandSerializers(specificbrand,  many=True, context={'request' : request})
     data.extend(serialized.data)
-   
+   #Done
     spend_discount = SpendDiscount.objects.filter(is_deleted=False).distinct()
     serialized = AvailOfferSpendDiscountSerializers(spend_discount,  many=True, context={'request' : request})
     data.extend(serialized.data)
-    
+    #Done
     spend_discount = SpendSomeAmount.objects.filter(is_deleted=False).distinct()
     serialized = AvailOfferSpendSomeAmountSerializers(spend_discount,  many=True, context={'request' : request})
     data.extend(serialized.data)
-    
+    #Done
     fixed_price = FixedPriceService.objects.filter(is_deleted=False).distinct()
     serialized = AvailOfferFixedPriceServiceSerializers(fixed_price,  many=True, context={'request' : request})
     data.extend(serialized.data)
-    
+    ##Done
     free_price = MentionedNumberService.objects.filter(is_deleted=False).distinct()
     serialized = AvailOfferMentionedNumberServiceSerializers(free_price,  many=True, context={'request' : request})
     data.extend(serialized.data)
-    
+    #Done
     bundle = BundleFixed.objects.filter(is_deleted=False).distinct()
     serialized = AvailOfferBundleFixedSerializers(bundle,  many=True, context={'request' : request})
     data.extend(serialized.data)
-    
+    #Done
     retail = RetailAndGetService.objects.filter(is_deleted=False).distinct()
     serialized = AvailOfferRetailAndGetServiceSerializers(retail, many=True, context={'request' : request})
     data.extend(serialized.data)
-    
+    #Done
     restricted = UserRestrictedDiscount.objects.filter(is_deleted=False).distinct()
     serialized = AvailOfferUserRestrictedDiscountSerializers(restricted, many=True, context={'request' : request})
     data.extend(serialized.data)
-    
+    #Done
     complimentry = ComplimentaryDiscount.objects.filter(is_deleted=False).distinct()
     serialized = AvailOfferComplimentaryDiscountSerializers(complimentry, many=True, context={'request' : request})
     data.extend(serialized.data)
-    
+    ##Done
     package = PackagesDiscount.objects.filter(is_deleted=False).distinct()
     serialized = AvailOfferPackagesDiscountSerializers(package, many=True, context={'request' : request})
     data.extend(serialized.data)
