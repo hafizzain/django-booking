@@ -5,7 +5,7 @@ from time import strptime
 from django.shortcuts import render
 from Employee.models import( CategoryCommission, EmployeDailySchedule, Employee , EmployeeProfessionalInfo ,
                         EmployeePermissionSetting,  EmployeeModulePermission
-                        , EmployeeMarketingPermission, EmployeeSelectedService , StaffGroup 
+                        , EmployeeMarketingPermission, EmployeeSelectedService, SallarySlipPayrol , StaffGroup 
                         , StaffGroupModulePermission, Attendance
                         ,Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation
                         )
@@ -17,7 +17,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from Employee.serializers import( EmployeSerializer , EmployeInformationsSerializer
                           , EmployPermissionSerializer,  EmployeModulesSerializer, EmployeeInformationSerializer
-                          ,  EmployeeMarketingSerializers, Payroll_Working_device_attendence_ScheduleSerializer, Payroll_Working_deviceScheduleSerializer, Payroll_WorkingScheduleSerializer, ScheduleSerializer, SingleEmployeeInformationSerializer, StaffGroupSerializers , 
+                          ,  EmployeeMarketingSerializers, Payroll_Working_device_attendence_ScheduleSerializer, Payroll_Working_deviceScheduleSerializer, Payroll_WorkingScheduleSerializer, SallarySlipPayrolSerializers, ScheduleSerializer, SingleEmployeeInformationSerializer, StaffGroupSerializers , 
                           StaffpermisionSerializers , AttendanceSerializers
                           ,PayrollSerializers, UserEmployeeSerializer, VacationSerializer,singleEmployeeSerializer , CommissionSerializer
                           , AssetSerializer, WorkingScheduleSerializer
@@ -1990,15 +1990,15 @@ def delete_payroll(request):
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def create_payroll(request):
+def create_sallaryslip(request):
     user = request.user
     
     business = request.data.get('business', None)
     employees = request.data.get('employees', None)
-    name = request.data.get('name', None)
-    Total_hours= request.data.get('Total_hours', None)
-    
-    if not all([ business, employees , name , Total_hours ]):
+    month = request.data.get('month', None)
+    year = request.data.get('year', None)
+ 
+    if not all([ business, employees , month ]):
          return Response(
             {
                 'status' : False,
@@ -2019,7 +2019,7 @@ def create_payroll(request):
         )
          
     try:
-             business_id=Business.objects.get(id=business)
+        business_id=Business.objects.get(id=business)
     except Exception as err:
             return Response(
                 {
@@ -2045,30 +2045,33 @@ def create_payroll(request):
                 }
                 }
             )
-            
-    payroll= Payroll.objects.create(
+    received_data = f'{month} {year}'
+    
+    month = datetime.datetime.strptime(received_data, "%B %Y").month
+    year = datetime.datetime.strptime(received_data, "%B %Y").year
+    date_obj = datetime.date(year=year, month=month, day=1)
+    
+    payroll= SallarySlipPayrol.objects.create(
         user= user,
         business= business_id,
         employee=employee_id,
-        name= name,
-        Total_hours=Total_hours
-        
-    )
-    
-    payroll_serializers= PayrollSerializers(payroll)
+        month = date_obj        
+    )    
+    payroll_serializers= SallarySlipPayrolSerializers(payroll)
     
     return Response(
             {
                 'status' : True,
                 'status_code' : 201,
                 'response' : {
-                    'message' : 'Payroll Created Successfully!',
+                    'message' : 'Sallary Slip Created Successfully!',
                     'error_message' : None,
                     'StaffGroup' : payroll_serializers.data,
                 }
             },
             status=status.HTTP_201_CREATED
         ) 
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_payrol_working(request):
