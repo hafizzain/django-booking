@@ -601,6 +601,8 @@ def create_appointment(request):
 @permission_classes([IsAuthenticated])
 def update_appointment(request):
     appointment_service_id = request.data.get('id', None)
+    start_time = request.data.get('start_time', None)
+    employee_id = request.data.get('employee_id', None)
     appointment_status = request.data.get('appointment_status', None)
     if appointment_service_id is None: 
        return Response(
@@ -634,6 +636,25 @@ def update_appointment(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    if employee_id:
+        try: 
+            employee = Employee.objects.get(id=employee_id, is_deleted=False)
+        except Exception as err:
+            return Response(
+                    {
+                        'status' : False,
+                        'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                        'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                        'response' : {
+                            'message' : 'Employee Not Found',
+                            'error_message' : str(err),
+                        }
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        service_appointment.member = employee
+        service_appointment.appointment_time = start_time
+        service_appointment.save()
     serializer = UpdateAppointmentSerializer(service_appointment , data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(
