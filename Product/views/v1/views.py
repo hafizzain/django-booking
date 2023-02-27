@@ -951,6 +951,7 @@ def update_product(request):
     category_id = request.data.get('category', None)
     brand_id = request.data.get('brand', None)
     location = request.data.get('location', None)
+    is_active = request.data.get('is_active', None)
     
     currency_retail_price = request.data.get('currency_retail_price', None)
     
@@ -1017,6 +1018,9 @@ def update_product(request):
         is_deleted = False,
         
     )
+    if is_active is not None:
+        product.is_active = False
+        product.save()
     images = request.data.getlist('product_images', None)
 
     if images is not None:

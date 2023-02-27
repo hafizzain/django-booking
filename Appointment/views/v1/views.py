@@ -26,7 +26,7 @@ from django.db.models import Q
 from Client.models import Client, ClientPromotions, Membership, Promotion, Rewards, Vouchers
 from datetime import date, timedelta
 from threading import Thread
-
+from django.db.models import F
 
 from Appointment.models import Appointment, AppointmentService, AppointmentNotes , AppointmentCheckout
 from Appointment.serializers import  CheckoutSerializer, AppoinmentSerializer, ServiceClientSaleSerializer, ServiceEmployeeSerializer,SingleAppointmentSerializer ,BlockSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer
@@ -477,12 +477,16 @@ def create_appointment(request):
             }
         )
         if selected_promotion_type == 'Complimentary_Discount':
-            client_promotion, created  = ClientPromotions.objects.get_or_create(
+            client_promotion  = ClientPromotions.objects.create(
                 user = user,
                 business = business,
                 client = client,
                 complimentary__id =  selected_promotion_id,
                 service = service,
+                # defaults={
+                #     'visits': 1
+                # },
+                # visits=F('visits') + 1
                 visits = 1
             )
                     
