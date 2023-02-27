@@ -58,7 +58,7 @@ class Product(models.Model):
     cost_price = models.PositiveIntegerField(default=0, null = True, blank= True)
     #full_price = models.PositiveIntegerField(default=0, null = True, blank= True)
     #sell_price = models.PositiveIntegerField(default=0, null = True, blank= True)
-    #product_size = models.PositiveIntegerField(default=0)
+    product_size = models.PositiveIntegerField(default=0)
     #product_size = models.CharField(max_length=50, null=True, blank=True)
 
 

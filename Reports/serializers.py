@@ -253,8 +253,13 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             total = 0
             service_orders = ServiceOrder.objects.filter(is_deleted=False, 
                         member = obj,
-                        #created_at__icontains = year
+                        created_at__icontains = year
                         )
+            app   = AppointmentService.objects.filter(
+                member = obj,
+                appointment_status = 'Done',
+                created_at__icontains = year
+            )
             for ord  in service_orders:                
                 create = str(ord.created_at)
                 created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()

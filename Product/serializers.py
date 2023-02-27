@@ -305,7 +305,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'id', 
             'name', 
             'currency_retail_price',
-            #'product_size',
+            'product_size',
             'product_type',
             'cost_price',
             #'full_price',
