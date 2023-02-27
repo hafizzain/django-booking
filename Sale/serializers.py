@@ -31,7 +31,7 @@ class PriceServiceSerializers(serializers.ModelSerializer):
         fields = '__all__'
 
 class AvailPriceServiceSerializers(serializers.ModelSerializer):
-    currency_name = serializers.SerializerMethodField(read_only=True)
+    currency = serializers.SerializerMethodField(read_only=True)
     
     def get_currency_name(self, obj):
         try:
