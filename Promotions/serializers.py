@@ -47,6 +47,19 @@ class ServiceDurationForSpecificTimeSerializers(serializers.ModelSerializer):
     class Meta:
         model = ServiceDurationForSpecificTime
         fields = '__all__'
+
+class AvailServiceDurationForSpecificTimeSerializers(serializers.ModelSerializer):
+    is_deleted = serializers.SerializerMethodField(read_only=True)
+    
+    
+    def get_is_deleted(self, obj):
+        if obj.is_deleted == True:
+            return 'True'
+        else:
+            return 'False'
+    class Meta:
+        model = ServiceDurationForSpecificTime
+        fields = ['id','service']
 class SpendSomeAmountAndGetDiscountSerializers(serializers.ModelSerializer):
     is_deleted = serializers.SerializerMethodField(read_only=True)
     
@@ -822,18 +835,18 @@ class AvailBundleFixedSerializers(serializers.ModelSerializer):
         model = BundleFixed
         fields = ['id','service']
         
-class AvailBundleFixedSerializers(serializers.ModelSerializer):
-    is_deleted = serializers.SerializerMethodField(read_only=True)
+# class AvailBundleFixedSerializers(serializers.ModelSerializer):
+#     is_deleted = serializers.SerializerMethodField(read_only=True)
 
-    def get_is_deleted(self, obj):
-        if obj.is_deleted == True:
-            return 'True'
-        else:
-            return 'False'
+#     def get_is_deleted(self, obj):
+#         if obj.is_deleted == True:
+#             return 'True'
+#         else:
+#             return 'False'
     
-    class Meta:
-        model = BundleFixed
-        fields = ['id','service']
+#     class Meta:
+#         model = BundleFixed
+#         fields = ['id','service']
         
 class RetailAndGetServiceSerializers(serializers.ModelSerializer):
     day_restrictions = serializers.SerializerMethodField(read_only=True)
@@ -1181,7 +1194,7 @@ class AvailOfferPackagesDiscountSerializers(serializers.ModelSerializer):
     def get_service_duration(self, obj):
         try:
             ser = ServiceDurationForSpecificTime.objects.filter(package = obj)
-            return ServiceDurationForSpecificTimeSerializers(ser, many = True).data
+            return AvailServiceDurationForSpecificTimeSerializers(ser, many = True).data
         except Exception as err:
             return err
             pass
@@ -1264,7 +1277,7 @@ class AvailOfferUserRestrictedDiscountSerializers(serializers.ModelSerializer):
     def get_user_restricted_discount(self, obj):
         try:
             ser = UserRestrictedDiscount.objects.filter(complimentary = obj)
-            return UserRestrictedDiscountSerializers(ser, many = True).data
+            return AvailUserRestrictedDiscountSerializers(ser, many = True).data
         except Exception as err:
             return err
             pass
@@ -1309,7 +1322,7 @@ class AvailOfferRetailAndGetServiceSerializers(serializers.ModelSerializer):
     def get_promotion(self, obj):
         try:
             ser = RetailAndGetService.objects.filter(retailandservice = obj)
-            return RetailAndGetServiceSerializers(ser, many = True).data
+            return AvailRetailAndGetServiceSerializers(ser, many = True).data
         except Exception as err:
             return err
             pass
@@ -1351,7 +1364,7 @@ class AvailOfferBundleFixedSerializers(serializers.ModelSerializer):
     def get_block_date(self, obj):
         try:
             ser = BundleFixed.objects.filter(bundlefixed = obj)
-            return BundleFixedSerializers(ser, many = True).data
+            return AvailBundleFixedSerializers(ser, many = True).data
         except Exception as err:
             pass
     
@@ -1718,14 +1731,14 @@ class AvailOfferPurchaseDiscountSerializers(serializers.ModelSerializer):
     def get_discount_product(self, obj):
         try:
             ser = PurchaseDiscount.objects.filter(purchasediscount = obj)
-            return PurchaseDiscountSerializers(ser, many = True).data
+            return AvailPurchaseDiscountSerializers(ser, many = True).data
         except Exception as err:
             pass
 
     def get_discount_service(self, obj):
         try:
             ser = PurchaseDiscount.objects.filter(purchasediscount = obj)
-            return PurchaseDiscountSerializers(ser, many = True).data
+            return AvailPurchaseDiscountSerializers(ser, many = True).data
         except Exception as err:
             pass
 
