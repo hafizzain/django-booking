@@ -125,7 +125,7 @@ class Order(models.Model):
     current_price =models.PositiveBigIntegerField(default = 0)
     tip =models.PositiveBigIntegerField(default = 0)
     gst = models.PositiveBigIntegerField(default = 0)
-    total_price = models.PositiveBigIntegerField(default = 0)
+    total_price = models.DecimalField(default = 0 , max_digits=6, decimal_places=2)
     sold_quantity = models.PositiveBigIntegerField(default = 0,)
     
     
