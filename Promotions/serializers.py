@@ -1385,14 +1385,14 @@ class AvailOfferFixedPriceServiceSerializers(serializers.ModelSerializer):
     type = serializers.SerializerMethodField(read_only=True)
     day_restrictions = serializers.SerializerMethodField(read_only=True)
     date_restrictions = serializers.SerializerMethodField(read_only=True)
-    duration = serializers.SerializerMethodField(read_only=True)
+    # duration = serializers.SerializerMethodField(read_only=True)
     
-    def get_duration(self, obj):
-        try:
-            ser = FixedPriceService.objects.filter(fixedpriceservice = obj)
-            return AvailFixedPriceServiceSerializers(ser, many = True).data
-        except Exception as err:
-            pass
+    # def get_duration(self, obj):
+    #     try:
+    #         ser = FixedPriceService.objects.filter(fixedpriceservice = obj)
+    #         return AvailFixedPriceServiceSerializers(ser, many = True).data
+    #     except Exception as err:
+    #         pass
 
 
     def get_type(self, obj):
@@ -1419,7 +1419,7 @@ class AvailOfferFixedPriceServiceSerializers(serializers.ModelSerializer):
             pass
     class Meta:
         model = FixedPriceService
-        fields = ['type','block_date' , 'duration','date_restrictions' , 'day_restrictions']
+        fields = ['type','block_date' , 'date_restrictions' , 'day_restrictions']
 
 class FreeServiceSerializers(serializers.ModelSerializer):
     is_deleted = serializers.SerializerMethodField(read_only=True)
