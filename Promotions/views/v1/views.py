@@ -701,7 +701,7 @@ def create_specificgroupdiscount(request):
             except Exception as err:
                error.append(str(err))
     
-    serializers= SpecificGroupDiscountSerializers(sp_grp, context={'request' : request})
+    serializers= PromtoionsSerializers.SpecificGroupDiscountSerializers(sp_grp, context={'request' : request})
     
     return Response(
             {
@@ -892,7 +892,7 @@ def update_specificgroupdiscount(request):
                     date = date,
                 ) 
         
-    serializers= SpecificGroupDiscountSerializers(specific_group, context={'request' : request})
+    serializers= PromtoionsSerializers.SpecificGroupDiscountSerializers(specific_group, context={'request' : request})
        
     return Response(
         {
@@ -964,7 +964,7 @@ def delete_specificgroupdiscount(request):
 @permission_classes([AllowAny])
 def get_specificgroupdiscount(request):
     specific_group = SpecificGroupDiscount.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = SpecificGroupDiscountSerializers(specific_group,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.SpecificGroupDiscountSerializers(specific_group,  many=True, context={'request' : request})
     
     return Response(
         {
@@ -1166,7 +1166,7 @@ def create_purchasediscount(request):
             except Exception as err:
                error.append(str(err))
                
-    serializers= PurchaseDiscountSerializers(purchase_discount, context={'request' : request})
+    serializers= PromtoionsSerializers.PurchaseDiscountSerializers(purchase_discount, context={'request' : request})
     
     return Response(
             {
@@ -1328,7 +1328,7 @@ def update_purchasediscount(request):
                     purchasediscount = purchase_discount,
                     date = date,
                 )
-    serializers= PurchaseDiscountSerializers(purchase_discount, data=request.data, partial=True, context={'request' : request})
+    serializers= PromtoionsSerializers.PurchaseDiscountSerializers(purchase_discount, data=request.data, partial=True, context={'request' : request})
     if serializers.is_valid():
         serializers.save()
     else:
@@ -1413,7 +1413,7 @@ def delete_purchasediscount(request):
 @permission_classes([AllowAny])
 def get_purchasediscount(request):
     purchase_discount = SpecificGroupDiscount.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = PurchaseDiscountSerializers(purchase_discount,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.PurchaseDiscountSerializers(purchase_discount,  many=True, context={'request' : request})
     
     return Response(
         {
@@ -1574,7 +1574,7 @@ def create_specificbrand_discount(request):
             except Exception as err:
                error.append(str(err))
     
-    serializers= SpecificBrandSerializers(specific_brand, context={'request' : request})
+    serializers= PromtoionsSerializers.SpecificBrandSerializers(specific_brand, context={'request' : request})
     
     return Response(
             {
@@ -1647,7 +1647,7 @@ def delete_specificbrand_discount(request):
 @permission_classes([AllowAny])
 def get_specificbrand_discount(request):
     specificbrand = SpecificBrand.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = SpecificBrandSerializers(specificbrand,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.SpecificBrandSerializers(specificbrand,  many=True, context={'request' : request})
     
     return Response(
         {
@@ -1797,7 +1797,7 @@ def update_specificbrand_discount(request):
                     specificbrand = specific_discount,
                     date = date,
                 )
-    serializers= SpecificBrandSerializers(specific_discount, data=request.data, partial=True, context={'request' : request})
+    serializers= PromtoionsSerializers.SpecificBrandSerializers(specific_discount, data=request.data, partial=True, context={'request' : request})
     if serializers.is_valid():
         serializers.save()
     else:
@@ -1998,7 +1998,7 @@ def create_spend_discount(request):
             except Exception as err:
                error.append(str(err))
                
-    serializers = SpendDiscountSerializers(spend_discount, context={'request' : request})
+    serializers = PromtoionsSerializers.SpendDiscountSerializers(spend_discount, context={'request' : request})
     
     return Response(
             {
@@ -2162,7 +2162,7 @@ def update_spend_discount(request):
                     date = date,
                 )
    
-    serializers= PurchaseDiscountSerializers(spend_discount, data=request.data, partial=True, context={'request' : request})
+    serializers= PromtoionsSerializers.PurchaseDiscountSerializers(spend_discount, data=request.data, partial=True, context={'request' : request})
     if serializers.is_valid():
         serializers.save()
     else:
@@ -2247,7 +2247,7 @@ def delete_spend_discount(request):
 @permission_classes([AllowAny])
 def get_spend_discount(request):
     spend_discount = SpendDiscount.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = SpendDiscountSerializers(spend_discount,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.SpendDiscountSerializers(spend_discount,  many=True, context={'request' : request})
     
     return Response(
         {
@@ -2420,7 +2420,7 @@ def create_spend_some_amount(request):
             except Exception as err:
                error.append(str(err))
                
-    serializers = SpendSomeAmountSerializers(spend_some_amount, context={'request' : request})
+    serializers = PromtoionsSerializers.SpendSomeAmountSerializers(spend_some_amount, context={'request' : request})
     
     return Response(
             {
@@ -2609,7 +2609,7 @@ def update_spend_some_amount(request):
                     spendsomeamount = spend_some,
                     date = date,
                 )
-    serializers= SpendSomeAmountSerializers(spend_some, data=request.data, partial=True, context={'request' : request})
+    serializers= PromtoionsSerializers.SpendSomeAmountSerializers(spend_some, data=request.data, partial=True, context={'request' : request})
     if serializers.is_valid():
         serializers.save()
     else:
@@ -2694,7 +2694,7 @@ def delete_spend_some_amount(request):
 @permission_classes([AllowAny])
 def get_spend_some_amount(request):
     spend_discount = SpendSomeAmount.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = SpendSomeAmountSerializers(spend_discount,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.SpendSomeAmountSerializers(spend_discount,  many=True, context={'request' : request})
     
     return Response(
         {
@@ -2839,7 +2839,7 @@ def create_fixed_price_service(request):
             except Exception as err:
                error.append(str(err))
                
-    serializers = FixedPriceServiceSerializers(fixed_price, context={'request' : request})
+    serializers = PromtoionsSerializers.FixedPriceServiceSerializers(fixed_price, context={'request' : request})
     
     return Response(
             {
@@ -3011,7 +3011,7 @@ def update_fixed_price_service(request):
                     date = date,
                 )
     
-    serializers= FixedPriceServiceSerializers(fixed_price, data=request.data, partial=True, context={'request' : request})
+    serializers= PromtoionsSerializers.FixedPriceServiceSerializers(fixed_price, data=request.data, partial=True, context={'request' : request})
     if serializers.is_valid():
         serializers.save()
     else:
@@ -3250,7 +3250,7 @@ def create_free_service(request):
             except Exception as err:
                error.append(str(err))
                
-    serializers = MentionedNumberServiceSerializers(mention_number, context={'request' : request})
+    serializers = PromtoionsSerializers.MentionedNumberServiceSerializers(mention_number, context={'request' : request})
     
     return Response(
             {
@@ -3467,7 +3467,7 @@ def update_free_service(request):
                     date = date,
                 )
     
-    serializers= MentionedNumberServiceSerializers(mention_service, )#data=request.data, partial=True, context={'request' : request})
+    serializers= PromtoionsSerializers.MentionedNumberServiceSerializers(mention_service, )#data=request.data, partial=True, context={'request' : request})
 
     return Response(
         {
@@ -3664,7 +3664,7 @@ def create_bundle_fixed_price(request):
             except Exception as err:
                error.append(str(err))
                
-    serializers = BundleFixedSerializers(bundle_fixed, context={'request' : request})
+    serializers = PromtoionsSerializers.BundleFixedSerializers(bundle_fixed, context={'request' : request})
     
     return Response(
             {
@@ -3838,7 +3838,7 @@ def update_bundle_fixed_price(request):
                     date = date,
                 )
     
-    serializers= BundleFixedSerializers(bundle_fixed, )#data=request.data, partial=True, context={'request' : request})
+    serializers= PromtoionsSerializers.BundleFixedSerializers(bundle_fixed, )#data=request.data, partial=True, context={'request' : request})
 
     return Response(
         {
@@ -4046,7 +4046,7 @@ def create_retail_get_service(request):
             except Exception as err:
                error.append(str(err))
                
-    serializers = RetailAndGetServiceSerializers(retail_service, context={'request' : request})
+    serializers = PromtoionsSerializers.RetailAndGetServiceSerializers(retail_service, context={'request' : request})
     
     return Response(
             {
@@ -4244,7 +4244,7 @@ def update_retail_get_service(request):
                     date = date,
                 )
     
-    serializers= RetailAndGetServiceSerializers(retail_price)#data=request.data, partial=True, context={'request' : request})
+    serializers= PromtoionsSerializers.RetailAndGetServiceSerializers(retail_price)#data=request.data, partial=True, context={'request' : request})
     # if serializers.is_valid():
     #     serializers.save()
     # else:
@@ -4453,7 +4453,7 @@ def create_user_restricted_discount(request):
             except Exception as err:
                error.append(str(err))
                
-    serializers = UserRestrictedDiscountSerializers(usr_res, context={'request' : request})
+    serializers = PromtoionsSerializers.UserRestrictedDiscountSerializers(usr_res, context={'request' : request})
     
     return Response(
             {
@@ -4633,7 +4633,7 @@ def update_user_restricted_discount(request):
                     date = date,
                 )
     
-    serializers= UserRestrictedDiscountSerializers(usr_res)#data=request.data, partial=True, context={'request' : request})
+    serializers= PromtoionsSerializers.UserRestrictedDiscountSerializers(usr_res)#data=request.data, partial=True, context={'request' : request})
 
     return Response(
         {
@@ -4840,7 +4840,7 @@ def create_complimentrydiscount(request):
             except Exception as err:
                error.append(str(err))
     
-    serializers= ComplimentaryDiscountSerializers(complimentry_discount, context={'request' : request})
+    serializers= PromtoionsSerializers.ComplimentaryDiscountSerializers(complimentry_discount, context={'request' : request})
     
     return Response(
             {
@@ -5035,7 +5035,7 @@ def update_complimentrydiscount(request):
                     date = date,
                 ) 
         
-    serializers= ComplimentaryDiscountSerializers(complimentry_discount, context={'request' : request})
+    serializers= PromtoionsSerializers.ComplimentaryDiscountSerializers(complimentry_discount, context={'request' : request})
        
     return Response(
         {
@@ -5257,7 +5257,7 @@ def create_packagesdiscount(request):
             except Exception as err:
                error.append(str(err))
                
-    serializers = PackagesDiscountSerializers(package_discount, context={'request' : request})
+    serializers = PromtoionsSerializers.PackagesDiscountSerializers(package_discount, context={'request' : request})
     
     return Response(
             {
@@ -5483,7 +5483,7 @@ def update_packagesdiscount(request):
                     date = date,
                 )
     
-    serializers= PackagesDiscountSerializers(package_discount)#data=request.data, partial=True, context={'request' : request})
+    serializers= PromtoionsSerializers.PackagesDiscountSerializers(package_discount)#data=request.data, partial=True, context={'request' : request})
     return Response(
         {
             'status' : True,
