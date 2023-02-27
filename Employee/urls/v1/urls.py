@@ -32,7 +32,7 @@ urlpatterns = [
     path('import_attendance/', views.import_attendance),
     
     #Payroll
-    path('create_payroll/', views.create_payroll),
+    path('create_sallaryslip/', views.create_sallaryslip),
     path('get_payrolls/', views.get_payrolls),
     path('get_payrol_working/', views.get_payrol_working),
     path('get_payrol_working_device/', views.get_payrol_working_device),

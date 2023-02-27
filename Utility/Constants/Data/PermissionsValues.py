@@ -78,6 +78,7 @@ ALL_PERMISSIONS = [
     'employee_reports',
     'sales_root_access',
     'sales_apply_offer',
+    'calender_root_access',
     'calender_appointment',
     'calender_block_time',
     
