@@ -7,6 +7,7 @@ from django.db import models
 from uuid import uuid4
 from Authentication.models import User
 from Business.models import Business, BusinessAddress
+#from Promotions.models import ComplimentaryDiscount
 
 from Utility.models import Country, Language, State, City
 from django.utils.timezone import now
@@ -359,6 +360,24 @@ class LoyaltyPoints(models.Model):
     is_deleted = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now, null=True) #null = True, default= datetime.now() )
+    
+    def __str__(self):
+        return str(self.id)
+class ClientPromotions(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='user_client_promotions', verbose_name='Creator ( User )')
+    business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_client_promotions')
+    
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True, related_name='client_client_promotions')
+    complimentary = models.ForeignKey('Promotions.ComplimentaryDiscount', on_delete=models.SET_NULL, null=True, blank=True, related_name='complimentry_client_promotions')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='service_client_promotions')    
+
+    visits = models.PositiveIntegerField(default=0, null=True, blank=True)
+    
+    is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now, null=True) 
     
     def __str__(self):
         return str(self.id)

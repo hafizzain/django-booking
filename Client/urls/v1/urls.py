@@ -55,4 +55,7 @@ urlpatterns = [
    path('get_loyalty/', views.get_loyalty),
    path('delete_loyalty/', views.delete_loyalty),
    path('update_loyalty/', views.update_loyalty),
+   
+   #client promotion
+   path('get_complimentary/', views.get_complimentary),
 ]

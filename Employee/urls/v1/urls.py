@@ -15,7 +15,6 @@ urlpatterns = [
     path('delete_all_employees/', views.delete_all_employees),
     path('check_email_employees/', views.check_email_employees),
     
-
     #Staff GROUP URLS 
     path('create_staff_group/', views.create_staff_group),
     path('import_staff_group/', views.import_staff_group),
@@ -89,5 +88,4 @@ urlpatterns = [
     
     #Set_passeord
     path('set_password/', views.set_password),
-    
 ]

@@ -3036,7 +3036,7 @@ def get_check_availability(request):
                                 'status' : True,
                                 'status_code' : 200,
                                 'response' : {
-                                    'message' : f'This time {employee.full_name} not Available',
+                                    'message' : f'{employee.full_name} is not available at this time',
                                     'error_message' : f'This Employee day off, {employee.full_name} date {date}',
                                     'Availability': False
                                 }
@@ -3049,7 +3049,7 @@ def get_check_availability(request):
                             'status' : True,
                             'status_code' : 200,
                             'response' : {
-                                'message' : f'This time {employee.full_name} not Available',
+                                'message' : f'{employee.full_name} is not available at this time',
                                 'error_message' : f'This Employee day off, {employee.full_name} date {date}',
                                 'Availability': False
                             }

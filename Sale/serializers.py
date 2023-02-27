@@ -32,7 +32,15 @@ class PriceServiceSerializers(serializers.ModelSerializer):
 
 class AvailPriceServiceSerializers(serializers.ModelSerializer):
     currency_name = serializers.SerializerMethodField(read_only=True)
-    
+    service = serializers.SerializerMethodField(read_only=True)
+
+    def get_service(self, obj):
+        try:
+            service = Service.objects.get(id  = obj.service.id)
+            return service.code
+        except Exception as err:
+            return str(err)
+        
     def get_currency_name(self, obj):
         try:
             currency = Currency.objects.get(id  = obj.currency.id)
@@ -41,7 +49,7 @@ class AvailPriceServiceSerializers(serializers.ModelSerializer):
             return str(err)
     class Meta:
         model = PriceService
-        fields = ['id','currency']
+        fields = ['id','currency','service']
         
 class ServiceSearchSerializer(serializers.ModelSerializer):
     priceservice = serializers.SerializerMethodField(read_only=True)
