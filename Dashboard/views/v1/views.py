@@ -584,6 +584,7 @@ def get_total_sales_device(request):
         member__id=employee_id,
     ).values_list('created_at__month', flat=True)
 
+
     apps_checkouts = AppointmentCheckout.objects.filter(
         is_deleted=False, 
         member__id=employee_id,
