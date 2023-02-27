@@ -80,15 +80,10 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
         
     def get_product_sale_price(self, obj):
         try:
-            
-            # product_order = ProductOrder.objects.filter(is_deleted=False, member = obj).order_by('-created_at')
-            
-            # serialized = ProductOrderSerializer(product_order,  many=True, context=self.context ).data
-            # return serialized
             month = self.context["month"]
             year = self.context["year"]
             total = 0
-            test = 0
+            
             service_orders = ProductOrder.objects.filter(
                 is_deleted=False, 
                 member = obj, 
@@ -99,8 +94,6 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
                 match = int(create.split(" ")[0].split("-")[1])
                 if int(month) == match:
                     total += int(ord.total_price)
-                    test = test + 5
-                    #return total
             
             return f'{total}'
                 
@@ -109,17 +102,25 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
     
     def get_service_sale_price(self, obj):
         try:
-            # service_orders = ServiceOrder.objects.filter(is_deleted=False).order_by('-created_at')
-            # serialized = ServiceOrderSerializer(service_orders,  many=True, context=self.context).data
-            # return serialized
             month = self.context["month"]
             year = self.context["year"]
             total = 0
-            test = 0
+            app   = AppointmentService.objects.filter(
+                member = obj,
+                appointment_status = 'Done',
+                created_at__icontains = year
+            )
+        
             service_orders = ServiceOrder.objects.filter(is_deleted=False, 
                         member = obj,
                         created_at__icontains = year
                         )
+            for appointment in app:
+                create = str(appointment.created_at)
+                match = int(create.split(" ")[0].split("-")[1])
+                if int(month) == match:
+                    total += int(appointment.price)
+                    
             for ord  in service_orders:
                 create = str(ord.created_at)
                 match = int(create.split(" ")[0].split("-")[1])
@@ -133,9 +134,6 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
         
     def get_staff_target(self, obj):
         try:
-            # staff_target = StaffTarget.objects.filter(employee = obj)  
-            # serializer = StaffTargetSerializers(staff_target, many = True, context=self.context).data
-            # return serializer
             month = self.context["month"]
             year = self.context["year"]
             service_target = 0
@@ -152,7 +150,6 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
                 if int(month) == match:
                     service_target += int(ord.service_target)
                     retail_target += int(ord.retail_target)
-                    #return total
             data.update({
                 'service_target': service_target,
                 'retail_target': retail_target
@@ -213,20 +210,17 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             service_orders = ProductOrder.objects.filter(
                 is_deleted=False, 
                 member = obj, 
-                #created_at__icontains = year
                 )
             for ord  in service_orders:
                 create = str(ord.created_at)
                 created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
                 if range_start is not None:
-                    #return f'range start {range_start >= created_at} {created_at <= range_end}  {range_start} created at {created_at} range end {range_end}'
                     if created_at >= range_start  and created_at <= range_end:
                         total += int(ord.total_price)
                         service_commission += ord.checkout.service_commission
                         product_commission += ord.checkout.product_commission
                         voucher_commission += ord.checkout.voucher_commission
-                    # else:
-                    #     return f'range start {service_commission}'
+        
                 else:
                     total += int(ord.total_price)
                     service_commission += ord.checkout.service_commission
