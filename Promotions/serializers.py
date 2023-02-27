@@ -1,4 +1,4 @@
-from Sale.serializers import PriceServiceSerializers
+from Sale.serializers import NewPriceServiceSerializers
 from Service.models import PriceService
 from rest_framework import serializers
 
@@ -1448,7 +1448,7 @@ class NewServiceSerializers(serializers.ModelSerializer):
     def get_priceservice(self, obj):
         try:
             ser = PriceService.objects.filter(service = obj.service)
-            return PriceServiceSerializers(ser, many = True).data
+            return NewPriceServiceSerializers(ser, many = True).data
         except Exception as err:
             return str(err)
     

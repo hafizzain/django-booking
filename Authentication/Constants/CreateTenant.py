@@ -4,9 +4,9 @@
 from Authentication.Constants.Domain import ssl_sub_domain
 from Client.models import Client
 from Employee.Constants.Add_Employe import add_employee
-from Employee.models import Employee, EmployeeSelectedService
+from Employee.models import EmployeDailySchedule, Employee, EmployeeProfessionalInfo, EmployeeSelectedService
 from Tenants.models import Tenant, Domain
-from Business.models import Business, BusinessAddress, BusinessPaymentMethod, BusinessType
+from Business.models import Business, BusinessAddress, BusinessOpeningHour, BusinessPaymentMethod, BusinessType
 from Profile.models import Profile
 from Utility.Constants.add_data_db import add_business_types, add_countries, add_software_types, add_states, add_cities, add_currencies, add_languages
 from Utility.models import Country, Currency, ExceptionRecord, Language
@@ -21,6 +21,7 @@ from Authentication.Constants import AuthTokenConstants
 from Authentication.Constants.UserConstants import create_user_account_type
 from threading import Thread
 from Service.models import PriceService, Service, ServiceGroup
+from datetime import date, timedelta
 
 import datetime
 
@@ -135,9 +136,25 @@ def create_employee(tenant=None, user = None, business=None):
                 
                 tenant_name = str(tenant.domain).split('.')[0]
                 tenant_name = tenant_name.split('-')
-                tenant_name = [word[0] for word in tenant_name]
-                employe_id = f'{tenant_name}-EMP-0001'
+                tenant_name = [word[0].upper() for word in tenant_name if word]  # Use upper() to capitalize letters and add a check to skip empty strings
+                employe_id = f'{" ".join(tenant_name)}-EMP-0001'
                 
+                opening_day = {
+                            "monday":{"start_time":"09:00:00","end_time":"18:00:00"},
+                            "tuesday":{"start_time":"09:00:00","end_time":"18:00:00"},
+                            "wednesday":{"start_time":"09:00:00","end_time":"18:00:00"},
+                            "thursday":{"start_time":"09:00:00","end_time":"18:00:00"},
+                            "friday":{"start_time":"09:00:00","end_time":"18:00:00"},
+                            }
+                days = [
+                    'monday',
+                    'tuesday',
+                    'wednesday',
+                    'thursday',
+                    'friday',
+                    'saturday',
+                    'sunday',
+                ]
                 try:
                     country = Country.objects.get(name__iexact = country_id)
                     currency = Currency.objects.get(name__iexact = currency_id)
@@ -147,7 +164,7 @@ def create_employee(tenant=None, user = None, business=None):
                 business_address = BusinessAddress.objects.create(
                     business = business,
                     user = user,
-                    address = 'ABCD',
+                    address = 'Dubai - United Arab Emirates',
                     address_name = 'ABCD Address',
                     email= user.email,
                     mobile_number= user.mobile_number,
@@ -173,34 +190,67 @@ def create_employee(tenant=None, user = None, business=None):
                 employee.location.add(business_address)
                 employee.save()
                 
+                EmployeeProfessionalInfo.objects.create(
+                    employee=employee,
+                    salary=20, 
+                    income_type = 'Hourly_Rate',
+                    designation = 'Store Manager',
+                    monday = True,
+                    tuesday = True,
+                    wednesday = True,
+                    thursday = True,
+                    friday = True,
+                )
+                
+                for day in days:
+                    bds_schedule = BusinessOpeningHour.objects.create(
+                    business_address = business_address,
+                    business = business,
+                    day = day,
+                )
+                    s_day = opening_day.get(day.lower(), None)
+                    if s_day is not None:
+                                            
+                        bds_schedule.start_time = s_day['start_time']
+                        bds_schedule.close_time = s_day['end_time']
+                        bds_schedule.save()
+                        
+                    else:
+                        bds_schedule.is_closed = True
+
+                bds_schedule.save()
                 
                 try:
                     username = user.email.split('@')[0]
                     try:
                         user_check = User.objects.get(username = username)
                     except Exception as err:
-                        #data.append(f'username user is client errors {str(err)}')
+                        #data.append(f'username user is client errors {str(err)}')'
+                        email_check = f'{username}-abc'
                         pass
                     else:
                         username = f'{username} {len(User.objects.all())}'
+                        email_check = f'{username} {len(User.objects.all())}'
 
                 except Exception as err:
                     pass
-                
+                auto_generate_email = f'{email_check}@gmail.com'
                 user = User.objects.create(
                     first_name = user.full_name,
                     username = username,
-                    email = user.email ,
+                    email = auto_generate_email ,
                     is_email_verified = True,
                     is_active = True,
                     mobile_number = user.mobile_number,
                 )
+                
                 account_type = AccountType.objects.create(
                         user = user,
                         account_type = 'Employee'
                     )
+                
                 try:
-                    thrd = Thread(target=add_employee, args=['ABCD', user.email , user.mobile_number, template, business.business_name, tenant, domain, user])
+                    thrd = Thread(target=add_employee, args=['ABCD', auto_generate_email, user.mobile_number, template, business.business_name, tenant.id, domain, user])
                     thrd.start()
                 except Exception as err:
                     pass
@@ -214,8 +264,9 @@ def create_client(tenant=None, user = None, business=None):
         with tenant_context(tenant):
             tenant_name = str(tenant.domain).split('.')[0]
             tenant_name = tenant_name.split('-')
-            tenant_name = [word[0] for word in tenant_name]
-            client_unique_id = f'{tenant_name}-EMP-0001'
+            tenant_name = [word[0].upper() for word in tenant_name if word]  # Use upper() to capitalize letters and add a check to skip empty strings
+            client_unique_id = f'{" ".join(tenant_name)}-CLI-0001'
+            
             try:
                 languages = 'English'
                 language_id = Language.objects.get(name__icontains='English')
@@ -230,10 +281,11 @@ def create_client(tenant=None, user = None, business=None):
                 mobile_number = user.mobile_number,
                 gender = 'Male',
                 language = language_id,
-                client_id = client_unique_id
+                client_id = client_unique_id,
+                is_active = True
                 
             )
-            
+   
 def create_ServiceGroup(tenant=None, user = None, business=None):
     if tenant is not None and user is not None and business is not None:
         try:
@@ -248,17 +300,20 @@ def create_ServiceGroup(tenant=None, user = None, business=None):
                 service_grp = ServiceGroup.objects.create(
                     business = business,
                     user = user,
-                    name = 'ABCD',
+                    name = 'Hair Care',
                     is_active = True                
                 )
                 for ser in range(2):
+                    if int(ser) == 0:
+                        ser_name = 'Hair color'
+                    else:
+                        ser_name = 'Hair cut'
                     service = Service.objects.create(
                         user = user,
                         business =business,
-                        name = 'ABCD',
-                        description = 'ABCD description',
-                        service_availible = 'Everyone',
-                                        
+                        name = ser_name,
+                        description = f'{ser_name} description',
+                        service_availible = 'Everyone',          
                     )
                     service.location.add(location)
                     service.save()
@@ -275,6 +330,41 @@ def create_ServiceGroup(tenant=None, user = None, business=None):
                         duration = '30_Min',
                         price = 500,
                     )
+        except Exception as err:
+            ExceptionRecord.objects.create(
+                text = f'Service creating error occur {str(err)} {location}'
+            )
+            
+def create_emp_schedule(tenant=None, user = None, business=None):
+    if tenant is not None and user is not None and business is not None:
+        try:
+            start_time = datetime.time(9, 0, 0)
+            end_time = datetime.time(6, 0, 0)
+            today = date.today()
+
+            with tenant_context(tenant):
+                emp = Employee.objects.all()[0]
+                for dt in range(30):
+                    next_date = today + timedelta(days=dt)
+                    EmployeDailySchedule.objects.create(
+                        user = user,
+                        business = business ,
+                        employee = emp,
+                                                
+                        start_time = start_time,
+                        end_time = end_time,
+                        
+                        from_date =next_date,
+                        to_date = next_date,
+                        note = "ABCD note",
+                        
+                        date = next_date,
+                        is_vacation = False,
+                        is_leave = False,
+                        is_off = False,
+                        is_active = True                                     
+                )
+                            
         except Exception as err:
             ExceptionRecord.objects.create(
                 text = f'Service creating error occur {str(err)}'
@@ -470,6 +560,11 @@ def create_tenant(request=None, user=None, data=None):
             except:
                 pass
             
+            # try:
+            #     service_thrd = Thread(target=create_employee, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+            #     service_thrd.start()
+            # except:
+            #     pass
             try:
                 t_token = create_tenant_user_token(tenant_user=t_user, tenant=user_tenant)
             except:
@@ -479,7 +574,13 @@ def create_tenant(request=None, user=None, data=None):
             #     terms_condition=data.get('terms_condition', True),
             #     is_subscribed=data.get('terms_condition', False)
             # )
-
+            try:
+                create_employee(tenant = user_tenant , user = t_user, business = t_business)
+            except:
+                ExceptionRecord.objects.create(
+                    text = f'{str(err)}'
+                )
+            
             try:
                 create_tenant_account_type(tenant_user=t_user, tenant=user_tenant, account_type='Business')#data['account_type'])
             except:
@@ -521,12 +622,6 @@ def create_tenant(request=None, user=None, data=None):
             #     pass
             
             try:
-                service_thrd = Thread(target=create_employee, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
-                service_thrd.start()
-            except:
-                pass
-            
-            try:
                 service_thrd = Thread(target=create_client, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
                 service_thrd.start()
             except:
@@ -537,3 +632,9 @@ def create_tenant(request=None, user=None, data=None):
                 service_thrd.start()
             except:
                 pass
+            try:
+                service_thrd = Thread(target=create_emp_schedule, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+                service_thrd.start()
+            except Exception as err:
+                pass
+            
