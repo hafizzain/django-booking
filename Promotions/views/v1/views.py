@@ -2,14 +2,13 @@ from datetime import datetime
 import email
 from django.conf import settings
 from operator import ge
-
-from Promotions.serializers import AvailOfferDirectOrFlatDiscountSerializers,AvailOfferSpecificGroupDiscountSerializers,AvailOfferPurchaseDiscountSerializers,AvailOfferSpecificBrandSerializers,AvailOfferSpendDiscountSerializers,AvailOfferSpendSomeAmountSerializers,AvailOfferFixedPriceServiceSerializers,AvailOfferMentionedNumberServiceSerializers,AvailOfferBundleFixedSerializers,AvailOfferRetailAndGetServiceSerializers,AvailOfferUserRestrictedDiscountSerializers,AvailOfferComplimentaryDiscountSerializers,AvailOfferPackagesDiscountSerializers,NewServiceSerializers
+import Promotions.serializers as PromtoionsSerializers
+# from Promotions.serializers import AvailOfferDirectOrFlatDiscountSerializers,AvailOfferSpecificGroupDiscountSerializers,AvailOfferPurchaseDiscountSerializers,AvailOfferSpecificBrandSerializers,AvailOfferSpendDiscountSerializers,AvailOfferSpendSomeAmountSerializers,AvailOfferFixedPriceServiceSerializers,AvailOfferMentionedNumberServiceSerializers,AvailOfferBundleFixedSerializers,AvailOfferRetailAndGetServiceSerializers,AvailOfferUserRestrictedDiscountSerializers,AvailOfferComplimentaryDiscountSerializers,AvailOfferPackagesDiscountSerializers,NewServiceSerializers
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from Authentication.serializers import UserTenantLoginSerializer
-
 from Business.models import BusinessAddressMedia, BusinessType
 from Business.serializers.v1_serializers import EmployeTenatSerializer, OpeningHoursSerializer,AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer
 from Client.models import Client
@@ -24,7 +23,7 @@ from Product.models import Brand, Product, ProductStock
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
 from Promotions.models import BlockDate, BundleFixed, CategoryDiscount, ComplimentaryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount, DiscountOnFreeService, FixedPriceService, FreeService, MentionedNumberService, PackagesDiscount, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, ServiceDurationForSpecificTime, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount, UserRestrictedDiscount
-from Promotions.serializers import BundleFixedSerializers, ComplimentaryDiscountSerializers, DirectOrFlatDiscountSerializers, FixedPriceServiceSerializers, MentionedNumberServiceSerializers, PackagesDiscountSerializers, PurchaseDiscountSerializers, RetailAndGetServiceSerializers, SpecificBrandSerializers, SpecificGroupDiscountSerializers, SpendDiscountSerializers, SpendSomeAmountSerializers, UserRestrictedDiscountSerializers
+# from Promotions.serializers import BundleFixedSerializers, ComplimentaryDiscountSerializers, DirectOrFlatDiscountSerializers, FixedPriceServiceSerializers, MentionedNumberServiceSerializers, PackagesDiscountSerializers, PurchaseDiscountSerializers, RetailAndGetServiceSerializers, SpecificBrandSerializers, SpecificGroupDiscountSerializers, SpendDiscountSerializers, SpendSomeAmountSerializers, UserRestrictedDiscountSerializers
 from Service.models import Service, ServiceGroup
 from Tenants.models import Domain, Tenant
 from Utility.models import Country, Currency, ExceptionRecord, Language, NstyleFile, Software, State, City
@@ -193,55 +192,55 @@ def get_directorflat(request):
     data = []
     
     flatordirect = DirectOrFlatDiscount.objects.filter(is_deleted=False).order_by('-created_at').distinct()
-    serialized = DirectOrFlatDiscountSerializers(flatordirect,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.DirectOrFlatDiscountSerializers(flatordirect,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
     specific_group = SpecificGroupDiscount.objects.filter(is_deleted=False).order_by('-created_at').distinct()
-    serialized = SpecificGroupDiscountSerializers(specific_group,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.SpecificGroupDiscountSerializers(specific_group,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
     purchase_discount = PurchaseDiscount.objects.filter(is_deleted=False).order_by('-created_at').distinct()
-    serialized = PurchaseDiscountSerializers(purchase_discount,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.PurchaseDiscountSerializers(purchase_discount,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
     specificbrand = SpecificBrand.objects.filter(is_deleted=False).order_by('-created_at').distinct()
-    serialized = SpecificBrandSerializers(specificbrand,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.SpecificBrandSerializers(specificbrand,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
     spend_discount = SpendDiscount.objects.filter(is_deleted=False).order_by('-created_at').distinct()
-    serialized = SpendDiscountSerializers(spend_discount,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.SpendDiscountSerializers(spend_discount,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
     spend_discount = SpendSomeAmount.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = SpendSomeAmountSerializers(spend_discount,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.SpendSomeAmountSerializers(spend_discount,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
     fixed_price = FixedPriceService.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = FixedPriceServiceSerializers(fixed_price,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.FixedPriceServiceSerializers(fixed_price,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
     free_price = MentionedNumberService.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = MentionedNumberServiceSerializers(free_price,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.MentionedNumberServiceSerializers(free_price,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
     bundle = BundleFixed.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = BundleFixedSerializers(bundle,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.BundleFixedSerializers(bundle,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
     retail = RetailAndGetService.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = RetailAndGetServiceSerializers(retail, many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.RetailAndGetServiceSerializers(retail, many=True, context={'request' : request})
     data.extend(serialized.data)
     
     restricted = UserRestrictedDiscount.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = UserRestrictedDiscountSerializers(restricted, many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.UserRestrictedDiscountSerializers(restricted, many=True, context={'request' : request})
     data.extend(serialized.data)
     
     complimentry = ComplimentaryDiscount.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = ComplimentaryDiscountSerializers(complimentry, many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.ComplimentaryDiscountSerializers(complimentry, many=True, context={'request' : request})
     data.extend(serialized.data)
     
     package = PackagesDiscount.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = PackagesDiscountSerializers(package, many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.PackagesDiscountSerializers(package, many=True, context={'request' : request})
     data.extend(serialized.data)
     
     return Response(
@@ -503,55 +502,55 @@ def get_discount_and_promotions(request):
     data = []
     ##Done
     flatordirect = DirectOrFlatDiscount.objects.filter(is_deleted=False).distinct()
-    serialized = AvailOfferDirectOrFlatDiscountSerializers(flatordirect,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.AvailOfferDirectOrFlatDiscountSerializers(flatordirect,  many=True, context={'request' : request})
     data.extend(serialized.data)
     #Done
     specific_group = SpecificGroupDiscount.objects.filter(is_deleted=False).distinct()
-    serialized = AvailOfferSpecificGroupDiscountSerializers(specific_group,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.AvailOfferSpecificGroupDiscountSerializers(specific_group,  many=True, context={'request' : request})
     data.extend(serialized.data)
     #Done
     purchase_discount = PurchaseDiscount.objects.filter(is_deleted=False).distinct()
-    serialized = AvailOfferPurchaseDiscountSerializers(purchase_discount,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.AvailOfferPurchaseDiscountSerializers(purchase_discount,  many=True, context={'request' : request})
     data.extend(serialized.data)
     #Done
     specificbrand = SpecificBrand.objects.filter(is_deleted=False).distinct()
-    serialized = AvailOfferSpecificBrandSerializers(specificbrand,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.AvailOfferSpecificBrandSerializers(specificbrand,  many=True, context={'request' : request})
     data.extend(serialized.data)
    #Done
     spend_discount = SpendDiscount.objects.filter(is_deleted=False).distinct()
-    serialized = AvailOfferSpendDiscountSerializers(spend_discount,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.AvailOfferSpendDiscountSerializers(spend_discount,  many=True, context={'request' : request})
     data.extend(serialized.data)
     #Done
     spend_discount = SpendSomeAmount.objects.filter(is_deleted=False).distinct()
-    serialized = AvailOfferSpendSomeAmountSerializers(spend_discount,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.AvailOfferSpendSomeAmountSerializers(spend_discount,  many=True, context={'request' : request})
     data.extend(serialized.data)
     #Done
     fixed_price = FixedPriceService.objects.filter(is_deleted=False).distinct()
-    serialized = AvailOfferFixedPriceServiceSerializers(fixed_price,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.AvailOfferFixedPriceServiceSerializers(fixed_price,  many=True, context={'request' : request})
     data.extend(serialized.data)
     ##Done
     free_price = MentionedNumberService.objects.filter(is_deleted=False).distinct()
-    serialized = AvailOfferMentionedNumberServiceSerializers(free_price,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.AvailOfferMentionedNumberServiceSerializers(free_price,  many=True, context={'request' : request})
     data.extend(serialized.data)
     #Done
     bundle = BundleFixed.objects.filter(is_deleted=False).distinct()
-    serialized = AvailOfferBundleFixedSerializers(bundle,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.AvailOfferBundleFixedSerializers(bundle,  many=True, context={'request' : request})
     data.extend(serialized.data)
     #Done
     retail = RetailAndGetService.objects.filter(is_deleted=False).distinct()
-    serialized = AvailOfferRetailAndGetServiceSerializers(retail, many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.AvailOfferRetailAndGetServiceSerializers(retail, many=True, context={'request' : request})
     data.extend(serialized.data)
     #Done
     restricted = UserRestrictedDiscount.objects.filter(is_deleted=False).distinct()
-    serialized = AvailOfferUserRestrictedDiscountSerializers(restricted, many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.AvailOfferUserRestrictedDiscountSerializers(restricted, many=True, context={'request' : request})
     data.extend(serialized.data)
     #Done
     complimentry = ComplimentaryDiscount.objects.filter(is_deleted=False).distinct()
-    serialized = AvailOfferComplimentaryDiscountSerializers(complimentry, many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.AvailOfferComplimentaryDiscountSerializers(complimentry, many=True, context={'request' : request})
     data.extend(serialized.data)
     ##Done
     package = PackagesDiscount.objects.filter(is_deleted=False).distinct()
-    serialized = AvailOfferPackagesDiscountSerializers(package, many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.AvailOfferPackagesDiscountSerializers(package, many=True, context={'request' : request})
     data.extend(serialized.data)
     
     return Response(
