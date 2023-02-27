@@ -16,6 +16,7 @@ urlpatterns = [
     path('update_brand/', views.update_brand),
     path('delete_brand/', views.delete_brand),
     path('search_brand/', views.search_brand),
+    path('import_brand/', views.import_brand),
     
 
     # Products Paths 
@@ -43,4 +44,23 @@ urlpatterns = [
     path('update_orderstock/', views.update_orderstock),
     path('delete_orderstock/', views.delete_orderstock),
     
+    #Update stockproduct order
+    path('update_orderstockproduct/', views.update_orderstockproduct),    
+
+    path('add_product_consumption/', views.add_product_consumption),
+    path('get_product_consumptions/', views.get_product_consumptions),
+    path('update_product_consumptions/', views.update_product_consumptions),
+    path('delete_product_consumption/', views.delete_product_consumptions),
+    
+
+    path('add_product_stock_transfer/', views.add_product_stock_transfer),
+    path('get_product_stock_transfers/', views.get_product_stock_transfers),
+    path('delete_product_stock_transfer/', views.delete_product_stock_transfer),
+    path('update_product_stock_transfer/', views.update_product_stock_transfer),
+    
+    #Inventory Reports
+    path('get_product_stock_report/', views.get_product_stock_report),
+    
+    #Testing Api
+    path('get_test_api/', views.get_test_api)
 ]

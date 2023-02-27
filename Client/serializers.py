@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from Product.Constants.index import tenant_media_base_url
+from Product.Constants.index import tenant_media_base_url, tenant_media_domain
 
 from Product.models import Product
 from Service.models import Service
 from Utility.models import Country, State, City
 
-from Client.models import Client, ClientGroup, DiscountMembership, Subscription, Promotion , Rewards , Membership, Vouchers
+from Client.models import Client, ClientGroup, DiscountMembership, LoyaltyPoints, Subscription, Promotion , Rewards , Membership, Vouchers
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -48,10 +48,40 @@ class ClientSerializer(serializers.ModelSerializer):
             except:
                 return obj.image
         return None
+    class Meta:
+        model = Client
+        fields =['id','full_name','image','client_id','email','mobile_number','dob','postal_code','address','gender','card_number',
+                 'country','city','state', 'is_active',
+                 'language', 'about_us', 'marketing','country_obj','customer_note',
+                 'created_at']
+        
+class Client_TenantSerializer(serializers.ModelSerializer):
+    country_obj = serializers.SerializerMethodField(read_only=True)
+    image = serializers.SerializerMethodField()
+    
+    
+    def get_country_obj(self, obj):
+        try:
+            return CountrySerializer(obj.country).data
+        except Exception as err:
+            return None
+    
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["tenant"]
+                url = tenant_media_domain(request)
+                return f'{url}{obj.image}'
+            except:
+                return obj.image
+        return None
     
     class Meta:
         model = Client
-        fields =['id','full_name','image','client_id','email','mobile_number','dob','postal_code','address','gender','card_number','country','city','state', 'is_active', 'country_obj', 'created_at']
+        fields =['id','full_name','image','client_id','email','mobile_number','dob','postal_code','address','gender','card_number',
+                 'country','city','state', 'is_active',
+                 'language', 'about_us', 'marketing','country_obj','customer_note',
+                 'created_at']
         
         
 class ClientGroupSerializer(serializers.ModelSerializer):
@@ -120,3 +150,9 @@ class ClientAppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
         fields = ['id', 'full_name', 'image']
+        
+class LoyaltyPointsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = LoyaltyPoints
+        fields = '__all__'

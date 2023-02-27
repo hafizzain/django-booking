@@ -21,7 +21,7 @@ class Employee(models.Model):
     full_name = models.CharField(max_length=300, default='')
     image = models.ImageField(upload_to='employee/employee_images/', null=True, blank=True)
     employee_id = models.CharField(max_length=50, default='')
-    email = models.EmailField(default='')
+    email = models.EmailField(verbose_name="email", max_length=60, unique=True)
     mobile_number = models.CharField(max_length=30, null=True, blank=True)
     is_email_verified = models.BooleanField(default=False)
     is_mobile_verified = models.BooleanField(default=False)
@@ -74,6 +74,8 @@ class EmployeeProfessionalInfo(models.Model):
     
     start_time = models.TimeField(null=True, blank=True)
     end_time = models.TimeField(null=True, blank=True)
+    maximum_discount = models.PositiveIntegerField(default=0, null=True, blank=True)
+    
     
     monday = models.BooleanField(default=False)
     tuesday = models.BooleanField(default=False)
@@ -99,8 +101,6 @@ class EmployeeSelectedService(models.Model):
 
     def __str__(self):
         return str(self.id)
-
-    
 
 class EmployeePermissionSetting(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
@@ -196,28 +196,85 @@ class Attendance(models.Model):
         
 
 class Payroll(models.Model):
-     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
-     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_payrolls')
-     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_employee_payrolls')
-     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_payrolls')
-     
-     name = models.CharField(max_length=300, default='')
-     created_at = models.DateTimeField(auto_now_add=now)
-     Total_hours = models.CharField(max_length=300, default='')
-     
-     def __str__(self):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_payrolls')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_employee_payrolls')
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_payrolls')
+    
+    name = models.CharField(max_length=300, default='')
+    created_at = models.DateTimeField(auto_now_add=now)
+    Total_hours = models.CharField(max_length=300, default='')
+    
+    def __str__(self):
+        return str(self.id)
+class SallarySlipPayrol(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_sallary_slip')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_employee_sallary_slip')
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_sallary_slip')
+    
+    month = models.DateTimeField(null = True)
+    created_at = models.DateTimeField(auto_now_add=now)
+    
+    def __str__(self):
         return str(self.id)
 
 
 class CommissionSchemeSetting(models.Model):
+    COMMISSION_CHOICES =[
+        ('Every day', 'Every day'),
+        ('Every week', 'Every week'),
+        ('Every 2 week', 'Every 2 week'),
+        ('Every 4 week', 'Every 4 week'),
+        ('Every month', 'Every month'),
+        ('Every quarter', 'Every quarter'),
+        ('Every 6 months', 'Every 6 months'),
+        ('Every year', 'Every year'),
+
+    ]
+    
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_commission_setting')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_commission_setting')
+    
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_commissioin', null=True, blank=True)
+    from_value = models.PositiveIntegerField(default=0, null=True, blank=True)
+    to_value = models.PositiveIntegerField(default=0, null=True, blank=True)
+    percentage = models.PositiveIntegerField(default=0, null=True, blank=True)
+    
+    commission_cycle = models.CharField(choices=COMMISSION_CHOICES, max_length=50, default='Every day',)
     
     sale_price_before_discount = models.BooleanField(default=True)
     sale_price_including_tax = models.BooleanField(default=True)
     service_price_before_membership_discount = models.BooleanField(default=False)
 
+    created_at = models.DateTimeField(auto_now_add=now)
+    
+    def __str__(self):
+        return str(self.id)
+
+class CategoryCommission(models.Model):
+    COMMISSION_CHOICE = [
+        ('percentage', 'percentage'),
+        ('currency', 'currency'),
+    ]
+    CATEGORY_CHOICES =[
+        ('Service', 'Service'),
+        ('Retail', 'Retail'),
+        ('Voucher', 'Voucher'),
+    ]
+    
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    commission = models.ForeignKey(CommissionSchemeSetting, on_delete=models.CASCADE, related_name='categorycommission_commission')
+    
+    from_value = models.PositiveIntegerField(default=0, null=True, blank=True)
+    to_value = models.CharField(max_length=50, null=True, blank= True)
+    commission_percentage = models.PositiveIntegerField(default=0, null=True, blank=True)
+    
+    category_comission = models.CharField(choices=CATEGORY_CHOICES, max_length=50, default='Service',)
+    #comission_choice = models.CharField(choices=COMMISSION_CHOICE, max_length=50, default='percentage',)
+    symbol = models.CharField(max_length=50, null=True, blank= True)
+    
     created_at = models.DateTimeField(auto_now_add=now)
     
     def __str__(self):
@@ -249,3 +306,77 @@ class AssetDocument(models.Model):
     def __str__(self):
         return str(self.id)
     
+class Vacation(models.Model):
+    
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null = True, related_name='user_vacation')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, null = True , related_name='business_vacation')
+    
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_vacation')
+    
+    from_date = models.DateField(verbose_name = 'From Date', null=True)
+    to_date = models.DateField(verbose_name = 'To Date', null=True)
+    note = models.CharField(max_length=300, default='')
+    
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=now)
+    
+    def __str__(self):
+        return str(self.id)
+    
+class EmployeDailySchedule(models.Model):
+    DAYS_CHOICE =[
+        ('Monday', 'Monday'),
+        ('Tuesday', 'Tuesday'),
+        ('Wednesday', 'Wednesday'),
+        ('Thursday', 'Thursday'),
+        ('Friday', 'Friday'),
+        ('Saturday', 'Saturday'),
+        ('Sunday', 'Sunday'),
+    ]
+    
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null = True, related_name='user_employedailyschedule')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, null = True , related_name='business_employedailyschedule')
+    
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_employedailyschedule')
+    day = models.CharField(choices=DAYS_CHOICE, default='Monday', max_length=50, null=True, blank = True)
+    #today_date = models.DateField(verbose_name = 'Today Date', null=True)
+    
+    start_time = models.TimeField(null=True, blank=True)
+    end_time = models.TimeField(null=True, blank=True)
+    
+    start_time_shift = models.TimeField(null=True, blank=True) #  =>>  Will be terminated
+    end_time_shift = models.TimeField(null=True, blank=True) # =>>   Will be terminated
+    
+    from_date = models.DateField(verbose_name = 'From Date', null=True) #  =>>  Will be terminated
+    to_date = models.DateField(verbose_name = 'To Date', null=True) # =>>   Will be terminated
+    note = models.CharField(max_length=300, default='', null=True)
+    
+    date = models.DateTimeField(verbose_name = 'Date', null=True)
+    
+    is_leave = models.BooleanField(default=False)
+    is_off = models.BooleanField(default=False)
+    is_vacation = models.BooleanField(default=False)
+    
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=now)
+    updated_at = models.DateTimeField(auto_now_add=now)
+    
+    def __str__(self):
+        return str(self.id)
+    
+# class EmployeDailyShift(models.Model):
+#     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, null = True, related_name='user_employedailyshift')
+#     business = models.ForeignKey(Business, on_delete=models.CASCADE, null = True , related_name='business_employedailyshift')
+    
+#     dailyschedule = models.ForeignKey(EmployeDailySchedule, on_delete=models.CASCADE, related_name='dailyschedule_employedailyshift')
+#     start_time = models.TimeField(null=True, blank=True)
+#     end_time = models.TimeField(null=True, blank=True)
+    
+#     is_active = models.BooleanField(default=True)
+#     created_at = models.DateTimeField(auto_now_add=now)
+    
+#     def __str__(self):
+#         return str(self.id)

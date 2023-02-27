@@ -55,6 +55,10 @@ NSTYLE_APPS = [
     'Order.apps.OrderConfig',
     'Dashboard.apps.DashboardConfig',
     'CRM.apps.CrmConfig',
+    'TragetControl.apps.TragetcontrolConfig',
+    'Customer.apps.CustomerConfig',
+    'Promotions.apps.PromotionsConfig',
+    'Reports.apps.ReportsConfig',
 ]
 
 
@@ -152,7 +156,8 @@ DATABASES = {
 }
 
 AUTH_USER_MODEL = 'Authentication.User'
-
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760
 
 
 # Password validation
@@ -203,7 +208,8 @@ USE_TZ = True
 
 
 CRONJOBS = [
-    ('* * * * *', 'Apponitment.Constants.today_appointment.today_appointment')
+    ('* * * * *', 'Apponitment.Constants.today_appointment.today_appointment'),
+    ('* * * * *', 'Product.Constants.Product_automation.ReorderQunatity')
 ]
 
 

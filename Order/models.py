@@ -33,12 +33,27 @@ class Checkout(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_checkout_order', null=True, blank=True)
 
-    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client_checkout_orders')
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client_checkout_orders', null=True, blank=True)
     location = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, related_name='location_checkout_orders', null=True, blank=True)
     member = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='member_checkout_orders')
     client_type = models.CharField(choices = CLIENT_TYPE, max_length=50 , default = '' )
     payment_type = models.CharField(choices = PAYMENT_TYPE, max_length=50 , default = '' )
-
+    
+    tip = models.PositiveBigIntegerField(default = 0)
+    
+    total_service_price = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
+    total_product_price = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
+    total_voucher_price = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
+    total_membership_price = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
+    
+    service_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
+    product_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
+    voucher_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
+    
+    service_commission_type = models.CharField( max_length=50 , default = '')
+    product_commission_type = models.CharField( max_length=50 , default = '')
+    voucher_commission_type = models.CharField( max_length=50 , default = '')
+    
     status =  models.CharField(choices=status_choice, max_length=100, default='Active')
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -89,7 +104,7 @@ class Order(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True,)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_sale_order', null=True, blank=True)
     
-    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client_orders')
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client_orders', null=True, blank=True)
     location = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, related_name='location_orders', null=True, blank=True)
     member = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='member_orders', null=True, blank=True)
     
@@ -104,6 +119,8 @@ class Order(models.Model):
     promotion =models.ForeignKey(Promotion, on_delete=models.CASCADE, related_name='checkout_promotion_orders', null=True, blank=True) 
     #membership =models.ForeignKey(Membership, on_delete=models.CASCADE, related_name='checkout_membership_orders', null=True, blank=True) 
     rewards =models.ForeignKey(Rewards, on_delete=models.CASCADE, related_name='checkout_reward_orders', null=True, blank=True) 
+    
+    quantity = models.PositiveBigIntegerField(default= 0)
     
     current_price =models.PositiveBigIntegerField(default = 0)
     tip =models.PositiveBigIntegerField(default = 0)

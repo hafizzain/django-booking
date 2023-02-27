@@ -55,7 +55,6 @@ def get_tenants_product(request):
             all_businesses = Business.objects.all()
             b_serialized = BusinessGetSerializer(all_businesses , context={'request' : request})
             businesses.append(b_serialized.data)
-            print(b_serialized.data)
             
     return Response(
         {

@@ -5,6 +5,7 @@ import uuid
 
 from Authentication.models import User
 from Business.models import Business, BusinessAddress, BusinessVendor
+from Utility.models import Currency
 
 
 
@@ -54,11 +55,11 @@ class Product(models.Model):
 
     name = models.CharField(max_length=1000, default='')
 
-    cost_price = models.PositiveIntegerField(default=0)
-    full_price = models.PositiveIntegerField(default=0)
-    sell_price = models.PositiveIntegerField(default=0)
+    cost_price = models.PositiveIntegerField(default=0, null = True, blank= True)
+    #full_price = models.PositiveIntegerField(default=0, null = True, blank= True)
+    #sell_price = models.PositiveIntegerField(default=0, null = True, blank= True)
     #product_size = models.PositiveIntegerField(default=0)
-    product_size = models.CharField(max_length=50, null=True, blank=True)
+    #product_size = models.CharField(max_length=50, null=True, blank=True)
 
 
     tax_rate = models.PositiveIntegerField(default=0, null=True, blank=True)
@@ -81,6 +82,22 @@ class Product(models.Model):
     def __str__(self):
         return str(self.id)
 
+class CurrencyRetailPrice(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products_currencyretailprice')
+    business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_currencyretailprice')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_currencyretailprice')
+    
+    currency = models.ForeignKey(Currency, on_delete=models.SET_NULL, null=True, blank=True)
+    retail_price = models.PositiveIntegerField(default=0)
+
+    is_deleted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+
+
+    def __str__(self):
+        return str(self.id)
 
 class ProductMedia(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
@@ -113,10 +130,15 @@ class ProductStock(models.Model):
     
     sellable_quantity = models.IntegerField(validators=[MinValueValidator(0)],null=True, blank=True, default=0, verbose_name= 'Sellable Quantity')
     consumable_quantity = models.IntegerField(validators=[MinValueValidator(0)],null=True, blank=True, default=0, verbose_name= 'Consumable Quantity')
+    location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, related_name='location_product_stocks')
     
     #quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0, verbose_name='Total Quantity')
     available_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
     sold_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
+    consumed_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
+
+    low_stock = models.PositiveIntegerField(default=0)
+    reorder_quantity = models.PositiveIntegerField(default=0)
     
     amount = models.PositiveIntegerField(default=0, verbose_name='Usage Amount', null=True, blank=True)
     unit = models.PositiveIntegerField(default=0, verbose_name='Usage Unit', null=True, blank=True)
@@ -149,10 +171,11 @@ class OrderStock(models.Model):
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_order_stock')
     
     vendor = models.ForeignKey(BusinessVendor, on_delete=models.CASCADE, related_name='vendor_order_stock', default=None, null=True, blank=True)
-    location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='locations_order_stock')
+    from_location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='from_locations_order_stock')
+    to_location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='to_locations_order_stock')
     
     status= models.CharField(choices = STATUS_CHOICES, max_length =100, default='Placed')
-    rec_quantity= models.PositiveIntegerField(default=0, verbose_name= 'Received Quantity', null=True, blank=True)
+#    rec_quantity= models.PositiveIntegerField(default=0, verbose_name= 'Received Quantity', null=True, blank=True)
     
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
@@ -163,13 +186,91 @@ class OrderStock(models.Model):
         return str(self.id)
     
 class OrderStockProduct(models.Model):
+    STATUS_CHOICES =[
+        ('Placed', 'Placed'),
+        ('Delivered', 'Delivered'),
+        ('Partially_Received', 'Partially Received'),
+        ('Received', 'Received'),
+        ('Cancelled', 'Cancelled'),
+    ]
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     order = models.ForeignKey(OrderStock, on_delete=models.CASCADE , related_name='order_stock')
     
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_order_stock')
+    status = models.CharField(choices = STATUS_CHOICES, max_length =100, default='Placed')
+    note = models.TextField(default='', null=True, blank=True)
+    rec_quantity= models.PositiveIntegerField(default=0, verbose_name= 'Received Quantity', null=True, blank=True)
     quantity = models.PositiveIntegerField(default=0)
     
     def __str__(self):
         return str(self.id)
     
+
+class ProductConsumption(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='consumptions')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_product_cunsumptions')
+
+    is_deleted = models.BooleanField(default=False)
+
+    location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='consumption_locations')
+    quantity = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return str(self.id)
     
+
+class ProductStockTransfer(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='products_stock_transfers')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='users_stock_tranfers')
+
+    is_deleted = models.BooleanField(default=False)
+
+    from_location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='from_location_stock_transfers')
+    to_location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='to_location_stock_transfers')
+    quantity = models.PositiveIntegerField(default=0)
+    note = models.TextField(default='', null=True, blank=True)
+    
+    is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now, null= True)
+    
+    def __str__(self):
+        return str(self.id)
+    
+class ProductOrderStockReport(models.Model):
+    TYPE_CHOICE = [
+        ('Purchase', 'Purchase'),
+        ('Consumed', 'Consumed'),
+        ('Sold', 'Sold'),
+        ('Transfer_to', 'Transfer_to'),
+        ('Transfer_from', 'Transfer_From'),
+        
+    ]
+    
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_stock_report')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='users_location_product_stock_report')
+
+    vendor = models.ForeignKey(BusinessVendor, on_delete=models.CASCADE, related_name='vendor_product_stock_report', default=None, null=True, blank=True)
+
+    
+    location =  models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='location_product_stock_report')
+    consumed_location =  models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='consumed_location_product_stock_report')
+    from_location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='from_location_product_stock_report')
+    to_location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='to_location_product_stock_report')
+
+    report_choice = models.CharField(choices = TYPE_CHOICE, max_length =100, default='Sold')
+    
+    quantity = models.PositiveIntegerField(default=0)
+    before_quantity = models.PositiveIntegerField(default=0)
+    after_quantity = models.PositiveIntegerField(default=0)
+    reorder_quantity = models.PositiveIntegerField(default=0)
+    
+    is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now, null= True)
+    
+    def __str__(self):
+        return str(self.id)

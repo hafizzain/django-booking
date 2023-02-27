@@ -42,13 +42,23 @@ class Appointment(models.Model):
 
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client_appointments', null=True, blank=True)
     business_address = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='appointment_address')
+    member = models.ForeignKey(Employee, on_delete=models.SET_NULL, related_name='employee_appointments_lg', null=True, blank=True)
+
     
     client_type= models.CharField(choices=TYPE_CHOICES, max_length=50, null=True, blank=True, )
     discount_type = models.CharField(max_length=50, choices= DISCOUNT_CHOICES, null=True, blank=True)
     payment_method = models.CharField(max_length=100, choices= PAYMENT_CHOICES, default='', null=True, blank=True)  
-
+    
+    extra_price  = models.PositiveIntegerField(default=0, null=True, blank=True)
+    tip  = models.PositiveIntegerField(default=0, null=True, blank=True)
+    discount_price  = models.PositiveIntegerField(default=0, null=True, blank=True)
+    
+    service_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
+    service_commission_type = models.CharField( max_length=50 , default = '')
+    
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
+    is_checkout = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
 
 
@@ -75,16 +85,7 @@ class AppointmentService(models.Model):
         ('Cancel', 'Cancel'),
     ]
 
-    DURATION_CHOICES = [
-        ('30 Min', '30 Min'), 
-        ('60 Min', '60 Min'),
-        ('90 Min', '90 Min'),
-        ('120 Min', '120 Min'),
-        ('150 Min', '150 Min'),
-        ('180 Min', '180 Min'),
-        ('210 Min', '210 Min'),
-        ('240 Min', '240 Min'),
-    ]
+    
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_appointment_services', verbose_name='Creator ( User )')
@@ -97,15 +98,23 @@ class AppointmentService(models.Model):
     is_favourite = models.BooleanField(default = False)
         
     appointment_date = models.DateField()
-    appointment_time = models.TimeField()
+    appointment_time = models.TimeField(verbose_name='Appointment Start Time')
 
-    duration = models.CharField(choices=DURATION_CHOICES, max_length=100, default='')
+    duration = models.CharField(max_length=100, default='')
+    
+    client_can_book = models.CharField(max_length=100, default='', null=True, blank=True)
+    slot_availible_for_online = models.CharField(max_length=100, default='', null=True, blank=True,)
+    
     appointment_status = models.CharField(choices=BOOKED_CHOICES, max_length=100, default='Appointment Booked')
     tip = models.PositiveIntegerField(default=0, null=True, blank=True)
     
-    end_time = models.TimeField(null=True, blank=True)
-    destails = models.CharField(max_length=255, null=True, blank=True)
+    price = models.PositiveIntegerField(default=0, null=True, blank=True)
     
+    service_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
+    service_commission_type = models.CharField( max_length=50 , default = '')
+    
+    end_time = models.TimeField(null=True, blank=True)
+    details = models.CharField(max_length=255, null=True, blank=True)
     
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)

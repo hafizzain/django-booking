@@ -60,4 +60,17 @@ urlpatterns = [
     path('search_business_vendor/', views.search_business_vendor),
     path('import_business_vendor/', views.import_business_vendor),
     
+    #Business Domain by user
+    path('get_domain_business_address/', views.get_domain_business_address),
+    path('get_check_availability/', views.get_check_availability),
+    path('get_employee_appointment/', views.get_employee_appointment),
+    #path('create_client_business/', views.create_client_business),
+    path('employee_availability/', views.employee_availability),
+    path('get_tenant_business_taxes/', views.get_tenant_business_taxes),
+    path('get_tenant_address_taxes/', views.get_tenant_address_taxes),
+    
+    path('get_address_taxes_device/', views.get_address_taxes_device),
+    
+    #Tenant Detail
+    path('get_common_tenant/', views.get_common_tenant),
 ]

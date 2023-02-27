@@ -1,11 +1,12 @@
 from django.contrib import admin
 from .models import (BusinessType, Business, BusinessSocial, BusinessAddress, BusinessOpeningHour, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, 
                      BookingSetting, BusinessPaymentMethod, 
-                     BusinessTax , BusinessVendor
+                     BusinessTax , BusinessVendor, BusinessAddressMedia
                     
                      )
 
 admin.site.register(BusinessVendor)
+admin.site.register(BusinessAddressMedia)
 
 @admin.register(BusinessPaymentMethod)
 class BusinessPaymentMethodAdmin(admin.ModelAdmin):

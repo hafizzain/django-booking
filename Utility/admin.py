@@ -36,4 +36,4 @@ class LanguageAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'is_active', 'is_deleted']
 @admin.register(ExceptionRecord)
 class ExceptionRecordAdmin(admin.ModelAdmin):
-    list_display = ['id', 'text']
+    list_display = ['id', 'text', 'is_resolved', 'created_at']

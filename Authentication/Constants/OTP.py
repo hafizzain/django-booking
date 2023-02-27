@@ -6,6 +6,8 @@ from twilio.rest import Client
 from .Email import send_otp_to_email
 from django.conf import  settings
 
+from Utility.models import ExceptionRecord
+
 def send_twillio_to_phone_number(user=None):
     if user is not None:
         try:
@@ -49,5 +51,5 @@ def generate_user_otp(user=None, code_for='Mobile'):
     try:
         # send_twillio_to_phone_number(user=user)
         send_otp_to_email(user=user)
-    except:
-        pass
+    except Exception as err:
+        ExceptionRecord.objects.create(text = f'OTP :: {str(err)}')

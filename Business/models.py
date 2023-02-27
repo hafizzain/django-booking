@@ -77,6 +77,12 @@ class BusinessAddress(models.Model):
         ('Disable' , 'Disable')
     ]
     
+    SERVICE_CHOICE = [
+        ('Everyone' , 'Everyone'),
+        ('Male' , 'Male'),
+        ('Female','Female'),
+    ]
+    
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_address')
@@ -86,8 +92,14 @@ class BusinessAddress(models.Model):
     state = models.ForeignKey(State, on_delete=models.SET_NULL, null=True, blank=True, related_name='address_state')
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, related_name='address_city')
     
+    currency = models.ForeignKey(Currency, on_delete=models.SET_NULL, null=True, blank=True, related_name='address_currency')
+    
     address_name = models.CharField(max_length=500, default='')
     address = models.TextField(default='')
+    
+    service_avaiable = models.CharField(choices = SERVICE_CHOICE , default = 'Male' , max_length = 100)  
+    location_name = models.CharField(max_length=500, default='')
+    
     latitude = models.CharField(default='', max_length=200, null=True, blank=True)
     longitude = models.CharField(default='', max_length=200, null=True, blank=True)
     postal_code = models.CharField(max_length=30, default='', null=True, blank=True)
@@ -99,8 +111,10 @@ class BusinessAddress(models.Model):
     mobile_number = models.CharField(default='', max_length=30)
     is_mobile_verified = models.BooleanField(default=False)
     
+    description =  models.CharField(max_length=300, null=True, blank=True)
     banking = models.CharField(choices = BANKING_CHOICE , default = 'Disable' , max_length = 50)
     
+    is_publish = models.BooleanField(default=False)
     is_primary = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
@@ -129,7 +143,22 @@ class BusinessOpeningHour(models.Model):
     def __str__(self):
         return str(self.id)
 
+class BusinessAddressMedia(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_businessaddress_media')
+    business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_businessaddress_media')
+    business_address = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_address_businessaddress_media')
 
+    image = models.ImageField(upload_to='business/address_media/', null= True, blank= True)
+    is_cover = models.BooleanField(default=False)
+
+    is_deleted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+
+
+    def __str__(self):
+        return str(self.id)
     
 # THEME CUSTOMIZATION 
 
@@ -240,8 +269,6 @@ class StockNotificationSetting(models.Model):
 
     def __str__(self):
         return str(self.id)
-
-
 
 
 class BookingSetting(models.Model):

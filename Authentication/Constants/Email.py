@@ -9,17 +9,19 @@ from django.utils.html import strip_tags
 
 from django.conf import settings
 
+from Utility.models import ExceptionRecord
+
 def send_otp_to_email(user=None, ):
     if user is None:
         return
 
     try:
-        print(user)
         user_otp = VerificationOTP.objects.get(user=user, code_for='Email')
     except Exception as err:
-        print(err)
-        return
-
+        ExceptionRecord.objects.create(
+                    text = f"VerificationOTP user for otp{user} {str(err)}"
+                )
+    
     html_file = render_to_string("otp_email.html", {'user_name': user_otp.user.username,'otp': user_otp.code, 'email':user_otp.user.email})
     text_content = strip_tags(html_file)
     

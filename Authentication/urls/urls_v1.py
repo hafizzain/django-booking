@@ -15,8 +15,6 @@ urlpatterns = [
 
     path('all_users/', nstyle.all_users),
 
-
-
     # Tenant Special 
 
     path('tenant_login/', tenant.login ),

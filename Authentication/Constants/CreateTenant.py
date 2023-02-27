@@ -2,10 +2,14 @@
 
 
 from Authentication.Constants.Domain import ssl_sub_domain
+from Client.models import Client
+from Employee.Constants.Add_Employe import add_employee
+from Employee.models import EmployeDailySchedule, Employee, EmployeeProfessionalInfo, EmployeeSelectedService
 from Tenants.models import Tenant, Domain
-from Business.models import Business, BusinessPaymentMethod, BusinessType
+from Business.models import Business, BusinessAddress, BusinessOpeningHour, BusinessPaymentMethod, BusinessType
 from Profile.models import Profile
 from Utility.Constants.add_data_db import add_business_types, add_countries, add_software_types, add_states, add_cities, add_currencies, add_languages
+from Utility.models import Country, Currency, ExceptionRecord, Language
 from Utility.models import GlobalPermissionChoices
 
 from rest_framework.authtoken.models import Token
@@ -16,7 +20,10 @@ from Authentication.models import AccountType, User, NewsLetterDetail
 from Authentication.Constants import AuthTokenConstants
 from Authentication.Constants.UserConstants import create_user_account_type
 from threading import Thread
-from Service.models import Service
+from Service.models import PriceService, Service, ServiceGroup
+from datetime import date, timedelta
+
+import datetime
 
 
 def create_tenant_user(tenant=None, data=None):
@@ -62,8 +69,19 @@ def create_tenant_profile(tenant_user=None, data=None, tenant=None):
     if tenant_user is None or tenant is None:
         return None
 
+    tnt_start_time = datetime.datetime.now()
 
     with tenant_context(tenant):
+
+        time_end = datetime.datetime.now()
+        time_diff = time_end - tnt_start_time
+
+        total_seconds = time_diff.seconds
+
+        ExceptionRecord.objects.create(
+            text = f'SWITCH TENANT TIME DIFF . {total_seconds} Seconds'
+        )
+
         user_profile = Profile.objects.create(
             user = tenant_user,
             is_active=True
@@ -97,18 +115,263 @@ def create_tenant_user_token(tenant_user=None, tenant=None):
         return user_token
         
 
-def create_tenant_account_type(tenant_user=None, tenant=None, account_type='everyone'):
+def create_tenant_account_type(tenant_user=None, tenant=None, account_type='Business'):
     if tenant_user is None or tenant is None :
         return None
     
     with tenant_context(tenant):
         return AccountType.objects.create(
             user=tenant_user,
-            account_type=account_type.capitalize()
+            account_type= 'Business'#account_type
         )
 
-def create_global_permission(tenant=None, user = None, business=None):
+def create_employee(tenant=None, user = None, business=None):
      if tenant is not None and user is not None and business is not None:
+        try:
+            with tenant_context(tenant):                
+                country_id = 'United Arab Emirates'
+                currency_id = 'Dirham'
+                domain = tenant.domain
+                template = 'Employee'
+                
+                tenant_name = str(tenant.domain).split('.')[0]
+                tenant_name = tenant_name.split('-')
+                tenant_name = [word[0].upper() for word in tenant_name if word]  # Use upper() to capitalize letters and add a check to skip empty strings
+                employe_id = f'{" ".join(tenant_name)}-EMP-0001'
+                
+                opening_day = {
+                            "monday":{"start_time":"09:00:00","end_time":"18:00:00"},
+                            "tuesday":{"start_time":"09:00:00","end_time":"18:00:00"},
+                            "wednesday":{"start_time":"09:00:00","end_time":"18:00:00"},
+                            "thursday":{"start_time":"09:00:00","end_time":"18:00:00"},
+                            "friday":{"start_time":"09:00:00","end_time":"18:00:00"},
+                            }
+                days = [
+                    'monday',
+                    'tuesday',
+                    'wednesday',
+                    'thursday',
+                    'friday',
+                    'saturday',
+                    'sunday',
+                ]
+                try:
+                    country = Country.objects.get(name__iexact = country_id)
+                    currency = Currency.objects.get(name__iexact = currency_id)
+                except Exception as err:
+                    pass
+
+                business_address = BusinessAddress.objects.create(
+                    business = business,
+                    user = user,
+                    address = 'Dubai - United Arab Emirates',
+                    address_name = 'ABCD Address',
+                    email= user.email,
+                    mobile_number= user.mobile_number,
+                    country=country,
+                    currency = currency,
+                    is_primary = False,
+                    is_active = True,
+                    is_deleted = False,
+                    is_closed = False,
+                )
+                
+                employee = Employee.objects.create(
+                    user=user,
+                    business=business,
+                    full_name = user.full_name,
+                    email= user.email,
+                    country = country,
+                    address = 'Dubai Marina',
+                    is_active =True,
+                    employee_id = employe_id,
+                    
+                )
+                employee.location.add(business_address)
+                employee.save()
+                
+                EmployeeProfessionalInfo.objects.create(
+                    employee=employee,
+                    salary=20, 
+                    income_type = 'Hourly_Rate',
+                    designation = 'Store Manager',
+                    monday = True,
+                    tuesday = True,
+                    wednesday = True,
+                    thursday = True,
+                    friday = True,
+                )
+                
+                for day in days:
+                    bds_schedule = BusinessOpeningHour.objects.create(
+                    business_address = business_address,
+                    business = business,
+                    day = day,
+                )
+                    s_day = opening_day.get(day.lower(), None)
+                    if s_day is not None:
+                                            
+                        bds_schedule.start_time = s_day['start_time']
+                        bds_schedule.close_time = s_day['end_time']
+                        bds_schedule.save()
+                        
+                    else:
+                        bds_schedule.is_closed = True
+
+                bds_schedule.save()
+                
+                try:
+                    username = user.email.split('@')[0]
+                    try:
+                        user_check = User.objects.get(username = username)
+                    except Exception as err:
+                        #data.append(f'username user is client errors {str(err)}')'
+                        email_check = f'{username}-abc'
+                        pass
+                    else:
+                        username = f'{username} {len(User.objects.all())}'
+                        email_check = f'{username} {len(User.objects.all())}'
+
+                except Exception as err:
+                    pass
+                auto_generate_email = f'{email_check}@gmail.com'
+                user = User.objects.create(
+                    first_name = user.full_name,
+                    username = username,
+                    email = auto_generate_email ,
+                    is_email_verified = True,
+                    is_active = True,
+                    mobile_number = user.mobile_number,
+                )
+                
+                account_type = AccountType.objects.create(
+                        user = user,
+                        account_type = 'Employee'
+                    )
+                
+                try:
+                    thrd = Thread(target=add_employee, args=['ABCD', auto_generate_email, user.mobile_number, template, business.business_name, tenant.id, domain, user])
+                    thrd.start()
+                except Exception as err:
+                    pass
+        except Exception as err:
+            ExceptionRecord.objects.create(
+                text = f'errors in some create employee {str(err)}'
+            )
+                                    
+def create_client(tenant=None, user = None, business=None):
+    if tenant is not None and user is not None and business is not None:
+        with tenant_context(tenant):
+            tenant_name = str(tenant.domain).split('.')[0]
+            tenant_name = tenant_name.split('-')
+            tenant_name = [word[0].upper() for word in tenant_name if word]  # Use upper() to capitalize letters and add a check to skip empty strings
+            client_unique_id = f'{" ".join(tenant_name)}-CLI-0001'
+            
+            try:
+                languages = 'English'
+                language_id = Language.objects.get(name__icontains='English')
+            except Exception as err:
+                ExceptionRecord.objects.create(
+                text = f'create client languages not found {str(err)}'
+            )
+            Client.objects.create(
+                business = business,
+                user = user,
+                full_name = 'ABCD',
+                mobile_number = user.mobile_number,
+                gender = 'Male',
+                language = language_id,
+                client_id = client_unique_id,
+                is_active = True
+                
+            )
+   
+def create_ServiceGroup(tenant=None, user = None, business=None):
+    if tenant is not None and user is not None and business is not None:
+        try:
+            with tenant_context(tenant):
+                try:
+                    currency_id = 'Dirham'
+                    location = BusinessAddress.objects.all()[0]
+                    emp = Employee.objects.all()[0]
+                    currency = Currency.objects.get(name__iexact = currency_id)
+                except:
+                    pass
+                service_grp = ServiceGroup.objects.create(
+                    business = business,
+                    user = user,
+                    name = 'Hair Care',
+                    is_active = True                
+                )
+                for ser in range(2):
+                    if int(ser) == 0:
+                        ser_name = 'Hair color'
+                    else:
+                        ser_name = 'Hair cut'
+                    service = Service.objects.create(
+                        user = user,
+                        business =business,
+                        name = ser_name,
+                        description = f'{ser_name} description',
+                        service_availible = 'Everyone',          
+                    )
+                    service.location.add(location)
+                    service.save()
+                    service_grp.services.add(service)
+                    service_grp.save()
+                    
+                    employe_service = EmployeeSelectedService.objects.create(
+                        service = service,
+                        employee = emp
+                        )
+                    price_service = PriceService.objects.create(
+                        service = service,
+                        currency = currency,
+                        duration = '30_Min',
+                        price = 500,
+                    )
+        except Exception as err:
+            ExceptionRecord.objects.create(
+                text = f'Service creating error occur {str(err)} {location}'
+            )
+            
+def create_emp_schedule(tenant=None, user = None, business=None):
+    if tenant is not None and user is not None and business is not None:
+        try:
+            start_time = datetime.time(9, 0, 0)
+            end_time = datetime.time(6, 0, 0)
+            today = date.today()
+
+            with tenant_context(tenant):
+                emp = Employee.objects.all()[0]
+                for dt in range(30):
+                    next_date = today + timedelta(days=dt)
+                    EmployeDailySchedule.objects.create(
+                        user = user,
+                        business = business ,
+                        employee = emp,
+                                                
+                        start_time = start_time,
+                        end_time = end_time,
+                        
+                        from_date =next_date,
+                        to_date = next_date,
+                        note = "ABCD note",
+                        
+                        date = next_date,
+                        is_vacation = False,
+                        is_leave = False,
+                        is_off = False,
+                        is_active = True                                     
+                )
+                            
+        except Exception as err:
+            ExceptionRecord.objects.create(
+                text = f'Service creating error occur {str(err)}'
+            )
+            
+def create_global_permission(tenant=None, user = None, business=None):
+    if tenant is not None and user is not None and business is not None:
         with tenant_context(tenant):
             permission = [
     
@@ -203,6 +466,8 @@ def add_data_to_tenant_thread(tenant=None):
     if tenant is None:
         return
 
+    time_start = datetime.datetime.now()
+
     try:
         print('gonna create DB data')
         add_currencies(tenant=tenant)
@@ -210,11 +475,24 @@ def add_data_to_tenant_thread(tenant=None):
         add_countries(tenant=tenant)
         add_states(tenant=tenant)
         add_cities(tenant=tenant)
+    
     except Exception as err:
         print(err)
+    else:
+
+        time_end = datetime.datetime.now()
+        time_diff = time_end - time_start
+
+        total_seconds = time_diff.total_seconds()
+
+        ExceptionRecord.objects.create(
+            text = f'ADD DATA TO TENANT DB TIME DIFF . {total_seconds} Seconds'
+        )
+            
 
 
 def create_tenant(request=None, user=None, data=None):
+    
     if user is None or data is None:
         return
     
@@ -227,18 +505,37 @@ def create_tenant(request=None, user=None, data=None):
         td_name = td_name + f'-{int(all_domains_length)}'
     except:
         pass
-    user_tenant = Tenant.objects.create(
-        user=user,
-        name=td_name,
-        domain=f'{td_name}.{settings.BACKEND_DOMAIN_NAME}',
-        schema_name=td_name
-    )
-
-    Domain.objects.create(
-        user=user,
-        schema_name=td_name,
-        domain=f'{td_name}.{settings.BACKEND_DOMAIN_NAME}',
-        tenant=user_tenant,
+    try:
+        user_domain_name = f'{td_name}.{settings.BACKEND_DOMAIN_NAME}'
+        all_tenants = Tenant.objects.filter(
+            user__isnull = True,
+            is_active = False,
+            is_ready = True
+        )
+        if len(all_tenants) > 0:
+            user_tenant = all_tenants[0]
+            
+            user_tenant.user = user
+            user_tenant.domain = user_domain_name
+            user_tenant.is_active = True
+            user_tenant.save()
+        else:
+            user_tenant = Tenant.objects.create(
+                user=user,
+                name=td_name,
+                domain = user_domain_name,
+                schema_name=td_name
+            )
+        
+        Domain.objects.create(
+            user=user,
+            schema_name=td_name,
+            domain=f'{td_name}.{settings.BACKEND_DOMAIN_NAME}',
+            tenant=user_tenant,
+        )
+    except Exception as err:
+        ExceptionRecord.objects.create(
+            text = f'Check domain errors . {str(err)} {user_tenant} line 400 create_tenant'
     )
 
 
@@ -250,17 +547,6 @@ def create_tenant(request=None, user=None, data=None):
         except:
             pass
         
-        try:
-            thrd = Thread(target=add_business_types, kwargs={'tenant' : user_tenant})
-            thrd.start()
-        except:
-            pass
-        try:
-            thrd = Thread(target=add_software_types, kwargs={'tenant' : user_tenant})
-            thrd.start()
-        except:
-            pass
-
         t_user = create_tenant_user(tenant=user_tenant, data=data)
         
         if t_user is not None:
@@ -274,18 +560,29 @@ def create_tenant(request=None, user=None, data=None):
             except:
                 pass
             
+            # try:
+            #     service_thrd = Thread(target=create_employee, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+            #     service_thrd.start()
+            # except:
+            #     pass
             try:
                 t_token = create_tenant_user_token(tenant_user=t_user, tenant=user_tenant)
             except:
                 pass
-            NewsLetterDetail.objects.create(
-                user = t_user,
-                terms_condition=data.get('terms_condition', True),
-                is_subscribed=data.get('terms_condition', False)
-            )
-
+            # NewsLetterDetail.objects.create(
+            #     user = t_user,
+            #     terms_condition=data.get('terms_condition', True),
+            #     is_subscribed=data.get('terms_condition', False)
+            # )
             try:
-                create_tenant_account_type(tenant_user=t_user, tenant=user_tenant, account_type=data['account_type'])
+                create_employee(tenant = user_tenant , user = t_user, business = t_business)
+            except:
+                ExceptionRecord.objects.create(
+                    text = f'{str(err)}'
+                )
+            
+            try:
+                create_tenant_account_type(tenant_user=t_user, tenant=user_tenant, account_type='Business')#data['account_type'])
             except:
                 pass
             
@@ -294,6 +591,7 @@ def create_tenant(request=None, user=None, data=None):
             #     service_thrd.start()
             # except:
             #     pass
+                       
             try:
                 service_thrd = Thread(target=create_global_permission, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
                 service_thrd.start()
@@ -305,11 +603,38 @@ def create_tenant(request=None, user=None, data=None):
                 payment_thrd.start()
             except:
                 pass
+
+            # try:
+            #     thrd = Thread(target=add_business_types, kwargs={'tenant' : user_tenant})
+            #     thrd.start()
+            # except:
+            #     pass
+            # try:
+            #     thrd = Thread(target=add_software_types, kwargs={'tenant' : user_tenant})
+            #     thrd.start()
+            # except:
+            #     pass
+            
+            # try:
+            #     thrd = Thread(target=add_data_to_tenant_thread, kwargs={'tenant' : user_tenant})
+            #     thrd.start()
+            # except:
+            #     pass
             
             try:
-                thrd = Thread(target=add_data_to_tenant_thread, kwargs={'tenant' : user_tenant})
-                thrd.start()
+                service_thrd = Thread(target=create_client, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+                service_thrd.start()
             except:
                 pass
             
-
+            try:
+                service_thrd = Thread(target=create_ServiceGroup, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+                service_thrd.start()
+            except:
+                pass
+            try:
+                service_thrd = Thread(target=create_emp_schedule, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+                service_thrd.start()
+            except Exception as err:
+                pass
+            
