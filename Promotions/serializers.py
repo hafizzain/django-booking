@@ -1,4 +1,4 @@
-from Sale.serializers import NewPriceServiceSerializers
+from Sale.serializers import AvailPriceServiceSerializers
 from Service.models import PriceService
 from rest_framework import serializers
 
@@ -22,7 +22,7 @@ class ServiceGroupDiscountSerializers(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class NewServiceGroupDiscountSerializers(serializers.ModelSerializer):
+class AvailServiceGroupDiscountSerializers(serializers.ModelSerializer):
     is_deleted = serializers.SerializerMethodField(read_only=True)
     
     
@@ -59,7 +59,7 @@ class SpendSomeAmountAndGetDiscountSerializers(serializers.ModelSerializer):
         model = SpendSomeAmountAndGetDiscount
         fields = '__all__'
 
-class NewSpendSomeAmountAndGetDiscountSerializers(serializers.ModelSerializer):
+class AvailSpendSomeAmountAndGetDiscountSerializers(serializers.ModelSerializer):
     is_deleted = serializers.SerializerMethodField(read_only=True)
     
     
@@ -84,7 +84,7 @@ class BlockDateSerializers(serializers.ModelSerializer):
         model = BlockDate
         fields = '__all__'
 
-class NewBlockDateSerializers(serializers.ModelSerializer):
+class AvailBlockDateSerializers(serializers.ModelSerializer):
     
     
     
@@ -110,7 +110,7 @@ class DayRestrictionsSerializers(serializers.ModelSerializer):
         model = DayRestrictions
         fields = '__all__'
 
-class NewDayRestrictionsSerializers(serializers.ModelSerializer):
+class AvailDayRestrictionsSerializers(serializers.ModelSerializer):
     is_deleted = serializers.SerializerMethodField(read_only=True)
     
     
@@ -149,7 +149,7 @@ class DateRestrictionsSerializers(serializers.ModelSerializer):
         model = DateRestrictions
         fields = '__all__'
 
-class NewDateRestrictionsSerializers(serializers.ModelSerializer):
+class AvailDateRestrictionsSerializers(serializers.ModelSerializer):
     address = serializers.SerializerMethodField()
     
     
@@ -392,7 +392,7 @@ class PurchaseDiscountSerializers(serializers.ModelSerializer):
         model = PurchaseDiscount
         fields = '__all__'
 
-class NewPurchaseDiscountSerializers(serializers.ModelSerializer):
+class AvailPurchaseDiscountSerializers(serializers.ModelSerializer):
     day_restrictions = serializers.SerializerMethodField(read_only=True)
     date_restrictions = serializers.SerializerMethodField(read_only=True)
     block_date = serializers.SerializerMethodField(read_only=True)
@@ -403,14 +403,14 @@ class NewPurchaseDiscountSerializers(serializers.ModelSerializer):
     def get_purchase_discount(self, obj):
         try:
             ser = PurchaseDiscount.objects.filter(purchasediscount = obj)
-            return NewPurchaseDiscountSerializers(ser, many = True).data
+            return AvailPurchaseDiscountSerializers(ser, many = True).data
         except Exception as err:
             pass
 
     def get_discount_service(self, obj):
         try:
             ser = PurchaseDiscount.objects.filter(purchasediscount = obj)
-            return NewPurchaseDiscountSerializers(ser, many = True).data
+            return AvailPurchaseDiscountSerializers(ser, many = True).data
         except Exception as err:
             pass
     
@@ -487,7 +487,7 @@ class SpecificBrandSerializers(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class NewSpecificBrandSerializers(serializers.ModelSerializer):
+class AvailSpecificBrandSerializers(serializers.ModelSerializer):
     day_restrictions = serializers.SerializerMethodField(read_only=True)
     date_restrictions = serializers.SerializerMethodField(read_only=True)
     block_date = serializers.SerializerMethodField(read_only=True)
@@ -566,7 +566,7 @@ class SpendDiscountSerializers(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class NewSpendDiscountSerializers(serializers.ModelSerializer):
+class AvailSpendDiscountSerializers(serializers.ModelSerializer):
     day_restrictions = serializers.SerializerMethodField(read_only=True)
     date_restrictions = serializers.SerializerMethodField(read_only=True)
     block_date = serializers.SerializerMethodField(read_only=True)
@@ -693,7 +693,7 @@ class FixedPriceServiceSerializers(serializers.ModelSerializer):
         model = FixedPriceService
         fields = '__all__'
 
-class NewFixedPriceServiceSerializers(serializers.ModelSerializer):
+class AvailFixedPriceServiceSerializers(serializers.ModelSerializer):
     # day_restrictions = serializers.SerializerMethodField(read_only=True)
     #spend_service = serializers.SerializerMethodField(read_only=True)
     # date_restrictions = serializers.SerializerMethodField(read_only=True)
@@ -805,7 +805,7 @@ class BundleFixedSerializers(serializers.ModelSerializer):
         model = BundleFixed
         fields = '__all__'
         
-class NewBundleFixedSerializers(serializers.ModelSerializer):
+class AvailBundleFixedSerializers(serializers.ModelSerializer):
     # day_restrictions = serializers.SerializerMethodField(read_only=True)
     # date_restrictions = serializers.SerializerMethodField(read_only=True)
     # block_date = serializers.SerializerMethodField(read_only=True)
@@ -821,7 +821,7 @@ class NewBundleFixedSerializers(serializers.ModelSerializer):
         model = BundleFixed
         fields = ['id','service']
         
-class NewBundleFixedSerializers(serializers.ModelSerializer):
+class AvailBundleFixedSerializers(serializers.ModelSerializer):
     is_deleted = serializers.SerializerMethodField(read_only=True)
 
     def get_is_deleted(self, obj):
@@ -884,7 +884,7 @@ class RetailAndGetServiceSerializers(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class NewRetailAndGetServiceSerializers(serializers.ModelSerializer):
+class AvailRetailAndGetServiceSerializers(serializers.ModelSerializer):
     # day_restrictions = serializers.SerializerMethodField(read_only=True)
     promotion = serializers.SerializerMethodField(read_only=True)
     # date_restrictions = serializers.SerializerMethodField(read_only=True)
@@ -975,7 +975,7 @@ class UserRestrictedDiscountSerializers(serializers.ModelSerializer):
         fields = '__all__'
         
 
-class NewUserRestrictedDiscountSerializers(serializers.ModelSerializer):
+class AvailUserRestrictedDiscountSerializers(serializers.ModelSerializer):
     # day_restrictions = serializers.SerializerMethodField(read_only=True)
     # date_restrictions = serializers.SerializerMethodField(read_only=True)
     # block_date = serializers.SerializerMethodField(read_only=True)
@@ -1065,7 +1065,7 @@ class ComplimentaryDiscountSerializers(serializers.ModelSerializer):
         model = ComplimentaryDiscount
         fields = '__all__'
         
-class NewComplimentaryDiscountSerializers(serializers.ModelSerializer):
+class AvailComplimentaryDiscountSerializers(serializers.ModelSerializer):
     # day_restrictions = serializers.SerializerMethodField(read_only=True)
     freeservice = serializers.SerializerMethodField(read_only=True)
     # date_restrictions = serializers.SerializerMethodField(read_only=True)
@@ -1188,21 +1188,21 @@ class AvailOfferPackagesDiscountSerializers(serializers.ModelSerializer):
     def get_block_date(self, obj):
         try:
             ser = BlockDate.objects.filter(package = obj)
-            return NewBlockDateSerializers(ser, many = True).data
+            return AvailBlockDateSerializers(ser, many = True).data
         except Exception as err:
             pass
     
     def get_date_restrictions(self, obj):
         try:
             ser = DateRestrictions.objects.get(package = obj)
-            return NewDateRestrictionsSerializers(ser).data
+            return AvailDateRestrictionsSerializers(ser).data
         except Exception as err:
             pass
    
     def get_day_restrictions(self, obj):
         try:
             ser = DayRestrictions.objects.filter(package = obj)
-            return NewDayRestrictionsSerializers(ser, many = True).data
+            return AvailDayRestrictionsSerializers(ser, many = True).data
         except Exception as err:
             pass
     class Meta:
@@ -1223,7 +1223,7 @@ class AvailOfferComplimentaryDiscountSerializers(serializers.ModelSerializer):
     def get_freeservice(self, obj):
         try:
             ser = ComplimentaryDiscount.objects.filter(complimentary = obj)
-            return NewComplimentaryDiscountSerializers(ser, many = True).data
+            return AvailComplimentaryDiscountSerializers(ser, many = True).data
         except Exception as err:
             return err
             pass
@@ -1231,21 +1231,21 @@ class AvailOfferComplimentaryDiscountSerializers(serializers.ModelSerializer):
     def get_block_date(self, obj):
         try:
             ser = BlockDate.objects.filter(complimentary = obj)
-            return NewBlockDateSerializers(ser, many = True).data
+            return AvailBlockDateSerializers(ser, many = True).data
         except Exception as err:
             pass
     
     def get_date_restrictions(self, obj):
         try:
             ser = DateRestrictions.objects.get(complimentary = obj)
-            return NewDateRestrictionsSerializers(ser).data
+            return AvailDateRestrictionsSerializers(ser).data
         except Exception as err:
             pass
    
     def get_day_restrictions(self, obj):
         try:
             ser = DayRestrictions.objects.filter(complimentary = obj)
-            return NewDayRestrictionsSerializers(ser, many = True).data
+            return AvailDayRestrictionsSerializers(ser, many = True).data
         except Exception as err:
             pass
     class Meta:
@@ -1273,20 +1273,20 @@ class AvailOfferUserRestrictedDiscountSerializers(serializers.ModelSerializer):
     def get_block_date(self, obj):
         try:
             ser = BlockDate.objects.filter(userrestricteddiscount = obj)
-            return NewBlockDateSerializers(ser, many = True).data
+            return AvailBlockDateSerializers(ser, many = True).data
         except Exception as err:
             pass
     def get_date_restrictions(self, obj):
         try:
             ser = DateRestrictions.objects.get(complimentary = obj)
-            return NewDateRestrictionsSerializers(ser).data
+            return AvailDateRestrictionsSerializers(ser).data
         except Exception as err:
             pass
    
     def get_day_restrictions(self, obj):
         try:
             ser = DayRestrictions.objects.filter(complimentary = obj)
-            return NewDayRestrictionsSerializers(ser, many = True).data
+            return AvailDayRestrictionsSerializers(ser, many = True).data
         except Exception as err:
             pass
     
@@ -1316,20 +1316,20 @@ class AvailOfferRetailAndGetServiceSerializers(serializers.ModelSerializer):
     def get_block_date(self, obj):
         try:
             ser = BlockDate.objects.filter(retailandservice = obj)
-            return NewBlockDateSerializers(ser, many = True).data
+            return AvailBlockDateSerializers(ser, many = True).data
         except Exception as err:
             pass
     def get_date_restrictions(self, obj):
         try:
             ser = DateRestrictions.objects.get(retailandservice = obj)
-            return NewDateRestrictionsSerializers(ser).data
+            return AvailDateRestrictionsSerializers(ser).data
         except Exception as err:
             pass
    
     def get_day_restrictions(self, obj):
         try:
             ser = DayRestrictions.objects.filter(retailandservice = obj)
-            return NewDayRestrictionsSerializers(ser, many = True).data
+            return AvailDayRestrictionsSerializers(ser, many = True).data
         except Exception as err:
             pass
     class Meta:
@@ -1357,20 +1357,20 @@ class AvailOfferBundleFixedSerializers(serializers.ModelSerializer):
     def get_block_date(self, obj):
         try:
             ser = BlockDate.objects.filter(bundlefixed = obj)
-            return NewBlockDateSerializers(ser, many = True).data
+            return AvailBlockDateSerializers(ser, many = True).data
         except Exception as err:
             pass
     def get_date_restrictions(self, obj):
         try:
             ser = DateRestrictions.objects.get(bundlefixed = obj)
-            return NewDateRestrictionsSerializers(ser).data
+            return AvailDateRestrictionsSerializers(ser).data
         except Exception as err:
             pass
    
     def get_day_restrictions(self, obj):
         try:
             ser = DayRestrictions.objects.filter(bundlefixed = obj)
-            return NewDayRestrictionsSerializers(ser, many = True).data
+            return AvailDayRestrictionsSerializers(ser, many = True).data
         except Exception as err:
             pass
 
@@ -1389,7 +1389,7 @@ class AvailOfferFixedPriceServiceSerializers(serializers.ModelSerializer):
     def get_duration(self, obj):
         try:
             ser = FixedPriceService.objects.filter(fixedpriceservice = obj)
-            return NewFixedPriceServiceSerializers(ser, many = True).data
+            return AvailFixedPriceServiceSerializers(ser, many = True).data
         except Exception as err:
             pass
 
@@ -1400,27 +1400,27 @@ class AvailOfferFixedPriceServiceSerializers(serializers.ModelSerializer):
     def get_block_date(self, obj):
         try:
             ser = BlockDate.objects.filter(fixedpriceservice = obj)
-            return NewBlockDateSerializers(ser, many = True).data
+            return AvailBlockDateSerializers(ser, many = True).data
         except Exception as err:
             pass
     def get_date_restrictions(self, obj):
         try:
             ser = DateRestrictions.objects.get(fixedpriceservice = obj)
-            return NewDateRestrictionsSerializers(ser).data
+            return AvailDateRestrictionsSerializers(ser).data
         except Exception as err:
             pass
    
     def get_day_restrictions(self, obj):
         try:
             ser = DayRestrictions.objects.filter(fixedpriceservice = obj)
-            return NewDayRestrictionsSerializers(ser, many = True).data
+            return AvailDayRestrictionsSerializers(ser, many = True).data
         except Exception as err:
             pass
     class Meta:
         model = FixedPriceService
         fields = ['type','block_date' , 'duration','date_restrictions' , 'day_restrictions']
 
-class NewFreeServiceSerializers(serializers.ModelSerializer):
+class AvailFreeServiceSerializers(serializers.ModelSerializer):
     is_deleted = serializers.SerializerMethodField(read_only=True)
     priceservice = serializers.SerializerMethodField(read_only=True)
     
@@ -1441,14 +1441,14 @@ class NewFreeServiceSerializers(serializers.ModelSerializer):
         model = FreeService
         fields = ['discount','priceservice']
 
-class NewServiceSerializers(serializers.ModelSerializer):
+class AvailServiceSerializers(serializers.ModelSerializer):
     is_deleted = serializers.SerializerMethodField(read_only=True)
     priceservice = serializers.SerializerMethodField(read_only=True)
     
     def get_priceservice(self, obj):
         try:
             ser = PriceService.objects.filter(service = obj.service)
-            return NewPriceServiceSerializers(ser, many = True).data
+            return AvailPriceServiceSerializers(ser, many = True).data
         except Exception as err:
             return str(err)
     
@@ -1477,7 +1477,7 @@ class AvailOfferMentionedNumberServiceSerializers(serializers.ModelSerializer):
     def get_free_services(self, obj):
         try:
             ser = FreeService.objects.filter(mentionnumberservice = obj)
-            return NewFreeServiceSerializers(ser, many = True).data
+            return AvailFreeServiceSerializers(ser, many = True).data
         except Exception as err:
             return err
             pass
@@ -1485,7 +1485,7 @@ class AvailOfferMentionedNumberServiceSerializers(serializers.ModelSerializer):
     def get_services(self, obj):
         try:
             ser = Service.objects.filter(mentionnumberservice = obj)
-            return NewServiceSerializers(ser, many = True).data
+            return AvailServiceSerializers(ser, many = True).data
         except Exception as err:
             return err
             pass
@@ -1493,20 +1493,20 @@ class AvailOfferMentionedNumberServiceSerializers(serializers.ModelSerializer):
     def get_block_date(self, obj):
         try:
             ser = BlockDate.objects.filter(mentionednumberservice = obj)
-            return NewBlockDateSerializers(ser, many = True).data
+            return AvailBlockDateSerializers(ser, many = True).data
         except Exception as err:
             pass
     def get_date_restrictions(self, obj):
         try:
             ser = DateRestrictions.objects.get(mentionednumberservice = obj)
-            return NewDateRestrictionsSerializers(ser).data
+            return AvailDateRestrictionsSerializers(ser).data
         except Exception as err:
             pass
    
     def get_day_restrictions(self, obj):
         try:
             ser = DayRestrictions.objects.filter(mentionednumberservice = obj)
-            return NewDayRestrictionsSerializers(ser, many = True).data
+            return AvailDayRestrictionsSerializers(ser, many = True).data
         except Exception as err:
             pass
 
@@ -1529,7 +1529,7 @@ class AvailOfferSpendSomeAmountSerializers(serializers.ModelSerializer):
     def get_spend_service(self, obj):
         try:
             ser = SpendSomeAmount.objects.filter(spandsomeamount = obj)
-            return NewSpendSomeAmountAndGetDiscountSerializers(ser, many = True).data
+            return AvailSpendSomeAmountAndGetDiscountSerializers(ser, many = True).data
         except Exception as err:
             return str(err)
             pass
@@ -1537,20 +1537,20 @@ class AvailOfferSpendSomeAmountSerializers(serializers.ModelSerializer):
     def get_block_date(self, obj):
         try:
             ser = BlockDate.objects.filter(spendsomeamount = obj)
-            return NewBlockDateSerializers(ser, many = True).data
+            return AvailBlockDateSerializers(ser, many = True).data
         except Exception as err:
             pass
     def get_date_restrictions(self, obj):
         try:
             ser = DateRestrictions.objects.get(spendsomeamount = obj)
-            return NewDateRestrictionsSerializers(ser).data
+            return AvailDateRestrictionsSerializers(ser).data
         except Exception as err:
             pass
    
     def get_day_restrictions(self, obj):
         try:
             ser = DayRestrictions.objects.filter(spendsomeamount = obj)
-            return NewDayRestrictionsSerializers(ser, many = True).data
+            return AvailDayRestrictionsSerializers(ser, many = True).data
         except Exception as err:
             pass
     class Meta:
@@ -1572,20 +1572,20 @@ class AvailOfferSpendDiscountSerializers(serializers.ModelSerializer):
     def get_spend_discount(self, obj):
         try:
             ser = SpendDiscount.objects.filter(specificbrand = obj)
-            return NewSpendDiscountSerializers(ser, many = True).data
+            return AvailSpendDiscountSerializers(ser, many = True).data
         except Exception as err:
             pass
 
     def get_block_date(self, obj):
         try:
             ser = BlockDate.objects.filter(specificbrand = obj)
-            return NewBlockDateSerializers(ser, many = True).data
+            return AvailBlockDateSerializers(ser, many = True).data
         except Exception as err:
             pass
     def get_date_restrictions(self, obj):
         try:
             ser = DateRestrictions.objects.get(specificbrand = obj)
-            return NewDateRestrictionsSerializers(ser).data
+            return AvailDateRestrictionsSerializers(ser).data
         except Exception as err:
             pass
    
@@ -1593,7 +1593,7 @@ class AvailOfferSpendDiscountSerializers(serializers.ModelSerializer):
     def get_day_restrictions(self, obj):
         try:
             ser = DayRestrictions.objects.filter(specificbrand = obj)
-            return NewDayRestrictionsSerializers(ser, many = True).data
+            return AvailDayRestrictionsSerializers(ser, many = True).data
         except Exception as err:
             pass
     class Meta:
@@ -1601,7 +1601,7 @@ class AvailOfferSpendDiscountSerializers(serializers.ModelSerializer):
         fields = ['spend_discount','discount_service','discount_product','discount_value','type','block_date' , 'date_restrictions' , 'day_restrictions']
         
 #10
-class NewCategoryDiscountSerializers(serializers.ModelSerializer):
+class AvailCategoryDiscountSerializers(serializers.ModelSerializer):
     
     class Meta:
         model = CategoryDiscount
@@ -1627,7 +1627,7 @@ class AvailOfferDirectOrFlatDiscountSerializers(serializers.ModelSerializer):
     def get_block_date(self, obj):
         try:
             ser = BlockDate.objects.filter(directorflat = obj)
-            return NewBlockDateSerializers(ser, many = True).data
+            return AvailBlockDateSerializers(ser, many = True).data
         except Exception as err:
             pass
         
@@ -1635,7 +1635,7 @@ class AvailOfferDirectOrFlatDiscountSerializers(serializers.ModelSerializer):
     def get_date_restrictions(self, obj):
         try:
             ser = DateRestrictions.objects.get(specificgroupdiscount = obj)
-            return NewDateRestrictionsSerializers(ser).data
+            return AvailDateRestrictionsSerializers(ser).data
         except Exception as err:
             pass
    
@@ -1643,14 +1643,14 @@ class AvailOfferDirectOrFlatDiscountSerializers(serializers.ModelSerializer):
     def get_day_restrictions(self, obj):
         try:
             ser = DayRestrictions.objects.filter(specificgroupdiscount = obj)
-            return NewDayRestrictionsSerializers(ser, many = True).data
+            return AvailDayRestrictionsSerializers(ser, many = True).data
         except Exception as err:
             pass
 
     def get_category_discount(self, obj):
         try:
             ser = CategoryDiscount.objects.filter(directorflat = obj)
-            return NewCategoryDiscountSerializers(ser, many = True).data
+            return AvailCategoryDiscountSerializers(ser, many = True).data
         except Exception as err:
             pass
     class Meta:
@@ -1673,13 +1673,13 @@ class AvailOfferSpecificGroupDiscountSerializers(serializers.ModelSerializer):
     def get_block_date(self, obj):
         try:
             ser = BlockDate.objects.filter(specificgroupdiscount = obj)
-            return NewBlockDateSerializers(ser, many = True).data
+            return AvailBlockDateSerializers(ser, many = True).data
         except Exception as err:
             pass
     def get_date_restrictions(self, obj):
         try:
             ser = DateRestrictions.objects.get(specificgroupdiscount = obj)
-            return NewDateRestrictionsSerializers(ser).data
+            return AvailDateRestrictionsSerializers(ser).data
         except Exception as err:
             pass
    
@@ -1687,14 +1687,14 @@ class AvailOfferSpecificGroupDiscountSerializers(serializers.ModelSerializer):
     def get_day_restrictions(self, obj):
         try:
             ser = DayRestrictions.objects.filter(specificgroupdiscount = obj)
-            return NewDayRestrictionsSerializers(ser, many = True).data
+            return AvailDayRestrictionsSerializers(ser, many = True).data
         except Exception as err:
             pass
         
     def get_servicegroup_discount(self, obj):
         try:
             ser = ServiceGroupDiscount.objects.filter(specificgroupdiscount = obj)
-            return NewServiceGroupDiscountSerializers(ser, many = True).data
+            return AvailServiceGroupDiscountSerializers(ser, many = True).data
         except Exception as err:
             pass
     class Meta:
@@ -1730,14 +1730,14 @@ class AvailOfferPurchaseDiscountSerializers(serializers.ModelSerializer):
     def get_block_date(self, obj):
         try:
             ser = BlockDate.objects.filter(purchasediscount = obj)
-            return NewBlockDateSerializers(ser, many = True).data
+            return AvailBlockDateSerializers(ser, many = True).data
         except Exception as err:
             pass
     
     def get_date_restrictions(self, obj):
         try:
             ser = DateRestrictions.objects.get(purchasediscount = obj)
-            return NewDateRestrictionsSerializers(ser).data
+            return AvailDateRestrictionsSerializers(ser).data
         except Exception as err:
             pass
    
@@ -1745,7 +1745,7 @@ class AvailOfferPurchaseDiscountSerializers(serializers.ModelSerializer):
     def get_day_restrictions(self, obj):
         try:
             ser = DayRestrictions.objects.filter(purchasediscount = obj)
-            return NewDayRestrictionsSerializers(ser, many = True).data
+            return AvailDayRestrictionsSerializers(ser, many = True).data
         except Exception as err:
             pass
     class Meta:
@@ -1766,21 +1766,21 @@ class AvailOfferSpecificBrandSerializers(serializers.ModelSerializer):
     def get_SpecificBrand_discount(self, obj):
         try:
             ser = SpecificBrand.objects.filter(specificgroupdiscount = obj)
-            return NewSpecificBrandSerializers(ser, many = True).data
+            return AvailSpecificBrandSerializers(ser, many = True).data
         except Exception as err:
             pass
 
     def get_block_date(self, obj):
         try:
             ser = BlockDate.objects.filter(specificbrand = obj)
-            return NewBlockDateSerializers(ser, many = True).data
+            return AvailBlockDateSerializers(ser, many = True).data
         except Exception as err:
             pass
     
     def get_date_restrictions(self, obj):
         try:
             ser = DateRestrictions.objects.get(specificbrand = obj)
-            return NewDateRestrictionsSerializers(ser).data
+            return AvailDateRestrictionsSerializers(ser).data
         except Exception as err:
             pass
    
@@ -1788,7 +1788,7 @@ class AvailOfferSpecificBrandSerializers(serializers.ModelSerializer):
     def get_day_restrictions(self, obj):
         try:
             ser = DayRestrictions.objects.filter(specificbrand = obj)
-            return NewDayRestrictionsSerializers(ser, many = True).data
+            return AvailDayRestrictionsSerializers(ser, many = True).data
         except Exception as err:
             pass
     class Meta:
