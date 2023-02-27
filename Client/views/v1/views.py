@@ -2349,3 +2349,9 @@ def update_loyalty(request):
         },
         status=status.HTTP_200_OK
         )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_complimentary(request):
+    pass
+    

@@ -23,7 +23,7 @@ from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
 from django.db.models import Q
-from Client.models import Client, Membership, Promotion, Rewards, Vouchers
+from Client.models import Client, ClientPromotions, Membership, Promotion, Rewards, Vouchers
 from datetime import date, timedelta
 from threading import Thread
 
@@ -299,17 +299,16 @@ def create_appointment(request):
     
     payment_method = request.data.get('payment_method', None)
     discount_type = request.data.get('discount_type', None) 
+    
+    selected_promotion_type = request.data.get('selected_promotion_type', None) 
+    selected_promotion_id = request.data.get('selected_promotion_id', None) 
        
     Errors = []
     service_commission = 0
     service_commission_type = ''
     toValue = 0
     total_price_app= 0
-    # try:
-    #     total_price_app += int(extra_price)
-    # except ValueError:
-    #     total_price_app += 0
-        
+            
     if not all([ client_type, appointment_date, business_id  ]):
          return Response(
             {
@@ -386,6 +385,7 @@ def create_appointment(request):
 
     elif type(appointments) == list:
         pass
+    
     if text:
         if type(text) == str:
             try:
@@ -429,30 +429,6 @@ def create_appointment(request):
         datetime_duration = app_date_time + timedelta(minutes=duration)
         datetime_duration = datetime_duration.strftime('%H:%M:%S')
         end_time = datetime_duration
-        
-        # service_commission = 0
-        # service_commission_type = ''
-        # toValue = 0
-        
-        # try:
-        #     commission = CommissionSchemeSetting.objects.get(employee = str(member))
-        #     category = CategoryCommission.objects.filter(commission = commission.id)
-        #     for cat in category:
-        #         try:
-        #             toValue = int(cat.to_value)
-        #         except :
-        #             sign  = cat.to_value
-        #         if cat.category_comission == 'Service':
-        #             if (int(cat.from_value) <= price and  price <  toValue) or (int(cat.from_value) <= price and sign ):
-        #                 if cat.symbol == '%':
-        #                     service_commission = price * int(cat.commission_percentage) / 100
-        #                     service_commission_type = str(service_commission_type) + cat.symbol
-        #                 else:
-        #                     service_commission = int(cat.commission_percentage)
-        #                     service_commission_type = str(service_commission) + cat.symbol
-                                            
-        # except Exception as err:
-        #     Errors.append(str(err))
         
         try:
             voucher = Vouchers.objects.get(id = voucher_id )
@@ -500,7 +476,16 @@ def create_appointment(request):
                 }
             }
         )
-        
+        if selected_promotion_type == 'Complimentary_Discount':
+            client_promotion, created  = ClientPromotions.objects.get_or_create(
+                user = user,
+                business = business,
+                client = client,
+                complimentary__id =  selected_promotion_id,
+                service = service,
+                visits = 1
+            )
+                    
         total_price_app += int(price)
         appointment_service = AppointmentService.objects.create(
             user = user,
@@ -518,11 +503,6 @@ def create_appointment(request):
             
             slot_availible_for_online = slot_availible_for_online,
             client_can_book = client_can_book,
-            # voucher = voucher,
-            # reward = reward,
-            # membership = membership,
-            # promotion = promotion
-            # tip=tip,
         )
         
         if fav is not None:
@@ -697,6 +677,7 @@ def update_appointment(request):
         },
         status=status.HTTP_200_OK
     )
+
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_appointment_device(request):
@@ -2180,3 +2161,7 @@ def get_employee_check_availability_list(request):
             },
             status=status.HTTP_200_OK
         )
+    
+# @api_view(['POST'])
+# @permission_classes([AllowAny])
+# def get_employee_check_availability_list(request):
