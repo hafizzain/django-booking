@@ -341,31 +341,11 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
     membership_sale_price = serializers.SerializerMethodField(read_only=True)
     
     tier_target = serializers.SerializerMethodField(read_only=True)
-    # product_target = serializers.SerializerMethodField(read_only=True)
-    # voucher_target = serializers.SerializerMethodField(read_only=True)
-    # membership_target = serializers.SerializerMethodField(read_only=True)
     
     def get_tier_target(self,obj):
         try:
-            # month = self.context["month"]
-            # year = self.context["year"]
-            # service_target = 0
-            # retail_target = 0
-            # voucher_target = 0
-            # membership_target = 0
-            # month_find = MONTH_DICT[month]
-            # return month_find
             tier = StoreTarget.objects.filter(
-                # storetarget__location = obj,
-                # month = month_find
                 )
-            # for tier_target in  tier:
-            #     create = str(tier_target.year)
-            #     match = int(create.split(" ")[0].split("-")[0])
-            #     return tier_target.year
-                #if int(year) == match:
-                    
-                    #total += int(ord.total_price)
                 
             return StoreTargetSerializers(tier,many = True ,context=self.context).data
         except Exception as err:
@@ -376,11 +356,22 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
             month = self.context["month"]
             year = self.context["year"]
             total = 0
+            
+            app   = AppointmentService.objects.filter(
+                member = obj,
+                appointment_status = 'Done',
+            )
             service_orders = ServiceOrder.objects.filter(is_deleted=False,
                         location = obj,
                         created_at__icontains = year
-                        
                         )
+            
+            for ord  in app:
+                create = str(ord.created_at)
+                match = int(create.split(" ")[0].split("-")[1])
+                if int(month) == match:
+                    total += int(ord.price)
+            
             for ord  in service_orders:
                 create = str(ord.created_at)
                 match = int(create.split(" ")[0].split("-")[1])
