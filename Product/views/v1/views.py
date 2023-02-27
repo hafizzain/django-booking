@@ -824,20 +824,6 @@ def add_product(request):
         is_active=True,
         published = True,
     )
-    # if type(location) == str:
-    #         location = json.loads(location)
-
-    # elif type(location) == list:
-    #         pass
-        
-    # for loc in location:
-    #     try:
-    #         location_id = BusinessAddress.objects.get(id=loc)  
-    #         print(location_id)
-    #         product.location.add(location_id)
-    #     except Exception as err:
-    #         product_error.append(str(err))
-
 
     for img in medias:
         ProductMedia.objects.create(
