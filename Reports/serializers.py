@@ -260,6 +260,16 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 appointment_status = 'Done',
                 created_at__icontains = year
             )
+            for appointment  in app:                
+                create = str(appointment.created_at)
+                created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
+                
+                if range_start:
+                    if range_start >= created_at  and created_at <= range_end:
+                        total += int(appointment.price)
+                else:
+                    total += int(appointment.price)
+                    
             for ord  in service_orders:                
                 create = str(ord.created_at)
                 created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
@@ -267,25 +277,9 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 if range_start:
                     if range_start >= created_at  and created_at <= range_end:
                         total += int(ord.total_price)
-                    #total += int(ord.total_price)
                 else:
                     total += int(ord.total_price)
-                    
-            # service_appointment = AppointmentService.objects.filter(is_deleted=False, 
-            #             member = obj,
-            #             #created_at__icontains = year
-            #             )
-            # for ord  in service_appointment:                
-            #     create = str(ord.created_at)
-            #     created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
-                
-            #     if range_start:
-            #         if range_start >= created_at  and created_at <= range_end:
-            #             total += int(ord.total_price)
-            #         else:
-            #             total += int(ord.total_price)
-            
-                      
+                                          
             return total         
             
         except Exception as err:
