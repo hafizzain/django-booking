@@ -174,8 +174,6 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
             except:
                 return obj.image
         return None
-    
-    
     class Meta:
         model = Employee
         fields = ['id', 'employee_id','is_active','full_name','image','location',
@@ -253,12 +251,12 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             total = 0
             service_orders = ServiceOrder.objects.filter(is_deleted=False, 
                         member = obj,
-                        created_at__icontains = year
+                        #created_at__icontains = year
                         )
             app   = AppointmentService.objects.filter(
                 member = obj,
                 appointment_status = 'Done',
-                created_at__icontains = year
+                #created_at__icontains = year
             )
             for appointment  in app:                
                 create = str(appointment.created_at)
@@ -266,13 +264,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 
                 if range_start:
                     if range_start >= created_at  and created_at <= range_end:
-                        if appointment.price == None:
-                            total += 0
-                        else:
-                            total += int(appointment.price)
-                else:
-                    if appointment.price == None:
-                            total += 0
+                        total += int(appointment.price)
                     else:
                         total += int(appointment.price)
                     
