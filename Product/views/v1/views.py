@@ -1018,7 +1018,7 @@ def update_product(request):
         is_deleted = False,
         
     )
-    if is_active is not None:
+    if is_active is None:
         product.is_active = False
         product.save()
     images = request.data.getlist('product_images', None)
