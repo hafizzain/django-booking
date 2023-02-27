@@ -41,5 +41,5 @@ class EmployeeDashboradSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Employee
-        fields=['id', 'full_name','achieve_target',  ]
+        fields=['id', 'full_name','achieve_target'  ]
 
