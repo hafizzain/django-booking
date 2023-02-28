@@ -164,16 +164,15 @@ class DateRestrictionsSerializers(serializers.ModelSerializer):
         fields = '__all__'
 
 class AvailDateRestrictionsSerializers(serializers.ModelSerializer):
-    address = serializers.SerializerMethodField()
+    # address = serializers.SerializerMethodField()
     
-    
-    
-    def get_address(self, obj):
-        try:
-            address = BusinessAddress.objects.get(id =obj.business_address)
-            return LocationSerializer(address).data
-        except Exception as err:
-            pass
+    # def get_address(self, obj):
+    #     try:
+    #         address = BusinessAddress.objects.get(id =obj.business_address)
+    #         return LocationSerializer(address).data
+    #     except Exception as err:
+    #         pass
+
     class Meta:
         model = DateRestrictions
         fields = ['id','start_date','end_date']
