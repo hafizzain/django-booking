@@ -1239,7 +1239,7 @@ class AvailOfferComplimentaryDiscountSerializers(serializers.ModelSerializer):
             ser = ComplimentaryDiscount.objects.filter(complimentary = obj)
             return AvailComplimentaryDiscountSerializers(ser, many = True).data
         except Exception as err:
-            return err
+            return str(err)
             pass
         
     def get_block_date(self, obj):
@@ -1279,7 +1279,7 @@ class AvailOfferUserRestrictedDiscountSerializers(serializers.ModelSerializer):
             ser = UserRestrictedDiscount.objects.filter(complimentary = obj)
             return AvailUserRestrictedDiscountSerializers(ser, many = True).data
         except Exception as err:
-            return err
+            return str(err)
             pass
     def get_type(self, obj):
         return 'User Restricted discount'
@@ -1324,7 +1324,7 @@ class AvailOfferRetailAndGetServiceSerializers(serializers.ModelSerializer):
             ser = RetailAndGetService.objects.filter(retailandservice = obj)
             return AvailRetailAndGetServiceSerializers(ser, many = True).data
         except Exception as err:
-            return err
+            return str(err)
             pass
         
     def get_block_date(self, obj):
@@ -1502,7 +1502,7 @@ class AvailOfferMentionedNumberServiceSerializers(serializers.ModelSerializer):
             ser = Service.objects.filter(mentionnumberservice = obj)
             return AvailServiceSerializers(ser, many = True).data
         except Exception as err:
-            return err
+            return str(err)
             pass
         
     def get_block_date(self, obj):
