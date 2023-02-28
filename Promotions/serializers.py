@@ -1265,16 +1265,15 @@ class AvailOfferUserRestrictedDiscountSerializers(serializers.ModelSerializer):
         ser = BlockDate.objects.filter(userrestricteddiscount = obj)
         return AvailBlockDateSerializers(ser, many = True).data
 
-
     def get_date_restrictions(self, obj):
         try:
-            ser = DateRestrictions.objects.get(complimentary = obj)
+            ser = DateRestrictions.objects.get(userrestricteddiscount = obj)
             return AvailDateRestrictionsSerializers(ser).data
         except Exception as err:
             pass
    
     def get_day_restrictions(self, obj):
-        ser = DayRestrictions.objects.filter(complimentary = obj)
+        ser = DayRestrictions.objects.filter(userrestricteddiscount = obj)
         return AvailDayRestrictionsSerializers(ser, many = True).data
 
     class Meta:
