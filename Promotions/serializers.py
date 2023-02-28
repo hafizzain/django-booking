@@ -1415,6 +1415,7 @@ class FreeServiceSerializers(serializers.ModelSerializer):
 class AvailServiceSerializers(serializers.ModelSerializer):
     is_deleted = serializers.SerializerMethodField(read_only=True)
     priceservice = serializers.SerializerMethodField(read_only=True)
+    discount = serializers.SerializerMethodField(read_only=True)
     
     def get_priceservice(self, obj):
         try:
@@ -1429,6 +1430,10 @@ class AvailServiceSerializers(serializers.ModelSerializer):
             return 'True'
         else:
             return 'False'
+        
+
+    def get_discount(self, obj):
+        return None
     class Meta:
         model = FreeService
         fields = ['discount','priceservice', 'is_deleted']
