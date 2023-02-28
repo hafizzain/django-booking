@@ -1588,7 +1588,7 @@ class AvailOfferDirectOrFlatDiscountSerializers(serializers.ModelSerializer):
     block_date = serializers.SerializerMethodField(read_only=True)
     type = serializers.SerializerMethodField(read_only=True)
     day_restrictions = serializers.SerializerMethodField(read_only=True)
-    date_restrictions = serializers.SerializerMethodField(read_only=True)
+    # date_restrictions = serializers.SerializerMethodField(read_only=True)
     
     # def get_is_deleted(self, obj):
     #     if obj.is_deleted == True:
@@ -1604,12 +1604,12 @@ class AvailOfferDirectOrFlatDiscountSerializers(serializers.ModelSerializer):
         return AvailBlockDateSerializers(ser, many = True).data
         
     
-    def get_date_restrictions(self, obj):
-        try:
-            ser = DateRestrictions.objects.get(directorflat = obj)
-            return AvailDateRestrictionsSerializers(ser).data
-        except Exception as err:
-            pass
+    # def get_date_restrictions(self, obj):
+    #     try:
+    #         ser = DateRestrictions.objects.get(directorflat = obj)
+    #         return AvailDateRestrictionsSerializers(ser).data
+    #     except Exception as err:
+    #         pass
    
     
     def get_day_restrictions(self, obj):
@@ -1623,7 +1623,9 @@ class AvailOfferDirectOrFlatDiscountSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = DirectOrFlatDiscount
-        fields = ['type','category_discount','day_restrictions','date_restrictions','block_date']
+        fields = ['type','category_discount','block_date', 'day_restrictions']
+        # 'day_restrictions',
+        # 'date_restrictions',
 
 #11
 class AvailOfferSpecificGroupDiscountSerializers(serializers.ModelSerializer):
