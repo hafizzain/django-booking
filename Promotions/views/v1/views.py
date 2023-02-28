@@ -169,7 +169,7 @@ def create_directorflat(request):
             except Exception as err:
                error.append(str(err))
                
-    serializers= DirectOrFlatDiscountSerializers(flatordirect, context={'request' : request})
+    serializers= PromtoionsSerializers.DirectOrFlatDiscountSerializers(flatordirect, context={'request' : request})
     
     return Response(
             {
@@ -479,7 +479,7 @@ def update_directorflat(request):
                     date = date,
                 ) 
     
-    serializers= DirectOrFlatDiscountSerializers(directorflat, context={'request' : request})
+    serializers= PromtoionsSerializers.DirectOrFlatDiscountSerializers(directorflat, context={'request' : request})
        
     return Response(
         {

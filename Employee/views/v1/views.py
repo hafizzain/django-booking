@@ -606,7 +606,7 @@ def create_employee(request):
     city = request.data.get('city', None)
    
     if not all([
-         business_id, full_name ,employee_id, email, country, gender  ,address , designation, income_type, salary ]): #or ( not to_present and ending_date is None):
+         business_id, full_name ,employee_id, country, gender  ,address , designation, income_type, salary ]): #or ( not to_present and ending_date is None):
        return Response(
             {
                 'status' : False,
