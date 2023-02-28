@@ -1686,14 +1686,14 @@ class AvailOfferSpecificBrandSerializers(serializers.ModelSerializer):
     type = serializers.SerializerMethodField(read_only=True)
     day_restrictions = serializers.SerializerMethodField(read_only=True)
     date_restrictions = serializers.SerializerMethodField(read_only=True)
-    specific_brand = serializers.SerializerMethodField(read_only=True)
+    # specific_brand = serializers.SerializerMethodField(read_only=True)
     
     def get_type(self, obj):
         return 'Specific Brand Discount'
     
-    def get_specific_brand(self, obj):
-        ser = SpecificBrand.objects.filter(specificgroupdiscount = obj)
-        return AvailSpecificBrandSerializers(ser, many = True).data
+    # def get_specific_brand(self, obj):
+    #     ser = SpecificBrand.objects.filter(specificgroupdiscount = obj)
+    #     return AvailSpecificBrandSerializers(ser, many = True).data
 
     def get_block_date(self, obj):
         ser = BlockDate.objects.filter(specificbrand = obj)
@@ -1711,4 +1711,5 @@ class AvailOfferSpecificBrandSerializers(serializers.ModelSerializer):
         return AvailDayRestrictionsSerializers(ser, many = True).data
     class Meta:
         model = SpecificBrand
-        fields = ['id','type' ,'specific_brand','day_restrictions','date_restrictions','block_date']
+        fields = ['id','type' ,'day_restrictions','date_restrictions','block_date']
+        # 'specific_brand',
