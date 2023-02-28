@@ -24,14 +24,14 @@ class ServiceGroupDiscountSerializers(serializers.ModelSerializer):
 
 
 class AvailServiceGroupDiscountSerializers(serializers.ModelSerializer):
-    is_deleted = serializers.SerializerMethodField(read_only=True)
+    # is_deleted = serializers.SerializerMethodField(read_only=True)
     
     
-    def get_is_deleted(self, obj):
-        if obj.is_deleted == True:
-            return 'True'
-        else:
-            return 'False'
+    # def get_is_deleted(self, obj):
+    #     if obj.is_deleted == True:
+    #         return 'True'
+    #     else:
+    #         return 'False'
     class Meta:
         model = ServiceGroupDiscount
         fields = ['specificgroupdiscount','discount']
@@ -49,14 +49,14 @@ class ServiceDurationForSpecificTimeSerializers(serializers.ModelSerializer):
         fields = '__all__'
 
 class AvailServiceDurationForSpecificTimeSerializers(serializers.ModelSerializer):
-    is_deleted = serializers.SerializerMethodField(read_only=True)
+    # is_deleted = serializers.SerializerMethodField(read_only=True)
     
     
-    def get_is_deleted(self, obj):
-        if obj.is_deleted == True:
-            return 'True'
-        else:
-            return 'False'
+    # def get_is_deleted(self, obj):
+    #     if obj.is_deleted == True:
+    #         return 'True'
+    #     else:
+    #         return 'False'
     class Meta:
         model = ServiceDurationForSpecificTime
         fields = ['id','service']
@@ -74,14 +74,14 @@ class SpendSomeAmountAndGetDiscountSerializers(serializers.ModelSerializer):
         fields = '__all__'
 
 class AvailSpendSomeAmountAndGetDiscountSerializers(serializers.ModelSerializer):
-    is_deleted = serializers.SerializerMethodField(read_only=True)
+    # is_deleted = serializers.SerializerMethodField(read_only=True)
     
     
-    def get_is_deleted(self, obj):
-        if obj.is_deleted == True:
-            return 'True'
-        else:
-            return 'False'
+    # def get_is_deleted(self, obj):
+    #     if obj.is_deleted == True:
+    #         return 'True'
+    #     else:
+    #         return 'False'
     class Meta:
         model = SpendSomeAmountAndGetDiscount
         fields = ['id','spandsomeamount']
@@ -102,11 +102,11 @@ class AvailBlockDateSerializers(serializers.ModelSerializer):
     
     
     
-    def get_is_deleted(self, obj):
-        if obj.is_deleted == True:
-            return 'True'
-        else:
-            return 'False'
+    # def get_is_deleted(self, obj):
+    #     if obj.is_deleted == True:
+    #         return 'True'
+    #     else:
+    #         return 'False'
     class Meta:
         model = BlockDate
         fields = ['date','id']
@@ -135,7 +135,7 @@ class AvailDayRestrictionsSerializers(serializers.ModelSerializer):
             return 'False'
     class Meta:
         model = DayRestrictions
-        fields = ['id','day']
+        fields = ['id','day', 'is_deleted']
 class LocationSerializer(serializers.ModelSerializer):
     
     class Meta:
@@ -715,11 +715,11 @@ class AvailFixedPriceServiceSerializers(serializers.ModelSerializer):
     type = serializers.SerializerMethodField(read_only=True)
     # is_deleted = serializers.SerializerMethodField(read_only=True)
 
-    def get_is_deleted(self, obj):
-        if obj.is_deleted == True:
-            return 'True'
-        else:
-            return 'False'
+    # def get_is_deleted(self, obj):
+    #     if obj.is_deleted == True:
+    #         return 'True'
+    #     else:
+    #         return 'False'
     
     def get_type(self, obj):
         return 'Fixed_Price_Service'
@@ -1410,7 +1410,7 @@ class FreeServiceSerializers(serializers.ModelSerializer):
             return 'False'
     class Meta:
         model = FreeService
-        fields = ['discount','priceservice']
+        fields = ['discount','priceservice', 'is_deleted']
 
 class AvailServiceSerializers(serializers.ModelSerializer):
     is_deleted = serializers.SerializerMethodField(read_only=True)
@@ -1431,7 +1431,7 @@ class AvailServiceSerializers(serializers.ModelSerializer):
             return 'False'
     class Meta:
         model = FreeService
-        fields = ['discount','priceservice']
+        fields = ['discount','priceservice', 'is_deleted']
 
 #7
 class AvailOfferMentionedNumberServiceSerializers(serializers.ModelSerializer):
@@ -1557,11 +1557,11 @@ class AvailOfferDirectOrFlatDiscountSerializers(serializers.ModelSerializer):
     day_restrictions = serializers.SerializerMethodField(read_only=True)
     date_restrictions = serializers.SerializerMethodField(read_only=True)
     
-    def get_is_deleted(self, obj):
-        if obj.is_deleted == True:
-            return 'True'
-        else:
-            return 'False'
+    # def get_is_deleted(self, obj):
+    #     if obj.is_deleted == True:
+    #         return 'True'
+    #     else:
+    #         return 'False'
 
     def get_type(self, obj):
         return 'Direct Or Flat Discount'
