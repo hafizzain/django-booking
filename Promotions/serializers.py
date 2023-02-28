@@ -1477,7 +1477,7 @@ class AvailOfferMentionedNumberServiceSerializers(serializers.ModelSerializer):
 
 #8
 class AvailOfferSpendSomeAmountSerializers(serializers.ModelSerializer):
-    spend_service = serializers.SerializerMethodField(read_only=True)
+    # spend_service = serializers.SerializerMethodField(read_only=True)
     block_date = serializers.SerializerMethodField(read_only=True)
     type = serializers.SerializerMethodField(read_only=True)
     day_restrictions = serializers.SerializerMethodField(read_only=True)
@@ -1487,9 +1487,9 @@ class AvailOfferSpendSomeAmountSerializers(serializers.ModelSerializer):
     def get_type(self, obj):
         return 'Spend Some Amount'
     
-    def get_spend_service(self, obj):
-        ser = SpendSomeAmount.objects.filter(spandsomeamount = obj)
-        return AvailSpendSomeAmountAndGetDiscountSerializers(ser, many = True).data
+    # def get_spend_service(self, obj):
+    #     ser = SpendSomeAmount.objects.filter(spandsomeamount = obj)
+    #     return AvailSpendSomeAmountAndGetDiscountSerializers(ser, many = True).data
     
     def get_block_date(self, obj):
         ser = BlockDate.objects.filter(spendsomeamount = obj)
@@ -1507,7 +1507,8 @@ class AvailOfferSpendSomeAmountSerializers(serializers.ModelSerializer):
         return AvailDayRestrictionsSerializers(ser, many = True).data
     class Meta:
         model = SpendSomeAmount
-        fields = ['type','block_date' ,'spend_service', 'date_restrictions' , 'day_restrictions']
+        fields = ['type','block_date' ,'date_restrictions' , 'day_restrictions']
+        # 'spend_service', 
 
 #9
 class AvailOfferSpendDiscountSerializers(serializers.ModelSerializer):
