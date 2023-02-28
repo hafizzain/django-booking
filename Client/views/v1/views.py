@@ -10,7 +10,7 @@ from Service.models import Service
 from Business.models import Business
 from Product.models import Product
 from Utility.models import Country, Language, State, City
-from Client.models import Client, ClientGroup, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers
+from Client.models import Client, ClientGroup, ClientPromotions, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers
 from Client.serializers import ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer
 from Utility.models import NstyleFile
 
@@ -2349,3 +2349,40 @@ def update_loyalty(request):
         },
         status=status.HTTP_200_OK
         )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_complimentary(request):
+    client = request.data.get('client', None)
+    if client is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'client'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+       
+    client = ClientPromotions.objects.filter(client__id =client ).count()
+    
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Client total Count',
+                'count': client,
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )

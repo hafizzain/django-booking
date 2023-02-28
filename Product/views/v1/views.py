@@ -670,7 +670,7 @@ def add_product(request):
     business_id = request.data.get('business', None)
     vendor_id = request.data.get('vendor', None)
     category_id = request.data.get('category', None)
-    product_size = request.data.get('product_size', None)
+    product_size = request.data.get('size', None)
     #image = request.data.getlist('image', None)
     brand_id = request.data.get('brand', None)
     product_type = request.data.get('product_type', 'Sellable')
@@ -814,7 +814,7 @@ def add_product(request):
         cost_price = cost_price,
         #full_price = full_price,
         #sell_price = sell_price,
-        #product_size=product_size,
+        product_size=product_size,
         tax_rate = tax_rate,
         short_description = short_description,
         description = description,
@@ -824,20 +824,6 @@ def add_product(request):
         is_active=True,
         published = True,
     )
-    # if type(location) == str:
-    #         location = json.loads(location)
-
-    # elif type(location) == list:
-    #         pass
-        
-    # for loc in location:
-    #     try:
-    #         location_id = BusinessAddress.objects.get(id=loc)  
-    #         print(location_id)
-    #         product.location.add(location_id)
-    #     except Exception as err:
-    #         product_error.append(str(err))
-
 
     for img in medias:
         ProductMedia.objects.create(
@@ -965,6 +951,7 @@ def update_product(request):
     category_id = request.data.get('category', None)
     brand_id = request.data.get('brand', None)
     location = request.data.get('location', None)
+    is_active = request.data.get('is_active', None)
     
     currency_retail_price = request.data.get('currency_retail_price', None)
     
@@ -1031,6 +1018,9 @@ def update_product(request):
         is_deleted = False,
         
     )
+    if is_active is None:
+        product.is_active = False
+        product.save()
     images = request.data.getlist('product_images', None)
 
     if images is not None:

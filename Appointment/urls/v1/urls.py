@@ -43,4 +43,5 @@ urlpatterns = [
     #Employee Check Availabilty
     path('get_employee_check_time/', views.get_employee_check_time),
     path('get_employee_check_availability_list/', views.get_employee_check_availability_list),
+    #path('get_complimentry_voucher/', views.get_employee_check_availability_list),
 ]

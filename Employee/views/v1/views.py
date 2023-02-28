@@ -1133,6 +1133,7 @@ def update_employee(request):
     if serializer_info.is_valid():
         serializer_info.save()
         data.update(serializer_info.data)
+    
     else:
         return Response(
         {
@@ -1163,8 +1164,10 @@ def update_employee(request):
                             pass
 
         empl_permission.save()
+    
     except Exception as err:
         Errors.append(err)
+    
     if location is not None:
         try:
             employee.location.clear()

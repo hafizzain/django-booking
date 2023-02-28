@@ -244,6 +244,13 @@ class ProductSerializer(serializers.ModelSerializer):
     
     location = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField(read_only=True)
+    size = serializers.SerializerMethodField(read_only=True)
+    
+    def get_size(self,obj):
+        try:
+            return obj.product_size
+        except:
+            return None
     
     def get_currency_retail_price(self, obj):
             currency_retail = CurrencyRetailPrice.objects.filter(product = obj)
@@ -305,7 +312,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'id', 
             'name', 
             'currency_retail_price',
-            #'product_size',
+            'size',
             'product_type',
             'cost_price',
             #'full_price',
