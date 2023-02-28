@@ -1773,7 +1773,7 @@ class AvailOfferSpecificBrandSerializers(serializers.ModelSerializer):
     def get_type(self, obj):
         return 'Specific Brand Discount'
     
-    def get_SpecificBrand_discount(self, obj):
+    def get_specific_brand(self, obj):
         try:
             ser = SpecificBrand.objects.filter(specificgroupdiscount = obj)
             return AvailSpecificBrandSerializers(ser, many = True).data
