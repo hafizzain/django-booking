@@ -1573,14 +1573,14 @@ class AvailOfferDirectOrFlatDiscountSerializers(serializers.ModelSerializer):
     
     def get_date_restrictions(self, obj):
         try:
-            ser = DateRestrictions.objects.get(specificgroupdiscount = obj)
+            ser = DateRestrictions.objects.get(directorflat = obj)
             return AvailDateRestrictionsSerializers(ser).data
         except Exception as err:
             pass
    
     
     def get_day_restrictions(self, obj):
-        ser = DayRestrictions.objects.filter(specificgroupdiscount = obj)
+        ser = DayRestrictions.objects.filter(directorflat = obj)
         return AvailDayRestrictionsSerializers(ser, many = True).data
 
     def get_category_discount(self, obj):
