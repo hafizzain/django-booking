@@ -1479,7 +1479,7 @@ class AvailServiceSerializers(serializers.ModelSerializer):
 #7
 class AvailOfferMentionedNumberServiceSerializers(serializers.ModelSerializer):
     # service = serializers.SerializerMethodField(read_only=True)
-    service = serializers.SerializerMethodField(read_only=True)
+    services = serializers.SerializerMethodField(read_only=True)
     block_date = serializers.SerializerMethodField(read_only=True)
     type = serializers.SerializerMethodField(read_only=True)
     day_restrictions = serializers.SerializerMethodField(read_only=True)
@@ -1527,7 +1527,7 @@ class AvailOfferMentionedNumberServiceSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = MentionedNumberService
-        fields = ['type','block_date','service' , 'date_restrictions' , 'day_restrictions']
+        fields = ['type','block_date','services' , 'date_restrictions' , 'day_restrictions']
 
 #8
 class AvailOfferSpendSomeAmountSerializers(serializers.ModelSerializer):
