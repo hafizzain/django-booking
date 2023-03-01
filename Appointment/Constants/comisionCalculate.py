@@ -13,12 +13,13 @@ def calculate_commission(member, price):
             elif cat.to_value is None and price >= int(cat.from_value):
                 commission_percentage = int(cat.commission_percentage)
                 break
-    if commission_percentage is None:
-        return 0, ''
-    elif cat.symbol == '%':
-        service_commission = price * commission_percentage / 100
-        service_commission_type = str(commission_percentage) + cat.symbol
-    else:
-        service_commission = commission_percentage
-        service_commission_type = str(commission_percentage) + cat.symbol
-    return service_commission, service_commission_type
+            
+            if commission_percentage is None:
+                return 0, ''
+            elif cat.symbol == '%':
+                service_commission = price * commission_percentage / 100
+                service_commission_type = str(commission_percentage) + cat.symbol
+            else:
+                service_commission = commission_percentage
+                service_commission_type = str(commission_percentage) + cat.symbol
+            return service_commission, service_commission_type

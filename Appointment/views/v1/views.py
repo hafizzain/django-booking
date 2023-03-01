@@ -499,6 +499,9 @@ def create_appointment(request):
             comm, comm_type = calculate_commission(member, int(price))
             service_commission += comm
             service_commission_type += comm_type
+            ExceptionRecord.objects.create(
+            text = f'commsion {service_commission}'
+        )
         except Exception as err:
             Errors.append(str(err))
         
@@ -575,9 +578,7 @@ def create_appointment(request):
     try:
         integer_value_ser = round(service_commission[0])
     except Exception as err:
-        ExceptionRecord.objects.create(
-            text = f'price{total_price_app} {type(total_price_app)}ser-con {service_commission} error {str(err)}'
-        )
+        pass
     
     appointment.extra_price = total_price_app
     appointment.service_commission = int(service_commission)
@@ -590,9 +591,7 @@ def create_appointment(request):
         thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
         thrd.start()
     except Exception as err:
-        ExceptionRecord.objects.create(
-            text=str(err)
-        )
+        pass
     
     all_memebers= Employee.objects.filter(
         is_deleted = False,
@@ -1680,8 +1679,7 @@ def create_appointment_client(request):
             is_appointment = True
         )
     except Exception as err:
-        ExceptionRecord.objects.create(text = f'Tenant Created Customer error and  {str(err)}')
-    
+        pass    
     with tenant_context(tenant):
         try:
             business=Business.objects.get(id=business_id)
@@ -1840,9 +1838,7 @@ def create_appointment_client(request):
             thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
             thrd.start()
         except Exception as err:
-            ExceptionRecord.objects.create(
-                text=str(err)
-            )
+            pass
         
         all_memebers= Employee.objects.filter(
             is_deleted = False,
