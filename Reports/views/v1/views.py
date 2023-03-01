@@ -28,7 +28,7 @@ from Product.models import Brand, Product, ProductOrderStockReport, ProductStock
 from django.db.models import Avg, Count, Min, Sum
 
 
-from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
+from Sale.serializers import AppointmentCheckout_ReportsSerializer, AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
 
 
 @api_view(['GET'])
@@ -222,7 +222,7 @@ def get_commission_reports_by_commission_details(request):
     Append_data = [] 
     newdata = {} 
     if range_start:
-        range_start = datetime.strptime(range_start, "%Y-%m-%d")#.date()
+        range_start = datetime.strptime(range_start, "%Y-%m-%d")
         range_end = datetime.strptime(range_end, "%Y-%m-%d")
         checkout_order = Checkout.objects.filter(
             is_deleted=False,
@@ -239,7 +239,7 @@ def get_commission_reports_by_commission_details(request):
             created_at__gte =  range_start ,
             created_at__lte = range_end
             )
-        serialized = AppointmentCheckoutSerializer(appointment_checkout, many = True)
+        serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
         data.extend(serialized.data)
     else:
         checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
@@ -249,7 +249,7 @@ def get_commission_reports_by_commission_details(request):
         data.extend(serialized.data)
             
         appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')
-        serialized = AppointmentCheckoutSerializer(appointment_checkout, many = True)
+        serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
         data.extend(serialized.data)
         
     for da in data:
