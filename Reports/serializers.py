@@ -265,8 +265,8 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 if range_start:
                     if range_start >= created_at  and created_at <= range_end:
                         total += int(appointment.price)
-                    else:
-                        total += int(appointment.price)
+                else:
+                    total += int(appointment.price)
                     
             for ord  in service_orders:                
                 create = str(ord.created_at)
