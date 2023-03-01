@@ -493,8 +493,8 @@ def create_appointment(request):
         service_commission_type = ''
         toValue = 0
         
-        for member, price in zip(member, price):
-            total_price_app += int(price)
+        # for member, price in zip(member, price):
+        #     total_price_app += int(price)
         try:
             comm, comm_type = calculate_commission(member, int(price))
             service_commission += comm
