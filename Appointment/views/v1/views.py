@@ -1274,7 +1274,8 @@ def create_checkout(request):
         gst = gst,
         service_price =service_price,
         total_price =total_price,
-        
+        service_commission = service_commission,
+        service_commission_type = service_commission_type,        
     )
     # checkout.business_address = service_appointment.business_address
     # checkout.save()
