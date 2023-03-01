@@ -173,8 +173,11 @@ class AppointmentCheckout(models.Model):
     tip = models.PositiveIntegerField(default=0, null=True, blank=True)
     gst = models.PositiveIntegerField(default=0, null=True, blank=True)
     
-    service_price = models.PositiveIntegerField(default=0, null=True, blank=True, )
+    service_price = models.PositiveIntegerField(default=0, null=True, blank=True)
     total_price = models.PositiveIntegerField(default=0, null=True, blank=True)
+    
+    service_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
+    service_commission_type = models.CharField( max_length=50 , default = '')
     
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
