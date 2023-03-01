@@ -4,6 +4,7 @@ from Appointment.Constants.ConvertTime import convert_24_to_12
 from Appointment.Constants.Reschedule import reschedule_appointment
 from Appointment.Constants.AddAppointment import Add_appointment
 from Appointment.Constants.cancelappointment import cancel_appointment
+from Appointment.Constants.comisionCalculate import calculate_commission
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -492,25 +493,35 @@ def create_appointment(request):
         service_commission_type = ''
         toValue = 0
         
+        for member, price in zip(member, price):
+            total_price_app += int(price)
         try:
-            commission = CommissionSchemeSetting.objects.get(employee = str(member))
-            category = CategoryCommission.objects.filter(commission = commission.id)
-            for cat in category:
-                try:
-                    toValue = int(cat.to_value)
-                except :
-                    sign  = cat.to_value
-                if cat.category_comission == 'Service':
-                    if (int(cat.from_value) <= price and  price <  toValue) or (int(cat.from_value) <= price and sign ):
-                        if cat.symbol == '%':
-                            service_commission = price * int(cat.commission_percentage) / 100
-                            service_commission_type = str(service_commission_type) + cat.symbol
-                        else:
-                            service_commission = int(cat.commission_percentage)
-                            service_commission_type = str(service_commission) + cat.symbol
-                                            
+            comm, comm_type = calculate_commission(member, int(price))
+            service_commission += comm
+            service_commission_type += comm_type
         except Exception as err:
             Errors.append(str(err))
+        
+        # try:
+        #     commission = CommissionSchemeSetting.objects.get(employee = str(member))
+        #     category = CategoryCommission.objects.filter(commission = commission.id)
+        #     for cat in category:
+        #         try:
+        #             toValue = int(cat.to_value)
+        #         except :
+        #             sign  = cat.to_value
+        #         if cat.category_comission == 'Service':
+        #             if (int(cat.from_value) <= price and  price <  toValue) or (int(cat.from_value) <= price and sign ):
+        #                 if cat.symbol == '%':
+        #                     service_commission = price * int(cat.commission_percentage) / 100
+        #                     service_commission_type = str(service_commission_type) + cat.symbol
+        #                 else:
+        #                     service_commission = int(cat.commission_percentage)
+        #                     service_commission_type = str(service_commission) + cat.symbol
+                                            
+        # except Exception as err:
+        #     Errors.append(str(err))
+            
         appointment_service = AppointmentService.objects.create(
             user = user,
             business = business,
