@@ -17,6 +17,6 @@ def ssl_sub_domain(domain):
     total_seconds = time_diff.total_seconds()
 
     ExceptionRecord.objects.create(
-        text = f'SSL Certificate TIME DIFF . {total_seconds} Seconds'
+        text = f'SSL Certificate TIME DIFF {total_seconds} Seconds'
     )
             

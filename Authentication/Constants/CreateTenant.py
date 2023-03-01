@@ -544,8 +544,10 @@ def create_tenant(request=None, user=None, data=None):
         try:
             thrd = Thread(target=ssl_sub_domain, args=[td_name])
             thrd.start()
-        except:
-            pass
+        except Exception as err:
+            ExceptionRecord.objects.create(
+                text = f'SSL ERROR . {str(err)}'
+            )
         
         t_user = create_tenant_user(tenant=user_tenant, data=data)
         
