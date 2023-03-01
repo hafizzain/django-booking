@@ -169,7 +169,7 @@ def create_directorflat(request):
             except Exception as err:
                error.append(str(err))
                
-    serializers= DirectOrFlatDiscountSerializers(flatordirect, context={'request' : request})
+    serializers= PromtoionsSerializers.DirectOrFlatDiscountSerializers(flatordirect, context={'request' : request})
     
     return Response(
             {
@@ -479,7 +479,7 @@ def update_directorflat(request):
                     date = date,
                 ) 
     
-    serializers= DirectOrFlatDiscountSerializers(directorflat, context={'request' : request})
+    serializers= PromtoionsSerializers.DirectOrFlatDiscountSerializers(directorflat, context={'request' : request})
        
     return Response(
         {
@@ -510,11 +510,11 @@ def get_discount_and_promotions(request):
     }
 
 
-    selected_date = request.GET.get('selected_date', '2023-01-25')
+    selected_date = request.GET.get('selected_date', '2023-01-19')
     selected_day = request.GET.get('selected_day', None)
 
-    if selected_day : 
-        pass
+    if not selected_day or selected_day is None : 
+        selected_day = 'Nothing'
 
 
     ##Done
@@ -523,8 +523,8 @@ def get_discount_and_promotions(request):
         directorflat_daterestrictions__end_date__gte = selected_date,
         # directorflat_dayrestrictions__day__in = [None]
         **filter_queries['normal_queries'],
-    ).distinct()
-    # ).exclude(Q(directorflat_dayrestrictions__day__icontains = selected_day)).distinct()
+    # ).distinct()
+    ).exclude(directorflat_dayrestrictions__day__icontains = selected_day).distinct()
     serialized = PromtoionsSerializers.AvailOfferDirectOrFlatDiscountSerializers(flatordirect,  many=True, context={'request' : request})
     data.extend(serialized.data)
 
