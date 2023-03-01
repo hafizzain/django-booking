@@ -126,7 +126,7 @@ class AvailServiceDurationForSpecificTimeSerializers(serializers.ModelSerializer
     #         return 'False'
     class Meta:
         model = ServiceDurationForSpecificTime
-        fields = ['id','service']
+        fields = ['service']
 class SpendSomeAmountAndGetDiscountSerializers(serializers.ModelSerializer):
     is_deleted = serializers.SerializerMethodField(read_only=True)
     
@@ -151,7 +151,7 @@ class AvailSpendSomeAmountAndGetDiscountSerializers(serializers.ModelSerializer)
     #         return 'False'
     class Meta:
         model = SpendSomeAmountAndGetDiscount
-        fields = ['id','spandsomeamount']
+        fields = ['spandsomeamount']
 class BlockDateSerializers(serializers.ModelSerializer):
     is_deleted = serializers.SerializerMethodField(read_only=True)
     
@@ -481,57 +481,57 @@ class PurchaseDiscountSerializers(serializers.ModelSerializer):
         fields = '__all__'
 
 class AvailPurchaseDiscountSerializers(serializers.ModelSerializer):
-    day_restrictions = serializers.SerializerMethodField(read_only=True)
-    date_restrictions = serializers.SerializerMethodField(read_only=True)
-    block_date = serializers.SerializerMethodField(read_only=True)
-    type = serializers.SerializerMethodField(read_only=True)
+    # day_restrictions = serializers.SerializerMethodField(read_only=True)
+    # date_restrictions = serializers.SerializerMethodField(read_only=True)
+    # block_date = serializers.SerializerMethodField(read_only=True)
+    # type = serializers.SerializerMethodField(read_only=True)
     discount_product = serializers.SerializerMethodField(read_only=True)
     discount_service = serializers.SerializerMethodField(read_only=True)
     
-    def get_purchase_discount(self, obj):
+    def get_discount_product(self, obj):
         try:
-            ser = PurchaseDiscount.objects.filter(purchasediscount = obj)
+            ser = PurchaseDiscount.objects.filter(purchase_discount = obj)
             return AvailPurchaseDiscountSerializers(ser, many = True).data
         except Exception as err:
             pass
 
     def get_discount_service(self, obj):
         try:
-            ser = PurchaseDiscount.objects.filter(purchasediscount = obj)
+            ser = PurchaseDiscount.objects.filter(purchase_discount = obj)
             return AvailPurchaseDiscountSerializers(ser, many = True).data
         except Exception as err:
             pass
     
-    def get_type(self, obj):
-        return 'Purchase Discount'
+    # def get_type(self, obj):
+    #     return 'Purchase Discount'
     
-    def get_block_date(self, obj):
-        try:
-            ser = BlockDate.objects.filter(purchasediscount = obj)
-            return BlockDateSerializers(ser, many = True).data
-        except Exception as err:
-            pass
+    # def get_block_date(self, obj):
+    #     try:
+    #         ser = BlockDate.objects.filter(purchasediscount = obj)
+    #         return BlockDateSerializers(ser, many = True).data
+    #     except Exception as err:
+    #         pass
     
     
-    def get_date_restrictions(self, obj):
-        try:
-            ser = DateRestrictions.objects.get(purchasediscount = obj)
-            return DateRestrictionsSerializers(ser).data
-        except Exception as err:
-            pass
+    # def get_date_restrictions(self, obj):
+    #     try:
+    #         ser = DateRestrictions.objects.get(purchasediscount = obj)
+    #         return DateRestrictionsSerializers(ser).data
+    #     except Exception as err:
+    #         pass
    
     
-    def get_day_restrictions(self, obj):
-        try:
-            ser = DayRestrictions.objects.filter(purchasediscount = obj)
-            return DayRestrictionsSerializers(ser, many = True).data
-        except Exception as err:
-            pass
+    # def get_day_restrictions(self, obj):
+    #     try:
+    #         ser = DayRestrictions.objects.filter(purchasediscount = obj)
+    #         return DayRestrictionsSerializers(ser, many = True).data
+    #     except Exception as err:
+    #         pass
         
     class Meta:
         model = PurchaseDiscount
-        fields = ['type','block_date','day_restrictions','date_restrictions','discount_product','discount_service']
-
+        fields = ['discount_product','discount_service']
+# 'type','block_date','day_restrictions','date_restrictions',
 
 class SpecificBrandSerializers(serializers.ModelSerializer):
     day_restrictions = serializers.SerializerMethodField(read_only=True)
@@ -791,10 +791,10 @@ class FixedPriceServiceSerializers(serializers.ModelSerializer):
 
 class AvailFixedPriceServiceSerializers(serializers.ModelSerializer):
     # day_restrictions = serializers.SerializerMethodField(read_only=True)
-    #spend_service = serializers.SerializerMethodField(read_only=True)
+    spend_services = serializers.SerializerMethodField(read_only=True)
     # date_restrictions = serializers.SerializerMethodField(read_only=True)
     # block_date = serializers.SerializerMethodField(read_only=True)
-    type = serializers.SerializerMethodField(read_only=True)
+    # type = serializers.SerializerMethodField(read_only=True)
     # is_deleted = serializers.SerializerMethodField(read_only=True)
 
     # def get_is_deleted(self, obj):
@@ -803,12 +803,14 @@ class AvailFixedPriceServiceSerializers(serializers.ModelSerializer):
     #     else:
     #         return 'False'
     
-    def get_type(self, obj):
-        return 'Fixed_Price_Service'
+    def get_spend_services(self, obj):
+        return {}
+
+    
         
     class Meta:
         model = FixedPriceService
-        fields = ['id','service']
+        fields = ['spend_services']
 
 class MentionedNumberServiceSerializers(serializers.ModelSerializer):
     day_restrictions = serializers.SerializerMethodField(read_only=True)
@@ -1805,15 +1807,15 @@ class AvailOfferSpecificBrandSerializers(serializers.ModelSerializer):
     # type = serializers.SerializerMethodField(read_only=True)
     # day_restrictions = serializers.SerializerMethodField(read_only=True)
     # date_restrictions = serializers.SerializerMethodField(read_only=True)
-    specific_brand = serializers.SerializerMethodField(read_only=True)
+    discount_brand = serializers.SerializerMethodField(read_only=True)
     
     # def get_type(self, obj):
     #     return 'Specific Brand Discount'
     
-    def get_specific_brand(self, obj):
-        ser = SpecificBrand.objects.filter(specificgroupdiscount = obj)
-        return AvailSpecificBrandSerializers(ser, many = True).data
-
+    def get_discount_brand(self, obj):
+        # ser = SpecificBrand.objects.filter(specificgroupdiscount = obj)
+        # return AvailSpecificBrandSerializers(ser, many = True).data
+        return {}
     # def get_block_date(self, obj):
     #     ser = BlockDate.objects.filter(specificbrand = obj)
     #     return AvailBlockDateSerializers(ser, many = True).data
@@ -1830,5 +1832,5 @@ class AvailOfferSpecificBrandSerializers(serializers.ModelSerializer):
     #     return AvailDayRestrictionsSerializers(ser, many = True).data
     class Meta:
         model = SpecificBrand
-        fields = ['specific_brand']
+        fields = ['discount_brand']
         # 'specific_brand', 'day_restrictions','date_restrictions','block_date'
