@@ -132,7 +132,7 @@ class MemberSerializer(serializers.ModelSerializer):
                 url = tenant_media_base_url(request)
                 return f'{url}{obj.image}'
             except:
-                return obj.image
+                return f'{obj.image}'
         return None
     class Meta:
         model = Employee
@@ -878,3 +878,81 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model =  Order
         fields = ('__all__')
+
+
+class CheckoutCommissionSerializer(serializers.ModelSerializer):
+
+    employee = serializers.SerializerMethodField()
+    commission = serializers.SerializerMethodField()
+    commission_rate = serializers.SerializerMethodField()
+    sale = serializers.SerializerMethodField()
+    location = LocationSerializer()
+
+
+    def get_employee(self, checkout):
+        # serialized = EmployeeBusinessSerializer(checkout.member)
+        # return serialized.data
+        return {
+            'full_name' : str(checkout.member.full_name),
+        }
+
+    def get_commission(self, checkout):
+        if checkout.service_commission and checkout.service_commission > 0:
+            return checkout.service_commission
+        elif checkout.product_commission and checkout.product_commission > 0:
+            return checkout.product_commission
+        elif checkout.voucher_commission and checkout.voucher_commission > 0:
+            return checkout.voucher_commission
+        else:
+            return 0
+
+    def get_commission_rate(self, checkout):
+        if checkout.service_commission_type:
+            return checkout.service_commission_type
+        elif checkout.product_commission_type:
+            return checkout.product_commission_type
+        elif checkout.voucher_commission_type:
+            return checkout.voucher_commission_type
+        else:
+            return ''
+
+    
+    def get_sale(self, checkout):
+        sale_item = {}
+        try:
+            product_order = ProductOrder.objects.get(checkout = checkout)
+        except:
+            try:
+                service_order = ServiceOrder.objects.get(checkout = checkout)
+            except:
+                try:
+                    voucher_order = VoucherOrder.objects.get(checkout = checkout)
+                except:
+                    pass
+                else:
+                    sale_item['voucher'] = VoucherOrderSerializer(voucher_order).data
+            else:
+                sale_item['service'] = ServiceOrderSerializer(service_order).data
+
+        else:
+            sale_item['product'] = ProductOrderSerializer(product_order).data
+
+        
+        return {
+            'created_at' : str(checkout.created_at),
+            'id' : str(checkout.id),
+            **sale_item
+        }
+
+    class Meta:
+        """
+            'employee' : {},
+            'location' : {},
+            'commission' : 00,
+            'commission_rate' : 00,
+            'sale' : {}
+        """
+        model = Checkout
+        fields = ['employee', 'location', 'commission', 'commission_rate', 'sale']
+    
+    

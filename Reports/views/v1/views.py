@@ -28,7 +28,7 @@ from Product.models import Brand, Product, ProductOrderStockReport, ProductStock
 from django.db.models import Avg, Count, Min, Sum
 
 
-from Sale.serializers import AppointmentCheckout_ReportsSerializer, AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
+from Sale.serializers import AppointmentCheckout_ReportsSerializer, AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer, CheckoutCommissionSerializer
 
 
 @api_view(['GET'])
@@ -306,78 +306,73 @@ def get_commission_reports_by_commission_details(request):
         },
         status=status.HTTP_200_OK
     )
+
+
+
+
     
-# @api_view(['GET'])
-# @permission_classes([AllowAny])
-# def get_commission_reports_by_commission_details(request):
-#     range_start = request.GET.get('range_start', None)
-#     year = request.GET.get('year', None)
-#     range_end = request.GET.get('range_end', None)
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_commission_reports_by_commission_details_updated(request):
+    range_start = request.GET.get('range_start', None) # 2023-02-23
+    year = request.GET.get('year', None) # non used
+    range_end = request.GET.get('range_end', None) # 2023-02-25
     
-#     data = []
-#     Append_data= []
+    data = []
+    Append_data= []
     
-#     if range_start:
-#         range_start = datetime.strptime(range_start, "%Y-%m-%d")
-#         range_end = datetime.strptime(range_end, "%Y-%m-%d")
-#         checkout_order = Checkout.objects.filter(
-#             is_deleted=False,
-#             created_at__gte =  range_start ,
-#             created_at__lte = range_end
-#             ).order_by('-created_at')
-#         serialized = CheckoutSerializer(checkout_order,  many=True, context={
-#             'request' : request, 
-#             })
-#         data.extend(serialized.data)
+    # if range_start:
+    #     range_start = datetime.strptime(range_start, "%Y-%m-%d")
+    #     range_end = datetime.strptime(range_end, "%Y-%m-%d")
+
+    #     checkout_order = Checkout.objects.filter(
+    #         is_deleted=False,
+    #         created_at__gte =  range_start ,
+    #         created_at__lte = range_end
+    #     ).order_by('-created_at')
+
+    #     serialized = CheckoutSerializer(checkout_order,  many=True, context={
+    #         'request' : request, 
+    #         })
+    #     # data.extend(serialized.data)
             
-#         appointment_checkout = AppointmentCheckout.objects.filter(
-#             appointment_service__appointment_status = 'Done',
-#             created_at__gte =  range_start ,
-#             created_at__lte = range_end
-#             )
-#         serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
-#         data.extend(serialized.data)
-#     else:
-#         checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
-#         serialized = CheckoutSerializer(checkout_order,  many=True, context={
-#             'request' : request, 
-#             })
-#         data.extend(serialized.data)
-            
-#         appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')
-#         serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
-#         data.extend(serialized.data)
+    #     appointment_checkout = AppointmentCheckout.objects.filter(
+    #         appointment_service__appointment_status = 'Done',
+    #         created_at__gte =  range_start ,
+    #         created_at__lte = range_end
+    #         )
+    #     serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
+    #     # data.extend(serialized.data)
+    # else:
+
+
+    checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = CheckoutCommissionSerializer(checkout_order,  many=True, context={
+        'request' : request, 
+        })
         
-#     for da in data:
-#         name = da.get('member')
-#         location = da.get('location')
-
-#         for commission_type in ['service', 'product', 'voucher']:
-#             commission = da.get(f"{commission_type}_commission")
-#             commission_rate = da.get(f"{commission_type}_commission_type")
-#             sale_price = da.get(commission_type)
-
-#             if commission is not None:
-#                 new_data = {
-#                     'employee': name,
-#                     'location': location,
-#                     'commission': commission,
-#                     'commission_rate': commission_rate,
-#                     'sale': sale_price
-#                 }
-
-#                 Append_data.append(new_data)
-
+    # appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')
+    # serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
         
-#     return Response(
-#         {
-#             'status' : 200,
-#             'status_code' : '200',
-#             'response' : {
-#                 'message' : 'All Sale Orders',
-#                 'error_message' : None,
-#                 'sales' : Append_data
-#             }
-#         },
-#         status=status.HTTP_200_OK
-#     )
+    
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Sale Orders',
+                'error_message' : None,
+                'sales' : serialized.data,
+                # 'sales' : [
+                #     {
+                #         'employee' : {},
+                #         'location' : {},
+                #         'commission' : 00,
+                #         'commission_rate' : 00,
+                #         'sale' : {},
+                #     }
+                # ]
+            }
+        },
+        status=status.HTTP_200_OK
+    )
