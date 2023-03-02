@@ -670,13 +670,15 @@ class ServiceGroupReport(serializers.ModelSerializer):
         try:
             month = self.context["month"]
             year = self.context["year"]
+            location = self.context["location"]
             ser_target = 0
             retail_target = 0
             data = {}
             
             service_target = ServiceTarget.objects.filter(
                 service_group = obj,
-                created_at__icontains = year                
+                created_at__icontains = year,
+                location__id =  location,
                 ) 
             for ord  in service_target:
                 create = str(ord.created_at)
