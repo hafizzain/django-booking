@@ -6,7 +6,7 @@ from rest_framework import serializers
 from Business.models import BusinessAddress, BusinessTax
 from Product.Constants.index import tenant_media_base_url
 from django_tenants.utils import tenant_context
-
+from Product.models import Product 
 from Promotions.models import BundleFixed, ComplimentaryDiscount, DirectOrFlatDiscount , CategoryDiscount , DateRestrictions , DayRestrictions, BlockDate, DiscountOnFreeService, FixedPriceService, FreeService, MentionedNumberService, PackagesDiscount, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, ServiceDurationForSpecificTime, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount, UserRestrictedDiscount, Service, ServiceGroup
 
 from Utility.models import Currency, ExceptionRecord
@@ -73,6 +73,33 @@ class AvailOfferService_Serializer(serializers.ModelSerializer):
 
     class Meta:
         model = Service
+        fields = ['id','name', 'slot_availible_for_online', 'prices', 'client_can_book']
+
+class AvailOfferProduct_Serializer(serializers.ModelSerializer):
+    prices = serializers.SerializerMethodField(read_only=True)
+
+    def get_prices(self, service):
+        request = self.context.get('request', None)
+        if request is not None:
+            location_id = request.GET.get('selected_location', None)
+        else:
+            location_id = None
+        
+        queries = {}
+        if location_id is not None:
+            try:
+                location = BusinessAddress.objects.get(id = location_id)
+            except:
+                pass
+            else:
+                queries['currency'] = location.currency
+
+        prices = PriceService.objects.filter(service = service, **queries)
+
+        return AvailOffer_PriceService_Serializers(prices, many = True).data
+
+    class Meta:
+        model = Product
         fields = ['id','name', 'slot_availible_for_online', 'prices', 'client_can_book']
 
 
@@ -311,6 +338,35 @@ class ProductAndGetSpecificSerializers(serializers.ModelSerializer):
     class Meta:
         model = ProductAndGetSpecific
         fields = '__all__'
+
+
+class AvailProduct_Serializers(serializers.ModelSerializer):
+    # prices = serializers.SerializerMethodField(read_only=True)
+
+    # def get_prices(self, product):
+    #     request = self.context.get('request', None)
+    #     if request is not None:
+    #         location_id = request.GET.get('selected_location', None)
+    #     else:
+    #         location_id = None
+        
+    #     queries = {}
+    #     if location_id is not None:
+    #         try:
+    #             location = BusinessAddress.objects.get(id = location_id)
+    #         except:
+    #             pass
+    #         else:
+    #             queries['currency'] = location.currency
+
+    #     prices = PriceService.objects.filter(product = product, **queries)
+
+    #     return AvailOffer_PriceService_Serializers(prices, many = True).data
+    class Meta:
+        model = Product
+        fields = ['id','cost_price']
+
+
 class DiscountOnFreeServiceSerializers(serializers.ModelSerializer):
     is_deleted = serializers.SerializerMethodField(read_only=True)
     
@@ -1806,8 +1862,10 @@ class AvailOfferPurchaseDiscountSerializers(serializers.ModelSerializer):
     # type = serializers.SerializerMethodField(read_only=True)
     # day_restrictions = serializers.SerializerMethodField(read_only=True)
     # date_restrictions = serializers.SerializerMethodField(read_only=True)
-    product = AvailPurchaseDiscountSerializers()
-    service = AvailPurchaseDiscountSerializers()
+    # product = AvailProductAndGetSpecificSerializers()
+    # ": "b0315b17-df09-4101-b46a-b361c70d02ee
+    service = AvailOfferService_Serializer()
+    product = AvailProduct_Serializers()
 
     # def get_type(self, obj):
     #     return 'Purchase Discount'
