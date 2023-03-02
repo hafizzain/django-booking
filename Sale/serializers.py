@@ -806,19 +806,14 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
             return ''
     
     def get_sale(self, obj):
-        
-        try:
-            name = Service.objects.get(id = obj.service)
-            ser_name =  obj.service.name
-        except Exception as err:
-            return str(err)
-        
+
         return {
             'created_at' : str(obj.created_at),
             'id' : str(obj.id),
-            'name' : ser_name,
+            'name' : str(obj.service.name),
             'order_type' : 'Service',
             'quantity' : 1,
+            'price' : obj.price,
         }
         
             
@@ -924,26 +919,32 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
 
     
     def get_sale(self, checkout):
-        sale_item = {}
+        sale_item = {
+            'errors' : []
+        }
         order_item = None
         try:
             order_item = ProductOrder.objects.get(checkout = checkout)
             sale_item['name'] = order_item.product.name
             sale_item['price'] = order_item.checkout.total_product_price
-        except:
+        except Exception as err:
+            sale_item['errors'].append(str(err))
             try:
                 order_item = ServiceOrder.objects.get(checkout = checkout)
                 sale_item['name'] = order_item.service.name
                 sale_item['price'] = order_item.checkout.total_service_price
-            except:
+            except Exception as err:
+                sale_item['errors'].append(str(err))
                 try:
                     order_item = VoucherOrder.objects.get(checkout = checkout)
                     sale_item['name'] = order_item.voucher.name
                     sale_item['price'] = order_item.checkout.total_voucher_price
 
-                except:
+                except Exception as err:
+                    sale_item['errors'].append(str(err))
                     order_item = None
                     sale_item['name'] = '-------'
+                    sale_item['price'] = '-------'
         
         if order_item is not None:
             sale_item['quantity'] = order_item.quantity
