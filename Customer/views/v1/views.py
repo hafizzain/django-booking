@@ -534,6 +534,7 @@ def customer_login(request):
 @permission_classes([AllowAny])
 def get_client_appointment(request):
     client_id = request.GET.get('client_id', None)
+    
     data = []
     
     if client_id is None:
