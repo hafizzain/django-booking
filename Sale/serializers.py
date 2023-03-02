@@ -922,32 +922,43 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
         sale_item = {
             'errors' : []
         }
+
         order_item = None
+        name = '-------'
+        price = '-------'
+        order_type = '-------'
+
         try:
             order_item = ProductOrder.objects.get(checkout = checkout)
-            sale_item['name'] = order_item.product.name
-            sale_item['price'] = order_item.checkout.total_product_price
+            name = order_item.product.name
+            price = order_item.checkout.total_product_price
+            order_type = 'Product'
         except Exception as err:
             sale_item['errors'].append(str(err))
             try:
                 order_item = ServiceOrder.objects.get(checkout = checkout)
-                sale_item['name'] = order_item.service.name
-                sale_item['price'] = order_item.checkout.total_service_price
+                name = order_item.service.name
+                price = order_item.checkout.total_service_price
+                order_type = 'Service'
             except Exception as err:
                 sale_item['errors'].append(str(err))
                 try:
                     order_item = VoucherOrder.objects.get(checkout = checkout)
-                    sale_item['name'] = order_item.voucher.name
-                    sale_item['price'] = order_item.checkout.total_voucher_price
+                    name = order_item.voucher.name
+                    price = order_item.checkout.total_voucher_price
+                    order_type = 'Voucher'
 
                 except Exception as err:
                     sale_item['errors'].append(str(err))
                     order_item = None
-                    sale_item['name'] = '-------'
-                    sale_item['price'] = '-------'
+
         
         if order_item is not None:
             sale_item['quantity'] = order_item.quantity
+
+        sale_item['name'] = name
+        sale_item['price'] = price
+        sale_item['order_type'] = order_type
 
         #         else:
         #             sale_item['voucher'] = VoucherOrderSerializer(order_item).data
