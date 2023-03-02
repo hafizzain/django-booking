@@ -1429,7 +1429,7 @@ def create_staff_group(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_staff_group(request):
-    all_staff_group= StaffGroup.objects.filter(employees__is_deleted=False).order_by('-created_at')
+    all_staff_group= StaffGroup.objects.filter(employees__is_deleted=False).order_by('-created_at').distinct()
     serialized = StaffGroupSerializers(all_staff_group, many=True, context={'request' : request})
     
     data = serialized.data

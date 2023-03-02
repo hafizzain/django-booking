@@ -4,6 +4,7 @@ from Appointment.Constants.ConvertTime import convert_24_to_12
 from Appointment.Constants.Reschedule import reschedule_appointment
 from Appointment.Constants.AddAppointment import Add_appointment
 from Appointment.Constants.cancelappointment import cancel_appointment
+from Appointment.Constants.comisionCalculate import calculate_commission
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -304,9 +305,6 @@ def create_appointment(request):
     selected_promotion_id = request.data.get('selected_promotion_id', None) 
        
     Errors = []
-    service_commission = 0
-    service_commission_type = ''
-    toValue = 0
     total_price_app= 0
             
     if not all([ client_type, appointment_date, business_id  ]):
@@ -491,6 +489,42 @@ def create_appointment(request):
             )
                     
         total_price_app += int(price)
+        service_commission = 0
+        service_commission_type = ''
+        toValue = 0
+        
+        # for member, price in zip(member, price):
+        #     total_price_app += int(price)
+        try:
+            comm, comm_type = calculate_commission(member, int(price))
+            service_commission += comm
+            service_commission_type += comm_type
+            ExceptionRecord.objects.create(
+            text = f'commsion {service_commission}'
+        )
+        except Exception as err:
+            Errors.append(str(err))
+        
+        # try:
+        #     commission = CommissionSchemeSetting.objects.get(employee = str(member))
+        #     category = CategoryCommission.objects.filter(commission = commission.id)
+        #     for cat in category:
+        #         try:
+        #             toValue = int(cat.to_value)
+        #         except :
+        #             sign  = cat.to_value
+        #         if cat.category_comission == 'Service':
+        #             if (int(cat.from_value) <= price and  price <  toValue) or (int(cat.from_value) <= price and sign ):
+        #                 if cat.symbol == '%':
+        #                     service_commission = price * int(cat.commission_percentage) / 100
+        #                     service_commission_type = str(service_commission_type) + cat.symbol
+        #                 else:
+        #                     service_commission = int(cat.commission_percentage)
+        #                     service_commission_type = str(service_commission) + cat.symbol
+                                            
+        # except Exception as err:
+        #     Errors.append(str(err))
+            
         appointment_service = AppointmentService.objects.create(
             user = user,
             business = business,
@@ -502,8 +536,8 @@ def create_appointment(request):
             service = service,
             member = member,
             price = price,
-            # service_commission = service_commission,
-            # service_commission_type= service_commission_type,
+            service_commission = service_commission,
+            service_commission_type= service_commission_type,
             
             slot_availible_for_online = slot_availible_for_online,
             client_can_book = client_can_book,
@@ -517,6 +551,9 @@ def create_appointment(request):
             appointment_service.business_address = business_address
             appointment_service.save()
     
+    service_commission = 0
+    service_commission_type = ''
+    toValue = 0
     try:
         commission = CommissionSchemeSetting.objects.get(employee = str(member))
         category = CategoryCommission.objects.filter(commission = commission.id)
@@ -541,9 +578,7 @@ def create_appointment(request):
     try:
         integer_value_ser = round(service_commission[0])
     except Exception as err:
-        ExceptionRecord.objects.create(
-            text = f'price{total_price_app} {type(total_price_app)}ser-con {service_commission} error {str(err)}'
-        )
+        pass
     
     appointment.extra_price = total_price_app
     appointment.service_commission = int(service_commission)
@@ -556,9 +591,7 @@ def create_appointment(request):
         thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
         thrd.start()
     except Exception as err:
-        ExceptionRecord.objects.create(
-            text=str(err)
-        )
+        pass
     
     all_memebers= Employee.objects.filter(
         is_deleted = False,
@@ -1185,6 +1218,12 @@ def create_checkout(request):
     service_price = request.data.get('service_price', None)
     total_price = request.data.get('total_price', None)
     
+    service_commission = 0
+    service_commission_type = ''
+    toValue = 0
+    
+    Errors = []
+    total_price_app = 0
     # if not all([]){
         
     # }
@@ -1236,6 +1275,26 @@ def create_checkout(request):
             service_appointment.save()
         except Exception as err:
             pass
+    total_price_app  = gst + total_price
+    try:
+        commission = CommissionSchemeSetting.objects.get(employee = str(member))
+        category = CategoryCommission.objects.filter(commission = commission.id)
+        for cat in category:
+            try:
+                toValue = int(cat.to_value)
+            except :
+                sign  = cat.to_value
+            if cat.category_comission == 'Service':
+                if (int(cat.from_value) <= total_price_app and  total_price_app <  toValue) or (int(cat.from_value) <= total_price_app and sign ):
+                    if cat.symbol == '%':
+                        service_commission = total_price_app * int(cat.commission_percentage) / 100
+                        service_commission_type = str(service_commission_type) + cat.symbol
+                    else:
+                        service_commission = int(cat.commission_percentage)
+                        service_commission_type = str(service_commission) + cat.symbol
+                                        
+    except Exception as err:
+        Errors.append(str(err))
         
     checkout =AppointmentCheckout.objects.create(
         appointment = appointments,
@@ -1248,7 +1307,8 @@ def create_checkout(request):
         gst = gst,
         service_price =service_price,
         total_price =total_price,
-        
+        service_commission = service_commission,
+        service_commission_type = service_commission_type,        
     )
     # checkout.business_address = service_appointment.business_address
     # checkout.save()
@@ -1262,6 +1322,7 @@ def create_checkout(request):
                     'message' : 'Appointment Checkout Created!',
                     'error_message' : None,
                     'checkout' : serialized.data,
+                    'errors': Errors
                 }
             },
             status=status.HTTP_201_CREATED
@@ -1618,8 +1679,7 @@ def create_appointment_client(request):
             is_appointment = True
         )
     except Exception as err:
-        ExceptionRecord.objects.create(text = f'Tenant Created Customer error and  {str(err)}')
-    
+        pass    
     with tenant_context(tenant):
         try:
             business=Business.objects.get(id=business_id)
@@ -1778,9 +1838,7 @@ def create_appointment_client(request):
             thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
             thrd.start()
         except Exception as err:
-            ExceptionRecord.objects.create(
-                text=str(err)
-            )
+            pass
         
         all_memebers= Employee.objects.filter(
             is_deleted = False,

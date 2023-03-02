@@ -6,7 +6,7 @@ from Business.models import BusinessAddress
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
 from Tenants.models import Domain, Tenant
 from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSIONS_MODEL_FIELDS
-from Utility.models import Country, GlobalPermissionChoices, State, City
+from Utility.models import Country, Currency, GlobalPermissionChoices, State, City
 from Service.models import Service
 from Permissions.models import EmployePermission
 from datetime import datetime, timedelta
@@ -45,9 +45,18 @@ class CitySerializer(serializers.ModelSerializer):
         exclude = ['is_deleted', 'created_at', 'unique_code', 'key']
  
 class LocationSerializer(serializers.ModelSerializer):
+    currency = serializers.SerializerMethodField(read_only=True)
+    
+    def get_currency(self, obj):
+        try:
+            cur = Currency.objects.get(id  = str(obj.currency) )
+            return cur.code
+        except Exception as err:
+            return str(err)
+            
     class Meta:
         model = BusinessAddress
-        fields = ['id', 'address_name']
+        fields = ['id', 'address_name', 'currency']
      
         
 class EmployeInformationsSerializer(serializers.ModelSerializer):

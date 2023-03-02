@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from Product.models import Brand
+from Utility.models import ExceptionRecord
 from rest_framework import serializers
 from Appointment.models import AppointmentCheckout, AppointmentService
 from Appointment.serializers import LocationSerializer
@@ -204,6 +205,24 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             product_commission = 0
             voucher_commission = 0
             data = {}
+            app   = AppointmentService.objects.filter(
+                member = obj,
+                appointment_status = 'Done',
+                #created_at__icontains = year
+            )
+            for appointment  in app:                
+                create = str(appointment.created_at)
+                created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
+                
+                if range_start:
+                    if range_start >= created_at  and created_at <= range_end:
+                        service_commission += int(appointment.service_commission)
+                else:
+                    service_commission += int(appointment.service_commission)
+                    
+            ExceptionRecord.objects.create(
+                    text=str(service_commission)
+                )
             
             service_orders = ProductOrder.objects.filter(
                 is_deleted=False, 
@@ -265,8 +284,8 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 if range_start:
                     if range_start >= created_at  and created_at <= range_end:
                         total += int(appointment.price)
-                    else:
-                        total += int(appointment.price)
+                else:
+                    total += int(appointment.price)
                     
             for ord  in service_orders:                
                 create = str(ord.created_at)

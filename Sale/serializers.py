@@ -730,7 +730,6 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
     price  = serializers.SerializerMethodField(read_only=True)
     
     appointment_service  = serializers.SerializerMethodField(read_only=True)
-    #price  = serializers.SerializerMethodField(read_only=True)
     
     def get_appointment_service(self, obj):
         service = AppointmentService.objects.filter(appointment = obj.appointment)
@@ -753,16 +752,9 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
             return serializers
         except Exception as err:
             return None
-        # try:
-        #     cli = f"{obj.appointment.client.full_name}"
-        #     return cli
-
-        # except Exception as err:
-        #     print(err)
-            
+        
     def get_price(self, obj):
         try:
-            #cli = f"{obj.appointment.client.full_name}"
             return obj.appointment_service.price
 
         except Exception as err:
@@ -774,12 +766,6 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
             return serializers
         except Exception as err:
             return None
-        # try:
-        #     cli = f"{obj.appointment_service.member.full_name}"
-        #     return cli
-
-        # except Exception as err:
-        #     print(err)
     
     def get_location(self, obj):
         try:
@@ -792,6 +778,62 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
         model = AppointmentCheckout
         fields = ('__all__')
         
+class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
+    location = serializers.SerializerMethodField(read_only=True)
+    client = serializers.SerializerMethodField(read_only=True)
+    order_type  = serializers.SerializerMethodField(read_only=True)
+    member  = serializers.SerializerMethodField(read_only=True)
+    service  = serializers.SerializerMethodField(read_only=True)
+    price  = serializers.SerializerMethodField(read_only=True)
+    
+    #appointment_service  = serializers.SerializerMethodField(read_only=True)
+    
+    def get_service(self, obj):
+        service = AppointmentService.objects.filter(appointment = obj.appointment)
+        return UpdateAppointmentSerializer(service, many = True).data
+    
+    # def get_service(self, obj):
+    #     try:
+    #         cli = f"{obj.service.name}"
+    #         return cli
+
+    #     except Exception as err:
+    #         print(err)
+            
+    def get_order_type(self, obj):
+        return 'Appointment'
+    
+    def get_client(self, obj):
+        try:
+            serializers = ClientSerializer(obj.appointment.client).data
+            return serializers
+        except Exception as err:
+            return None
+        
+    def get_price(self, obj):
+        try:
+            return obj.appointment_service.price
+
+        except Exception as err:
+            print(err)
+            
+    def get_member(self, obj):
+        try:
+            serializers = MemberSerializer(obj.member,context=self.context ).data
+            return serializers
+        except Exception as err:
+            return None
+    
+    def get_location(self, obj):
+        try:
+            serializers = LocationSerializer(obj.business_address).data
+            return serializers
+        
+        except Exception as err:
+            return None
+    class Meta:
+        model = AppointmentCheckout
+        fields = ('__all__')
 
 class BusinessTaxSerializer(serializers.ModelSerializer):
     parent_tax = ParentBusinessTaxSerializer(many=True, read_only=True)
