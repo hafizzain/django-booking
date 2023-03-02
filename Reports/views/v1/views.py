@@ -28,7 +28,7 @@ from Product.models import Brand, Product, ProductOrderStockReport, ProductStock
 from django.db.models import Avg, Count, Min, Sum
 
 
-from Sale.serializers import AppointmentCheckout_ReportsSerializer, AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
+from Sale.serializers import AppointmentCheckout_ReportsSerializer, AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer, CheckoutCommissionSerializer
 
 
 @api_view(['GET'])
@@ -377,6 +377,76 @@ def get_commission_reports_by_commission_details(request):
                 'message' : 'All Sale Orders',
                 'error_message' : None,
                 'sales' : Append_data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
+
+
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_commission_reports_by_commission_details_updated(request):
+    range_start = request.GET.get('range_start', None) # 2023-02-23
+    year = request.GET.get('year', None) # non used
+    range_end = request.GET.get('range_end', None) # 2023-02-25
+    
+    data = []
+    Append_data= []
+    
+    # if range_start:
+    #     range_start = datetime.strptime(range_start, "%Y-%m-%d")
+    #     range_end = datetime.strptime(range_end, "%Y-%m-%d")
+
+    #     checkout_order = Checkout.objects.filter(
+    #         is_deleted=False,
+    #         created_at__gte =  range_start ,
+    #         created_at__lte = range_end
+    #     ).order_by('-created_at')
+
+    #     serialized = CheckoutSerializer(checkout_order,  many=True, context={
+    #         'request' : request, 
+    #         })
+    #     # data.extend(serialized.data)
+            
+    #     appointment_checkout = AppointmentCheckout.objects.filter(
+    #         appointment_service__appointment_status = 'Done',
+    #         created_at__gte =  range_start ,
+    #         created_at__lte = range_end
+    #         )
+    #     serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
+    #     # data.extend(serialized.data)
+    # else:
+
+
+    checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
+    serialized = CheckoutCommissionSerializer(checkout_order,  many=True, context={
+        'request' : request, 
+        })
+        
+    # appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')
+    # serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
+        
+    
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Sale Orders',
+                'error_message' : None,
+                'sales' : serialized.data,
+                # 'sales' : [
+                #     {
+                #         'employee' : {},
+                #         'location' : {},
+                #         'commission' : 00,
+                #         'commission_rate' : 00,
+                #         'sale' : {},
+                #     }
+                # ]
             }
         },
         status=status.HTTP_200_OK
