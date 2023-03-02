@@ -925,23 +925,36 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
     
     def get_sale(self, checkout):
         sale_item = {}
+        order_item = None
         try:
-            product_order = ProductOrder.objects.get(checkout = checkout)
+            order_item = ProductOrder.objects.get(checkout = checkout)
+            sale_item['name'] = order_item.product.name
+            sale_item['price'] = order_item.checkout.total_product_price
         except:
             try:
-                service_order = ServiceOrder.objects.get(checkout = checkout)
+                order_item = ServiceOrder.objects.get(checkout = checkout)
+                sale_item['name'] = order_item.service.name
+                sale_item['price'] = order_item.checkout.total_service_price
             except:
                 try:
-                    voucher_order = VoucherOrder.objects.get(checkout = checkout)
-                except:
-                    pass
-                else:
-                    sale_item['voucher'] = VoucherOrderSerializer(voucher_order).data
-            else:
-                sale_item['service'] = ServiceOrderSerializer(service_order).data
+                    order_item = VoucherOrder.objects.get(checkout = checkout)
+                    sale_item['name'] = order_item.voucher.name
+                    sale_item['price'] = order_item.checkout.total_voucher_price
 
-        else:
-            sale_item['product'] = ProductOrderSerializer(product_order).data
+                except:
+                    order_item = None
+                    sale_item['name'] = '-------'
+        
+        if order_item is not None:
+            sale_item['quantity'] = order_item.quantity
+
+        #         else:
+        #             sale_item['voucher'] = VoucherOrderSerializer(order_item).data
+        #     else:
+        #         sale_item['service'] = ServiceOrderSerializer(order_item).data
+
+        # else:
+        #     sale_item['product'] = ProductOrderSerializer(order_item).data
 
         
         return {
