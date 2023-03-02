@@ -167,9 +167,14 @@ def get_store_target_report(request):
 def get_service_target_report(request):
     month = request.GET.get('month', None)
     year = request.GET.get('year', None)
+    location = request.GET.get('location', None)
     
     address = ServiceGroup.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = ServiceGroupReport(address, many=True, context={'request' : request, 'month': month, 'year': year})
+    serialized = ServiceGroupReport(address, many=True, context={'request' : request, 
+                    'month': month,
+                    'location': location,
+                    'year': year
+                    })
     return Response(
         {
             'status' : 200,

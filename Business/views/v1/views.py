@@ -3085,7 +3085,7 @@ def get_check_availability(request):
                         # member__employee_employedailyschedule__start_time__gte = start_time,
                         # member__employee_employedailyschedule__end_time__lte = start_time,
                         is_blocked = False,
-                    )#.values_list('member__id', flat=True)
+                    )
                     
                     for ser in av_staff_ids:
                         if tested <= ser.appointment_time:# or start_time >= ser.end_time:
