@@ -806,11 +806,12 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
             return ''
     
     def get_sale(self, obj):
+        
         try:
             name = Service.objects.get(id = obj.service)
             ser_name =  name.name
         except Exception as err:
-            pass
+            ser_name = ''
         
         return {
             'created_at' : str(obj.created_at),
