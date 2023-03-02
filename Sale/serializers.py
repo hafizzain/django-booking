@@ -780,42 +780,47 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
         
 class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
-    client = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
+    
     member  = serializers.SerializerMethodField(read_only=True)
     service  = serializers.SerializerMethodField(read_only=True)
-    price  = serializers.SerializerMethodField(read_only=True)
+    commission  = serializers.SerializerMethodField(read_only=True)
+    
+    commission_rate  = serializers.SerializerMethodField(read_only=True)
+    sale =serializers.SerializerMethodField(read_only=True)
     
     #appointment_service  = serializers.SerializerMethodField(read_only=True)
-    
-    def get_service(self, obj):
-        service = AppointmentService.objects.filter(appointment = obj.appointment)
-        return UpdateAppointmentSerializer(service, many = True).data
-    
-    # def get_service(self, obj):
-    #     try:
-    #         cli = f"{obj.service.name}"
-    #         return cli
-
-    #     except Exception as err:
-    #         print(err)
             
     def get_order_type(self, obj):
-        return 'Appointment'
+        return 'Service'
     
-    def get_client(self, obj):
+    def get_commission(self, obj):
         try:
-            serializers = ClientSerializer(obj.appointment.client).data
-            return serializers
-        except Exception as err:
-            return None
+            return obj.service_commission
+        except:
+            return 0
         
-    def get_price(self, obj):
+    def get_commission_rate(self, obj):
         try:
-            return obj.appointment_service.price
-
+            return obj.service_commission_type
+        except:
+            return ''
+    
+    def get_sale(self, obj):
+        try:
+            name = Service.objects.get(id = obj.service)
+            ser_name =  name.name
         except Exception as err:
-            print(err)
+            pass
+        
+        return {
+            'created_at' : str(obj.created_at),
+            'id' : str(obj.id),
+            'name' : ser_name,
+            'order_type' : 'Service',
+            'quantity' : 1,
+        }
+        
             
     def get_member(self, obj):
         try:
@@ -831,9 +836,10 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
         
         except Exception as err:
             return None
+   
     class Meta:
-        model = AppointmentCheckout
-        fields = ('__all__')
+        model = AppointmentService
+        fields = ['location','order_type','member','service','commission','commission_rate','sale']
 
 class BusinessTaxSerializer(serializers.ModelSerializer):
     parent_tax = ParentBusinessTaxSerializer(many=True, read_only=True)
