@@ -809,9 +809,9 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
         
         try:
             name = Service.objects.get(id = obj.service)
-            ser_name =  name.name
+            ser_name =  obj.service.name
         except Exception as err:
-            ser_name = ''
+            return str(err)
         
         return {
             'created_at' : str(obj.created_at),
