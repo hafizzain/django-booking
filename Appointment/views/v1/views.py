@@ -1819,6 +1819,8 @@ def create_appointment_client(request):
                 service = service,
                 member = member,
                 price = price,
+                
+                
                 # voucher = voucher,
                 # reward = reward,
                 # membership = membership,

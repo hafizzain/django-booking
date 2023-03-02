@@ -377,7 +377,7 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
             total = 0
             
             app   = AppointmentService.objects.filter(
-                member = obj,
+                business_address = obj,
                 appointment_status = 'Done',
             )
             service_orders = ServiceOrder.objects.filter(is_deleted=False,
