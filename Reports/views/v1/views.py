@@ -350,9 +350,10 @@ def get_commission_reports_by_commission_details_updated(request):
     serialized = CheckoutCommissionSerializer(checkout_order,  many=True, context={
         'request' : request, 
         })
-        
-    # appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')
-    # serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
+    data.extend(serialized.data)
+    
+    appointment_checkout = AppointmentService.objects.filter(appointment_status = 'Done')
+    serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
         
     
     return Response(
