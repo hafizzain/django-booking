@@ -783,7 +783,6 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
     order_type  = serializers.SerializerMethodField(read_only=True)
     
     member  = serializers.SerializerMethodField(read_only=True)
-    service  = serializers.SerializerMethodField(read_only=True)
     commission  = serializers.SerializerMethodField(read_only=True)
     
     commission_rate  = serializers.SerializerMethodField(read_only=True)
@@ -839,7 +838,7 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
    
     class Meta:
         model = AppointmentService
-        fields = ['location','order_type','member','service','commission','commission_rate','sale']
+        fields = ['location','order_type','member','commission','commission_rate','sale']
 
 class BusinessTaxSerializer(serializers.ModelSerializer):
     parent_tax = ParentBusinessTaxSerializer(many=True, read_only=True)
