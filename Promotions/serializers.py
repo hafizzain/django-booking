@@ -1806,25 +1806,25 @@ class AvailOfferPurchaseDiscountSerializers(serializers.ModelSerializer):
     # type = serializers.SerializerMethodField(read_only=True)
     # day_restrictions = serializers.SerializerMethodField(read_only=True)
     # date_restrictions = serializers.SerializerMethodField(read_only=True)
-    product = serializers.SerializerMethodField(read_only=True)
-    service = serializers.SerializerMethodField(read_only=True)
+    product = AvailPurchaseDiscountSerializers()
+    service = AvailPurchaseDiscountSerializers()
 
     # def get_type(self, obj):
     #     return 'Purchase Discount'
     
-    def get_product(self, obj):
-        try:
-            ser = PurchaseDiscount.objects.filter(purchasediscount = obj)
-            return AvailPurchaseDiscountSerializers(ser, many = True).data
-        except Exception as err:
-            pass
+    # def get_product(self, obj):
+    #     try:
+    #         ser = PurchaseDiscount.objects.filter(purchasediscount = obj)
+    #         return AvailPurchaseDiscountSerializers(ser, many = True).data
+    #     except Exception as err:
+    #         pass
 
-    def get_service(self, obj):
-        try:
-            ser = PurchaseDiscount.objects.filter(purchasediscount = obj)
-            return AvailPurchaseDiscountSerializers(ser, many = True).data
-        except Exception as err:
-            pass
+    # def get_service(self, obj):
+    #     try:
+    #         ser = PurchaseDiscount.objects.filter(purchasediscount = obj)
+    #         return AvailPurchaseDiscountSerializers(ser, many = True).data
+    #     except Exception as err:
+    #         pass
 
     # def get_block_date(self, obj):
     #     try:
