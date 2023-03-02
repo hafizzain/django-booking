@@ -354,6 +354,7 @@ def get_commission_reports_by_commission_details_updated(request):
     
     appointment_checkout = AppointmentService.objects.filter(appointment_status = 'Done')
     serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
+    data.extend(serialized.data)
         
     
     return Response(
@@ -363,7 +364,7 @@ def get_commission_reports_by_commission_details_updated(request):
             'response' : {
                 'message' : 'All Sale Orders',
                 'error_message' : None,
-                'sales' : serialized.data,
+                'sales' : data,
                 # 'sales' : [
                 #     {
                 #         'employee' : {},
