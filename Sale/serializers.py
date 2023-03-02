@@ -782,7 +782,7 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
     
-    member  = serializers.SerializerMethodField(read_only=True)
+    employee  = serializers.SerializerMethodField(read_only=True)
     commission  = serializers.SerializerMethodField(read_only=True)
     
     commission_rate  = serializers.SerializerMethodField(read_only=True)
@@ -822,7 +822,7 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
         }
         
             
-    def get_member(self, obj):
+    def get_employee(self, obj):
         try:
             serializers = MemberSerializer(obj.member,context=self.context ).data
             return serializers
