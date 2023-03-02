@@ -14,6 +14,8 @@ def add_employee(emp_name, emp_email, mobile_number , template,busines_name , te
     #     ExceptionRecord.objects.create(
     #         text='Tenant is None'
     #     )
+    
+        
     if email is None:
         ExceptionRecord.objects.create(
             text='Email is None'

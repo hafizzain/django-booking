@@ -848,10 +848,13 @@ def create_employee(request):
                 )
         except Exception as err:
             pass        
-    
+    # stop_thread = False
     try:
         thrd = Thread(target=add_employee, args=[full_name, email , mobile_number, template, business.business_name, tenant_id, domain, user])
         thrd.start()
+        # stop_thread = True
+        # if thrd.is_alive():
+        #     thrd._stop()
     except Exception as err:
         employees_error.append(str(err))
     
