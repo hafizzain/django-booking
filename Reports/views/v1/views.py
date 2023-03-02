@@ -254,17 +254,17 @@ def get_commission_reports_by_commission_details(request):
         
     for da in data:
         try:
-            location =  da['location']
-            name = da['member']
-            service_sale_price = da['service']
-            product_sale_price = da['product']
-            voucher_sale_price = da['voucher']
-            service_commission = da['service_commission']
-            voucher_commission = da['voucher_commission']
-            product_commission = da['product_commission']
-            voucher_commission_type = da['voucher_commission_type']
-            product_commission_type = da['product_commission_type']
-            service_commission_type = da['service_commission_type']
+            location =  da.get('location', None)
+            name = da.get('member', None)
+            service_sale_price = da.get('service', None)
+            product_sale_price = da.get('product', None)
+            voucher_sale_price = da.get('voucher', None)
+            service_commission = da.get('service_commission', None)
+            voucher_commission = da.get('voucher_commission', None)
+            product_commission = da.get('product_commission', None)
+            voucher_commission_type = da.get('voucher_commission_type', None)
+            product_commission_type = da.get('product_commission_type', None)
+            service_commission_type = da.get('service_commission_type', None)
             
             newdata = {
                 'employee': name,
