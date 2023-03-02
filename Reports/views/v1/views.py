@@ -204,109 +204,6 @@ def get_retail_target_report(request):
         status=status.HTTP_200_OK
     )
 
-# @api_view(['GET'])
-# @permission_classes([AllowAny])
-# def get_commission_reports_by_commission_details(request):
-#     range_start = request.GET.get('range_start', None)
-#     year = request.GET.get('year', None)
-#     range_end = request.GET.get('range_end', None)
-    
-#     # #pagination
-    
-#     # paginator = CustomPagination()
-#     # paginator.page_size = 1
-#     # result_page = paginator.paginate_queryset(product_order, request)
-#     # serialized = ProductOrderSerializer(result_page,  many=True)
-    
-#     data=[]
-#     Append_data = [] 
-#     newdata = {} 
-#     if range_start:
-#         range_start = datetime.strptime(range_start, "%Y-%m-%d")
-#         range_end = datetime.strptime(range_end, "%Y-%m-%d")
-#         checkout_order = Checkout.objects.filter(
-#             is_deleted=False,
-#             created_at__gte =  range_start ,
-#             created_at__lte = range_end
-#             ).order_by('-created_at')
-#         serialized = CheckoutSerializer(checkout_order,  many=True, context={
-#             'request' : request, 
-#             })
-#         data.extend(serialized.data)
-            
-#         appointment_checkout = AppointmentCheckout.objects.filter(
-#             appointment_service__appointment_status = 'Done',
-#             created_at__gte =  range_start ,
-#             created_at__lte = range_end
-#             )
-#         serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
-#         data.extend(serialized.data)
-#     else:
-#         checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
-#         serialized = CheckoutSerializer(checkout_order,  many=True, context={
-#             'request' : request, 
-#             })
-#         data.extend(serialized.data)
-            
-#         appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')
-#         serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
-#         data.extend(serialized.data)
-        
-#     for da in data:
-#         try:
-#             location =  da.get('location', None)
-#             name = da.get('member', None)
-#             service_sale_price = da.get('service', None)
-#             product_sale_price = da.get('product', None)
-#             voucher_sale_price = da.get('voucher', None)
-#             service_commission = da.get('service_commission', None)
-#             voucher_commission = da.get('voucher_commission', None)
-#             product_commission = da.get('product_commission', None)
-#             voucher_commission_type = da.get('voucher_commission_type', None)
-#             product_commission_type = da.get('product_commission_type', None)
-#             service_commission_type = da.get('service_commission_type', None)
-            
-#             newdata = {
-#                 'employee': name,
-#                 'location': location,
-#                 'commission': service_commission,
-#                 'commission_rate': service_commission_type,
-#                 'sale': service_sale_price,
-#                 }
-#             Append_data.append(newdata)
-            
-#             newdata = {
-#                 'employee': name,
-#                 'location': location,
-#                 'commission': product_commission,
-#                 'commission_rate': product_commission_type,
-#                 'sale': product_sale_price,
-#                 }
-#             Append_data.append(newdata)
-#             newdata = {
-#                 'employee': name,
-#                 'location': location,
-#                 'commission': voucher_commission,
-#                 'commission_rate': voucher_commission_type,
-#                 'sale': voucher_sale_price,
-#                 }
-#             Append_data.append(newdata)
-#         except Exception as err:
-#             pass
-        
-#     return Response(
-#         {
-#             'status' : 200,
-#             'status_code' : '200',
-#             'response' : {
-#                 'message' : 'All Sale Orders',
-#                 'error_message' : None,
-#                 'sales' : Append_data
-#             }
-#         },
-#         status=status.HTTP_200_OK
-#     )
-    
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_commission_reports_by_commission_details(request):
@@ -314,9 +211,16 @@ def get_commission_reports_by_commission_details(request):
     year = request.GET.get('year', None)
     range_end = request.GET.get('range_end', None)
     
-    data = []
-    Append_data= []
+    # #pagination
     
+    # paginator = CustomPagination()
+    # paginator.page_size = 1
+    # result_page = paginator.paginate_queryset(product_order, request)
+    # serialized = ProductOrderSerializer(result_page,  many=True)
+    
+    data=[]
+    Append_data = [] 
+    newdata = {} 
     if range_start:
         range_start = datetime.strptime(range_start, "%Y-%m-%d")
         range_end = datetime.strptime(range_end, "%Y-%m-%d")
@@ -349,25 +253,46 @@ def get_commission_reports_by_commission_details(request):
         data.extend(serialized.data)
         
     for da in data:
-        name = da.get('member')
-        location = da.get('location')
-
-        for commission_type in ['service', 'product', 'voucher']:
-            commission = da.get(f"{commission_type}_commission")
-            commission_rate = da.get(f"{commission_type}_commission_type")
-            sale_price = da.get(commission_type)
-
-            if commission is not None:
-                new_data = {
-                    'employee': name,
-                    'location': location,
-                    'commission': commission,
-                    'commission_rate': commission_rate,
-                    'sale': sale_price
+        try:
+            location =  da.get('location', None)
+            name = da.get('member', None)
+            service_sale_price = da.get('service', None)
+            product_sale_price = da.get('product', None)
+            voucher_sale_price = da.get('voucher', None)
+            service_commission = da.get('service_commission', None)
+            voucher_commission = da.get('voucher_commission', None)
+            product_commission = da.get('product_commission', None)
+            voucher_commission_type = da.get('voucher_commission_type', None)
+            product_commission_type = da.get('product_commission_type', None)
+            service_commission_type = da.get('service_commission_type', None)
+            
+            newdata = {
+                'employee': name,
+                'location': location,
+                'commission': service_commission,
+                'commission_rate': service_commission_type,
+                'sale': service_sale_price,
                 }
-
-                Append_data.append(new_data)
-
+            Append_data.append(newdata)
+            
+            newdata = {
+                'employee': name,
+                'location': location,
+                'commission': product_commission,
+                'commission_rate': product_commission_type,
+                'sale': product_sale_price,
+                }
+            Append_data.append(newdata)
+            newdata = {
+                'employee': name,
+                'location': location,
+                'commission': voucher_commission,
+                'commission_rate': voucher_commission_type,
+                'sale': voucher_sale_price,
+                }
+            Append_data.append(newdata)
+        except Exception as err:
+            pass
         
     return Response(
         {
@@ -381,3 +306,78 @@ def get_commission_reports_by_commission_details(request):
         },
         status=status.HTTP_200_OK
     )
+    
+# @api_view(['GET'])
+# @permission_classes([AllowAny])
+# def get_commission_reports_by_commission_details(request):
+#     range_start = request.GET.get('range_start', None)
+#     year = request.GET.get('year', None)
+#     range_end = request.GET.get('range_end', None)
+    
+#     data = []
+#     Append_data= []
+    
+#     if range_start:
+#         range_start = datetime.strptime(range_start, "%Y-%m-%d")
+#         range_end = datetime.strptime(range_end, "%Y-%m-%d")
+#         checkout_order = Checkout.objects.filter(
+#             is_deleted=False,
+#             created_at__gte =  range_start ,
+#             created_at__lte = range_end
+#             ).order_by('-created_at')
+#         serialized = CheckoutSerializer(checkout_order,  many=True, context={
+#             'request' : request, 
+#             })
+#         data.extend(serialized.data)
+            
+#         appointment_checkout = AppointmentCheckout.objects.filter(
+#             appointment_service__appointment_status = 'Done',
+#             created_at__gte =  range_start ,
+#             created_at__lte = range_end
+#             )
+#         serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
+#         data.extend(serialized.data)
+#     else:
+#         checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
+#         serialized = CheckoutSerializer(checkout_order,  many=True, context={
+#             'request' : request, 
+#             })
+#         data.extend(serialized.data)
+            
+#         appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')
+#         serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
+#         data.extend(serialized.data)
+        
+#     for da in data:
+#         name = da.get('member')
+#         location = da.get('location')
+
+#         for commission_type in ['service', 'product', 'voucher']:
+#             commission = da.get(f"{commission_type}_commission")
+#             commission_rate = da.get(f"{commission_type}_commission_type")
+#             sale_price = da.get(commission_type)
+
+#             if commission is not None:
+#                 new_data = {
+#                     'employee': name,
+#                     'location': location,
+#                     'commission': commission,
+#                     'commission_rate': commission_rate,
+#                     'sale': sale_price
+#                 }
+
+#                 Append_data.append(new_data)
+
+        
+#     return Response(
+#         {
+#             'status' : 200,
+#             'status_code' : '200',
+#             'response' : {
+#                 'message' : 'All Sale Orders',
+#                 'error_message' : None,
+#                 'sales' : Append_data
+#             }
+#         },
+#         status=status.HTTP_200_OK
+#     )
