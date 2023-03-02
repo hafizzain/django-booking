@@ -737,7 +737,9 @@ def create_employee(request):
         employee.is_active =True
     else:
         employee.is_active = False 
-    employee.email= email,
+    
+    if email is not None:
+        employee.email= email
     employee.save()
     data = {}
 
