@@ -5,6 +5,7 @@ from Appointment.models import AppointmentCheckout
 
 def total_sale_employee(employee_id):
     total_price = 0
+    employee_id = str(employee_id)
     checkout_orders_total = Checkout.objects.filter(
         is_deleted=False, 
         member__id=employee_id,
