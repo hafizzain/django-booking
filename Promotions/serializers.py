@@ -939,7 +939,7 @@ class AvailMentionedNumberServiceSerializers(serializers.ModelSerializer):
     def get_free_service(self, obj):
         try:
             ser = FreeService.objects.filter(mentionnumberservice = obj)
-            return FreeServiceSerializers(ser, many = True).data
+            return AvailFreeServiceSerializers(ser, many = True).data
         except Exception as err:
             return []
             pass
@@ -1601,7 +1601,7 @@ class AvailOfferFixedPriceServiceSerializers(serializers.ModelSerializer):
         fields = ['id','services']
         # 'block_date' , 'date_restrictions' , 'day_restrictions'
 
-class FreeServiceSerializers(serializers.ModelSerializer):
+class AvailFreeServiceSerializers(serializers.ModelSerializer):
     is_deleted = serializers.SerializerMethodField(read_only=True)
     priceservice = serializers.SerializerMethodField(read_only=True)
     
