@@ -806,10 +806,11 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
             return ''
     
     def get_sale(self, obj):
-        appointment_checkout = obj.appointment_service_checkout.get()
-        tip = appointment_checkout.tip
-        payment_type = appointment_checkout.payment_method
-        client = appointment_checkout.client.full_name
+        appointment_checkout = obj.appointment_service_checkout.first()
+        if appointment_checkout:
+            tip = appointment_checkout.tip
+            payment_type = appointment_checkout.payment_method
+            client = appointment_checkout.client.full_name
         # if appointment_checkout:
         #     tip = appointment_checkout.tip
         # else:
