@@ -941,7 +941,7 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
         order_type = '-------'
 
         try:
-            order_item = ProductOrder.objects.get(checkout = checkout)
+            order_item = ProductOrder.objects.get(checkout = str(checkout))
             name = order_item.product.name
             price = order_item.checkout.total_product_price
             payment_type = order_item.checkout.payment_type
