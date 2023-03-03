@@ -810,11 +810,10 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
         if appointment_checkout:
             tip = appointment_checkout.tip
             payment_type = appointment_checkout.payment_method
-            #client = appointment_checkout.client.full_name
-        # if appointment_checkout:
-        #     tip = appointment_checkout.tip
-        # else:
-        #     tip = 0
+            if obj.appointment.client.full_name is not None:
+                client =  obj.appointment.client.full_name,
+            else:
+                client = ''
         
         return {
             'created_at' : str(obj.created_at),
@@ -824,8 +823,8 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
             'quantity' : 1,
             'price' : obj.price,
             'payment_type' : payment_type, #obj.appointment_service_checkout.payment_method,
-            'tip' : tip,
-            'client' : obj.appointment.client.full_name,
+            'tip' : tip,  
+            'client': client
         }
         
             
