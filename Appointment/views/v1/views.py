@@ -500,7 +500,7 @@ def create_appointment(request):
             service_commission += comm
             service_commission_type += comm_type
             ExceptionRecord.objects.create(
-            text = f'commsion {service_commission}'
+                text = f'commsion {service_commission}'
         )
         except Exception as err:
             Errors.append(str(err))
