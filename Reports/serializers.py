@@ -394,7 +394,7 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
                 create = str(ord.created_at)
                 match = int(create.split(" ")[0].split("-")[1])
                 if int(month) == match:
-                    total += int(ord.total_price)
+                    total += int(ord.checkout.total_service_price)
                                 
             return total         
             
@@ -416,7 +416,7 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
                 create = str(ord.created_at)
                 match = int(create.split(" ")[0].split("-")[1])
                 if int(month) == match:
-                    total += int(ord.total_price)
+                    total += int(ord.checkout.total_product_price)
             
             return total
                 
@@ -438,7 +438,7 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
                 create = str(ord.created_at)
                 match = int(create.split(" ")[0].split("-")[1])
                 if int(month) == match:
-                    total += int(ord.total_price)
+                    total += int(ord.checkout.total_voucher_price)
             
             return total
                 
@@ -460,7 +460,7 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
                 create = str(ord.created_at)
                 match = int(create.split(" ")[0].split("-")[1])
                 if int(month) == match:
-                    total += int(ord.total_price)
+                    total += int(ord.checkout.total_membership_price)
             
             return total
                 

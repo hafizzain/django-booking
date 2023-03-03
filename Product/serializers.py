@@ -299,13 +299,21 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_stocks(self, obj):
         location = self.context['location']
-        all_stocks = ProductStock.objects.filter(product=obj, is_deleted=False, location__id = location ).order_by('-created_at')
-        return ProductStockSerializer(all_stocks, many=True).data
+        if location is not None:
+            all_stocks = ProductStock.objects.filter(product=obj, is_deleted=False, location__id = location ).order_by('-created_at')
+            return ProductStockSerializer(all_stocks, many=True).data
+        else:
+            all_stocks = ProductStock.objects.filter(product=obj, is_deleted=False,).order_by('-created_at')
+            return ProductStockSerializer(all_stocks, many=True).data
 
     def get_location_quantities(self, obj):
         location = self.context['location']
-        all_stocks = ProductStock.objects.filter(product=obj, location__is_deleted=False, location__id = location).order_by('-created_at')
-        return ProductStockSerializer(all_stocks, many=True).data
+        if location is not None:
+            all_stocks = ProductStock.objects.filter(product=obj, location__is_deleted=False, location__id = location).order_by('-created_at')
+            return ProductStockSerializer(all_stocks, many=True).data
+        else:
+            all_stocks = ProductStock.objects.filter(product=obj, location__is_deleted=False, location__id = location).order_by('-created_at')
+            return ProductStockSerializer(all_stocks, many=True).data
 
 
     class Meta:

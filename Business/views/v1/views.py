@@ -3093,8 +3093,9 @@ def get_check_availability(request):
                                 data.append(f'Employees are free, employee name {employee.full_name}')
                                 
                             else:
-                                data.append(f'The selected staff is not available at this time  {employee.full_name}')
-                                Availability = False
+                                pass
+                                # data.append(f'The selected staff is not available at this time  {employee.full_name}')
+                                # Availability = False
                                                                         
                         else:
                             data.append(f'Employees are free, employee name: {employee.full_name}')
