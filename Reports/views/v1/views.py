@@ -324,42 +324,39 @@ def get_commission_reports_by_commission_details_updated(request):
     range_end = request.GET.get('range_end', None) # 2023-02-25
     
     data = []
-    Append_data= []
     
-    # if range_start:
-    #     range_start = datetime.strptime(range_start, "%Y-%m-%d")
-    #     range_end = datetime.strptime(range_end, "%Y-%m-%d")
+    if range_start:
+        range_start = datetime.strptime(range_start, "%Y-%m-%d")
+        range_end = datetime.strptime(range_end, "%Y-%m-%d")
 
-    #     checkout_order = Checkout.objects.filter(
-    #         is_deleted=False,
-    #         created_at__gte =  range_start ,
-    #         created_at__lte = range_end
-    #     ).order_by('-created_at')
+        checkout_order = Checkout.objects.filter(
+            is_deleted=False,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+        ).order_by('-created_at')
 
-    #     serialized = CheckoutSerializer(checkout_order,  many=True, context={
-    #         'request' : request, 
-    #         })
-    #     # data.extend(serialized.data)
+        serialized = CheckoutCommissionSerializer(checkout_order,  many=True, context={
+            'request' : request, 
+            })
+        data.extend(serialized.data)
             
-    #     appointment_checkout = AppointmentCheckout.objects.filter(
-    #         appointment_service__appointment_status = 'Done',
-    #         created_at__gte =  range_start ,
-    #         created_at__lte = range_end
-    #         )
-    #     serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
-    #     # data.extend(serialized.data)
-    # else:
-
-
-    checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = CheckoutCommissionSerializer(checkout_order,  many=True, context={
-        'request' : request, 
-        })
-    data.extend(serialized.data)
-    
-    appointment_checkout = AppointmentService.objects.filter(appointment_status = 'Done')
-    serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
-    data.extend(serialized.data)
+        appointment_checkout = AppointmentCheckout.objects.filter(
+            appointment_service__appointment_status = 'Done',
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+            )
+        serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
+        data.extend(serialized.data)
+    else:
+        checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
+        serialized = CheckoutCommissionSerializer(checkout_order,  many=True, context={
+            'request' : request, 
+            })
+        data.extend(serialized.data)
+        
+        appointment_checkout = AppointmentService.objects.filter(appointment_status = 'Done')
+        serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
+        data.extend(serialized.data)
         
     
     return Response(
