@@ -806,11 +806,14 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
             return ''
     
     def get_sale(self, obj):
-        appointment_checkout = obj.appointment_service_checkout.first()
-        if appointment_checkout:
-            tip = appointment_checkout.tip
-        else:
-            tip = 0
+        appointment_checkout = obj.appointment_service_checkout.get()
+        tip = appointment_checkout.tip
+        payment_type = appointment_checkout.payment_method
+        client = appointment_checkout.client.full_name
+        # if appointment_checkout:
+        #     tip = appointment_checkout.tip
+        # else:
+        #     tip = 0
         
         return {
             'created_at' : str(obj.created_at),
@@ -819,9 +822,9 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
             'order_type' : 'Service',
             'quantity' : 1,
             'price' : obj.price,
-            #'payment_type' : obj.appointment_service_checkout.payment_method,
+            'payment_type' : payment_type, #obj.appointment_service_checkout.payment_method,
             'tip' : tip,
-            #'client' : obj.appointment_service_checkout.client.full_name,
+            'client' : client #obj.appointment_service_checkout.client.full_name,
         }
         
             
