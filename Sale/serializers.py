@@ -810,7 +810,7 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
         if appointment_checkout:
             tip = appointment_checkout.tip
             payment_type = appointment_checkout.payment_method
-            client = appointment_checkout.client.full_name
+            #client = appointment_checkout.client.full_name
         # if appointment_checkout:
         #     tip = appointment_checkout.tip
         # else:
@@ -825,7 +825,7 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
             'price' : obj.price,
             'payment_type' : payment_type, #obj.appointment_service_checkout.payment_method,
             'tip' : tip,
-            'client' : client #obj.appointment_service_checkout.client.full_name,
+            'client' : obj.appointment.client.full_name,
         }
         
             
