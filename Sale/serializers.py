@@ -816,7 +816,7 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
             'price' : obj.price,
             'payment_type' : obj.appointment_service_checkout.payment_method,
             'tip' : obj.appointment_service_checkout.tip,
-            'client' : obj.appointment_service_checkout.client.full_name,
+            #'client' : obj.appointment_service_checkout.client.full_name,
         }
         
             
