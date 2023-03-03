@@ -3,7 +3,7 @@ from Appointment.models import AppointmentCheckout
 
 
 
-def total_sale_employee(employee_id):
+def total_sale_employee(str(employee_id)):
     total_price = 0
     checkout_orders_total = Checkout.objects.filter(
         is_deleted=False, 
