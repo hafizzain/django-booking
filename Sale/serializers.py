@@ -973,7 +973,7 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
         sale_item['order_type'] = order_type
         sale_item['payment_type'] = payment_type
         sale_item['tip'] = tip
-        sale_item['client'] = client
+        #sale_item['client'] = client
 
         #         else:
         #             sale_item['voucher'] = VoucherOrderSerializer(order_item).data
