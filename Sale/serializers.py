@@ -946,7 +946,11 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
             price = order_item.checkout.total_product_price
             payment_type = order_item.checkout.payment_type
             tip = order_item.checkout.tip
-            client = order_item.checkout.client.full_name
+            #client = order_item.checkout.client.full_name
+            if order_item.checkout.client is not None:
+                client = order_item.checkout.client.full_name
+            else:
+                client = ''
             order_type = 'Product'
         except Exception as err:
             sale_item['errors'].append(str(err))
@@ -969,7 +973,10 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
                     price = order_item.checkout.total_voucher_price
                     payment_type = order_item.checkout.payment_type
                     tip = order_item.checkout.tip
-                    client = order_item.checkout.client.full_name
+                    if order_item.checkout.client is not None:
+                        client = order_item.checkout.client.full_name
+                    else:
+                        client = ''
                     order_type = 'Voucher'
 
                 except Exception as err:
