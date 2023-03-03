@@ -17,25 +17,24 @@ from Utility.Constants.Data.months import MONTH_DICT
 
 
 class ServiceOrderSerializer(serializers.ModelSerializer):
-    # user  = serializers.SerializerMethodField(read_only=True)
-    # order_type  = serializers.SerializerMethodField(read_only=True)
-    
-    # def get_order_type(self, obj):
-    #     return 'Service'
-        
-    # def get_user(self, obj):
-    #     try:
-    #         return obj.user.full_name
-    #     except Exception as err:
-    #         return None
+    location = serializers.SerializerMethodField(read_only=True)
+
+    def get_location(self, obj):
+        loc = BusinessAddress.objects.get(id  = str(obj.checkout.location))
+        return LocationSerializer(loc ).data
     class Meta:
         model = ServiceOrder
-        fields = ('total_price', 'sold_quantity','current_price', 'created_at')
+        fields = ('total_price', 'sold_quantity','current_price', 'location','created_at')
         
 class AppointmentCheckoutReportSerializer(serializers.ModelSerializer):
+    location = serializers.SerializerMethodField(read_only=True)
+
+    def get_location(self, obj):
+        loc = BusinessAddress.objects.get(id  = str(obj.business_address))
+        return LocationSerializer(loc ).data
     class Meta:
         model = AppointmentCheckout
-        fields = ['total_price', 'created_at']
+        fields = ['total_price', 'created_at', 'location']
 
 class ServiceReportSerializer(serializers.ModelSerializer):
     sale = serializers.SerializerMethodField(read_only=True)
