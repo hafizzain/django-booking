@@ -232,13 +232,13 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
                 if range_start is not None:
                     if created_at >= range_start  and created_at <= range_end:
-                        total += int(ord.total_price)
+                        total += int(ord.checkout.total_service_price)
                         service_commission += ord.checkout.service_commission
                         product_commission += ord.checkout.product_commission
                         voucher_commission += ord.checkout.voucher_commission
         
                 else:
-                    total += int(ord.total_price)
+                    total += int(ord.checkout.total_product_price)
                     service_commission += ord.checkout.service_commission
                     product_commission += ord.checkout.product_commission
                     voucher_commission += ord.checkout.voucher_commission
@@ -292,9 +292,9 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 
                 if range_start:
                     if range_start >= created_at  and created_at <= range_end:
-                        total += int(ord.total_price)
+                        total += int(ord.checkout.total_service_price)
                 else:
-                    total += int(ord.total_price)
+                    total += int(ord.checkout.total_service_price)
                                           
             return total         
             
@@ -322,9 +322,9 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 
                 if range_start:
                     if range_start >= created_at  and created_at <= range_end:
-                        total += int(ord.total_price)
+                        total += int(ord.checkout.total_voucher_price)
                 else:
-                    total += int(ord.total_price)
+                    total += int(ord.checkout.total_voucher_price)
                                 
             return total         
             
