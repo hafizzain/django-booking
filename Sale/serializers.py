@@ -972,7 +972,7 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
         sale_item['price'] = price
         sale_item['order_type'] = order_type
         sale_item['payment_type'] = 'Cash'
-        sale_item['tip'] = tip
+        sale_item['tip'] = '1'
         #sale_item['client'] = client
 
         #         else:
