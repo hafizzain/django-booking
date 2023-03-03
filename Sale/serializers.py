@@ -814,6 +814,9 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
             'order_type' : 'Service',
             'quantity' : 1,
             'price' : obj.price,
+            'payment_type' : obj.appointment_service_checkout.payment_method,
+            'tip' : obj.appointment_service_checkout.tip,
+            'client' : obj.appointment_service_checkout.client.full_name,
         }
         
             
@@ -932,6 +935,9 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
             order_item = ProductOrder.objects.get(checkout = checkout)
             name = order_item.product.name
             price = order_item.checkout.total_product_price
+            payment_type = order_item.checkout.payment_type
+            tip = order_item.checkout.tip
+            client = order_item.checkout.client.full_name
             order_type = 'Product'
         except Exception as err:
             sale_item['errors'].append(str(err))
@@ -939,6 +945,9 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
                 order_item = ServiceOrder.objects.get(checkout = checkout)
                 name = order_item.service.name
                 price = order_item.checkout.total_service_price
+                payment_type = order_item.checkout.payment_type
+                tip = order_item.checkout.tip
+                client = order_item.checkout.client.full_name
                 order_type = 'Service'
             except Exception as err:
                 sale_item['errors'].append(str(err))
@@ -946,6 +955,9 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
                     order_item = VoucherOrder.objects.get(checkout = checkout)
                     name = order_item.voucher.name
                     price = order_item.checkout.total_voucher_price
+                    payment_type = order_item.checkout.payment_type
+                    tip = order_item.checkout.tip
+                    client = order_item.checkout.client.full_name
                     order_type = 'Voucher'
 
                 except Exception as err:
@@ -959,6 +971,9 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
         sale_item['name'] = name
         sale_item['price'] = price
         sale_item['order_type'] = order_type
+        sale_item['payment_type'] = payment_type
+        sale_item['tip'] = tip
+        sale_item['client'] = client
 
         #         else:
         #             sale_item['voucher'] = VoucherOrderSerializer(order_item).data
