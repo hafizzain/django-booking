@@ -3,6 +3,7 @@ from genericpath import exists
 from pyexpat import model
 from Appointment.models import AppointmentCheckout
 from Business.models import BusinessAddress
+from Employee.Constants.total_sale import total_sale_employee
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
 from Tenants.models import Domain, Tenant
 from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSIONS_MODEL_FIELDS
@@ -546,10 +547,16 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
     state_name = serializers.SerializerMethodField(read_only=True)
     city_name = serializers.SerializerMethodField(read_only=True)   
     services = serializers.SerializerMethodField(read_only=True)
-    
-    #location = LocationSerializer(read_only=True) 
-    
+        
     location = serializers.SerializerMethodField()
+    total_sale = serializers.SerializerMethodField()
+    
+    def get_total_sale(self,obj):
+        try:
+            sale = total_sale_employee(obj)
+            return sale
+        except Exception as err:
+            return str(err)
     
     def get_location(self, obj):
         try:
@@ -574,6 +581,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
            return obj.country.name
         except Exception as err:
             return None
+   
     def get_state_name(self, obj):
         try:
            return obj.state.name
@@ -602,6 +610,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             return salary_info.salary
         except Exception:
             return None
+    
     def get_level(self, obj):
         try:
             level = EmployeeSelectedService.objects.get(employee=obj)
@@ -652,6 +661,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'services',
             'created_at' ,
             'location', 
+            'total_sale',
             'is_active',  
             ]   
 
