@@ -927,7 +927,7 @@ def add_product(request):
         ExceptionRecord.objects.create(text='No Location Quantities Find')
     
 
-    serialized = ProductSerializer(product, context={'request' : request})
+    serialized = ProductSerializer(product, context={'request' : request, 'location': None})
     return Response(
         {
             'status' : True,
