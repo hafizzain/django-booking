@@ -675,6 +675,11 @@ class ServiceGroupReport(serializers.ModelSerializer):
             retail_target = 0
             data = {}
             
+            try:
+                location_id = BusinessAddress.objects.get(id = str(location))
+            except:
+                return
+            
             service_target = ServiceTarget.objects.filter(
                 service_group = obj,
                 created_at__icontains = year,
