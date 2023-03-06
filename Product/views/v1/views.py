@@ -698,7 +698,7 @@ def add_product(request):
     # unit = request.data.get('unit', None)
     # product_unit = request.data.get('product_unit', None)
     # amount = request.data.get('amount', None)
-    stock_status = request.data.get('stock_status', None)
+    stock_status = request.data.get('stock_status', True)
 
     #turnover = request.data.get('turnover', None)
    
@@ -732,10 +732,16 @@ def add_product(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    if is_active is not None:
+        is_active = False #json.loads(stock_status)
+    else: 
+        is_active = True
+        
     if stock_status is not None:
         stock_status = False #json.loads(stock_status)
     else: 
         stock_status = True
+        
     if alert_when_stock_becomes_lowest  is not None:
         alert_when_stock_becomes_lowest= True #json.loads(alert_when_stock_becomes_lowest)
     else:
@@ -821,7 +827,7 @@ def add_product(request):
         barcode_id = barcode_id,
         sku = sku,
         slug = str(name).replace(' ' , '-').replace('/' , '-').replace('?' , '-'),
-        is_active = stock_status,
+        is_active = is_active,
         published = True,
     )
 
