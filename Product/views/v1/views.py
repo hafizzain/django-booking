@@ -1156,7 +1156,7 @@ def update_product(request):
     #     data.update(serialized.data)
         
     
-    serialized = ProductSerializer(product, data=request.data, partial=True, context={'request':request})
+    serialized = ProductSerializer(product, data=request.data, partial=True, context={'request':request, 'location': None})
     if serialized.is_valid():
         serialized.save()
         data.update(serialized.data)
