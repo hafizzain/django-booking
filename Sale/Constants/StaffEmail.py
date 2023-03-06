@@ -1,6 +1,7 @@
 from Business.models import StaffNotificationSetting
 from Client.models import Client
 from Employee.models import Employee
+from Utility.models import ExceptionRecord
 from django_tenants.utils import tenant_context
 from django.conf import settings
 from datetime import datetime,date
@@ -49,4 +50,6 @@ def StaffSaleEmail(ids = None, location = None, tenant = None, member =None, inv
             email.attach_alternative(html_file, "text/html")
             email.send()
         except Exception as err:
-            pass
+            ExceptionRecord.objects.create(
+                text = f' error in email sale{str(err)}'
+            )
