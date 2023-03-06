@@ -418,6 +418,7 @@ def create_appointment(request):
         reward_id = appoinmnt.get('reward', None)
         membership_id = appoinmnt.get('membership', None)
         promotion_id = appoinmnt.get('promotion', None)
+        discount_price = appoinmnt.get('discount_price', None)
         # tip = appoinmnt['tip']
         
         app_date_time = f'2000-01-01 {date_time}'
@@ -461,6 +462,7 @@ def create_appointment(request):
                 }
             }
         )
+        
         try:
             service=Service.objects.get(id=service)
         except Exception as err:
@@ -491,19 +493,7 @@ def create_appointment(request):
         total_price_app += int(price)
         service_commission = 0
         service_commission_type = ''
-        toValue = 0
-        
-        # for member, price in zip(member, price):
-        #     total_price_app += int(price)
-        try:
-            comm, comm_type = calculate_commission(member, int(price))
-            service_commission += comm
-            service_commission_type += comm_type
-            ExceptionRecord.objects.create(
-                text = f'commsion {service_commission}'
-        )
-        except Exception as err:
-            Errors.append(str(err))
+        toValue = 0        
         
         # try:
         #     commission = CommissionSchemeSetting.objects.get(employee = str(member))
@@ -535,13 +525,32 @@ def create_appointment(request):
             end_time = end_time,
             service = service,
             member = member,
-            price = price,
+            discount_price = discount_price,
+            total_price = price,
+            
             service_commission = service_commission,
             service_commission_type= service_commission_type,
             
             slot_availible_for_online = slot_availible_for_online,
             client_can_book = client_can_book,
         )
+        price_com =  0
+        try:
+            if discount_price is not None:
+                price_com = discount_price
+                appointment_service.price = discount_price
+            else:
+                price_com =  price
+                appointment_service.price = price
+            appointment_service.save()
+            comm, comm_type = calculate_commission(member, price_com)#int(price))
+            service_commission += comm
+            service_commission_type += comm_type
+            ExceptionRecord.objects.create(
+                text = f'commsion {service_commission}'
+        )
+        except Exception as err:
+            Errors.append(str(err))
         
         if fav is not None:
             appointment_service.is_favourite = True
