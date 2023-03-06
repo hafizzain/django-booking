@@ -12,7 +12,7 @@ from rest_framework.response import Response
 
 from rest_framework import status
 from Appointment.Constants.durationchoice import DURATION_CHOICES
-from Business.models import Business , BusinessAddress
+from Business.models import Business , BusinessAddress, ClientNotificationSetting, StaffNotificationSetting
 from datetime import datetime
 from Order.models import Checkout, MemberShipOrder, ProductOrder, VoucherOrder
 from Sale.serializers import MemberShipOrderSerializer, ProductOrderSerializer, VoucherOrderSerializer
@@ -695,6 +695,7 @@ def update_appointment(request):
         status=status.HTTP_404_NOT_FOUND
         )
     serializer.save()
+    
     if appointment_status == 'Cancel':
         try:
             thrd = Thread(target=cancel_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant} )

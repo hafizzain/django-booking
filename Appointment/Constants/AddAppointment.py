@@ -57,7 +57,6 @@ def Add_appointment(appointment = None, tenant = None):
                     except Exception as err:
                         pass
                 
-        #{'client': False, 'staff': True,'name': name,'email': email_c, 'ser_name':ser_name ,'t_name':mem_name , 'date':dat, 'mem_id':mem_id, 'client_type': client_type}
             if client_email.sms_appoinment == True:
                 html_file = render_to_string("AppointmentEmail/add_appointment.html",{'client': False, 'appointment' : appointment,'staff': True,'t_name':name_c} )
                 text_content = strip_tags(html_file)
