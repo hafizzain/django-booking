@@ -821,7 +821,7 @@ def add_product(request):
         barcode_id = barcode_id,
         sku = sku,
         slug = str(name).replace(' ' , '-').replace('/' , '-').replace('?' , '-'),
-        is_active=True,
+        is_active = stock_status,
         published = True,
     )
 
@@ -857,15 +857,15 @@ def add_product(request):
             )
             except Exception as err:
                 print(str(err))
-                ExceptionRecord.objects.create(is_resolved = False, text=f'currency not found product line 866  ' )
+                #ExceptionRecord.objects.create(is_resolved = False, text=f'currency not found product line 866  ' )
             
                     
     location_quantities = request.data.get('location_quantities', None)
     if location_quantities is not None:
         if type(location_quantities) == str:
-            ExceptionRecord.objects.create(is_resolved = True, text='Location Quantities was string and gonna convert')
+            #ExceptionRecord.objects.create(is_resolved = True, text='Location Quantities was string and gonna convert')
             location_quantities = json.loads(location_quantities)
-            ExceptionRecord.objects.create(is_resolved = True, text='Converted')
+            #ExceptionRecord.objects.create(is_resolved = True, text='Converted')
         
         for loc_quan in location_quantities:
             location_id = loc_quan.get('id', None)

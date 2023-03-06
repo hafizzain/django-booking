@@ -344,7 +344,8 @@ class ProductSerializer(serializers.ModelSerializer):
             'created_at',
             'consumed',
             'stocktransfer',
-            'location'
+            'location',
+            'is_active'
         ]
         read_only_fields = ['slug', 'id']
 class ProductOrderSerializer(serializers.ModelSerializer):
