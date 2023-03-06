@@ -74,10 +74,6 @@ def Add_appointment(appointment = None, tenant = None):
                 email.send()
     
         except Exception as err:
-            
-            print(err)
-
-        #name = appointment.client.full_name
-        #email_c = appointment.client.email
-
-        
+            ExceptionRecord.objects.create(
+                text = f'create app email {str(err)}'
+        )
