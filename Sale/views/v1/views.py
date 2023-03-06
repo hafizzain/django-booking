@@ -1,5 +1,7 @@
 from datetime import timedelta
+from threading import Thread
 from django.shortcuts import render
+from Sale.Constants.StaffEmail import StaffSaleEmail
 
 from rest_framework import status
 from Appointment.models import Appointment, AppointmentCheckout, AppointmentService
@@ -1193,19 +1195,10 @@ def create_sale_order(request):
     product_commission_type = request.data.get('product_commission_type', None)
     voucher_commission_type = request.data.get('voucher_commission_type', None)
     
-    #product_id = request.data.get('product', None)
-    
-    #Order Service
-    #service_id = request.data.get('service', None)
     duration = request.data.get('duration', None)
     
-    #Order Membership
-    #membership_id = request.data.get('membership', None)
     start_date = request.data.get('start_date', None)
     end_date = request.data.get('end_date', None)
-    
-    #Order Voucher
-    #voucher_id = request.data.get('voucher', None)
      
     tip = request.data.get('tip', None)
     total_price = request.data.get('total_price', None)
@@ -1285,6 +1278,7 @@ def create_sale_order(request):
         
         tip = tip
     )
+    
     for id in ids:          
         sale_type = id['selection_type']
         service_id = id['id']
@@ -1294,12 +1288,7 @@ def create_sale_order(request):
         if sale_type == 'PRODUCT':
             try:
                 product = Product.objects.get(id = service_id)
-                # commission = CommissionSchemeSetting.objects.filter(
-                #     employee = member,
-                #     categorycommission__from_value = total_price,
-                #     categorycommission__commission__category_comission = 'Retail'
-                #     )
-
+                
                 try:
                     transfer = ProductStock.objects.get(product__id=product.id, location = business_address.id)
                     if transfer.available_quantity > int(quantity):
@@ -1493,6 +1482,12 @@ def create_sale_order(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+    
+    try:
+        thrd = Thread(target=StaffSaleEmail, args=[], kwargs={'ids' : ids, 'location': business_address.address_name ,'tenant' : request.tenant, 'member': member, 'invoice': checkout.id, 'client': client})
+        thrd.start()
+    except Exception as err:
+        pass
     
     serialized = CheckoutSerializer(checkout, context = {'request' : request, })
     
