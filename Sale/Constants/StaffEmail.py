@@ -44,7 +44,7 @@ def StaffSaleEmail(ids = None, location = None, tenant = None, member =None, inv
                     'Appointment Booked',
                     text_content,
                     settings.EMAIL_HOST_USER,
-                    to = [member.email],
+                    to = [member_id.email],
                 
                 )
             email.attach_alternative(html_file, "text/html")
