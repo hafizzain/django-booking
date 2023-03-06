@@ -72,8 +72,12 @@ def Add_appointment(appointment = None, tenant = None):
                     
                 email.attach_alternative(html_file, "text/html")
                 email.send()
+            
+            ExceptionRecord.objects.create(
+                text = f'create app email {staff_email.sms_daily_sale} {client_email.sms_appoinment}'
+        )
     
         except Exception as err:
             ExceptionRecord.objects.create(
-                text = f'create app email {str(err)}'
+                text = f'create app email {str(err)} '
         )
