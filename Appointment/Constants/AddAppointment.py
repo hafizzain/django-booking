@@ -19,8 +19,6 @@ def Add_appointment(appointment = None, tenant = None):
         )
 
     with tenant_context(tenant):
-        
-        
         try:
             appointment =  AppointmentService.objects.filter(appointment = appointment)                
             for appo in appointment:
