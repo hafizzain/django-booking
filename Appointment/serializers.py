@@ -192,7 +192,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
         model = AppointmentService
         fields =['id',
         'appointment_id','appointment_date','appointment_status', 
-        'price',
+        'price','total_price', 'discount_price',
         'appointment_time', 
         'end_time',
         'client_type','duration', 'currency','created_at','service', 'client','location', 'is_blocked' ,'details' 
