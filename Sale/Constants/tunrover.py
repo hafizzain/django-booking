@@ -38,4 +38,6 @@ def ProductTurnover(product=None, product_stock = None, business_address = None 
             email.attach_alternative(html_file, "text/html")
             email.send()
         except Exception as err:
-            pass
+            ExceptionRecord.objects.create(
+                text = f'turnover emails error {str(err)}'
+            )
