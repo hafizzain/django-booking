@@ -157,7 +157,7 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
                 
                 created_date = ord.created_at.date() 
                 ExceptionRecord.objects.create(
-                    text = f'staff_target {ord.created_at.date() }'
+                    text = f'staff_target {ord.year.date() }'
                 )
                 if created_date.month == date_obj.month and created_date.year == date_obj.year:
                     service_target += int(ord.service_target)
