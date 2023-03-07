@@ -709,8 +709,10 @@ class ReportBrandSerializer(serializers.ModelSerializer):
     brand_target = serializers.SerializerMethodField(read_only=True)
 
     def get_brand_target(self, obj):
+        location = self.context["location"]
         retail_target = RetailTarget.objects.filter(
-            brand = obj
+            brand = obj,
+            location__id =  location,            
             ).order_by('-created_at').distinct()
         return RetailTargetSerializers(retail_target, many = True).data
     
