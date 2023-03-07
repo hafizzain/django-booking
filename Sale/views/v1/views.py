@@ -2,6 +2,7 @@ from datetime import timedelta
 from threading import Thread
 from django.shortcuts import render
 from Sale.Constants.StaffEmail import StaffSaleEmail
+from Sale.Constants.tunrover import ProductTurnover
 
 from rest_framework import status
 from Appointment.models import Appointment, AppointmentCheckout, AppointmentService
@@ -1288,51 +1289,6 @@ def create_sale_order(request):
         if sale_type == 'PRODUCT':
             try:
                 product = Product.objects.get(id = service_id)
-                
-                try:
-                    transfer = ProductStock.objects.get(product__id=product.id, location = business_address.id)
-                    if transfer.available_quantity > int(quantity):
-                        stock_transfer = ProductOrderStockReport.objects.create(
-                        report_choice = 'Sold',
-                        product = product,
-                        user = request.user,
-                        location = business_address,
-                        #quantity = int(quantity), 
-                        before_quantity = transfer.available_quantity      
-                        )                    
-                        sold = transfer.available_quantity - int(quantity)
-                        transfer.available_quantity = sold
-                        transfer.sold_quantity += int(quantity)
-                        transfer.save()
-                        
-                        stock_transfer.after_quantity = sold
-                        stock_transfer.save()
-                        
-                    else:
-                        errors.append('Available quantity issue')
-                
-                except Exception as err:
-                    errors.append(str(err))
-
-                product_order = ProductOrder.objects.create(
-                    user = user,
-                    client = client,
-                    product = product,
-                    #status = sale_status,
-                    checkout = checkout,
-                    member = member,
-                    location = business_address,
-                    tip = tip,
-                    total_price = total_price, 
-                    payment_type= payment_type,
-                    client_type = client_type,
-                    quantity = quantity,
-                    current_price = price,
-                )
-                product_order.sold_quantity += 1 # product_stock.sold_quantity
-                product_order.save()
-                checkout.product_commission = product_commission
-                checkout.save()
             except Exception as err:
                 return Response(
                     {
@@ -1345,6 +1301,57 @@ def create_sale_order(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+                
+            try:
+                transfer = ProductStock.objects.get(product__id=product.id, location = business_address.id)
+                
+                if transfer.available_quantity > int(quantity):
+                    stock_transfer = ProductOrderStockReport.objects.create(
+                    report_choice = 'Sold',
+                    product = product,
+                    user = request.user,
+                    location = business_address,
+                    #quantity = int(quantity), 
+                    before_quantity = transfer.available_quantity      
+                    )                    
+                    sold = transfer.available_quantity - int(quantity)
+                    transfer.available_quantity = sold
+                    transfer.sold_quantity += int(quantity)
+                    transfer.save()
+                    
+                    stock_transfer.after_quantity = sold
+                    stock_transfer.save()
+                    try:
+                        thrd = Thread(target=ProductTurnover, args=[], kwargs={'product' : product,'product_stock': transfer, 'business_address':business_address ,'tenant' : request.tenant})
+                        thrd.start()
+                    except Exception as err:
+                        pass
+                else:
+                    errors.append('Available quantity issue')
+            
+            except Exception as err:
+                errors.append(str(err))
+
+            product_order = ProductOrder.objects.create(
+                user = user,
+                client = client,
+                product = product,
+                #status = sale_status,
+                checkout = checkout,
+                member = member,
+                location = business_address,
+                tip = tip,
+                total_price = total_price, 
+                payment_type= payment_type,
+                client_type = client_type,
+                quantity = quantity,
+                current_price = price,
+            )
+            product_order.sold_quantity += 1 # product_stock.sold_quantity
+            product_order.save()
+            checkout.product_commission = product_commission
+            checkout.save()
+
                         
         elif sale_type == 'SERVICE':
             try:
