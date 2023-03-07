@@ -140,14 +140,19 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
             retail_target = 0
             data = {}
             
+            date_str = f'{month}-{year}'
+            date_obj = datetime.strptime(date_str, '%m-%Y')
+            
             staff_target = StaffTarget.objects.filter(
                 employee = obj,
-                #created_at__icontains = year                
+                created_at__icontains = date_obj                
                 ) 
             for ord  in staff_target:
                 create = str(ord.created_at)
                 match = int(create.split(" ")[0].split("-")[1])
-                
+                ExceptionRecord.objects.create(
+                    text = f'months {match}{ int(month) == match }'
+                )
                 if int(month) == match:
                     service_target += int(ord.service_target)
                     retail_target += int(ord.retail_target)
