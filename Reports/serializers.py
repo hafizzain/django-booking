@@ -147,6 +147,9 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
             for ord  in staff_target:
                 create = str(ord.created_at)
                 match = int(create.split(" ")[0].split("-")[1])
+                ExceptionRecord.objects.create(
+                text = f'months {match}{ int(month) == match }'
+            )
                 if int(month) == match:
                     service_target += int(ord.service_target)
                     retail_target += int(ord.retail_target)
