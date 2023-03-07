@@ -148,13 +148,6 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
                 #created_at__icontains = date_obj                
                 ) 
             for ord  in staff_target:
-                # create = str(ord.created_at)
-                # match = int(create.split(" ")[0].split("-")[1])
-                # ExceptionRecord.objects.create(
-                #     text = f'months {match}{ int(month) == match }'
-                # )
-                # if int(month) == match:
-                
                 created_date = ord.year.date() 
                 if created_date.month == date_obj.month and created_date.year == date_obj.year:
                     service_target += int(ord.service_target)

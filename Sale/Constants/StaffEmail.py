@@ -26,22 +26,12 @@ def StaffSaleEmail(ids = None, location = None, tenant = None, member =None, inv
         current_time = datetime.datetime.now().time()
         
         invoice =  invoice.split('-')[0]
-        #for id in ids:
-        # sale_type = id['selection_type']
-        # service_id = id['id']
-        # quantity = id['quantity']
-        
-        # try:
-        #     staff_email = StaffNotificationSetting.objects.get(business = str(appo.appointment.business))
-        # except:
-        #     passinvoice
-        # if staff_email.sms_daily_sale == True:
         try:   
             html_file = render_to_string("Sales/quick_sales_staff.html", {'name': member_id.name,'location':location, 'sale_type': ids, 'invoice': invoice, 'date': date,'time': current_time, 'client': client})
             text_content = strip_tags(html_file)
                 
             email = EmailMultiAlternatives(
-                    'Appointment Booked',
+                    'Daily Sale',
                     text_content,
                     settings.EMAIL_HOST_USER,
                     to = [member_id.email],
