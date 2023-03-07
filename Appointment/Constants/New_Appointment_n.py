@@ -32,7 +32,7 @@ def Add_appointment(appointment = None, tenant = None):
                 mem_id= appo.member.employee_id
                 client_type= appo.appointment.client_type
                 name = appo.appointment.client.full_name
-                
+
                 time=datetime.today().time()
                 staff = appointment.member.full_name
                 loc_name = appointment.business_address.address_name
@@ -46,7 +46,7 @@ def Add_appointment(appointment = None, tenant = None):
                     pass
                 if staff_email.sms_daily_sale == True:
                     try:   
-                        html_file = render_to_string("AppointmentEmail/Email_notification_on_appointment_n", {'location':loc_name, 'ser_name':ser_name  , 'duration':dur,'time':time, 'date':dat, 'staff':staff})
+                        html_file = render_to_string("AppointmentEmail/new_appointment_n", {'location':loc_name, 'ser_name':ser_name  , 'duration':dur,'time':time, 'date':dat, 'staff':staff})
                         text_content = strip_tags(html_file)
                             
                         email = EmailMultiAlternatives(
@@ -61,23 +61,23 @@ def Add_appointment(appointment = None, tenant = None):
                     except Exception as err:
                         pass
                 
-            if client_email.sms_appoinment == True:
-                html_file = render_to_string("AppointmentEmail/Email_notification_on_appointment_n.html",{'name':name_c ,'phone':phon,'email':email_c} )
-                text_content = strip_tags(html_file)
+            # if client_email.sms_appoinment == True:
+            #     html_file = render_to_string("AppointmentEmail/Email_notification_on_appointment_n.html",{'name':name_c ,'phone':phon,'email':email_c} )
+            #     text_content = strip_tags(html_file)
                 
-                email = EmailMultiAlternatives(
-                    'Appointment Booked',
-                    text_content,
-                    settings.EMAIL_HOST_USER,
-                    to = [email_c],
-                )
+            #     email = EmailMultiAlternatives(
+            #         'Appointment Booked',
+            #         text_content,
+            #         settings.EMAIL_HOST_USER,
+            #         to = [email_c],
+            #     )
                     
-                email.attach_alternative(html_file, "text/html")
-                email.send()
+            #     email.attach_alternative(html_file, "text/html")
+            #     email.send()
             
-            ExceptionRecord.objects.create(
-                text = f'create app email {staff_email.sms_daily_sale} {client_email.sms_appoinment}'
-        )
+        #     ExceptionRecord.objects.create(
+        #         text = f'create app email {staff_email.sms_daily_sale} {client_email.sms_appoinment}'
+        # )
     
         except Exception as err:
             ExceptionRecord.objects.create(
