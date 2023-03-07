@@ -191,11 +191,17 @@ def get_service_target_report(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_retail_target_report(request):
+    
     month = request.GET.get('month', None)
     year = request.GET.get('year', None)
+    location = request.GET.get('location', None)
     
     brand = Brand.objects.filter(is_active=True).order_by('-created_at')
-    serialized = ReportBrandSerializer(brand, many=True, context={'request' : request, 'month': month, 'year': year})
+    serialized = ReportBrandSerializer(brand, many=True, context={'request' : request, 
+                                            'month': month,
+                                            'year': year,
+                                            'location': location,
+                                            })
     return Response(
         {
             'status' : 200,
