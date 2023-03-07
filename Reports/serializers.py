@@ -155,10 +155,7 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
                 # )
                 # if int(month) == match:
                 
-                created_date = ord.created_at.date() 
-                ExceptionRecord.objects.create(
-                    text = f'staff_target {ord.year.date() }'
-                )
+                created_date = ord.year.date() 
                 if created_date.month == date_obj.month and created_date.year == date_obj.year:
                     service_target += int(ord.service_target)
                     retail_target += int(ord.retail_target)
