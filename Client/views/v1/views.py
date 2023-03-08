@@ -2416,10 +2416,22 @@ def get_client_package(request):
     try:
         client_validation = ClientPackageValidation.objects.get(client__id =client, package__id = package, serviceduration__id = package_service)
         service_pac = ServiceDurationForSpecificTime.objects.get(id = package_service )
-    
-        listc = list(set(client_validation.service) - set(service_pac.service)) + list(set(service_pac.service) - set(client_validation.service))
     except Exception as err:
         Error.append(str(err))
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Client Validation not found ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    listc = list(set(client_validation.service) - set(service_pac.service)) + list(set(service_pac.service) - set(client_validation.service))
 
     return Response(
         {
