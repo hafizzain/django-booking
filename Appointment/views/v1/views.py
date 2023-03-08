@@ -24,7 +24,7 @@ from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
 from django.db.models import Q
-from Client.models import Client, ClientPromotions, Membership, Promotion, Rewards, Vouchers
+from Client.models import Client, ClientPackageValidation, ClientPromotions, Membership, Promotion, Rewards, Vouchers
 from datetime import date, timedelta
 from threading import Thread
 from django.db.models import F
@@ -489,6 +489,28 @@ def create_appointment(request):
                 # visits=F('visits') + 1
                 visits = 1
             )
+        if selected_promotion_type == 'Packages_Discount':
+            try:
+                clientpackage = ClientPackageValidation.objects.get(serviceduration__id =  selected_promotion_id) #package__package_duration = 'duration')
+                clientpackage.service.add(service)
+                packages.save()
+                
+            except Exception as err:
+                Errors.append(str(err))
+                                
+            packages=  ClientPackageValidation.objects.create(
+                user = user,
+                business = business,
+                client = client,
+                serviceduration__id =  selected_promotion_id,
+                #service = service,
+            )
+            current_date = datetime.date.today()
+            next_3_months = current_date + datetime.timedelta(days=3*30)
+            
+            packages.service.add(service)
+            packages.due_date = next_3_months
+            packages.save()
                     
         total_price_app += int(price)
         service_commission = 0

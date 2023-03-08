@@ -733,9 +733,9 @@ def add_product(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     if is_active is not None:
-        is_active = False #json.loads(stock_status)
+        is_active = True #json.loads(stock_status)
     else: 
-        is_active = True
+        is_active = False
         
     if stock_status is not None:
         stock_status = False #json.loads(stock_status)

@@ -140,14 +140,16 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
             retail_target = 0
             data = {}
             
+            date_str = f'{month}-{year}'
+            date_obj = datetime.strptime(date_str, '%m-%Y')
+            
             staff_target = StaffTarget.objects.filter(
                 employee = obj,
-                 created_at__icontains = year                
+                #created_at__icontains = date_obj                
                 ) 
             for ord  in staff_target:
-                create = str(ord.created_at)
-                match = int(create.split(" ")[0].split("-")[1])
-                if int(month) == match:
+                created_date = ord.year.date() 
+                if created_date.month == date_obj.month and created_date.year == date_obj.year:
                     service_target += int(ord.service_target)
                     retail_target += int(ord.retail_target)
             data.update({

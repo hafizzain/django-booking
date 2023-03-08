@@ -1,6 +1,7 @@
 from threading import Thread
 from Client.Constants.Add_Employe import add_client
 from Employee.Constants.Add_Employe import add_employee
+from Promotions.models import ServiceDurationForSpecificTime
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -10,7 +11,7 @@ from Service.models import Service
 from Business.models import Business
 from Product.models import Product
 from Utility.models import Country, Language, State, City
-from Client.models import Client, ClientGroup, ClientPromotions, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers
+from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers
 from Client.serializers import ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer
 from Utility.models import NstyleFile
 
@@ -2353,7 +2354,7 @@ def update_loyalty(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_complimentary(request):
-    client = request.data.get('client', None)
+    client = request.GET.get('client', None)
     if client is None: 
        return Response(
             {
@@ -2382,6 +2383,119 @@ def get_complimentary(request):
                 'message' : 'Client total Count',
                 'count': client,
                 'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_client_package(request):
+    client = request.GET.get('client', None)
+    package = request.GET.get('package', None)
+    package_service = request.GET.get('package_service', None)
+    
+    Error = []
+    
+    if client and package is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'client'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    # try:
+    #     client_validation = ClientPackageValidation.objects.get(client__id =client, package__id = package, serviceduration__id = package_service)
+    #     service_pac = ServiceDurationForSpecificTime.objects.get(id = package_service )
+    # except Exception as err:
+    #     Error.append(str(err))
+    #     return Response(
+    #         {
+    #             'status' : False,
+    #             'status_code' : 404,
+    #             'status_code_text' : '404',
+    #             'response' : {
+    #                 'message' : 'Client Validation not found ID!',
+    #                 'error_message' : str(err),
+    #             }
+    #         },
+    #         status=status.HTTP_404_NOT_FOUND
+    #     )
+    
+    # listc = list(set(client_validation.service) - set(service_pac.service)) + list(set(service_pac.service) - set(client_validation.service))
+    
+    try:
+        client_validation = ClientPackageValidation.objects.get(client__id=client, package__id=package, serviceduration__id=package_service)
+    except Exception as err:
+        Error.append(str(err))
+        return Response(
+            {
+                'status': False,
+                'status_code': 404,
+                'status_code_text': '404',
+                'response': {
+                    'message': 'Client Validation not found ID!',
+                    'error_message': str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    try:
+        service_pac = ServiceDurationForSpecificTime.objects.get(id=package_service)
+    except Exception as err:
+        Error.append(str(err))
+        return Response(
+            {
+                'status': False,
+                'status_code': 404,
+                'status_code_text': '404',
+                'response': {
+                    'message': 'Service Duration not found ID!',
+                    'error_message': str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    try:
+        client_service = list(client_validation.service.all())
+        pac_service = list(service_pac.service.all())
+        service_diff = list(set(client_service) - set(pac_service)) + list(set(pac_service) - set(client_service))
+    except Exception as err:
+        Error.append(str(err))
+        return Response(
+            {
+                'status': False,
+                'status_code': 500,
+                'status_code_text': '500',
+                'response': {
+                    'message': 'Error getting non-common elements!',
+                    'error_message': str(err),
+                }
+            },
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+    
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Remain Service',
+                'Service': service_diff,
+                'error_message' : None,
+                'Errors': Error
             }
         },
         status=status.HTTP_200_OK
