@@ -381,3 +381,25 @@ class ClientPromotions(models.Model):
     
     def __str__(self):
         return str(self.id)
+    
+class ClientPackageValidation(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='user_client_packagevalidation', verbose_name='Creator ( User )')
+    business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_client_packagevalidation')
+    
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True, related_name='client_client_packagevalidation')
+    package = models.ForeignKey('Promotions.PackagesDiscount', on_delete=models.SET_NULL, null=True, blank=True, related_name='package_client_packagevalidation')
+    serviceduration = models.ForeignKey('Promotions.ServiceDurationForSpecificTime', on_delete=models.SET_NULL, null=True, blank=True, related_name='serviceduration_client_packagevalidation')
+    service = models.ManyToManyField(Service, related_name='service_client_packagevalidation') 
+
+    #month = models.PositiveIntegerField(default=0, null=True, blank=True)
+    
+    due_date = models.DateField(null=True) 
+    
+    is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now, null=True) 
+    
+    def __str__(self):
+        return str(self.id)
