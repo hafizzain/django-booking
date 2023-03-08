@@ -2353,7 +2353,7 @@ def update_loyalty(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_complimentary(request):
-    client = request.data.get('client', None)
+    client = request.GET.get('client', None)
     if client is None: 
        return Response(
             {
