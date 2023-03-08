@@ -5,6 +5,7 @@ from Appointment.Constants.Reschedule import reschedule_appointment
 from Appointment.Constants.AddAppointment import Add_appointment
 from Appointment.Constants.cancelappointment import cancel_appointment
 from Appointment.Constants.comisionCalculate import calculate_commission
+from Promotions.models import ServiceDurationForSpecificTime
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -491,6 +492,10 @@ def create_appointment(request):
             )
         if selected_promotion_type == 'Packages_Discount':
             try:
+                service_duration = ServiceDurationForSpecificTime.objects.get(id = selected_promotion_id)
+            except:
+                pass
+            try:
                 clientpackage = ClientPackageValidation.objects.get(serviceduration__id =  selected_promotion_id) #package__package_duration = 'duration')
                 clientpackage.service.add(service)
                 packages.save()
@@ -502,7 +507,7 @@ def create_appointment(request):
                 user = user,
                 business = business,
                 client = client,
-                serviceduration__id =  selected_promotion_id,
+                serviceduration =  service_duration,
                 #service = service,
             )
             current_date = datetime.date.today()
