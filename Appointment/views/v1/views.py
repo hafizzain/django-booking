@@ -500,7 +500,7 @@ def create_appointment(request):
                 clientpackage = ClientPackageValidation.objects.get(serviceduration__id =  selected_promotion_id) #package__package_duration = 'duration')
                 testduration = True
                 clientpackage.service.add(service)
-                packages.save()
+                clientpackage.save()
                 
             except Exception as err:
                 Errors.append(str(err))
