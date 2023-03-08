@@ -2470,13 +2470,14 @@ def get_client_package(request):
 
     try:
         client_service = list(client_validation.service.all().values_list('id', flat=True))
-        pac_service = list(service_pac.service.all().values_list('id', flat=True))
+        client_service_str = [str(uuid) for uuid in client_service]
+        #pac_service = list(service_pac.service.all().values_list('id', flat=True))
         #service_diff = [s.__dict__ for s in list(set(client_service) - set(pac_service)) + list(set(pac_service) - set(client_service))]
 
-        service_diff = list(set(client_service) - set(pac_service)) + list(set(pac_service) - set(client_service))
-        Error.append(str(service_diff))
+        #service_diff = list(set(client_service) - set(pac_service)) + list(set(pac_service) - set(client_service))
+        Error.append(str(client_service_str))
         
-        data = serializers.serialize('json', service_diff)
+        data = ''#serializers.serialize('json', service_diff)
         #data = service_diff.json()
     except Exception as err:
         Error.append(str(err))
