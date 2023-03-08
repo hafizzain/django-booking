@@ -2395,6 +2395,8 @@ def get_client_package(request):
     package = request.GET.get('package', None)
     package_service = request.GET.get('package_service', None)
     
+    Error = []
+    
     if client and package is None: 
        return Response(
             {
@@ -2411,9 +2413,10 @@ def get_client_package(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-       
-    client_validation = ClientPackageValidation.objects.get(client__id =client, package__id = package, serviceduration__id = package_service)
-    
+    try:
+        client_validation = ClientPackageValidation.objects.get(client__id =client, package__id = package, serviceduration__id = package_service)
+    except Exception as err:
+        Error.append(str(err))
     service_pac = ServiceDurationForSpecificTime.objects.get(id = package_service )
     
     listc = list(set(client_validation.service) - set(service_pac.service)) + list(set(service_pac.service) - set(client_validation.service))
@@ -2426,7 +2429,8 @@ def get_client_package(request):
             'response' : {
                 'message' : 'Remain Service',
                 'Service': listc,
-                'error_message' : None
+                'error_message' : None,
+                'Errors': Error
             }
         },
         status=status.HTTP_200_OK
