@@ -430,7 +430,7 @@ def send_verification_otp(request):
                     'status_code' : StatusCodes.USER_NOT_EXIST_4005,
                     'status_code_text' : 'USER_NOT_EXIST_4005',
                     'response' : {
-                        'message' : f'User with this {"Email" if code_for == "Email" else "Mobile Number"} not exist',
+                        'message' : f'User does not exist with this {"Email" if code_for == "Email" else "Mobile Number"} ',
                         'error_fields' : ["email" if code_for == "Email" else "phone_number"],
                         'error_message' : str(err),
                     }
