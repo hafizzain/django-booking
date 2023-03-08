@@ -513,7 +513,7 @@ def create_appointment(request):
                     #service = service,
                 )
                 current_date = date.today()
-                next_3_months = current_date + datetime.timedelta(days=3*30)
+                next_3_months = current_date + timedelta(days=3*30)
                 
                 packages.service.add(service)
                 packages.due_date = next_3_months
