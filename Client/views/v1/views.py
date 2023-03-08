@@ -2434,7 +2434,7 @@ def get_client_package(request):
     # listc = list(set(client_validation.service) - set(service_pac.service)) + list(set(service_pac.service) - set(client_validation.service))
     
     try:
-        client_validation = ClientPackageValidation.objects.get(client__id=client, package__id=package, serviceduration__id=package_service)
+        client_validation = ClientPackageValidation.objects.get(client__id=client, serviceduration__id=package_service)
     except Exception as err:
         Error.append(str(err))
         return Response(
