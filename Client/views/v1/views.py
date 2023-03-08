@@ -2470,7 +2470,9 @@ def get_client_package(request):
     try:
         client_service = list(client_validation.service.all())
         pac_service = list(service_pac.service.all())
-        service_diff = list(set(client_service) - set(pac_service)) + list(set(pac_service) - set(client_service))
+        service_diff = [s.__dict__ for s in list(set(client_service) - set(pac_service)) + list(set(pac_service) - set(client_service))]
+
+        #service_diff = list(set(client_service) - set(pac_service)) + list(set(pac_service) - set(client_service))
     except Exception as err:
         Error.append(str(err))
         return Response(
