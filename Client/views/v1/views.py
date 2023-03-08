@@ -10,7 +10,7 @@ from django.db.models import Q
 from Service.models import Service
 from Business.models import Business
 from Product.models import Product
-from Utility.models import Country, Language, State, City
+from Utility.models import Country, ExceptionRecord, Language, State, City
 from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers
 from Client.serializers import ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer
 from Utility.models import NstyleFile
@@ -2474,6 +2474,8 @@ def get_client_package(request):
         #service_diff = [s.__dict__ for s in list(set(client_service) - set(pac_service)) + list(set(pac_service) - set(client_service))]
 
         service_diff = list(set(client_service) - set(pac_service)) + list(set(pac_service) - set(client_service))
+        Error.append(str(err))
+        
         data = serializers.serialize('json', service_diff)
         #data = service_diff.json()
     except Exception as err:
