@@ -16,6 +16,7 @@ from Client.serializers import ClientSerializer, ClientGroupSerializer, LoyaltyP
 from Utility.models import NstyleFile
 
 import json
+from django.core import serializers
 from NStyle.Constants import StatusCodes
 
 @api_view(['POST'])
@@ -2473,7 +2474,8 @@ def get_client_package(request):
         #service_diff = [s.__dict__ for s in list(set(client_service) - set(pac_service)) + list(set(pac_service) - set(client_service))]
 
         service_diff = list(set(client_service) - set(pac_service)) + list(set(pac_service) - set(client_service))
-        data = service_diff.json()
+        data = serializers.serialize('json', service_diff)
+        #data = service_diff.json()
     except Exception as err:
         Error.append(str(err))
         return Response(
