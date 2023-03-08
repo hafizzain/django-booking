@@ -2391,7 +2391,7 @@ def get_complimentary(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_client_package(request):
+def get_client_package_test(request):
     client = request.GET.get('client', None)
     package = request.GET.get('package', None)
     package_service = request.GET.get('package_service', None)
@@ -2478,7 +2478,7 @@ def get_client_package(request):
         service_diff = list(set(client_service_str) - set(pac_service_str)) + list(set(pac_service_str) - set(client_service_str))
         Error.append(str(service_diff))
         
-        data = serializers.serialize('json', service_diff)
+        #data = serializers.serialize('json', service_diff)
         #data = service_diff.json()
     except Exception as err:
         Error.append(str(err))
@@ -2502,7 +2502,104 @@ def get_client_package(request):
             'status_code_text' : '200',
             'response' : {
                 'message' : 'Remain Service',
-                'Service': data,
+                'Service': service_diff,
+                'error_message' : None,
+                'Errors': Error
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_client_package(request):
+    client = request.GET.get('client', None)
+    package = request.GET.get('package', None)
+    package_service = request.GET.get('package_service', None)
+    
+    Error = []
+    
+    if client and package is None: 
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'client'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        client_validation = ClientPackageValidation.objects.get(client__id=client, serviceduration__id=package_service)
+    except Exception as err:
+        Error.append(str(err))
+        return Response(
+            {
+                'status': False,
+                'status_code': 404,
+                'status_code_text': '404',
+                'response': {
+                    'message': 'Client Validation not found ID!',
+                    'error_message': str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    try:
+        service_pac = ServiceDurationForSpecificTime.objects.get(id=package_service)
+    except Exception as err:
+        Error.append(str(err))
+        return Response(
+            {
+                'status': False,
+                'status_code': 404,
+                'status_code_text': '404',
+                'response': {
+                    'message': 'Service Duration not found ID!',
+                    'error_message': str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    try:
+        client_service = list(client_validation.service.all().values_list('id', flat=True))
+        client_service_str = [str(uuid) for uuid in client_service]
+        
+        pac_service = list(service_pac.service.all().values_list('id', flat=True))
+        pac_service_str = [str(uuid) for uuid in pac_service]
+        
+        service_diff = list(set(client_service_str) - set(pac_service_str)) + list(set(pac_service_str) - set(client_service_str))
+    except Exception as err:
+        Error.append(str(err))
+        return Response(
+            {
+                'status': False,
+                'status_code': 500,
+                'status_code_text': '500',
+                'response': {
+                    'message': 'Error getting non-common elements!',
+                    'error_message': str(err),
+                }
+            },
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+    
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Remain Service',
+                'Service': service_diff,
                 'error_message' : None,
                 'Errors': Error
             }
