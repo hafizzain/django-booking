@@ -2474,7 +2474,7 @@ def get_client_package(request):
         #service_diff = [s.__dict__ for s in list(set(client_service) - set(pac_service)) + list(set(pac_service) - set(client_service))]
 
         service_diff = list(set(client_service) - set(pac_service)) + list(set(pac_service) - set(client_service))
-        Error.append(str(err))
+        Error.append(str(service_diff))
         
         data = serializers.serialize('json', service_diff)
         #data = service_diff.json()
