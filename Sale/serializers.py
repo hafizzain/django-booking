@@ -899,7 +899,7 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
     commission_rate = serializers.SerializerMethodField()
     sale = serializers.SerializerMethodField()
     location = LocationSerializer()
-
+    
 
     def get_employee(self, checkout):
         # serialized = EmployeeBusinessSerializer(checkout.member)
@@ -938,6 +938,10 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
         name = '-------'
         price = '-------'
         order_type = '-------'
+        payment_type = ''
+        tip = ''
+        client = ''
+
 
         try:
             order_item = ProductOrder.objects.get(checkout = checkout)
