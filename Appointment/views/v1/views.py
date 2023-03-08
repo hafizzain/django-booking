@@ -491,31 +491,33 @@ def create_appointment(request):
                 visits = 1
             )
         if selected_promotion_type == 'Packages_Discount':
+            testduration = False
             try:
                 service_duration = ServiceDurationForSpecificTime.objects.get(id = selected_promotion_id)
             except:
                 pass
             try:
                 clientpackage = ClientPackageValidation.objects.get(serviceduration__id =  selected_promotion_id) #package__package_duration = 'duration')
+                testduration = True
                 clientpackage.service.add(service)
                 packages.save()
                 
             except Exception as err:
                 Errors.append(str(err))
-                                
-            packages=  ClientPackageValidation.objects.create(
-                user = user,
-                business = business,
-                client = client,
-                serviceduration =  service_duration,
-                #service = service,
-            )
-            current_date = datetime.date.today()
-            next_3_months = current_date + datetime.timedelta(days=3*30)
-            
-            packages.service.add(service)
-            packages.due_date = next_3_months
-            packages.save()
+            if testduration == False:                 
+                packages=  ClientPackageValidation.objects.create(
+                    user = user,
+                    business = business,
+                    client = client,
+                    serviceduration =  service_duration,
+                    #service = service,
+                )
+                current_date = date.today()
+                next_3_months = current_date + datetime.timedelta(days=3*30)
+                
+                packages.service.add(service)
+                packages.due_date = next_3_months
+                packages.save()
                     
         total_price_app += int(price)
         service_commission = 0
