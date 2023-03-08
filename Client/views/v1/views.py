@@ -2387,6 +2387,7 @@ def get_complimentary(request):
         },
         status=status.HTTP_200_OK
     )
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_client_package(request):
@@ -2394,7 +2395,7 @@ def get_client_package(request):
     package = request.GET.get('package', None)
     package_service = request.GET.get('package_service', None)
     
-    if client or package is None: 
+    if client and package is None: 
        return Response(
             {
                 'status' : False,
