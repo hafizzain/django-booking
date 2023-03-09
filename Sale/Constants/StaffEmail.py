@@ -26,6 +26,9 @@ def StaffSaleEmail(ids = None, location = None, tenant = None, member =None, inv
         current_time = datetime.datetime.now().time()
         
         invoice =  invoice.split('-')[0]
+        ExceptionRecord.objects.create(
+                text = f'Staff Email on sale {member_id} {location} {ids} {invoice} {date} {current_time} {client} '
+            )
         try:   
             html_file = render_to_string("Sales/quick_sales_staff.html", {'name': member_id.name,'location':location, 'sale_type': ids, 'invoice': invoice, 'date': date,'time': current_time, 'client': client})
             text_content = strip_tags(html_file)
