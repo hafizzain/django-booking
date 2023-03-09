@@ -1492,7 +1492,7 @@ def create_sale_order(request):
     
     try:
         ExceptionRecord.objects.create(
-                text = f'Thread in staff email'
+                text = f'Thread in staff email {request.tenant}'
             )
         thrd = Thread(target=StaffSaleEmail, args=[], kwargs={'ids' : ids, 'location': business_address.address_name ,'tenant' : request.tenant, 'member': member, 'invoice': checkout.id, 'client': client})
         thrd.start()
