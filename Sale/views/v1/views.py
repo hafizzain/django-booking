@@ -1321,6 +1321,9 @@ def create_sale_order(request):
                     
                     stock_transfer.after_quantity = sold
                     stock_transfer.save()
+                    ExceptionRecord.objects.create(
+                            text = f'Turnover email sale 789{str(err)}'
+                        )
                     try:
                         ExceptionRecord.objects.create(
                             text = f' error in Turnover email sale{str(err)}'
