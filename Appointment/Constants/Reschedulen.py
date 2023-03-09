@@ -46,7 +46,7 @@ def reschedule_appointment_n(appointment = None , tenant = None):
                 pass
             if staff_email.sms_daily_sale == True:   
                     
-                html_file = render_to_string("AppointmentEmail/reschedule_appointment_n.html", {'location':loc_name, 'ser_name':ser_name  , 'duration':dur,'time':time, 'date':dat})
+                html_file = render_to_string("AppointmentEmail/appointment_reschedule_n.html", {'location':loc_name, 'ser_name':ser_name  , 'duration':dur,'time':time, 'date':dat})
                 text_content = strip_tags(html_file)
                     
                 email = EmailMultiAlternatives(
@@ -61,7 +61,7 @@ def reschedule_appointment_n(appointment = None , tenant = None):
                 
             if client_email.sms_appoinment == True:
                 
-                html_file = render_to_string("AppointmentEmail/reschedule_appointment_n.html", {'name': name_c,'mobile_number': phon,'email':email_m})
+                html_file = render_to_string("AppointmentEmail/appointment_reschedule_n.html", {'name': name_c,'mobile_number': phon,'email':email_m})
                 text_content = strip_tags(html_file)
                     
                 email = EmailMultiAlternatives(

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 from Appointment.Constants.Reschedulen import reschedule_appointment_n
-from Appointment.Constants.New_Appointment_n import Add_appointment_nn
+# from Appointment.Constants.New_Appointment_n import Add_appointment_nn
 from Appointment.Constants.cancelappointmentn import cancel_appointment_n
 from Appointment.Constants.AddAppointment_n import Add_appointment_n
 
