@@ -13,36 +13,44 @@ from Utility.models import ExceptionRecord, TurnOverProductRecord
 
 def ProductTurnover(product=None, product_stock = None, business_address = None ,tenant= None):
     with tenant_context(tenant):
-        
-        email = 'rijariaz5@gmail.com'
         try:
-            product= Product.objects.get(id = str(product))
-        except Exception as err:
-            pass
-        
-        TurnOverProductRecord.objects.create(
-            text = 'Email Generate for Product Turnover '
-        )
-        
-        # total_sold = ProductOrderStockReport.objects.filter(
-        #     product=product,
-        #     report_choice__iexact='Sold',
-        #     location__id = business_address,            
-        # ).aggregate(Sum('quantity'))
-        
-        try:   
-            html_file = render_to_string("Sales/product_turnover_details.html")
-            text_content = strip_tags(html_file)
-                
-            email = EmailMultiAlternatives(
-                    'Turnover Report',
-                    text_content,
-                    settings.EMAIL_HOST_USER,
-                    to = [email],
-                
+            email = 'rijariaz5@gmail.com'
+            try:
+                product= Product.objects.get(id = str(product))
+            except Exception as err:
+                pass
+            
+            ExceptionRecord.objects.create(
+                text = f'turnover emails'
+            )
+            
+            TurnOverProductRecord.objects.create(
+                text = 'Email Generate for Product Turnover '
+            )
+            
+            # total_sold = ProductOrderStockReport.objects.filter(
+            #     product=product,
+            #     report_choice__iexact='Sold',
+            #     location__id = business_address,            
+            # ).aggregate(Sum('quantity'))
+            
+            try:   
+                html_file = render_to_string("Sales/product_turnover_details.html")
+                text_content = strip_tags(html_file)
+                    
+                email = EmailMultiAlternatives(
+                        'Turnover Report',
+                        text_content,
+                        settings.EMAIL_HOST_USER,
+                        to = [email],
+                    
+                    )
+                email.attach_alternative(html_file, "text/html")
+                email.send()
+            except Exception as err:
+                ExceptionRecord.objects.create(
+                    text = f'turnover emails error {str(err)}'
                 )
-            email.attach_alternative(html_file, "text/html")
-            email.send()
         except Exception as err:
             ExceptionRecord.objects.create(
                 text = f'turnover emails error {str(err)}'
