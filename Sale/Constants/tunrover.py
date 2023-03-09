@@ -13,6 +13,7 @@ from Utility.models import ExceptionRecord
 
 def ProductTurnover(product=None, product_stock = None, business_address = None ,tenant= None):
     with tenant_context(tenant):
+        
         email = 'rijariaz5@gmail.com'
         try:
             product= Product.objects.get(id = str(product))
