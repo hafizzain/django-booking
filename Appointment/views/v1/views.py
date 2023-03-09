@@ -1630,9 +1630,9 @@ def get_client_sale(request):
     voucher = VoucherOrderSerializer(voucher_order,  many=True,  context={'request' : request, })
     data.extend(voucher.data)
     
-    membership_order = MemberShipOrder.objects.filter(checkout__client = client).order_by('-created_at')
-    membership = MemberShipOrderSerializer(membership_order,  many=True,  context={'request' : request, })
-    data.extend(membership.data)
+    # membership_order = MemberShipOrder.objects.filter(checkout__client = client).order_by('-created_at')
+    # membership = MemberShipOrderSerializer(membership_order,  many=True,  context={'request' : request, })
+    # data.extend(membership.data)
     
     # appointment_checkout = AppointmentCheckout.objects.filter(appointment__client = client)
     # serialized = CheckoutSerializer(appointment_checkout, many = True)

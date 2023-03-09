@@ -367,12 +367,19 @@ class ProductOrderSerializer(serializers.ModelSerializer):
     
     price  = serializers.SerializerMethodField(read_only=True)
     name  = serializers.SerializerMethodField(read_only=True)
+    total_product  = serializers.SerializerMethodField(read_only=True)
     
     def get_name(self, obj):
         try:
             return obj.product.name
         except Exception as err:
             return None
+        
+    def get_total_product(self, obj):
+        try:
+            return obj.checkout.total_product_price
+        except:
+            return 0
         
     def get_price(self, obj):
         try:
