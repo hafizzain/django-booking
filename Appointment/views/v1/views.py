@@ -644,7 +644,7 @@ def create_appointment(request):
     # )
     
     try:
-        thrd = Thread(target=Add_appointment_n, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
+        thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
         thrd.start()
     except Exception as err:
         pass
