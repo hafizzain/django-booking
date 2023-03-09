@@ -34,10 +34,10 @@ def Add_appointment_n(appointment = None, tenant = None):
                 name = appo.appointment.client.full_name
                 
                 time=datetime.today().time()
-                staff = appointment.member.full_name
-                loc_name = appointment.business_address.address_name
-                dur = appointment.duration
-                phon = appointment.member.mobile_number
+                staff = appo.member.full_name
+                loc_name = appo.appointment.business_address.address_name
+                dur = appo.appointment.duration
+                phon = appo.appointment.member.mobile_number
                 
                 try:
                     staff_email = StaffNotificationSetting.objects.get(business = str(appo.appointment.business))
@@ -46,7 +46,7 @@ def Add_appointment_n(appointment = None, tenant = None):
                     pass
                 if staff_email.sms_daily_sale == True:
                     try:   
-                        html_file = render_to_string("AppointmentEmail/Email_notification_on_new_appointment_n", {'location':loc_name, 'ser_name':ser_name  , 'duration':dur,'time':time, 'date':dat, 'staff':staff})
+                        html_file = render_to_string("AppointmentEmail/new_appointment_n", {'location':loc_name, 'ser_name':ser_name  , 'duration':dur,'time':time, 'date':dat, 'staff':staff})
                         text_content = strip_tags(html_file)
                             
                         email = EmailMultiAlternatives(
@@ -62,7 +62,7 @@ def Add_appointment_n(appointment = None, tenant = None):
                         pass
                 
             if client_email.sms_appoinment == True:
-                html_file = render_to_string("AppointmentEmail/Email_notification_on_new_appointment_n.html",{'name':name_c ,'phone':phon,'email':email_c} )
+                html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'name':name_c ,'phone':phon,'email':email_c} )
                 text_content = strip_tags(html_file)
                 
                 email = EmailMultiAlternatives(
