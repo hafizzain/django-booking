@@ -32,7 +32,7 @@ def cancel_appointment_n(appointment = None , tenant = None):
             ser_name = appointment.service.name
             dat = appointment.appointment_date
 
-            time=datetime.today().time()
+            time = datetime.today().time()
             loc_name = appointment.business_address.address_name
             dur = appointment.duration
             phon = appointment.member.mobile_number
