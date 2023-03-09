@@ -14,6 +14,9 @@ from Utility.models import ExceptionRecord, TurnOverProductRecord
 def ProductTurnover(product=None, product_stock = None, business_address = None ,tenant= None):
     with tenant_context(tenant):
         
+        ExceptionRecord.objects.create(
+            text = f'tproduct is ::: {product}'
+        )
         email = 'rijariaz5@gmail.com'
         t_total = 0
         # try:
@@ -25,14 +28,21 @@ def ProductTurnover(product=None, product_stock = None, business_address = None 
             text = 'Email Generate for Product Turnover',
             i_email = 'TURNOVER_PRODUCT'
         )
-        total_sold = ProductOrderStockReport.objects.filter(
-            #product=product,
-            report_choice='Sold',
-            location__id=business_address,
-        )#.aggregate(Sum('quantity'))['quantity__sum']
-        for i in total_sold:
-            t_total += i.quantity
-    
+        try:
+            
+            total_sold = ProductOrderStockReport.objects.filter(
+                #product=product,
+                report_choice='Sold',
+                location__id=business_address,
+            )#.aggregate(Sum('quantity'))['quantity__sum']
+            for i in total_sold:
+                t_total += i.quantity
+                
+        except Exception as err:
+            ExceptionRecord.objects.create(
+                text = f'turnover emails error {str(err)}'
+            )
+                
         ExceptionRecord.objects.create(
             text = f'turnover emails error {t_total}'
         )
