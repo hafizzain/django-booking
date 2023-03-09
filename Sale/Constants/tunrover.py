@@ -32,7 +32,7 @@ def ProductTurnover(product=None, product_stock = None, business_address = None 
                 ).aggregate(Sum('quantity'))
             except Exception as err:
                 ExceptionRecord.objects.create(
-                text = f'turnover emails error {str(err)}'
+                text = f'turnover emails error35:::  {str(err)}'
             )
             
             ExceptionRecord.objects.create(
