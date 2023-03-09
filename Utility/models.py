@@ -141,10 +141,9 @@ class TurnOverProductRecord(models.Model):
     id = models.UUIDField(default=uuid4, editable=False, unique=True, primary_key=True)
 
     text = models.TextField()
-    is_resolved = models.BooleanField(default=False)
+    i_email = models.CharField(default='', max_length=200)
     created_at = models.DateTimeField(auto_now_add=now)
-
-
+    
     def __str__(self):
         return str(self.id)
     

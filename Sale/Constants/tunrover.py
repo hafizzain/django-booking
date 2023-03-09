@@ -19,6 +19,7 @@ def ProductTurnover(product=None, product_stock = None, business_address = None 
             product= Product.objects.get(id = str(product))
         except Exception as err:
             pass
+        
         total_sold = ProductOrderStockReport.objects.filter(
             product=product,
             report_choice__iexact='Sold',
