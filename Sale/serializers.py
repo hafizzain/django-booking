@@ -441,7 +441,7 @@ class ProductOrderSerializer(serializers.ModelSerializer):
         model = ProductOrder
         fields = ['id', 'client','quantity','status','created_at',
                   'location', 'member', 'tip', 'total_price' , 'payment_type','product_price','price','name',
-                  'product_name', 'gst', 'order_type', 'sold_quantity','product_details' ]
+                  'product_name', 'gst', 'order_type', 'sold_quantity','product_details','total_product' ]
           
 class ServiceOrderSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
