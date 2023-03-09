@@ -20,19 +20,20 @@ def ProductTurnover(product=None, product_stock = None, business_address = None 
             except Exception as err:
                 pass
             
-            ExceptionRecord.objects.create(
-                text = f'turnover emails'
-            )
-            
             TurnOverProductRecord.objects.create(
-                text = 'Email Generate for Product Turnover '
+                text = 'Email Generate for Product Turnover',
+                i_email = 'TURNOVER_PRODUCT'
             )
             
-            # total_sold = ProductOrderStockReport.objects.filter(
-            #     product=product,
-            #     report_choice__iexact='Sold',
-            #     location__id = business_address,            
-            # ).aggregate(Sum('quantity'))
+            total_sold = ProductOrderStockReport.objects.filter(
+                product=product,
+                report_choice__iexact='Sold',
+                location__id = business_address,            
+            ).aggregate(Sum('quantity'))
+            
+            ExceptionRecord.objects.create(
+                text = f'turnover emails error {total_sold}'
+            )
             
             try:   
                 html_file = render_to_string("Sales/product_turnover_details.html")
