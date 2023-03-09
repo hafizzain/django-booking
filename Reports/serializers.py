@@ -692,7 +692,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
             for ord  in service_target:
                 created_date = ord.year.date() 
                 if created_date.month == date_obj.month and created_date.year == date_obj.year:
-                    service_target += int(ord.service_target)
+                    ser_target += int(ord.service_target)
                 # create = str(ord.created_at)
                 # match = int(create.split(" ")[0].split("-")[1])
                 # if int(month) == match:
