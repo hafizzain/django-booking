@@ -638,12 +638,18 @@ def create_appointment(request):
     #     thrd.start()
     # except Exception as err:
     #     pass
-
+    
+    # ExceptionRecord.objects.create(
+    #     text = f'error while hitting {str(err)}'
+    # )
+    
     try:
         thrd = Thread(target=Add_appointment_n, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
         thrd.start()
     except Exception as err:
         pass
+
+    
     
     all_memebers= Employee.objects.filter(
         is_deleted = False,
