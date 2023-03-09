@@ -59,9 +59,11 @@ def Add_appointment_n(appointment = None, tenant = None):
                         email.attach_alternative(html_file, "text/html")
                         email.send()
                     except Exception as err:
-                        ExceptionRecord.objects.create(
-                            text = f'issue of sending email {str(err)}'
-        )
+                        pass
+                    # except Exception as err:
+                    #     ExceptionRecord.objects.create(
+                    #         text = f'issue of sending email {str(err)}'
+                    # )
                 
             if client_email.sms_appoinment == True:
                 html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'name':name_c ,'phone':phon,'email':email_c} )
