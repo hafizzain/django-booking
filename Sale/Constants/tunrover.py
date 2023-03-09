@@ -27,7 +27,7 @@ def ProductTurnover(product=None, product_stock = None, business_address = None 
             )
             try:
                 total_sold = ProductOrderStockReport.objects.filter(
-                    product=product,
+                    #product=product,
                     report_choice='Sold',
                     location__id=business_address,
                 )#.aggregate(Sum('quantity'))['quantity__sum']
