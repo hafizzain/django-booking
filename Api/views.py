@@ -35,12 +35,12 @@ def country_code(request):
     
 def EmailTemplate(request):
    
-   # context={'user_name': 'Abdullah',
-   #           'otp': '7891',
-   #           'email': 'user_otp.user.email',
+   context={'user_name': 'Abdullah',
+             'otp': '7891',
+             'email': 'user_otp.user.email',
              
-   #           }
+             }
    
    #return render(request, "AppointmentEmail/add_appointment.html", context = {'user_name': 'Abdullah' , 'email': 'abc@user_otp.user.email',  'otp': '7891', })
-   return render(request, "Sales/quick_sales_staff.html", {'name': 'member_id','location':'location', 'sale_type': 'ids', 'invoice': 'invoice', 'date': 'date','time': 'current_time', 'client': 'client'})
-      
+   # return render(request, "Sales/quick_sales_staff.html", {'name': 'member_id','location':'location', 'sale_type': 'ids', 'invoice': 'invoice', 'date': 'date','time': 'current_time', 'client': 'client'})
+   return render(request, "AppointmentEmail/new_appointment_n.html", {'name': 'member_id','location':'location', 'sale_type': 'ids', 'invoice': 'invoice', 'date': 'date','time': 'current_time', 'client': 'client'})
