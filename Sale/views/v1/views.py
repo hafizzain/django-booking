@@ -1328,9 +1328,6 @@ def create_sale_order(request):
             except Exception as err:
                 errors.append(str(err))
             try:
-                ExceptionRecord.objects.create(
-                    text = f' error in Turnover email sale'
-                )
                 thrd = Thread(target=ProductTurnover, args=[], kwargs={'product' : product,'product_stock': transfer, 'business_address':business_address ,'tenant' : request.tenant})
                 thrd.start()
             except Exception as err:
@@ -1358,7 +1355,6 @@ def create_sale_order(request):
             checkout.product_commission = product_commission
             checkout.save()
 
-                        
         elif sale_type == 'SERVICE':
             try:
                 service = Service.objects.get(id = service_id)
