@@ -673,17 +673,10 @@ class ServiceGroupReport(serializers.ModelSerializer):
             year = self.context["year"]
             location = self.context["location"]
             ser_target = 0
-            retail_target = 0
-            data = {}
             
             date_str = f'{month}-{year}'
             date_obj = datetime.strptime(date_str, '%m-%Y')
-            
-            try:
-                location_id = BusinessAddress.objects.get(id = str(location))
-            except:
-                return
-            
+                        
             service_target = ServiceTarget.objects.filter(
                 service_group = obj,
                 created_at__icontains = year,
@@ -692,25 +685,14 @@ class ServiceGroupReport(serializers.ModelSerializer):
             for ord  in service_target:
                 created_date = ord.year.date() 
                 if created_date.month == date_obj.month and created_date.year == date_obj.year:
-                    ser_target += int(ord.service_target)
-                # create = str(ord.created_at)
-                # match = int(create.split(" ")[0].split("-")[1])
-                # if int(month) == match:
-                #     ser_target += int(ord.service_target)
-                    #retail_target += int(ord.retail_target)
-                    #return total
-            # data.update({
-            #     'service_target': service_target,
-            #     'retail_target': retail_target
-            # })
-            
+                    ser_target += int(ord.service_target)            
             return ser_target
             
         except Exception as err:
             return str(err)        
     class Meta:
         model = ServiceGroup
-        fields = ['id','name','service','service_target']#'service_sale_price']
+        fields = ['id','name','service','service_target']
         
 class ReportBrandSerializer(serializers.ModelSerializer): 
     product_sale_price = serializers.SerializerMethodField(read_only=True)
