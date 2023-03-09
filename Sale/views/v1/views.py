@@ -1321,24 +1321,25 @@ def create_sale_order(request):
                     
                     stock_transfer.after_quantity = sold
                     stock_transfer.save()
-                    ExceptionRecord.objects.create(
-                            text = f'Turnover email sale 789{str(err)}'
-                        )
-                    try:
-                        ExceptionRecord.objects.create(
-                            text = f' error in Turnover email sale{str(err)}'
-                        )
-                        thrd = Thread(target=ProductTurnover, args=[], kwargs={'product' : product,'product_stock': transfer, 'business_address':business_address ,'tenant' : request.tenant})
-                        thrd.start()
-                    except Exception as err:
-                        ExceptionRecord.objects.create(
-                            text = f' error in Turnover email sale{str(err)}'
-                        )
+                    
                 else:
                     errors.append('Available quantity issue')
             
             except Exception as err:
                 errors.append(str(err))
+            ExceptionRecord.objects.create(
+                    text = f'Turnover email sale 789{str(err)}'
+                )
+            try:
+                ExceptionRecord.objects.create(
+                    text = f' error in Turnover email sale{str(err)}'
+                )
+                thrd = Thread(target=ProductTurnover, args=[], kwargs={'product' : product,'product_stock': transfer, 'business_address':business_address ,'tenant' : request.tenant})
+                thrd.start()
+            except Exception as err:
+                ExceptionRecord.objects.create(
+                    text = f' error in Turnover email sale{str(err)}'
+                )
 
             product_order = ProductOrder.objects.create(
                 user = user,
