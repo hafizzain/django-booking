@@ -44,9 +44,9 @@ def Add_appointment_n(appointment = None, tenant = None):
                     client_email = ClientNotificationSetting.objects.get(business = str(appo.appointment.business))
                 except:
                     pass
-                if staff_email.sms_daily_sale == True:
+                if staff_email.sms_daily_sale :
                     try:   
-                        html_file = render_to_string("AppointmentEmail/new_appointment_n.html", {'client': True, 'staff': False, 'location':loc_name, 'ser_name':ser_name  , 'duration':dur,'time':time, 'date':dat, 'staff':staff})
+                        html_file = render_to_string("AppointmentEmail/new_appointment_n.html", { 'location':loc_name, 'ser_name':ser_name  , 'duration':dur,'time':time, 'date':dat, 'staff':staff})
                         text_content = strip_tags(html_file)
                             
                         email = EmailMultiAlternatives(
@@ -59,12 +59,14 @@ def Add_appointment_n(appointment = None, tenant = None):
                         email.attach_alternative(html_file, "text/html")
                         email.send()
                     except Exception as err:
-                            ExceptionRecord.objects.create(
-                                text = f'issue of sending email {str(err)}'
-        )
+                        pass
+                    # except Exception as err:
+                    #     ExceptionRecord.objects.create(
+                    #         text = f'issue of sending email {str(err)}'
+                    # )
                 
             if client_email.sms_appoinment == True:
-                html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'client': False,'staff': True,'name':name_c ,'phone':phon,'email':email_c} )
+                html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'name':name_c ,'phone':phon,'email':email_c} )
                 text_content = strip_tags(html_file)
                 
                 email = EmailMultiAlternatives(
@@ -78,7 +80,7 @@ def Add_appointment_n(appointment = None, tenant = None):
                 email.send()
             
             ExceptionRecord.objects.create(
-                text = f'create app email {staff_email.sms_daily_sale} {client_email.sms_appoinment}'
+                text = f'create an app email {staff_email.sms_daily_sale} {client_email.sms_appoinment}'
         )
     
         except Exception as err:
