@@ -17,7 +17,7 @@ def ProductTurnover(product=None, product_stock = None, business_address = None 
             email = 'rijariaz5@gmail.com'
             t_total = 0
             try:
-                product= Product.objects.get(id = str(product))
+                product= Product.objects.get(id = product)
             except Exception as err:
                 pass
             
