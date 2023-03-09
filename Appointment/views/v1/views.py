@@ -1,4 +1,10 @@
 from django.shortcuts import render
+
+from Appointment.Constants.Reschedulen import reschedule_appointment_n
+from Appointment.Constants.New_Appointment_n import Add_appointment_nn
+from Appointment.Constants.cancelappointmentn import cancel_appointment_n
+from Appointment.Constants.AddAppointment_n import Add_appointment_n
+
 from Appointment.Constants.ConvertTime import convert_24_to_12
 
 from Appointment.Constants.Reschedule import reschedule_appointment
@@ -627,8 +633,14 @@ def create_appointment(request):
     
     serialized = AppoinmentSerializer(appointment)
     
+    # try:
+    #     thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
+    #     thrd.start()
+    # except Exception as err:
+    #     pass
+
     try:
-        thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
+        thrd = Thread(target=Add_appointment_n, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
         thrd.start()
     except Exception as err:
         pass
@@ -727,17 +739,32 @@ def update_appointment(request):
         )
     serializer.save()
     
+    # if appointment_status == 'Cancel':
+    #     try:
+    #         thrd = Thread(target=cancel_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant} )
+    #         thrd.start()
+    #     except Exception as err:
+    #         print(err)
+    #         pass
+
     if appointment_status == 'Cancel':
         try:
-            thrd = Thread(target=cancel_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant} )
+            thrd = Thread(target=cancel_appointment_n, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant} )
             thrd.start()
         except Exception as err:
             print(err)
             pass
         
     else :
+        # try:
+        #     thrd = Thread(target=reschedule_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant})
+        #     thrd.start()
+        # except Exception as err:
+        #     print(err)
+        #     pass
+
         try:
-            thrd = Thread(target=reschedule_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant})
+            thrd = Thread(target=reschedule_appointment_n, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant})
             thrd.start()
         except Exception as err:
             print(err)
@@ -1877,8 +1904,14 @@ def create_appointment_client(request):
                 appointment_service.save()
         serialized = AppoinmentSerializer(appointment)
         
+        # try:
+        #     thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
+        #     thrd.start()
+        # except Exception as err:
+        #     pass
+
         try:
-            thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
+            thrd = Thread(target=Add_appointment_nn, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
             thrd.start()
         except Exception as err:
             pass
