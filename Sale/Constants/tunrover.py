@@ -15,7 +15,7 @@ def ProductTurnover(product=None, product_stock = None, business_address = None 
     with tenant_context(tenant):
         
         ExceptionRecord.objects.create(
-            text = f'tproduct is ::: {product}'
+            text = f'tproduct is ::: {product} loc {business_address}'
         )
         email = 'rijariaz5@gmail.com'
         t_total = 0
