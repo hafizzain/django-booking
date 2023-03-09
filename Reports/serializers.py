@@ -676,6 +676,9 @@ class ServiceGroupReport(serializers.ModelSerializer):
             retail_target = 0
             data = {}
             
+            date_str = f'{month}-{year}'
+            date_obj = datetime.strptime(date_str, '%m-%Y')
+            
             try:
                 location_id = BusinessAddress.objects.get(id = str(location))
             except:
@@ -687,10 +690,13 @@ class ServiceGroupReport(serializers.ModelSerializer):
                 location__id =  location,
                 ) 
             for ord  in service_target:
-                create = str(ord.created_at)
-                match = int(create.split(" ")[0].split("-")[1])
-                if int(month) == match:
-                    ser_target += int(ord.service_target)
+                created_date = ord.year.date() 
+                if created_date.month == date_obj.month and created_date.year == date_obj.year:
+                    service_target += int(ord.service_target)
+                # create = str(ord.created_at)
+                # match = int(create.split(" ")[0].split("-")[1])
+                # if int(month) == match:
+                #     ser_target += int(ord.service_target)
                     #retail_target += int(ord.retail_target)
                     #return total
             # data.update({
@@ -733,7 +739,7 @@ class ReportBrandSerializer(serializers.ModelSerializer):
                 create = str(ord.created_at)
                 match = int(create.split(" ")[0].split("-")[1])
                 if int(month) == match:
-                    total += int(ord.total_price)
+                    total += int(ord.checkout.total_product_price)
             
             return total
                 
