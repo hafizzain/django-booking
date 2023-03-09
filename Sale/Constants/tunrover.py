@@ -15,6 +15,7 @@ def ProductTurnover(product=None, product_stock = None, business_address = None 
     with tenant_context(tenant):
         try:
             email = 'rijariaz5@gmail.com'
+            t_total = 0
             try:
                 product= Product.objects.get(id = str(product))
             except Exception as err:
@@ -29,14 +30,17 @@ def ProductTurnover(product=None, product_stock = None, business_address = None 
                     product=product,
                     report_choice='Sold',
                     location__id=business_address,
-                ).aggregate(Sum('quantity'))['quantity__sum']
+                )#.aggregate(Sum('quantity'))['quantity__sum']
+                for i in total_sold:
+                  t_total += i.quantity
+                    
             except Exception as err:
                 ExceptionRecord.objects.create(
                 text = f'turnover emails error35:::  {str(err)}'
             )
              
             ExceptionRecord.objects.create(
-                text = f'turnover emails error {total_sold}'
+                text = f'turnover emails error {t_total}'
             )
             
             try:   
