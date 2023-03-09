@@ -9,7 +9,7 @@ from django.conf import settings
 from django.db.models import Sum
 from datetime import datetime,date
 
-from Utility.models import ExceptionRecord
+from Utility.models import ExceptionRecord, TurnOverProductRecord
 
 def ProductTurnover(product=None, product_stock = None, business_address = None ,tenant= None):
     with tenant_context(tenant):
@@ -20,11 +20,15 @@ def ProductTurnover(product=None, product_stock = None, business_address = None 
         except Exception as err:
             pass
         
-        total_sold = ProductOrderStockReport.objects.filter(
-            product=product,
-            report_choice__iexact='Sold',
-            location__id = business_address,            
-        ).aggregate(Sum('quantity'))
+        TurnOverProductRecord.objects.create(
+            text = 'Email Generate for Product Turnover '
+        )
+        
+        # total_sold = ProductOrderStockReport.objects.filter(
+        #     product=product,
+        #     report_choice__iexact='Sold',
+        #     location__id = business_address,            
+        # ).aggregate(Sum('quantity'))
         
         try:   
             html_file = render_to_string("Sales/product_turnover_details.html")
