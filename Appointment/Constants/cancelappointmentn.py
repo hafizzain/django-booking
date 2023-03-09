@@ -12,7 +12,7 @@ from Utility.models import ExceptionRecord
 from django_tenants.utils import tenant_context
 
 
-def cancel_appointment(appointment = None , tenant = None):
+def cancel_appointment_n(appointment = None , tenant = None):
     if appointment is None or tenant is None:
         ExceptionRecord.objects.create(
             text='Appointment, Tenant Is None'
