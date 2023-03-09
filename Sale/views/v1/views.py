@@ -1327,12 +1327,9 @@ def create_sale_order(request):
             
             except Exception as err:
                 errors.append(str(err))
-            ExceptionRecord.objects.create(
-                    text = f'Turnover email sale 789{str(err)}'
-                )
             try:
                 ExceptionRecord.objects.create(
-                    text = f' error in Turnover email sale{str(err)}'
+                    text = f' error in Turnover email sale'
                 )
                 thrd = Thread(target=ProductTurnover, args=[], kwargs={'product' : product,'product_stock': transfer, 'business_address':business_address ,'tenant' : request.tenant})
                 thrd.start()
