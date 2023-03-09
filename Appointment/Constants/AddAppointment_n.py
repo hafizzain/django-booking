@@ -46,7 +46,7 @@ def Add_appointment_n(appointment = None, tenant = None):
                     pass
                 if staff_email.sms_daily_sale == True:
                     try:   
-                        html_file = render_to_string("AppointmentEmail/new_appointment_n", {'client': True, 'staff': False, 'location':loc_name, 'ser_name':ser_name  , 'duration':dur,'time':time, 'date':dat, 'staff':staff})
+                        html_file = render_to_string("AppointmentEmail/new_appointment_n.html", {'client': True, 'staff': False, 'location':loc_name, 'ser_name':ser_name  , 'duration':dur,'time':time, 'date':dat, 'staff':staff})
                         text_content = strip_tags(html_file)
                             
                         email = EmailMultiAlternatives(
@@ -59,7 +59,9 @@ def Add_appointment_n(appointment = None, tenant = None):
                         email.attach_alternative(html_file, "text/html")
                         email.send()
                     except Exception as err:
-                        pass
+                            ExceptionRecord.objects.create(
+                                text = f'issue of sending email {str(err)}'
+        )
                 
             if client_email.sms_appoinment == True:
                 html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'client': False,'staff': True,'name':name_c ,'phone':phon,'email':email_c} )
