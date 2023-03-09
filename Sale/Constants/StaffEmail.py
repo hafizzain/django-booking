@@ -26,7 +26,7 @@ def StaffSaleEmail(ids = None, location = None, tenant = None, member =None, inv
             dates = date.today()
             current_time = datetime.now().time()
             
-            invoice =  invoice.split('-')[0]
+            invoice =  str(invoice).split('-')[0]
             ExceptionRecord.objects.create(
                     text = f'Staff Email on sale {member_id} {location} {ids} {invoice} {dates} {current_time} {client} '
                 )
