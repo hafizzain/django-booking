@@ -12,7 +12,7 @@ from datetime import datetime,date
 from Utility.models import ExceptionRecord
 
 
-def Add_appointment(appointment = None, tenant = None):
+def Add_appointment_n(appointment = None, tenant = None):
     if appointment is None or tenant is None:
         ExceptionRecord.objects.create(
             text='Appointment, Tenant Is None'
