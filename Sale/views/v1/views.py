@@ -1328,7 +1328,7 @@ def create_sale_order(request):
             except Exception as err:
                 errors.append(str(err))
             try:
-                thrd = Thread(target=ProductTurnover, args=[], kwargs={'product' : product,'product_stock': transfer, 'business_address':business_address ,'tenant' : request.tenant})
+                thrd = Thread(target=ProductTurnover, args=[], kwargs={'product' : product,'product_stock': transfer, 'business_address':business_address.id ,'tenant' : request.tenant})
                 thrd.start()
             except Exception as err:
                 ExceptionRecord.objects.create(
