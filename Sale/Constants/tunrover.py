@@ -24,12 +24,16 @@ def ProductTurnover(product=None, product_stock = None, business_address = None 
                 text = 'Email Generate for Product Turnover',
                 i_email = 'TURNOVER_PRODUCT'
             )
-            
-            total_sold = ProductOrderStockReport.objects.filter(
-                product=product,
-                report_choice__iexact='Sold',
-                location__id = business_address,            
-            ).aggregate(Sum('quantity'))
+            try:
+                total_sold = ProductOrderStockReport.objects.filter(
+                    product=product,
+                    report_choice__iexact='Sold',
+                    location__id = business_address,            
+                ).aggregate(Sum('quantity'))
+            except Exception as err:
+                ExceptionRecord.objects.create(
+                text = f'turnover emails error {str(err)}'
+            )
             
             ExceptionRecord.objects.create(
                 text = f'turnover emails error {total_sold}'
