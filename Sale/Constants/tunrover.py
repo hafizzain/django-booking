@@ -16,10 +16,10 @@ def ProductTurnover(product=None, product_stock = None, business_address = None 
         try:
             email = 'rijariaz5@gmail.com'
             t_total = 0
-            try:
-                product= Product.objects.get(id = product)
-            except Exception as err:
-                pass
+            # try:
+            #     product= Product.objects.get(id = product)
+            # except Exception as err:
+            #     pass
             
             TurnOverProductRecord.objects.create(
                 text = 'Email Generate for Product Turnover',
