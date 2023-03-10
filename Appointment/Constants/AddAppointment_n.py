@@ -29,7 +29,7 @@ def Add_appointment_n(appointment = None, tenant = None):
                     ser_name = appo.service.name
                     dat = appo.appointment_date
                     mem_email = appo.member.email
-                    # mem_name = appo.member.full_name
+                    mem_name = appo.member.full_name
                     # mem_id= appo.member.employee_id
                     # client_type= appo.appointment.client_type
                     # name = appo.appointment.client.full_name
@@ -49,7 +49,7 @@ def Add_appointment_n(appointment = None, tenant = None):
                     pass
                 if staff_email is not None and staff_email.sms_daily_sale:
                     try:   
-                        html_file = render_to_string("AppointmentEmail/new_appointment_n.html", { 'location':loc_name, 'ser_name':ser_name  , 'duration':dur,'time':time, 'date':dat, 'staff':staff})
+                        html_file = render_to_string("AppointmentEmail/new_appointment_n.html", { 'client': True, 'staff': False,'t_name':mem_name,'location':loc_name, 'ser_name':ser_name  , 'duration':dur,'time':time, 'date':dat, 'staff':staff})
                         text_content = strip_tags(html_file)
                             
                         email = EmailMultiAlternatives(
@@ -67,7 +67,7 @@ def Add_appointment_n(appointment = None, tenant = None):
                     )
                 
                 if client_email is not None and client_email.sms_appoinment:
-                    html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'name':name_c ,'phone':phon,'email':email_c} )
+                    html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'client': False, 'staff': True,'name':name_c ,'phone':phon,'email':email_c} )
                     text_content = strip_tags(html_file)
                     
                     email = EmailMultiAlternatives(
