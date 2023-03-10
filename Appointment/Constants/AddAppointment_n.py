@@ -80,7 +80,7 @@ def Add_appointment_n(appointment = None, tenant = None):
                 email.send()
                 
             ExceptionRecord.objects.create(
-                text = f'issue of sending email {str(err)}'
+                text = f'create app email {staff_email.sms_daily_sale} {client_email.sms_appoinment}'
         )
     
         except Exception as err:
