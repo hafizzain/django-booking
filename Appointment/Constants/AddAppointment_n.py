@@ -20,6 +20,7 @@ def Add_appointment_n(appointment = None, tenant = None):
 
     with tenant_context(tenant):
         try:
+            name_c = ""
             appointment =  AppointmentService.objects.filter(appointment = appointment)                
             for appo in appointment:
                 if appo.appointment.client is not None and appo.appointment.client.email is not None:
@@ -64,17 +65,17 @@ def Add_appointment_n(appointment = None, tenant = None):
                             text = f'issue of sending email {str(err)}'
                     )
                 
-            if client_email is not None and client_email.sms_appoinment:
-                html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'name':name_c ,'phone':phon,'email':email_c} )
-                text_content = strip_tags(html_file)
-                
-                email = EmailMultiAlternatives(
-                    'Appointment Booked',
-                    text_content,
-                    settings.EMAIL_HOST_USER,
-                    to = [email_c],
-                )
+                if client_email is not None and client_email.sms_appoinment:
+                    html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'name':name_c ,'phone':phon,'email':email_c} )
+                    text_content = strip_tags(html_file)
                     
+                    email = EmailMultiAlternatives(
+                        'Appointment Booked',
+                        text_content,
+                        settings.EMAIL_HOST_USER,
+                        to = [email_c],
+                    )
+                        
                 email.attach_alternative(html_file, "text/html")
                 email.send()
             else:
