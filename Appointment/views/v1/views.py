@@ -632,6 +632,9 @@ def create_appointment(request):
     appointment.service_commission_type = service_commission_type
     appointment.save() 
     
+    
+    
+    
     serialized = AppoinmentSerializer(appointment)
     
     try:
