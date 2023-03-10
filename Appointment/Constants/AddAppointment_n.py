@@ -37,7 +37,7 @@ def Add_appointment_n(appointment = None, tenant = None):
                     time = datetime.now()
                     staff = appo.member.full_name
                     loc_name = appo.appointment.business_address.address_name
-                    dur = appo.appointment.duration
+                    dur = appo.duration
                     phon = appo.appointment.member.mobile_number
                 
                 try:
