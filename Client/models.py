@@ -307,8 +307,8 @@ class Membership(models.Model):
     term_condition =  models.CharField(max_length=300, null=True, blank=True)
 
     
-    price = models.PositiveIntegerField(default=0)
-    tax_rate = models.PositiveIntegerField(default=0)
+    #price = models.PositiveIntegerField(default=0)
+    #tax_rate = models.PositiveIntegerField(default=0)
 
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
