@@ -47,7 +47,7 @@ def Add_appointment_n(appointment = None, tenant = None):
                     # staff_email = None
                     # client_email = None
                     pass
-                if staff_email  is not None and staff_email.sms_daily_sale :
+                if staff_email.sms_daily_sale == True: 
                     try:   
                         html_file = render_to_string("AppointmentEmail/new_appointment_n.html", { 't_name':mem_name,'location':loc_name, 'ser_name':ser_name  , 'duration':dur,'time':time, 'date':dat, 'staff':staff})
                         text_content = strip_tags(html_file)
@@ -62,9 +62,7 @@ def Add_appointment_n(appointment = None, tenant = None):
                         email.attach_alternative(html_file, "text/html")
                         email.send()
                     except Exception as err:
-                        ExceptionRecord.objects.create(
-                            text = f'issue of sending email {str(err)}'
-                        )
+                        pass
                     
             if client_email is not None and client_email.sms_appoinment:
    
