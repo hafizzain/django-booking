@@ -5,7 +5,7 @@ from Product.models import Product
 from Service.models import Service
 from Utility.models import Country, State, City
 
-from Client.models import Client, ClientGroup, DiscountMembership, LoyaltyPoints, Subscription, Promotion , Rewards , Membership, Vouchers
+from Client.models import Client, ClientGroup, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription, Promotion , Rewards , Membership, Vouchers
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -123,10 +123,14 @@ class DiscountMembershipSerializers(serializers.ModelSerializer):
     class Meta:
         model = DiscountMembership
         fields = '__all__'
+class CurrencyPriceMembershipSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = CurrencyPriceMembership
+        fields = '__all__'
         
 class MembershipSerializer(serializers.ModelSerializer):
     discount_membership = serializers.SerializerMethodField()
-    discount_membership = serializers.SerializerMethodField()
+    currency_membership = serializers.SerializerMethodField()
     
     def get_discount_membership(self, obj):
         try:
@@ -136,16 +140,16 @@ class MembershipSerializer(serializers.ModelSerializer):
             print(err)
     
     
-    def get_discount_membership(self, obj):
+    def get_currency_membership(self, obj):
         try:
-            pro = DiscountMembership.objects.filter(membership = obj)
-            return DiscountMembershipSerializers(pro, many= True).data
+            pro = CurrencyPriceMembership.objects.filter(membership = obj)
+            return CurrencyPriceMembershipSerializers(pro, many= True).data
         except Exception as err:
             print(err)
             
     class Meta:
         model = Membership
-        fields = ['id', 'name','valid_for','discount','price','tax_rate','discount_membership']
+        fields = ['id', 'name','valid_for','discount','price','tax_rate','discount_membership', 'currency_membership']
 
 class VoucherSerializer(serializers.ModelSerializer):
     
