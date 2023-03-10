@@ -20,7 +20,7 @@ def Add_appointment_n(appointment = None, tenant = None):
 
     with tenant_context(tenant):
         try:
-            name_c = ""
+            # name_c = ""
             appointment =  AppointmentService.objects.filter(appointment = appointment)                
             for appo in appointment:
                 if appo.appointment.client is not None and appo.appointment.client.email is not None:
@@ -79,11 +79,11 @@ def Add_appointment_n(appointment = None, tenant = None):
                         
                 #     email.attach_alternative(html_file, "text/html")
                 #     email.send()
-                # else:
-                #     pass
-                #     ExceptionRecord.objects.create(
-                #         text = f'create an app email {staff_email.sms_daily_sale} {client_email.sms_appoinment}'
-                #     )
+                else:
+                    pass
+                    ExceptionRecord.objects.create(
+                        text = f'create an app email {staff_email.sms_daily_sale} {client_email.sms_appoinment}'
+                    )
     
         except Exception as err:
             ExceptionRecord.objects.create(
