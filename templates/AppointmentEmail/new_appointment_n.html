@@ -185,6 +185,7 @@
                         </tr>
                       </thead>
                       <tbody>
+                        {% for appo in appointment %}
                         <tr>
                           <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ appo.appointment.business_address.address_name }}</td>
                           <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ appo.service.name }}</td>
