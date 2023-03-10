@@ -11,8 +11,8 @@ from django.db.models import Q
 from Service.models import Service
 from Business.models import Business
 from Product.models import Product
-from Utility.models import Country, ExceptionRecord, Language, State, City
-from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers
+from Utility.models import Country, Currency, ExceptionRecord, Language, State, City
+from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers
 from Client.serializers import ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer
 from Utility.models import NstyleFile
 
@@ -1619,6 +1619,7 @@ def create_memberships(request):
     price = request.data.get('price',None)
     tax_rate = request.data.get('tax_rate',None)
     discount = request.data.get('discount',None)
+    currency_membership_price = request.data.get('currency_membership_price',None)#CurrencyPriceMembership
     
     if not all([business, name , valid_for, price, ]):
         return Response(
@@ -1676,6 +1677,34 @@ def create_memberships(request):
         discount = discount,
         
     )
+    if currency_membership_price is not None:
+        if type(currency_membership_price) == str:
+            currency_membership_price = currency_membership_price.replace("'" , '"')
+            currency_membership_price = json.loads(services)
+        else:
+            pass
+        for ser in currency_membership_price:
+            curency = ser['currency']
+            price = ser['price']
+            
+            try:
+                currency_id = Currency.objects.get(id=curency)
+            except Exception as err:
+                return Response(
+                    {
+                        'status' : False,
+                        'response' : {
+                        'message' : 'Currency not found',
+                        'error_message' : str(err),
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            services_obj = CurrencyPriceMembership.objects.create(
+                membership = membership_cr,
+                currency = currency_id,
+                price = price,
+            )
     if services is not None:
         if type(services) == str:
             services = services.replace("'" , '"')
