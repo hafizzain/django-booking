@@ -1710,7 +1710,7 @@ def create_memberships(request):
             pass
         for ser in services:
             percentage = ser.get('percentage', 0)
-            duration = ser.get('duration', None)
+            duration = ser.get('duration', '7 Days')
             servic = ser['service']
             
             try:
@@ -1743,7 +1743,7 @@ def create_memberships(request):
             
             percentage = pro.get('percentage', 0)
             product = pro['product']
-            duration = pro.get('duration', None)
+            duration = pro.get('duration', '7 Days')
             
             try:
                 product_id=Product.objects.get(id=product)
