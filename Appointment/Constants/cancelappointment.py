@@ -32,6 +32,7 @@ def cancel_appointment(appointment = None , tenant = None):
 
             ser_name =appointment.service.name
             dat = appointment.appointment_date
+            time = datetime.now()
             
             try:
                 staff_email = StaffNotificationSetting.objects.get(business = str(appointment.appointment.business))
@@ -39,7 +40,7 @@ def cancel_appointment(appointment = None , tenant = None):
             except:
                 pass
             if staff_email.sms_daily_sale == True:                    
-                html_file = render_to_string("AppointmentEmail/cancel_appointment.html", {'name': name_c, 'ser_name':ser_name ,'t_name':mem_name , 'date':dat, 'mem_id':mem_id})
+                html_file = render_to_string("AppointmentEmail/cancel_appointment_n.html", {'name': name_c, 'ser_name':ser_name ,'t_name':mem_name , 'date':dat,'time':time ,'mem_id':mem_id})
                 text_content = strip_tags(html_file)
                     
                 email = EmailMultiAlternatives(
@@ -53,7 +54,7 @@ def cancel_appointment(appointment = None , tenant = None):
                 email.send()
                 
             if client_email.sms_appoinment == True:
-                html_file = render_to_string("AppointmentEmail/cancel_appointment.html", {'name': name_c, 'ser_name':ser_name ,'t_name':name_c , 'date':dat, 'mem_id':mem_id})
+                html_file = render_to_string("AppointmentEmail/cancel_appointment_n.html", {'name': name_c, 'ser_name':ser_name ,'t_name':name_c , 'date':dat,'time':time, 'mem_id':mem_id})
                 text_content = strip_tags(html_file)
                     
                 email = EmailMultiAlternatives(
