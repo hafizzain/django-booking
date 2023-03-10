@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from Appointment.Constants.AddApp import AddApp
 
 from Appointment.Constants.Reschedulen import reschedule_appointment_n
 # from Appointment.Constants.New_Appointment_n import Add_appointment_nn
@@ -646,7 +647,7 @@ def create_appointment(request):
     #         text='email is in sending process'
     #     )
     try:
-        thrd = Thread(target=Add_appointment_n, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
+        thrd = Thread(target=AddApp, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
         thrd.start()
     except Exception as err:
         pass
