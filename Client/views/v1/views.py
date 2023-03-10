@@ -1709,7 +1709,7 @@ def create_memberships(request):
         else:
             pass
         for ser in services:
-            percentage = ser['percentage']
+            percentage = ser.get('percentage', 0)
             duration = ser['duration']
             servic = ser['service']
             
@@ -1741,7 +1741,7 @@ def create_memberships(request):
             pass
         for pro in products:
             
-            percentage = pro['percentage']
+            percentage = pro.get('percentage', 0)
             product = pro['product']
             duration = pro['duration']
             
