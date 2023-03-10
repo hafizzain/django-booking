@@ -37,15 +37,16 @@ def Add_appointment_n(appointment = None, tenant = None):
                     time = datetime.now()
                     staff = appo.member.full_name
                     loc_name = appo.appointment.business_address.address_name
-                    dur = appo.appointment.duration_str
+                    dur = appo.appointment.duration
                     phon = appo.appointment.member.mobile_number
                 
                 try:
                     staff_email = StaffNotificationSetting.objects.get(business = str(appo.appointment.business))
                     client_email = ClientNotificationSetting.objects.get(business = str(appo.appointment.business))
                 except:
-                    staff_email = None
-                    client_email = None
+                    # staff_email = None
+                    # client_email = None
+                    pass
                 if staff_email is not None and staff_email.sms_daily_sale:
                     try:   
                         html_file = render_to_string("AppointmentEmail/new_appointment_n.html", { 'location':loc_name, 'ser_name':ser_name  , 'duration':dur,'time':time, 'date':dat, 'staff':staff})
