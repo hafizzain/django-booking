@@ -126,6 +126,15 @@ class DiscountMembershipSerializers(serializers.ModelSerializer):
         
 class MembershipSerializer(serializers.ModelSerializer):
     discount_membership = serializers.SerializerMethodField()
+    discount_membership = serializers.SerializerMethodField()
+    
+    def get_discount_membership(self, obj):
+        try:
+            pro = DiscountMembership.objects.filter(membership = obj)
+            return DiscountMembershipSerializers(pro, many= True).data
+        except Exception as err:
+            print(err)
+    
     
     def get_discount_membership(self, obj):
         try:
