@@ -34,7 +34,7 @@ def reschedule_appointment_n(appointment = None , tenant = None):
             dat = appointment.appointment_date
 
 
-            time=datetime.today().time()
+            time = datetime.today().time()
             loc_name = appointment.business_address.address_name
             dur = appointment.duration
             phon = appointment.member.mobile_number
