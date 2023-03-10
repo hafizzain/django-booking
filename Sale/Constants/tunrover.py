@@ -10,45 +10,31 @@ from django.db.models import Sum
 from datetime import datetime,date
 
 from Utility.models import ExceptionRecord, TurnOverProductRecord
+from Business.models import BusinessAddress
+
 
 def ProductTurnover(product=None, product_stock = None, business_address = None ,tenant= None):
     with tenant_context(tenant):
         
-        ExceptionRecord.objects.create(
-            text = f'tproduct is ::: {product} loc {business_address}'
-        )
         email = 'rijariaz5@gmail.com'
-        t_total = 0
-        # try:
-        #     product= Product.objects.get(id = product)
-        # except Exception as err:
-        #     pass
-        
-        TurnOverProductRecord.objects.create(
-            text = 'Email Generate for Product Turnover',
-            i_email = 'TURNOVER_PRODUCT'
-        )
+                
         try:
-            
-            total_sold = ProductOrderStockReport.objects.filter(
-                #product=product,
-                report_choice='Sold',
-                location__id=business_address,
-            )#.aggregate(Sum('quantity'))['quantity__sum']
-            for i in total_sold:
-                t_total += i.quantity
-                
+            product= Product.objects.get(id = product)
         except Exception as err:
-            ExceptionRecord.objects.create(
-                text = f'turnover emails error {str(err)}'
-            )
-                
-        ExceptionRecord.objects.create(
-            text = f'turnover emails error {t_total}'
-        )
+            pass
+        try:
+            business= BusinessAddress.objects.get(id = business_address)
+        except Exception as err:
+            pass
+        dates = date.today()
         
+        # TurnOverProductRecord.objects.create(
+        #     text = 'Email Generate for Product Turnover',
+        #     i_email = 'TURNOVER_PRODUCT'
+        # )
+                
         try:   
-            html_file = render_to_string("Sales/product_turnover_details.html")
+            html_file = render_to_string("Sales/product_turnover_details.html", {'name': 'Rija Riaz','pro_name': product.name, 'location':business.address_name, 'turnover': 'Lowest' , 'date': dates})
             text_content = strip_tags(html_file)
                 
             email = EmailMultiAlternatives(
