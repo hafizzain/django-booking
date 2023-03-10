@@ -9,7 +9,7 @@ from Authentication.models import User
 from Business.models import Business, BusinessAddress
 #from Promotions.models import ComplimentaryDiscount
 
-from Utility.models import Country, Language, State, City
+from Utility.models import Country, Currency, Language, State, City
 from django.utils.timezone import now
 from Product.models import Product
 from Service.models import Service
@@ -336,6 +336,17 @@ class DiscountMembership(models.Model):
     
     def __str__(self):
         return str(self.id)
+class CurrencyPriceMembership(models.Model):
+    
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    
+    membership = models.ForeignKey(Membership, on_delete=models.CASCADE, related_name='membership_currenypricemembership')
+    currency = models.ForeignKey(Currency, on_delete=models.SET_NULL, null=True, blank=True)
+    price = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return str(self.id)
+    
 #now = datetime.now()
 class LoyaltyPoints(models.Model):
     
