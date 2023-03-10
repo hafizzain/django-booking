@@ -75,5 +75,5 @@ def Add_appointment(appointment = None, tenant = None):
     
         except Exception as err:
             ExceptionRecord.objects.create(
-                text = f'create app email {str(err)} '
+                text = f'create email line 78 on create app {str(err)} '
         )
