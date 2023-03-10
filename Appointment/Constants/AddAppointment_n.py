@@ -38,7 +38,7 @@ def Add_appointment_n(appointment = None, tenant = None):
                     staff = appo.member.full_name
                     loc_name = appo.appointment.business_address.address_name
                     dur = appo.duration
-                    phon = appo.appointment.member.mobile_number
+                    phon = appo.member.mobile_number
                 
                 try:
                     staff_email = StaffNotificationSetting.objects.get(business = str(appo.appointment.business))
