@@ -1621,7 +1621,7 @@ def create_memberships(request):
     discount = request.data.get('discount',None)
     currency_membership_price = request.data.get('currency_membership_price',None)#CurrencyPriceMembership
     
-    if not all([business, name , valid_for, price, ]):
+    if not all([business, name , valid_for, ]):
         return Response(
             {
                 'status' : False,
@@ -1635,9 +1635,6 @@ def create_memberships(request):
                           'name',
                           'validity',
                           'valid_for', 
-                          'price',
-                          'tax_rate'
-
                     ]
                 }
             },
