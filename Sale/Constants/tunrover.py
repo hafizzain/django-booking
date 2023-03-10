@@ -27,14 +27,15 @@ def ProductTurnover(product=None, product_stock = None, business_address = None 
             except Exception as err:
                 pass
             dates = date.today()
-            
+            name = 'Rija Riaz'
+            turnover = 'Lowest'
             # TurnOverProductRecord.objects.create(
             #     text = 'Email Generate for Product Turnover',
             #     i_email = 'TURNOVER_PRODUCT'
             # )
                     
             try:   
-                html_file = render_to_string("Sales/product_turnover_details.html", {'name': 'Rija Riaz','pro_name': product.name, 'location':business.address_name, 'turnover': 'Lowest' , 'date': dates})
+                html_file = render_to_string("Sales/product_turnover_details.html", {'name': name ,'pro_name': product.name, 'location':business.address_name, 'turnover': turnover , 'date': dates})
                 text_content = strip_tags(html_file)
                     
                 email = EmailMultiAlternatives(
