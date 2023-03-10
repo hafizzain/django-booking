@@ -8,7 +8,7 @@ from Client.models import Client, Membership
 
 from Employee.models import Employee, EmployeeProfessionalInfo, EmployeeSelectedService
 from Business.models import BusinessAddress, BusinessTax
-from Order.models import Checkout, MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
+from Order.models import Checkout, MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
 from django_tenants.utils import tenant_context
 from Utility.models import Currency, ExceptionRecord
@@ -29,6 +29,27 @@ class PriceServiceSerializers(serializers.ModelSerializer):
     class Meta:
         model = PriceService
         fields = '__all__'
+
+class AvailPriceServiceSerializers(serializers.ModelSerializer):
+    currency_name = serializers.SerializerMethodField(read_only=True)
+    service = serializers.SerializerMethodField(read_only=True)
+
+    def get_service(self, obj):
+        try:
+            service = Service.objects.get(id  = obj.service.id)
+            return service.code
+        except Exception as err:
+            return str(err)
+        
+    def get_currency_name(self, obj):
+        try:
+            currency = Currency.objects.get(id  = obj.currency.id)
+            return currency.code
+        except Exception as err:
+            return str(err)
+    class Meta:
+        model = PriceService
+        fields = ['id','currency','service']
         
 class ServiceSearchSerializer(serializers.ModelSerializer):
     priceservice = serializers.SerializerMethodField(read_only=True)
@@ -111,7 +132,7 @@ class MemberSerializer(serializers.ModelSerializer):
                 url = tenant_media_base_url(request)
                 return f'{url}{obj.image}'
             except:
-                return obj.image
+                return f'{obj.image}'
         return None
     class Meta:
         model = Employee
@@ -346,12 +367,19 @@ class ProductOrderSerializer(serializers.ModelSerializer):
     
     price  = serializers.SerializerMethodField(read_only=True)
     name  = serializers.SerializerMethodField(read_only=True)
+    total_product  = serializers.SerializerMethodField(read_only=True)
     
     def get_name(self, obj):
         try:
             return obj.product.name
         except Exception as err:
             return None
+        
+    def get_total_product(self, obj):
+        try:
+            return obj.checkout.total_product_price
+        except:
+            return 0
         
     def get_price(self, obj):
         try:
@@ -413,7 +441,7 @@ class ProductOrderSerializer(serializers.ModelSerializer):
         model = ProductOrder
         fields = ['id', 'client','quantity','status','created_at',
                   'location', 'member', 'tip', 'total_price' , 'payment_type','product_price','price','name',
-                  'product_name', 'gst', 'order_type', 'sold_quantity','product_details' ]
+                  'product_name', 'gst', 'order_type', 'sold_quantity','product_details','total_product' ]
           
 class ServiceOrderSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
@@ -709,7 +737,6 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
     price  = serializers.SerializerMethodField(read_only=True)
     
     appointment_service  = serializers.SerializerMethodField(read_only=True)
-    #price  = serializers.SerializerMethodField(read_only=True)
     
     def get_appointment_service(self, obj):
         service = AppointmentService.objects.filter(appointment = obj.appointment)
@@ -732,16 +759,9 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
             return serializers
         except Exception as err:
             return None
-        # try:
-        #     cli = f"{obj.appointment.client.full_name}"
-        #     return cli
-
-        # except Exception as err:
-        #     print(err)
-            
+        
     def get_price(self, obj):
         try:
-            #cli = f"{obj.appointment.client.full_name}"
             return obj.appointment_service.price
 
         except Exception as err:
@@ -753,12 +773,6 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
             return serializers
         except Exception as err:
             return None
-        # try:
-        #     cli = f"{obj.appointment_service.member.full_name}"
-        #     return cli
-
-        # except Exception as err:
-        #     print(err)
     
     def get_location(self, obj):
         try:
@@ -771,6 +785,74 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
         model = AppointmentCheckout
         fields = ('__all__')
         
+class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
+    location = serializers.SerializerMethodField(read_only=True)
+    order_type  = serializers.SerializerMethodField(read_only=True)
+    
+    employee  = serializers.SerializerMethodField(read_only=True)
+    commission  = serializers.SerializerMethodField(read_only=True)
+    
+    commission_rate  = serializers.SerializerMethodField(read_only=True)
+    sale =serializers.SerializerMethodField(read_only=True)
+    
+    #appointment_service  = serializers.SerializerMethodField(read_only=True)
+            
+    def get_order_type(self, obj):
+        return 'Service'
+    
+    def get_commission(self, obj):
+        try:
+            return obj.service_commission
+        except:
+            return 0
+        
+    def get_commission_rate(self, obj):
+        try:
+            return obj.service_commission_type
+        except:
+            return ''
+    
+    def get_sale(self, obj):
+        appointment_checkout = obj.appointment_service_checkout.first()
+        if appointment_checkout:
+            tip = appointment_checkout.tip
+            payment_type = appointment_checkout.payment_method
+            if obj.appointment.client is not None:
+                client =  obj.appointment.client.full_name,
+            else:
+                client = ''
+        
+        return {
+            'created_at' : str(obj.created_at),
+            'id' : str(obj.id),
+            'name' : str(obj.service.name),
+            'order_type' : 'Service',
+            'quantity' : 1,
+            'price' : obj.price,
+            'payment_type' : payment_type, #obj.appointment_service_checkout.payment_method,
+            'tip' : tip,  
+            'client': client
+        }
+        
+            
+    def get_employee(self, obj):
+        try:
+            serializers = MemberSerializer(obj.member,context=self.context ).data
+            return serializers
+        except Exception as err:
+            return None
+    
+    def get_location(self, obj):
+        try:
+            serializers = LocationSerializer(obj.business_address).data
+            return serializers
+        
+        except Exception as err:
+            return None
+   
+    class Meta:
+        model = AppointmentService
+        fields = ['location','order_type','employee','commission','commission_rate','sale']
 
 class BusinessTaxSerializer(serializers.ModelSerializer):
     parent_tax = ParentBusinessTaxSerializer(many=True, read_only=True)
@@ -802,3 +884,150 @@ class BusinessAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessAddress
         fields = ['id', 'address_name','tax']
+        
+class OrderSerializer(serializers.ModelSerializer):
+    
+    created_at = serializers.SerializerMethodField(read_only=True)
+    
+    def get_created_at(self, obj):
+        try:
+            return obj.created_at
+        except:
+            return None
+    class Meta:
+        model =  Order
+        fields = ('__all__')
+
+
+class CheckoutCommissionSerializer(serializers.ModelSerializer):
+
+    employee = serializers.SerializerMethodField()
+    commission = serializers.SerializerMethodField()
+    commission_rate = serializers.SerializerMethodField()
+    sale = serializers.SerializerMethodField()
+    location = LocationSerializer()
+    
+
+    def get_employee(self, checkout):
+        # serialized = EmployeeBusinessSerializer(checkout.member)
+        # return serialized.data
+        return {
+            'full_name' : str(checkout.member.full_name),
+        }
+
+    def get_commission(self, checkout):
+        if checkout.service_commission and checkout.service_commission > 0:
+            return checkout.service_commission
+        elif checkout.product_commission and checkout.product_commission > 0:
+            return checkout.product_commission
+        elif checkout.voucher_commission and checkout.voucher_commission > 0:
+            return checkout.voucher_commission
+        else:
+            return 0
+
+    def get_commission_rate(self, checkout):
+        if checkout.service_commission_type:
+            return checkout.service_commission_type
+        elif checkout.product_commission_type:
+            return checkout.product_commission_type
+        elif checkout.voucher_commission_type:
+            return checkout.voucher_commission_type
+        else:
+            return ''
+
+    
+    def get_sale(self, checkout):
+        sale_item = {
+            'errors' : []
+        }
+
+        order_item = None
+        name = '-------'
+        price = '-------'
+        order_type = '-------'
+        payment_type = ''
+        tip = ''
+        client = ''
+
+
+        try:
+            order_item = ProductOrder.objects.get(checkout = checkout)
+            name = order_item.product.name
+            price = order_item.checkout.total_product_price
+            payment_type = order_item.checkout.payment_type
+            tip = order_item.checkout.tip
+            #client = order_item.checkout.client.full_name
+            if order_item.checkout.client is not None:
+                client = order_item.checkout.client.full_name
+            else:
+                client = ''
+            order_type = 'Product'
+        except Exception as err:
+            sale_item['errors'].append(str(err))
+            try:
+                order_item = ServiceOrder.objects.get(checkout = checkout)
+                name = order_item.service.name
+                price = order_item.checkout.total_service_price
+                payment_type = order_item.checkout.payment_type
+                tip = order_item.checkout.tip
+                if order_item.checkout.client is not None:
+                    client = order_item.checkout.client.full_name
+                else:
+                    client = ''
+                order_type = 'Service'
+            except Exception as err:
+                sale_item['errors'].append(str(err))
+                try:
+                    order_item = VoucherOrder.objects.get(checkout = checkout)
+                    name = order_item.voucher.name
+                    price = order_item.checkout.total_voucher_price
+                    payment_type = order_item.checkout.payment_type
+                    tip = order_item.checkout.tip
+                    if order_item.checkout.client is not None:
+                        client = order_item.checkout.client.full_name
+                    else:
+                        client = ''
+                    order_type = 'Voucher'
+
+                except Exception as err:
+                    sale_item['errors'].append(str(err))
+                    order_item = None
+
+        
+        if order_item is not None:
+            sale_item['quantity'] = order_item.quantity
+
+        sale_item['name'] = name
+        sale_item['price'] = price
+        sale_item['order_type'] = order_type
+        sale_item['payment_type'] = payment_type
+        sale_item['tip'] = tip
+        sale_item['client'] = client
+
+        #         else:
+        #             sale_item['voucher'] = VoucherOrderSerializer(order_item).data
+        #     else:
+        #         sale_item['service'] = ServiceOrderSerializer(order_item).data
+
+        # else:
+        #     sale_item['product'] = ProductOrderSerializer(order_item).data
+
+        
+        return {
+            'created_at' : str(checkout.created_at),
+            'id' : str(checkout.id),
+            **sale_item
+        }
+
+    class Meta:
+        """
+            'employee' : {},
+            'location' : {},
+            'commission' : 00,
+            'commission_rate' : 00,
+            'sale' : {}
+        """
+        model = Checkout
+        fields = ['employee', 'location', 'commission', 'commission_rate', 'sale']
+    
+    

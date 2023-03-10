@@ -244,6 +244,13 @@ class ProductSerializer(serializers.ModelSerializer):
     
     location = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField(read_only=True)
+    size = serializers.SerializerMethodField(read_only=True)
+    
+    def get_size(self,obj):
+        try:
+            return obj.product_size
+        except:
+            return None
     
     def get_currency_retail_price(self, obj):
             currency_retail = CurrencyRetailPrice.objects.filter(product = obj)
@@ -291,12 +298,22 @@ class ProductSerializer(serializers.ModelSerializer):
         return ProductMediaSerializer(all_medias, many=True, context=context).data
 
     def get_stocks(self, obj):
-        all_stocks = ProductStock.objects.filter(product=obj, is_deleted=False).order_by('-created_at')
-        return ProductStockSerializer(all_stocks, many=True).data
+        location = self.context['location']
+        if location is not None:
+            all_stocks = ProductStock.objects.filter(product=obj, is_deleted=False, location__id = location ).order_by('-created_at')
+            return ProductStockSerializer(all_stocks, many=True).data
+        else:
+            all_stocks = ProductStock.objects.filter(product=obj, is_deleted=False,).order_by('-created_at')
+            return ProductStockSerializer(all_stocks, many=True).data
 
     def get_location_quantities(self, obj):
-        all_stocks = ProductStock.objects.filter(product=obj, location__is_deleted=False).order_by('-created_at')
-        return ProductStockSerializer(all_stocks, many=True).data
+        location = self.context['location']
+        if location is not None:
+            all_stocks = ProductStock.objects.filter(product=obj, location__is_deleted=False, location__id = location).order_by('-created_at')
+            return ProductStockSerializer(all_stocks, many=True).data
+        else:
+            all_stocks = ProductStock.objects.filter(product=obj, location__is_deleted=False,).order_by('-created_at')
+            return ProductStockSerializer(all_stocks, many=True).data
 
 
     class Meta:
@@ -305,7 +322,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'id', 
             'name', 
             'currency_retail_price',
-            #'product_size',
+            'size',
             'product_type',
             'cost_price',
             #'full_price',
@@ -327,7 +344,8 @@ class ProductSerializer(serializers.ModelSerializer):
             'created_at',
             'consumed',
             'stocktransfer',
-            'location'
+            'location',
+            'is_active'
         ]
         read_only_fields = ['slug', 'id']
 class ProductOrderSerializer(serializers.ModelSerializer):

@@ -3,10 +3,11 @@ from genericpath import exists
 from pyexpat import model
 from Appointment.models import AppointmentCheckout
 from Business.models import BusinessAddress
+from Employee.Constants.total_sale import total_sale_employee
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
 from Tenants.models import Domain, Tenant
 from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSIONS_MODEL_FIELDS
-from Utility.models import Country, GlobalPermissionChoices, State, City
+from Utility.models import Country, Currency, GlobalPermissionChoices, State, City
 from Service.models import Service
 from Permissions.models import EmployePermission
 from datetime import datetime, timedelta
@@ -15,7 +16,7 @@ from datetime import datetime, timedelta
 from rest_framework import serializers
 from .models import( EmployeDailySchedule, Employee, EmployeeProfessionalInfo ,
                EmployeePermissionSetting, EmployeeModulePermission 
-               , EmployeeMarketingPermission,
+               , EmployeeMarketingPermission, SallarySlipPayrol,
                StaffGroup, StaffGroupModulePermission, Attendance
                ,Payroll , CommissionSchemeSetting , Asset ,AssetDocument,
                EmployeeSelectedService, Vacation ,CategoryCommission
@@ -45,9 +46,18 @@ class CitySerializer(serializers.ModelSerializer):
         exclude = ['is_deleted', 'created_at', 'unique_code', 'key']
  
 class LocationSerializer(serializers.ModelSerializer):
+    currency = serializers.SerializerMethodField(read_only=True)
+    
+    def get_currency(self, obj):
+        try:
+            cur = Currency.objects.get(id  = str(obj.currency) )
+            return cur.code
+        except Exception as err:
+            return str(err)
+            
     class Meta:
         model = BusinessAddress
-        fields = ['id', 'address_name']
+        fields = ['id', 'address_name', 'currency']
      
         
 class EmployeInformationsSerializer(serializers.ModelSerializer):
@@ -494,6 +504,25 @@ class EmployPayrollSerializers(serializers.ModelSerializer):
             
          ]        
 
+class SallarySlipPayrolSerializers(serializers.ModelSerializer):
+    employee = EmployPayrollSerializers(read_only=True)
+    class Meta:
+        model = SallarySlipPayrol
+        fields = [
+            'id',
+            'created_at',
+            'month' ,
+            'employee',
+            ]
+class SallarySlipPayrol_EmployeSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = SallarySlipPayrol
+        fields = [
+            'id',
+            'created_at',
+            'month' ,
+            ]
+        
 class PayrollSerializers(serializers.ModelSerializer):
     employee = EmployPayrollSerializers(read_only=True)
     class Meta:
@@ -518,10 +547,16 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
     state_name = serializers.SerializerMethodField(read_only=True)
     city_name = serializers.SerializerMethodField(read_only=True)   
     services = serializers.SerializerMethodField(read_only=True)
-    
-    #location = LocationSerializer(read_only=True) 
-    
+        
     location = serializers.SerializerMethodField()
+    total_sale = serializers.SerializerMethodField()
+    
+    def get_total_sale(self,obj):
+        try:
+            sale = total_sale_employee(obj)
+            return sale
+        except Exception as err:
+            return str(err)
     
     def get_location(self, obj):
         try:
@@ -546,6 +581,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
            return obj.country.name
         except Exception as err:
             return None
+   
     def get_state_name(self, obj):
         try:
            return obj.state.name
@@ -574,6 +610,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             return salary_info.salary
         except Exception:
             return None
+    
     def get_level(self, obj):
         try:
             level = EmployeeSelectedService.objects.get(employee=obj)
@@ -624,6 +661,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'services',
             'created_at' ,
             'location', 
+            'total_sale',
             'is_active',  
             ]   
 
@@ -819,6 +857,23 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
 class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField()
+    employee_permission = serializers.SerializerMethodField()
+    
+    def get_employee_permission(self, obj):
+        try:
+            permission = EmployePermission.objects.get(employee=obj)
+        except:
+            return {}
+        else:
+            returned_value = {}
+            try:            
+                for permit in ALL_PERMISSIONS:
+                    returned_value[permit] = []
+                    for opt in PERMISSIONS_MODEL_FIELDS[permit](permission).all():
+                        returned_value[permit].append(opt.text)
+                return returned_value
+            except Exception as err:
+                pass
     
     def get_location(self, obj):
         loc = obj.location.all()
@@ -836,7 +891,8 @@ class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Employee
-        fields = ['id', 'image','location','full_name', 'email', 'mobile_number','country','state','city', 'address', 'postal_code']
+        fields = ['id', 'image','location','full_name', 'email', 
+                  'mobile_number','country','state','city', 'address', 'postal_code', 'employee_permission']
 class EmployeeInformationSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     
@@ -862,6 +918,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     #employe_id = serializers.SerializerMethodField(read_only=True)
     
     location = serializers.SerializerMethodField(read_only=True)
+    sallaryslip = serializers.SerializerMethodField(read_only=True)
     
     def get_location(self, obj):
         loc = obj.location.all()
@@ -885,6 +942,10 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         schedule =  EmployeDailySchedule.objects.filter(employee= obj )            
         return WorkingSchedulePayrollSerializer(schedule, many = True,context=self.context).data
     
+    def get_sallaryslip(self, obj):
+        sallary =  SallarySlipPayrol.objects.filter(employee= obj )            
+        return SallarySlipPayrol_EmployeSerializers(sallary, many = True,context=self.context).data
+    
     def get_image(self, obj):
         if obj.image:
             try:
@@ -898,7 +959,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Employee
-        fields = ['id', 'employee_id','is_active','full_name','image','location',
+        fields = ['id', 'employee_id','is_active','full_name','image','location','sallaryslip',
                   'schedule','created_at', 'income_type', 'salary']
 class Payroll_Working_device_attendence_ScheduleSerializer(serializers.ModelSerializer):    
     schedule =  serializers.SerializerMethodField(read_only=True)    
@@ -1042,7 +1103,7 @@ class UserEmployeeSerializer(serializers.ModelSerializer):
                 is_blocked=False,
                 is_active=True
             )
-            return user_domain.schema_name
+            return user_domain.domain
         except Exception as err:
             return str(err)
         

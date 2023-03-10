@@ -430,7 +430,7 @@ def send_verification_otp(request):
                     'status_code' : StatusCodes.USER_NOT_EXIST_4005,
                     'status_code_text' : 'USER_NOT_EXIST_4005',
                     'response' : {
-                        'message' : f'User with this {"Email" if code_for == "Email" else "Mobile Number"} not exist',
+                        'message' : f'User does not exist with this {"Email" if code_for == "Email" else "Mobile Number"} ',
                         'error_fields' : ["email" if code_for == "Email" else "phone_number"],
                         'error_message' : str(err),
                     }
@@ -509,7 +509,7 @@ def login(request):
         )
         employee = True
     except Exception as err: 
-        pass
+        user = None
         
     if user == None:
         try:
@@ -628,10 +628,11 @@ def login(request):
                 token = Token.objects.get(user=user)
             except Token.DoesNotExist:
                 token = Token.objects.create(user=user)
+            domain_name = str(employe_user.tenant.domain).split('.')[0]
             serialized = UserLoginSerializer(user, context={'employee' : True,
                                     'request' : request,
                                     'token' : token.key,
-                                    'tenant' : employe_user.tenant.schema_name
+                                    'tenant' : domain_name
                                     })
             s_data = dict(serialized.data)
             #s_data['access_token'] = str(tnt_token.key)

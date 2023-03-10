@@ -48,9 +48,19 @@ class Appointment(models.Model):
     client_type= models.CharField(choices=TYPE_CHOICES, max_length=50, null=True, blank=True, )
     discount_type = models.CharField(max_length=50, choices= DISCOUNT_CHOICES, null=True, blank=True)
     payment_method = models.CharField(max_length=100, choices= PAYMENT_CHOICES, default='', null=True, blank=True)  
-
+    
+    extra_price  = models.PositiveIntegerField(default=0, null=True, blank=True)
+    tip  = models.PositiveIntegerField(default=0, null=True, blank=True)
+    
+    discount_price  = models.PositiveIntegerField(default=0, null=True, blank=True)
+    discount_percentage = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
+    
+    service_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
+    service_commission_type = models.CharField( max_length=50 , default = '')
+    
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
+    is_checkout = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
 
 
@@ -104,6 +114,11 @@ class AppointmentService(models.Model):
     
     service_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
     service_commission_type = models.CharField( max_length=50 , default = '')
+    
+    discount_price = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
+    discount_percentage = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
+        
+    total_price = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
     
     end_time = models.TimeField(null=True, blank=True)
     details = models.CharField(max_length=255, null=True, blank=True)
@@ -165,8 +180,11 @@ class AppointmentCheckout(models.Model):
     tip = models.PositiveIntegerField(default=0, null=True, blank=True)
     gst = models.PositiveIntegerField(default=0, null=True, blank=True)
     
-    service_price = models.PositiveIntegerField(default=0, null=True, blank=True, )
+    service_price = models.PositiveIntegerField(default=0, null=True, blank=True)
     total_price = models.PositiveIntegerField(default=0, null=True, blank=True)
+    
+    service_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
+    service_commission_type = models.CharField( max_length=50 , default = '')
     
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
@@ -174,6 +192,10 @@ class AppointmentCheckout(models.Model):
     
     def __str__(self):
         return str(self.id)
+    
+    @property
+    def fun():
+        return 'rewards'
 
 
 class AppointmentNotes(models.Model):

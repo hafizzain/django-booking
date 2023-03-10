@@ -1,5 +1,8 @@
 from datetime import timedelta
+from threading import Thread
 from django.shortcuts import render
+from Sale.Constants.StaffEmail import StaffSaleEmail
+from Sale.Constants.tunrover import ProductTurnover
 
 from rest_framework import status
 from Appointment.models import Appointment, AppointmentCheckout, AppointmentService
@@ -782,7 +785,7 @@ def get_all_sale_orders(request):
     # serialized = ProductOrderSerializer(result_page,  many=True)
     
     data=[]
-    checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
+    checkout_order = Checkout.objects.filter(is_deleted=False).order_by('created_at')
     serialized = CheckoutSerializer(checkout_order,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
@@ -802,7 +805,7 @@ def get_all_sale_orders(request):
     # serialized = VoucherOrderSerializer(voucher_orders,  many=True, context={'request' : request})
     # data.extend(serialized.data)
     
-    appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')
+    appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done').order_by('created_at')
     serialized = AppointmentCheckoutSerializer(appointment_checkout, 
                                                many = True, 
                                                context={'request' : request
@@ -1193,19 +1196,10 @@ def create_sale_order(request):
     product_commission_type = request.data.get('product_commission_type', None)
     voucher_commission_type = request.data.get('voucher_commission_type', None)
     
-    #product_id = request.data.get('product', None)
-    
-    #Order Service
-    #service_id = request.data.get('service', None)
     duration = request.data.get('duration', None)
     
-    #Order Membership
-    #membership_id = request.data.get('membership', None)
     start_date = request.data.get('start_date', None)
     end_date = request.data.get('end_date', None)
-    
-    #Order Voucher
-    #voucher_id = request.data.get('voucher', None)
      
     tip = request.data.get('tip', None)
     total_price = request.data.get('total_price', None)
@@ -1285,6 +1279,7 @@ def create_sale_order(request):
         
         tip = tip
     )
+    
     for id in ids:          
         sale_type = id['selection_type']
         service_id = id['id']
@@ -1294,56 +1289,6 @@ def create_sale_order(request):
         if sale_type == 'PRODUCT':
             try:
                 product = Product.objects.get(id = service_id)
-                # commission = CommissionSchemeSetting.objects.filter(
-                #     employee = member,
-                #     categorycommission__from_value = total_price,
-                #     categorycommission__commission__category_comission = 'Retail'
-                #     )
-
-                try:
-                    transfer = ProductStock.objects.get(product__id=product.id, location = business_address.id)
-                    if transfer.available_quantity > int(quantity):
-                        stock_transfer = ProductOrderStockReport.objects.create(
-                        report_choice = 'Sold',
-                        product = product,
-                        user = request.user,
-                        location = business_address,
-                        #quantity = int(quantity), 
-                        before_quantity = transfer.available_quantity      
-                        )                    
-                        sold = transfer.available_quantity - int(quantity)
-                        transfer.available_quantity = sold
-                        transfer.sold_quantity += int(quantity)
-                        transfer.save()
-                        
-                        stock_transfer.after_quantity = sold
-                        stock_transfer.save()
-                        
-                    else:
-                        errors.append('Available quantity issue')
-                
-                except Exception as err:
-                    errors.append(str(err))
-
-                product_order = ProductOrder.objects.create(
-                    user = user,
-                    client = client,
-                    product = product,
-                    #status = sale_status,
-                    checkout = checkout,
-                    member = member,
-                    location = business_address,
-                    tip = tip,
-                    total_price = total_price, 
-                    payment_type= payment_type,
-                    client_type = client_type,
-                    quantity = quantity,
-                    current_price = price,
-                )
-                product_order.sold_quantity += 1 # product_stock.sold_quantity
-                product_order.save()
-                checkout.product_commission = product_commission
-                checkout.save()
             except Exception as err:
                 return Response(
                     {
@@ -1356,7 +1301,62 @@ def create_sale_order(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-                        
+                
+            try:
+                transfer = ProductStock.objects.get(product__id=product.id, location = business_address.id)
+                
+                if transfer.available_quantity > int(quantity):
+                    stock_transfer = ProductOrderStockReport.objects.create(
+                    report_choice = 'Sold',
+                    product = product,
+                    user = request.user,
+                    location = business_address,
+                    #quantity = int(quantity), 
+                    before_quantity = transfer.available_quantity      
+                    )                    
+                    sold = transfer.available_quantity - int(quantity)
+                    transfer.available_quantity = sold
+                    transfer.sold_quantity += int(quantity)
+                    transfer.save()
+                    
+                    stock_transfer.after_quantity = sold
+                    stock_transfer.save()                    
+                    
+                else:
+                    errors.append('Available quantity issue')
+            
+            except Exception as err:
+                errors.append(str(err))
+                
+            if transfer.available_quantity <= 5 :
+                try:
+                    thrd = Thread(target=ProductTurnover, args=[], kwargs={'product' : product,'product_stock': transfer, 'business_address':business_address.id ,'tenant' : request.tenant})
+                    thrd.start()
+                except Exception as err:
+                    ExceptionRecord.objects.create(
+                        text = f' error in Turnover email sale{str(err)}'
+                    )
+
+            product_order = ProductOrder.objects.create(
+                user = user,
+                client = client,
+                product = product,
+                #status = sale_status,
+                checkout = checkout,
+                member = member,
+                location = business_address,
+                tip = tip,
+                total_price = total_price, 
+                payment_type= payment_type,
+                client_type = client_type,
+                quantity = quantity,
+                current_price = price,
+            )
+            product_order.sold_quantity += 1 # product_stock.sold_quantity
+            product_order.save()
+            checkout.product_commission = product_commission
+            checkout.save()
+
         elif sale_type == 'SERVICE':
             try:
                 service = Service.objects.get(id = service_id)
@@ -1492,6 +1492,14 @@ def create_sale_order(request):
                     }
                 },
                 status=status.HTTP_400_BAD_REQUEST
+            )
+    
+    try:
+        thrd = Thread(target=StaffSaleEmail, args=[], kwargs={'ids' : ids, 'location': business_address.address_name ,'tenant' : request.tenant, 'member': member, 'invoice': checkout.id, 'client': client})
+        thrd.start()
+    except Exception as err:
+        ExceptionRecord.objects.create(
+                text = f' error in email sale{str(err)}'
             )
     
     serialized = CheckoutSerializer(checkout, context = {'request' : request, })

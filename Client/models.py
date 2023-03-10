@@ -7,8 +7,9 @@ from django.db import models
 from uuid import uuid4
 from Authentication.models import User
 from Business.models import Business, BusinessAddress
+#from Promotions.models import ComplimentaryDiscount
 
-from Utility.models import Country, Language, State, City
+from Utility.models import Country, Currency, Language, State, City
 from django.utils.timezone import now
 from Product.models import Product
 from Service.models import Service
@@ -302,12 +303,12 @@ class Membership(models.Model):
     
     #validity = models.PositiveIntegerField(default=0, verbose_name='No. of Validity Days/Month', null=True, blank=True)
     
-    color =  models.CharField(max_length=100, default='')
+    #color =  models.CharField(max_length=100, default='')
     term_condition =  models.CharField(max_length=300, null=True, blank=True)
 
     
-    price = models.PositiveIntegerField(default=0)
-    tax_rate = models.PositiveIntegerField(default=0)
+    #price = models.PositiveIntegerField(default=0)
+    #tax_rate = models.PositiveIntegerField(default=0)
 
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -327,7 +328,7 @@ class DiscountMembership(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     
     membership = models.ForeignKey(Membership, on_delete=models.CASCADE, related_name='membership_discountmembership')
-    duration = models.CharField(choices=DURATION_CHOICE, default='7 Days' , verbose_name='Duration', max_length=50)
+    duration = models.CharField(choices=DURATION_CHOICE, default='7 Days' , verbose_name='Duration', max_length=50, null=True, blank=True,)
     percentage = models.PositiveIntegerField(default=0)
 
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_memberships')
@@ -335,6 +336,17 @@ class DiscountMembership(models.Model):
     
     def __str__(self):
         return str(self.id)
+class CurrencyPriceMembership(models.Model):
+    
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    
+    membership = models.ForeignKey(Membership, on_delete=models.CASCADE, related_name='membership_currenypricemembership')
+    currency = models.ForeignKey(Currency, on_delete=models.SET_NULL, null=True, blank=True)
+    price = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return str(self.id)
+    
 #now = datetime.now()
 class LoyaltyPoints(models.Model):
     
@@ -359,6 +371,46 @@ class LoyaltyPoints(models.Model):
     is_deleted = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now, null=True) #null = True, default= datetime.now() )
+    
+    def __str__(self):
+        return str(self.id)
+class ClientPromotions(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='user_client_promotions', verbose_name='Creator ( User )')
+    business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_client_promotions')
+    
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True, related_name='client_client_promotions')
+    complimentary = models.ForeignKey('Promotions.ComplimentaryDiscount', on_delete=models.SET_NULL, null=True, blank=True, related_name='complimentry_client_promotions')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='service_client_promotions')    
+
+    visits = models.PositiveIntegerField(default=0, null=True, blank=True)
+    
+    is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now, null=True) 
+    
+    def __str__(self):
+        return str(self.id)
+    
+class ClientPackageValidation(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='user_client_packagevalidation', verbose_name='Creator ( User )')
+    business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_client_packagevalidation')
+    
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True, related_name='client_client_packagevalidation')
+    package = models.ForeignKey('Promotions.PackagesDiscount', on_delete=models.SET_NULL, null=True, blank=True, related_name='package_client_packagevalidation')
+    serviceduration = models.ForeignKey('Promotions.ServiceDurationForSpecificTime', on_delete=models.SET_NULL, null=True, blank=True, related_name='serviceduration_client_packagevalidation')
+    service = models.ManyToManyField(Service, related_name='service_client_packagevalidation') 
+
+    #month = models.PositiveIntegerField(default=0, null=True, blank=True)
+    
+    due_date = models.DateField(null=True) 
+    
+    is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now, null=True) 
     
     def __str__(self):
         return str(self.id)

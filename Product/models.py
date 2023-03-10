@@ -58,7 +58,7 @@ class Product(models.Model):
     cost_price = models.PositiveIntegerField(default=0, null = True, blank= True)
     #full_price = models.PositiveIntegerField(default=0, null = True, blank= True)
     #sell_price = models.PositiveIntegerField(default=0, null = True, blank= True)
-    #product_size = models.PositiveIntegerField(default=0)
+    product_size = models.PositiveIntegerField(default=0)
     #product_size = models.CharField(max_length=50, null=True, blank=True)
 
 
@@ -135,6 +135,7 @@ class ProductStock(models.Model):
     #quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0, verbose_name='Total Quantity')
     available_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
     sold_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
+    consumed_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
 
     low_stock = models.PositiveIntegerField(default=0)
     reorder_quantity = models.PositiveIntegerField(default=0)

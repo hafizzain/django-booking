@@ -5,7 +5,7 @@ from time import strptime
 from django.shortcuts import render
 from Employee.models import( CategoryCommission, EmployeDailySchedule, Employee , EmployeeProfessionalInfo ,
                         EmployeePermissionSetting,  EmployeeModulePermission
-                        , EmployeeMarketingPermission, EmployeeSelectedService , StaffGroup 
+                        , EmployeeMarketingPermission, EmployeeSelectedService, SallarySlipPayrol , StaffGroup 
                         , StaffGroupModulePermission, Attendance
                         ,Payroll, CommissionSchemeSetting, Asset, AssetDocument, Vacation
                         )
@@ -17,7 +17,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from Employee.serializers import( EmployeSerializer , EmployeInformationsSerializer
                           , EmployPermissionSerializer,  EmployeModulesSerializer, EmployeeInformationSerializer
-                          ,  EmployeeMarketingSerializers, Payroll_Working_device_attendence_ScheduleSerializer, Payroll_Working_deviceScheduleSerializer, Payroll_WorkingScheduleSerializer, ScheduleSerializer, SingleEmployeeInformationSerializer, StaffGroupSerializers , 
+                          ,  EmployeeMarketingSerializers, Payroll_Working_device_attendence_ScheduleSerializer, Payroll_Working_deviceScheduleSerializer, Payroll_WorkingScheduleSerializer, SallarySlipPayrolSerializers, ScheduleSerializer, SingleEmployeeInformationSerializer, StaffGroupSerializers , 
                           StaffpermisionSerializers , AttendanceSerializers
                           ,PayrollSerializers, UserEmployeeSerializer, VacationSerializer,singleEmployeeSerializer , CommissionSerializer
                           , AssetSerializer, WorkingScheduleSerializer
@@ -604,9 +604,11 @@ def create_employee(request):
     country = request.data.get('country', None)   
     state = request.data.get('state', None)         
     city = request.data.get('city', None)
-   
+    
+
+
     if not all([
-         business_id, full_name ,employee_id, email, country, gender  ,address , designation, income_type, salary ]): #or ( not to_present and ending_date is None):
+         business_id, full_name ,employee_id, country, gender  ,address , designation, income_type, salary ]): #or ( not to_present and ending_date is None):
        return Response(
             {
                 'status' : False,
@@ -631,23 +633,24 @@ def create_employee(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    with tenant_context(Tenant.objects.get(schema_name = 'public')):
-        try:
-            employe = User.objects.get(email__icontains = email)
-            return Response(
-                {
-                    'status' : False,
-                    'status_code' : 404,
-                    'status_code_text' : '404',
-                    'response' : {
-                        'message' : f'User Already exist with this {email}!',
-                        'error_message' : None,
-                    }
-                },
-                status=status.HTTP_404_NOT_FOUND
-            )
-        except Exception as err:
-            pass
+    if email is not None:
+        with tenant_context(Tenant.objects.get(schema_name = 'public')):
+            try:
+                employe = User.objects.get(email__icontains = email)
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : 404,
+                        'status_code_text' : '404',
+                        'response' : {
+                            'message' : f'User Already exist with this {email}!',
+                            'error_message' : None,
+                        }
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            except Exception as err:
+                pass
     
     if len(salary) > 7:
         return Response(
@@ -715,7 +718,6 @@ def create_employee(request):
         full_name = full_name,
         image= image,
         employee_id= employee_id,
-        email= email,
         mobile_number= mobile_number,
         dob=dob,
         gender= gender,
@@ -735,6 +737,9 @@ def create_employee(request):
         employee.is_active =True
     else:
         employee.is_active = False 
+    
+    if email is not None:
+        employee.email= email
     employee.save()
     data = {}
 
@@ -747,10 +752,14 @@ def create_employee(request):
         except:
             pass
     
-    employee_p_info = EmployeeProfessionalInfo.objects.create(employee=employee,
-           # start_time = start_time , end_time = end_time, 
+    employee_p_info = EmployeeProfessionalInfo.objects.create(
+            employee=employee,
+            # start_time = start_time , end_time = end_time, 
             maximum_discount = maximum_discount,
-            salary=salary, designation = designation )
+            salary=salary, 
+            designation = designation,
+            income_type = income_type,
+        )
     
     employee_p_info.monday = True if 'monday' in request.data else False
     employee_p_info.tuesday = True if 'tuesday' in request.data else False
@@ -812,39 +821,42 @@ def create_employee(request):
     data.update(employee_serialized.data)
 
     template = 'Employee'
-    
-    try:
+    if email is not None:
         try:
-            username = email.split('@')[0]
             try:
-                user_check = User.objects.get(username = username)
+                username = email.split('@')[0]
+                try:
+                    user_check = User.objects.get(username = username)
+                except Exception as err:
+                    #data.append(f'username user is client errors {str(err)}')
+                    pass
+                else:
+                    username = f'{username} {len(User.objects.all())}'
+
             except Exception as err:
-                #data.append(f'username user is client errors {str(err)}')
                 pass
-            else:
-                username = f'{username} {len(User.objects.all())}'
 
-        except Exception as err:
-            pass
-
-        user = User.objects.create(
-            first_name = full_name,
-            username = username,
-            email = email ,
-            is_email_verified = True,
-            is_active = True,
-            mobile_number = mobile_number,
-        )
-        account_type = AccountType.objects.create(
-                user = user,
-                account_type = 'Employee'
+            user = User.objects.create(
+                first_name = full_name,
+                username = username,
+                email = email ,
+                is_email_verified = True,
+                is_active = True,
+                mobile_number = mobile_number,
             )
-    except Exception as err:
-        pass        
-    
+            account_type = AccountType.objects.create(
+                    user = user,
+                    account_type = 'Employee'
+                )
+        except Exception as err:
+            pass        
+    # stop_thread = False
     try:
         thrd = Thread(target=add_employee, args=[full_name, email , mobile_number, template, business.business_name, tenant_id, domain, user])
         thrd.start()
+        # stop_thread = True
+        # if thrd.is_alive():
+        #     thrd._stop()
     except Exception as err:
         employees_error.append(str(err))
     
@@ -1129,6 +1141,7 @@ def update_employee(request):
     if serializer_info.is_valid():
         serializer_info.save()
         data.update(serializer_info.data)
+    
     else:
         return Response(
         {
@@ -1159,8 +1172,10 @@ def update_employee(request):
                             pass
 
         empl_permission.save()
+    
     except Exception as err:
         Errors.append(err)
+    
     if location is not None:
         try:
             employee.location.clear()
@@ -1422,7 +1437,7 @@ def create_staff_group(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_staff_group(request):
-    all_staff_group= StaffGroup.objects.filter(employees__is_deleted=False).order_by('-created_at')
+    all_staff_group= StaffGroup.objects.filter(employees__is_deleted=False).order_by('-created_at').distinct()
     serialized = StaffGroupSerializers(all_staff_group, many=True, context={'request' : request})
     
     data = serialized.data
@@ -1986,15 +2001,15 @@ def delete_payroll(request):
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def create_payroll(request):
+def create_sallaryslip(request):
     user = request.user
     
     business = request.data.get('business', None)
     employees = request.data.get('employees', None)
-    name = request.data.get('name', None)
-    Total_hours= request.data.get('Total_hours', None)
-    
-    if not all([ business, employees , name , Total_hours ]):
+    month = request.data.get('month', None)
+    year = request.data.get('year', None)
+ 
+    if not all([ business, employees , month ]):
          return Response(
             {
                 'status' : False,
@@ -2015,7 +2030,7 @@ def create_payroll(request):
         )
          
     try:
-             business_id=Business.objects.get(id=business)
+        business_id=Business.objects.get(id=business)
     except Exception as err:
             return Response(
                 {
@@ -2041,30 +2056,33 @@ def create_payroll(request):
                 }
                 }
             )
-            
-    payroll= Payroll.objects.create(
+    received_data = f'{month} {year}'
+    
+    month = datetime.datetime.strptime(received_data, "%B %Y").month
+    year = datetime.datetime.strptime(received_data, "%B %Y").year
+    date_obj = datetime.date(year=year, month=month, day=1)
+    
+    payroll= SallarySlipPayrol.objects.create(
         user= user,
         business= business_id,
         employee=employee_id,
-        name= name,
-        Total_hours=Total_hours
-        
-    )
-    
-    payroll_serializers= PayrollSerializers(payroll)
+        month = date_obj        
+    )    
+    payroll_serializers= SallarySlipPayrolSerializers(payroll)
     
     return Response(
             {
                 'status' : True,
                 'status_code' : 201,
                 'response' : {
-                    'message' : 'Payroll Created Successfully!',
+                    'message' : 'Sallary Slip Created Successfully!',
                     'error_message' : None,
                     'StaffGroup' : payroll_serializers.data,
                 }
             },
             status=status.HTTP_201_CREATED
         ) 
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_payrol_working(request):

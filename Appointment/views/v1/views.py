@@ -1,9 +1,18 @@
 from django.shortcuts import render
+from Appointment.Constants.AddApp import AddApp
+
+from Appointment.Constants.Reschedulen import reschedule_appointment_n
+# from Appointment.Constants.New_Appointment_n import Add_appointment_nn
+from Appointment.Constants.cancelappointmentn import cancel_appointment_n
+from Appointment.Constants.AddAppointment_n import Add_appointment_n
+
 from Appointment.Constants.ConvertTime import convert_24_to_12
 
 from Appointment.Constants.Reschedule import reschedule_appointment
 from Appointment.Constants.AddAppointment import Add_appointment
 from Appointment.Constants.cancelappointment import cancel_appointment
+from Appointment.Constants.comisionCalculate import calculate_commission
+from Promotions.models import ServiceDurationForSpecificTime
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -11,7 +20,7 @@ from rest_framework.response import Response
 
 from rest_framework import status
 from Appointment.Constants.durationchoice import DURATION_CHOICES
-from Business.models import Business , BusinessAddress
+from Business.models import Business , BusinessAddress, ClientNotificationSetting, StaffNotificationSetting
 from datetime import datetime
 from Order.models import Checkout, MemberShipOrder, ProductOrder, VoucherOrder
 from Sale.serializers import MemberShipOrderSerializer, ProductOrderSerializer, VoucherOrderSerializer
@@ -23,10 +32,10 @@ from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
 from django.db.models import Q
-from Client.models import Client, Membership, Promotion, Rewards, Vouchers
+from Client.models import Client, ClientPackageValidation, ClientPromotions, Membership, Promotion, Rewards, Vouchers
 from datetime import date, timedelta
 from threading import Thread
-
+from django.db.models import F
 
 from Appointment.models import Appointment, AppointmentService, AppointmentNotes , AppointmentCheckout
 from Appointment.serializers import  CheckoutSerializer, AppoinmentSerializer, ServiceClientSaleSerializer, ServiceEmployeeSerializer,SingleAppointmentSerializer ,BlockSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer
@@ -291,15 +300,21 @@ def create_appointment(request):
     text = request.data.get('appointment_notes', None)
     business_address_id = request.data.get('business_address', None)
     member = request.data.get('member', None)
+    extra_price = request.data.get('extra_price', '0')
     #business_id, member, appointment_date, appointment_time, duration
 
     client = request.data.get('client', None)
     client_type = request.data.get('client_type', None)
     
     payment_method = request.data.get('payment_method', None)
-    discount_type = request.data.get('discount_type', None)    
+    discount_type = request.data.get('discount_type', None) 
+    
+    selected_promotion_type = request.data.get('selected_promotion_type', None) 
+    selected_promotion_id = request.data.get('selected_promotion_id', None) 
+       
     Errors = []
-        
+    total_price_app= 0
+            
     if not all([ client_type, appointment_date, business_id  ]):
          return Response(
             {
@@ -354,7 +369,7 @@ def create_appointment(request):
         client = Client.objects.get(id=client)
     except Exception as err:
         client = None
-       
+        
     appointment = Appointment.objects.create(
             user = user,
             business=business,
@@ -362,7 +377,10 @@ def create_appointment(request):
             client_type=client_type,
             payment_method=payment_method,
             discount_type=discount_type,
+            # service_commission = service_commission,
+            # service_commission_type= service_commission_type,
         )
+    
     if business_address_id is not None:
         appointment.business_address = business_address
         appointment.save()
@@ -373,6 +391,7 @@ def create_appointment(request):
 
     elif type(appointments) == list:
         pass
+    
     if text:
         if type(text) == str:
             try:
@@ -407,6 +426,7 @@ def create_appointment(request):
         reward_id = appoinmnt.get('reward', None)
         membership_id = appoinmnt.get('membership', None)
         promotion_id = appoinmnt.get('promotion', None)
+        discount_price = appoinmnt.get('discount_price', None)
         # tip = appoinmnt['tip']
         
         app_date_time = f'2000-01-01 {date_time}'
@@ -416,30 +436,6 @@ def create_appointment(request):
         datetime_duration = app_date_time + timedelta(minutes=duration)
         datetime_duration = datetime_duration.strftime('%H:%M:%S')
         end_time = datetime_duration
-        
-        service_commission = 0
-        service_commission_type = ''
-        toValue = 0
-        
-        try:
-            commission = CommissionSchemeSetting.objects.get(employee = str(member))
-            category = CategoryCommission.objects.filter(commission = commission.id)
-            for cat in category:
-                try:
-                    toValue = int(cat.to_value)
-                except :
-                    sign  = cat.to_value
-                if cat.category_comission == 'Service':
-                    if (int(cat.from_value) <= price and  price <  toValue) or (int(cat.from_value) <= price and sign ):
-                        if cat.symbol == '%':
-                            service_commission = price * int(cat.commission_percentage) / 100
-                            service_commission_type = str(service_commission_type) + cat.symbol
-                        else:
-                            service_commission = int(cat.commission_percentage)
-                            service_commission_type = str(service_commission) + cat.symbol
-                                            
-        except Exception as err:
-            Errors.append(str(err))
         
         try:
             voucher = Vouchers.objects.get(id = voucher_id )
@@ -474,6 +470,7 @@ def create_appointment(request):
                 }
             }
         )
+        
         try:
             service=Service.objects.get(id=service)
         except Exception as err:
@@ -487,6 +484,74 @@ def create_appointment(request):
                 }
             }
         )
+        if selected_promotion_type == 'Complimentary_Discount':
+            client_promotion  = ClientPromotions.objects.create(
+                user = user,
+                business = business,
+                client = client,
+                complimentary__id =  selected_promotion_id,
+                service = service,
+                # defaults={
+                #     'visits': 1
+                # },
+                # visits=F('visits') + 1
+                visits = 1
+            )
+        if selected_promotion_type == 'Packages_Discount':
+            testduration = False
+            try:
+                service_duration = ServiceDurationForSpecificTime.objects.get(id = selected_promotion_id)
+            except:
+                pass
+            try:
+                clientpackage = ClientPackageValidation.objects.get(serviceduration__id =  selected_promotion_id) #package__package_duration = 'duration')
+                testduration = True
+                clientpackage.service.add(service)
+                clientpackage.save()
+                
+            except Exception as err:
+                Errors.append(str(err))
+            if testduration == False:                 
+                packages=  ClientPackageValidation.objects.create(
+                    user = user,
+                    business = business,
+                    client = client,
+                    serviceduration =  service_duration,
+                    #service = service,
+                )
+                current_date = date.today()
+                duration_rectricte = int(service_duration.package_duration)
+                
+                next_3_months = current_date + timedelta(days=duration_rectricte*30)
+                
+                packages.service.add(service)
+                packages.due_date = next_3_months
+                packages.save()
+                    
+        total_price_app += int(price)
+        service_commission = 0
+        service_commission_type = ''
+        toValue = 0        
+        
+        # try:
+        #     commission = CommissionSchemeSetting.objects.get(employee = str(member))
+        #     category = CategoryCommission.objects.filter(commission = commission.id)
+        #     for cat in category:
+        #         try:
+        #             toValue = int(cat.to_value)
+        #         except :
+        #             sign  = cat.to_value
+        #         if cat.category_comission == 'Service':
+        #             if (int(cat.from_value) <= price and  price <  toValue) or (int(cat.from_value) <= price and sign ):
+        #                 if cat.symbol == '%':
+        #                     service_commission = price * int(cat.commission_percentage) / 100
+        #                     service_commission_type = str(service_commission_type) + cat.symbol
+        #                 else:
+        #                     service_commission = int(cat.commission_percentage)
+        #                     service_commission_type = str(service_commission) + cat.symbol
+                                            
+        # except Exception as err:
+        #     Errors.append(str(err))
             
         appointment_service = AppointmentService.objects.create(
             user = user,
@@ -498,18 +563,33 @@ def create_appointment(request):
             end_time = end_time,
             service = service,
             member = member,
-            price = price,
+            discount_price = discount_price,
+            total_price = price,
+            
             service_commission = service_commission,
             service_commission_type= service_commission_type,
             
             slot_availible_for_online = slot_availible_for_online,
             client_can_book = client_can_book,
-            # voucher = voucher,
-            # reward = reward,
-            # membership = membership,
-            # promotion = promotion
-            # tip=tip,
         )
+        price_com =  0
+        try:
+            if discount_price is not None:
+                price_com = discount_price
+                appointment_service.price = discount_price
+            else:
+                price_com =  price
+                appointment_service.price = price
+            appointment_service.save()
+            comm, comm_type = calculate_commission(member, price_com)#int(price))
+            service_commission += comm
+            service_commission_type += comm_type
+        #     ExceptionRecord.objects.create(
+        #         text = f'commsion {service_commission}'
+        # )
+        except Exception as err:
+            Errors.append(str(err))
+        
         if fav is not None:
             appointment_service.is_favourite = True
             appointment_service.save()
@@ -517,15 +597,69 @@ def create_appointment(request):
         if business_address_id is not None:
             appointment_service.business_address = business_address
             appointment_service.save()
+    
+    service_commission = 0
+    service_commission_type = ''
+    toValue = 0
+    try:
+        commission = CommissionSchemeSetting.objects.get(employee = str(member))
+        category = CategoryCommission.objects.filter(commission = commission.id)
+        for cat in category:
+            try:
+                toValue = int(cat.to_value)
+            except :
+                sign  = cat.to_value
+            if cat.category_comission == 'Service':
+                if (int(cat.from_value) <= total_price_app and  total_price_app <  toValue) or (int(cat.from_value) <= total_price_app and sign ):
+                    if cat.symbol == '%':
+                        service_commission = price * int(cat.commission_percentage) / 100
+                        service_commission_type = str(service_commission_type) + cat.symbol
+                    else:
+                        service_commission = int(cat.commission_percentage)
+                        service_commission_type = str(service_commission) + cat.symbol
+                                        
+    except Exception as err:
+        Errors.append(str(err))
+        
+    # integer_value_price = round(total_price_app[0])
+    try:
+        integer_value_ser = round(service_commission[0])
+    except Exception as err:
+        pass
+    
+    appointment.extra_price = total_price_app
+    appointment.service_commission = int(service_commission)
+    appointment.service_commission_type = service_commission_type
+    appointment.save() 
+    
     serialized = AppoinmentSerializer(appointment)
     
     try:
         thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
         thrd.start()
     except Exception as err:
-        ExceptionRecord.objects.create(
-            text=str(err)
-        )
+        pass
+    
+    # ExceptionRecord.objects.create(
+    #     text = f'error while hitting {str(err)}'
+    # )
+    # ExceptionRecord.objects.create(
+    #         text='email is in sending process'
+    #     )
+    # try:
+    #     thrd = Thread(target=Add_appointment_n, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
+    #     thrd.start()
+    # except Exception as err:
+    #     pass
+    # try:
+    #     thrd = Thread(target=AddApp, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
+    #     thrd.start()
+    # except Exception as err:
+    #     pass
+    # ExceptionRecord.objects.create(
+    #         text='email is in sended'
+    #     )
+    
     
     all_memebers= Employee.objects.filter(
         is_deleted = False,
@@ -552,6 +686,8 @@ def create_appointment(request):
 @permission_classes([IsAuthenticated])
 def update_appointment(request):
     appointment_service_id = request.data.get('id', None)
+    start_time = request.data.get('start_time', None)
+    employee_id = request.data.get('employee_id', None)
     appointment_status = request.data.get('appointment_status', None)
     if appointment_service_id is None: 
        return Response(
@@ -585,6 +721,25 @@ def update_appointment(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    if employee_id:
+        try: 
+            employee = Employee.objects.get(id=employee_id, is_deleted=False)
+        except Exception as err:
+            return Response(
+                    {
+                        'status' : False,
+                        'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                        'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                        'response' : {
+                            'message' : 'Employee Not Found',
+                            'error_message' : str(err),
+                        }
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        service_appointment.member = employee
+        service_appointment.appointment_time = start_time
+        service_appointment.save()
     serializer = UpdateAppointmentSerializer(service_appointment , data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(
@@ -599,17 +754,33 @@ def update_appointment(request):
         status=status.HTTP_404_NOT_FOUND
         )
     serializer.save()
+    
+    # if appointment_status == 'Cancel':
+    #     try:
+    #         thrd = Thread(target=cancel_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant} )
+    #         thrd.start()
+    #     except Exception as err:
+    #         print(err)
+    #         pass
+
     if appointment_status == 'Cancel':
         try:
-            thrd = Thread(target=cancel_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant} )
+            thrd = Thread(target=cancel_appointment_n, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant} )
             thrd.start()
         except Exception as err:
             print(err)
             pass
         
     else :
+        # try:
+        #     thrd = Thread(target=reschedule_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant})
+        #     thrd.start()
+        # except Exception as err:
+        #     print(err)
+        #     pass
+
         try:
-            thrd = Thread(target=reschedule_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant})
+            thrd = Thread(target=reschedule_appointment_n, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant})
             thrd.start()
         except Exception as err:
             print(err)
@@ -627,6 +798,7 @@ def update_appointment(request):
         },
         status=status.HTTP_200_OK
     )
+
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_appointment_device(request):
@@ -1130,6 +1302,12 @@ def create_checkout(request):
     service_price = request.data.get('service_price', None)
     total_price = request.data.get('total_price', None)
     
+    service_commission = 0
+    service_commission_type = ''
+    toValue = 0
+    
+    Errors = []
+    total_price_app = 0
     # if not all([]){
         
     # }
@@ -1181,6 +1359,26 @@ def create_checkout(request):
             service_appointment.save()
         except Exception as err:
             pass
+    total_price_app  = gst + total_price
+    try:
+        commission = CommissionSchemeSetting.objects.get(employee = str(member))
+        category = CategoryCommission.objects.filter(commission = commission.id)
+        for cat in category:
+            try:
+                toValue = int(cat.to_value)
+            except :
+                sign  = cat.to_value
+            if cat.category_comission == 'Service':
+                if (int(cat.from_value) <= total_price_app and  total_price_app <  toValue) or (int(cat.from_value) <= total_price_app and sign ):
+                    if cat.symbol == '%':
+                        service_commission = total_price_app * int(cat.commission_percentage) / 100
+                        service_commission_type = str(service_commission_type) + cat.symbol
+                    else:
+                        service_commission = int(cat.commission_percentage)
+                        service_commission_type = str(service_commission) + cat.symbol
+                                        
+    except Exception as err:
+        Errors.append(str(err))
         
     checkout =AppointmentCheckout.objects.create(
         appointment = appointments,
@@ -1193,7 +1391,8 @@ def create_checkout(request):
         gst = gst,
         service_price =service_price,
         total_price =total_price,
-        
+        service_commission = service_commission,
+        service_commission_type = service_commission_type,        
     )
     # checkout.business_address = service_appointment.business_address
     # checkout.save()
@@ -1207,6 +1406,7 @@ def create_checkout(request):
                     'message' : 'Appointment Checkout Created!',
                     'error_message' : None,
                     'checkout' : serialized.data,
+                    'errors': Errors
                 }
             },
             status=status.HTTP_201_CREATED
@@ -1563,8 +1763,7 @@ def create_appointment_client(request):
             is_appointment = True
         )
     except Exception as err:
-        ExceptionRecord.objects.create(text = f'Tenant Created Customer error and  {str(err)}')
-    
+        pass    
     with tenant_context(tenant):
         try:
             business=Business.objects.get(id=business_id)
@@ -1704,6 +1903,8 @@ def create_appointment_client(request):
                 service = service,
                 member = member,
                 price = price,
+                
+                
                 # voucher = voucher,
                 # reward = reward,
                 # membership = membership,
@@ -1719,13 +1920,17 @@ def create_appointment_client(request):
                 appointment_service.save()
         serialized = AppoinmentSerializer(appointment)
         
+        # try:
+        #     thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
+        #     thrd.start()
+        # except Exception as err:
+        #     pass
+
         try:
-            thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
+            thrd = Thread(target=Add_appointment_nn, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
             thrd.start()
         except Exception as err:
-            ExceptionRecord.objects.create(
-                text=str(err)
-            )
+            pass
         
         all_memebers= Employee.objects.filter(
             is_deleted = False,
@@ -2110,3 +2315,7 @@ def get_employee_check_availability_list(request):
             },
             status=status.HTTP_200_OK
         )
+    
+# @api_view(['POST'])
+# @permission_classes([AllowAny])
+# def get_employee_check_availability_list(request):

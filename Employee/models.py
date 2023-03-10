@@ -21,7 +21,7 @@ class Employee(models.Model):
     full_name = models.CharField(max_length=300, default='')
     image = models.ImageField(upload_to='employee/employee_images/', null=True, blank=True)
     employee_id = models.CharField(max_length=50, default='')
-    email = models.EmailField(verbose_name="email", max_length=60, unique=True)
+    email = models.EmailField(verbose_name="email", max_length=60)
     mobile_number = models.CharField(max_length=30, null=True, blank=True)
     is_email_verified = models.BooleanField(default=False)
     is_mobile_verified = models.BooleanField(default=False)
@@ -204,6 +204,17 @@ class Payroll(models.Model):
     name = models.CharField(max_length=300, default='')
     created_at = models.DateTimeField(auto_now_add=now)
     Total_hours = models.CharField(max_length=300, default='')
+    
+    def __str__(self):
+        return str(self.id)
+class SallarySlipPayrol(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_sallary_slip')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_employee_sallary_slip')
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_sallary_slip')
+    
+    month = models.DateTimeField(null = True)
+    created_at = models.DateTimeField(auto_now_add=now)
     
     def __str__(self):
         return str(self.id)

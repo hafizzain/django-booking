@@ -5,7 +5,7 @@ from Product.models import Product
 from Service.models import Service
 from Utility.models import Country, State, City
 
-from Client.models import Client, ClientGroup, DiscountMembership, LoyaltyPoints, Subscription, Promotion , Rewards , Membership, Vouchers
+from Client.models import Client, ClientGroup, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription, Promotion , Rewards , Membership, Vouchers
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -85,7 +85,7 @@ class Client_TenantSerializer(serializers.ModelSerializer):
         
         
 class ClientGroupSerializer(serializers.ModelSerializer):
-    client =serializers.SerializerMethodField()
+    client =serializers.SerializerMethodField(read_only=True)
     
     def get_client(self, obj):
         all_client =obj.client.all()
@@ -120,12 +120,31 @@ class PromotionSerializer(serializers.ModelSerializer):
         fields = ['id', 'name','purchases' , 'promotion_type', 'product', 'service','discount','valid_til']
 
 class DiscountMembershipSerializers(serializers.ModelSerializer):
+    service_name = serializers.SerializerMethodField(read_only=True)
+    product_name = serializers.SerializerMethodField(read_only=True)
+    
+    def get_product_name(self, obj):
+        try:
+            return obj.product.name
+        except:
+            return None
+    def get_service_name(self, obj):
+        try:
+            return obj.service.name
+        except:
+            return None
     class Meta:
         model = DiscountMembership
+        fields = '__all__'
+class CurrencyPriceMembershipSerializers(serializers.ModelSerializer):
+    
+    class Meta:
+        model = CurrencyPriceMembership
         fields = '__all__'
         
 class MembershipSerializer(serializers.ModelSerializer):
     discount_membership = serializers.SerializerMethodField()
+    currency_membership = serializers.SerializerMethodField()
     
     def get_discount_membership(self, obj):
         try:
@@ -133,10 +152,18 @@ class MembershipSerializer(serializers.ModelSerializer):
             return DiscountMembershipSerializers(pro, many= True).data
         except Exception as err:
             print(err)
+    
+    
+    def get_currency_membership(self, obj):
+        try:
+            pro = CurrencyPriceMembership.objects.filter(membership = obj)
+            return CurrencyPriceMembershipSerializers(pro, many= True).data
+        except Exception as err:
+            print(err)
             
     class Meta:
         model = Membership
-        fields = ['id', 'name','valid_for','discount','price','tax_rate','discount_membership']
+        fields = ['id', 'name','valid_for','discount','discount_membership', 'currency_membership']
 
 class VoucherSerializer(serializers.ModelSerializer):
     

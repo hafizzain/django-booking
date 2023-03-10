@@ -277,7 +277,7 @@ def get_business(request):
 @permission_classes([AllowAny])
 def get_business_by_domain(request):
     domain_name = request.GET.get('domain', None)
-
+    id = ''
     if domain_name is None:
         return Response(
             {
@@ -299,12 +299,23 @@ def get_business_by_domain(request):
         domain_name = f'{domain_name}.{settings.BACKEND_DOMAIN_NAME}'
         domain = None
         try :
-           tenant_id = Tenant.objects.get(domain = domain_name )
+           tenant_id = Tenant.objects.get(domain__iexact = domain_name )
            id = tenant_id.id
         except Exception as err:
-            pass
+            return Response(
+            {
+                'status' : False,
+                'status_code_text' : 'Tenants Not Found',
+                'response' : {
+                    'message' : 'Tenants Not Found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+            
         with tenant_context(Tenant.objects.get(schema_name = 'public')):
-            domain = Domain.objects.get(domain=domain_name)
+            domain = Domain.objects.get(domain__iexact =domain_name)
 
         if domain is not None:
             with tenant_context(domain.tenant):
@@ -956,136 +967,135 @@ def update_location(request):
         pass 
 
     user = request.user
-    if business_address.user == user or business_address.business.user == user :
-        business_address.address_name = request.data.get('address_name', business_address.address_name)
-        business_address.address = request.data.get('address', business_address.address)
-        business_address.postal_code = request.data.get('postal_code', business_address.postal_code)
-        business_address.mobile_number= request.data.get('mobile_number', business_address.mobile_number)
-        business_address.email= request.data.get('email', business_address.email)
-        business_address.banking= request.data.get('banking', business_address.banking)
-        business_address.service_avaiable= request.data.get('service_avaiable', business_address.service_avaiable)
-        business_address.location_name= request.data.get('location_name', business_address.location_name)
-        business_address.description= request.data.get('description', business_address.description)
-             
-        country = request.data.get('country', None)
-        state = request.data.get('state', None)
-        city = request.data.get('city', None)
-        currency = request.data.get('currency', None)
-        images = request.data.get('images', None)
-        is_publish = request.data.get('is_publish', None)
-        
-        if is_publish is not None:
-            business_address.is_publish = True
-        else:
-            business_address.is_publish = False
+    #if business_address.user == user or business_address.business.user == user :
+    business_address.address_name = request.data.get('address_name', business_address.address_name)
+    business_address.address = request.data.get('address', business_address.address)
+    business_address.postal_code = request.data.get('postal_code', business_address.postal_code)
+    business_address.mobile_number= request.data.get('mobile_number', business_address.mobile_number)
+    business_address.email= request.data.get('email', business_address.email)
+    business_address.banking= request.data.get('banking', business_address.banking)
+    business_address.service_avaiable= request.data.get('service_avaiable', business_address.service_avaiable)
+    business_address.location_name= request.data.get('location_name', business_address.location_name)
+    business_address.description= request.data.get('description', business_address.description)
             
-        
-        if images is not None:
-            try:
-                image = BusinessAddressMedia.objects.get(business = business_address.business,business_address = business_address,)
-                image.delete()
-            except:
-                pass
-            images = BusinessAddressMedia.objects.create(
-                user = user,
-                business = business_address.business,
-                business_address = business_address,
-                image = images
-            )
-
-        try:
-            if currency is not None:
-                currency_id = Currency.objects.get( id = currency, is_deleted=False, is_active=True )
-                business_address.currency = currency_id
-                business_address.save()
-                
-            if country is not None:
-                country = Country.objects.get( id=country, is_deleted=False, is_active=True )
-                business_address.country = country
-                business_address.save()
-            if state is not None:
-                state = State.objects.get( id=state, is_deleted=False, is_active=True )
-                business_address.state = state
-                business_address.save()
-            if city is not None:
-                city = City.objects.get( id=city, is_deleted=False, is_active=True )
-                business_address.city = city
-                business_address.save()
-        except Exception as err:
-            return Response(
-                {
-                    'status' : False,
-                    'status_code' : 400,
-                    'status_code_text' : 'Invalid Data',
-                    'response' : {
-                        'message' : 'Invalid Country, State or City',
-                        'error_message' : str(err),
-                    }
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        business_address.save()
-        
-        days = [
-            'monday',
-            'tuesday',
-            'wednesday',
-            'thursday',
-            'friday',
-            'saturday',
-            'sunday',
-        ]
-        
-        for day in days:
-            try:
-                bds_schedule = BusinessOpeningHour.objects.get(business_address=business_address, day=day)
-        
-            except Exception as err:
-                pass
-            
-            print(day)
-            s_day = opening_day.get(day.lower(), None)
-            if s_day is not None:
-                bds_schedule.start_time = s_day['start_time']
-                bds_schedule.close_time = s_day['end_time']
-                bds_schedule.is_closed = False
-
-            else:
-                bds_schedule.is_closed = True
-
-            bds_schedule.save()
-
-        serialized = BusinessAddress_GetSerializer(business_address, context={'request' : request})
-
-        return Response(
-                {
-                    'status' : True,
-                    'status_code' : 200,
-                    'status_code_text' : 'Updated',
-                    'response' : {
-                        'message' : 'Location updated successful',
-                        'error_message' : None,
-                        'location' : serialized.data
-                    }
-                },
-                status=status.HTTP_200_OK
-            )
-        
-
+    country = request.data.get('country', None)
+    state = request.data.get('state', None)
+    city = request.data.get('city', None)
+    currency = request.data.get('currency', None)
+    images = request.data.get('images', None)
+    is_publish = request.data.get('is_publish', None)
+    
+    if is_publish is not None:
+        business_address.is_publish = True
     else:
+        business_address.is_publish = False
+        
+    
+    if images is not None:
+        try:
+            image = BusinessAddressMedia.objects.get(business = business_address.business,business_address = business_address,)
+            image.delete()
+        except:
+            pass
+        images = BusinessAddressMedia.objects.create(
+            user = user,
+            business = business_address.business,
+            business_address = business_address,
+            image = images
+        )
+
+    try:
+        if currency is not None:
+            currency_id = Currency.objects.get( id = currency, is_deleted=False, is_active=True )
+            business_address.currency = currency_id
+            business_address.save()
+            
+        if country is not None:
+            country = Country.objects.get( id=country, is_deleted=False, is_active=True )
+            business_address.country = country
+            business_address.save()
+        if state is not None:
+            state = State.objects.get( id=state, is_deleted=False, is_active=True )
+            business_address.state = state
+            business_address.save()
+        if city is not None:
+            city = City.objects.get( id=city, is_deleted=False, is_active=True )
+            business_address.city = city
+            business_address.save()
+    except Exception as err:
         return Response(
             {
                 'status' : False,
-                'status_code' : StatusCodes.USER_HAS_NO_PERMISSION_1001,
-                'status_code_text' : 'USER_HAS_NO_PERMISSION_1001',
+                'status_code' : 400,
+                'status_code_text' : 'Invalid Data',
                 'response' : {
-                    'message' : 'You don"t have permission to edit this location',
-                    'error_message' : 'User don"t have permission to edit this Business Address, user must be Business Owner or Location creator',
+                    'message' : 'Invalid Country, State or City',
+                    'error_message' : str(err),
                 }
             },
-            status=status.HTTP_403_FORBIDDEN
+            status=status.HTTP_400_BAD_REQUEST
         )
+
+    business_address.save()
+    
+    days = [
+        'monday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday',
+        'saturday',
+        'sunday',
+    ]
+    
+    for day in days:
+        try:
+            bds_schedule = BusinessOpeningHour.objects.get(business_address=business_address, day=day)
+    
+        except Exception as err:
+            pass
+        
+        print(day)
+        s_day = opening_day.get(day.lower(), None)
+        if s_day is not None:
+            bds_schedule.start_time = s_day['start_time']
+            bds_schedule.close_time = s_day['end_time']
+            bds_schedule.is_closed = False
+
+        else:
+            bds_schedule.is_closed = True
+
+        bds_schedule.save()
+
+    serialized = BusinessAddress_GetSerializer(business_address, context={'request' : request})
+
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : 'Updated',
+                'response' : {
+                    'message' : 'Location updated successful',
+                    'error_message' : None,
+                    'location' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    
+    # else:
+    #     return Response(
+    #         {
+    #             'status' : False,
+    #             'status_code' : StatusCodes.USER_HAS_NO_PERMISSION_1001,
+    #             'status_code_text' : 'USER_HAS_NO_PERMISSION_1001',
+    #             'response' : {
+    #                 'message' : 'You don"t have permission to edit this location',
+    #                 'error_message' : 'User don"t have permission to edit this Business Address, user must be Business Owner or Location creator',
+    #             }
+    #         },
+    #         status=status.HTTP_403_FORBIDDEN
+    #     )
 
 
 @api_view(['GET'])
@@ -2204,8 +2214,8 @@ def update_business_tax(request):
 
     try:
         business_tax = BusinessTax.objects.get(
-            id=tax_id,
-            user = user,
+            id = str(tax_id),
+            #user = user,
             business=business,
         )
     except Exception as err:
@@ -3026,7 +3036,7 @@ def get_check_availability(request):
                                 'status' : True,
                                 'status_code' : 200,
                                 'response' : {
-                                    'message' : f'This time {employee.full_name} not Available',
+                                    'message' : f'{employee.full_name} is not available at this time',
                                     'error_message' : f'This Employee day off, {employee.full_name} date {date}',
                                     'Availability': False
                                 }
@@ -3039,7 +3049,7 @@ def get_check_availability(request):
                             'status' : True,
                             'status_code' : 200,
                             'response' : {
-                                'message' : f'This time {employee.full_name} not Available',
+                                'message' : f'{employee.full_name} is not available at this time',
                                 'error_message' : f'This Employee day off, {employee.full_name} date {date}',
                                 'Availability': False
                             }
@@ -3075,7 +3085,7 @@ def get_check_availability(request):
                         # member__employee_employedailyschedule__start_time__gte = start_time,
                         # member__employee_employedailyschedule__end_time__lte = start_time,
                         is_blocked = False,
-                    )#.values_list('member__id', flat=True)
+                    )
                     
                     for ser in av_staff_ids:
                         if tested <= ser.appointment_time:# or start_time >= ser.end_time:
@@ -3083,8 +3093,9 @@ def get_check_availability(request):
                                 data.append(f'Employees are free, employee name {employee.full_name}')
                                 
                             else:
-                                data.append(f'The selected staff is not available at this time  {employee.full_name}')
-                                Availability = False
+                                pass
+                                # data.append(f'The selected staff is not available at this time  {employee.full_name}')
+                                # Availability = False
                                                                         
                         else:
                             data.append(f'Employees are free, employee name: {employee.full_name}')

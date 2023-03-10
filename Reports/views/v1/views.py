@@ -28,7 +28,7 @@ from Product.models import Brand, Product, ProductOrderStockReport, ProductStock
 from django.db.models import Avg, Count, Min, Sum
 
 
-from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
+from Sale.serializers import AppointmentCheckout_ReportsSerializer, AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer, CheckoutCommissionSerializer
 
 
 @api_view(['GET'])
@@ -167,9 +167,14 @@ def get_store_target_report(request):
 def get_service_target_report(request):
     month = request.GET.get('month', None)
     year = request.GET.get('year', None)
+    location = request.GET.get('location', None)
     
     address = ServiceGroup.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = ServiceGroupReport(address, many=True, context={'request' : request, 'month': month, 'year': year})
+    serialized = ServiceGroupReport(address, many=True, context={'request' : request, 
+                    'month': month,
+                    'location': location,
+                    'year': year
+                    })
     return Response(
         {
             'status' : 200,
@@ -186,11 +191,17 @@ def get_service_target_report(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_retail_target_report(request):
+    
     month = request.GET.get('month', None)
     year = request.GET.get('year', None)
+    location = request.GET.get('location', None)
     
     brand = Brand.objects.filter(is_active=True).order_by('-created_at')
-    serialized = ReportBrandSerializer(brand, many=True, context={'request' : request, 'month': month, 'year': year})
+    serialized = ReportBrandSerializer(brand, many=True, context={'request' : request, 
+                                            'month': month,
+                                            'year': year,
+                                            'location': location,
+                                            })
     return Response(
         {
             'status' : 200,
@@ -204,32 +215,27 @@ def get_retail_target_report(request):
         status=status.HTTP_200_OK
     )
 
+    
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_commission_reports_by_commission_details(request):
-    range_start = request.GET.get('range_start', None)
-    year = request.GET.get('year', None)
-    range_end = request.GET.get('range_end', None)
+def get_commission_reports_by_commission_details_updated(request):
+    range_start = request.GET.get('range_start', None) # 2023-02-23
+    year = request.GET.get('year', None) # non used
+    range_end = request.GET.get('range_end', None) # 2023-02-25
     
-    # #pagination
+    data = []
     
-    # paginator = CustomPagination()
-    # paginator.page_size = 1
-    # result_page = paginator.paginate_queryset(product_order, request)
-    # serialized = ProductOrderSerializer(result_page,  many=True)
-    
-    data=[]
-    Append_data = [] 
-    newdata = {} 
     if range_start:
-        range_start = datetime.strptime(range_start, "%Y-%m-%d")#.date()
+        range_start = datetime.strptime(range_start, "%Y-%m-%d")
         range_end = datetime.strptime(range_end, "%Y-%m-%d")
+
         checkout_order = Checkout.objects.filter(
             is_deleted=False,
             created_at__gte =  range_start ,
             created_at__lte = range_end
-            ).order_by('-created_at')
-        serialized = CheckoutSerializer(checkout_order,  many=True, context={
+        ).order_by('-created_at')
+
+        serialized = CheckoutCommissionSerializer(checkout_order,  many=True, context={
             'request' : request, 
             })
         data.extend(serialized.data)
@@ -239,61 +245,20 @@ def get_commission_reports_by_commission_details(request):
             created_at__gte =  range_start ,
             created_at__lte = range_end
             )
-        serialized = AppointmentCheckoutSerializer(appointment_checkout, many = True)
+        serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
         data.extend(serialized.data)
     else:
         checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
-        serialized = CheckoutSerializer(checkout_order,  many=True, context={
+        serialized = CheckoutCommissionSerializer(checkout_order,  many=True, context={
             'request' : request, 
             })
         data.extend(serialized.data)
-            
-        appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')
-        serialized = AppointmentCheckoutSerializer(appointment_checkout, many = True)
+        
+        appointment_checkout = AppointmentService.objects.filter(appointment_status = 'Done')
+        serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
         data.extend(serialized.data)
         
-    for da in data:
-        try:
-            location =  da['location']
-            name = da['member']
-            service_sale_price = da['service']
-            product_sale_price = da['product']
-            voucher_sale_price = da['voucher']
-            service_commission = da['service_commission']
-            voucher_commission = da['voucher_commission']
-            product_commission = da['product_commission']
-            voucher_commission_type = da['voucher_commission_type']
-            product_commission_type = da['product_commission_type']
-            service_commission_type = da['service_commission_type']
-            
-            newdata = {
-                'employee': name,
-                'location': location,
-                'commission': service_commission,
-                'commission_rate': service_commission_type,
-                'sale': service_sale_price,
-                }
-            Append_data.append(newdata)
-            
-            newdata = {
-                'employee': name,
-                'location': location,
-                'commission': product_commission,
-                'commission_rate': product_commission_type,
-                'sale': product_sale_price,
-                }
-            Append_data.append(newdata)
-            newdata = {
-                'employee': name,
-                'location': location,
-                'commission': voucher_commission,
-                'commission_rate': voucher_commission_type,
-                'sale': voucher_sale_price,
-                }
-            Append_data.append(newdata)
-        except Exception as err:
-            pass
-        
+    
     return Response(
         {
             'status' : 200,
@@ -301,9 +266,17 @@ def get_commission_reports_by_commission_details(request):
             'response' : {
                 'message' : 'All Sale Orders',
                 'error_message' : None,
-                'sales' : Append_data
+                'sales' : data,
+                # 'sales' : [
+                #     {
+                #         'employee' : {},
+                #         'location' : {},
+                #         'commission' : 00,
+                #         'commission_rate' : 00,
+                #         'sale' : {},
+                #     }
+                # ]
             }
         },
         status=status.HTTP_200_OK
     )
-    

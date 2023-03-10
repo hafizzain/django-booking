@@ -60,7 +60,6 @@ def complete_user_account(request, user=None, data=None):
         if social_id is not None:
             user.social_id = social_id
     else:
-        ExceptionRecord.objects.create(text=f'This account was not social account {data.get("social_platform", None)}')
         try:
             OTP.generate_user_otp(user=user, code_for='Email')
         except Exception as error:

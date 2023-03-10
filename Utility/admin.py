@@ -1,10 +1,11 @@
 from django.contrib import admin
-from .models import ExceptionRecord, GlobalPermissionChoices, NstyleFile, Software, Country, State, City, Language, Currency
+from .models import ExceptionRecord, GlobalPermissionChoices, NstyleFile, Software, Country, State, City, Language, Currency, TurnOverProductRecord
 
 admin.site.register(NstyleFile)
 
 
 admin.site.register(GlobalPermissionChoices)
+admin.site.register(TurnOverProductRecord)
 
 # @admin.register(GlobalPermissionChoices)
 # class PermissionAdmin(admin.ModelAdmin):

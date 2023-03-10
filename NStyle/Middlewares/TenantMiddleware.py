@@ -44,8 +44,11 @@ class CustomTanantMiddleware(MiddlewareMixin):
         request.tenant = tenant
         try:
             request.tenant_name = self.domain_name
+            request.tenant_schema_name = tenant.schema_name
         except:
             request.tenant_name = ''
+            request.tenant_schema_name = ''
+
         connection.set_tenant(request.tenant)
         self.setup_url_routing(request)
 

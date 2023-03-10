@@ -670,7 +670,7 @@ def add_product(request):
     business_id = request.data.get('business', None)
     vendor_id = request.data.get('vendor', None)
     category_id = request.data.get('category', None)
-    product_size = request.data.get('product_size', None)
+    product_size = request.data.get('size', None)
     #image = request.data.getlist('image', None)
     brand_id = request.data.get('brand', None)
     product_type = request.data.get('product_type', 'Sellable')
@@ -698,7 +698,7 @@ def add_product(request):
     # unit = request.data.get('unit', None)
     # product_unit = request.data.get('product_unit', None)
     # amount = request.data.get('amount', None)
-    stock_status = request.data.get('stock_status', None)
+    stock_status = request.data.get('stock_status', True)
 
     #turnover = request.data.get('turnover', None)
    
@@ -732,10 +732,16 @@ def add_product(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    if is_active is not None:
+        is_active = True #json.loads(stock_status)
+    else: 
+        is_active = False
+        
     if stock_status is not None:
         stock_status = False #json.loads(stock_status)
     else: 
         stock_status = True
+        
     if alert_when_stock_becomes_lowest  is not None:
         alert_when_stock_becomes_lowest= True #json.loads(alert_when_stock_becomes_lowest)
     else:
@@ -814,30 +820,16 @@ def add_product(request):
         cost_price = cost_price,
         #full_price = full_price,
         #sell_price = sell_price,
-        #product_size=product_size,
+        product_size=product_size,
         tax_rate = tax_rate,
         short_description = short_description,
         description = description,
         barcode_id = barcode_id,
         sku = sku,
         slug = str(name).replace(' ' , '-').replace('/' , '-').replace('?' , '-'),
-        is_active=True,
+        is_active = is_active,
         published = True,
     )
-    # if type(location) == str:
-    #         location = json.loads(location)
-
-    # elif type(location) == list:
-    #         pass
-        
-    # for loc in location:
-    #     try:
-    #         location_id = BusinessAddress.objects.get(id=loc)  
-    #         print(location_id)
-    #         product.location.add(location_id)
-    #     except Exception as err:
-    #         product_error.append(str(err))
-
 
     for img in medias:
         ProductMedia.objects.create(
@@ -871,15 +863,15 @@ def add_product(request):
             )
             except Exception as err:
                 print(str(err))
-                ExceptionRecord.objects.create(is_resolved = False, text=f'currency not found product line 866  ' )
+                #ExceptionRecord.objects.create(is_resolved = False, text=f'currency not found product line 866  ' )
             
                     
     location_quantities = request.data.get('location_quantities', None)
     if location_quantities is not None:
         if type(location_quantities) == str:
-            ExceptionRecord.objects.create(is_resolved = True, text='Location Quantities was string and gonna convert')
+            #ExceptionRecord.objects.create(is_resolved = True, text='Location Quantities was string and gonna convert')
             location_quantities = json.loads(location_quantities)
-            ExceptionRecord.objects.create(is_resolved = True, text='Converted')
+            #ExceptionRecord.objects.create(is_resolved = True, text='Converted')
         
         for loc_quan in location_quantities:
             location_id = loc_quan.get('id', None)
@@ -941,7 +933,7 @@ def add_product(request):
         ExceptionRecord.objects.create(text='No Location Quantities Find')
     
 
-    serialized = ProductSerializer(product, context={'request' : request})
+    serialized = ProductSerializer(product, context={'request' : request, 'location': None})
     return Response(
         {
             'status' : True,
@@ -965,6 +957,7 @@ def update_product(request):
     category_id = request.data.get('category', None)
     brand_id = request.data.get('brand', None)
     location = request.data.get('location', None)
+    is_active = request.data.get('is_active', None)
     
     currency_retail_price = request.data.get('currency_retail_price', None)
     
@@ -1031,6 +1024,9 @@ def update_product(request):
         is_deleted = False,
         
     )
+    if is_active is None:
+        product.is_active = False
+        product.save()
     images = request.data.getlist('product_images', None)
 
     if images is not None:
@@ -1166,7 +1162,7 @@ def update_product(request):
     #     data.update(serialized.data)
         
     
-    serialized = ProductSerializer(product, data=request.data, partial=True, context={'request':request})
+    serialized = ProductSerializer(product, data=request.data, partial=True, context={'request':request, 'location': None})
     if serialized.is_valid():
         serialized.save()
         data.update(serialized.data)
@@ -1200,8 +1196,12 @@ def update_product(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_products(request):
+    location = request.GET.get('location', None)
     all_products = Product.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = ProductSerializer(all_products, many=True, context={'request' : request})
+    serialized = ProductSerializer(all_products, many=True, 
+                                   context={'request' : request,
+                                            'location': location,
+                                            })
 
     return Response(
         {
@@ -2026,6 +2026,7 @@ def add_product_consumption(request):
             )
             sold = consumed.available_quantity - int(quantity)
             consumed.available_quantity = sold
+            consumed.consumed_quantity +=  int(quantity)
             #consumed.sold_quantity += int(quantity)
             consumed.save()
             stock_cunsumed.after_quantity = sold

@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from Product.models import Brand
+from Utility.models import ExceptionRecord
 from rest_framework import serializers
 from Appointment.models import AppointmentCheckout, AppointmentService
 from Appointment.serializers import LocationSerializer
@@ -16,25 +17,24 @@ from Utility.Constants.Data.months import MONTH_DICT
 
 
 class ServiceOrderSerializer(serializers.ModelSerializer):
-    # user  = serializers.SerializerMethodField(read_only=True)
-    # order_type  = serializers.SerializerMethodField(read_only=True)
-    
-    # def get_order_type(self, obj):
-    #     return 'Service'
-        
-    # def get_user(self, obj):
-    #     try:
-    #         return obj.user.full_name
-    #     except Exception as err:
-    #         return None
+    location = serializers.SerializerMethodField(read_only=True)
+
+    def get_location(self, obj):
+        loc = BusinessAddress.objects.get(id  = str(obj.checkout.location))
+        return LocationSerializer(loc ).data
     class Meta:
         model = ServiceOrder
-        fields = ('total_price', 'sold_quantity','current_price', 'created_at')
+        fields = ('total_price', 'sold_quantity','current_price', 'location','created_at')
         
 class AppointmentCheckoutReportSerializer(serializers.ModelSerializer):
+    location = serializers.SerializerMethodField(read_only=True)
+
+    def get_location(self, obj):
+        loc = BusinessAddress.objects.get(id  = str(obj.business_address))
+        return LocationSerializer(loc ).data
     class Meta:
         model = AppointmentCheckout
-        fields = ['total_price', 'created_at']
+        fields = ['total_price', 'created_at', 'location']
 
 class ServiceReportSerializer(serializers.ModelSerializer):
     sale = serializers.SerializerMethodField(read_only=True)
@@ -80,15 +80,10 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
         
     def get_product_sale_price(self, obj):
         try:
-            
-            # product_order = ProductOrder.objects.filter(is_deleted=False, member = obj).order_by('-created_at')
-            
-            # serialized = ProductOrderSerializer(product_order,  many=True, context=self.context ).data
-            # return serialized
             month = self.context["month"]
             year = self.context["year"]
             total = 0
-            test = 0
+            
             service_orders = ProductOrder.objects.filter(
                 is_deleted=False, 
                 member = obj, 
@@ -99,8 +94,6 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
                 match = int(create.split(" ")[0].split("-")[1])
                 if int(month) == match:
                     total += int(ord.total_price)
-                    test = test + 5
-                    #return total
             
             return f'{total}'
                 
@@ -109,17 +102,25 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
     
     def get_service_sale_price(self, obj):
         try:
-            # service_orders = ServiceOrder.objects.filter(is_deleted=False).order_by('-created_at')
-            # serialized = ServiceOrderSerializer(service_orders,  many=True, context=self.context).data
-            # return serialized
             month = self.context["month"]
             year = self.context["year"]
             total = 0
-            test = 0
+            app   = AppointmentService.objects.filter(
+                member = obj,
+                appointment_status = 'Done',
+                created_at__icontains = year
+            )
+        
             service_orders = ServiceOrder.objects.filter(is_deleted=False, 
                         member = obj,
                         created_at__icontains = year
                         )
+            for appointment in app:
+                create = str(appointment.created_at)
+                match = int(create.split(" ")[0].split("-")[1])
+                if int(month) == match:
+                    total += int(appointment.price)
+                    
             for ord  in service_orders:
                 create = str(ord.created_at)
                 match = int(create.split(" ")[0].split("-")[1])
@@ -133,26 +134,24 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
         
     def get_staff_target(self, obj):
         try:
-            # staff_target = StaffTarget.objects.filter(employee = obj)  
-            # serializer = StaffTargetSerializers(staff_target, many = True, context=self.context).data
-            # return serializer
             month = self.context["month"]
             year = self.context["year"]
             service_target = 0
             retail_target = 0
             data = {}
             
+            date_str = f'{month}-{year}'
+            date_obj = datetime.strptime(date_str, '%m-%Y')
+            
             staff_target = StaffTarget.objects.filter(
                 employee = obj,
-                 created_at__icontains = year                
+                #created_at__icontains = date_obj                
                 ) 
             for ord  in staff_target:
-                create = str(ord.created_at)
-                match = int(create.split(" ")[0].split("-")[1])
-                if int(month) == match:
+                created_date = ord.year.date() 
+                if created_date.month == date_obj.month and created_date.year == date_obj.year:
                     service_target += int(ord.service_target)
                     retail_target += int(ord.retail_target)
-                    #return total
             data.update({
                 'service_target': service_target,
                 'retail_target': retail_target
@@ -177,8 +176,6 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
             except:
                 return obj.image
         return None
-    
-    
     class Meta:
         model = Employee
         fields = ['id', 'employee_id','is_active','full_name','image','location',
@@ -209,26 +206,41 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             product_commission = 0
             voucher_commission = 0
             data = {}
+            app   = AppointmentService.objects.filter(
+                member = obj,
+                appointment_status = 'Done',
+                #created_at__icontains = year
+            )
+            for appointment  in app:                
+                create = str(appointment.created_at)
+                created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
+                
+                if range_start:
+                    if range_start >= created_at  and created_at <= range_end:
+                        service_commission += int(appointment.service_commission)
+                else:
+                    service_commission += int(appointment.service_commission)
+                    
+            ExceptionRecord.objects.create(
+                    text=str(service_commission)
+                )
             
             service_orders = ProductOrder.objects.filter(
                 is_deleted=False, 
                 member = obj, 
-                #created_at__icontains = year
                 )
             for ord  in service_orders:
                 create = str(ord.created_at)
                 created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
                 if range_start is not None:
-                    #return f'range start {range_start >= created_at} {created_at <= range_end}  {range_start} created at {created_at} range end {range_end}'
                     if created_at >= range_start  and created_at <= range_end:
-                        total += int(ord.total_price)
+                        total += int(ord.checkout.total_service_price)
                         service_commission += ord.checkout.service_commission
                         product_commission += ord.checkout.product_commission
                         voucher_commission += ord.checkout.voucher_commission
-                    # else:
-                    #     return f'range start {service_commission}'
+        
                 else:
-                    total += int(ord.total_price)
+                    total += int(ord.checkout.total_product_price)
                     service_commission += ord.checkout.service_commission
                     product_commission += ord.checkout.product_commission
                     voucher_commission += ord.checkout.voucher_commission
@@ -261,32 +273,31 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                         member = obj,
                         #created_at__icontains = year
                         )
+            app   = AppointmentService.objects.filter(
+                member = obj,
+                appointment_status = 'Done',
+                #created_at__icontains = year
+            )
+            for appointment  in app:                
+                create = str(appointment.created_at)
+                created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
+                
+                if range_start:
+                    if range_start >= created_at  and created_at <= range_end:
+                        total += int(appointment.price)
+                else:
+                    total += int(appointment.price)
+                    
             for ord  in service_orders:                
                 create = str(ord.created_at)
                 created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
                 
                 if range_start:
                     if range_start >= created_at  and created_at <= range_end:
-                        total += int(ord.total_price)
-                    #total += int(ord.total_price)
+                        total += int(ord.checkout.total_service_price)
                 else:
-                    total += int(ord.total_price)
-                    
-            # service_appointment = AppointmentService.objects.filter(is_deleted=False, 
-            #             member = obj,
-            #             #created_at__icontains = year
-            #             )
-            # for ord  in service_appointment:                
-            #     create = str(ord.created_at)
-            #     created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
-                
-            #     if range_start:
-            #         if range_start >= created_at  and created_at <= range_end:
-            #             total += int(ord.total_price)
-            #         else:
-            #             total += int(ord.total_price)
-            
-                      
+                    total += int(ord.checkout.total_service_price)
+                                          
             return total         
             
         except Exception as err:
@@ -313,9 +324,9 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 
                 if range_start:
                     if range_start >= created_at  and created_at <= range_end:
-                        total += int(ord.total_price)
+                        total += int(ord.checkout.total_voucher_price)
                 else:
-                    total += int(ord.total_price)
+                    total += int(ord.checkout.total_voucher_price)
                                 
             return total         
             
@@ -350,31 +361,11 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
     membership_sale_price = serializers.SerializerMethodField(read_only=True)
     
     tier_target = serializers.SerializerMethodField(read_only=True)
-    # product_target = serializers.SerializerMethodField(read_only=True)
-    # voucher_target = serializers.SerializerMethodField(read_only=True)
-    # membership_target = serializers.SerializerMethodField(read_only=True)
     
     def get_tier_target(self,obj):
         try:
-            # month = self.context["month"]
-            # year = self.context["year"]
-            # service_target = 0
-            # retail_target = 0
-            # voucher_target = 0
-            # membership_target = 0
-            # month_find = MONTH_DICT[month]
-            # return month_find
             tier = StoreTarget.objects.filter(
-                # storetarget__location = obj,
-                # month = month_find
                 )
-            # for tier_target in  tier:
-            #     create = str(tier_target.year)
-            #     match = int(create.split(" ")[0].split("-")[0])
-            #     return tier_target.year
-                #if int(year) == match:
-                    
-                    #total += int(ord.total_price)
                 
             return StoreTargetSerializers(tier,many = True ,context=self.context).data
         except Exception as err:
@@ -385,16 +376,27 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
             month = self.context["month"]
             year = self.context["year"]
             total = 0
+            
+            app   = AppointmentService.objects.filter(
+                business_address = obj,
+                appointment_status = 'Done',
+            )
             service_orders = ServiceOrder.objects.filter(is_deleted=False,
                         location = obj,
                         created_at__icontains = year
-                        
                         )
+            
+            for ord  in app:
+                create = str(ord.created_at)
+                match = int(create.split(" ")[0].split("-")[1])
+                if int(month) == match:
+                    total += int(ord.price)
+            
             for ord  in service_orders:
                 create = str(ord.created_at)
                 match = int(create.split(" ")[0].split("-")[1])
                 if int(month) == match:
-                    total += int(ord.total_price)
+                    total += int(ord.checkout.total_service_price)
                                 
             return total         
             
@@ -416,7 +418,7 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
                 create = str(ord.created_at)
                 match = int(create.split(" ")[0].split("-")[1])
                 if int(month) == match:
-                    total += int(ord.total_price)
+                    total += int(ord.checkout.total_product_price)
             
             return total
                 
@@ -438,7 +440,7 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
                 create = str(ord.created_at)
                 match = int(create.split(" ")[0].split("-")[1])
                 if int(month) == match:
-                    total += int(ord.total_price)
+                    total += int(ord.checkout.total_voucher_price)
             
             return total
                 
@@ -460,7 +462,7 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
                 create = str(ord.created_at)
                 match = int(create.split(" ")[0].split("-")[1])
                 if int(month) == match:
-                    total += int(ord.total_price)
+                    total += int(ord.checkout.total_membership_price)
             
             return total
                 
@@ -669,41 +671,38 @@ class ServiceGroupReport(serializers.ModelSerializer):
         try:
             month = self.context["month"]
             year = self.context["year"]
+            location = self.context["location"]
             ser_target = 0
-            retail_target = 0
-            data = {}
             
+            date_str = f'{month}-{year}'
+            date_obj = datetime.strptime(date_str, '%m-%Y')
+                        
             service_target = ServiceTarget.objects.filter(
                 service_group = obj,
-                created_at__icontains = year                
+                created_at__icontains = year,
+                location__id =  location,
                 ) 
             for ord  in service_target:
-                create = str(ord.created_at)
-                match = int(create.split(" ")[0].split("-")[1])
-                if int(month) == match:
-                    ser_target += int(ord.service_target)
-                    #retail_target += int(ord.retail_target)
-                    #return total
-            # data.update({
-            #     'service_target': service_target,
-            #     'retail_target': retail_target
-            # })
-            
+                created_date = ord.year.date() 
+                if created_date.month == date_obj.month and created_date.year == date_obj.year:
+                    ser_target += int(ord.service_target)            
             return ser_target
             
         except Exception as err:
             return str(err)        
     class Meta:
         model = ServiceGroup
-        fields = ['id','name','service','service_target']#'service_sale_price']
+        fields = ['id','name','service','service_target']
         
 class ReportBrandSerializer(serializers.ModelSerializer): 
     product_sale_price = serializers.SerializerMethodField(read_only=True)
     brand_target = serializers.SerializerMethodField(read_only=True)
 
     def get_brand_target(self, obj):
+        location = self.context["location"]
         retail_target = RetailTarget.objects.filter(
-            brand = obj
+            brand = obj,
+            location__id =  location,            
             ).order_by('-created_at').distinct()
         return RetailTargetSerializers(retail_target, many = True).data
     
@@ -722,7 +721,7 @@ class ReportBrandSerializer(serializers.ModelSerializer):
                 create = str(ord.created_at)
                 match = int(create.split(" ")[0].split("-")[1])
                 if int(month) == match:
-                    total += int(ord.total_price)
+                    total += int(ord.checkout.total_product_price)
             
             return total
                 

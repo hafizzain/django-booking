@@ -1,6 +1,8 @@
+from datetime import date
 from threading import Thread
 from Client.Constants.Add_Employe import add_client
 from Employee.Constants.Add_Employe import add_employee
+from Promotions.models import ServiceDurationForSpecificTime
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -9,12 +11,13 @@ from django.db.models import Q
 from Service.models import Service
 from Business.models import Business
 from Product.models import Product
-from Utility.models import Country, Language, State, City
-from Client.models import Client, ClientGroup, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers
+from Utility.models import Country, Currency, ExceptionRecord, Language, State, City
+from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers
 from Client.serializers import ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer
 from Utility.models import NstyleFile
 
 import json
+from django.core import serializers
 from NStyle.Constants import StatusCodes
 
 @api_view(['POST'])
@@ -1616,8 +1619,9 @@ def create_memberships(request):
     price = request.data.get('price',None)
     tax_rate = request.data.get('tax_rate',None)
     discount = request.data.get('discount',None)
+    currency_membership_price = request.data.get('currency_membership_price',None)#CurrencyPriceMembership
     
-    if not all([business, name , valid_for, price, ]):
+    if not all([business, name , valid_for, ]):
         return Response(
             {
                 'status' : False,
@@ -1631,9 +1635,6 @@ def create_memberships(request):
                           'name',
                           'validity',
                           'valid_for', 
-                          'price',
-                          'tax_rate'
-
                     ]
                 }
             },
@@ -1661,18 +1662,46 @@ def create_memberships(request):
         #membership=membership_type,
         valid_for = valid_for,
         #validity = validity,
-        price = price,
-        tax_rate = tax_rate,
+        # price = price,
+        # tax_rate = tax_rate,
         #total_number = total_number,
         
         #New Require
         description = description,
-        color = color,
+        #color = color,
         term_condition = terms_condition,
         
         discount = discount,
         
     )
+    if currency_membership_price is not None:
+        if type(currency_membership_price) == str:
+            currency_membership_price = currency_membership_price.replace("'" , '"')
+            currency_membership_price = json.loads(services)
+        else:
+            pass
+        for ser in currency_membership_price:
+            curency = ser['currency']
+            price = ser['price']
+            
+            try:
+                currency_id = Currency.objects.get(id=curency)
+            except Exception as err:
+                return Response(
+                    {
+                        'status' : False,
+                        'response' : {
+                        'message' : 'Currency not found',
+                        'error_message' : str(err),
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            services_obj = CurrencyPriceMembership.objects.create(
+                membership = membership_cr,
+                currency = currency_id,
+                price = price,
+            )
     if services is not None:
         if type(services) == str:
             services = services.replace("'" , '"')
@@ -1680,8 +1709,8 @@ def create_memberships(request):
         else:
             pass
         for ser in services:
-            percentage = ser['percentage']
-            duration = ser['duration']
+            percentage = ser.get('percentage', 0)
+            duration = ser.get('duration', '7 Days')
             servic = ser['service']
             
             try:
@@ -1712,9 +1741,9 @@ def create_memberships(request):
             pass
         for pro in products:
             
-            percentage = pro['percentage']
+            percentage = pro.get('percentage', 0)
             product = pro['product']
-            duration = pro['duration']
+            duration = pro.get('duration', '7 Days')
             
             try:
                 product_id=Product.objects.get(id=product)
@@ -2349,3 +2378,143 @@ def update_loyalty(request):
         },
         status=status.HTTP_200_OK
         )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_complimentary(request):
+    client = request.GET.get('client', None)
+    if client is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'client'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+       
+    client = ClientPromotions.objects.filter(client__id =client ).count()
+    
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Client total Count',
+                'count': client,
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_client_package(request):
+    client = request.GET.get('client', None)
+    package = request.GET.get('package', None)
+    package_service = request.GET.get('package_service', None)
+    
+    Error = []
+    service_diff= []
+    
+    if client and package is None: 
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'client'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        client_validation = ClientPackageValidation.objects.get(client__id=client, serviceduration__id=package_service)
+    except Exception as err:
+        Error.append(str(err))
+        return Response(
+            {
+                'status': False,
+                'status_code': 404,
+                'status_code_text': '404',
+                'response': {
+                    'message': 'Client Validation not found ID!',
+                    'error_message': str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    try:
+        service_pac = ServiceDurationForSpecificTime.objects.get(id=package_service)
+    except Exception as err:
+        Error.append(str(err))
+        return Response(
+            {
+                'status': False,
+                'status_code': 404,
+                'status_code_text': '404',
+                'response': {
+                    'message': 'Service Duration not found ID!',
+                    'error_message': str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    client_validation_te = client_validation.due_date
+    current_date = date.today()
+    if current_date <= client_validation_te:
+        try:
+            is_expired = False
+            client_service = list(client_validation.service.all().values_list('id', flat=True))
+            client_service_str = [str(uuid) for uuid in client_service]
+            pac_service = list(service_pac.service.all().values_list('id', flat=True))
+            pac_service_str = [str(uuid) for uuid in pac_service]
+            
+            service_diff = list(set(client_service_str) - set(pac_service_str)) + list(set(pac_service_str) - set(client_service_str))
+        except Exception as err:
+            Error.append(str(err))
+            return Response(
+                {
+                    'status': False,
+                    'status_code': 500,
+                    'status_code_text': '500',
+                    'response': {
+                        'message': 'Error getting non-common elements!',
+                        'error_message': str(err),
+                    }
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    else:
+        is_expired = True
+    
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Remain Service',
+                'Service': service_diff,
+                'error_message' : None,
+                'Errors': Error,
+                'is_expired':is_expired
+            }
+        },
+        status=status.HTTP_200_OK
+    )

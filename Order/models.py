@@ -125,9 +125,12 @@ class Order(models.Model):
     current_price =models.PositiveBigIntegerField(default = 0)
     tip =models.PositiveBigIntegerField(default = 0)
     gst = models.PositiveBigIntegerField(default = 0)
-    total_price = models.PositiveBigIntegerField(default = 0)
-    sold_quantity = models.PositiveBigIntegerField(default = 0,)
+    total_price = models.DecimalField(default = 0 , max_digits=10, decimal_places=5)
+    sold_quantity = models.PositiveBigIntegerField(default = 0)
     
+    discount_percentage = models.PositiveBigIntegerField(default= 0)
+    discount_price = models.PositiveBigIntegerField(default= 0)
+    price = models.PositiveBigIntegerField(default= 0)
     
     status =  models.CharField(choices=status_choice, max_length=100, default='Active')
     is_deleted = models.BooleanField(default=False)

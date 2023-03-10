@@ -11,7 +11,7 @@ admin.site.register(OrderStock)
 admin.site.register(OrderStockProduct)
 admin.site.register(ProductConsumption)
 admin.site.register(CurrencyRetailPrice)
-admin.site.register(ProductOrderStockReport)
+#admin.site.register(ProductOrderStockReport)
 @admin.register(ProductStock)
 class ProductStockpAdmin(admin.ModelAdmin):
     list_display= [
@@ -19,4 +19,12 @@ class ProductStockpAdmin(admin.ModelAdmin):
                 'product',
                 'location', 
                 'available_quantity',
+                   ]
+@admin.register(ProductOrderStockReport)
+class ProductOrderStockReportAdmin(admin.ModelAdmin):
+    list_display= [
+                'id', 
+                'product',
+                'location', 
+                'report_choice',
                    ]
