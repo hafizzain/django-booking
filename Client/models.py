@@ -303,7 +303,7 @@ class Membership(models.Model):
     
     #validity = models.PositiveIntegerField(default=0, verbose_name='No. of Validity Days/Month', null=True, blank=True)
     
-    color =  models.CharField(max_length=100, default='')
+    #color =  models.CharField(max_length=100, default='')
     term_condition =  models.CharField(max_length=300, null=True, blank=True)
 
     

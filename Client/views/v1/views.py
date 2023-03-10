@@ -1668,7 +1668,7 @@ def create_memberships(request):
         
         #New Require
         description = description,
-        color = color,
+        #color = color,
         term_condition = terms_condition,
         
         discount = discount,
