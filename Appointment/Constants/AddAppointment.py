@@ -60,10 +60,11 @@ def Add_appointment(appointment = None, tenant = None):
                 
             if client_email.sms_appoinment == True:
                 ExceptionRecord.objects.create(
-                    text = f'ccreate client {client_email.sms_appoinment == True}'
+                    text = f'ccreate client {client_email.sms_appoinment == True} apppointment {appointment}'
                 )
                 try:
-                    html_file = render_to_string("AppointmentEmail/add_appointment.html",{'client': False, 'appointment' : appointment,'staff': True,'t_name':name_c} )
+                    #html_file = render_to_string("AppointmentEmail/add_appointment.html",{'client': False, 'appointment' : appointment,'staff': True,'t_name':name_c} )
+                    html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'client': False, 'appointment' : appointment,'staff': True,'t_name':name_c} )
                     text_content = strip_tags(html_file)
                     
                     email = EmailMultiAlternatives(
