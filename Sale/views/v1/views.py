@@ -1320,23 +1320,22 @@ def create_sale_order(request):
                     transfer.save()
                     
                     stock_transfer.after_quantity = sold
-                    stock_transfer.save()
+                    stock_transfer.save()                    
                     
                 else:
                     errors.append('Available quantity issue')
             
             except Exception as err:
                 errors.append(str(err))
-            try:
-                ExceptionRecord.objects.create(
-                    text = f' error in Turnover email sale'
-                )
-                thrd = Thread(target=ProductTurnover, args=[], kwargs={'product' : product,'product_stock': transfer, 'business_address':business_address ,'tenant' : request.tenant})
-                thrd.start()
-            except Exception as err:
-                ExceptionRecord.objects.create(
-                    text = f' error in Turnover email sale{str(err)}'
-                )
+                
+            if transfer.available_quantity <= 5 :
+                try:
+                    thrd = Thread(target=ProductTurnover, args=[], kwargs={'product' : product,'product_stock': transfer, 'business_address':business_address.id ,'tenant' : request.tenant})
+                    thrd.start()
+                except Exception as err:
+                    ExceptionRecord.objects.create(
+                        text = f' error in Turnover email sale{str(err)}'
+                    )
 
             product_order = ProductOrder.objects.create(
                 user = user,
@@ -1358,7 +1357,6 @@ def create_sale_order(request):
             checkout.product_commission = product_commission
             checkout.save()
 
-                        
         elif sale_type == 'SERVICE':
             try:
                 service = Service.objects.get(id = service_id)
