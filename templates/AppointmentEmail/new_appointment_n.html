@@ -186,13 +186,13 @@
                       </thead>
                       <tbody>
                         <tr>
-                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ location }}</td>
-                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ ser_name }}</td>
-                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ duration }}</td>
-                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ date }}</td>
+                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ appo.appointment.business_address.address_name }}</td>
+                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ appo.service.name }}</td>
+                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ appo.duration }}</td>
+                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ appo.appointment_date }}</td>
 
                           <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ time }}</td>
-                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ staff }}</td>
+                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ appo.member.full_name }}</td>
                         </tr>
                       </tbody>
                     </table>
