@@ -76,8 +76,8 @@ def Add_appointment_n(appointment = None, tenant = None):
                         to = [email_c],
                     )
                         
-                email.attach_alternative(html_file, "text/html")
-                email.send()
+                    email.attach_alternative(html_file, "text/html")
+                    email.send()
             else:
                 pass
                 ExceptionRecord.objects.create(
