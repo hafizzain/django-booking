@@ -57,7 +57,9 @@ def AddApp(appointment = None, tenant = None):
                         email.attach_alternative(html_file, "text/html")
                         email.send()
                     except Exception as err:
-                        pass
+                        ExceptionRecord.objects.create(
+                            text = f'create app to email {str(err)} '
+                )
                 
             if client_email.sms_appoinment == True:
                 html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'client': False, 'staff': True,'name':name_c ,'email':email_c} )
