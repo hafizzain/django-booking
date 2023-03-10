@@ -85,7 +85,7 @@ class Client_TenantSerializer(serializers.ModelSerializer):
         
         
 class ClientGroupSerializer(serializers.ModelSerializer):
-    client =serializers.SerializerMethodField()
+    client =serializers.SerializerMethodField(read_only=True)
     
     def get_client(self, obj):
         all_client =obj.client.all()
@@ -120,10 +120,24 @@ class PromotionSerializer(serializers.ModelSerializer):
         fields = ['id', 'name','purchases' , 'promotion_type', 'product', 'service','discount','valid_til']
 
 class DiscountMembershipSerializers(serializers.ModelSerializer):
+    service_name = serializers.SerializerMethodField(read_only=True)
+    product_name = serializers.SerializerMethodField(read_only=True)
+    
+    def get_product_name(self, obj):
+        try:
+            return obj.product.name
+        except:
+            return None
+    def get_service_name(self, obj):
+        try:
+            return obj.service.name
+        except:
+            return None
     class Meta:
         model = DiscountMembership
         fields = '__all__'
 class CurrencyPriceMembershipSerializers(serializers.ModelSerializer):
+    
     class Meta:
         model = CurrencyPriceMembership
         fields = '__all__'

@@ -634,11 +634,11 @@ def create_appointment(request):
     
     serialized = AppoinmentSerializer(appointment)
     
-    # try:
-    #     thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
-    #     thrd.start()
-    # except Exception as err:
-    #     pass
+    try:
+        thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
+        thrd.start()
+    except Exception as err:
+        pass
     
     # ExceptionRecord.objects.create(
     #     text = f'error while hitting {str(err)}'
@@ -646,11 +646,19 @@ def create_appointment(request):
     # ExceptionRecord.objects.create(
     #         text='email is in sending process'
     #     )
+<<<<<<< HEAD
     try:
         thrd = Thread(target=AddApp, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
         thrd.start()
     except Exception as err:
         pass
+=======
+    # try:
+    #     thrd = Thread(target=Add_appointment_n, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
+    #     thrd.start()
+    # except Exception as err:
+    #     pass
+>>>>>>> 6749ab7fffe8d4ad789299a8cabb12a3d4edcaea
     # ExceptionRecord.objects.create(
     #         text='email is in sended'
     #     )
