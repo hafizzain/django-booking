@@ -34,7 +34,7 @@ def Add_appointment_n(appointment = None, tenant = None):
                     # client_type= appo.appointment.client_type
                     # name = appo.appointment.client.full_name
                     
-                    time = appo.datetime.today().time()
+                    time = datetime.today().time()
                     staff = appo.member.full_name
                     loc_name = appo.appointment.business_address.address_name
                     dur = appo.appointment.duration
