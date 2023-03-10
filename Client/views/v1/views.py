@@ -1662,8 +1662,8 @@ def create_memberships(request):
         #membership=membership_type,
         valid_for = valid_for,
         #validity = validity,
-        price = price,
-        tax_rate = tax_rate,
+        # price = price,
+        # tax_rate = tax_rate,
         #total_number = total_number,
         
         #New Require
