@@ -47,42 +47,43 @@ def Add_appointment_n(appointment = None, tenant = None):
                     # staff_email = None
                     # client_email = None
                     pass
-                if staff_email is not None and staff_email.sms_daily_sale:
+                if staff_email and client_email is not None and staff_email.sms_daily_sale and client_email.sms_appoinment:
+                    
                     try:   
                         html_file = render_to_string("AppointmentEmail/new_appointment_n.html", { 'client': True, 'staff': False,'t_name':mem_name,'location':loc_name, 'ser_name':ser_name  , 'duration':dur,'time':time, 'date':dat, 'staff':staff})
                         text_content = strip_tags(html_file)
-                            
+                                
                         email = EmailMultiAlternatives(
                                 'Appointment Booked',
                                 text_content,
                                 settings.EMAIL_HOST_USER,
                                 to = [mem_email],
-                            
-                            )
+                                
+                                )
                         email.attach_alternative(html_file, "text/html")
                         email.send()
                     except Exception as err:
                         ExceptionRecord.objects.create(
                             text = f'issue of sending email {str(err)}'
-                    )
-                
-                # if client_email is not None and client_email.sms_appoinment:
-                #     html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'client': False, 'staff': True,'name':name_c ,'phone':phon,'email':email_c} )
-                #     text_content = strip_tags(html_file)
+                        )
                     
-                #     email = EmailMultiAlternatives(
-                #         'Appointment Booked',
-                #         text_content,
-                #         settings.EMAIL_HOST_USER,
-                #         to = [email_c],
-                #     )
+                    # if client_email is not None and client_email.sms_appoinment:
+                    #     html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'client': False, 'staff': True,'name':name_c ,'phone':phon,'email':email_c} )
+                    #     text_content = strip_tags(html_file)
                         
-                #     email.attach_alternative(html_file, "text/html")
-                #     email.send()
+                    #     email = EmailMultiAlternatives(
+                    #         'Appointment Booked',
+                    #         text_content,
+                    #         settings.EMAIL_HOST_USER,
+                    #         to = [email_c],
+                    #     )
+                            
+                    #     email.attach_alternative(html_file, "text/html")
+                    #     email.send()
                 else:
                     pass
                     ExceptionRecord.objects.create(
-                        text = f'create an app email {staff_email.sms_daily_sale} {client_email.sms_appoinment}'
+                         text = f'create an app email {staff_email.sms_daily_sale} {client_email.sms_appoinment}'
                     )
     
         except Exception as err:
