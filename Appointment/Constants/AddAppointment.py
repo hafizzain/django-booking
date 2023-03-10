@@ -23,8 +23,8 @@ def Add_appointment(appointment = None, tenant = None):
             appointment =  AppointmentService.objects.filter(appointment = appointment)                
             for appo in appointment:
                 
-                email_c =appo.appointment.client.email
-                name_c =appo.appointment.client.full_name
+                email_c = appo.appointment.client.email
+                name_c = appo.appointment.client.full_name
                 ser_name = appo.service.name
                 dat = appo.appointment_date
                 mem_email = appo.member.email
@@ -39,6 +39,9 @@ def Add_appointment(appointment = None, tenant = None):
                 except:
                     pass
                 if staff_email.sms_daily_sale == True:
+                    ExceptionRecord.objects.create(
+                    text = f'ccreate client 43 {staff_email.sms_daily_sale == True}'
+                )
                     try:   
                         html_file = render_to_string("AppointmentEmail/email_for_client_appointment.html", {'client': True, 'staff': False,'name': name_c,'t_name':mem_name , 'ser_name':ser_name , 'date':dat, 'mem_id':mem_id, 'client_type': client_type})
                         text_content = strip_tags(html_file)
@@ -56,22 +59,29 @@ def Add_appointment(appointment = None, tenant = None):
                         pass
                 
             if client_email.sms_appoinment == True:
-                html_file = render_to_string("AppointmentEmail/add_appointment.html",{'client': False, 'appointment' : appointment,'staff': True,'t_name':name_c} )
-                text_content = strip_tags(html_file)
-                
-                email = EmailMultiAlternatives(
-                    'Appointment Booked',
-                    text_content,
-                    settings.EMAIL_HOST_USER,
-                    to = [email_c],
+                ExceptionRecord.objects.create(
+                    text = f'ccreate client {client_email.sms_appoinment == True}'
                 )
+                try:
+                    html_file = render_to_string("AppointmentEmail/add_appointment.html",{'client': False, 'appointment' : appointment,'staff': True,'t_name':name_c} )
+                    text_content = strip_tags(html_file)
                     
-                email.attach_alternative(html_file, "text/html")
-                email.send()
-            
+                    email = EmailMultiAlternatives(
+                        'Appointment Booked',
+                        text_content,
+                        settings.EMAIL_HOST_USER,
+                        to = [email_c],
+                    )
+                        
+                    email.attach_alternative(html_file, "text/html")
+                    email.send()
+                except Exception as err:
+                    ExceptionRecord.objects.create(
+                        text = f'Error on creating email client;;;'
+                    )
             ExceptionRecord.objects.create(
                 text = f'create app email {staff_email.sms_daily_sale} {client_email.sms_appoinment}'
-        )
+            )
     
         except Exception as err:
             ExceptionRecord.objects.create(
