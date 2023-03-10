@@ -646,6 +646,11 @@ def create_appointment(request):
     # ExceptionRecord.objects.create(
     #         text='email is in sending process'
     #     )
+    try:
+        thrd = Thread(target=AddApp, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
+        thrd.start()
+    except Exception as err:
+        pass
     # try:
     #     thrd = Thread(target=Add_appointment_n, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
     #     thrd.start()
