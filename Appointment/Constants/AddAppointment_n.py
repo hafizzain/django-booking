@@ -23,21 +23,21 @@ def Add_appointment_n(appointment = None, tenant = None):
             # name_c = ""
             appointment =  AppointmentService.objects.filter(appointment = appointment)                
             for appo in appointment:
-                if appo.appointment.client is not None and appo.appointment.client.email is not None:
-                    email_c =appo.appointment.client.email
-                    name_c =appo.appointment.client.full_name
-                    ser_name = appo.service.name
-                    dat = appo.appointment_date
-                    mem_email = appo.member.email
-                    mem_name = appo.member.full_name
-                    # mem_id= appo.member.employee_id
-                    # client_type= appo.appointment.client_type
-                    # name = appo.appointment.client.full_name
+                # if appo.appointment.client is not None and appo.appointment.client.email is not None:
+                email_c =appo.appointment.client.email
+                name_c =appo.appointment.client.full_name
+                ser_name = appo.service.name
+                dat = appo.appointment_date
+                mem_email = appo.member.email
+                mem_name = appo.member.full_name
+                # mem_id= appo.member.employee_id
+                # client_type= appo.appointment.client_type
+                # name = appo.appointment.client.full_name
                     
-                    time = datetime.now()
-                    staff = appo.member.full_name
-                    loc_name = appo.appointment.business_address.address_name
-                    dur = appo.duration
+                time = datetime.now()
+                staff = appo.member.full_name
+                loc_name = appo.appointment.business_address.address_name
+                dur = appo.duration
                     # phon = appo.member.mobile_number
                 
                 try:
@@ -66,24 +66,24 @@ def Add_appointment_n(appointment = None, tenant = None):
                             text = f'issue of sending email {str(err)}'
                         )
                     
-                if client_email is not None and client_email.sms_appoinment:
-                    try:
-                        html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'name':name_c ,'email':email_c} )
-                        text_content = strip_tags(html_file)
+            if client_email is not None and client_email.sms_appoinment:
+   
+                html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'name':name_c ,'email':email_c} )
+                text_content = strip_tags(html_file)
                             
-                        email = EmailMultiAlternatives(
-                            'Appointment Booked',
-                            text_content,
-                            settings.EMAIL_HOST_USER,
-                            to = [email_c],
-                        )
+                email = EmailMultiAlternatives(
+                    'Appointment Booked',
+                    text_content,
+                    settings.EMAIL_HOST_USER,
+                    to = [email_c],
+                )
                                 
-                        email.attach_alternative(html_file, "text/html")
-                        email.send()
-                    except Exception as err:
-                        ExceptionRecord.objects.create(
-                            text = f'issue of sending email {str(err)}'
-                        )
+                email.attach_alternative(html_file, "text/html")
+                email.send()
+                
+            ExceptionRecord.objects.create(
+                text = f'issue of sending email {str(err)}'
+        )
     
         except Exception as err:
             ExceptionRecord.objects.create(
