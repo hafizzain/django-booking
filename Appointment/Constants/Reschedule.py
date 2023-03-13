@@ -22,11 +22,9 @@ def reschedule_appointment(appointment = None , tenant = None):
     with tenant_context(tenant):
 
         try:
-            appointment =  AppointmentService.objects.filter(appointment = appointment.id)
+            appointment =  AppointmentService.objects.filter(appointment = appointment)
             current_time = datetime.now().time()
-            ExceptionRecord.objects.create(
-                text = f'reschedule_appointment {current_time}'
-            )
+            
             for appo in appointment:
                 
                 email_c = appo.appointment.client.email
@@ -63,7 +61,10 @@ def reschedule_appointment(appointment = None , tenant = None):
                         )
                 
         except Exception as err:
-            print("Appointment error",err)
+            #print("Appointment error",err)
+            ExceptionRecord.objects.create(
+                text = f'reschedule_appointment {str(err)}'
+            )
             # appointment =  AppointmentService.objects.get(id = appointment.id)
             
             # email_c =appointment.appointment.client.email
