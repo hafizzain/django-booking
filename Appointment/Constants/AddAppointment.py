@@ -57,21 +57,22 @@ def Add_appointment(appointment = None, tenant = None):
                         email.send()
                     except Exception as err:
                         pass
-                
+                    
+            current_time = datetime.now().time()
             if client_email.sms_appoinment == True:
                 ExceptionRecord.objects.create(
-                    text = f'ccreate client {client_email.sms_appoinment == True} apppointment {appointment}'
+                    text = f'client email {email_c} '
                 )
                 try:
                     #html_file = render_to_string("AppointmentEmail/add_appointment.html",{'client': False, 'appointment' : appointment,'staff': True,'t_name':name_c} )
-                    html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'client': False, 'appointment' : appointment,'staff': True,'t_name':name_c} )
+                    html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'client': False, 'appointment' : appointment,'staff': True,'t_name':name_c ,'time': current_time,} )
                     text_content = strip_tags(html_file)
                     
                     email = EmailMultiAlternatives(
                         'Appointment Booked',
                         text_content,
                         settings.EMAIL_HOST_USER,
-                        to = [mem_email],
+                        to = [email_c],
                     )
                         
                     email.attach_alternative(html_file, "text/html")
