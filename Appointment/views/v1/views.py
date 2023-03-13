@@ -556,6 +556,7 @@ def create_appointment(request):
         appointment_service = AppointmentService.objects.create(
             user = user,
             business = business,
+            business_address = business_address,
             appointment = appointment,
             duration=app_duration,
             appointment_time=date_time,
@@ -729,6 +730,7 @@ def update_appointment(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    
     if employee_id:
         try: 
             employee = Employee.objects.get(id=employee_id, is_deleted=False)
@@ -748,6 +750,7 @@ def update_appointment(request):
         service_appointment.member = employee
         service_appointment.appointment_time = start_time
         service_appointment.save()
+    
     serializer = UpdateAppointmentSerializer(service_appointment , data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(
@@ -763,21 +766,21 @@ def update_appointment(request):
         )
     serializer.save()
     
-    # if appointment_status == 'Cancel':
-    #     try:
-    #         thrd = Thread(target=cancel_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant} )
-    #         thrd.start()
-    #     except Exception as err:
-    #         print(err)
-    #         pass
-
     if appointment_status == 'Cancel':
         try:
-            thrd = Thread(target=cancel_appointment_n, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant} )
+            thrd = Thread(target=cancel_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant} )
             thrd.start()
         except Exception as err:
             print(err)
             pass
+
+    # if appointment_status == 'Cancel':
+    #     try:
+    #         thrd = Thread(target=cancel_appointment_n, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant} )
+    #         thrd.start()
+    #     except Exception as err:
+    #         print(err)
+    #         pass
         
     else :
         # try:
@@ -1000,9 +1003,6 @@ def update_appointment_service(request):
             if id is not None:
                 try:
                     service_appointment = AppointmentService.objects.get(id=str(id))
-                    ExceptionRecord.objects.create(
-                        text = f'{is_deleted == True} id {service_appointment}'
-                    )
                     #if str(is_deleted) == "true":
                     if is_deleted == True:
                         service_appointment.delete()
@@ -1018,6 +1018,20 @@ def update_appointment_service(request):
                     service_appointment.save()                    
                 except Exception as err:
                     errors.append(str(err))
+    
+    try:
+        ExceptionRecord.objects.create(
+                text = f'reschedule_appointment Entry phase'
+            )
+        thrd = Thread(target=reschedule_appointment, args=[] , kwargs={'appointment' : appointment, 'tenant' : request.tenant, 'client': client})
+        thrd.start()
+    except Exception as err:
+        ExceptionRecord.objects.create(
+            text = f'reschedule_appointment {str(err)}'
+        )
+        pass
+    
+    
     return Response(
         {
             'status' : True,

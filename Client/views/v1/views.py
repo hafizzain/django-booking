@@ -1640,6 +1640,7 @@ def create_memberships(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    
     try:
         business=Business.objects.get(id=business)
     except Exception as err:
