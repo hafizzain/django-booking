@@ -180,12 +180,14 @@
                       </thead>
                       <tbody>
                         <tr>
-                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ location }}</td>
-                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ ser_name }}</td>
-                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ duration }}</td>
-                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ date }}</td>
+                          {% for data in appointment %}
+                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ data.appointment.location }}</td>
+                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ data.appointment.ser_name }}</td>
+                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ data.appointment.duration }}</td>
+                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ data.date }}</td>
 
-                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ time }}</td>
+                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ data.time }}</td>
+                          {% endfor %}
                         </tr>
                         
                       </tbody>
