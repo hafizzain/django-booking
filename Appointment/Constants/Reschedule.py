@@ -13,7 +13,7 @@ from Utility.models import ExceptionRecord
 
 
 
-def reschedule_appointment(appointment = None , tenant = None):
+def reschedule_appointment(appointment = None , tenant = None, client =  None):
     if appointment is None or tenant is None:
         ExceptionRecord.objects.create(
             text='Appointment, Tenant Is None'
