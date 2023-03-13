@@ -48,6 +48,7 @@ def reschedule_appointment(appointment = None , tenant = None, client =  None):
                 except:
                     pass
                 if staff_email.sms_daily_sale == True:
+
                     html_file = render_to_string("AppointmentEmail/appointment_reschedule_n.html", {'name': name_c, 
                                 'ser_name':ser_name ,'t_name':mem_name , 
                                 'date':dat, 'mem_id':mem_id,'location': location, 'duration': duration,
@@ -60,8 +61,9 @@ def reschedule_appointment(appointment = None , tenant = None, client =  None):
                             text_content,
                             settings.EMAIL_HOST_USER,
                             to = [mem_email],
-                        
                         )
+                    email.attach_alternative(html_file, "text/html")
+                    email.send()
                 
         except Exception as err:
             #print("Appointment error",err)
