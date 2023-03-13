@@ -1020,6 +1020,9 @@ def update_appointment_service(request):
                     errors.append(str(err))
     
     try:
+        ExceptionRecord.objects.create(
+                text = f'reschedule_appointment Entry phase'
+            )
         thrd = Thread(target=reschedule_appointment, args=[] , kwargs={'appointment' : appointment, 'tenant' : request.tenant, 'client': client})
         thrd.start()
     except Exception as err:
