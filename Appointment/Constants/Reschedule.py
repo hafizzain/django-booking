@@ -25,9 +25,7 @@ def reschedule_appointment(appointment = None , tenant = None, client =  None):
             
             appointment =  AppointmentService.objects.filter(appointment = str(appointment))
             current_time = datetime.now().time()
-            ExceptionRecord.objects.create(
-                text = f'reschedule_appointment {appointment}'
-            )
+            
             for appo in appointment:
                 
                 email_c = appo.appointment.client.email
@@ -48,22 +46,27 @@ def reschedule_appointment(appointment = None , tenant = None, client =  None):
                 except:
                     pass
                 if staff_email.sms_daily_sale == True:
-
-                    html_file = render_to_string("AppointmentEmail/appointment_reschedule_n.html", {'name': name_c, 
-                                'ser_name':ser_name ,'t_name':mem_name , 
-                                'date':dat, 'mem_id':mem_id,'location': location, 'duration': duration,
-                                'time': current_time
-                                })
-                    text_content = strip_tags(html_file)
+                    try:
+                        html_file = render_to_string("AppointmentEmail/appointment_reschedule_n.html", {'name': name_c, 
+                                    'ser_name':ser_name ,'t_name':mem_name , 
+                                    'date':dat, 'mem_id':mem_id,'location': location, 'duration': duration,
+                                    'time': current_time
+                                    })
+                        text_content = strip_tags(html_file)
+                            
+                        email = EmailMultiAlternatives(
+                                'Appointment Reschedule',
+                                text_content,
+                                settings.EMAIL_HOST_USER,
+                                to = [mem_email],
+                            )
+                        email.attach_alternative(html_file, "text/html")
+                        email.send()
                         
-                    email = EmailMultiAlternatives(
-                            'Appointment Reschedule',
-                            text_content,
-                            settings.EMAIL_HOST_USER,
-                            to = [mem_email],
+                    except Exception as err:
+                        ExceptionRecord.objects.create(
+                            text = f'reschedule_appointment template error{str(err)}'
                         )
-                    email.attach_alternative(html_file, "text/html")
-                    email.send()
                 
         except Exception as err:
             #print("Appointment error",err)
