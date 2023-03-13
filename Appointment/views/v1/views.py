@@ -1003,9 +1003,6 @@ def update_appointment_service(request):
             if id is not None:
                 try:
                     service_appointment = AppointmentService.objects.get(id=str(id))
-                    ExceptionRecord.objects.create(
-                        text = f'{is_deleted == True} id {service_appointment}'
-                    )
                     #if str(is_deleted) == "true":
                     if is_deleted == True:
                         service_appointment.delete()
@@ -1026,7 +1023,9 @@ def update_appointment_service(request):
         thrd = Thread(target=reschedule_appointment, args=[] , kwargs={'appointment' : appointment, 'tenant' : request.tenant, 'client': client})
         thrd.start()
     except Exception as err:
-        print(err)
+        ExceptionRecord.objects.create(
+            text = f'reschedule_appointment {str(err)}'
+        )
         pass
     
     
