@@ -5,7 +5,7 @@ from Appointment.Constants.Reschedulen import reschedule_appointment_n
 # from Appointment.Constants.New_Appointment_n import Add_appointment_nn
 from Appointment.Constants.cancelappointmentn import cancel_appointment_n
 from Appointment.Constants.AddAppointment_n import Add_appointment_n
-
+from Appointment.Constants.Reschedulen import reschedule_appointment_n
 from Appointment.Constants.ConvertTime import convert_24_to_12
 
 from Appointment.Constants.Reschedule import reschedule_appointment
