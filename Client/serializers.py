@@ -163,7 +163,7 @@ class MembershipSerializer(serializers.ModelSerializer):
             
     class Meta:
         model = Membership
-        fields = ['id', 'name','valid_for','discount','discount_membership', 'currency_membership']
+        fields = ['id', 'name','valid_for','discount','description', 'term_condition','discount_membership', 'currency_membership']
 
 class VoucherSerializer(serializers.ModelSerializer):
     
