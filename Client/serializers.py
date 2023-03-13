@@ -143,18 +143,18 @@ class CurrencyPriceMembershipSerializers(serializers.ModelSerializer):
         fields = '__all__'
         
 class MembershipSerializer(serializers.ModelSerializer):
-    product = serializers.SerializerMethodField()
-    service = serializers.SerializerMethodField()
+    products = serializers.SerializerMethodField()
+    services = serializers.SerializerMethodField()
     currency_membership = serializers.SerializerMethodField()
     
-    def get_product(self, obj):
+    def get_products(self, obj):
         try:
             pro = DiscountMembership.objects.filter(membership = obj, service__isnull = True)
             return DiscountMembershipSerializers(pro, many= True).data
         except Exception as err:
             print(err)
             
-    def get_service(self, obj):
+    def get_services(self, obj):
         try:
             pro = DiscountMembership.objects.filter(membership = obj,  product__isnull = True)
             return DiscountMembershipSerializers(pro, many= True).data
@@ -171,7 +171,7 @@ class MembershipSerializer(serializers.ModelSerializer):
             
     class Meta:
         model = Membership
-        fields = ['id', 'name','valid_for','discount','description', 'term_condition','product', 'service', 'currency_membership']
+        fields = ['id', 'name','valid_for','discount','description', 'term_condition','products', 'services', 'currency_membership']
 
 class VoucherSerializer(serializers.ModelSerializer):
     
