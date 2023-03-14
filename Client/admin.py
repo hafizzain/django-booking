@@ -1,8 +1,9 @@
 from django.contrib import admin
-from .models import Client, ClientGroup, Subscription , Membership , Vouchers , Promotion , Rewards , DiscountMembership, ClientPackageValidation
+from .models import Client, ClientGroup, Subscription , Membership , Vouchers , Promotion , Rewards , DiscountMembership, ClientPackageValidation, CurrencyPriceMembership
 # Register your models here.
 admin.site.register(DiscountMembership)
 admin.site.register(ClientPackageValidation)
+admin.site.register(CurrencyPriceMembership)
 @admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
     list_display= [

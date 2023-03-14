@@ -330,7 +330,8 @@ class ServiceSerializer(serializers.ModelSerializer):
     
     def get_location(self, obj):
         #loc = BusinessAddress.objects.filter(is_deleted = False)
-        return LocationServiceSerializer(obj.location, many = True).data
+        locations = obj.location.filter(is_deleted = False)
+        return LocationServiceSerializer(locations, many = True, ).data
     
     #employee = EmployeeServiceSerializer(read_only=True, many = True)
     

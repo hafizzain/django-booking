@@ -1860,6 +1860,7 @@ def update_memberships(request):
     service = request.data.get('service', None)
     product = request.data.get('product',None)
     membership_type = request.data.get('membership_type',None)
+    currency_membership = request.data.get('currency_membership',None)
     
     if id is None: 
         return Response(
@@ -1927,8 +1928,47 @@ def update_memberships(request):
         membership.service= service_id
         membership.product = None
         membership.save()
+     
+    if currency_membership:  
+        if type(currency_membership) == str:
+            currency_membership = currency_membership.replace("'" , '"')
+            currency_membership = json.loads(currency_membership)
+
+        elif type(currency_membership) == list:
+            pass 
         
-        
+        for curr in currency_membership:
+            currency = curr.get('currency', None)
+            id = curr.get('id', None)
+            #membership = curr.get('membership', None)
+            price = curr.get('price', None)
+            try:
+                currency_id = Currency.objects.get(id=currency)
+            except Exception as err:
+                pass
+            if id is not None:
+                try:
+                    currency_price = CurrencyPriceMembership.objects.get(id=id)
+                except Exception as err:
+                    pass
+                
+                currency_price.price = price
+                currency_price.save()
+            
+            elif currency_id is not None: 
+                try:
+                    currency_price = CurrencyPriceMembership.objects.get(currency=currency_id)
+                    currency_price.price = price
+                    currency_price.save()
+                except Exception as err:
+                    #pass
+                    services_obj = CurrencyPriceMembership.objects.create(
+                        membership = membership,
+                        currency = currency_id,
+                        price = price,
+                    )                
+                
+                
     serializer = MembershipSerializer(membership, data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(
@@ -1971,7 +2011,7 @@ def create_vouchers(request):
     
     sales = request.data.get('sales', None)
     price = request.data.get('price', None)
-    if not all([business_id , name , value ,sales, price, voucher_type, validity]):
+    if not all([business_id , name ,sales, price, voucher_type, validity]):
         return Response(
             {
                 'status' : False,
@@ -2017,7 +2057,7 @@ def create_vouchers(request):
         user = user,
         business = business, 
         name = name,
-        value = value,
+        #value = value,
         voucher_type=voucher_type,
         #valid_for = valid_for,
         sales = sales,
