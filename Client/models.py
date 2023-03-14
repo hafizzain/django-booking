@@ -205,7 +205,7 @@ class Vouchers(models.Model):
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_voucher')
     
     name = models.CharField(max_length=100, default='')
-    value = models.PositiveIntegerField(default=0)
+    #value = models.PositiveIntegerField(default=0)
     
     voucher_type = models.CharField(choices= VOUCHER_CHOICES,default= 'Product', verbose_name = 'Voucher Type', max_length=20)
     # service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_voucher')
