@@ -1855,7 +1855,7 @@ def delete_memberships(request):
     
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def xxxxxxxxupdate_memberships(request):
+def update_memberships(request):
     id = request.data.get('id', None)
     service = request.data.get('service', None)
     product = request.data.get('product',None)
@@ -1954,6 +1954,7 @@ def xxxxxxxxupdate_memberships(request):
                 
                 currency_price.price = price
                 currency_price.save()
+             
                 
             else:
                 services_obj = CurrencyPriceMembership.objects.get_or_create(
