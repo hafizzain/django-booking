@@ -1961,14 +1961,12 @@ def update_memberships(request):
                     currency_price.price = price
                     currency_price.save()
                 except Exception as err:
-                    pass
-            
-            else:
-                services_obj = CurrencyPriceMembership.objects.create(
-                    membership = membership,
-                    currency = currency_id,
-                    price = price,
-                )
+                    #pass
+                    services_obj = CurrencyPriceMembership.objects.create(
+                        membership = membership,
+                        currency = currency_id,
+                        price = price,
+                    )                
                 
                 
     serializer = MembershipSerializer(membership, data=request.data, partial=True)
