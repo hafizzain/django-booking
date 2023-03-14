@@ -1954,10 +1954,17 @@ def update_memberships(request):
                 
                 currency_price.price = price
                 currency_price.save()
-             
-                
+            
+            elif currency_id is not None: 
+                try:
+                    currency_price = CurrencyPriceMembership.objects.get(currency=currency_id)
+                    currency_price.price = price
+                    currency_price.save()
+                except Exception as err:
+                    pass
+            
             else:
-                services_obj = CurrencyPriceMembership.objects.get_or_create(
+                services_obj = CurrencyPriceMembership.objects.create(
                     membership = membership,
                     currency = currency_id,
                     price = price,
