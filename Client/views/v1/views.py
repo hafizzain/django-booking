@@ -1860,6 +1860,7 @@ def update_memberships(request):
     service = request.data.get('service', None)
     product = request.data.get('product',None)
     membership_type = request.data.get('membership_type',None)
+    currency_membership = request.data.get('currency_membership',None)
     
     if id is None: 
         return Response(
@@ -1927,8 +1928,40 @@ def update_memberships(request):
         membership.service= service_id
         membership.product = None
         membership.save()
+     
+    if currency_membership:  
+        if type(currency_membership) == str:
+            currency_membership = currency_membership.replace("'" , '"')
+            currency_membership = json.loads(currency_membership)
+
+        elif type(currency_membership) == list:
+            pass 
         
-        
+        for curr in currency_membership:
+            currency = curr.get('currency', None)
+            id = curr.get('id', None)
+            #membership = curr.get('membership', None)
+            price = curr.get('price', None)
+            try:
+                currency_id = Currency.objects.get(id=currency)
+            except Exception as err:
+                pass
+            if id is not None:
+                try:
+                    currency_price = CurrencyPriceMembership.objects.get(id=id)
+                except Exception as err:
+                    pass
+                
+                currency_price.price = price
+                currency_price.save()
+            else:
+                services_obj = CurrencyPriceMembership.objects.create(
+                    membership = membership,
+                    currency = currency_id,
+                    price = price,
+                )
+                
+                
     serializer = MembershipSerializer(membership, data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(
