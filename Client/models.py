@@ -188,7 +188,7 @@ class Vouchers(models.Model):
     VALIDITY_DAY=[
         ('7 Days' , '7 Days'),
         ('14 Days' , '14 Days'),
-        ('1 Month' ,  '1 Months'),
+        ('1 Months' ,  '1 Months'),
         ('2 Months' , '2 Months'),
         ('3 Months' , '3 Months'),
         ('4 Months' , '4 Months'),
