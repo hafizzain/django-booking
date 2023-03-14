@@ -2512,7 +2512,22 @@ def import_business_vendor(request):
             print(f'Added Vendor {create_vendor} ... {vendor_name} ')
                 
     file.delete()
-    return Response({'Status' : 'Success'})
+    all_vendors = BusinessVendor.objects.filter(is_deleted=False, is_closed=False)
+    serialized = BusinessVendorSerializer(all_vendors, many=True)
+    #return Response({'Status' : 'Success'})
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'All available business vendors!',
+                    'error_message' : None,
+                    'vendors' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
             
 
 @api_view(['GET'])
