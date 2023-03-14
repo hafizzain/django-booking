@@ -2004,7 +2004,7 @@ def create_vouchers(request):
     
     sales = request.data.get('sales', None)
     price = request.data.get('price', None)
-    if not all([business_id , name , value ,sales, price, voucher_type, validity]):
+    if not all([business_id , name ,sales, price, voucher_type,]):
         return Response(
             {
                 'status' : False,
@@ -2055,7 +2055,7 @@ def create_vouchers(request):
         #valid_for = valid_for,
         sales = sales,
         price = price,    
-        validity=validity 
+        #validity=validity 
         
     )
     # voucher.days = days
