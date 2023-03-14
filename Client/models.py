@@ -280,7 +280,7 @@ class Membership(models.Model):
         ('5 Years' , '5 Years'),
     ]
     DISCOUNT_CHOICE = [
-        ('Unlimited' , 'Unlimited'),
+        ('Limited' , 'Limited'),
         ('Free' , 'Free'),
     ]
 
