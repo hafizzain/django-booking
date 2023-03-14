@@ -939,7 +939,7 @@ def add_product(request):
             'status' : True,
             'status_code' : 201,
             'response' : {
-                'message' : 'Product Added!',
+                'message' : 'Product added successfully',
                 'error_message' : None,
                 'errors': product_error,
                 'product' : serialized.data
