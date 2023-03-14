@@ -6,7 +6,7 @@ from Sale.Constants.tunrover import ProductTurnover
 
 from rest_framework import status
 from Appointment.models import Appointment, AppointmentCheckout, AppointmentService
-from Business.models import Business
+from Business.models import AdminNotificationSetting, Business, StaffNotificationSetting, StockNotificationSetting
 from Client.models import Client, Membership, Vouchers
 from Order.models import Checkout, MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
 from Sale.Constants.Custom_pag import CustomPagination
@@ -1327,8 +1327,13 @@ def create_sale_order(request):
             
             except Exception as err:
                 errors.append(str(err))
-                
-            if transfer.available_quantity <= 5 :
+            admin_email = None 
+            try:
+                admin_email = StockNotificationSetting.objects.get(business = str(business_address.business))
+            except:
+                pass
+            if admin_email.notify_stock_turnover == True and transfer.available_quantity <= 5:
+            #if transfer.available_quantity <= 5 :
                 try:
                     thrd = Thread(target=ProductTurnover, args=[], kwargs={'product' : product,'product_stock': transfer, 'business_address':business_address.id ,'tenant' : request.tenant})
                     thrd.start()
