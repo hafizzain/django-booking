@@ -164,7 +164,7 @@ class MembershipSerializer(serializers.ModelSerializer):
     
     def get_currency_membership(self, obj):
         try:
-            pro = CurrencyPriceMembership.objects.filter(membership = obj).order_by('-created_at').distinct()
+            pro = CurrencyPriceMembership.objects.filter(membership = obj).distinct()
             return CurrencyPriceMembershipSerializers(pro, many= True).data
         except Exception as err:
             print(err)
