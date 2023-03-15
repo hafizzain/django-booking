@@ -3119,27 +3119,27 @@ def get_check_availability(request):
                 # if len(av_staff_ids) == 0:
                 #     data.append(f'Employees are free, you can proceed further employee name {employee.full_name}')
                 
-                av_staff_ids = AppointmentService.objects.filter(
-                        member__id=employee.id,
-                        appointment_date=date,
-                        is_blocked= True,
-                        appointment_time__lt=end_time,
-                        end_time__gt=start_time,
-                    )
+                # av_staff_ids = AppointmentService.objects.filter(
+                #         member__id=employee.id,
+                #         appointment_date=date,
+                #         is_blocked= True,
+                #         appointment_time__lt=end_time,
+                #         end_time__gt=start_time,
+                #     )
 
-                if av_staff_ids:
-                        # Check if the selected time slot overlaps with any existing appointments
-                        for appointment in av_staff_ids:
-                            if start_time < appointment.end_time and tested > appointment.appointment_time:
-                                Availability = False
-                                data.append(f'Error: Employee {employee.full_name} already has an appointment scheduled during the selected time slot.')
-                                break
+                # if av_staff_ids:
+                #         # Check if the selected time slot overlaps with any existing appointments
+                #         for appointment in av_staff_ids:
+                #             if start_time < appointment.end_time and tested > appointment.appointment_time:
+                #                 Availability = False
+                #                 data.append(f'Error: Employee {employee.full_name} already has an appointment scheduled during the selected time slot.')
+                #                 break
                     
                 try:
                     av_staff_ids = AppointmentService.objects.filter(
                         member__id=employee.id,
                         appointment_date=date,
-                        is_blocked=False,
+                        #is_blocked=False,
                         appointment_time__lt=end_time,
                         end_time__gt=start_time,
                     )
