@@ -882,14 +882,14 @@ def add_product(request):
             #if all([location_id, current_stock, low_stock, reorder_quantity]):
             try:
                 loc = BusinessAddress.objects.get(id = location_id)
-                ExceptionRecord.objects.create(text=loc)
+                #ExceptionRecord.objects.create(text=loc)
                 location_ids.append(str(loc))
             except Exception as err:
                 ExceptionRecord.objects.create(text=str(err))
                 pass
             
             else:
-                ExceptionRecord.objects.create(text=f'{current_stock} {low_stock}  reorder_quantity{reorder_quantity}')
+                #ExceptionRecord.objects.create(text=f'{current_stock} {low_stock}  reorder_quantity{reorder_quantity}')
                 product_stock = ProductStock.objects.create(
                     user = user,
                     business = business,
