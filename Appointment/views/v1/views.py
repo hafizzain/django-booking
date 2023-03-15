@@ -585,9 +585,12 @@ def create_appointment(request):
             comm, comm_type = calculate_commission(member, price_com)#int(price))
             service_commission += comm
             service_commission_type += comm_type
-            ExceptionRecord.objects.create(
-                text = f'commsion {service_commission}'
-        )
+            appointment_service.service_commission = service_commission
+            appointment_service.service_commission_type = service_commission_type
+            appointment_service.save()
+        #     ExceptionRecord.objects.create(
+        #         text = f'commsion {service_commission}'
+        # )
         except Exception as err:
             Errors.append(str(err))
         
