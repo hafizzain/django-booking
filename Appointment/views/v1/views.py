@@ -1383,7 +1383,7 @@ def create_checkout(request):
             pass
     # if gst is None:
     #     gst = 0
-    total_price_app  = gst + total_price
+    total_price_app  = gst + int(total_price)
     try:
         commission = CommissionSchemeSetting.objects.get(employee = str(member))
         category = CategoryCommission.objects.filter(commission = commission.id)
