@@ -322,7 +322,7 @@ def get_dashboard_target_overview(request):
     #     range_end = datetime.strptime(range_end, "%Y-%m-%d")
 
     appointment_checkout = AppointmentService.objects.filter(
-        appointment_service__appointment_status = 'Done',
+        appointment_status = 'Done',
         member__id = employee_id,
         # created_at__gte =  range_start ,
         # created_at__lte = range_end
