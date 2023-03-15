@@ -613,7 +613,7 @@ def get_discount_and_promotions(request):
         Q(spendsomeamount_daterestrictions__business_address__id = selected_location)
     ).distinct()
     #serialized = PromtoionsSerializers.AvailOfferSpendSomeAmountSerializers(spend_discount,  many=True, context={'request' : request})
-    serialized = PromtoionsSerializers.SpendDiscountSerializers(spend_discount,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.SpendSomeAmountSerializers(spend_discount,  many=True, context={'request' : request})
     data['spendSomeAmount'] = serialized.data
 
 
