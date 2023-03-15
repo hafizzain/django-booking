@@ -14,7 +14,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from Appointment.models import Appointment, AppointmentCheckout
+from Appointment.models import Appointment, AppointmentCheckout, AppointmentService
 from Client.models import Client
 from NStyle.Constants import StatusCodes
 from Business.models import Business, BusinessAddress
@@ -321,11 +321,11 @@ def get_dashboard_target_overview(request):
     #     range_start = datetime.strptime(range_start, "%Y-%m-%d")
     #     range_end = datetime.strptime(range_end, "%Y-%m-%d")
 
-    appointment_checkout = AppointmentCheckout.objects.filter(
+    appointment_checkout = AppointmentService.objects.filter(
         appointment_service__appointment_status = 'Done',
         member__id = employee_id,
-        created_at__gte =  range_start ,
-        created_at__lte = range_end
+        # created_at__gte =  range_start ,
+        # created_at__lte = range_end
         ).values_list('total_price', flat=True)
     sum_total_acheived += sum(appointment_checkout)
 
