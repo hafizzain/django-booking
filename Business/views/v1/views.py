@@ -3134,13 +3134,14 @@ def get_check_availability(request):
                         if start_time < ser.end_time and end_time > ser.appointment_time:
                             data.append(f'Error: Employee {employee.full_name} already has an appointment scheduled between {ser.appointment_time} and {ser.end_time}.')
                             break
+                        elif start_time == ser.appointment_time and end_time == ser.end_time:
+                            data.append(f'Error: Employee {employee.full_name} already has an appointment scheduled between {ser.appointment_time} and {ser.end_time}.')
+                            break
                     else:
                         data.append(f'Employees are free, employee name: {employee.full_name}')
 
                 except Exception as err:
                     data.append(f'Error: {str(err)}')
-
-
                 
             except Exception as err:
                 data.append(f'the Error  {str(err)},  Employee Not Available on this time')
