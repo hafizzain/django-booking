@@ -3123,25 +3123,23 @@ def get_check_availability(request):
                 #     data.append(f'the employe{employee}, start_time {str(err)}')
                 
                 try:
+                    # Check if there are any existing appointments during the selected time slot
                     av_staff_ids = AppointmentService.objects.filter(
                         member__id=employee.id,
                         appointment_date=date,
                         is_blocked=False,
+                        appointment_time__lte=end_time,
+                        end_time__gte=start_time,
                     )
 
-                    # Check for existing appointments that overlap with the new appointment
-                    for ser in av_staff_ids:
-                        if start_time < ser.end_time and end_time > ser.appointment_time:
-                            data.append(f'Error: Employee {employee.full_name} already has an appointment scheduled between {ser.appointment_time} and {ser.end_time}.')
-                            break
-                        elif start_time == ser.appointment_time and end_time == ser.end_time:
-                            data.append(f'Error: Employee {employee.full_name} already has an appointment scheduled between {ser.appointment_time} and {ser.end_time}.')
-                            break
+                    if av_staff_ids:
+                        data.append(f'Error: Employee {employee.full_name} already has an appointment scheduled during the selected time slot.')
                     else:
                         data.append(f'Employees are free, employee name: {employee.full_name}')
 
                 except Exception as err:
                     data.append(f'Error: {str(err)}')
+
                 
             except Exception as err:
                 data.append(f'the Error  {str(err)},  Employee Not Available on this time')
