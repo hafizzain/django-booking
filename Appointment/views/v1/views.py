@@ -1167,15 +1167,17 @@ def create_blockTime(request):
     
     # dt = datetime.strptime(date, "%Y-%m-%d")
     # date = dt.date()
-    
-    app_date_time = f'2000-01-01 {start_time}'
+    try:
+        app_date_time = f'2000-01-01 {start_time}'
 
-    duration = DURATION_CHOICES[duration]
-    app_date_time = datetime.fromisoformat(app_date_time)
-    datetime_duration = app_date_time + timedelta(minutes=duration)
-    datetime_duration = datetime_duration.strftime('%H:%M:%S')
-    tested = datetime.strptime(datetime_duration ,'%H:%M:%S').time()
-    end_time = datetime_duration
+        duration = DURATION_CHOICES[duration]
+        app_date_time = datetime.fromisoformat(app_date_time)
+        datetime_duration = app_date_time + timedelta(minutes=duration)
+        datetime_duration = datetime_duration.strftime('%H:%M:%S')
+        tested = datetime.strptime(datetime_duration ,'%H:%M:%S').time()
+        end_time = datetime_duration
+    except Exception as err:
+        ExceptionRecord.objects.create(text=f'Errors happer in end linr 1180 {str(err)}')
     
     block_time = AppointmentService.objects.create(
             user = user,
