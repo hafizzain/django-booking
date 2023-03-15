@@ -29,6 +29,8 @@ def calculate_commission(member, price):
     # return service_commission, service_commission_type
     
     try:
+        service_commission = 0
+        service_commission_type = ''
         commission = CommissionSchemeSetting.objects.get(employee = member)
         category = CategoryCommission.objects.filter(commission = commission.id)
         for cat in category:
@@ -45,6 +47,7 @@ def calculate_commission(member, price):
                         service_commission = int(cat.commission_percentage)
                         service_commission_type = str(service_commission) + cat.symbol
                                         
+        return service_commission, service_commission_type
     except Exception as err:
         ExceptionRecord.objects.create(
             text = f'calculate_commission error {str(err)}'
