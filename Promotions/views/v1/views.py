@@ -581,7 +581,8 @@ def get_discount_and_promotions(request):
         Q(specificbrand_blockdate__date = selected_date,) |
         Q(specificbrand_daterestrictions__business_address__id = selected_location)
     ).distinct()
-    serialized = PromtoionsSerializers.AvailOfferSpecificBrandSerializers(specificbrand,  many=True, context={'request' : request})
+    #serialized = PromtoionsSerializers.AvailOfferSpecificBrandSerializers(specificbrand,  many=True, context={'request' : request})
+    serialized = PromtoionsSerializers.SpecificBrandSerializers(specificbrand,  many=True, context={'request' : request})
     data['specificBrandServiceGroup'] = serialized.data
 
 
