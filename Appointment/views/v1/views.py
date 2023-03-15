@@ -1186,7 +1186,7 @@ def create_blockTime(request):
             member = member,
             details = details,
             is_blocked = True,
-            end_time = end_time
+            end_time = tested
         )
     
     all_members =Employee.objects.filter(is_deleted=False, is_active = True).order_by('-created_at')
