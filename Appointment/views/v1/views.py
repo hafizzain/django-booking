@@ -1170,9 +1170,9 @@ def create_blockTime(request):
     try:
         app_date_time = f'2000-01-01 {start_time}'
 
-        duration = DURATION_CHOICES[duration]
+        duration_end = DURATION_CHOICES[duration]
         app_date_time = datetime.fromisoformat(app_date_time)
-        datetime_duration = app_date_time + timedelta(minutes=duration)
+        datetime_duration = app_date_time + timedelta(minutes=duration_end)
         datetime_duration = datetime_duration.strftime('%H:%M:%S')
         tested = datetime.strptime(datetime_duration ,'%H:%M:%S').time()
         end_time = datetime_duration
