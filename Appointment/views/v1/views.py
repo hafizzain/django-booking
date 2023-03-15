@@ -1161,6 +1161,22 @@ def create_blockTime(request):
                 }
             }
         )
+        
+    # dtime = datetime.strptime(start_time, "%H:%M:%S")
+    # start_time = dtime.time()
+    
+    # dt = datetime.strptime(date, "%Y-%m-%d")
+    # date = dt.date()
+    
+    app_date_time = f'2000-01-01 {start_time}'
+
+    duration = DURATION_CHOICES[duration]
+    app_date_time = datetime.fromisoformat(app_date_time)
+    datetime_duration = app_date_time + timedelta(minutes=duration)
+    datetime_duration = datetime_duration.strftime('%H:%M:%S')
+    tested = datetime.strptime(datetime_duration ,'%H:%M:%S').time()
+    end_time = datetime_duration
+    
     block_time = AppointmentService.objects.create(
             user = user,
             business = business,
@@ -1170,6 +1186,7 @@ def create_blockTime(request):
             member = member,
             details = details,
             is_blocked = True,
+            end_time = end_time
         )
     
     all_members =Employee.objects.filter(is_deleted=False, is_active = True).order_by('-created_at')
