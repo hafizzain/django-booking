@@ -1381,6 +1381,8 @@ def create_checkout(request):
             service_appointment.save()
         except Exception as err:
             pass
+    if gst is None:
+        gst = 0
     total_price_app  = gst + total_price
     try:
         commission = CommissionSchemeSetting.objects.get(employee = str(member))
