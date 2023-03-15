@@ -3132,7 +3132,7 @@ def get_check_availability(request):
                     if av_staff_ids:
                         # Check if the selected time slot overlaps with any existing appointments
                         for appointment in av_staff_ids:
-                            if start_time < appointment.end_time and end_time > appointment.appointment_time:
+                            if start_time < appointment.end_time and tested > appointment.appointment_time:
                                 data.append(f'Error: Employee {employee.full_name} already has an appointment scheduled during the selected time slot.')
                                 break
                         else:
