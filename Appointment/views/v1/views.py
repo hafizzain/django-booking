@@ -1320,7 +1320,7 @@ def create_checkout(request):
     business_address = request.data.get('business_address', None)
     
     tip = request.data.get('tip', None)
-    gst = request.data.get('gst', None)
+    gst = request.data.get('gst', 0)
     service_price = request.data.get('service_price', None)
     total_price = request.data.get('total_price', None)
     
@@ -1381,8 +1381,8 @@ def create_checkout(request):
             service_appointment.save()
         except Exception as err:
             pass
-    if gst is None:
-        gst = 0
+    # if gst is None:
+    #     gst = 0
     total_price_app  = gst + total_price
     try:
         commission = CommissionSchemeSetting.objects.get(employee = str(member))
