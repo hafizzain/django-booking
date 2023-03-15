@@ -29,7 +29,7 @@ def calculate_commission(member, price):
     # return service_commission, service_commission_type
     
     try:
-        commission = CommissionSchemeSetting.objects.get(employee = str(member))
+        commission = CommissionSchemeSetting.objects.get(employee = member)
         category = CategoryCommission.objects.filter(commission = commission.id)
         for cat in category:
             try:
