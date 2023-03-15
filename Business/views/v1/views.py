@@ -3129,14 +3129,17 @@ def get_check_availability(request):
                         is_blocked=False,
                     )
 
-                    if any(ser.appointment_time == start_time for ser in av_staff_ids):
-                        data.append(f'Employees are free, employee name: {employee.full_name}')
+                    # Check for existing appointments that overlap with the new appointment
+                    for ser in av_staff_ids:
+                        if start_time < ser.end_time and end_time > ser.appointment_time:
+                            data.append(f'Error: Employee {employee.full_name} already has an appointment scheduled between {ser.appointment_time} and {ser.end_time}.')
+                            break
                     else:
-                        Availability = False
-                        data.append(f'Employee is busy right now, employee name: {employee.full_name}')
+                        data.append(f'Employees are free, employee name: {employee.full_name}')
 
                 except Exception as err:
                     data.append(f'Error: {str(err)}')
+
 
                 
             except Exception as err:
