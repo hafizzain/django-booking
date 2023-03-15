@@ -1198,6 +1198,7 @@ def update_blocktime(request):
     block_id = request.data.get('id', None)
     end_time = request.data.get('end_time', None)
     start_time = request.data.get('start_time', None)
+    duration = request.data.get('duration', None)
     if block_id is None: 
        return Response(
             {
@@ -1232,6 +1233,20 @@ def update_blocktime(request):
         )
     # end = start_time + timedelta(minutes=23)
     # print(F"{end} -- {end_time}")
+    if start_time is not None:
+        app_date_time = f'2000-01-01 {start_time}'
+
+        duration_end = DURATION_CHOICES[duration]
+        app_date_time = datetime.fromisoformat(app_date_time)
+        datetime_duration = app_date_time + timedelta(minutes=duration_end)
+        datetime_duration = datetime_duration.strftime('%H:%M:%S')
+        tested = datetime.strptime(datetime_duration ,'%H:%M:%S').time()
+        end_time = datetime_duration
+        
+        block.appointment_time = start_time
+        block.end_time = tested
+        block.save()
+        
     serializer = UpdateAppointmentSerializer(block , data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(

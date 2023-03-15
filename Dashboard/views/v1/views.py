@@ -324,8 +324,8 @@ def get_dashboard_target_overview(request):
     appointment_checkout = AppointmentService.objects.filter(
         appointment_status = 'Done',
         member__id = employee_id,
-        # created_at__gte =  range_start ,
-        # created_at__lte = range_end
+        created_at__gte =  range_start ,
+        created_at__lte = range_end
         ).values_list('total_price', flat=True)
     sum_total_acheived += sum(appointment_checkout)
 
