@@ -87,7 +87,7 @@ class AppointmentClientSerializer(serializers.ModelSerializer):
     
     def get_tip(self,obj):
         service = AppointmentCheckout.objects.filter(appointment = obj)
-        total_tip = sum(obj.tip for obj in service)
+        total_tip = sum(int(obj.tip) for obj in service)
         return total_tip
 
     class Meta:
