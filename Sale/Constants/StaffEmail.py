@@ -33,6 +33,7 @@ def StaffSaleEmail(ids = None, location = None, tenant = None, member =None, inv
                 client = Client.objects.get(id = str(client))
                 
                 if client_email.sms_quick_sale == True:
+                    
                     html_file = render_to_string("Sales/quick_sales_staff.html", {'name': client.full_name,'location':location, 'sale_type': ids, 'invoice': invoice, 'date': dates,'time': current_time, 'client': None})
                     text_content = strip_tags(html_file)
                         
@@ -50,6 +51,7 @@ def StaffSaleEmail(ids = None, location = None, tenant = None, member =None, inv
             
             try:   
                 if staff_email.sms_daily_sale == True:
+                    
                     html_file = render_to_string("Sales/quick_sales_staff.html", {'name': member_id.full_name,'location':location, 'sale_type': ids, 'invoice': invoice, 'date': dates,'time': current_time, 'client': client})
                     text_content = strip_tags(html_file)
                         

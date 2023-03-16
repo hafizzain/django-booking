@@ -947,7 +947,7 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
 
         order_item = None
         name = '-------'
-        price = '-------'
+        price = 0
         order_type = '-------'
         payment_type = ''
         tip = ''
