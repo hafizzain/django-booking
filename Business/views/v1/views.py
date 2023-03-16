@@ -2488,15 +2488,17 @@ def import_business_vendor(request):
             if len(row) < 5:
                 continue
             vendor_name = row[0].strip('"')
-            email = row[1].strip('"')
-            address = row[2].strip('"')
-            status_ven = row[3].strip('"')
-            gstin = row[4].strip('"')
+            phone = row[1].strip('"')
+            email = row[2].strip('"')
+            address = row[3].strip('"')
+            status_ven = row[4].strip('"')
+            gstin = row[5].strip('"')
             
             create_vendor = BusinessVendor.objects.create(
                 user = user,
                 business = business,
                 vendor_name =vendor_name,
+                mobile_number = phone,
                 address =  address,
                 gstin =gstin,
                 email = email,
