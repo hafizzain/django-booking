@@ -10,7 +10,8 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
 
-def StaffSaleEmail(ids = None, location = None, tenant = None, member =None, invoice = None, client = None):
+# def StaffSaleEmail(ids = None, location = None, tenant = None, member =None, invoice = None, client = None):
+def StaffSaleEmail( location = None, tenant = None, member =None, invoice = None, client = None, ssitem = None, spitem = None):
     with tenant_context(tenant):
         try:
             try:
@@ -29,7 +30,8 @@ def StaffSaleEmail(ids = None, location = None, tenant = None, member =None, inv
             invoice =  str(invoice).split('-')[0]
             
             try:   
-                html_file = render_to_string("Sales/quick_sales_staff.html", {'name': member_id.full_name,'location':location, 'sale_type': ids, 'invoice': invoice, 'date': dates,'time': current_time, 'client': client})
+                # html_file = render_to_string("Sales/quick_sales_staff.html", {'name': member_id.full_name,'location':location, 'sale_type': ids, 'invoice': invoice, 'date': dates,'time': current_time, 'client': client})
+                html_file = render_to_string("Sales/quick_sales_staff.html", {'name': member_id.full_name,'location':location, 'sale_type': ssitem or spitem, 'invoice': invoice, 'date': dates,'time': current_time, 'client': client})
                 text_content = strip_tags(html_file)
                     
                 email = EmailMultiAlternatives(
