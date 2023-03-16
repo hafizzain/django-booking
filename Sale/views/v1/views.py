@@ -1288,6 +1288,9 @@ def create_sale_order(request):
         discount_price = id.get('discount_price', None)
         if discount_price is not None:
             price = int(discount_price) #* int(quantity)
+            ExceptionRecord.objects.create(
+                text = f'price {price} discount_price {discount_price}'
+            )
         
         if sale_type == 'PRODUCT':
             try:
@@ -1330,7 +1333,6 @@ def create_sale_order(request):
             
             except Exception as err:
                 errors.append(str(err))
-            #admin_email.notify_stock_turnover = False 
             try:
                 admin_email = StockNotificationSetting.objects.get(business = str(business_address.business))
                 if admin_email.notify_stock_turnover == True and transfer.available_quantity <= 5:
