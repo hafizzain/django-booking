@@ -1286,7 +1286,7 @@ def create_sale_order(request):
         quantity = id['quantity']
         price = id['price']
         discount_price = id.get('discount_price', None)
-        if discount_price is not None and  discount_price == 0:
+        if discount_price is not None and  int(discount_price) == 0:
             price = int(discount_price) #* int(quantity)
             ExceptionRecord.objects.create(
                 text = f'price {price} discount_price {discount_price}'
