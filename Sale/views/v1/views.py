@@ -1287,7 +1287,7 @@ def create_sale_order(request):
         price = id['price']
         discount_price = id.get('discount_price', None)
         if discount_price is not None:
-            price = discount_price
+            price = int(discount_price) * int(quantity)
         
         if sale_type == 'PRODUCT':
             try:
