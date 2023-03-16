@@ -2006,25 +2006,25 @@ def get_employee_check_time(request):
                 date = date,
                 )      
             if start_time >= daily_schedule.start_time and start_time < daily_schedule.end_time :
-                pass
-            elif daily_schedule.start_time_shift and daily_schedule.start_time_shift != None:
-                if start_time >= daily_schedule.start_time_shift and start_time < daily_schedule.end_time_shift:
-                    pass
-                else:
-                    st_time = convert_24_to_12(str(start_time))
-                    ed_time = convert_24_to_12(str(tested))
-                    return Response(
-                    {
-                        'status' : True,
-                        'status_code' : 200,
-                        'response' : {
-                            'message' : f'{employee.full_name} isn’t available on the selected date {st_time} and {ed_time}, but your team member can still book appointments for them.   testtedddddd',
-                            'error_message' : f'This Employee day off, {employee.full_name} date {date}',
-                            'Availability': False
-                        }
-                    },
-                    status=status.HTTP_200_OK
-                )
+                #pass
+                if daily_schedule.start_time_shift and daily_schedule.start_time_shift != None:
+                    if start_time >= daily_schedule.start_time_shift and start_time < daily_schedule.end_time_shift:
+                        pass
+                    else:
+                        st_time = convert_24_to_12(str(start_time))
+                        ed_time = convert_24_to_12(str(tested))
+                        return Response(
+                        {
+                            'status' : True,
+                            'status_code' : 200,
+                            'response' : {
+                                'message' : f'{employee.full_name} isn’t available on the selected date {st_time} and {ed_time}, but your team member can still book appointments for them.   testtedddddd',
+                                'error_message' : f'This Employee day off, {employee.full_name} date {date}',
+                                'Availability': False
+                            }
+                        },
+                        status=status.HTTP_200_OK
+                    )
             else:
                 st_time = convert_24_to_12(str(start_time))
                 ed_time = convert_24_to_12(str(tested))
