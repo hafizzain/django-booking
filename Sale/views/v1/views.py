@@ -1286,11 +1286,12 @@ def create_sale_order(request):
         quantity = id['quantity']
         price = id['price']
         discount_price = id.get('discount_price', None)
-        if discount_price is not None and  int(discount_price) == 0:
+        if discount_price is not None:
             price = int(discount_price) #* int(quantity)
             ExceptionRecord.objects.create(
                 text = f'price {price} discount_price {discount_price}'
             )
+            
         
         if sale_type == 'PRODUCT':
             try:
@@ -1372,6 +1373,9 @@ def create_sale_order(request):
                 service = Service.objects.get(id = service_id)
                 service_price = PriceService.objects.filter(service = service_id).first()
                 dur = service_price.duration
+                ExceptionRecord.objects.create(
+                    text = f'price {price} discount_price {discount_price}'
+                )
                 
                 service_order = ServiceOrder.objects.create(
                     user = user,
