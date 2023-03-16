@@ -1506,8 +1506,14 @@ def create_sale_order(request):
     #     ExceptionRecord.objects.create(
     #             text = f' error in email sale{str(err)}'
     #         )
+    datas = []
+    if len(ids) == 0:
+                datas.append(f'Service {product.name}')
+                datas.append(f'Service {service.name}')
+                                
+
     try:
-        thrd = Thread(target=StaffSaleEmail, args=[], kwargs={'ids' : ids,'location': business_address.address_name ,'tenant' : request.tenant, 'member': member, 'invoice': checkout.id, 'client': client, 'ssitem':service.name,'spitem':product.name})
+        thrd = Thread(target=StaffSaleEmail, args=[], kwargs={'ids' : datas,'location': business_address.address_name ,'tenant' : request.tenant, 'member': member, 'invoice': checkout.id, 'client': client})
         thrd.start()
     except Exception as err:
         ExceptionRecord.objects.create(
