@@ -12,7 +12,7 @@ from Appointment.Constants.Reschedule import reschedule_appointment
 from Appointment.Constants.AddAppointment import Add_appointment
 from Appointment.Constants.cancelappointment import cancel_appointment
 from Appointment.Constants.comisionCalculate import calculate_commission
-from Promotions.models import ServiceDurationForSpecificTime
+from Promotions.models import ComplimentaryDiscount, ServiceDurationForSpecificTime
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -487,18 +487,23 @@ def create_appointment(request):
         )
         
         if selected_promotion_type == 'Complimentary_Discount':
-            client_promotion  = ClientPromotions.objects.create(
-                user = user,
-                business = business,
-                client = client,
-                complimentary__id =  selected_promotion_id,
-                service = service,
-                # defaults={
-                #     'visits': 1
-                # },
-                # visits=F('visits') + 1
-                visits = 1
-            )
+            
+            try:
+                complimentary = ComplimentaryDiscount.objects.get(id = selected_promotion_id)
+                ClientPromotions.objects.create(
+                    user = user,
+                    business = business,
+                    client = client,
+                    complimentary =  complimentary,
+                    service = service,
+                    # defaults={
+                    #     'visits': 1
+                    # },
+                    # visits=F('visits') + 1
+                    visits = 1
+                )
+            except Exception as err:
+                Errors.append(str(err))
         
         if selected_promotion_type == 'Packages_Discount':
             testduration = False
