@@ -223,7 +223,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             is_active = True,
             is_deleted = False
             #is_blocked = False
-        ).exclude(appointment_status__in=excluded_list)
+        ).exclude(appointment_status__in=excluded_list).distinct()
         #selected_data = []
         
         
