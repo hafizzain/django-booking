@@ -814,6 +814,7 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
             return ''
     
     def get_sale(self, obj):
+        payment_type = 'Cash'
         appointment_checkout = obj.appointment_service_checkout.first()
         if appointment_checkout:
             tip = appointment_checkout.tip
