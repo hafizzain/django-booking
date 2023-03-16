@@ -13,6 +13,11 @@ from django.utils.html import strip_tags
 def StaffSaleEmail(ids = None, location = None, tenant = None, member =None, invoice = None, client = None):
     with tenant_context(tenant):
         try:
+            dates = date.today()
+            current_time = datetime.now().time()
+            
+            invoice =  str(invoice).split('-')[0]
+            
             try:
                 member_id = Employee.objects.get(id = str(member))
             except Exception as err:
@@ -20,13 +25,21 @@ def StaffSaleEmail(ids = None, location = None, tenant = None, member =None, inv
             
             try:
                 client = Client.objects.get(id = str(client))
+                
+                html_file = render_to_string("Sales/quick_sales_staff.html", {'name': member_id.full_name,'location':location, 'sale_type': ids, 'invoice': invoice, 'date': dates,'time': current_time, 'client': None})
+                text_content = strip_tags(html_file)
+                    
+                email = EmailMultiAlternatives(
+                        'Daily Sale',
+                        text_content,
+                        settings.EMAIL_HOST_USER,
+                        to = [member_id.email],
+                    
+                    )
+                email.attach_alternative(html_file, "text/html")
+                email.send()
             except Exception as err:
                 pass
-            
-            dates = date.today()
-            current_time = datetime.now().time()
-            
-            invoice =  str(invoice).split('-')[0]
             
             try:   
                 html_file = render_to_string("Sales/quick_sales_staff.html", {'name': member_id.full_name,'location':location, 'sale_type': ids, 'invoice': invoice, 'date': dates,'time': current_time, 'client': client})
