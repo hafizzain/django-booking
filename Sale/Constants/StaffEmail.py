@@ -1,3 +1,4 @@
+from urllib import request
 from Service.models import Service
 from Product.models import Product
 from Business.models import StaffNotificationSetting
@@ -13,8 +14,26 @@ from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
 
 # def StaffSaleEmail(ids = None, location = None, tenant = None, member =None, invoice = None, client = None):
-def StaffSaleEmail( ids = None,location = None, tenant = None, member =None, invoice = None, client = None, ssitem = None, spitem = None):
+def StaffSaleEmail( ids = None,location = None, tenant = None, member =None, invoice = None, client = None):
     with tenant_context(tenant):
+        sdata = []
+        
+        try:
+            if ids is not None:
+                for service_name in ids:
+                    service = Service.objects.get( name = str(service_name))
+                    sdata.append(f'Service {service.name}')
+
+            if ids is not None:
+                for product_name in ids:
+                    product = Product.objects.get( name = str(product_name))
+                    sdata.append(f'Product {product.name}')       
+        except Exception as err:
+            ExceptionRecord.objects.create(
+                    text = f' error in getting names of service and product{str(err)}'
+                )
+
+
         try:
             try:
                 member_id = Employee.objects.get(id = str(member))
@@ -36,7 +55,7 @@ def StaffSaleEmail( ids = None,location = None, tenant = None, member =None, inv
                 html_file = render_to_string("Sales/quick_sales_staff.html", {
                     'name': member_id.full_name,
                     'location': location,
-                    'sale_type': ids,
+                    'sdata': sdata,
                     'invoice': invoice,
                     'date': dates,
                     'time': current_time,
