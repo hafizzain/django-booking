@@ -1996,51 +1996,100 @@ def get_employee_check_time(request):
     data = []
         
     try:
-        employee = Employee.objects.get(
-                id = emp_id,
-                ) 
-        try:
-            daily_schedule = EmployeDailySchedule.objects.get(
-                employee = employee,
-                is_vacation = False,
-                date = date,
-                )      
-            if start_time >= daily_schedule.start_time and start_time < daily_schedule.end_time :
-                pass
-            elif daily_schedule.start_time_shift != None:
-                if start_time >= daily_schedule.start_time_shift and start_time < daily_schedule.end_time_shift:
-                    pass
-                else:
-                    st_time = convert_24_to_12(str(start_time))
-                    ed_time = convert_24_to_12(str(tested))
-                    return Response(
-                    {
-                        'status' : True,
-                        'status_code' : 200,
-                        'response' : {
-                            'message' : f'{employee.full_name} isn’t available on the selected date {st_time} and {ed_time}, but your team member can still book appointments for them.',
-                            'error_message' : f'This Employee day off, {employee.full_name} date {date}',
-                            'Availability': False
-                        }
-                    },
-                    status=status.HTTP_200_OK
-                )
-            else:
-                st_time = convert_24_to_12(str(start_time))
-                ed_time = convert_24_to_12(str(tested))
-                return Response(
-                {
-                    'status' : True,
-                    'status_code' : 200,
-                    'response' : {
-                        'message' : f'{employee.full_name} isn’t available on the selected date {st_time} and {ed_time}, but your team member can still book appointments for them.',
-                        #'message' : f'{employee.full_name} isn’t available on the selected date, but your team member can still book appointments for them.',
-                        'error_message' : f'This Employee day off, {employee.full_name} date {date}',
-                        'Availability': False
-                    }
-                },
-                status=status.HTTP_200_OK
-            )
+        employee = Employee.objects.get(id=emp_id)
+        daily_schedule = EmployeDailySchedule.objects.filter(
+            employee=employee,
+            is_vacation=False,
+            date=date,
+        ).first()
+        
+        if daily_schedule is None:
+            st_time = convert_24_to_12(str(start_time))
+            ed_time = convert_24_to_12(str(tested))
+            message = f"{employee.full_name} isn’t available on the selected date {st_time} and {ed_time}, but your team member can still book appointments for them."
+            error_message = f"This Employee is off, {employee.full_name} date {date}"
+            return Response({
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': message,
+                    'error_message': error_message,
+                    'Availability': False
+                }
+            }, status=status.HTTP_200_OK)
+        
+        start_time_valid = daily_schedule.start_time <= start_time < daily_schedule.end_time
+        start_time_shift_valid = daily_schedule.start_time_shift is not None and daily_schedule.start_time_shift <= start_time < daily_schedule.end_time_shift
+        
+        if start_time_valid or start_time_shift_valid:
+            return Response({
+                'status': True,
+                'status_code': 200,
+                'response': {
+                    'message': f"{employee.full_name} is available on the selected date.",
+                    'Availability': True
+                }
+            }, status=status.HTTP_200_OK)
+        
+        st_time = convert_24_to_12(str(start_time))
+        ed_time = convert_24_to_12(str(tested))
+        message = f"{employee.full_name} isn’t available on the selected date {st_time} and {ed_time}, but your team member can still book appointments for them."
+        error_message = f"This Employee is off, {employee.full_name} date {date}"
+        return Response({
+            'status': True,
+            'status_code': 200,
+            'response': {
+                'message': message,
+                'error_message': error_message,
+                'Availability': False
+            }
+        }, status=status.HTTP_200_OK)
+
+        # employee = Employee.objects.get(
+        #         id = emp_id,
+        #         ) 
+        # try:
+        #     daily_schedule = EmployeDailySchedule.objects.get(
+        #         employee = employee,
+        #         is_vacation = False,
+        #         date = date,
+        #         )      
+        #     if start_time >= daily_schedule.start_time and start_time < daily_schedule.end_time :
+        #         pass
+        #     elif daily_schedule.start_time_shift != None:
+        #         if start_time >= daily_schedule.start_time_shift and start_time < daily_schedule.end_time_shift:
+        #             pass
+        #         else:
+        #             st_time = convert_24_to_12(str(start_time))
+        #             ed_time = convert_24_to_12(str(tested))
+        #             return Response(
+        #             {
+        #                 'status' : True,
+        #                 'status_code' : 200,
+        #                 'response' : {
+        #                     'message' : f'{employee.full_name} isn’t available on the selected date {st_time} and {ed_time}, but your team member can still book appointments for them.',
+        #                     'error_message' : f'This Employee day off, {employee.full_name} date {date}',
+        #                     'Availability': False
+        #                 }
+        #             },
+        #             status=status.HTTP_200_OK
+        #         )
+        #     else:
+        #         st_time = convert_24_to_12(str(start_time))
+        #         ed_time = convert_24_to_12(str(tested))
+        #         return Response(
+        #         {
+        #             'status' : True,
+        #             'status_code' : 200,
+        #             'response' : {
+        #                 'message' : f'{employee.full_name} isn’t available on the selected date {st_time} and {ed_time}, but your team member can still book appointments for them.',
+        #                 #'message' : f'{employee.full_name} isn’t available on the selected date, but your team member can still book appointments for them.',
+        #                 'error_message' : f'This Employee day off, {employee.full_name} date {date}',
+        #                 'Availability': False
+        #             }
+        #         },
+        #         status=status.HTTP_200_OK
+        #     )
                 
         except Exception as err:
             # st_time = convert_24_to_12(str(start_time))
