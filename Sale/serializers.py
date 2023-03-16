@@ -500,7 +500,7 @@ class ServiceOrderSerializer(serializers.ModelSerializer):
         
     def get_price(self, obj):
         try:
-            return obj.service.price
+            return obj.current_price
         except Exception as err:
             return None
     
