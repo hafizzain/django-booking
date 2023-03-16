@@ -585,7 +585,7 @@ def create_appointment(request):
         except Exception as err:
             Errors.append(str(err))
         
-        if fav is not None:
+        if fav and fav is not None:
             appointment_service.is_favourite = True
             appointment_service.save()
             
