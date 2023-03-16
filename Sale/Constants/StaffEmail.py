@@ -1,3 +1,5 @@
+from Service.models import Service
+from Product.models import Product
 from Business.models import StaffNotificationSetting
 from Client.models import Client
 from Employee.models import Employee
@@ -11,7 +13,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
 
 # def StaffSaleEmail(ids = None, location = None, tenant = None, member =None, invoice = None, client = None):
-def StaffSaleEmail( location = None, tenant = None, member =None, invoice = None, client = None, ssitem = None, spitem = None):
+def StaffSaleEmail( ids = None,location = None, tenant = None, member =None, invoice = None, client = None, ssitem = None, spitem = None):
     with tenant_context(tenant):
         try:
             try:
@@ -28,10 +30,28 @@ def StaffSaleEmail( location = None, tenant = None, member =None, invoice = None
             current_time = datetime.now().time()
             
             invoice =  str(invoice).split('-')[0]
-            
+            try:
+                if ssitem:
+                    ssitem_obj = Product.name.get(id=ssitem)
+                    
+                if spitem:
+                    spitem_obj = Service.name.get(id=spitem)
+                    
+            except Exception as err:
+                pass
             try:   
                 # html_file = render_to_string("Sales/quick_sales_staff.html", {'name': member_id.full_name,'location':location, 'sale_type': ids, 'invoice': invoice, 'date': dates,'time': current_time, 'client': client})
-                html_file = render_to_string("Sales/quick_sales_staff.html", {'name': member_id.full_name,'location':location, 'sale_type': ssitem or spitem, 'invoice': invoice, 'date': dates,'time': current_time, 'client': client})
+                html_file = render_to_string("Sales/quick_sales_staff.html", {
+                    'name': member_id.full_name,
+                    'location': location,
+                    'sale_type': ids,
+                    'invoice': invoice,
+                    'date': dates,
+                    'time': current_time,
+                    'client': client,
+                    'ssitem': ssitem_obj,
+                    'spitem': spitem_obj
+                })
                 text_content = strip_tags(html_file)
                     
                 email = EmailMultiAlternatives(
