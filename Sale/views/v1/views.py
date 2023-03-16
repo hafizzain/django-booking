@@ -1201,7 +1201,7 @@ def create_sale_order(request):
     start_date = request.data.get('start_date', None)
     end_date = request.data.get('end_date', None)
      
-    tip = request.data.get('tip', None)
+    tip = request.data.get('tip', 0)
     total_price = request.data.get('total_price', None)
     
     errors = []
