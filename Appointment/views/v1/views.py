@@ -2018,7 +2018,7 @@ def get_employee_check_time(request):
                         'status' : True,
                         'status_code' : 200,
                         'response' : {
-                            'message' : f'{employee.full_name} isn’t available on the selected date {st_time} and {ed_time}, but your team member can still book appointments for them.',
+                            'message' : f'{employee.full_name} isn’t available on the selected date {st_time} and {ed_time}, but your team member can still book appointments for them.   testtedddddd',
                             'error_message' : f'This Employee day off, {employee.full_name} date {date}',
                             'Availability': False
                         }
