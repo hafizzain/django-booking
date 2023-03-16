@@ -324,7 +324,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             
     
     def get_employees(self, obj):
-        emp = EmployeeSelectedService.objects.filter(service = obj) 
+        emp = EmployeeSelectedService.objects.filter(service = obj, employee__is_deleted = False ) 
         return EmployeeSelectedServiceSerializer(emp, many = True, context=self.context).data
         
     
