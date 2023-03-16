@@ -1285,6 +1285,9 @@ def create_sale_order(request):
         service_id = id['id']
         quantity = id['quantity']
         price = id['price']
+        discount_price = id.get('discount_price', None)
+        if discount_price is not None:
+            price = discount_price
         
         if sale_type == 'PRODUCT':
             try:
