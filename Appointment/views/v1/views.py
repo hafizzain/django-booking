@@ -2007,7 +2007,7 @@ def get_employee_check_time(request):
                 )      
             if start_time >= daily_schedule.start_time and start_time < daily_schedule.end_time :
                 pass
-            elif daily_schedule.start_time_shift != None:
+            elif daily_schedule.start_time_shift and daily_schedule.start_time_shift != None:
                 if start_time >= daily_schedule.start_time_shift and start_time < daily_schedule.end_time_shift:
                     pass
                 else:
