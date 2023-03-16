@@ -1347,7 +1347,7 @@ def create_checkout(request):
     tip = request.data.get('tip', None)
     gst = request.data.get('gst', 0)
     service_price = request.data.get('service_price', None)
-    total_price = request.data.get('total_price', None)
+    total_price = request.data.get('total_price', 0)
     
     service_commission = 0
     service_commission_type = ''
