@@ -879,31 +879,32 @@ def add_product(request):
             low_stock = loc_quan.get('low_stock', None)
             reorder_quantity = loc_quan.get('reorder_quantity', None)
 
-            if all([location_id, current_stock, low_stock, reorder_quantity]):
-                try:
-                    loc = BusinessAddress.objects.get(id = location_id)
-                    ExceptionRecord.objects.create(text=loc)
-                    location_ids.append(str(loc))
-                except Exception as err:
-                    ExceptionRecord.objects.create(text=str(err))
-                    pass
-                
-                else:
-                    product_stock = ProductStock.objects.create(
-                        user = user,
-                        business = business,
-                        product = product,
-                        location = loc,
-                        available_quantity = current_stock,
-                        #order_quantity = current_stock,
-                        low_stock = low_stock, 
-                        reorder_quantity = reorder_quantity,
-                        alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
-                        is_active = stock_status,
-                    )
-
+            #if all([location_id, current_stock, low_stock, reorder_quantity]):
+            try:
+                loc = BusinessAddress.objects.get(id = location_id)
+                #ExceptionRecord.objects.create(text=loc)
+                location_ids.append(str(loc))
+            except Exception as err:
+                ExceptionRecord.objects.create(text=str(err))
+                pass
+            
             else:
-                ExceptionRecord.objects.create(text=f'fields not all {location_id}, {current_stock}, {low_stock}, {reorder_quantity}')
+                #ExceptionRecord.objects.create(text=f'{current_stock} {low_stock}  reorder_quantity{reorder_quantity}')
+                product_stock = ProductStock.objects.create(
+                    user = user,
+                    business = business,
+                    product = product,
+                    location = loc,
+                    available_quantity = current_stock,
+                    #order_quantity = current_stock,
+                    low_stock = low_stock, 
+                    reorder_quantity = reorder_quantity,
+                    alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
+                    is_active = stock_status,
+                )
+
+            # else:
+            #     ExceptionRecord.objects.create(text=f'fields not all {location_id}, {current_stock}, {low_stock}, {reorder_quantity}')
                 
         try:
             location_remaing = BusinessAddress.objects.filter(is_deleted = False).exclude(id__in = location_ids)

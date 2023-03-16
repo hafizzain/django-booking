@@ -3090,37 +3090,76 @@ def get_check_availability(request):
                 # if EmployeDaily:
                 #     data.append(f'Employees daily schedule not Available {employee.full_name}')
                                
+                #try:
+                
+                # av_staff_ids = AppointmentService.objects.filter(
+                #     member__id = employee.id,
+                #     appointment_date = date,
+                #     # appointment_time__gte = start_time, # 1:00
+                #     # end_time__lte = start_time, # 1:40
+                #     # member__employee_employedailyschedule__date = date,
+                #     # member__employee_employedailyschedule__start_time__gte = start_time,
+                #     # member__employee_employedailyschedule__end_time__lte = start_time,
+                #     is_blocked = False,
+                # )
+                
+                # for ser in av_staff_ids:
+                #     if tested <= ser.appointment_time:# or start_time >= ser.end_time:
+                #         if start_time >= ser.end_time:
+                #             data.append(f'Employees are free, employee name {employee.full_name}')
+                            
+                #         else:
+                #             pass
+                #             # data.append(f'The selected staff is not available at this time  {employee.full_name}')
+                #             # Availability = False
+                                                                    
+                #     else:
+                #         data.append(f'Employees are free, employee name: {employee.full_name}')
+                        
+                # if len(av_staff_ids) == 0:
+                #     data.append(f'Employees are free, you can proceed further employee name {employee.full_name}')
+                
+                # av_staff_ids = AppointmentService.objects.filter(
+                #         member__id=employee.id,
+                #         appointment_date=date,
+                #         is_blocked= True,
+                #         appointment_time__lt=end_time,
+                #         end_time__gt=start_time,
+                #     )
+
+                # if av_staff_ids:
+                #         # Check if the selected time slot overlaps with any existing appointments
+                #         for appointment in av_staff_ids:
+                #             if start_time < appointment.end_time and tested > appointment.appointment_time:
+                #                 Availability = False
+                #                 data.append(f'Error: Employee {employee.full_name} already has an appointment scheduled during the selected time slot.')
+                #                 break
+                    
                 try:
                     av_staff_ids = AppointmentService.objects.filter(
-                        member__id = employee.id,
-                        appointment_date = date,
-                        # appointment_time__gte = start_time, # 1:00
-                        # end_time__lte = start_time, # 1:40
-                        # member__employee_employedailyschedule__date = date,
-                        # member__employee_employedailyschedule__start_time__gte = start_time,
-                        # member__employee_employedailyschedule__end_time__lte = start_time,
-                        is_blocked = False,
+                        member__id=employee.id,
+                        appointment_date=date,
+                        #is_blocked=False,
+                        appointment_time__lt=end_time,
+                        end_time__gt=start_time,
                     )
-                    
-                    for ser in av_staff_ids:
-                        if tested <= ser.appointment_time:# or start_time >= ser.end_time:
-                            if start_time >= ser.end_time:
-                                data.append(f'Employees are free, employee name {employee.full_name}')
-                                
-                            else:
-                                pass
-                                # data.append(f'The selected staff is not available at this time  {employee.full_name}')
-                                # Availability = False
-                                                                        
+
+                    if av_staff_ids:
+                        # Check if the selected time slot overlaps with any existing appointments
+                        for appointment in av_staff_ids:
+                            if start_time < appointment.end_time and tested > appointment.appointment_time:
+                                Availability = False
+                                data.append(f'Error: Employee {employee.full_name} already has an appointment scheduled during the selected time slot.')
+                                break
                         else:
                             data.append(f'Employees are free, employee name: {employee.full_name}')
-                            
-                    if len(av_staff_ids) == 0:
-                        data.append(f'Employees are free, you can proceed further employee name {employee.full_name}')
-                        #data.append(f'{av_staff_ids} type {type(datetime_duration)}, ')
-                    
+                    else:
+                        data.append(f'Employees are free, employee name: {employee.full_name}')
+
                 except Exception as err:
-                    data.append(f'the employe{employee}, start_time {str(err)}')
+                    data.append(f'Error: {str(err)}')
+
+                
             except Exception as err:
                 data.append(f'the Error  {str(err)},  Employee Not Available on this time')
                     

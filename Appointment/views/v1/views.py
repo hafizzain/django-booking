@@ -446,6 +446,7 @@ def create_appointment(request):
             reward = Rewards.objects.get(id = reward_id )
         except:
             reward = None
+        
         try:
             membership = Membership.objects.get(id = membership_id )
         except:
@@ -484,6 +485,7 @@ def create_appointment(request):
                 }
             }
         )
+        
         if selected_promotion_type == 'Complimentary_Discount':
             client_promotion  = ClientPromotions.objects.create(
                 user = user,
@@ -497,6 +499,7 @@ def create_appointment(request):
                 # visits=F('visits') + 1
                 visits = 1
             )
+        
         if selected_promotion_type == 'Packages_Discount':
             testduration = False
             try:
@@ -531,28 +534,8 @@ def create_appointment(request):
         total_price_app += int(price)
         service_commission = 0
         service_commission_type = ''
-        toValue = 0        
-        
-        # try:
-        #     commission = CommissionSchemeSetting.objects.get(employee = str(member))
-        #     category = CategoryCommission.objects.filter(commission = commission.id)
-        #     for cat in category:
-        #         try:
-        #             toValue = int(cat.to_value)
-        #         except :
-        #             sign  = cat.to_value
-        #         if cat.category_comission == 'Service':
-        #             if (int(cat.from_value) <= price and  price <  toValue) or (int(cat.from_value) <= price and sign ):
-        #                 if cat.symbol == '%':
-        #                     service_commission = price * int(cat.commission_percentage) / 100
-        #                     service_commission_type = str(service_commission_type) + cat.symbol
-        #                 else:
-        #                     service_commission = int(cat.commission_percentage)
-        #                     service_commission_type = str(service_commission) + cat.symbol
-                                            
-        # except Exception as err:
-        #     Errors.append(str(err))
-            
+        toValue = 0    
+                    
         appointment_service = AppointmentService.objects.create(
             user = user,
             business = business,
@@ -585,6 +568,9 @@ def create_appointment(request):
             comm, comm_type = calculate_commission(member, price_com)#int(price))
             service_commission += comm
             service_commission_type += comm_type
+            appointment_service.service_commission = service_commission
+            appointment_service.service_commission_type = service_commission_type
+            appointment_service.save()
         #     ExceptionRecord.objects.create(
         #         text = f'commsion {service_commission}'
         # )
@@ -1158,6 +1144,24 @@ def create_blockTime(request):
                 }
             }
         )
+        
+    # dtime = datetime.strptime(start_time, "%H:%M:%S")
+    # start_time = dtime.time()
+    
+    # dt = datetime.strptime(date, "%Y-%m-%d")
+    # date = dt.date()
+    try:
+        app_date_time = f'2000-01-01 {start_time}'
+
+        duration_end = DURATION_CHOICES[duration]
+        app_date_time = datetime.fromisoformat(app_date_time)
+        datetime_duration = app_date_time + timedelta(minutes=duration_end)
+        datetime_duration = datetime_duration.strftime('%H:%M:%S')
+        tested = datetime.strptime(datetime_duration ,'%H:%M:%S').time()
+        end_time = datetime_duration
+    except Exception as err:
+        ExceptionRecord.objects.create(text=f'Errors happer in end linr 1180 {str(err)}')
+    
     block_time = AppointmentService.objects.create(
             user = user,
             business = business,
@@ -1167,6 +1171,7 @@ def create_blockTime(request):
             member = member,
             details = details,
             is_blocked = True,
+            end_time = tested
         )
     
     all_members =Employee.objects.filter(is_deleted=False, is_active = True).order_by('-created_at')
@@ -1193,6 +1198,7 @@ def update_blocktime(request):
     block_id = request.data.get('id', None)
     end_time = request.data.get('end_time', None)
     start_time = request.data.get('start_time', None)
+    duration = request.data.get('duration', None)
     if block_id is None: 
        return Response(
             {
@@ -1227,6 +1233,20 @@ def update_blocktime(request):
         )
     # end = start_time + timedelta(minutes=23)
     # print(F"{end} -- {end_time}")
+    if start_time is not None:
+        app_date_time = f'2000-01-01 {start_time}'
+
+        duration_end = DURATION_CHOICES[duration]
+        app_date_time = datetime.fromisoformat(app_date_time)
+        datetime_duration = app_date_time + timedelta(minutes=duration_end)
+        datetime_duration = datetime_duration.strftime('%H:%M:%S')
+        tested = datetime.strptime(datetime_duration ,'%H:%M:%S').time()
+        end_time = datetime_duration
+        
+        block.appointment_time = start_time
+        block.end_time = tested
+        block.save()
+        
     serializer = UpdateAppointmentSerializer(block , data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(
@@ -1320,7 +1340,7 @@ def create_checkout(request):
     business_address = request.data.get('business_address', None)
     
     tip = request.data.get('tip', None)
-    gst = request.data.get('gst', None)
+    gst = request.data.get('gst', 0)
     service_price = request.data.get('service_price', None)
     total_price = request.data.get('total_price', None)
     
@@ -1381,7 +1401,9 @@ def create_checkout(request):
             service_appointment.save()
         except Exception as err:
             pass
-    total_price_app  = gst + total_price
+    # if gst is None:
+    #     gst = 0
+    total_price_app  = int(gst) + int(total_price)
     try:
         commission = CommissionSchemeSetting.objects.get(employee = str(member))
         category = CategoryCommission.objects.filter(commission = commission.id)
