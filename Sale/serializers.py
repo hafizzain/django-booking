@@ -324,7 +324,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             
     
     def get_employees(self, obj):
-        emp = EmployeeSelectedService.objects.filter(service = obj) 
+        emp = EmployeeSelectedService.objects.filter(service = obj, employee__is_deleted = False ) 
         return EmployeeSelectedServiceSerializer(emp, many = True, context=self.context).data
         
     
@@ -500,7 +500,7 @@ class ServiceOrderSerializer(serializers.ModelSerializer):
         
     def get_price(self, obj):
         try:
-            return obj.service.price
+            return obj.current_price
         except Exception as err:
             return None
     
@@ -814,6 +814,9 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
             return ''
     
     def get_sale(self, obj):
+        payment_type = 'Cash'
+        tip = 0
+        client = ''
         appointment_checkout = obj.appointment_service_checkout.first()
         if appointment_checkout:
             tip = appointment_checkout.tip
@@ -944,7 +947,7 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
 
         order_item = None
         name = '-------'
-        price = '-------'
+        price = 0
         order_type = '-------'
         payment_type = ''
         tip = ''

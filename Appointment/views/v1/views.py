@@ -12,7 +12,7 @@ from Appointment.Constants.Reschedule import reschedule_appointment
 from Appointment.Constants.AddAppointment import Add_appointment
 from Appointment.Constants.cancelappointment import cancel_appointment
 from Appointment.Constants.comisionCalculate import calculate_commission
-from Promotions.models import ServiceDurationForSpecificTime
+from Promotions.models import ComplimentaryDiscount, ServiceDurationForSpecificTime
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -300,7 +300,8 @@ def create_appointment(request):
     text = request.data.get('appointment_notes', None)
     business_address_id = request.data.get('business_address', None)
     member = request.data.get('member', None)
-    extra_price = request.data.get('extra_price', '0')
+    extra_price = request.data.get('extra_price', None)
+    free_services_quantity = request.data.get('free_services_quantity', None)
     #business_id, member, appointment_date, appointment_time, duration
 
     client = request.data.get('client', None)
@@ -358,7 +359,6 @@ def create_appointment(request):
             return Response(
             {
                     'status' : False,
-                    # 'error_message' : str(err),
                     'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
                     'response' : {
                     'message' : 'Business not found',
@@ -377,8 +377,6 @@ def create_appointment(request):
             client_type=client_type,
             payment_method=payment_method,
             discount_type=discount_type,
-            # service_commission = service_commission,
-            # service_commission_type= service_commission_type,
         )
     
     if business_address_id is not None:
@@ -415,7 +413,7 @@ def create_appointment(request):
         member = appoinmnt['member']
         service = appoinmnt['service']
         app_duration = appoinmnt['duration']
-        price = appoinmnt['price']
+        price = appoinmnt.get('price', 0) #appoinmnt['price']
         date_time = appoinmnt['date_time']
         fav = appoinmnt.get('favourite', None)
         
@@ -487,18 +485,23 @@ def create_appointment(request):
         )
         
         if selected_promotion_type == 'Complimentary_Discount':
-            client_promotion  = ClientPromotions.objects.create(
-                user = user,
-                business = business,
-                client = client,
-                complimentary__id =  selected_promotion_id,
-                service = service,
-                # defaults={
-                #     'visits': 1
-                # },
-                # visits=F('visits') + 1
-                visits = 1
-            )
+            
+            try:
+                complimentary = ComplimentaryDiscount.objects.get(id = selected_promotion_id)
+                ClientPromotions.objects.create(
+                    user = user,
+                    business = business,
+                    client = client,
+                    complimentary =  complimentary,
+                    service = service,
+                    # defaults={
+                    #     'visits': 1
+                    # },
+                    # visits=F('visits') + 1
+                    visits = 1
+                )
+            except Exception as err:
+                Errors.append(str(err))
         
         if selected_promotion_type == 'Packages_Discount':
             testduration = False
@@ -530,6 +533,8 @@ def create_appointment(request):
                 packages.service.add(service)
                 packages.due_date = next_3_months
                 packages.save()
+                
+        
                     
         total_price_app += int(price)
         service_commission = 0
@@ -558,6 +563,9 @@ def create_appointment(request):
         )
         price_com =  0
         try:
+            if extra_price is not None and price == 0:
+                price = int(extra_price) / int(free_services_quantity)
+            
             if discount_price is not None:
                 price_com = discount_price
                 appointment_service.price = discount_price
@@ -577,7 +585,7 @@ def create_appointment(request):
         except Exception as err:
             Errors.append(str(err))
         
-        if fav is not None:
+        if fav and fav is not None:
             appointment_service.is_favourite = True
             appointment_service.save()
             
@@ -607,20 +615,11 @@ def create_appointment(request):
                                         
     except Exception as err:
         Errors.append(str(err))
-        
-    # integer_value_price = round(total_price_app[0])
-    try:
-        integer_value_ser = round(service_commission[0])
-    except Exception as err:
-        pass
     
     appointment.extra_price = total_price_app
     appointment.service_commission = int(service_commission)
     appointment.service_commission_type = service_commission_type
-    appointment.save() 
-    
-    
-    
+    appointment.save()
     
     serialized = AppoinmentSerializer(appointment)
     
@@ -629,33 +628,7 @@ def create_appointment(request):
         thrd.start()
     except Exception as err:
         pass
-    
-    # ExceptionRecord.objects.create(
-    #     text = f'error while hitting {str(err)}'
-    # )
-    # ExceptionRecord.objects.create(
-    #         text='email is in sending process'
-    #     )
-    # try:
-    #     thrd = Thread(target=AddApp, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
-    #     thrd.start()
-    # except Exception as err:
-        # pass
-    # try:
-    #     thrd = Thread(target=Add_appointment_n, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
-    #     thrd.start()
-    # except Exception as err:
-    #     pass
-    # try:
-    #     thrd = Thread(target=AddApp, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
-    #     thrd.start()
-    # except Exception as err:
-    #     pass
-    # ExceptionRecord.objects.create(
-    #         text='email is in sended'
-    #     )
-    
-    
+        
     all_memebers= Employee.objects.filter(
         is_deleted = False,
         is_active = True,
@@ -1342,7 +1315,7 @@ def create_checkout(request):
     tip = request.data.get('tip', None)
     gst = request.data.get('gst', 0)
     service_price = request.data.get('service_price', None)
-    total_price = request.data.get('total_price', None)
+    total_price = request.data.get('total_price', 0)
     
     service_commission = 0
     service_commission_type = ''
@@ -2034,24 +2007,24 @@ def get_employee_check_time(request):
                 )      
             if start_time >= daily_schedule.start_time and start_time < daily_schedule.end_time :
                 pass
-            elif daily_schedule.start_time_shift != None:
-                if start_time >= daily_schedule.start_time_shift and start_time < daily_schedule.end_time_shift:
-                    pass
-                else:
-                    st_time = convert_24_to_12(str(start_time))
-                    ed_time = convert_24_to_12(str(tested))
-                    return Response(
-                    {
-                        'status' : True,
-                        'status_code' : 200,
-                        'response' : {
-                            'message' : f'{employee.full_name} isn’t available on the selected date {st_time} and {ed_time}, but your team member can still book appointments for them.',
-                            'error_message' : f'This Employee day off, {employee.full_name} date {date}',
-                            'Availability': False
-                        }
-                    },
-                    status=status.HTTP_200_OK
-                )
+            elif daily_schedule.start_time_shift and daily_schedule.start_time_shift != None:
+                    if start_time >= daily_schedule.start_time_shift and start_time < daily_schedule.end_time_shift:
+                        pass
+                    else:
+                        st_time = convert_24_to_12(str(start_time))
+                        ed_time = convert_24_to_12(str(tested))
+                        return Response(
+                        {
+                            'status' : True,
+                            'status_code' : 200,
+                            'response' : {
+                                'message' : f'{employee.full_name} isn’t available on the selected date {st_time} and {ed_time}, but your team member can still book appointments for them.   testtedddddd',
+                                'error_message' : f'This Employee day off, {employee.full_name} date {date}',
+                                'Availability': False
+                            }
+                        },
+                        status=status.HTTP_200_OK
+                    )
             else:
                 st_time = convert_24_to_12(str(start_time))
                 ed_time = convert_24_to_12(str(tested))
@@ -2061,7 +2034,6 @@ def get_employee_check_time(request):
                     'status_code' : 200,
                     'response' : {
                         'message' : f'{employee.full_name} isn’t available on the selected date {st_time} and {ed_time}, but your team member can still book appointments for them.',
-                        #'message' : f'{employee.full_name} isn’t available on the selected date, but your team member can still book appointments for them.',
                         'error_message' : f'This Employee day off, {employee.full_name} date {date}',
                         'Availability': False
                     }
@@ -2070,8 +2042,6 @@ def get_employee_check_time(request):
             )
                 
         except Exception as err:
-            # st_time = convert_24_to_12(str(start_time))
-            # ed_time = convert_24_to_12(str(tested))
             return Response(
             {
                 'status' : True,
@@ -2360,6 +2330,4 @@ def get_employee_check_availability_list(request):
             status=status.HTTP_200_OK
         )
     
-# @api_view(['POST'])
-# @permission_classes([AllowAny])
-# def get_employee_check_availability_list(request):
+    

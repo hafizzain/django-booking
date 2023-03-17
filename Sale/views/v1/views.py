@@ -1192,16 +1192,16 @@ def create_sale_order(request):
     product_commission = request.data.get('product_commission', None)
     voucher_commission = request.data.get('voucher_commission', None)
     
-    service_commission_type = request.data.get('service_commission_type', None)
-    product_commission_type = request.data.get('product_commission_type', None)
-    voucher_commission_type = request.data.get('voucher_commission_type', None)
+    service_commission_type = request.data.get('service_commission_type', '')
+    product_commission_type = request.data.get('product_commission_type', '')
+    voucher_commission_type = request.data.get('voucher_commission_type', '')
     
     duration = request.data.get('duration', None)
     
     start_date = request.data.get('start_date', None)
     end_date = request.data.get('end_date', None)
      
-    tip = request.data.get('tip', None)
+    tip = request.data.get('tip', 0)
     total_price = request.data.get('total_price', None)
     
     errors = []
@@ -1285,6 +1285,13 @@ def create_sale_order(request):
         service_id = id['id']
         quantity = id['quantity']
         price = id['price']
+        discount_price = id.get('discount_price', None)
+        if discount_price is not None:
+            price = int(discount_price) #* int(quantity)
+            ExceptionRecord.objects.create(
+                text = f'price {price} discount_price {discount_price}'
+            )
+            
         
         if sale_type == 'PRODUCT':
             try:
@@ -1327,7 +1334,6 @@ def create_sale_order(request):
             
             except Exception as err:
                 errors.append(str(err))
-            #admin_email.notify_stock_turnover = False 
             try:
                 admin_email = StockNotificationSetting.objects.get(business = str(business_address.business))
                 if admin_email.notify_stock_turnover == True and transfer.available_quantity <= 5:
@@ -1367,6 +1373,9 @@ def create_sale_order(request):
                 service = Service.objects.get(id = service_id)
                 service_price = PriceService.objects.filter(service = service_id).first()
                 dur = service_price.duration
+                ExceptionRecord.objects.create(
+                    text = f'price {price} discount_price {discount_price}'
+                )
                 
                 service_order = ServiceOrder.objects.create(
                     user = user,

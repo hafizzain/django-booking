@@ -66,6 +66,14 @@ class ProductMediaSerializer(serializers.ModelSerializer):
         model = ProductMedia
         fields = ['id', 'image']
 class CurrencyRetailPriceSerializer(serializers.ModelSerializer):
+    currency_code = serializers.SerializerMethodField(read_only=True)
+    
+    def get_currency_code(self, obj):
+        try:
+            return obj.currency.code
+        except Exception as err:
+            return str(err)
+            
     class Meta:
         model = CurrencyRetailPrice
         fields = '__all__'        
