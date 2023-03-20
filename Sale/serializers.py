@@ -819,7 +819,9 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
         client = ''
         try:
             appointment_checkout = obj.appointment_service_checkout.first()
-        except: pass
+        except:
+            appointment_checkout = ''
+            #pass
         if appointment_checkout:
             tip = appointment_checkout.tip
             payment_type = appointment_checkout.payment_method
