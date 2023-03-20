@@ -785,7 +785,7 @@ def get_all_sale_orders(request):
     # serialized = ProductOrderSerializer(result_page,  many=True)
     
     data=[]
-    checkout_order = Checkout.objects.filter(is_deleted=False).order_by('created_at')
+    checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
     serialized = CheckoutSerializer(checkout_order,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
@@ -805,7 +805,7 @@ def get_all_sale_orders(request):
     # serialized = VoucherOrderSerializer(voucher_orders,  many=True, context={'request' : request})
     # data.extend(serialized.data)
     
-    appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done').order_by('created_at')
+    appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done').order_by('-created_at')
     serialized = AppointmentCheckoutSerializer(appointment_checkout, 
                                                many = True, 
                                                context={'request' : request
