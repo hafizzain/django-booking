@@ -2482,7 +2482,7 @@ def get_employee_commission(request):
                     'status' : False,
                     'response' : {
                     'message' : 'Commission Scheme Setting',
-                    'error_message' : str(err),
+                    'error_message' : f'error {str(err) } employee id {employe}',
                     }
                 },
                 status=status.HTTP_400_BAD_REQUEST
