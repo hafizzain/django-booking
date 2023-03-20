@@ -822,7 +822,7 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
         except:
             service_name = ''
         try:
-            price = str(obj.obj.price)
+            price = str(obj.price)
         except:
             price = 0
         try:
