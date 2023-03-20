@@ -822,7 +822,7 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
         except:
             appointment_checkout = None
             #pass
-        if appointment_checkout:
+        if appointment_checkout is not None:
             tip = appointment_checkout.tip
             payment_type = appointment_checkout.payment_method
             if obj.appointment.client is not None:
