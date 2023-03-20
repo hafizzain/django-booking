@@ -255,11 +255,11 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
                 if range_start is not None:
                     if created_at >= range_start  and created_at <= range_end:
-                        total += int(ord.checkout.total_service_price)
+                        #total += int(ord.checkout.total_service_price)
                         service_commission += ord.checkout.service_commission
                     
-                    else:
-                        service_commission += ord.checkout.service_commission
+                else:
+                    service_commission += ord.checkout.service_commission
             
             voucher_orders = VoucherOrder.objects.filter(
                 is_deleted=False, 
@@ -270,7 +270,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
                 if range_start is not None:
                     if created_at >= range_start  and created_at <= range_end:
-                        total += int(ord.checkout.total_service_price)
+                       # total += int(ord.checkout.total_service_price)
                         voucher_commission += ord.checkout.voucher_commission
                 else:
                     #total += int(ord.checkout.total_product_price)
