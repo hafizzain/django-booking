@@ -822,6 +822,10 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
         except:
             service_name = ''
         try:
+            price = str(obj.obj.price)
+        except:
+            price = 0
+        try:
             appointment_checkout = obj.appointment_service_checkout.first()
         except:
             appointment_checkout = None
@@ -840,7 +844,7 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
             'name' : service_name, #str(obj.service.name),
             'order_type' : 'Service',
             'quantity' : 1,
-            'price' : obj.price,
+            'price' : price,
             'payment_type' : payment_type, #obj.appointment_service_checkout.payment_method,
             'tip' : tip,  
             'client': client
