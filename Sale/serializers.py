@@ -820,7 +820,7 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
         try:
             appointment_checkout = obj.appointment_service_checkout.first()
         except:
-            appointment_checkout = ''
+            appointment_checkout = None
             #pass
         if appointment_checkout:
             tip = appointment_checkout.tip
