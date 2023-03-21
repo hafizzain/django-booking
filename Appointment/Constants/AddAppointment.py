@@ -50,7 +50,8 @@ def Add_appointment(appointment = None, tenant = None):
                                 'Appointment Booked',
                                 text_content,
                                 settings.EMAIL_HOST_USER,
-                                to = [mem_email],
+                                #to = [mem_email],
+                                to = [client_email],
                             
                             )
                         email.attach_alternative(html_file, "text/html")
@@ -72,7 +73,8 @@ def Add_appointment(appointment = None, tenant = None):
                         'Appointment Booked',
                         text_content,
                         settings.EMAIL_HOST_USER,
-                        to = [email_c],
+                        #to = [email_c],
+                        to = [mem_email],
                     )
                         
                     email.attach_alternative(html_file, "text/html")
