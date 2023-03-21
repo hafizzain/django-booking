@@ -2474,7 +2474,7 @@ def get_employee_commission(request):
     except Exception as err:
         pass
     try:
-        commission = CommissionSchemeSetting.objects.get(employee = str(employe))
+        commission = CommissionSchemeSetting.objects.get(employee = employe)
         serializer = CommissionSerializer(commission, context={'request' : request})
     except Exception as err:
         return Response(
@@ -2482,7 +2482,7 @@ def get_employee_commission(request):
                     'status' : False,
                     'response' : {
                     'message' : 'Commission Scheme Setting',
-                    'error_message' : str(err),
+                    'error_message' : f'error {str(err) } employee id {employe}',
                     }
                 },
                 status=status.HTTP_400_BAD_REQUEST

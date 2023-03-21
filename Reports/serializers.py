@@ -225,24 +225,55 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                     text=str(service_commission)
                 )
             
-            service_orders = ProductOrder.objects.filter(
+            product_orders = ProductOrder.objects.filter(
                 is_deleted=False, 
                 member = obj, 
                 )
-            for ord  in service_orders:
+            for ord  in product_orders:
                 create = str(ord.created_at)
                 created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
                 if range_start is not None:
                     if created_at >= range_start  and created_at <= range_end:
                         total += int(ord.checkout.total_service_price)
-                        service_commission += ord.checkout.service_commission
+                        #service_commission += ord.checkout.service_commission
                         product_commission += ord.checkout.product_commission
-                        voucher_commission += ord.checkout.voucher_commission
+                        #voucher_commission += ord.checkout.voucher_commission
         
                 else:
                     total += int(ord.checkout.total_product_price)
-                    service_commission += ord.checkout.service_commission
+                    #service_commission += ord.checkout.service_commission
                     product_commission += ord.checkout.product_commission
+                    #voucher_commission += ord.checkout.voucher_commission
+                    
+            service_orders = ServiceOrder.objects.filter(
+                is_deleted=False, 
+                member = obj, 
+                )
+            
+            for ord  in service_orders:
+                create = str(ord.created_at)
+                created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
+                if range_start is not None:
+                    if created_at >= range_start  and created_at <= range_end:
+                        #total += int(ord.checkout.total_service_price)
+                        service_commission += ord.checkout.service_commission
+                    
+                else:
+                    service_commission += ord.checkout.service_commission
+            
+            voucher_orders = VoucherOrder.objects.filter(
+                is_deleted=False, 
+                member = obj, 
+                )
+            for ord  in voucher_orders:
+                create = str(ord.created_at)
+                created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
+                if range_start is not None:
+                    if created_at >= range_start  and created_at <= range_end:
+                       # total += int(ord.checkout.total_service_price)
+                        voucher_commission += ord.checkout.voucher_commission
+                else:
+                    #total += int(ord.checkout.total_product_price)
                     voucher_commission += ord.checkout.voucher_commission
 
             commission_total = service_commission + product_commission + voucher_commission
