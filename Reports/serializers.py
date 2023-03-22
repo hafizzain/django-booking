@@ -232,10 +232,12 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             voucher_commission = voucher_orders.aggregate(Sum('checkout__voucher_commission'))['checkout__voucher_commission__sum'] or 0
 
             commission_total = total_service_commission + product_commission + voucher_commission
+            
+            ser_commission = int(service_commission) + int(total_service_commission)
             data = {
                 'product_sale_price': total_product_price,
                 'commission_total': commission_total,
-                'service_commission': service_commission,
+                'service_commission': ser_commission,
                 'product_commission': product_commission,
                 'voucher_commission': voucher_commission,
             }
