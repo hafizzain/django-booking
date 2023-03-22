@@ -240,8 +240,8 @@ def get_commission_reports_by_commission_details_updated(request):
             })
         data.extend(serialized.data)
             
-        appointment_checkout = AppointmentCheckout.objects.filter(
-            appointment_service__appointment_status = 'Done',
+        appointment_checkout = AppointmentService.objects.filter(
+            appointment_status = 'Done', #appointment_service__
             created_at__gte =  range_start ,
             created_at__lte = range_end
             )
