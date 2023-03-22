@@ -191,8 +191,11 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
     product_sale_price = serializers.SerializerMethodField(read_only=True)
     voucher_sale_price = serializers.SerializerMethodField(read_only=True)
     
-    def get_product_sale_price(obj, range_start=None, range_end=None, year=None):
+    def get_product_sale_price(self,obj):
         try:
+            range_start = self.context["range_start"]
+            range_end = self.context["range_end"]
+            
             app = AppointmentService.objects.filter(
                 member=obj,
                 appointment_status='Done',
