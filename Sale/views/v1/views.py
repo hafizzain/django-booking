@@ -2,6 +2,7 @@ from datetime import timedelta
 from threading import Thread
 from django.shortcuts import render
 from Sale.Constants.StaffEmail import StaffSaleEmail
+from Sale.Constants.stock_lowest import stock_lowest
 from Sale.Constants.tunrover import ProductTurnover
 
 from rest_framework import status
@@ -1345,6 +1346,19 @@ def create_sale_order(request):
                     except Exception as err:
                         ExceptionRecord.objects.create(
                             text = f' error in Turnover email sale{str(err)}'
+                        )
+            except:
+                pass
+            
+            try:
+                admin_email = StockNotificationSetting.objects.get(business = str(business_address.business))
+                if admin_email.notify_for_lowest_stock == True and transfer.available_quantity <= 5:
+                    try:
+                        thrd = Thread(target=stock_lowest, args=[], kwargs={'product' : product,'product_stock': transfer, 'business_address':business_address.id ,'tenant' : request.tenant,'quantity': transfer.available_quantity})
+                        thrd.start()
+                    except Exception as err:
+                        ExceptionRecord.objects.create(
+                            text = f' error in Stock lowest email sale{str(err)}'
                         )
             except:
                 pass
