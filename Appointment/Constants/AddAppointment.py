@@ -20,14 +20,14 @@ def Add_appointment(appointment = None, tenant = None):
     current_time = datetime.now().time()
     with tenant_context(tenant):
         try:
-            appointment =  AppointmentService.objects.filter(appointment = appointment)    
-            try:
-                staff_email = StaffNotificationSetting.objects.get(business = str(appo.appointment.business))
-                client_email = ClientNotificationSetting.objects.get(business = str(appo.appointment.business))
-            except:
-                pass        
+            appointment =  AppointmentService.objects.filter(appointment = appointment)           
             
             for appo in appointment:
+                try:
+                    staff_email = StaffNotificationSetting.objects.get(business = str(appo.appointment.business))
+                    client_email = ClientNotificationSetting.objects.get(business = str(appo.appointment.business))
+                except:
+                    pass 
                 
                 try:
                     email_c = appo.appointment.client.email
