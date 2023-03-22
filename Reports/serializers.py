@@ -248,8 +248,9 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             range_start = self.context.get("range_start")
             range_end = self.context.get("range_end")
             
-            if range_start:
+            if range_start is not None:
                 range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
+            if range_end is not None:
                 range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
                 
             total = 0
@@ -258,7 +259,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             appointments = AppointmentService.objects.filter(
                 member=obj,
                 appointment_status='Done',
-                created_at__range=(range_start, range_end) if range_start else None
+                created_at__range=(range_start, range_end) if range_start and range_end else None
             ).aggregate(total=Coalesce(Sum('price'), 0))['total']
             total += appointments
             
@@ -266,7 +267,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             service_orders = ServiceOrder.objects.filter(
                 is_deleted=False,
                 member=obj,
-                created_at__range=(range_start, range_end) if range_start else None
+                created_at__range=(range_start, range_end) if range_start and range_end else None
             ).aggregate(total=Coalesce(Sum('checkout__total_service_price'), 0))['total']
             total += service_orders
             
@@ -274,6 +275,38 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             
         except Exception as err:
             return str(err)
+
+    # def get_service_sale_price(self, obj):
+    #     try:
+    #         range_start = self.context.get("range_start")
+    #         range_end = self.context.get("range_end")
+            
+    #         if range_start:
+    #             range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
+    #             range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
+                
+    #         total = 0
+            
+    #         # Get the total price of all appointments that are done and belong to the given member.
+    #         appointments = AppointmentService.objects.filter(
+    #             member=obj,
+    #             appointment_status='Done',
+    #             created_at__range=(range_start, range_end) if range_start else None
+    #         ).aggregate(total=Coalesce(Sum('price'), 0))['total']
+    #         total += appointments
+            
+    #         # Get the total price of all service orders that are not deleted and belong to the given member.
+    #         service_orders = ServiceOrder.objects.filter(
+    #             is_deleted=False,
+    #             member=obj,
+    #             created_at__range=(range_start, range_end) if range_start else None
+    #         ).aggregate(total=Coalesce(Sum('checkout__total_service_price'), 0))['total']
+    #         total += service_orders
+            
+    #         return total
+            
+    #     except Exception as err:
+    #         return str(err)
 
     # def get_product_sale_price(self, obj):
     #     try:
