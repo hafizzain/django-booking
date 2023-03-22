@@ -12,7 +12,7 @@ from datetime import datetime,date
 from Utility.models import ExceptionRecord
 
 
-def Add_appointment(appointment = None, tenant = None):
+def Add_appointment(appointment = None, tenant = None, client =  None):
     if appointment is None or tenant is None:
         ExceptionRecord.objects.create(
             text='Appointment, Tenant Is None'
@@ -32,6 +32,10 @@ def Add_appointment(appointment = None, tenant = None):
                 mem_id= appo.member.employee_id
                 client_type= appo.appointment.client_type
                 name = appo.appointment.client.full_name
+
+                phone = appo.appointment.client.mobile_number
+                location = appo.appointment.business_address.address_name
+                duration = appo.duration
                 
                 try:
                     staff_email = StaffNotificationSetting.objects.get(business = str(appo.appointment.business))
@@ -60,13 +64,17 @@ def Add_appointment(appointment = None, tenant = None):
                         pass
                     
             current_time = datetime.now().time()
-            if client_email.sms_appoinment == True:
+            if client_email.sms_appoinment == True and client:
                 ExceptionRecord.objects.create(
-                    text = f'client email {email_c} '
+                    text=f'client email {email_c}'
                 )
                 try:
                     #html_file = render_to_string("AppointmentEmail/add_appointment.html",{'client': False, 'appointment' : appointment,'staff': True,'t_name':name_c} )
-                    html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'client': False, 'appointment' : appointment,'staff': True,'t_name':name_c ,'time': current_time,} )
+                    html_file = render_to_string("AppointmentEmail/new_appointment_n.html", { 
+                                'ser_name':ser_name ,'t_name':name , 'mem_name':mem_name,
+                                'date':dat, 'location': location, 'duration': duration,
+                                'time': current_time,
+                                })
                     text_content = strip_tags(html_file)
                     
                     email = EmailMultiAlternatives(
