@@ -928,7 +928,7 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
         # serialized = EmployeeBusinessSerializer(checkout.member)
         # return serialized.data
         return {
-            'full_name' : str(checkout.member.full_name),
+            'full_named' : str(checkout.member.full_name),
         }
 
     def get_commission(self, checkout):
