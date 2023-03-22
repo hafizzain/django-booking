@@ -249,6 +249,7 @@ def get_commission_reports_by_commission_details_updated(request):
             'request' : request, 
             })
         data.extend(serialized.data)
+        sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
     else:
         checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
         serialized = CheckoutCommissionSerializer(checkout_order,  many=True, context={
@@ -261,7 +262,7 @@ def get_commission_reports_by_commission_details_updated(request):
             'request' : request, 
             })
         data.extend(serialized.data)
-        
+        sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
     
     return Response(
         {
@@ -270,7 +271,7 @@ def get_commission_reports_by_commission_details_updated(request):
             'response' : {
                 'message' : 'All Sale Orders',
                 'error_message' : None,
-                'sales' : data,
+                'sales' : sorted_data,
                 # 'sales' : [
                 #     {
                 #         'employee' : {},
