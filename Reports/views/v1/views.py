@@ -245,7 +245,9 @@ def get_commission_reports_by_commission_details_updated(request):
             created_at__gte =  range_start ,
             created_at__lte = range_end
             )
-        serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
+        serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True, context={
+            'request' : request, 
+            })
         data.extend(serialized.data)
     else:
         checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
@@ -255,7 +257,9 @@ def get_commission_reports_by_commission_details_updated(request):
         data.extend(serialized.data)
         
         appointment_checkout = AppointmentService.objects.filter(appointment_status = 'Done')
-        serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
+        serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True,context={
+            'request' : request, 
+            })
         data.extend(serialized.data)
         
     

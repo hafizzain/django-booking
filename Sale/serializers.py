@@ -854,6 +854,7 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
     def get_employee(self, obj):
         try:
             serializers = MemberSerializer(obj.member,context=self.context ).data
+            
             return serializers
         except Exception as err:
             return None
