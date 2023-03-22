@@ -261,7 +261,8 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 appointment_status='Done',
                 created_at__range=(range_start, range_end) if range_start and range_end else None
             ).aggregate(total=Coalesce(Sum('price'), 0))['total']
-            total += appointments
+            if appointments is not None:
+                total += appointments
             
             # Get the total price of all service orders that are not deleted and belong to the given member.
             service_orders = ServiceOrder.objects.filter(
@@ -269,7 +270,8 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 member=obj,
                 created_at__range=(range_start, range_end) if range_start and range_end else None
             ).aggregate(total=Coalesce(Sum('checkout__total_service_price'), 0))['total']
-            total += service_orders
+            if service_orders is not None:
+                total += service_orders
             
             return total
             
