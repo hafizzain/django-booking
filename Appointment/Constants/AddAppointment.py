@@ -31,7 +31,7 @@ def Add_appointment(appointment = None, tenant = None, client =  None):
                 mem_name = appo.member.full_name
                 mem_id= appo.member.employee_id
                 client_type= appo.appointment.client_type
-                name = appo.appointment.client.full_name
+                # name = appo.appointment.client.full_name
 
                 phone = appo.appointment.client.mobile_number
                 location = appo.appointment.business_address.address_name
@@ -64,17 +64,17 @@ def Add_appointment(appointment = None, tenant = None, client =  None):
                         pass
                     
             current_time = datetime.now().time()
-            if client_email.sms_appoinment == True and client:
+            if client_email.sms_appoinment == True :
                 ExceptionRecord.objects.create(
-                    text=f'client email {email_c}'
+                    text = f'client email {email_c} '
                 )
                 try:
-                    #html_file = render_to_string("AppointmentEmail/add_appointment.html",{'client': False, 'appointment' : appointment,'staff': True,'t_name':name_c} )
-                    html_file = render_to_string("AppointmentEmail/new_appointment_n.html", { 
-                                'ser_name':ser_name ,'t_name':name , 'mem_name':mem_name,
-                                'date':dat, 'location': location, 'duration': duration,
-                                'time': current_time,
-                                })
+                    html_file = render_to_string("AppointmentEmail/add_appointment.html",{'client': False, 'appointment' : appointment,'staff': True,'t_name':name_c, 'ser_name':ser_name ,'date':dat, 'mem_id':mem_id,'location': location, 'duration': duration,'time': current_time, 'email_c': email_c , 'phone': phone} )
+                    # html_file = render_to_string("AppointmentEmail/new_appointment_n.html", {'name': name_c, 
+                    #             'ser_name':ser_name ,'t_name':name , 
+                    #             'date':dat, 'mem_id':mem_id,'location': location, 'duration': duration,
+                    #             'time': current_time, 'email_c': email_c , 'phone': phone, 'client': client
+                    #             })
                     text_content = strip_tags(html_file)
                     
                     email = EmailMultiAlternatives(
