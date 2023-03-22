@@ -17,31 +17,32 @@ def Add_appointment(appointment = None, tenant = None):
         ExceptionRecord.objects.create(
             text='Appointment, Tenant Is None'
         )
-
+    current_time = datetime.now().time()
     with tenant_context(tenant):
         try:
-            appointment =  AppointmentService.objects.filter(appointment = appointment)                
+            appointment =  AppointmentService.objects.filter(appointment = appointment)    
+            try:
+                staff_email = StaffNotificationSetting.objects.get(business = str(appo.appointment.business))
+                client_email = ClientNotificationSetting.objects.get(business = str(appo.appointment.business))
+            except:
+                pass        
+            
             for appo in appointment:
                 
-                email_c = appo.appointment.client.email
-                name_c = appo.appointment.client.full_name
+                try:
+                    email_c = appo.appointment.client.email
+                    name_c = appo.appointment.client.full_name
+                    client_type= appo.appointment.client_type
+                except:
+                    pass
+                
                 ser_name = appo.service.name
                 dat = appo.appointment_date
                 mem_email = appo.member.email
                 mem_name = appo.member.full_name
                 mem_id= appo.member.employee_id
-                client_type= appo.appointment.client_type
-                name = appo.appointment.client.full_name
                 
-                try:
-                    staff_email = StaffNotificationSetting.objects.get(business = str(appo.appointment.business))
-                    client_email = ClientNotificationSetting.objects.get(business = str(appo.appointment.business))
-                except:
-                    pass
                 if staff_email.sms_daily_sale == True:
-                    ExceptionRecord.objects.create(
-                    text = f'ccreate client 43 {staff_email.sms_daily_sale == True}'
-                )
                     try:   
                         html_file = render_to_string("AppointmentEmail/email_for_client_appointment.html", {'client': True, 'staff': False,'name': name_c,'t_name':mem_name , 'ser_name':ser_name , 'date':dat, 'mem_id':mem_id, 'client_type': client_type})
                         text_content = strip_tags(html_file)
@@ -51,20 +52,19 @@ def Add_appointment(appointment = None, tenant = None):
                                 text_content,
                                 settings.EMAIL_HOST_USER,
                                 #to = [mem_email],
-                                to = [client_email],
+                                to = [email_c],
                             
                             )
                         email.attach_alternative(html_file, "text/html")
                         email.send()
                     except Exception as err:
                         pass
-                    
-            current_time = datetime.now().time()
+            
             if client_email.sms_appoinment == True:
-                ExceptionRecord.objects.create(
-                    text = f'client email {email_c} '
-                )
                 try:
+                    ExceptionRecord.objects.create(
+                        text = f'Employee Email sended options line 66'
+                    )
                     #html_file = render_to_string("AppointmentEmail/add_appointment.html",{'client': False, 'appointment' : appointment,'staff': True,'t_name':name_c} )
                     html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'client': False, 'appointment' : appointment,'staff': True,'t_name':name_c ,'time': current_time,} )
                     text_content = strip_tags(html_file)
@@ -79,13 +79,11 @@ def Add_appointment(appointment = None, tenant = None):
                         
                     email.attach_alternative(html_file, "text/html")
                     email.send()
+                    
                 except Exception as err:
                     ExceptionRecord.objects.create(
                         text = f'Error on creating email client;;;'
                     )
-            ExceptionRecord.objects.create(
-                text = f'create app email {staff_email.sms_daily_sale} {client_email.sms_appoinment}'
-            )
     
         except Exception as err:
             ExceptionRecord.objects.create(
