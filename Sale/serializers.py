@@ -873,7 +873,7 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
    
     class Meta:
         model = AppointmentService
-        fields = ['location','order_type','employee','commission','commission_rate','sale']
+        fields = ['location','order_type','employee','commission','commission_rate','sale', 'created_at']
 
 class BusinessTaxSerializer(serializers.ModelSerializer):
     parent_tax = ParentBusinessTaxSerializer(many=True, read_only=True)
@@ -1049,6 +1049,6 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
             'sale' : {}
         """
         model = Checkout
-        fields = ['employee', 'location', 'commission', 'commission_rate', 'sale']
+        fields = ['employee', 'location', 'commission', 'commission_rate', 'sale', 'created_at']
     
     
