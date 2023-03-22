@@ -8,7 +8,7 @@ from Business.models import BusinessAddress
 from Employee.models import Employee
 from Product.Constants.index import tenant_media_base_url
 from django.db.models import Sum
-
+from django.db.models.functions import Coalesce
 
 from Order.models import MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
 from Sale.serializers import ProductOrderSerializer
@@ -243,6 +243,38 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
         except Exception as e:
             return str(e)
             
+    def get_service_sale_price(self, obj):
+        try:
+            range_start = self.context.get("range_start")
+            range_end = self.context.get("range_end")
+            
+            if range_start:
+                range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
+                range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
+                
+            total = 0
+            
+            # Get the total price of all appointments that are done and belong to the given member.
+            appointments = AppointmentService.objects.filter(
+                member=obj,
+                appointment_status='Done',
+                created_at__range=(range_start, range_end) if range_start else None
+            ).aggregate(total=Coalesce(Sum('price'), 0))['total']
+            total += appointments
+            
+            # Get the total price of all service orders that are not deleted and belong to the given member.
+            service_orders = ServiceOrder.objects.filter(
+                is_deleted=False,
+                member=obj,
+                created_at__range=(range_start, range_end) if range_start else None
+            ).aggregate(total=Coalesce(Sum('checkout__total_service_price'), 0))['total']
+            total += service_orders
+            
+            return total
+            
+        except Exception as err:
+            return str(err)
+
     # def get_product_sale_price(self, obj):
     #     try:
 
@@ -343,50 +375,50 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
     #     except Exception as err:
     #         return str(err)
     
-    def get_service_sale_price(self, obj):
-        try:
-            range_start = self.context["range_start"]
-            range_end = self.context["range_end"]
-            year = self.context["year"]
+    # def get_service_sale_price(self, obj):
+    #     try:
+    #         range_start = self.context["range_start"]
+    #         range_end = self.context["range_end"]
+    #         year = self.context["year"]
             
-            if range_start:
-                range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
-                range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
+    #         if range_start:
+    #             range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
+    #             range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
             
-            total = 0
-            service_orders = ServiceOrder.objects.filter(is_deleted=False, 
-                        member = obj,
-                        #created_at__icontains = year
-                        )
-            app   = AppointmentService.objects.filter(
-                member = obj,
-                appointment_status = 'Done',
-                #created_at__icontains = year
-            )
-            for appointment  in app:                
-                create = str(appointment.created_at)
-                created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
+    #         total = 0
+    #         service_orders = ServiceOrder.objects.filter(is_deleted=False, 
+    #                     member = obj,
+    #                     #created_at__icontains = year
+    #                     )
+    #         app   = AppointmentService.objects.filter(
+    #             member = obj,
+    #             appointment_status = 'Done',
+    #             #created_at__icontains = year
+    #         )
+    #         for appointment  in app:                
+    #             create = str(appointment.created_at)
+    #             created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
                 
-                if range_start:
-                    if range_start >= created_at  and created_at <= range_end:
-                        total += int(appointment.price)
-                else:
-                    total += int(appointment.price)
+    #             if range_start:
+    #                 if range_start >= created_at  and created_at <= range_end:
+    #                     total += int(appointment.price)
+    #             else:
+    #                 total += int(appointment.price)
                     
-            for ord  in service_orders:                
-                create = str(ord.created_at)
-                created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
+    #         for ord  in service_orders:                
+    #             create = str(ord.created_at)
+    #             created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
                 
-                if range_start:
-                    if range_start >= created_at  and created_at <= range_end:
-                        total += int(ord.checkout.total_service_price)
-                else:
-                    total += int(ord.checkout.total_service_price)
+    #             if range_start:
+    #                 if range_start >= created_at  and created_at <= range_end:
+    #                     total += int(ord.checkout.total_service_price)
+    #             else:
+    #                 total += int(ord.checkout.total_service_price)
                                           
-            return total         
+    #         return total         
             
-        except Exception as err:
-            return str(err)
+    #     except Exception as err:
+    #         return str(err)
         
     def get_voucher_sale_price(self, obj):
         try:
