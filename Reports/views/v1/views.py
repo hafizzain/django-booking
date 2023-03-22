@@ -224,12 +224,13 @@ def get_commission_reports_by_commission_details_updated(request):
     range_end = request.GET.get('range_end', None) # 2023-02-25
     
     data = []
-    ExceptionRecord.objects.create(
-        text = f'{range_start} {range_end}'
-    )
+    
     if range_start:
         range_start = datetime.strptime(range_start, "%Y-%m-%d")
         range_end = datetime.strptime(range_end, "%Y-%m-%d")
+        ExceptionRecord.objects.create(
+            text = f'{range_start} {range_end}'
+        )
 
         checkout_order = Checkout.objects.filter(
             is_deleted=False,
