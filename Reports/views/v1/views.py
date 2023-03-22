@@ -227,10 +227,7 @@ def get_commission_reports_by_commission_details_updated(request):
     
     if range_start:
         range_start = datetime.strptime(range_start, "%Y-%m-%d")
-        range_end = datetime.strptime(range_end, "%Y-%m-%d")
-        ExceptionRecord.objects.create(
-            text = f'{range_start} {range_end}'
-        )
+        range_end = datetime.strptime(range_end, "%Y-%m-%d") + timedelta(days=1) - timedelta(seconds=1)
 
         checkout_order = Checkout.objects.filter(
             is_deleted=False,
