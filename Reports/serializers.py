@@ -244,171 +244,45 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             return str(e)
             
     def get_service_sale_price(self, obj):
-        try:
-            range_start = self.context.get("range_start")
-            range_end = self.context.get("range_end")
+        range_start = self.context.get("range_start")
+        range_end = self.context.get("range_end")
+        
+        if range_start:
+            range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
+        if range_end:
+            range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
             
-            if range_start is not None:
-                range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
-            if range_end is not None:
-                range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
-                
-            total = 0
-            
-            # Get the total price of all appointments that are done and belong to the given member.
-            appointments = AppointmentService.objects.filter(
+        appointments_total = 0
+        service_orders_total = 0
+        
+        if range_start and range_end:
+            appointments_total = AppointmentService.objects.filter(
                 member=obj,
                 appointment_status='Done',
-                created_at__range=(range_start, range_end) if range_start and range_end else None
+                created_at__range=(range_start, range_end)
             ).aggregate(total=Coalesce(Sum('price'), 0))['total']
-            if appointments is not None:
-                total += appointments
             
-            # Get the total price of all service orders that are not deleted and belong to the given member.
-            service_orders = ServiceOrder.objects.filter(
+            service_orders_total = ServiceOrder.objects.filter(
                 is_deleted=False,
                 member=obj,
-                created_at__range=(range_start, range_end) if range_start and range_end else None
+                created_at__range=(range_start, range_end)
             ).aggregate(total=Coalesce(Sum('checkout__total_service_price'), 0))['total']
-            if service_orders is not None:
-                total += service_orders
+        else:
+            appointments_total = AppointmentService.objects.filter(
+                member=obj,
+                appointment_status='Done'
+            ).aggregate(total=Coalesce(Sum('price'), 0))['total']
             
-            return total
-            
-        except Exception as err:
-            return str(err)
-
-    # def get_service_sale_price(self, obj):
-    #     try:
-    #         range_start = self.context.get("range_start")
-    #         range_end = self.context.get("range_end")
-            
-    #         if range_start:
-    #             range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
-    #             range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
-                
-    #         total = 0
-            
-    #         # Get the total price of all appointments that are done and belong to the given member.
-    #         appointments = AppointmentService.objects.filter(
-    #             member=obj,
-    #             appointment_status='Done',
-    #             created_at__range=(range_start, range_end) if range_start else None
-    #         ).aggregate(total=Coalesce(Sum('price'), 0))['total']
-    #         total += appointments
-            
-    #         # Get the total price of all service orders that are not deleted and belong to the given member.
-    #         service_orders = ServiceOrder.objects.filter(
-    #             is_deleted=False,
-    #             member=obj,
-    #             created_at__range=(range_start, range_end) if range_start else None
-    #         ).aggregate(total=Coalesce(Sum('checkout__total_service_price'), 0))['total']
-    #         total += service_orders
-            
-    #         return total
-            
-    #     except Exception as err:
-    #         return str(err)
-
-    # def get_product_sale_price(self, obj):
-    #     try:
-
-    #         range_start = self.context["range_start"]
-    #         range_end = self.context["range_end"]
-    #         year = self.context["year"] 
-            
-    #         if range_start:
-    #             range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
-    #             range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
-                                          
-    #         total = 0
-    #         service_commission = 0
-            
-    #         product_commission = 0
-    #         voucher_commission = 0
-    #         data = {}
-    #         app   = AppointmentService.objects.filter(
-    #             member = obj,
-    #             appointment_status = 'Done',
-    #             #created_at__icontains = year
-    #         )
-    #         for appointment  in app:                
-    #             create = str(appointment.created_at)
-    #             created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
-                
-    #             if range_start:
-    #                 if range_start >= created_at  and created_at <= range_end:
-    #                     service_commission += int(appointment.service_commission)
-    #             else:
-    #                 service_commission += int(appointment.service_commission)
-                    
-    #         ExceptionRecord.objects.create(
-    #                 text=str(service_commission)
-    #             )
-            
-    #         product_orders = ProductOrder.objects.filter(
-    #             is_deleted=False, 
-    #             member = obj, 
-    #             )
-    #         for ord  in product_orders:
-    #             create = str(ord.created_at)
-    #             created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
-    #             if range_start is not None:
-    #                 if created_at >= range_start  and created_at <= range_end:
-    #                     total += int(ord.checkout.total_service_price)
-    #                     #service_commission += ord.checkout.service_commission
-    #                     product_commission += ord.checkout.product_commission
-    #                     #voucher_commission += ord.checkout.voucher_commission
+            service_orders_total = ServiceOrder.objects.filter(
+                is_deleted=False,
+                member=obj
+            ).aggregate(total=Coalesce(Sum('checkout__total_service_price'), 0))['total']
         
-    #             else:
-    #                 total += int(ord.checkout.total_product_price)
-    #                 #service_commission += ord.checkout.service_commission
-    #                 product_commission += ord.checkout.product_commission
-    #                 #voucher_commission += ord.checkout.voucher_commission
-                    
-    #         service_orders = ServiceOrder.objects.filter(
-    #             is_deleted=False, 
-    #             member = obj, 
-    #             )
-            
-    #         for ord  in service_orders:
-    #             create = str(ord.created_at)
-    #             created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
-    #             if range_start is not None:
-    #                 if created_at >= range_start  and created_at <= range_end:
-    #                     #total += int(ord.checkout.total_service_price)
-    #                     service_commission += ord.checkout.service_commission
-                    
-    #             else:
-    #                 service_commission += ord.checkout.service_commission
-            
-    #         voucher_orders = VoucherOrder.objects.filter(
-    #             is_deleted=False, 
-    #             member = obj, 
-    #             )
-    #         for ord  in voucher_orders:
-    #             create = str(ord.created_at)
-    #             created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
-    #             if range_start is not None:
-    #                 if created_at >= range_start  and created_at <= range_end:
-    #                    # total += int(ord.checkout.total_service_price)
-    #                     voucher_commission += ord.checkout.voucher_commission
-    #             else:
-    #                 #total += int(ord.checkout.total_product_price)
-    #                 voucher_commission += ord.checkout.voucher_commission
+        total = appointments_total + service_orders_total
+        
+        return total
 
-    #         commission_total = service_commission + product_commission + voucher_commission
-    #         data.update({
-    #             'product_sale_price': total,
-    #             'commission_total': commission_total,
-    #             'service_commission': service_commission,
-    #             'product_commission': product_commission,
-    #             'voucher_commission': voucher_commission,
-    #         })
-    #         return data
-                
-    #     except Exception as err:
-    #         return str(err)
+
     
     # def get_service_sale_price(self, obj):
     #     try:
