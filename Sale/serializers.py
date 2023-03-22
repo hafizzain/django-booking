@@ -856,10 +856,12 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
         #     'full_name' : str(obj.member.full_name),
         # }
         try:
-            serializers = MemberSerializer(obj.member,context=self.context ).data
+            mem = Employee.objects.get(id = str(obj.member))
+            serializers = MemberSerializer(mem , context=self.context ).data
+            #serializers = MemberSerializer(obj.member,context=self.context ).data
             return serializers
         except Exception as err:
-            return None
+            return str(err)
     
     def get_location(self, obj):
         try:
