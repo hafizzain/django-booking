@@ -49,9 +49,9 @@ def Add_appointment(appointment = None, tenant = None):
                 #if client_email.sms_appoinment == True:
                     try:   
                         html_file = render_to_string("AppointmentEmail/appointment_staff_new.html", {
-                            'client': False, 'staff': True, #'name': name_c,
+                            'client': False, 'staff': True, #'name': name_c,'client_type': client_type ,
                             't_name':mem_name , 'ser_name':ser_name , 
-                            'date':dat, 'mem_id':mem_id, 'client_type': client_type ,
+                            'date':dat, 'mem_id':mem_id, 
                             'location':location, 'duration': duration, 'current_time': current_time,
                             })
                         text_content = strip_tags(html_file)
