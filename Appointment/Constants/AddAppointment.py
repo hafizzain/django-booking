@@ -41,11 +41,19 @@ def Add_appointment(appointment = None, tenant = None):
                 mem_email = appo.member.email
                 mem_name = appo.member.full_name
                 mem_id= appo.member.employee_id
+                location = appo.business_address.address_name
+                duration = appo.duration
                 
-                #if staff_email.sms_daily_sale == True:
-                if client_email.sms_appoinment == True:
+                
+                if staff_email.sms_daily_sale == True:
+                #if client_email.sms_appoinment == True:
                     try:   
-                        html_file = render_to_string("AppointmentEmail/email_for_client_appointment.html", {'client': True, 'staff': False,'name': name_c,'t_name':mem_name , 'ser_name':ser_name , 'date':dat, 'mem_id':mem_id, 'client_type': client_type})
+                        html_file = render_to_string("AppointmentEmail/appointment_staff_new.html", {
+                            'client': False, 'staff': True,
+                            'name': name_c,'t_name':mem_name , 'ser_name':ser_name , 
+                            'date':dat, 'mem_id':mem_id, 'client_type': client_type ,
+                            'location':location, 'duration': duration, 'current_time': current_time,
+                            })
                         text_content = strip_tags(html_file)
                             
                         email = EmailMultiAlternatives(
@@ -53,30 +61,29 @@ def Add_appointment(appointment = None, tenant = None):
                                 text_content,
                                 settings.EMAIL_HOST_USER,
                                 #to = [mem_email],
-                                to = [email_c],
+                                to = [mem_email],
                             
                             )
                         email.attach_alternative(html_file, "text/html")
                         email.send()
                     except Exception as err:
-                        pass
-        
-            #if client_email.sms_appoinment == True:
-            if staff_email.sms_daily_sale == True:
-                try:
-                    ExceptionRecord.objects.create(
-                        text = f'Employee Email sended options line 66 employee email {mem_email}'
+                        ExceptionRecord.objects.create(
+                            text = f'send email for employee error face issue {str(err)} '
                     )
+        
+            if client_email.sms_appoinment == True:
+            #if staff_email.sms_daily_sale == True:
+                try:
                     #html_file = render_to_string("AppointmentEmail/add_appointment.html",{'client': False, 'appointment' : appointment,'staff': True,'t_name':name_c} )
-                    html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'client': False, 'appointment' : appointment,'staff': True,'t_name':mem_name ,'time': current_time,} )
+                    html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'client': True, 'appointment' : appointment,'staff': False,'t_name':name_c ,'time': current_time,} )
                     text_content = strip_tags(html_file)
                     
                     email = EmailMultiAlternatives(
                         'Appointment Booked',
                         text_content,
                         settings.EMAIL_HOST_USER,
-                        #to = [email_c],
-                        to = [mem_email],
+                        to = [email_c],
+                        #to = [mem_email],
                     )
                         
                     email.attach_alternative(html_file, "text/html")
