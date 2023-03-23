@@ -55,7 +55,7 @@ def Add_appointment(appointment = None, tenant = None):
                             })
                         text_content = strip_tags(html_file)
                         ExceptionRecord.objects.create(
-                            text = f'inter in employee send email {str(err)} '
+                            text = f'inter in employee send email '
                         )
                         email = EmailMultiAlternatives(
                                 'Appointment Booked',
