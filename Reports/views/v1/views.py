@@ -227,7 +227,7 @@ def get_commission_reports_by_commission_details_updated(request):
     
     if range_start:
         range_start = datetime.strptime(range_start, "%Y-%m-%d")
-        range_end = datetime.strptime(range_end, "%Y-%m-%d")
+        range_end = datetime.strptime(range_end, "%Y-%m-%d") + timedelta(days=1) - timedelta(seconds=1)
 
         checkout_order = Checkout.objects.filter(
             is_deleted=False,
@@ -240,13 +240,16 @@ def get_commission_reports_by_commission_details_updated(request):
             })
         data.extend(serialized.data)
             
-        appointment_checkout = AppointmentCheckout.objects.filter(
-            appointment_service__appointment_status = 'Done',
+        appointment_checkout = AppointmentService.objects.filter(
+            appointment_status = 'Done', #appointment_service__
             created_at__gte =  range_start ,
             created_at__lte = range_end
             )
-        serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
+        serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True, context={
+            'request' : request, 
+            })
         data.extend(serialized.data)
+        sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
     else:
         checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
         serialized = CheckoutCommissionSerializer(checkout_order,  many=True, context={
@@ -255,9 +258,11 @@ def get_commission_reports_by_commission_details_updated(request):
         data.extend(serialized.data)
         
         appointment_checkout = AppointmentService.objects.filter(appointment_status = 'Done')
-        serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True)
+        serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True,context={
+            'request' : request, 
+            })
         data.extend(serialized.data)
-        
+        sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
     
     return Response(
         {
@@ -266,7 +271,7 @@ def get_commission_reports_by_commission_details_updated(request):
             'response' : {
                 'message' : 'All Sale Orders',
                 'error_message' : None,
-                'sales' : data,
+                'sales' : sorted_data,
                 # 'sales' : [
                 #     {
                 #         'employee' : {},

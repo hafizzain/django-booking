@@ -852,11 +852,16 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
         
             
     def get_employee(self, obj):
+        # return {
+        #     'full_name' : str(obj.member.full_name),
+        # }
         try:
-            serializers = MemberSerializer(obj.member,context=self.context ).data
+            mem = Employee.objects.get(id = str(obj.member))
+            serializers = MemberSerializer(mem , context=self.context ).data
+            #serializers = MemberSerializer(obj.member,context=self.context ).data
             return serializers
         except Exception as err:
-            return None
+            return str(err)
     
     def get_location(self, obj):
         try:
@@ -868,7 +873,7 @@ class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
    
     class Meta:
         model = AppointmentService
-        fields = ['location','order_type','employee','commission','commission_rate','sale']
+        fields = ['location','order_type','employee','commission','commission_rate','sale', 'created_at']
 
 class BusinessTaxSerializer(serializers.ModelSerializer):
     parent_tax = ParentBusinessTaxSerializer(many=True, read_only=True)
@@ -1044,6 +1049,6 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
             'sale' : {}
         """
         model = Checkout
-        fields = ['employee', 'location', 'commission', 'commission_rate', 'sale']
+        fields = ['employee', 'location', 'commission', 'commission_rate', 'sale', 'created_at']
     
     

@@ -3796,7 +3796,7 @@ def employee_login(request):
     
     data = []
     
-    if not all([email, password ]):
+    if not all([email, password]):
         return Response(
             {
                 'status' : False,
@@ -3819,7 +3819,7 @@ def employee_login(request):
         user_id = User.objects.get(
             email=email,
             is_deleted=False,
-            #user_account_type__account_type = 'Employee'
+            user_account_type__account_type = 'Employee'
         )
         
     except Exception as err:

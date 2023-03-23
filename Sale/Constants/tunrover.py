@@ -29,29 +29,26 @@ def ProductTurnover(product=None, product_stock = None, business_address = None 
             dates = date.today()
             name = 'Rija Riaz'
             turnover = 'Lowest'
-            # TurnOverProductRecord.objects.create(
-            #     text = 'Email Generate for Product Turnover',
-            #     i_email = 'TURNOVER_PRODUCT'
-            # )
-                    
             try:   
-                html_file = render_to_string("Sales/product_turnover_details.html", {'name': name ,'pro_name': product.name, 'location':business.address_name, 'turnover': turnover , 'date': dates})
+                html_file = render_to_string("Sales/product_turnover_details.html", {'name': business.user.full_name ,'pro_name': product.name, 'location':business.address_name, 'turnover': turnover , 'date': dates})
                 text_content = strip_tags(html_file)
                     
                 email = EmailMultiAlternatives(
                         'Turnover Report',
                         text_content,
                         settings.EMAIL_HOST_USER,
-                        to = [email],
+                        to = [business.user.email],
                     
                     )
                 email.attach_alternative(html_file, "text/html")
                 email.send()
             except Exception as err:
-                ExceptionRecord.objects.create(
-                    text = f'turnover emails error {str(err)}'
-                )
+                pass
+                # ExceptionRecord.objects.create(
+                #     text = f'turnover emails error {str(err)}'
+                # )
         except Exception as err:
-                ExceptionRecord.objects.create(
-                    text = f'turnover emails error {str(err)}'
-                )
+            pass
+                # ExceptionRecord.objects.create(
+                #     text = f'turnover emails error {str(err)}'
+                # )
