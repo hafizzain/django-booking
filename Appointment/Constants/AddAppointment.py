@@ -30,10 +30,12 @@ def Add_appointment(appointment = None, tenant = None):
                     pass 
                 
                 try:
+                    client = appo.appointment.client
                     email_c = appo.appointment.client.email
                     name_c = appo.appointment.client.full_name
                     client_type= appo.appointment.client_type
                 except:
+                    client = None
                     pass
                 
                 ser_name = appo.service.name
@@ -44,12 +46,13 @@ def Add_appointment(appointment = None, tenant = None):
                 location = appo.business_address.address_name
                 duration = appo.duration
                 
+                
                 if staff_email.sms_daily_sale == True:
                     
                     try:   
                         html_file = render_to_string("AppointmentEmail/appointment_staff_new.html", {
-                            'client': False, 'staff': True, #'name': name_c,'client_type': client_type ,
-                            't_name':mem_name , 'ser_name':ser_name , 
+                            'staff': True, #'name': name_c,'client_type': client_type , 'client': False,
+                            't_name':mem_name , 'ser_name':ser_name ,'client': client,
                             'date':dat, 'mem_id':mem_id, 
                             'location':location, 'duration': duration, 'current_time': current_time,
                             })
