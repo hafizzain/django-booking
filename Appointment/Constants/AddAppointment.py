@@ -42,7 +42,8 @@ def Add_appointment(appointment = None, tenant = None):
                 mem_name = appo.member.full_name
                 mem_id= appo.member.employee_id
                 
-                if staff_email.sms_daily_sale == True:
+                #if staff_email.sms_daily_sale == True:
+                if client_email.sms_appoinment == True:
                     try:   
                         html_file = render_to_string("AppointmentEmail/email_for_client_appointment.html", {'client': True, 'staff': False,'name': name_c,'t_name':mem_name , 'ser_name':ser_name , 'date':dat, 'mem_id':mem_id, 'client_type': client_type})
                         text_content = strip_tags(html_file)
@@ -59,8 +60,9 @@ def Add_appointment(appointment = None, tenant = None):
                         email.send()
                     except Exception as err:
                         pass
-            
-            if client_email.sms_appoinment == True:
+        
+            #if client_email.sms_appoinment == True:
+            if staff_email.sms_daily_sale == True:
                 try:
                     ExceptionRecord.objects.create(
                         text = f'Employee Email sended options line 66 employee email {mem_email}'
