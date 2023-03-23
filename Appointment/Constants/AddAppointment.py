@@ -44,9 +44,8 @@ def Add_appointment(appointment = None, tenant = None):
                 location = appo.business_address.address_name
                 duration = appo.duration
                 
-                
                 if staff_email.sms_daily_sale == True:
-                #if client_email.sms_appoinment == True:
+                    
                     try:   
                         html_file = render_to_string("AppointmentEmail/appointment_staff_new.html", {
                             'client': False, 'staff': True, #'name': name_c,'client_type': client_type ,
@@ -55,7 +54,9 @@ def Add_appointment(appointment = None, tenant = None):
                             'location':location, 'duration': duration, 'current_time': current_time,
                             })
                         text_content = strip_tags(html_file)
-                            
+                        ExceptionRecord.objects.create(
+                            text = f'inter in employee send email {str(err)} '
+                        )
                         email = EmailMultiAlternatives(
                                 'Appointment Booked',
                                 text_content,
@@ -71,28 +72,27 @@ def Add_appointment(appointment = None, tenant = None):
                             text = f'send email for employee error face issue {str(err)} '
                     )
         
-            if client_email.sms_appoinment == True and name_c is not None :
-            #if staff_email.sms_daily_sale == True:
-                try:
-                    #html_file = render_to_string("AppointmentEmail/add_appointment.html",{'client': False, 'appointment' : appointment,'staff': True,'t_name':name_c} )
-                    html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'client': True, 'appointment' : appointment,'staff': False,'t_name':name_c ,'time': current_time,} )
-                    text_content = strip_tags(html_file)
+            # if client_email.sms_appoinment == True and name_c is not None :
+            #     try:
+            #         #html_file = render_to_string("AppointmentEmail/add_appointment.html",{'client': False, 'appointment' : appointment,'staff': True,'t_name':name_c} )
+            #         html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'client': True, 'appointment' : appointment,'staff': False,'t_name':name_c ,'time': current_time,} )
+            #         text_content = strip_tags(html_file)
                     
-                    email = EmailMultiAlternatives(
-                        'Appointment Booked',
-                        text_content,
-                        settings.EMAIL_HOST_USER,
-                        to = [email_c],
-                        #to = [mem_email],
-                    )
+            #         email = EmailMultiAlternatives(
+            #             'Appointment Booked',
+            #             text_content,
+            #             settings.EMAIL_HOST_USER,
+            #             to = [email_c],
+            #             #to = [mem_email],
+            #         )
                         
-                    email.attach_alternative(html_file, "text/html")
-                    email.send()
+            #         email.attach_alternative(html_file, "text/html")
+            #         email.send()
                     
-                except Exception as err:
-                    ExceptionRecord.objects.create(
-                        text = f'Error on creating email client;;; {str(err)}'
-                    )
+            #     except Exception as err:
+            #         ExceptionRecord.objects.create(
+            #             text = f'Error on creating email client;;; {str(err)}'
+            #         )
     
         except Exception as err:
             ExceptionRecord.objects.create(
