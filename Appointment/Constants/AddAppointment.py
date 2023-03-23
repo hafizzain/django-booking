@@ -49,8 +49,8 @@ def Add_appointment(appointment = None, tenant = None):
                 #if client_email.sms_appoinment == True:
                     try:   
                         html_file = render_to_string("AppointmentEmail/appointment_staff_new.html", {
-                            'client': False, 'staff': True,
-                            'name': name_c,'t_name':mem_name , 'ser_name':ser_name , 
+                            'client': False, 'staff': True, #'name': name_c,
+                            't_name':mem_name , 'ser_name':ser_name , 
                             'date':dat, 'mem_id':mem_id, 'client_type': client_type ,
                             'location':location, 'duration': duration, 'current_time': current_time,
                             })
@@ -71,7 +71,7 @@ def Add_appointment(appointment = None, tenant = None):
                             text = f'send email for employee error face issue {str(err)} '
                     )
         
-            if client_email.sms_appoinment == True:
+            if client_email.sms_appoinment == True and name_c is not None :
             #if staff_email.sms_daily_sale == True:
                 try:
                     #html_file = render_to_string("AppointmentEmail/add_appointment.html",{'client': False, 'appointment' : appointment,'staff': True,'t_name':name_c} )
