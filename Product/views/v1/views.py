@@ -280,10 +280,10 @@ def import_category(request):
             row = row.split(',')
             row = row
             
-            if len(row) < 2:
+            if len(row) < 3:
                 continue
             name = row[0].strip('"')
-            active=row[1].replace('\n', '').strip('"')
+            active=row[2].replace('\n', '').strip('"')
             
             if active == 'Active':
                 active = True
