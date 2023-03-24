@@ -329,16 +329,16 @@ def get_dashboard_target_overview(request):
         member__id = employee_id,
         created_at__gte =  range_start ,
         created_at__lte = range_end
-        ).values_list('total_price', flat=True)
+    ).values_list('total_price', flat=True)
     sum_total_acheived += sum(appointment_checkout)
 
 
     targets = StaffTarget.objects.filter(
-        is_deleted=False,
+        # is_deleted=False,
         member__id = employee_id,
         created_at__gte =  range_start ,
         created_at__lte = range_end
-        )
+    )
     targets.values_list('service_target', flat=True)
     targets.values_list('retail_target', flat=True)
     
@@ -494,6 +494,7 @@ def get_total_comission(request):
     total_service_comission = 0
     total_product_comission = 0
     total_voucher_comission = 0
+    
 
     if range_start:
         range_start = datetime.strptime(range_start, "%Y-%m-%d")#.date()
@@ -505,7 +506,8 @@ def get_total_comission(request):
             created_at__gte =  range_start ,
             created_at__lte = range_end
             ).values_list('service_commission', flat=True)
-        total_service_comission += sum(service_commission)
+        if service_commission:
+            total_service_comission += sum(service_commission)
 
         product_commission = Checkout.objects.filter(
             is_deleted=False,
@@ -513,7 +515,8 @@ def get_total_comission(request):
             created_at__gte =  range_start ,
             created_at__lte = range_end
             ).values_list('product_commission', flat=True)
-        total_product_comission += sum(product_commission)
+        if product_commission:
+            total_product_comission += sum(product_commission)
 
         voucher_commission = Checkout.objects.filter(
             is_deleted=False,
@@ -521,29 +524,32 @@ def get_total_comission(request):
             created_at__gte =  range_start ,
             created_at__lte = range_end
             ).values_list('voucher_commission', flat=True)
-        total_voucher_comission += sum(voucher_commission)
-        sum_total_commision = sum([total_service_comission,total_product_comission,total_voucher_comission])
+        if voucher_commission:
+            total_voucher_comission += sum(voucher_commission)
         
     else:
         service_commission = Checkout.objects.filter(
             is_deleted=False,
             member__id = employee_id,
             ).values_list('service_commission', flat=True)
-        total_service_comission += sum(service_commission)
+        if service_commission:
+            total_service_comission += sum(service_commission)
 
         product_commission = Checkout.objects.filter(
             is_deleted=False,
             member__id = employee_id,
             ).values_list('product_commission', flat=True)
-        total_product_comission += sum(product_commission)
+        if product_commission:
+            total_product_comission += sum(product_commission)
 
         voucher_commission = Checkout.objects.filter(
             is_deleted=False,
             member__id = employee_id,
             ).values_list('voucher_commission', flat=True)
         
-        total_voucher_comission += sum(voucher_commission)
-        sum_total_commision = sum([total_service_comission,total_product_comission,total_voucher_comission])
+        if voucher_commission:
+            total_voucher_comission += sum(voucher_commission)
+    sum_total_commision = total_service_comission + total_product_comission + total_voucher_comission
     
     return Response(
         {
