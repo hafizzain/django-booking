@@ -267,8 +267,11 @@ def get_acheived_target_report(request):
 def get_dashboard_target_overview(request):
 
     employee_id = request.GET.get('employee_id', None)
-    range_start =  request.GET.get('range_start', None)
-    range_end = request.GET.get('range_end', None)
+    
+    range_start =  request.GET.get('range_start', '1990-01-01')
+    range_end = request.GET.get('range_end', '2050-12-20')
+    
+
     # employee_id = request.GET.get('employee_id', None)
     # start_month =  request.GET.get('start_month', None)
     # end_month = request.GET.get('end_month', None)
