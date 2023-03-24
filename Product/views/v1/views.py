@@ -285,17 +285,17 @@ def import_category(request):
             name = row[0].strip('"')
             active=row[2].replace('\n', '').strip('"')
             
-            if active == 'Active':
-                active = True
-            else:
-                active = False
-                
-                
-            Category.objects.create(
+            category = Category.objects.create(
                 name = name,
-                is_active=active,
+                #is_active=active,
             )  
-            
+            if active == 'Active':
+               category.active = True
+               category.save()
+            else:
+                category.active  = False
+                category.save()
+                
     file.delete()
     return Response({'Status' : 'Success'})
 
