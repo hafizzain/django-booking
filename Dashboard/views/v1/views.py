@@ -603,13 +603,13 @@ def get_total_sales_device(request):
     )
     
     for price in checkout_orders_total:
-        total_price += int(price.total_service_price)
-        total_price += int(price.total_product_price)
-        total_price += int(price.total_voucher_price)
-        total_price += int(price.total_membership_price)
+        total_price += int(price.total_service_price or 0)
+        total_price += int(price.total_product_price or 0)
+        total_price += int(price.total_voucher_price or 0)
+        total_price += int(price.total_membership_price or 0)
     
     for price in apps_checkouts_total:
-        total_price += int(price.total_price)
+        total_price += int(price.total_price or 0)
 
     dashboard_data = []
     for index, month in enumerate(months):
