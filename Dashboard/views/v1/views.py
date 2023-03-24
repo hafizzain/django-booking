@@ -335,7 +335,7 @@ def get_dashboard_target_overview(request):
 
     targets = StaffTarget.objects.filter(
         # is_deleted=False,
-        member__id = employee_id,
+        employee__id = employee_id,
         created_at__gte =  range_start ,
         created_at__lte = range_end
         )
