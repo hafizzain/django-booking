@@ -126,17 +126,26 @@ def import_brand(request):
             row = row.split(',')
             row = row
             
-            if len(row) < 3:
+            if len(row) < 5:
                 continue
             name =  row[0].strip('"')
             website =  row[1].strip('"')
-            description =  row[2].strip('"')
+            status =  row[2].strip('"')
+            description =  row[3].strip('"')
+            image =  row[4].strip('"')
             brand = Brand.objects.create(
                 #user = user,
                 name=name,
                 description=description,
                 website=website,
+                image=image,
             )
+            if status == 'Active':
+                brand.is_active = True
+                brand.save()
+            else:
+                brand.is_active = False
+                brand.save()
             
     file.delete()
     return Response({'Status' : 'Success'})
