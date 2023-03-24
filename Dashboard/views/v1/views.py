@@ -343,28 +343,28 @@ def get_dashboard_target_overview(request):
     targets.values_list('retail_target', flat=True)
     
     service_targets = ServiceOrder.objects.filter(
-        member = employee_id,
+        member__id = employee_id,
         created_at__gte =  range_start ,
         created_at__lte = range_end
     ).values_list('service_target', flat=True)
     all_service_targets += sum(service_targets)
 
     retail_targets = ProductOrder.objects.filter(
-        member = employee_id,
+        member__id = employee_id,
         created_at__gte =  range_start ,
         created_at__lte = range_end
     ).values_list('retail_targets', flat=True)
     all_retail_targets += sum(retail_targets)
     
     voucher_targets = VoucherOrder.objects.filter(
-        member = employee_id,
+        member__id = employee_id,
         created_at__gte =  range_start ,
         created_at__lte = range_end
     ).values_list('voucher_targets', flat=True)
     all_voucher_targets += sum(voucher_targets)
 
     membership_targets = MemberShipOrder.objects.filter(
-        member = employee_id,
+        member__id = employee_id,
         created_at__gte =  range_start ,
         created_at__lte = range_end
     ).values_list('membership_targets', flat=True)
