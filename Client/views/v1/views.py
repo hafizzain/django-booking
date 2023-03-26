@@ -30,6 +30,32 @@ def import_client(request):
     file = NstyleFile.objects.create(
         file = client_csv
     )
+    tenant_name = str(request.tenant_name).split('.')[0]
+    tenant_name = tenant_name.split('-')
+    tenant_name = [word[0].upper() for word in tenant_name if word] 
+    
+    count = Client.objects.all().count()
+    count += 1
+   
+    return_loop = True
+    while return_loop:
+        if 0 < count <= 9 : 
+            count = f'000{count}'
+        elif 9 < count <= 99 :
+            count = f'00{count}'
+        elif 99 < count <= 999:
+            count = f'0{count}'
+        new_id =f'{tenant_name}-CLI-{count}'
+        
+        try:
+            Client.objects.get(employee_id=new_id)
+            count += 1
+        except:
+            return_loop = False
+            break
+    
+    client_unique_id = f'{" ".join(tenant_name)}-{new_id}'
+    
     with open( file.file.path , 'r', encoding='utf-8') as imp_file:
         for index, row in enumerate(imp_file):
             if index == 0:
@@ -37,15 +63,16 @@ def import_client(request):
             row = row.split(',')
             row = row
             
-            if len(row) < 6:
+            if len(row) < 7:
                 continue
             
             name= row[0].strip('"')
             email = row[1].strip('"')
             client_id = row[2].strip('"')
-            gender = row[3].strip('"')
-            address = row[4].strip('"')
-            active = row[5].replace('\n', '').strip('"') 
+            mobile_number = row[3].strip('"')
+            gender = row[4].strip('"')
+            address = row[5].strip('"')
+            active = row[6].replace('\n', '').strip('"') 
 
             if active == 'Active':
                 active = True
@@ -72,9 +99,10 @@ def import_client(request):
                 user = user,
                 business= business,
                 full_name = name,
-                client_id = client_id,
+                client_id = client_unique_id,
                 email = email,
                 gender = gender,
+                mobile_number = mobile_number,
                 address = address,
                 is_active = active
             )
@@ -242,6 +270,7 @@ def create_client(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    
     try:
         business=Business.objects.get(id=business_id)
     except Exception as err:
