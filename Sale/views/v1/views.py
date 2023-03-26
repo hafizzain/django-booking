@@ -1297,7 +1297,8 @@ def create_sale_order(request):
             #     text = f'price {price} discount_price {discount_price}'
             # )
         if price == 0:
-            price =  int(total_price) / int(free_services_quantity)
+            number = float(total_price)
+            price =  int(number) / int(free_services_quantity)
             ExceptionRecord.objects.create(
                 text = f'price {price} '
             )
