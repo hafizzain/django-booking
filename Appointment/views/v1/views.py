@@ -533,9 +533,7 @@ def create_appointment(request):
                 packages.service.add(service)
                 packages.due_date = next_3_months
                 packages.save()
-                
-        
-                    
+                  
         total_price_app += int(price)
         service_commission = 0
         service_commission_type = ''

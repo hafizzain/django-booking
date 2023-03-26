@@ -1187,6 +1187,8 @@ def create_sale_order(request):
     client_type = request.data.get('client_type', None)
     ids = request.data.get('ids', None)
     
+    free_services_quantity = request.data.get('free_services_quantity', None)
+    
     service_total_price = request.data.get('service_total_price', None)
     product_total_price = request.data.get('product_total_price', None)
     voucher_total_price = request.data.get('voucher_total_price', None)
@@ -1291,11 +1293,14 @@ def create_sale_order(request):
         discount_price = id.get('discount_price', None)
         if discount_price is not None:
             price = int(discount_price) #* int(quantity)
+            # ExceptionRecord.objects.create(
+            #     text = f'price {price} discount_price {discount_price}'
+            # )
+        if price == 0:
+            price =  int(total_price) / int(free_services_quantity)
             ExceptionRecord.objects.create(
-                text = f'price {price} discount_price {discount_price}'
+                text = f'price {price} '
             )
-            
-        
         if sale_type == 'PRODUCT':
             try:
                 product = Product.objects.get(id = service_id)
@@ -1523,6 +1528,9 @@ def create_sale_order(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+    
+    checkout.total_service_price = total_price
+    checkout.save()
     
     try:
         thrd = Thread(target=StaffSaleEmail, args=[], kwargs={'ids' : ids, 'location': business_address.address_name ,'tenant' : request.tenant, 'member': member, 'invoice': checkout.id, 'client': client})
