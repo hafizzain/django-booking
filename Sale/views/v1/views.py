@@ -1284,6 +1284,7 @@ def create_sale_order(request):
         
         tip = tip
     )
+    test = True
     
     for id in ids:          
         sale_type = id['selection_type']
@@ -1299,6 +1300,10 @@ def create_sale_order(request):
         if price == 0:
             number = float(total_price)
             price =  int(number) / int(free_services_quantity)
+            if test == True:
+                checkout.total_service_price = int(float(total_price))
+                checkout.save()
+                test = False
             ExceptionRecord.objects.create(
                 text = f'price {price} '
             )
@@ -1529,9 +1534,6 @@ def create_sale_order(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-    
-    checkout.total_service_price = total_price
-    checkout.save()
     
     try:
         thrd = Thread(target=StaffSaleEmail, args=[], kwargs={'ids' : ids, 'location': business_address.address_name ,'tenant' : request.tenant, 'member': member, 'invoice': checkout.id, 'client': client})
