@@ -339,7 +339,7 @@ def create_emp_schedule(tenant=None, user = None, business=None):
     if tenant is not None and user is not None and business is not None:
         try:
             start_time = datetime.time(9, 0, 0)
-            end_time = datetime.time(6, 0, 0)
+            end_time = datetime.time(18, 0, 0)
             today = date.today()
 
             with tenant_context(tenant):
