@@ -327,7 +327,7 @@ def create_ServiceGroup(tenant=None, user = None, business=None):
                     price_service = PriceService.objects.create(
                         service = service,
                         currency = currency,
-                        duration = '30_Min',
+                        duration = '30Min',
                         price = 500,
                     )
         except Exception as err:
