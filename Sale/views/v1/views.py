@@ -1294,19 +1294,15 @@ def create_sale_order(request):
         discount_price = id.get('discount_price', None)
         if discount_price is not None:
             price = int(discount_price) #* int(quantity)
-            # ExceptionRecord.objects.create(
-            #     text = f'price {price} discount_price {discount_price}'
-            # )
-        if price == 0:
-            number = float(total_price)
-            price =  int(number) / int(free_services_quantity)
-            if test == True:
-                checkout.total_service_price = int(float(total_price))
-                checkout.save()
-                test = False
-            ExceptionRecord.objects.create(
-                text = f'price {price} '
-            )
+            
+        # if price == 0:
+        #     number = float(total_price)
+        #     price =  int(number) / int(free_services_quantity)
+        #     if test == True:
+        #         checkout.total_service_price = int(float(total_price))
+        #         checkout.save()
+        #         test = False
+                
         if sale_type == 'PRODUCT':
             try:
                 product = Product.objects.get(id = service_id)
