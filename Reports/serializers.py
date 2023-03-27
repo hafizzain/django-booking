@@ -736,6 +736,7 @@ class ReportBrandSerializer(serializers.ModelSerializer):
     
     def get_product_sale_price(self, obj):
         try:
+            location = self.context["location"]
             month = self.context["month"]
             year = self.context["year"]
             total = 0
@@ -743,7 +744,8 @@ class ReportBrandSerializer(serializers.ModelSerializer):
             service_orders = ProductOrder.objects.filter(
                 is_deleted=False, 
                 product__brand= obj,
-                created_at__icontains = year
+                created_at__icontains = year,
+                location__id =  location,  
                 )
             for ord  in service_orders:
                 create = str(ord.created_at)
