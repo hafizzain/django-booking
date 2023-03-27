@@ -45,6 +45,8 @@ def get_busines_client_appointment(request):
         )
     revenue = 0
     appointment = 0
+    total_price = 0
+    
     client_count = Client.objects.prefetch_related('client_appointments__business_address').filter(client_appointments__business_address__id = business_id).count()
  
     if duration is not None:
@@ -52,11 +54,32 @@ def get_busines_client_appointment(request):
         day = today - timedelta(days=int(duration))
         checkouts = AppointmentCheckout.objects.filter(business_address__id = business_id, created_at__gte = day)
     else:
-        checkouts = AppointmentCheckout.objects.filter(business_address__id = business_id)
-    for check in checkouts:
-        appointment +=1
-        if check.total_price is not None:
-            revenue += check.total_price
+        checkout_orders_total = Checkout.objects.filter(
+        is_deleted=False, 
+        location__id = business_id
+        #member__id=employee_id,
+        )   
+        
+        checkouts = AppointmentCheckout.objects.filter(
+            is_deleted=False, 
+            business_address__id = business_id
+            #member__id=employee_id,
+        )
+        
+        for price in checkout_orders_total:
+            total_price += int(price.total_service_price or 0)
+            total_price += int(price.total_product_price or 0)
+            total_price += int(price.total_voucher_price or 0)
+            total_price += int(price.total_membership_price or 0)
+        
+        for price in checkouts:
+            appointment +=1
+            total_price += int(price.total_price or 0)
+    #     checkouts = AppointmentCheckout.objects.filter(business_address__id = business_id)
+    # for check in checkouts:
+    #     appointment +=1
+    #     if check.total_price is not None:
+    #         revenue += check.total_price
 
     return Response(
         {
