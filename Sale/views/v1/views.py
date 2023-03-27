@@ -1201,6 +1201,7 @@ def create_sale_order(request):
     product_commission_type = request.data.get('product_commission_type', '')
     voucher_commission_type = request.data.get('voucher_commission_type', '')
     
+    is_promotion_availed = request.data.get('is_promotion_availed', None)
     duration = request.data.get('duration', None)
     
     start_date = request.data.get('start_date', None)
@@ -1295,13 +1296,13 @@ def create_sale_order(request):
         if discount_price is not None:
             price = int(discount_price) #* int(quantity)
             
-        # if price == 0:
-        #     number = float(total_price)
-        #     price =  int(number) / int(free_services_quantity)
-        #     if test == True:
-        #         checkout.total_service_price = int(float(total_price))
-        #         checkout.save()
-        #         test = False
+        if price == 0 and bool(is_promotion_availed) == True:
+            number = float(total_price)
+            price =  int(number) / int(free_services_quantity)
+            if test == True:
+                checkout.total_service_price = int(float(total_price))
+                checkout.save()
+                test = False
                 
         if sale_type == 'PRODUCT':
             try:
