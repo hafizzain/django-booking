@@ -88,7 +88,7 @@ def get_busines_client_appointment(request):
             'response' : {
                 'message' : 'Total Revenue',
                 'error_message' : None,
-                'revenue' : revenue,
+                'revenue' : total_price,
                 'client_count': client_count,
                 'appointments_count': appointment,
             }
