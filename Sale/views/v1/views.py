@@ -1326,7 +1326,7 @@ def create_sale_order(request):
             try:
                 transfer = ProductStock.objects.get(product__id=product.id, location = business_address.id)
                 
-                if transfer.available_quantity > int(quantity):
+                if transfer.available_quantity >= int(quantity):
                     stock_transfer = ProductOrderStockReport.objects.create(
                     report_choice = 'Sold',
                     product = product,
