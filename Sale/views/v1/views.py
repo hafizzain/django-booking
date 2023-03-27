@@ -1263,9 +1263,9 @@ def create_sale_order(request):
     elif type(ids) == list:
             pass
         
-    service_total_price = round(service_total_price)
-    product_total_price = round(product_total_price)
-    product_total_price = round(product_total_price)
+    service_total_price = int(float(service_total_price))
+    product_total_price = int(float(product_total_price))
+    voucher_total_price = int(float(voucher_total_price))
     
     checkout = Checkout.objects.create(
         user = user,
