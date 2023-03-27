@@ -30,12 +30,12 @@ def complete_user_account(request, user=None, data=None):
         return
     
     account_type = data.get('account_type', None)
-    # if account_type is not None and account_type == 'business':
-    #     try:
-    #         create_tenant_thread = Thread(target=CreateTenant.create_tenant, args=[], kwargs={'user' : user, 'data' : data})
-    #         create_tenant_thread.start()
-    #     except Exception as error:
-    #         ExceptionRecord.objects.create(text=f'error from create_tenant_thread \n{str(error)}')
+    if account_type is not None and account_type == 'business':
+        try:
+            create_tenant_thread = Thread(target=CreateTenant.create_tenant, args=[], kwargs={'user' : user, 'data' : data})
+            create_tenant_thread.start()
+        except Exception as error:
+            ExceptionRecord.objects.create(text=f'error from create_tenant_thread \n{str(error)}')
 
 
     first_name = data['first_name']
@@ -66,15 +66,7 @@ def complete_user_account(request, user=None, data=None):
             ExceptionRecord.objects.create(text=f'error from create_tenant_thread \n{str(error)}')
 
     user.save()
-    
-    if account_type is not None and account_type == 'business':
-        try:
-            create_tenant_thread = Thread(target=CreateTenant.create_tenant, args=[], kwargs={'user' : user, 'data' : data})
-            create_tenant_thread.start()
-        except Exception as error:
-            ExceptionRecord.objects.create(text=f'error from create_tenant_thread \n{str(error)}')
-
-    
+   
     # NewsLetterDetail.objects.create(
     #     user = user,
     #     terms_condition=data.get('terms_condition', True),
