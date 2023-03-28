@@ -523,6 +523,7 @@ def create_appointment(request):
                     business = business,
                     client = client,
                     serviceduration =  service_duration,
+                    package = service_duration.package
                     #service = service,
                 )
                 current_date = date.today()
