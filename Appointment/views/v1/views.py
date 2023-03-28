@@ -565,8 +565,8 @@ def create_appointment(request):
             discount_price = discount_price,
             total_price = price,
             
-            service_commission = service_commission,
-            service_commission_type= service_commission_type,
+            # service_commission = service_commission,
+            # service_commission_type= service_commission_type,
             
             slot_availible_for_online = slot_availible_for_online,
             client_can_book = client_can_book,
@@ -579,19 +579,22 @@ def create_appointment(request):
             if discount_price is not None:
                 price_com = discount_price
                 appointment_service.price = discount_price
+                
             else:
                 price_com =  price
                 appointment_service.price = price
+                
             appointment_service.save()
+            
             comm, comm_type = calculate_commission(member, price_com)#int(price))
             service_commission += comm
             service_commission_type += comm_type
             appointment_service.service_commission = service_commission
             appointment_service.service_commission_type = service_commission_type
             appointment_service.save()
-        #     ExceptionRecord.objects.create(
-        #         text = f'commsion {service_commission}'
-        # )
+            ExceptionRecord.objects.create(
+                text = f'commsion {service_commission} service_commission_type {service_commission_type} dicount {discount_price}'
+        )
         except Exception as err:
             Errors.append(str(err))
         
