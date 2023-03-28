@@ -592,9 +592,9 @@ def create_appointment(request):
             appointment_service.service_commission = service_commission
             appointment_service.service_commission_type = service_commission_type
             appointment_service.save()
-            ExceptionRecord.objects.create(
-                text = f'commsion {service_commission} service_commission_type {service_commission_type} dicount {discount_price}'
-        )
+        #     ExceptionRecord.objects.create(
+        #         text = f'commsion {service_commission} service_commission_type {service_commission_type} dicount {discount_price}'
+        # )
         except Exception as err:
             Errors.append(str(err))
         
