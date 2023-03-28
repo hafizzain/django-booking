@@ -2519,7 +2519,11 @@ def get_client_package(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     try:
-        client_validation = ClientPackageValidation.objects.get(client__id=client, serviceduration__id=package_service)
+        client_validation = ClientPackageValidation.objects.get(
+            client__id=client, 
+            serviceduration__id=package_service,
+            package__id = package
+            )
     except Exception as err:
         Error.append(str(err))
         return Response(
