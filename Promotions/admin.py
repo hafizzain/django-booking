@@ -1,7 +1,7 @@
 
 from django.contrib import admin
 
-from .models import DateRestrictions, DayRestrictions, FixedPriceService, FreeService,SpecificGroupDiscount, ServiceGroupDiscount, PurchaseDiscount, DirectOrFlatDiscount,SpendDiscount,CategoryDiscount, BlockDate, SpendSomeAmountAndGetDiscount, SpendSomeAmount
+from .models import DateRestrictions, DayRestrictions, FixedPriceService, FreeService,SpecificGroupDiscount, ServiceGroupDiscount, PurchaseDiscount, DirectOrFlatDiscount,SpendDiscount,CategoryDiscount, BlockDate, SpendSomeAmountAndGetDiscount, SpendSomeAmount,ServiceDurationForSpecificTime
 
 
 # Register your models here.
@@ -18,3 +18,4 @@ admin.site.register(SpendSomeAmountAndGetDiscount)
 admin.site.register(FixedPriceService)
 admin.site.register(FreeService)
 admin.site.register(SpendSomeAmount)
+admin.site.register(ServiceDurationForSpecificTime)
