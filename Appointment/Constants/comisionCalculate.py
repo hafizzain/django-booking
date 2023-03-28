@@ -43,7 +43,10 @@ def calculate_commission(member, price):
                 if (int(cat.from_value) <= price and  price <  toValue) or (int(cat.from_value) <= price and sign ):
                     if cat.symbol == '%':
                         service_commission = price * int(cat.commission_percentage) / 100
-                        service_commission_type = str(service_commission_type) + cat.symbol
+                        service_commission_type = str(cat.commission_percentage) + cat.symbol
+                        ExceptionRecord.objects.create(
+                            text = f'{service_commission_type} '
+                        )
                     else:
                         service_commission = int(cat.commission_percentage)
                         service_commission_type = str(service_commission) + cat.symbol
