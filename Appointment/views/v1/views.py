@@ -516,13 +516,18 @@ def create_appointment(request):
                 pass
             
             try:
-                clientpackage = ClientPackageValidation.objects.get(serviceduration__id =  selected_promotion_id) #package__package_duration = 'duration')
+                clientpackage = ClientPackageValidation.objects.get(
+                    serviceduration__id =  selected_promotion_id,
+                    client = client,
+                    package = package_dis
+                    ) #package__package_duration = 'duration')
                 testduration = True
                 clientpackage.service.add(service)
                 clientpackage.save()
                 
             except Exception as err:
                 Errors.append(str(err))
+            
             if testduration == False:                 
                 packages=  ClientPackageValidation.objects.create(
                     user = user,
