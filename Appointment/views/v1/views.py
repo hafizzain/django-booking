@@ -519,7 +519,7 @@ def create_appointment(request):
                 clientpackage = ClientPackageValidation.objects.get(
                     serviceduration__id =  selected_promotion_id,
                     client = client,
-                    package = package_dis
+                    package = package_dis,
                     ) #package__package_duration = 'duration')
                 testduration = True
                 clientpackage.service.add(service)
