@@ -2453,6 +2453,7 @@ def update_loyalty(request):
 @permission_classes([AllowAny])
 def get_complimentary(request):
     client = request.GET.get('client', None)
+    complimentary = request.GET.get('complimentary', None)
     if client is None: 
        return Response(
             {
@@ -2470,7 +2471,11 @@ def get_complimentary(request):
             status=status.HTTP_400_BAD_REQUEST
         )
        
-    client = ClientPromotions.objects.filter(client__id =client ).count()
+    client = ClientPromotions.objects.filter(
+        client__id =client, 
+        complimentary__id =complimentary, 
+        
+        ).count()
     
     return Response(
         {
