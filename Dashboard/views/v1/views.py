@@ -745,7 +745,8 @@ def get_dashboard_target_overview_update(request):
             created_at__lte = range_end
         )#.values_list('service_target', flat=True)
         for ser in service_order_sale:
-            service_sale += int(ser.checkout.total_service_price)
+            
+            service_sale += int(ser.checkout.total_service_price or 0)
 
         retail_order_sale = ProductOrder.objects.filter(
             member = employee,
@@ -753,7 +754,7 @@ def get_dashboard_target_overview_update(request):
             created_at__lte = range_end
         )#.values_list('retail_targets', flat=True)
         for pro in retail_order_sale:
-            retail_sale += int(pro.checkout.total_product_price)
+            retail_sale += int(pro.checkout.total_product_price or 0)
     else:
         targets = StaffTarget.objects.filter(
             # is_deleted=False,
@@ -773,13 +774,13 @@ def get_dashboard_target_overview_update(request):
             member = employee,
         )
         for ser in service_order_sale:
-            service_sale += int(ser.checkout.total_service_price)
+            service_sale += int(ser.checkout.total_service_price or 0)
 
         retail_order_sale = ProductOrder.objects.filter(
             member = employee,
         )
         for pro in retail_order_sale:
-            retail_sale += int(pro.checkout.total_product_price)
+            retail_sale += int(pro.checkout.total_product_price or 0)
         
     total_targets = service_target + retail_target
     total_sale = service_sale + retail_sale
