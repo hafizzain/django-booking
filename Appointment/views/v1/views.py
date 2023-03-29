@@ -1328,6 +1328,7 @@ def create_checkout(request):
     
     tip = request.data.get('tip', None)
     gst = request.data.get('gst', 0)
+    gst_price = request.data.get('gst_price', 0)
     service_price = request.data.get('service_price', None)
     total_price = request.data.get('total_price', 0)
     
@@ -1420,6 +1421,7 @@ def create_checkout(request):
         business_address=business_address,
         tip = tip,
         gst = gst,
+        gst_price = gst_price,
         service_price =service_price,
         total_price =total_price,
         service_commission = service_commission,
