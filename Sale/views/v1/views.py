@@ -1291,23 +1291,33 @@ def create_sale_order(request):
         tip = tip
     )
     test = True
-    minus_price = 0
+    
     for id in ids:          
         sale_type = id['selection_type']
         service_id = id['id']
         quantity = id['quantity']
         price = id['price']
+        minus_price = 0
         discount_price = id.get('discount_price', None)
+        
         if discount_price is not None:
             price = int(discount_price) #* int(quantity)
         
         if price > 0 and bool(is_promotion_availed) == True:
             minus_price += price
+            ExceptionRecord.objects.create(
+                text = f'price {price > 0} minus_price {minus_price}'
+            )
         
         if price == 0 and bool(is_promotion_availed) == True:
             number = int(float(total_price))
             rem_price = number - int(minus_price)
             price =  int(rem_price) / int(free_services_quantity)
+            
+            ExceptionRecord.objects.create(
+                text = f'price {price} minus_pricesssssss {minus_price}'
+            )
+            
             if test == True:
                 checkout.total_service_price = int(float(total_price))
                 checkout.save()
