@@ -317,6 +317,7 @@ def get_dashboard_target_overview(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    
     try: 
         employee = Employee.objects.get(id=employee_id, is_deleted=False)
     except Exception as err:
@@ -669,3 +670,140 @@ def get_total_sales_device(request):
         },
         status=status.HTTP_200_OK
     )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_dashboard_target_overview_update(request):
+    employee_id = request.GET.get('employee_id', None)
+    
+    range_start =  request.GET.get('range_start', '1990-01-01')
+    range_end = request.GET.get('range_end', '2050-12-20')
+    
+    service_target = 0
+    retail_target = 0
+    service_sale = 0
+    retail_sale = 0
+    
+    if not all([employee_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required',
+                    'fields' : [
+                        'employee_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try: 
+        employee = Employee.objects.get(id=employee_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                    'response' : {
+                        'message' : 'Employee Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    if range_start:
+        range_start = datetime.strptime(range_start, "%Y-%m-%d")
+        range_end = datetime.strptime(range_end, "%Y-%m-%d")
+        
+        targets = StaffTarget.objects.filter(
+            # is_deleted=False,
+            employee = employee,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+            )
+        for tar in targets:
+            service_target += int(tar.service_target)
+            retail_target += int(tar.retail_target)
+        
+        appointment_checkout = AppointmentService.objects.filter(
+            appointment_status = 'Done',
+            member = employee,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+            ).values_list('total_price', flat=True)
+        service_sale += sum(appointment_checkout)
+        
+        service_order_sale = ServiceOrder.objects.filter(
+            member = employee,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+        )#.values_list('service_target', flat=True)
+        for ser in service_order_sale:
+            service_sale += int(ser.checkout.total_service_price)
+
+        retail_order_sale = ProductOrder.objects.filter(
+            member = employee,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+        )#.values_list('retail_targets', flat=True)
+        for pro in retail_order_sale:
+            retail_sale += int(pro.checkout.total_product_price)
+    else:
+        targets = StaffTarget.objects.filter(
+            # is_deleted=False,
+            employee = employee,
+            )
+        for tar in targets:
+            service_target += int(tar.service_target)
+            retail_target += int(tar.retail_target)
+        
+        appointment_checkout = AppointmentService.objects.filter(
+            appointment_status = 'Done',
+            member = employee,
+            ).values_list('total_price', flat=True)
+        service_sale += sum(appointment_checkout)
+        
+        service_order_sale = ServiceOrder.objects.filter(
+            member = employee,
+        )
+        for ser in service_order_sale:
+            service_sale += int(ser.checkout.total_service_price)
+
+        retail_order_sale = ProductOrder.objects.filter(
+            member = employee,
+        )
+        for pro in retail_order_sale:
+            retail_sale += int(pro.checkout.total_product_price)
+        
+    total_targets = service_target + retail_target
+    total_sale = service_sale + retail_sale
+    
+    return Response(
+            {
+                'status' : 200,
+                'status_code' : '200',
+                'response' : {
+                    'message' : 'Employee Id recieved',
+                    'error_message' : None,
+                    'employee_id' : employee_id,
+
+                    'set' : {
+                        'service' : service_target,
+                        'retail' : retail_target,
+                        'total' : total_targets
+                    },
+                    'acheived' : {
+                        'service' : service_sale,
+                        'retail' : retail_sale,
+                        'total' : total_sale
+                    }
+                }
+            },
+            status=status.HTTP_200_OK
+        )
