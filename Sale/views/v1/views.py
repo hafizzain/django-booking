@@ -1209,6 +1209,7 @@ def create_sale_order(request):
      
     tip = request.data.get('tip', 0)
     total_price = request.data.get('total_price', None)
+    minus_price = 0
     
     errors = []
     
@@ -1292,22 +1293,27 @@ def create_sale_order(request):
     )
     test = True
     
+    if bool(is_promotion_availed) == True:
+        for item in ids:
+            price = item["price"]
+            minus_price +=(price)
+            #print(price)
+        
     for id in ids:          
         sale_type = id['selection_type']
         service_id = id['id']
         quantity = id['quantity']
         price = id['price']        
         discount_price = id.get('discount_price', None)
-        minus_price = 0
         
         if discount_price is not None:
             price = int(discount_price) #* int(quantity)
         
-        if price > 0 and bool(is_promotion_availed) == True:
-            minus_price += price
-            ExceptionRecord.objects.create(
-                text = f'price {price > 0} minus_price {minus_price}'
-            )
+        # if price > 0 and bool(is_promotion_availed) == True:
+        #     minus_price += price
+        #     ExceptionRecord.objects.create(
+        #         text = f'price {price > 0} minus_price {minus_price}'
+        #     )
         
         if price == 0 and bool(is_promotion_availed) == True:
             number = int(float(total_price))
