@@ -1296,9 +1296,9 @@ def create_sale_order(request):
         sale_type = id['selection_type']
         service_id = id['id']
         quantity = id['quantity']
-        price = id['price']
-        minus_price = 0
+        price = id['price']        
         discount_price = id.get('discount_price', None)
+        minus_price = 0
         
         if discount_price is not None:
             price = int(discount_price) #* int(quantity)
@@ -1311,11 +1311,11 @@ def create_sale_order(request):
         
         if price == 0 and bool(is_promotion_availed) == True:
             number = int(float(total_price))
-            rem_price = number - int(minus_price)
+            rem_price = number - minus_price
             price =  int(rem_price) / int(free_services_quantity)
             
             ExceptionRecord.objects.create(
-                text = f'price {price} minus_pricesssssss {minus_price}'
+                text = f'price {price} rem_price {rem_price} minus_pricesssssss {minus_price}'
             )
             
             if test == True:
