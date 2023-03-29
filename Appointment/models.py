@@ -179,6 +179,7 @@ class AppointmentCheckout(models.Model):
     
     tip = models.PositiveIntegerField(default=0, null=True, blank=True)
     gst = models.PositiveIntegerField(default=0, null=True, blank=True)
+    gst_price = models.PositiveIntegerField(default=0, null=True, blank=True)
     
     service_price = models.PositiveIntegerField(default=0, null=True, blank=True)
     total_price = models.PositiveIntegerField(default=0, null=True, blank=True)

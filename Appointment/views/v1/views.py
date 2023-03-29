@@ -425,6 +425,7 @@ def create_appointment(request):
         membership_id = appoinmnt.get('membership', None)
         promotion_id = appoinmnt.get('promotion', None)
         discount_price = appoinmnt.get('discount_price', None)
+        gst_id = appoinmnt.get('gst_id', None)
         # tip = appoinmnt['tip']
         
         app_date_time = f'2000-01-01 {date_time}'
