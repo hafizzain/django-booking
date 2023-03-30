@@ -231,6 +231,7 @@ def get_commission_reports_by_commission_details_updated(request):
 
         checkout_order = Checkout.objects.filter(
             is_deleted=False,
+            is_promotion = False,
             created_at__gte =  range_start ,
             created_at__lte = range_end
         ).order_by('-created_at')

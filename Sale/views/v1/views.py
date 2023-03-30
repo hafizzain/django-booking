@@ -1202,6 +1202,7 @@ def create_sale_order(request):
     voucher_commission_type = request.data.get('voucher_commission_type', '')
     
     is_promotion_availed = request.data.get('is_promotion_availed', None)
+    is_promotion = request.data.get('is_promotion', None)
     duration = request.data.get('duration', None)
     
     start_date = request.data.get('start_date', None)
@@ -1289,8 +1290,12 @@ def create_sale_order(request):
         product_commission_type = product_commission_type,
         voucher_commission_type = voucher_commission_type ,  
         
-        tip = tip
+        tip = tip,
     )
+    if bool(is_promotion) == True:
+        checkout.is_promotion = True
+        checkout.save()
+        
     test = True
     
     if bool(is_promotion_availed) == True:
