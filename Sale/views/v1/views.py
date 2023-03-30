@@ -1296,6 +1296,9 @@ def create_sale_order(request):
         checkout.is_promotion = True
         checkout.save()
         
+    ExceptionRecord.objects.create(
+                text = f' is_promotion condition {bool(is_promotion) == True} is_promotion {is_promotion}'
+            )
     test = True
     
     if bool(is_promotion_availed) == True:
@@ -1324,10 +1327,6 @@ def create_sale_order(request):
             number = int(float(total_price))
             rem_price = number - minus_price
             price =  int(rem_price) / int(free_services_quantity)
-            
-            ExceptionRecord.objects.create(
-                text = f'price {price} rem_price {rem_price} minus_pricesssssss {minus_price}'
-            )
             
             if test == True:
                 checkout.total_service_price = int(float(total_price))
