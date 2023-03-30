@@ -1202,7 +1202,7 @@ def create_sale_order(request):
     voucher_commission_type = request.data.get('voucher_commission_type', '')
     
     is_promotion_availed = request.data.get('is_promotion_availed', None)
-    is_promotion = request.data.get('is_promotion', None)
+    is_promotion = request.data.get('is_promotion', False)
     duration = request.data.get('duration', None)
     
     start_date = request.data.get('start_date', None)
@@ -1296,9 +1296,9 @@ def create_sale_order(request):
         checkout.is_promotion = True
         checkout.save()
         
-    ExceptionRecord.objects.create(
-                text = f' is_promotion condition {bool(is_promotion) == True} is_promotion {is_promotion}'
-            )
+    # ExceptionRecord.objects.create(
+    #             text = f' is_promotion condition {bool(is_promotion) == True} is_promotion {is_promotion}'
+    #         )
     test = True
     
     if bool(is_promotion_availed) == True:
@@ -1426,9 +1426,9 @@ def create_sale_order(request):
                 service = Service.objects.get(id = service_id)
                 service_price = PriceService.objects.filter(service = service_id).first()
                 dur = service_price.duration
-                ExceptionRecord.objects.create(
-                    text = f'price {price} discount_price {discount_price}'
-                )
+                # ExceptionRecord.objects.create(
+                #     text = f'price {price} discount_price {discount_price}'
+                # )
                 
                 service_order = ServiceOrder.objects.create(
                     user = user,
