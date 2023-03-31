@@ -3343,7 +3343,7 @@ def create_vacation_emp(request):
             if working_schedule is not None:
                 #date_obj = datetime.fromisoformat(from_date)
                 
-                working_schedule.is_vacation = True
+                working_schedule.is_vacation = True,
                 working_schedule.from_date = from_date,
                 working_schedule.save()
                 
