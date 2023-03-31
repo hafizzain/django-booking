@@ -3324,6 +3324,7 @@ def create_vacation_emp(request):
     to_date = datetime.strptime(to_date, "%Y-%m-%d")
     diff = to_date - from_date 
     #print(diff.days)
+    working_schedule = None
     days = int(diff.days)
     if days > 0 :
         for i, value in enumerate(range(days+1)):
@@ -3331,37 +3332,46 @@ def create_vacation_emp(request):
                 from_date = from_date + timedelta(days=i)
             else:
                 from_date = from_date + timedelta(days=1)
-            working_schedule = EmployeDailySchedule.objects.create(
-                user = user,
-                business = business ,
-                employee = employee_id,
-                day = day,
-                start_time = start_time,
-                end_time = end_time,
-                start_time_shift = start_time_shift,
-                end_time_shift = end_time_shift,
                 
-                date = from_date,
-                from_date =from_date,
-                to_date = to_date,
-                note = note,
-                
-            )    
-            if is_vacation is not None:
+            working_schedule = EmployeDailySchedule.objects.get(
+                employee = employee_id,   
+                date = from_date
+            )
+            if working_schedule is not None:
                 working_schedule.is_vacation = True
-            else:
-                working_schedule.is_vacation = False
+                working_schedule.save()
+            else:   
+                working_schedule = EmployeDailySchedule.objects.create(
+                    user = user,
+                    business = business ,
+                    employee = employee_id,
+                    day = day,
+                    start_time = start_time,
+                    end_time = end_time,
+                    start_time_shift = start_time_shift,
+                    end_time_shift = end_time_shift,
+                    
+                    date = from_date,
+                    from_date =from_date,
+                    to_date = to_date,
+                    note = note,
+                    
+                )    
+                if is_vacation is not None:
+                    working_schedule.is_vacation = True
+                else:
+                    working_schedule.is_vacation = False
+                    
+                if is_leave is not None:
+                    working_schedule.is_leave = True
+                else:
+                    working_schedule.is_leave = False
+                if is_off is not None:
+                    working_schedule.is_off = True
+                else:
+                    working_schedule.is_off = False
                 
-            if is_leave is not None:
-                working_schedule.is_leave = True
-            else:
-                working_schedule.is_leave = False
-            if is_off is not None:
-                working_schedule.is_off = True
-            else:
-                working_schedule.is_off = False
-            
-            working_schedule.save()
+                working_schedule.save()
             
     all_employe= EmployeDailySchedule.objects.all().order_by('created_at')
     serialized = ScheduleSerializer(all_employe, many=True, context={'request' : request})
