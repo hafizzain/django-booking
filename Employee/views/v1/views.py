@@ -3342,7 +3342,9 @@ def create_vacation_emp(request):
             
             if working_schedule is not None:
                 working_schedule.is_vacation = True
+                working_schedule.from_date =from_date,
                 working_schedule.save()
+                
             else:   
                 working_schedule = EmployeDailySchedule.objects.create(
                     user = user,
