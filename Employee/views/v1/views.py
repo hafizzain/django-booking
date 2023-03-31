@@ -3332,11 +3332,14 @@ def create_vacation_emp(request):
                 from_date = from_date + timedelta(days=i)
             else:
                 from_date = from_date + timedelta(days=1)
-                
-            working_schedule = EmployeDailySchedule.objects.get(
-                employee = employee_id,   
-                date = from_date
-            )
+            try:
+                working_schedule = EmployeDailySchedule.objects.get(
+                    employee = employee_id,   
+                    date = from_date
+                )
+            except Exception as err:
+                pass
+            
             if working_schedule is not None:
                 working_schedule.is_vacation = True
                 working_schedule.save()
