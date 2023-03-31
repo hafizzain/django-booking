@@ -3324,7 +3324,7 @@ def create_vacation_emp(request):
     to_date = datetime.strptime(to_date, "%Y-%m-%d")
     diff = to_date - from_date 
     #print(diff.days)
-    working_schedule = None
+    working_sch = None
     days = int(diff.days)
     if days > 0 :
         for i, value in enumerate(range(days+1)):
@@ -3333,19 +3333,20 @@ def create_vacation_emp(request):
             else:
                 from_date = from_date + timedelta(days=1)
             try:
-                working_schedule = EmployeDailySchedule.objects.get(
+                working_sch = EmployeDailySchedule.objects.get(
                     employee = employee_id,   
                     date = from_date
                 )
             except Exception as err:
                 pass
             
-            if working_schedule is not None:
+            if working_sch is not None:
                 #date_obj = datetime.fromisoformat(from_date)
                 
-                working_schedule.is_vacation = True
-                working_schedule.from_date = from_date
-                working_schedule.save()
+                working_sch.is_vacation = True
+                working_sch.from_date = from_date
+                working_sch.save()
+                working_sch = None
                 
             else:   
                 working_schedule = EmployeDailySchedule.objects.create(
