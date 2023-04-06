@@ -1158,8 +1158,9 @@ def update_employee(request):
         empl_permission = EmployePermission.objects.get(employee=employee)
         
         for permit in ALL_PERMISSIONS:
-            
-            value = request.data.get(permit, None)
+            pass
+        
+            #value = request.data.get(permit, None)
             #PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
             # if value is not None:
             #     if type(value) == str:
@@ -1171,7 +1172,7 @@ def update_employee(request):
             #             except:
             #                 pass
 
-        empl_permission.save()
+        #empl_permission.save()
     
     except Exception as err:
         Errors.append(err)
