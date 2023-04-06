@@ -1158,7 +1158,7 @@ def update_employee(request):
 
         empl_permission.save()
         
-    except Exception as err:
+    except (TypeError, json.JSONDecodeError, AttributeError) as err: #Exception as err:
         Errors.append(err)
 
     
