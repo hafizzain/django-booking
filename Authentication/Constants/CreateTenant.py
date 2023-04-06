@@ -298,7 +298,7 @@ def create_client(tenant=None, user = None, business=None):
             Client.objects.create(
                 business = business,
                 user = user,
-                full_name = 'ABCD',
+                full_name = user.first_name, # 'ABCD',
                 mobile_number = user.mobile_number,
                 gender = 'Male',
                 language = language_id,
