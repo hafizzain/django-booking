@@ -1116,22 +1116,22 @@ def update_employee(request):
     try:
         empl_permission = EmployePermission.objects.get_or_create(employee=employee)
         
-        for permit in ALL_PERMISSIONS:
-            pass
+        # for permit in ALL_PERMISSIONS:
+        #     pass
         
-            value = request.data.get(permit, None)
-            PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
-            if value is not None:
-                if type(value) == str:
-                    value = json.loads(value)
-                    for opt in value:
-                        try:
-                            option = GlobalPermissionChoices.objects.get(text=opt)
-                            PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
-                        except:
-                            pass
+        #     value = request.data.get(permit, None)
+        #     PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
+        #     if value is not None:
+        #         if type(value) == str:
+        #             value = json.loads(value)
+        #             for opt in value:
+        #                 try:
+        #                     option = GlobalPermissionChoices.objects.get(text=opt)
+        #                     PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
+        #                 except:
+        #                     pass
 
-        empl_permission.save()
+        # empl_permission.save()
     
     except Exception as err:
         Errors.append(err)
