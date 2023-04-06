@@ -1116,8 +1116,8 @@ def update_employee(request):
     try:
         empl_permission = EmployePermission.objects.get_or_create(employee=employee)
         
-        # for permit in ALL_PERMISSIONS:
-        #     pass
+        for permit in ALL_PERMISSIONS:
+            pass
         
         #     value = request.data.get(permit, None)
         #     PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
