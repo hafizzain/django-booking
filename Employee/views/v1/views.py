@@ -1151,7 +1151,7 @@ def update_employee(request):
                 else:
                     for opt in value:
                         try:
-                            option = GlobalPermissionChoices.objects.get_or_create(text=opt)
+                            option = GlobalPermissionChoices.objects.get(text=opt)
                             PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
                         except GlobalPermissionChoices.DoesNotExist:
                             pass
