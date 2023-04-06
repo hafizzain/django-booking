@@ -1061,47 +1061,6 @@ def update_employee(request):
     Employe_Informations.saturday = True if 'saturday' in request.data else False
     Employe_Informations.sunday = True if 'sunday' in request.data else False
     
-    # monday = request.data.get('monday', None)
-    # tuesday = request.data.get('tuesday', None)
-    # wednesday = request.data.get('wednesday', None)
-    # thursday = request.data.get('thursday', None)
-    # friday = request.data.get('friday', None)
-    # saturday = request.data.get('saturday', None)
-    # sunday = request.data.get('sunday', None)
-    
-    # if monday is not None:
-    #     working_days.append('Monday')
-    # if tuesday is not None:
-    #     working_days.append('Tuesday')
-    # if wednesday is not None:
-    #     working_days.append('Wednesday')
-    # if thursday is not None:
-    #     working_days.append('Thursday')
-    # if friday is not None:
-    #     working_days.append('Friday')
-    # if saturday is not None:
-    #     working_days.append('Saturday')
-    # if sunday is not None:
-    #     working_days.append('Sunday')
-    
-    # schedule = EmployeDailySchedule.objects.filter(created_at__gte = datetime.now()).exclude(day__in = working_days)
-    # for sch in schedule:
-    #     sch.delete()
-        
-    
-    # if type(working_days) == str:
-    #         working_days = json.loads(working_days)
-
-    # elif type(working_days) == list:
-    #         pass
-    # for days in working_days:
-    #     EmployeDailySchedule.objects.create(
-    #         user=employee.user,
-    #         business=employee.business,
-    #         employee = employee,
-    #         day = days,
-    #     )
-    
     
     if services_id is not None:
         if type(services_id) == str:
@@ -1154,8 +1113,8 @@ def update_employee(request):
         },
         status=status.HTTP_404_NOT_FOUND
     )
-    try:
-        empl_permission = EmployePermission.objects.get(employee=employee)
+    # try:
+    #     empl_permission = EmployePermission.objects.get(employee=employee)
         
         # for permit in ALL_PERMISSIONS:
         #     pass
@@ -1174,8 +1133,8 @@ def update_employee(request):
 
         #empl_permission.save()
     
-    except Exception as err:
-        Errors.append(err)
+    # except Exception as err:
+    #     Errors.append(err)
     
     if location is not None:
         try:
@@ -1185,17 +1144,6 @@ def update_employee(request):
         except Exception as err:
             Errors.append(err)
             print(err)
-    
-    # if type(location) == str:
-    #     location = json.loads(location)
-        
-    # employee.location.clear()
-    # for loc in location:
-    #     try:
-    #         address=  BusinessAddress.objects.get(id = str(loc))
-    #         employee.location.add(address)
-    #     except Exception as err:
-    #         print(err)
 
     serializer = EmployeSerializer(employee, data=request.data, partial=True, context={'request' : request,})
     if serializer.is_valid():
