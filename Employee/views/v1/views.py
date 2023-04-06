@@ -1114,7 +1114,7 @@ def update_employee(request):
         status=status.HTTP_404_NOT_FOUND
     )
     try:
-        empl_permission = EmployePermission.objects.get_or_create(employee=employee)
+        empl_permission = EmployePermission.objects.get(employee=employee)
         
         for permit in ALL_PERMISSIONS:
               
