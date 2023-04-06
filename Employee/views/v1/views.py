@@ -1146,8 +1146,8 @@ def update_employee(request):
             if value is not None:
                 try:
                     value = json.loads(value)
-                except (TypeError, json.JSONDecodeError):
-                    pass
+                except (TypeError, json.JSONDecodeError, AttributeError) as e:
+                    print(f"Error parsing value '{value}' for permit '{permit}': {e}")
                 else:
                     for opt in value:
                         try:
