@@ -1141,7 +1141,7 @@ def update_employee(request):
             
         for permit in ALL_PERMISSIONS:
             value = request.data.get(permit, None)
-            PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
+            #PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
                 
             if value is not None:
                 try:
