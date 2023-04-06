@@ -1141,20 +1141,20 @@ def update_employee(request):
             
         for permit in ALL_PERMISSIONS:
             value = request.data.get(permit, None)
-            #PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
                 
             if value is not None:
+                PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
                 try:
                     value = json.loads(value)
                 except (TypeError, json.JSONDecodeError, AttributeError) as e:
                     print(f"Error parsing value '{value}' for permit '{permit}': {e}")
-            #     else:
-            #         for opt in value:
-            #             try:
-            #                 option = GlobalPermissionChoices.objects.get(text=opt)
-            #                 PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
-            #             except GlobalPermissionChoices.DoesNotExist:
-            #                 pass
+                else:
+                    for opt in value:
+                        try:
+                            option = GlobalPermissionChoices.objects.get(text=opt)
+                            PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
+                        except GlobalPermissionChoices.DoesNotExist:
+                            pass
 
         #empl_permission.save()
         
