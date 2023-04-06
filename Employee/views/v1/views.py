@@ -1143,11 +1143,11 @@ def update_employee(request):
             value = request.data.get(permit, None)
             #PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
                 
-            # if value is not None:
-            #     try:
-            #         value = json.loads(value)
-            #     except (TypeError, json.JSONDecodeError, AttributeError) as e:
-            #         print(f"Error parsing value '{value}' for permit '{permit}': {e}")
+            if value is not None:
+                try:
+                    value = json.loads(value)
+                except (TypeError, json.JSONDecodeError, AttributeError) as e:
+                    print(f"Error parsing value '{value}' for permit '{permit}': {e}")
             #     else:
             #         for opt in value:
             #             try:
