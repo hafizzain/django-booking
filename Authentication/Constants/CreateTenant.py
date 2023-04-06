@@ -1,13 +1,16 @@
 
 
 
+import json
 from Authentication.Constants.Domain import ssl_sub_domain
 from Client.models import Client
 from Employee.Constants.Add_Employe import add_employee
 from Employee.models import EmployeDailySchedule, Employee, EmployeeProfessionalInfo, EmployeeSelectedService
+from Permissions.models import EmployePermission
 from Tenants.models import Tenant, Domain
 from Business.models import Business, BusinessAddress, BusinessOpeningHour, BusinessPaymentMethod, BusinessType
 from Profile.models import Profile
+from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSIONS_MODEL_FIELDS
 from Utility.Constants.add_data_db import add_business_types, add_countries, add_software_types, add_states, add_cities, add_currencies, add_languages
 from Utility.models import Country, Currency, ExceptionRecord, Language
 from Utility.models import GlobalPermissionChoices
@@ -235,6 +238,24 @@ def create_employee(tenant=None, user = None, business=None):
                 except Exception as err:
                     pass
                 auto_generate_email = f'{email_check}@gmail.com'
+                
+                # empl_permission = EmployePermission.objects.create(employee=employee)
+                # for permit in ALL_PERMISSIONS:
+                
+                #     value = request.data.get(permit, None)
+                #     #employees_error.append(value)
+                #     if value is not None:
+                #         if type(value) == str:
+                #             value = json.loads(value)
+                #         for opt in value:
+                #             try:
+                #                 option = GlobalPermissionChoices.objects.get(text=opt)
+                #                 PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
+                #             except Exception as err:
+                #                 pass
+                #                 #employees_error.append(str(value))
+                # empl_permission.save()
+                
                 user = User.objects.create(
                     first_name = user.full_name,
                     username = username,

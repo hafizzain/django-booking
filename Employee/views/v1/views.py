@@ -1161,15 +1161,20 @@ def update_employee(request):
             
             value = request.data.get(permit, None)
             PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
+            
             if value is not None:
-                if type(value) == str:
-                    value = json.loads(value)
+                try:
+                    if type(value) == str:
+                        value = json.loads(value)
+                
                     for opt in value:
                         try:
                             option = GlobalPermissionChoices.objects.get(text=opt)
                             PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
                         except:
                             pass
+                except Exception as err:
+                    Errors.append(err)
 
         empl_permission.save()
     
