@@ -1156,7 +1156,7 @@ def update_employee(request):
             #             except GlobalPermissionChoices.DoesNotExist:
             #                 pass
 
-        empl_permission.save()
+        #empl_permission.save()
         
     except (TypeError, json.JSONDecodeError, AttributeError) as err: #Exception as err:
         Errors.append(err)
