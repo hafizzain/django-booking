@@ -831,18 +831,20 @@ def get_all_sale_orders_pagination(request):
     data = checkout_data + appointment_checkout_data
     sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
     
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Sale Orders',
-                'error_message' : None,
-                'sales' : sorted_data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    return paginator.get_paginated_response(sorted_data)
+
+    # return Response(
+    #     {
+    #         'status' : 200,
+    #         'status_code' : '200',
+    #         'response' : {
+    #             'message' : 'All Sale Orders',
+    #             'error_message' : None,
+    #             'sales' : sorted_data
+    #         }
+    #     },
+    #     status=status.HTTP_200_OK
+    # )
     
     
 @api_view(['GET'])
