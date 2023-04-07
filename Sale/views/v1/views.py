@@ -854,7 +854,7 @@ def get_all_sale_orders_pagination(request):
 def get_all_sale_orders_default(request):
     
     paginator = PageNumberPagination()
-    paginator.page_size = 10
+    paginator.page_size = 5
     
     checkout_order = Checkout.objects.filter(is_deleted=False)
     paginated_checkout_order = paginator.paginate_queryset(checkout_order, request)
