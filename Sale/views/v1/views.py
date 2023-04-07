@@ -789,22 +789,7 @@ def get_all_sale_orders(request):
     checkout_order = Checkout.objects.filter(is_deleted=False)#.order_by('-created_at')
     serialized = CheckoutSerializer(checkout_order,  many=True, context={'request' : request})
     data.extend(serialized.data)
-    
-    # product_order = ProductOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    # serialized = ProductOrderSerializer(product_order,  many=True, context={'request' : request})
-    # data.extend(serialized.data)
-    
-    # service_orders = ServiceOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    # serialized = ServiceOrderSerializer(service_orders,  many=True, context={'request' : request})
-    # data.extend(serialized.data)
-    
-    # membership_order = MemberShipOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    # serialized = MemberShipOrderSerializer(membership_order,  many=True, context={'request' : request} )
-    # data.extend(serialized.data)
-    
-    # voucher_orders = VoucherOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    # serialized = VoucherOrderSerializer(voucher_orders,  many=True, context={'request' : request})
-    # data.extend(serialized.data)
+   
     
     appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')#.order_by('-created_at')
     serialized = AppointmentCheckoutSerializer(appointment_checkout, 
@@ -827,6 +812,38 @@ def get_all_sale_orders(request):
         },
         status=status.HTTP_200_OK
     )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_all_sale_orders_pagination(request):
+    
+    paginator = CustomPagination()
+    paginator.page_size = 10
+    
+    checkout_order = Checkout.objects.filter(is_deleted=False)
+    paginated_checkout_order = paginator.paginate_queryset(checkout_order, request)
+    checkout_data = CheckoutSerializer(paginated_checkout_order, many=True, context={'request': request}).data
+    
+    appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status='Done')
+    paginated_appointment_checkout = paginator.paginate_queryset(appointment_checkout, request)
+    appointment_checkout_data = AppointmentCheckoutSerializer(paginated_appointment_checkout, many=True, context={'request': request}).data
+    
+    data = checkout_data + appointment_checkout_data
+    sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
+    
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Sale Orders',
+                'error_message' : None,
+                'sales' : sorted_data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
