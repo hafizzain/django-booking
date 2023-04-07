@@ -30,6 +30,7 @@ from django.db.models import Avg, Count, Min, Sum
 
 
 from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
+from rest_framework.pagination import PageNumberPagination
 
 
 # @api_view(['GET'])
@@ -774,16 +775,17 @@ def update_servicegroup(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def get_all_sale_orders(request):
-    
     # #pagination
     
     # paginator = CustomPagination()
     # paginator.page_size = 1
     # result_page = paginator.paginate_queryset(product_order, request)
     # serialized = ProductOrderSerializer(result_page,  many=True)
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_all_sale_orders(request):
+    
     
     data=[]
     checkout_order = Checkout.objects.filter(is_deleted=False)#.order_by('-created_at')
@@ -846,6 +848,26 @@ def get_all_sale_orders_pagination(request):
     #     status=status.HTTP_200_OK
     # )
     
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_all_sale_orders_default(request):
+    
+    paginator = PageNumberPagination()
+    paginator.page_size = 10
+    
+    checkout_order = Checkout.objects.filter(is_deleted=False)
+    paginated_checkout_order = paginator.paginate_queryset(checkout_order, request)
+    checkout_data = CheckoutSerializer(paginated_checkout_order, many=True, context={'request': request}).data
+    
+    appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status='Done')
+    paginated_appointment_checkout = paginator.paginate_queryset(appointment_checkout, request)
+    appointment_checkout_data = AppointmentCheckoutSerializer(paginated_appointment_checkout, many=True, context={'request': request}).data
+    
+    data = checkout_data + appointment_checkout_data
+    sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
+    
+    return paginator.get_paginated_response(sorted_data)
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
