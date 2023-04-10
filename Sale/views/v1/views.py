@@ -833,7 +833,7 @@ def get_all_sale_orders_pagination(request):
     data = checkout_data + appointment_checkout_data
     sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
     
-    sale_data = paginator.get_paginated_response(sorted_data)
+    sale_data = paginator.get_paginated_response(sorted_data, 'sales')
 
     return Response(
         {
