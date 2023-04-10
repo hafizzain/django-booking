@@ -818,15 +818,22 @@ def get_all_sale_orders(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_all_sale_orders_pagination(request):
-    
+    location_id = request.GET.get('location', None)
     paginator = CustomPagination()
     paginator.page_size = 10
     
-    checkout_order = Checkout.objects.filter(is_deleted=False)
+    checkout_order = Checkout.objects.filter(
+        is_deleted=False,
+        location__id = location_id,
+        )
+    
     #paginated_checkout_order = paginator.paginate_queryset(checkout_order, request)
     checkout_data = CheckoutSerializer(checkout_order, many=True, context={'request': request}).data
     
-    appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status='Done')
+    appointment_checkout = AppointmentCheckout.objects.filter(
+        appointment_service__appointment_status='Done',
+        location__id = location_id,
+        )
     #paginated_appointment_checkout = paginator.paginate_queryset(appointment_checkout, request)
     appointment_checkout_data = AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data
     
@@ -861,7 +868,8 @@ def get_all_sale_orders_default(request):
     paginator = PageNumberPagination()
     paginator.page_size = 5
     
-    checkout_order = Checkout.objects.filter(is_deleted=False)
+    checkout_order = Checkout.objects.filter(
+        is_deleted=False)
     paginated_checkout_order = paginator.paginate_queryset(checkout_order, request)
     checkout_data = CheckoutSerializer(paginated_checkout_order, many=True, context={'request': request}).data
     
