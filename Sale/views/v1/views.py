@@ -823,15 +823,18 @@ def get_all_sale_orders_pagination(request):
     paginator.page_size = 5
     
     checkout_order = Checkout.objects.filter(is_deleted=False)
-    paginated_checkout_order = paginator.paginate_queryset(checkout_order, request)
-    checkout_data = CheckoutSerializer(paginated_checkout_order, many=True, context={'request': request}).data
+    #paginated_checkout_order = paginator.paginate_queryset(checkout_order, request)
+    checkout_data = CheckoutSerializer(checkout_order, many=True, context={'request': request}).data
     
     appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status='Done')
-    paginated_appointment_checkout = paginator.paginate_queryset(appointment_checkout, request)
-    appointment_checkout_data = AppointmentCheckoutSerializer(paginated_appointment_checkout, many=True, context={'request': request}).data
+    #paginated_appointment_checkout = paginator.paginate_queryset(appointment_checkout, request)
+    appointment_checkout_data = AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data
     
-    data = checkout_data + appointment_checkout_data
-    sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
+    data_total = checkout_data + appointment_checkout_data
+    
+    paginated_appointment_checkout = paginator.paginate_queryset(data_total, request)
+    
+    sorted_data = sorted(paginated_appointment_checkout, key=lambda x: x['created_at'], reverse=True)
     
     return paginator.get_paginated_response(sorted_data, 'sales')
     
