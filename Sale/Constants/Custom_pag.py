@@ -24,7 +24,7 @@ class CustomPagination(PageNumberPagination):
                'next': base_url + self.get_next_link().split('?')[-1] if self.get_next_link() else None,
                'previous': base_url + self.get_previous_link().split('?')[-1] if self.get_previous_link() else None
             },
-            'count': len(data)/10,
+            'count': self.page.paginator.count,
             'per_page_result': self.page_size,
             'response' : {
                 'message' : f'All {pramas_data}',
