@@ -832,7 +832,7 @@ def get_all_sale_orders_pagination(request):
     
     appointment_checkout = AppointmentCheckout.objects.filter(
         appointment_service__appointment_status='Done',
-        location__id = location_id,
+        business_address__id = location_id,
         )
     #paginated_appointment_checkout = paginator.paginate_queryset(appointment_checkout, request)
     appointment_checkout_data = AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data

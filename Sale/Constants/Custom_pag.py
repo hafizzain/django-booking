@@ -19,13 +19,16 @@ from rest_framework.response import Response
 class CustomPagination(PageNumberPagination):
     def get_paginated_response(self, data, pramas_data):
         base_url = self.request.build_absolute_uri().split('?')[0] + '?'
+        count = self.page.paginator.count
+        per_page_result = self.page_size
         return Response({
             'links': {
                'next': base_url + self.get_next_link().split('?')[-1] if self.get_next_link() else None,
                'previous': base_url + self.get_previous_link().split('?')[-1] if self.get_previous_link() else None
             },
-            'count': self.page.paginator.count,
-            'per_page_result': self.page_size,
+            'count': count,
+            'pages' : count / per_page_result,
+            'per_page_result': per_page_result ,
             'response' : {
                 'message' : f'All {pramas_data}',
                 'error_message' : None,
