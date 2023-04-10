@@ -842,7 +842,7 @@ def get_all_sale_orders_pagination(request):
             'response' : {
                 'message' : 'All Sale Orders',
                 'error_message' : None,
-                'sales' : sale_data
+                'sales' : sale_data.data
             }
         },
         status=status.HTTP_200_OK
