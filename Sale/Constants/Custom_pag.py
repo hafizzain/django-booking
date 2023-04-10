@@ -26,7 +26,13 @@ class CustomPagination(PageNumberPagination):
             },
             'count': self.page.paginator.count,
             'per_page_result': self.page_size,
-            pramas_data: data
+            'response' : {
+                'message' : f'All {pramas_data}',
+                'error_message' : None,
+                pramas_data : data
+            },
+            
+            #pramas_data: data
             #'results': data
         })
 
