@@ -2254,6 +2254,7 @@ def create_loyalty(request):
     amount_spend = request.data.get('amount_spend', None)
     number_points = request.data.get('number_points', None)
     earn_points = request.data.get('earn_points', None)
+    location = request.data.get('location', None)
     total_earn_from_points = request.data.get('total_earn_from_points', None)
     
     if not all([business_id , name , loyaltytype ,amount_spend, number_points, earn_points]):

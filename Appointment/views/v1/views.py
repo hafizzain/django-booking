@@ -13,6 +13,7 @@ from Appointment.Constants.AddAppointment import Add_appointment
 from Appointment.Constants.cancelappointment import cancel_appointment
 from Appointment.Constants.comisionCalculate import calculate_commission
 from Promotions.models import ComplimentaryDiscount, PackagesDiscount, ServiceDurationForSpecificTime
+from Sale.Constants.Custom_pag import CustomPagination
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -251,8 +252,17 @@ def get_today_appointments(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_all_appointments(request):
+    
+    paginator = CustomPagination()
+    paginator.page_size = 10
+    
     test = AppointmentService.objects.filter(is_blocked=False).order_by('-created_at')
+    #paginated_checkout_order = paginator.paginate_queryset(test, request)
     serialize = AllAppoinmentSerializer(test, many=True)
+    
+    #sale_data = paginator.get_paginated_response(serialize.data)
+    
+    
     return Response(
         {
             'status' : 200,
@@ -261,6 +271,7 @@ def get_all_appointments(request):
                 'message' : 'All Appointment',
                 'error_message' : None,
                 'appointments' : serialize.data
+                #'appointments' : sale_data
             }
         },
         status=status.HTTP_200_OK
