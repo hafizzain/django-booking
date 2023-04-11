@@ -252,11 +252,14 @@ def get_today_appointments(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_all_appointments(request):
-    
+    location_id = request.GET.get('location', None)
     paginator = CustomPagination()
     paginator.page_size = 10
     
-    test = AppointmentService.objects.filter(is_blocked=False).order_by('-created_at')
+    test = AppointmentService.objects.filter(
+        is_blocked=False,
+        business_address__id = location_id,
+        ).order_by('-created_at')
     paginated_checkout_order = paginator.paginate_queryset(test, request)
     serialize = AllAppoinmentSerializer(paginated_checkout_order, many=True)
     
