@@ -45,8 +45,8 @@ def get_busines_client_appointment(request):
         )
     revenue = 0
     total_price = 0
-    clients=Client.objects.filter(is_deleted=False)
-    appo = AppointmentService.objects.filter().exclude(status='cancel')
+    clients=Client.objects.filter(is_deleted=False).count()
+    appo = AppointmentService.objects.filter(is_deleted=False).exclude(status='cancel').count()
     
 
     client_count = Client.objects.prefetch_related('client_appointments__business_address').filter(client_appointments__business_address__id = business_id).count()
