@@ -132,6 +132,47 @@ def get_dashboard_day_wise(request):
         },
         status=status.HTTP_200_OK
     )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_dashboard_footfalls(request):
+    date = request.GET.get('date', None)
+
+    appointments_count = 0
+    total_footfalls = 0
+    total_appointments = 0
+    client_count = 0
+
+    appointment = AppointmentCheckout.objects.filter(is_deleted=False)
+    for app in appointment:
+        create_at = str(app.created_at)
+        if (create_at.split(" ")[0] == date ):
+            appointments_count +=1
+            total_appointments +=1
+            client_count = len(set(app.client.id for app in appointment))
+        
+    client = Client.objects.filter(is_deleted=False)
+    for cl in client:
+        create_at = str(cl.created_at)
+        if (create_at.split(" ")[0] == date ):
+            total_footfalls +=1
+
+    avg_appointments = total_appointments / client_count if client_count != 0 else 0
+    
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Total Footfalls',
+                'error_message' : None,
+                'appointments_count': appointments_count,
+                'total_footfalls': total_footfalls,
+                'average_appointments_per_client': avg_appointments
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
