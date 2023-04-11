@@ -46,9 +46,9 @@ def get_busines_client_appointment(request):
     revenue = 0
     appointment = 0
     total_price = 0
-    
-    client_count = Client.objects.prefetch_related('client_appointments__business_address').filter(client_appointments__business_address__id = business_id).count()
- 
+
+    total_footfalls = Client.objects.prefetch_related('client_appointments__business_address').filter(client_appointments__business_address__id = business_id).count()
+    average_appointments_per_client = appointment / total_footfalls if total_footfalls > 0 else 0
     if duration is not None:
         today = datetime.today()
         day = today - timedelta(days=int(duration))
@@ -80,6 +80,7 @@ def get_busines_client_appointment(request):
     #     appointment +=1
     #     if check.total_price is not None:
     #         revenue += check.total_price
+    average_appointments_per_client = appointment / total_footfalls if total_footfalls > 0 else 0
 
     return Response(
         {
@@ -89,13 +90,15 @@ def get_busines_client_appointment(request):
                 'message' : 'Total Revenue',
                 'error_message' : None,
                 'revenue' : total_price,
-                'client_count': client_count,
+                'total_footfalls': total_footfalls,
                 'appointments_count': appointment,
+                'average_appointments_per_client': average_appointments_per_client,
             }
         },
         status=status.HTTP_200_OK
     )
-    
+
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_dashboard_day_wise(request):
@@ -103,9 +106,7 @@ def get_dashboard_day_wise(request):
     #date = '2022-10-22'
     total_revenue = 0
     appointments_count = 0
-    total_footfalls = 0
-    total_appointments = 0
-    client_count = 0
+    total_client = 0
     appointment = AppointmentCheckout.objects.filter(is_deleted=False)
     for app in appointment:
         create_at = str(app.created_at)
@@ -113,20 +114,13 @@ def get_dashboard_day_wise(request):
             appointments_count +=1
             if app.total_price is not None:
                 total_revenue += app.total_price
-                if (create_at.split(" ")[0] == date ):
-                    appointments_count +=1
-                    total_appointments +=1
-                    client_count = len(set(app.client.id for appo in appointment))
         
-
     client = Client.objects.filter(is_deleted=False)
     for cl in client:
         create_at = str(cl.created_at)
         if (create_at.split(" ")[0] == date ):
-            total_footfalls +=1
+            total_client +=1
     
-    avg_appointments = total_appointments / client_count if client_count != 0 else 0
-
     return Response(
         {
             'status' : 200,
@@ -136,13 +130,12 @@ def get_dashboard_day_wise(request):
                 'error_message' : None,
                 'revenue' : total_revenue,
                 'appointments_count': appointments_count,
-                'total_client': total_footfalls,
-                'average_appointments_per_client': avg_appointments
+                'total_client': total_client,
             }
         },
         status=status.HTTP_200_OK
     )
-
+    
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_appointments_client(request):
