@@ -44,11 +44,13 @@ def get_busines_client_appointment(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     revenue = 0
-    appointment = 0
     total_price = 0
+    clients=Client.objects.filter(is_deleted=False)
+    appo = AppointmentService.objects.filter().exclude(status='cancel')
+    
 
-    total_footfalls = Client.objects.prefetch_related('client_appointments__business_address').filter(client_appointments__business_address__id = business_id).count()
-    average_appointments_per_client = appointment / total_footfalls if total_footfalls > 0 else 0
+    client_count = Client.objects.prefetch_related('client_appointments__business_address').filter(client_appointments__business_address__id = business_id).count()
+ 
     if duration is not None:
         today = datetime.today()
         day = today - timedelta(days=int(duration))
@@ -80,7 +82,7 @@ def get_busines_client_appointment(request):
     #     appointment +=1
     #     if check.total_price is not None:
     #         revenue += check.total_price
-    average_appointments_per_client = appointment / total_footfalls if total_footfalls > 0 else 0
+    avg=appo/clients
 
     return Response(
         {
@@ -90,9 +92,10 @@ def get_busines_client_appointment(request):
                 'message' : 'Total Revenue',
                 'error_message' : None,
                 'revenue' : total_price,
-                'total_footfalls': total_footfalls,
+                'footfalls':client_count,
+                # 'client_count': client_count,
                 'appointments_count': appointment,
-                'average_appointments_per_client': average_appointments_per_client,
+                'average_appointent':avg,
             }
         },
         status=status.HTTP_200_OK
@@ -135,7 +138,7 @@ def get_dashboard_day_wise(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_appointments_client(request):
