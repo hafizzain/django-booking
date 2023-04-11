@@ -45,6 +45,8 @@ def get_busines_client_appointment(request):
         )
     revenue = 0
     total_price = 0
+    appointment = 0
+
     clients=Client.objects.filter(is_deleted=False).count()
     appo = AppointmentService.objects.filter(is_deleted=False).exclude(appointment_status__iexact ='cancel').count()
     
