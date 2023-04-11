@@ -44,9 +44,11 @@ def get_busines_client_appointment(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     revenue = 0
-    appointment = 0
     total_price = 0
+    clients=Client.objects.filter(is_deleted=False).count()
+    appo = AppointmentService.objects.filter(is_deleted=False).exclude(status='cancel').count()
     
+
     client_count = Client.objects.prefetch_related('client_appointments__business_address').filter(client_appointments__business_address__id = business_id).count()
  
     if duration is not None:
@@ -80,6 +82,7 @@ def get_busines_client_appointment(request):
     #     appointment +=1
     #     if check.total_price is not None:
     #         revenue += check.total_price
+    avg=appo/clients
 
     return Response(
         {
@@ -89,13 +92,16 @@ def get_busines_client_appointment(request):
                 'message' : 'Total Revenue',
                 'error_message' : None,
                 'revenue' : total_price,
-                'client_count': client_count,
+                'footfalls':client_count,
+                # 'client_count': client_count,
                 'appointments_count': appointment,
+                'average_appointent':avg,
             }
         },
         status=status.HTTP_200_OK
     )
-    
+
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_dashboard_day_wise(request):
