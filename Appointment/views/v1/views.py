@@ -257,25 +257,25 @@ def get_all_appointments(request):
     paginator.page_size = 10
     
     test = AppointmentService.objects.filter(is_blocked=False).order_by('-created_at')
-    #paginated_checkout_order = paginator.paginate_queryset(test, request)
-    serialize = AllAppoinmentSerializer(test, many=True)
+    paginated_checkout_order = paginator.paginate_queryset(test, request)
+    serialize = AllAppoinmentSerializer(paginated_checkout_order, many=True)
     
-    #sale_data = paginator.get_paginated_response(serialize.data)
+    return paginator.get_paginated_response(serialize.data, 'appointments' )
     
     
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Appointment',
-                'error_message' : None,
-                'appointments' : serialize.data
-                #'appointments' : sale_data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    # return Response(
+    #     {
+    #         'status' : 200,
+    #         'status_code' : '200',
+    #         'response' : {
+    #             'message' : 'All Appointment',
+    #             'error_message' : None,
+    #             'appointments' : serialize.data
+    #             #'appointments' : sale_data
+    #         }
+    #     },
+    #     status=status.HTTP_200_OK
+    # )
 
     
 @api_view(['GET'])
