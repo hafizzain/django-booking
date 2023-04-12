@@ -49,8 +49,8 @@ def get_busines_client_appointment(request):
     total_price = 0
     appointment = 0
 
-    # footfalls = Client.objects.filter(is_deleted=False).count()
-    footfalls = AppointmentService.objects.filter(is_deleted=False).exclude(appointment_status__iexact ='cancel').count()
+    footfalls = Client.objects.filter(is_deleted=False, client_appointments__appointment_services__appointment_status='Appointment_Booked').count()
+    # footfalls = AppointmentService.objects.filter(is_deleted=False).exclude(appointment_status__iexact ='cancel').count()
     
 
     client_count = Client.objects.prefetch_related('client_appointments__business_address').filter(client_appointments__business_address__id = business_id).count()
