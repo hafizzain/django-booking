@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Q
 from Service.models import Service
-from Business.models import Business
+from Business.models import Business, BusinessAddress
 from Product.models import Product
 from Utility.models import Country, Currency, ExceptionRecord, Language, State, City
 from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers
@@ -2292,15 +2292,31 @@ def create_loyalty(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+    
+    if location is not None:
+        try:
+            business_address = BusinessAddress.objects.get(id=location)
+        except Exception as err:
+            return Response(
+            {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Location not found',
+                }
+            }
+        )
+    
     loyalty = LoyaltyPoints.objects.create(
         user = user,
         business = business,
         name =name,
         loyaltytype = loyaltytype,
-        amount_spend =amount_spend,
+        amount_spend = amount_spend,
         number_points = number_points,
         earn_points = earn_points,
         total_earn_from_points = total_earn_from_points,
+        location = business_address,
     )
     
     serialized = LoyaltyPointsSerializer(loyalty)
