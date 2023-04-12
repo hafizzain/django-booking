@@ -187,7 +187,14 @@ class ClientAppointmentSerializer(serializers.ModelSerializer):
         fields = ['id', 'full_name', 'image']
         
 class LoyaltyPointsSerializer(serializers.ModelSerializer):
-
+    location = serializers.SerializerMethodField(read_only=True)
+    
+    def get_location(self, obj):
+        try:
+            loc = BusinessAddress.objects.get(id = obj.business_address.id)
+            return LocationSerializer(loc).data
+        except Exception as err:
+            print(err)
     class Meta:
         model = LoyaltyPoints
         fields = '__all__'
