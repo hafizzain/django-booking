@@ -49,6 +49,8 @@ def get_busines_client_appointment(request):
     total_price = 0
     appointment = 0
 
+    all_apps_clients = Appointment.objects.filter(client__isnull=False).distinct('client').count()
+
     clients_booked = Client.objects.filter(is_deleted=False, client_appointments__appointment_services__appointment_status='Appointment_Booked').count()
     footfalls = AppointmentService.objects.filter(is_deleted=False).exclude(appointment_status__iexact ='cancel').count()
     
@@ -87,7 +89,7 @@ def get_busines_client_appointment(request):
     #     if check.total_price is not None:
     #         revenue += check.total_price
     
-    avg = footfalls / clients_booked if clients_booked > 0 else 0
+    avg = footfalls / all_apps_clients if all_apps_clients > 0 else 0
     return Response(
         {
             'status' : 200,
@@ -98,7 +100,7 @@ def get_busines_client_appointment(request):
                 'revenue' : total_price,
                 'client_count':client_count,
                 'footfalls': footfalls,
-                'clients_booked':clients_booked,
+                'clients_booked':all_apps_clients,
                 'appointments_count': appointment,
                 'average_appointent':avg,
             }
