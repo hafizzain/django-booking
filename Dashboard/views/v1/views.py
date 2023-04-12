@@ -86,7 +86,7 @@ def get_busines_client_appointment(request):
     #     if check.total_price is not None:
     #         revenue += check.total_price
     
-    avg = client_count / appo
+    avg = client_count / appo if appo > 0 else 0
     return Response(
         {
             'status' : 200,
@@ -95,7 +95,7 @@ def get_busines_client_appointment(request):
                 'message' : 'Total Revenue',
                 'error_message' : None,
                 'revenue' : total_price,
-                'footfalls':client_count,
+                'client_count':client_count,
                 # 'client_count': client_count,
                 'appointments_count': appointment,
                 'average_appointent':avg,
