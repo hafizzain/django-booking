@@ -98,6 +98,7 @@ def get_busines_client_appointment(request):
                 'revenue' : total_price,
                 'client_count':client_count,
                 'footfalls': footfalls,
+                'clients_booked':clients_booked,
                 'appointments_count': appointment,
                 'average_appointent':avg,
             }
