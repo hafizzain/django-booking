@@ -197,7 +197,7 @@ class LoyaltyPointsSerializer(serializers.ModelSerializer):
     
     def get_location(self, obj):
         try:
-            loc = BusinessAddress.objects.get(id = obj.business_address.id)
+            loc = BusinessAddress.objects.get(id = obj.location.id)
             return LocationSerializerLoyalty(loc).data
         except Exception as err:
             print(err)
