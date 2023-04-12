@@ -43,6 +43,7 @@ def get_busines_client_appointment(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    avg=0
     revenue = 0
     total_price = 0
     appointment = 0
@@ -84,8 +85,8 @@ def get_busines_client_appointment(request):
     #     appointment +=1
     #     if check.total_price is not None:
     #         revenue += check.total_price
-    avg=appo/clients
-
+    
+    avg = client_count / appo
     return Response(
         {
             'status' : 200,
