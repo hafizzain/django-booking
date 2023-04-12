@@ -43,13 +43,14 @@ def get_busines_client_appointment(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    avg=0
+    avg = 0
     revenue = 0
+    footfalls = 0
     total_price = 0
     appointment = 0
 
-    clients=Client.objects.filter(is_deleted=False).count()
-    appo = AppointmentService.objects.filter(is_deleted=False).exclude(appointment_status__iexact ='cancel').count()
+    clients_booked = Client.objects.filter(is_deleted=False, client_appointments__appointment_services__appointment_status='Appointment_Booked').count()
+    footfalls = AppointmentService.objects.filter(is_deleted=False).exclude(appointment_status__iexact ='cancel').count()
     
 
     client_count = Client.objects.prefetch_related('client_appointments__business_address').filter(client_appointments__business_address__id = business_id).count()
@@ -86,7 +87,7 @@ def get_busines_client_appointment(request):
     #     if check.total_price is not None:
     #         revenue += check.total_price
     
-    avg = client_count / appo if appo > 0 else 0
+    avg = footfalls / clients_booked if clients_booked > 0 else 0
     return Response(
         {
             'status' : 200,
@@ -96,7 +97,7 @@ def get_busines_client_appointment(request):
                 'error_message' : None,
                 'revenue' : total_price,
                 'client_count':client_count,
-                # 'client_count': client_count,
+                'footfalls': footfalls,
                 'appointments_count': appointment,
                 'average_appointent':avg,
             }
