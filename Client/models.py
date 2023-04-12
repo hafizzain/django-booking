@@ -359,6 +359,7 @@ class LoyaltyPoints(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='user_loyalty', verbose_name='Creator ( User )')
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_loyalty')
+    location = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, related_name='location_loyaltypoints', null=True, blank=True)
     
     name = models.CharField(max_length=100, default='')
     loyaltytype = models.CharField(choices=LOYALTY_CHOICE, default='Service' , verbose_name='Loyalty Type', max_length=50)
