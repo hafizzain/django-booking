@@ -30,6 +30,32 @@ def import_client(request):
     file = NstyleFile.objects.create(
         file = client_csv
     )
+    tenant_name = str(request.tenant_name).split('.')[0]
+    tenant_name = tenant_name.split('-')
+    tenant_name = [word[0].upper() for word in tenant_name if word] 
+    
+    count = Client.objects.all().count()
+    count += 1
+   
+    return_loop = True
+    while return_loop:
+        if 0 < count <= 9 : 
+            count = f'000{count}'
+        elif 9 < count <= 99 :
+            count = f'00{count}'
+        elif 99 < count <= 999:
+            count = f'0{count}'
+        new_id =f'{tenant_name}-CLI-{count}'
+        
+        try:
+            Client.objects.get(employee_id=new_id)
+            count += 1
+        except:
+            return_loop = False
+            break
+    
+    client_unique_id = f'{" ".join(tenant_name)}-{new_id}'
+    
     with open( file.file.path , 'r', encoding='utf-8') as imp_file:
         for index, row in enumerate(imp_file):
             if index == 0:
@@ -37,15 +63,16 @@ def import_client(request):
             row = row.split(',')
             row = row
             
-            if len(row) < 6:
+            if len(row) < 7:
                 continue
             
             name= row[0].strip('"')
             email = row[1].strip('"')
             client_id = row[2].strip('"')
-            gender = row[3].strip('"')
-            address = row[4].strip('"')
-            active = row[5].replace('\n', '').strip('"') 
+            mobile_number = row[3].strip('"')
+            gender = row[4].strip('"')
+            address = row[5].strip('"')
+            active = row[6].replace('\n', '').strip('"') 
 
             if active == 'Active':
                 active = True
@@ -72,9 +99,10 @@ def import_client(request):
                 user = user,
                 business= business,
                 full_name = name,
-                client_id = client_id,
+                client_id = client_unique_id,
                 email = email,
                 gender = gender,
+                mobile_number = mobile_number,
                 address = address,
                 is_active = active
             )
@@ -242,6 +270,7 @@ def create_client(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    
     try:
         business=Business.objects.get(id=business_id)
     except Exception as err:
@@ -2225,6 +2254,7 @@ def create_loyalty(request):
     amount_spend = request.data.get('amount_spend', None)
     number_points = request.data.get('number_points', None)
     earn_points = request.data.get('earn_points', None)
+    location = request.data.get('location', None)
     total_earn_from_points = request.data.get('total_earn_from_points', None)
     
     if not all([business_id , name , loyaltytype ,amount_spend, number_points, earn_points]):
@@ -2424,6 +2454,7 @@ def update_loyalty(request):
 @permission_classes([AllowAny])
 def get_complimentary(request):
     client = request.GET.get('client', None)
+    complimentary = request.GET.get('complimentary', None)
     if client is None: 
        return Response(
             {
@@ -2441,7 +2472,11 @@ def get_complimentary(request):
             status=status.HTTP_400_BAD_REQUEST
         )
        
-    client = ClientPromotions.objects.filter(client__id =client ).count()
+    client = ClientPromotions.objects.filter(
+        client__id =client, 
+        complimentary__id =complimentary, 
+        
+        ).count()
     
     return Response(
         {
@@ -2485,7 +2520,11 @@ def get_client_package(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     try:
-        client_validation = ClientPackageValidation.objects.get(client__id=client, serviceduration__id=package_service)
+        client_validation = ClientPackageValidation.objects.get(
+            client__id=client, 
+            serviceduration__id=package_service,
+            package__id = package
+            )
     except Exception as err:
         Error.append(str(err))
         return Response(

@@ -43,8 +43,15 @@ def get_busines_client_appointment(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    avg=0
     revenue = 0
+    total_price = 0
     appointment = 0
+
+    clients=Client.objects.filter(is_deleted=False).count()
+    appo = AppointmentService.objects.filter(is_deleted=False).exclude(appointment_status__iexact ='cancel').count()
+    
+
     client_count = Client.objects.prefetch_related('client_appointments__business_address').filter(client_appointments__business_address__id = business_id).count()
  
     if duration is not None:
@@ -52,12 +59,34 @@ def get_busines_client_appointment(request):
         day = today - timedelta(days=int(duration))
         checkouts = AppointmentCheckout.objects.filter(business_address__id = business_id, created_at__gte = day)
     else:
-        checkouts = AppointmentCheckout.objects.filter(business_address__id = business_id)
-    for check in checkouts:
-        appointment +=1
-        if check.total_price is not None:
-            revenue += check.total_price
-
+        checkout_orders_total = Checkout.objects.filter(
+        is_deleted=False, 
+        location__id = business_id
+        #member__id=employee_id,
+        )   
+        
+        checkouts = AppointmentCheckout.objects.filter(
+            is_deleted=False, 
+            business_address__id = business_id
+            #member__id=employee_id,
+        )
+        
+        for price in checkout_orders_total:
+            total_price += int(price.total_service_price or 0)
+            total_price += int(price.total_product_price or 0)
+            total_price += int(price.total_voucher_price or 0)
+            total_price += int(price.total_membership_price or 0)
+        
+        for price in checkouts:
+            appointment +=1
+            total_price += int(price.total_price or 0)
+    #     checkouts = AppointmentCheckout.objects.filter(business_address__id = business_id)
+    # for check in checkouts:
+    #     appointment +=1
+    #     if check.total_price is not None:
+    #         revenue += check.total_price
+    
+    avg = client_count / appo if appo > 0 else 0
     return Response(
         {
             'status' : 200,
@@ -65,14 +94,17 @@ def get_busines_client_appointment(request):
             'response' : {
                 'message' : 'Total Revenue',
                 'error_message' : None,
-                'revenue' : revenue,
-                'client_count': client_count,
+                'revenue' : total_price,
+                'client_count':client_count,
+                # 'client_count': client_count,
                 'appointments_count': appointment,
+                'average_appointent':avg,
             }
         },
         status=status.HTTP_200_OK
     )
-    
+
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_dashboard_day_wise(request):
@@ -267,8 +299,11 @@ def get_acheived_target_report(request):
 def get_dashboard_target_overview(request):
 
     employee_id = request.GET.get('employee_id', None)
-    range_start =  request.GET.get('range_start', None)
-    range_end = request.GET.get('range_end', None)
+    
+    range_start =  request.GET.get('range_start', '1990-01-01')
+    range_end = request.GET.get('range_end', '2050-12-20')
+    
+
     # employee_id = request.GET.get('employee_id', None)
     # start_month =  request.GET.get('start_month', None)
     # end_month = request.GET.get('end_month', None)
@@ -291,6 +326,7 @@ def get_dashboard_target_overview(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    
     try: 
         employee = Employee.objects.get(id=employee_id, is_deleted=False)
     except Exception as err:
@@ -331,8 +367,8 @@ def get_dashboard_target_overview(request):
 
 
     targets = StaffTarget.objects.filter(
-        is_deleted=False,
-        member__id = employee_id,
+        # is_deleted=False,
+        employee__id = employee_id,
         created_at__gte =  range_start ,
         created_at__lte = range_end
         )
@@ -340,28 +376,28 @@ def get_dashboard_target_overview(request):
     targets.values_list('retail_target', flat=True)
     
     service_targets = ServiceOrder.objects.filter(
-        member = employee_id,
+        member__id = employee_id,
         created_at__gte =  range_start ,
         created_at__lte = range_end
     ).values_list('service_target', flat=True)
     all_service_targets += sum(service_targets)
 
     retail_targets = ProductOrder.objects.filter(
-        member = employee_id,
+        member__id = employee_id,
         created_at__gte =  range_start ,
         created_at__lte = range_end
     ).values_list('retail_targets', flat=True)
     all_retail_targets += sum(retail_targets)
     
     voucher_targets = VoucherOrder.objects.filter(
-        member = employee_id,
+        member__id = employee_id,
         created_at__gte =  range_start ,
         created_at__lte = range_end
     ).values_list('voucher_targets', flat=True)
     all_voucher_targets += sum(voucher_targets)
 
     membership_targets = MemberShipOrder.objects.filter(
-        member = employee_id,
+        member__id = employee_id,
         created_at__gte =  range_start ,
         created_at__lte = range_end
     ).values_list('membership_targets', flat=True)
@@ -491,6 +527,7 @@ def get_total_comission(request):
     total_service_comission = 0
     total_product_comission = 0
     total_voucher_comission = 0
+    
 
     if range_start:
         range_start = datetime.strptime(range_start, "%Y-%m-%d")#.date()
@@ -502,6 +539,7 @@ def get_total_comission(request):
             created_at__gte =  range_start ,
             created_at__lte = range_end
             ).values_list('service_commission', flat=True)
+        service_commission = [i for i in service_commission if i]
         total_service_comission += sum(service_commission)
 
         product_commission = Checkout.objects.filter(
@@ -510,6 +548,7 @@ def get_total_comission(request):
             created_at__gte =  range_start ,
             created_at__lte = range_end
             ).values_list('product_commission', flat=True)
+        product_commission = [i for i in product_commission if i]
         total_product_comission += sum(product_commission)
 
         voucher_commission = Checkout.objects.filter(
@@ -518,29 +557,32 @@ def get_total_comission(request):
             created_at__gte =  range_start ,
             created_at__lte = range_end
             ).values_list('voucher_commission', flat=True)
+        voucher_commission = [i for i in voucher_commission if i]
         total_voucher_comission += sum(voucher_commission)
-        sum_total_commision = sum([total_service_comission,total_product_comission,total_voucher_comission])
+        # sum_total_commision = sum([total_service_comission,total_product_comission,total_voucher_comission])
         
     else:
         service_commission = Checkout.objects.filter(
             is_deleted=False,
             member__id = employee_id,
             ).values_list('service_commission', flat=True)
+        service_commission = [i for i in service_commission if i]
         total_service_comission += sum(service_commission)
 
         product_commission = Checkout.objects.filter(
             is_deleted=False,
             member__id = employee_id,
             ).values_list('product_commission', flat=True)
+        product_commission = [i for i in product_commission if i]
         total_product_comission += sum(product_commission)
 
         voucher_commission = Checkout.objects.filter(
             is_deleted=False,
             member__id = employee_id,
             ).values_list('voucher_commission', flat=True)
-        
+        voucher_commission = [i for i in voucher_commission if i]
         total_voucher_comission += sum(voucher_commission)
-        sum_total_commision = sum([total_service_comission,total_product_comission,total_voucher_comission])
+    sum_total_commision = sum([total_service_comission,total_product_comission,total_voucher_comission])
     
     return Response(
         {
@@ -637,3 +679,141 @@ def get_total_sales_device(request):
         },
         status=status.HTTP_200_OK
     )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_dashboard_target_overview_update(request):
+    employee_id = request.GET.get('employee_id', None)
+    
+    range_start =  request.GET.get('range_start', '1990-01-01')
+    range_end = request.GET.get('range_end', '2050-12-20')
+    
+    service_target = 0
+    retail_target = 0
+    service_sale = 0
+    retail_sale = 0
+    
+    if not all([employee_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required',
+                    'fields' : [
+                        'employee_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try: 
+        employee = Employee.objects.get(id=employee_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                    'response' : {
+                        'message' : 'Employee Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    if range_start:
+        range_start = datetime.strptime(range_start, "%Y-%m-%d")
+        range_end = datetime.strptime(range_end, "%Y-%m-%d")
+        
+        targets = StaffTarget.objects.filter(
+            # is_deleted=False,
+            employee = employee,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+            )
+        for tar in targets:
+            service_target += int(tar.service_target)
+            retail_target += int(tar.retail_target)
+        
+        appointment_checkout = AppointmentService.objects.filter(
+            appointment_status = 'Done',
+            member = employee,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+            ).values_list('total_price', flat=True)
+        service_sale += sum(appointment_checkout)
+        
+        service_order_sale = ServiceOrder.objects.filter(
+            member = employee,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+        )#.values_list('service_target', flat=True)
+        for ser in service_order_sale:
+            
+            service_sale += int(ser.checkout.total_service_price or 0)
+
+        retail_order_sale = ProductOrder.objects.filter(
+            member = employee,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+        )#.values_list('retail_targets', flat=True)
+        for pro in retail_order_sale:
+            retail_sale += int(pro.checkout.total_product_price or 0)
+    else:
+        targets = StaffTarget.objects.filter(
+            # is_deleted=False,
+            employee = employee,
+            )
+        for tar in targets:
+            service_target += int(tar.service_target)
+            retail_target += int(tar.retail_target)
+        
+        appointment_checkout = AppointmentService.objects.filter(
+            appointment_status = 'Done',
+            member = employee,
+            ).values_list('total_price', flat=True)
+        service_sale += sum(appointment_checkout)
+        
+        service_order_sale = ServiceOrder.objects.filter(
+            member = employee,
+        )
+        for ser in service_order_sale:
+            service_sale += int(ser.checkout.total_service_price or 0)
+
+        retail_order_sale = ProductOrder.objects.filter(
+            member = employee,
+        )
+        for pro in retail_order_sale:
+            retail_sale += int(pro.checkout.total_product_price or 0)
+        
+    total_targets = service_target + retail_target
+    total_sale = service_sale + retail_sale
+    
+    return Response(
+            {
+                'status' : 200,
+                'status_code' : '200',
+                'response' : {
+                    'message' : 'Employee Id recieved',
+                    'error_message' : None,
+                    'employee_id' : employee_id,
+
+                    'set' : {
+                        'service' : service_target,
+                        'retail' : retail_target,
+                        'total' : total_targets
+                    },
+                    'acheived' : {
+                        'service' : service_sale,
+                        'retail' : retail_sale,
+                        'total' : total_sale
+                    }
+                }
+            },
+            status=status.HTTP_200_OK
+        )

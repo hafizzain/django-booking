@@ -132,13 +132,13 @@ def import_brand(request):
             website =  row[1].strip('"')
             status =  row[2].strip('"')
             description =  row[3].strip('"')
-            image =  row[4].strip('"')
+            #image =  row[4].strip('"')
             brand = Brand.objects.create(
                 #user = user,
                 name=name,
                 description=description,
                 website=website,
-                image=image,
+                #image=image,
             )
             if status == 'Active':
                 brand.is_active = True

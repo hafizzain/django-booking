@@ -1061,47 +1061,6 @@ def update_employee(request):
     Employe_Informations.saturday = True if 'saturday' in request.data else False
     Employe_Informations.sunday = True if 'sunday' in request.data else False
     
-    # monday = request.data.get('monday', None)
-    # tuesday = request.data.get('tuesday', None)
-    # wednesday = request.data.get('wednesday', None)
-    # thursday = request.data.get('thursday', None)
-    # friday = request.data.get('friday', None)
-    # saturday = request.data.get('saturday', None)
-    # sunday = request.data.get('sunday', None)
-    
-    # if monday is not None:
-    #     working_days.append('Monday')
-    # if tuesday is not None:
-    #     working_days.append('Tuesday')
-    # if wednesday is not None:
-    #     working_days.append('Wednesday')
-    # if thursday is not None:
-    #     working_days.append('Thursday')
-    # if friday is not None:
-    #     working_days.append('Friday')
-    # if saturday is not None:
-    #     working_days.append('Saturday')
-    # if sunday is not None:
-    #     working_days.append('Sunday')
-    
-    # schedule = EmployeDailySchedule.objects.filter(created_at__gte = datetime.now()).exclude(day__in = working_days)
-    # for sch in schedule:
-    #     sch.delete()
-        
-    
-    # if type(working_days) == str:
-    #         working_days = json.loads(working_days)
-
-    # elif type(working_days) == list:
-    #         pass
-    # for days in working_days:
-    #     EmployeDailySchedule.objects.create(
-    #         user=employee.user,
-    #         business=employee.business,
-    #         employee = employee,
-    #         day = days,
-    #     )
-    
     
     if services_id is not None:
         if type(services_id) == str:
@@ -1154,28 +1113,54 @@ def update_employee(request):
         },
         status=status.HTTP_404_NOT_FOUND
     )
-    try:
-        empl_permission = EmployePermission.objects.get(employee=employee)
+    # try:
+    #     empl_permission = EmployePermission.objects.get(employee=employee)
         
-        for permit in ALL_PERMISSIONS:
+    #     for permit in ALL_PERMISSIONS:
+              
+    #         value = request.data.get(permit, None)
+    #         PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
             
+    #         if value is not None:
+    #             if type(value) == str:
+    #                 value = json.loads(value)
+    #                 for opt in value:
+    #                     try:
+    #                         option = GlobalPermissionChoices.objects.get(text=opt)
+    #                         PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
+    #                     except:
+    #                         pass
+
+    #     empl_permission.save()
+    
+    # except Exception as err:
+    #     Errors.append(err)
+    
+    try:
+        empl_permission, created = EmployePermission.objects.get_or_create(employee=employee)
+    
+        for permit in ALL_PERMISSIONS:
             value = request.data.get(permit, None)
-            PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
+                
             if value is not None:
-                if type(value) == str:
+                #PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
+                try:
                     value = json.loads(value)
+                except (TypeError, json.JSONDecodeError, AttributeError) as e:
+                    print(f"Error parsing value '{value}' for permit '{permit}': {e}")
+                else:
                     for opt in value:
                         try:
                             option = GlobalPermissionChoices.objects.get(text=opt)
                             PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
-                        except:
+                        except GlobalPermissionChoices.DoesNotExist:
                             pass
-
-        empl_permission.save()
-    
-    except Exception as err:
+                        
+        #empl_permission.save()
+        
+    except (TypeError, json.JSONDecodeError, AttributeError) as err: #Exception as err:
         Errors.append(err)
-    
+
     if location is not None:
         try:
             employee.location.clear()
@@ -1184,17 +1169,6 @@ def update_employee(request):
         except Exception as err:
             Errors.append(err)
             print(err)
-    
-    # if type(location) == str:
-    #     location = json.loads(location)
-        
-    # employee.location.clear()
-    # for loc in location:
-    #     try:
-    #         address=  BusinessAddress.objects.get(id = str(loc))
-    #         employee.location.add(address)
-    #     except Exception as err:
-    #         print(err)
 
     serializer = EmployeSerializer(employee, data=request.data, partial=True, context={'request' : request,})
     if serializer.is_valid():
@@ -3324,6 +3298,7 @@ def create_vacation_emp(request):
     to_date = datetime.strptime(to_date, "%Y-%m-%d")
     diff = to_date - from_date 
     #print(diff.days)
+    working_sch = None
     days = int(diff.days)
     if days > 0 :
         for i, value in enumerate(range(days+1)):
@@ -3331,37 +3306,54 @@ def create_vacation_emp(request):
                 from_date = from_date + timedelta(days=i)
             else:
                 from_date = from_date + timedelta(days=1)
-            working_schedule = EmployeDailySchedule.objects.create(
-                user = user,
-                business = business ,
-                employee = employee_id,
-                day = day,
-                start_time = start_time,
-                end_time = end_time,
-                start_time_shift = start_time_shift,
-                end_time_shift = end_time_shift,
-                
-                date = from_date,
-                from_date =from_date,
-                to_date = to_date,
-                note = note,
-                
-            )    
-            if is_vacation is not None:
-                working_schedule.is_vacation = True
-            else:
-                working_schedule.is_vacation = False
-                
-            if is_leave is not None:
-                working_schedule.is_leave = True
-            else:
-                working_schedule.is_leave = False
-            if is_off is not None:
-                working_schedule.is_off = True
-            else:
-                working_schedule.is_off = False
+            try:
+                working_sch = EmployeDailySchedule.objects.get(
+                    employee = employee_id,   
+                    date = from_date
+                )
+            except Exception as err:
+                pass
             
-            working_schedule.save()
+            if working_sch is not None:
+                #date_obj = datetime.fromisoformat(from_date)
+                
+                working_sch.is_vacation = True
+                working_sch.from_date = from_date
+                working_sch.save()
+                working_sch = None
+                
+            else:   
+                working_schedule = EmployeDailySchedule.objects.create(
+                    user = user,
+                    business = business ,
+                    employee = employee_id,
+                    day = day,
+                    start_time = start_time,
+                    end_time = end_time,
+                    start_time_shift = start_time_shift,
+                    end_time_shift = end_time_shift,
+                    
+                    date = from_date,
+                    from_date =from_date,
+                    to_date = to_date,
+                    note = note,
+                    
+                )    
+                if is_vacation is not None:
+                    working_schedule.is_vacation = True
+                else:
+                    working_schedule.is_vacation = False
+                    
+                if is_leave is not None:
+                    working_schedule.is_leave = True
+                else:
+                    working_schedule.is_leave = False
+                if is_off is not None:
+                    working_schedule.is_off = True
+                else:
+                    working_schedule.is_off = False
+                
+                working_schedule.save()
             
     all_employe= EmployeDailySchedule.objects.all().order_by('created_at')
     serialized = ScheduleSerializer(all_employe, many=True, context={'request' : request})

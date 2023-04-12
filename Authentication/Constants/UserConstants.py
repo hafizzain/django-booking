@@ -66,6 +66,7 @@ def complete_user_account(request, user=None, data=None):
             ExceptionRecord.objects.create(text=f'error from create_tenant_thread \n{str(error)}')
 
     user.save()
+   
     # NewsLetterDetail.objects.create(
     #     user = user,
     #     terms_condition=data.get('terms_condition', True),

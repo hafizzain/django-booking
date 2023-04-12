@@ -1,4 +1,5 @@
 from datetime import timedelta
+import datetime
 from threading import Thread
 from django.shortcuts import render
 from Sale.Constants.StaffEmail import StaffSaleEmail
@@ -30,6 +31,7 @@ from django.db.models import Avg, Count, Min, Sum
 
 
 from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
+from rest_framework.pagination import PageNumberPagination
 
 
 # @api_view(['GET'])
@@ -774,10 +776,6 @@ def update_servicegroup(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def get_all_sale_orders(request):
-    
     # #pagination
     
     # paginator = CustomPagination()
@@ -785,26 +783,16 @@ def get_all_sale_orders(request):
     # result_page = paginator.paginate_queryset(product_order, request)
     # serialized = ProductOrderSerializer(result_page,  many=True)
     
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_all_sale_orders(request):
+    
+    
     data=[]
     checkout_order = Checkout.objects.filter(is_deleted=False)#.order_by('-created_at')
     serialized = CheckoutSerializer(checkout_order,  many=True, context={'request' : request})
     data.extend(serialized.data)
-    
-    # product_order = ProductOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    # serialized = ProductOrderSerializer(product_order,  many=True, context={'request' : request})
-    # data.extend(serialized.data)
-    
-    # service_orders = ServiceOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    # serialized = ServiceOrderSerializer(service_orders,  many=True, context={'request' : request})
-    # data.extend(serialized.data)
-    
-    # membership_order = MemberShipOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    # serialized = MemberShipOrderSerializer(membership_order,  many=True, context={'request' : request} )
-    # data.extend(serialized.data)
-    
-    # voucher_orders = VoucherOrder.objects.filter(is_deleted=False).order_by('-created_at')
-    # serialized = VoucherOrderSerializer(voucher_orders,  many=True, context={'request' : request})
-    # data.extend(serialized.data)
+   
     
     appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')#.order_by('-created_at')
     serialized = AppointmentCheckoutSerializer(appointment_checkout, 
@@ -827,6 +815,96 @@ def get_all_sale_orders(request):
         },
         status=status.HTTP_200_OK
     )
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_all_sale_orders_pagination(request):
+    location_id = request.GET.get('location', None)
+    range_start =  request.GET.get('range_start', None)
+    range_end = request.GET.get('range_end', None)
+
+    paginator = CustomPagination()
+    paginator.page_size = 10
+    if range_start:
+        # range_start = datetime.strptime(range_start, "%Y-%m-%d")
+        # range_end = datetime.strptime(range_end, "%Y-%m-%d")
+
+        checkout_order = Checkout.objects.filter(
+            is_deleted=False,
+            location__id = location_id,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+            )
+        
+        #paginated_checkout_order = paginator.paginate_queryset(checkout_order, request)
+        checkout_data = CheckoutSerializer(checkout_order, many=True, context={'request': request}).data
+        
+        appointment_checkout = AppointmentCheckout.objects.filter(
+            appointment_service__appointment_status='Done',
+            business_address__id = location_id,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+            )
+    else:
+        checkout_order = Checkout.objects.filter(
+            is_deleted=False,
+            location__id = location_id,
+            )
+        
+        #paginated_checkout_order = paginator.paginate_queryset(checkout_order, request)
+        checkout_data = CheckoutSerializer(checkout_order, many=True, context={'request': request}).data
+        
+        appointment_checkout = AppointmentCheckout.objects.filter(
+            appointment_service__appointment_status='Done',
+            business_address__id = location_id,
+            )
+    #paginated_appointment_checkout = paginator.paginate_queryset(appointment_checkout, request)
+    appointment_checkout_data = AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data
+    
+    data_total = checkout_data + appointment_checkout_data
+    
+    paginated_appointment_checkout = paginator.paginate_queryset(data_total, request)
+    
+    sorted_data = sorted(paginated_appointment_checkout, key=lambda x: x['created_at'], reverse=True)
+    
+    return paginator.get_paginated_response(sorted_data, 'sales')
+    
+    # sale_data = paginator.get_paginated_response(sorted_data, 'sales')
+
+    # return Response(
+    #     {
+    #         'status' : 200,
+    #         'status_code' : '200',
+    #         'response' : {
+    #             'message' : 'All Sale Orders',
+    #             'error_message' : None,
+    #             'sales' : sale_data.data
+    #         }
+    #     },
+    #     status=status.HTTP_200_OK
+    # )
+    
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_all_sale_orders_default(request):
+    
+    paginator = PageNumberPagination()
+    paginator.page_size = 5
+    
+    checkout_order = Checkout.objects.filter(
+        is_deleted=False)
+    paginated_checkout_order = paginator.paginate_queryset(checkout_order, request)
+    checkout_data = CheckoutSerializer(paginated_checkout_order, many=True, context={'request': request}).data
+    
+    appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status='Done')
+    paginated_appointment_checkout = paginator.paginate_queryset(appointment_checkout, request)
+    appointment_checkout_data = AppointmentCheckoutSerializer(paginated_appointment_checkout, many=True, context={'request': request}).data
+    
+    data = checkout_data + appointment_checkout_data
+    sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
+    
+    return paginator.get_paginated_response(sorted_data)
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -1187,6 +1265,8 @@ def create_sale_order(request):
     client_type = request.data.get('client_type', None)
     ids = request.data.get('ids', None)
     
+    free_services_quantity = request.data.get('free_services_quantity', None)
+    
     service_total_price = request.data.get('service_total_price', None)
     product_total_price = request.data.get('product_total_price', None)
     voucher_total_price = request.data.get('voucher_total_price', None)
@@ -1199,6 +1279,8 @@ def create_sale_order(request):
     product_commission_type = request.data.get('product_commission_type', '')
     voucher_commission_type = request.data.get('voucher_commission_type', '')
     
+    is_promotion_availed = request.data.get('is_promotion_availed', None)
+    is_promotion = request.data.get('is_promotion', False)
     duration = request.data.get('duration', None)
     
     start_date = request.data.get('start_date', None)
@@ -1206,6 +1288,7 @@ def create_sale_order(request):
      
     tip = request.data.get('tip', 0)
     total_price = request.data.get('total_price', None)
+    minus_price = 0
     
     errors = []
     
@@ -1259,6 +1342,11 @@ def create_sale_order(request):
 
     elif type(ids) == list:
             pass
+        
+    # service_total_price = int(float(service_total_price))
+    # product_total_price = int(float(product_total_price))
+    # voucher_total_price = int(float(voucher_total_price))
+    
     checkout = Checkout.objects.create(
         user = user,
         
@@ -1280,22 +1368,49 @@ def create_sale_order(request):
         product_commission_type = product_commission_type,
         voucher_commission_type = voucher_commission_type ,  
         
-        tip = tip
+        tip = tip,
     )
+    if bool(is_promotion) == True:
+        checkout.is_promotion = True
+        checkout.save()
+        
+    # ExceptionRecord.objects.create(
+    #             text = f' is_promotion condition {bool(is_promotion) == True} is_promotion {is_promotion}'
+    #         )
+    test = True
     
+    if bool(is_promotion_availed) == True:
+        for item in ids:
+            price = item["price"]
+            minus_price +=(price)
+            #print(price)
+        
     for id in ids:          
         sale_type = id['selection_type']
         service_id = id['id']
         quantity = id['quantity']
-        price = id['price']
+        price = id['price']        
         discount_price = id.get('discount_price', None)
+        
         if discount_price is not None:
             price = int(discount_price) #* int(quantity)
-            ExceptionRecord.objects.create(
-                text = f'price {price} discount_price {discount_price}'
-            )
-            
         
+        # if price > 0 and bool(is_promotion_availed) == True:
+        #     minus_price += price
+        #     ExceptionRecord.objects.create(
+        #         text = f'price {price > 0} minus_price {minus_price}'
+        #     )
+        
+        if price == 0 and bool(is_promotion_availed) == True:
+            number = int(float(total_price))
+            rem_price = number - minus_price
+            price =  int(rem_price) / int(free_services_quantity)
+            
+            if test == True:
+                checkout.total_service_price = int(float(total_price))
+                checkout.save()
+                test = False
+                
         if sale_type == 'PRODUCT':
             try:
                 product = Product.objects.get(id = service_id)
@@ -1315,7 +1430,7 @@ def create_sale_order(request):
             try:
                 transfer = ProductStock.objects.get(product__id=product.id, location = business_address.id)
                 
-                if transfer.available_quantity > int(quantity):
+                if transfer.available_quantity >= int(quantity):
                     stock_transfer = ProductOrderStockReport.objects.create(
                     report_choice = 'Sold',
                     product = product,
@@ -1389,9 +1504,9 @@ def create_sale_order(request):
                 service = Service.objects.get(id = service_id)
                 service_price = PriceService.objects.filter(service = service_id).first()
                 dur = service_price.duration
-                ExceptionRecord.objects.create(
-                    text = f'price {price} discount_price {discount_price}'
-                )
+                # ExceptionRecord.objects.create(
+                #     text = f'price {price} discount_price {discount_price}'
+                # )
                 
                 service_order = ServiceOrder.objects.create(
                     user = user,

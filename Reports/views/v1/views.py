@@ -231,6 +231,7 @@ def get_commission_reports_by_commission_details_updated(request):
 
         checkout_order = Checkout.objects.filter(
             is_deleted=False,
+            is_promotion = False,
             created_at__gte =  range_start ,
             created_at__lte = range_end
         ).order_by('-created_at')
@@ -251,7 +252,10 @@ def get_commission_reports_by_commission_details_updated(request):
         data.extend(serialized.data)
         sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
     else:
-        checkout_order = Checkout.objects.filter(is_deleted=False).order_by('-created_at')
+        checkout_order = Checkout.objects.filter(
+            is_deleted=False,
+            is_promotion = False,
+            ).order_by('-created_at')
         serialized = CheckoutCommissionSerializer(checkout_order,  many=True, context={
             'request' : request, 
             })
