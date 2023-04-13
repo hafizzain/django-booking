@@ -94,6 +94,41 @@ def import_client(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
+            if email is not None:
+                try:
+                    client = Client.objects.get(email__icontains = email)
+                    return Response(
+                        {
+                            'status' : False,
+                            'status_code' : 404,
+                            'status_code_text' : '404',
+                            'response' : {
+                                'message' : f'Client Already exist with this {email}!',
+                                'error_message' : None,
+                            }
+                        },
+                        status=status.HTTP_404_NOT_FOUND
+                    )
+                except Exception as err:
+                    pass
+
+            if  mobile_number is not None:
+                try:
+                    employe = Client.objects.get(mobile_number = mobile_number)
+                    return Response(
+                        {
+                            'status' : False,
+                            'status_code' : 404,
+                            'status_code_text' : '404',
+                            'response' : {
+                                'message' : f'Client Already exist with this {mobile_number}!',
+                                'error_message' : None,
+                            }
+                        },
+                        status=status.HTTP_404_NOT_FOUND
+                    )
+                except Exception as err:
+                    pass
             
             Client.objects.create(
                 user = user,

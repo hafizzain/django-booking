@@ -42,7 +42,7 @@ def cancel_appointment_n(appointment = None , tenant = None):
                 pass
                 if staff_email.sms_daily_sale == True: 
                     try:                   
-                        html_file = render_to_string("AppointmentEmail/cancel_appointment_n.html", {'name': name_c, 'ser_name':ser_name ,'t_name':mem_name , 'date':dat,'time':time ,'mem_id':mem_id})
+                        html_file = render_to_string("AppointmentEmail/cancel_appointment_n.html", {'client': True, 'staff': False,'name': name_c, 'ser_name':ser_name ,'t_name':mem_name , 'date':dat,'time':time ,'mem_id':mem_id})
                         text_content = strip_tags(html_file)
                             
                         email = EmailMultiAlternatives(
