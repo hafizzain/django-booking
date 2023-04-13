@@ -256,11 +256,18 @@ def get_all_appointments(request):
     paginator = CustomPagination()
     paginator.page_size = 10
     
-    test = AppointmentService.objects.filter(
-        is_blocked=False,
-        business_address__id = location_id,
+    if location_id is not None:
+        test = AppointmentService.objects.filter(
+            is_blocked=False,
+            business_address__id = location_id,
         ).order_by('-created_at')
-    paginated_checkout_order = paginator.paginate_queryset(test, request)
+        paginated_checkout_order = paginator.paginate_queryset(test, request)
+    else:
+        paginated_checkout_order = AppointmentService.objects.filter(
+            is_blocked=False,
+        #business_address__id = location_id,
+        ).order_by('-created_at')
+    
     serialize = AllAppoinmentSerializer(paginated_checkout_order, many=True)
     
     return paginator.get_paginated_response(serialize.data, 'appointments' )
