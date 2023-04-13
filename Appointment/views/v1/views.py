@@ -263,11 +263,11 @@ def get_all_appointments(request):
         ).order_by('-created_at')
         paginated_checkout_order = paginator.paginate_queryset(test, request)
     else:
-        paginated_checkout_order = AppointmentService.objects.filter(
+        test = AppointmentService.objects.filter(
             is_blocked=False,
         #business_address__id = location_id,
         ).order_by('-created_at')
-    
+        paginated_checkout_order = paginator.paginate_queryset(test, request)
     serialize = AllAppoinmentSerializer(paginated_checkout_order, many=True)
     
     return paginator.get_paginated_response(serialize.data, 'appointments' )
