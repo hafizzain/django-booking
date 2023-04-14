@@ -344,23 +344,23 @@ def create_client(request):
 
     if  mobile_number is not None:
         try:
-            employe_mobile = Client.objects.get(mobile_number__exact = mobile_number)
-            return Response(
-                        {
-                            'status' : False,
-                            'status_code' : 404,
-                            'status_code_text' : '404',
-                            'response' : {
-                                'message' : f'Client Already exist with this {mobile_number}!',
-                                'error_message' : None, 
-                            }
-                        },
-            status=status.HTTP_404_NOT_FOUND
-                    )
+            employe_mobile = Client.objects.filter(mobile_number = mobile_number).exist()
+            if employe_mobile:
+                return Response(
+                            {
+                                'status' : False,
+                                'status_code' : 404,
+                                'status_code_text' : '404',
+                                'response' : {
+                                    'message' : f'Client Already exist with this {mobile_number}!',
+                                    'error_message' : None, 
+                                }
+                            },
+                status=status.HTTP_404_NOT_FOUND
+                        )
         except Exception as err:
                  pass
-            
-        
+    
     client=Client.objects.create(
         user=user,
         business=business,
