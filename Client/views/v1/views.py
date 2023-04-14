@@ -2448,6 +2448,7 @@ def delete_loyalty(request):
 @permission_classes([IsAuthenticated])
 def update_loyalty(request):
     id = request.data.get('id', None)
+    location = request.data.get('location', None)
     if id is None: 
         return Response(
         {
@@ -2478,6 +2479,23 @@ def update_loyalty(request):
             },
                 status=status.HTTP_404_NOT_FOUND
         )
+        
+    if location is not None:
+        try:
+            business_address = BusinessAddress.objects.get(id=location)
+            loyalty.location = business_address
+            loyalty.save()
+        except Exception as err:
+            return Response(
+            {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Location not found',
+                }
+            }
+        )
+        
     serializer = LoyaltyPointsSerializer(loyalty, data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(
