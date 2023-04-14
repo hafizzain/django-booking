@@ -375,6 +375,27 @@ class LoyaltyPoints(models.Model):
     
     def __str__(self):
         return str(self.id)
+    
+class LoyaltyPointLogs(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    location = models.ForeignKey(LoyaltyPoints, on_delete=models.CASCADE, related_name="location_loyaltypointlogs")
+    client = models.ForeignKey(Client, on_delete=models.CASCADE,  related_name="client_loyaltypointlogs" )
+    loyalty_points = models.PositiveIntegerField(default=0, null=True, blank=True)
+    total_earn = models.PositiveIntegerField(default=0, null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=now, null=True)
+    updated_at = models.DateTimeField(auto_now_add=now, null=True)
+    is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return str(self.id)
+
+
+
+
+
 class ClientPromotions(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='user_client_promotions', verbose_name='Creator ( User )')
