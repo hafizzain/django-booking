@@ -666,7 +666,6 @@ def cancel_appointment_client(request):
                 text = appointment_notes
             )
         
-            
         serializer = AppointmentClientSerializer(appointment, context={'request' : request})
         data.append(serializer.data)
         # try:
@@ -682,7 +681,7 @@ def cancel_appointment_client(request):
             'status_code' : 200,
             'response' : {
                 'message' : 'Cancel Appointment Successfully',
-                'error_message' : None,
+                'error_message' : appointment_notes,
                 'appointment': serializer.data
             }
         },
