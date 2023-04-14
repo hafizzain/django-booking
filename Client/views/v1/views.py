@@ -344,7 +344,7 @@ def create_client(request):
 
     if  mobile_number is not None:
         try:
-            employe_mobile = Client.objects.get(mobile_number__iexact = mobile_number)
+            employe_mobile = Client.objects.get(mobile_number__exact = mobile_number)
             return Response(
                         {
                             'status' : False,
