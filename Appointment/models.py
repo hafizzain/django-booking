@@ -21,6 +21,8 @@ class AppointmentLogs(models.Model):
 
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     member = models.ForeignKey(Employee, on_delete=models.SET_NULL, related_name='appointmentlogs_staffname', null=True, blank=True)
+    
+    location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='appointmentlogs_location')
 
     log_type = models.CharField(choices=LOG_TYPE_CHOICES, max_length=50, null=True, blank=True, )
     customer_type =  models.CharField(max_length=50, null=True, blank=True, )
