@@ -542,7 +542,8 @@ def delete_client(request):
         cl_grp.client.remove(client)
         cl_grp.save()
             
-    client.is_deleted = True
+    #client.is_deleted = True
+    client.delete()
     client.save()
     return Response(
         {
