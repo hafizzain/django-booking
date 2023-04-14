@@ -408,7 +408,7 @@ def create_client(request):
             'status_code' : 201,
             'response' : {
                 'message' : 'Client Added!',
-                'error_message' : None,
+                'error_message' : errors,
                 'client' : serialized.data
             }
         },
