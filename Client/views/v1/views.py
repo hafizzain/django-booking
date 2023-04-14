@@ -94,7 +94,6 @@ def import_client(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-            
             Client.objects.create(
                 user = user,
                 business= business,
@@ -249,6 +248,7 @@ def create_client(request):
     state= request.data.get('state', None)
     country= request.data.get('country', None)
     languages= request.data.get('language', None)
+    errors = []
     
     if not all([business_id, client_id, full_name ,gender  , languages]):
         return Response(
@@ -307,6 +307,9 @@ def create_client(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    
+
+    
     if languages is not None:
         language_id = Language.objects.get(id=languages)
     else:
@@ -321,7 +324,47 @@ def create_client(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-        
+
+    if email is not None:
+        try:
+            client = Client.objects.get(email__iexact = email)
+            return Response(
+                        {
+                            'status' : False,
+                            'status_code' : 404,
+                            'status_code_text' : '404',
+                            'response' : {
+                                'message' : f'Client Already exist with this {email}!',
+                                'error_message' : None,
+                            }
+                        },
+                status=status.HTTP_404_NOT_FOUND
+                    )
+        except Exception as err:
+            pass
+
+    if  mobile_number is not None:
+        try:
+            employe_mobile = Client.objects.get(mobile_number = mobile_number)
+            #if employe_mobile:
+            return Response(
+                        {
+                            'status' : False,
+                            'status_code' : 404,
+                            'status_code_text' : '404',
+                            'response' : {
+                                'message' : f'Client Already exist with this {mobile_number}!',
+                                'error_message' : None, 
+                            }
+                        },
+            status=status.HTTP_404_NOT_FOUND
+                    )
+        except Exception as err:
+            ExceptionRecord.objects.create(
+                text = f'error on create client {str(err)}'
+            )
+            errors.append(f'clients errors {str(err)} mobile_number {mobile_number}')
+    
     client=Client.objects.create(
         user=user,
         business=business,
@@ -365,7 +408,7 @@ def create_client(request):
             'status_code' : 201,
             'response' : {
                 'message' : 'Client Added!',
-                'error_message' : None,
+                'error_message' : errors,
                 'client' : serialized.data
             }
         },
@@ -499,7 +542,8 @@ def delete_client(request):
         cl_grp.client.remove(client)
         cl_grp.save()
             
-    client.is_deleted = True
+    #client.is_deleted = True
+    client.delete()
     client.save()
     return Response(
         {
@@ -2409,6 +2453,7 @@ def delete_loyalty(request):
 @permission_classes([IsAuthenticated])
 def update_loyalty(request):
     id = request.data.get('id', None)
+    location = request.data.get('location', None)
     if id is None: 
         return Response(
         {
@@ -2439,6 +2484,23 @@ def update_loyalty(request):
             },
                 status=status.HTTP_404_NOT_FOUND
         )
+        
+    if location is not None:
+        try:
+            business_address = BusinessAddress.objects.get(id=location)
+            loyalty.location = business_address
+            loyalty.save()
+        except Exception as err:
+            return Response(
+            {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Location not found',
+                }
+            }
+        )
+        
     serializer = LoyaltyPointsSerializer(loyalty, data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(

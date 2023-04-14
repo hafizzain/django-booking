@@ -217,7 +217,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
         return None
 
     def get_appointments(self, obj):
-        excluded_list = ['Cancel', 'Done', 'Paid']
+        excluded_list = ['Cancel']
         appoint_services = AppointmentService.objects.filter(
             member=obj,
             is_active = True,
