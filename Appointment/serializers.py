@@ -848,7 +848,7 @@ class AppointmenttLogSerializer(serializers.ModelSerializer):
                 'start_time':appointment.created_at,
                 'assigned_staff':appointment.member.full_name,
                 }
-        
+            output.append(service)
         return output
 
 
