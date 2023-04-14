@@ -38,8 +38,8 @@ from datetime import date, timedelta
 from threading import Thread
 from django.db.models import F
 
-from Appointment.models import Appointment, AppointmentService, AppointmentNotes , AppointmentCheckout
-from Appointment.serializers import  CheckoutSerializer, AppoinmentSerializer, ServiceClientSaleSerializer, ServiceEmployeeSerializer,SingleAppointmentSerializer ,BlockSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer
+from Appointment.models import Appointment, AppointmentService, AppointmentNotes , AppointmentCheckout , AppointmentLogs
+from Appointment.serializers import  CheckoutSerializer, AppoinmentSerializer, ServiceClientSaleSerializer, ServiceEmployeeSerializer,SingleAppointmentSerializer ,BlockSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer, AppointmenttLogSerializer
 from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
 from Utility.models import ExceptionRecord
@@ -388,8 +388,10 @@ def create_appointment(request):
         )
     try:
         client = Client.objects.get(id=client)
+        customer_type = client.full_name
     except Exception as err:
         client = None
+        customer_type = 'WALKIN'
         
     appointment = Appointment.objects.create(
             user = user,
@@ -399,6 +401,14 @@ def create_appointment(request):
             payment_method=payment_method,
             discount_type=discount_type,
         )
+    appointment_logs = AppointmentLogs.objects.create( 
+        
+        member = member,
+        log_type = 'Create',
+        customer_type = customer_type,            
+        )
+    
+    
     
     if business_address_id is not None:
         appointment.business_address = business_address
@@ -571,8 +581,10 @@ def create_appointment(request):
         total_price_app += int(price)
         service_commission = 0
         service_commission_type = ''
-        toValue = 0    
-                    
+        toValue = 0  
+        
+
+
         appointment_service = AppointmentService.objects.create(
             user = user,
             business = business,
@@ -684,7 +696,9 @@ def create_appointment(request):
             },
             status=status.HTTP_201_CREATED
     )    
- 
+
+
+
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_appointment(request):
@@ -945,17 +959,27 @@ def update_appointment_service(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+        
     if client:
         try:
             client = Client.objects.get(id=client)
             appointment.client = client
+            customer_type = client.full_name
             appointment.save()
         except Exception as err:
             client = None
+            customer_type = 'WALKIN'
         
     if client_type:
         appointment.client_type = client_type
         appointment.save()
+    if appointment_logs:
+        appointment_logs = AppointmentLogs.objects.create( 
+            
+                member = member,
+                log_type = 'Create',
+                customer_type = customer_type,            
+            )
     if appointment_notes:
         try:
             notes = AppointmentNotes.objects.filter(appointment =appointment )
@@ -965,6 +989,7 @@ def update_appointment_service(request):
                 appointment =appointment ,
                 text = appointment_notes 
             )
+            
         except Exception as err:
             errors.append(str(err))
             
@@ -2367,4 +2392,45 @@ def get_employee_check_availability_list(request):
             status=status.HTTP_200_OK
         )
     
+
+ 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_appointment_logs(request):
+    member = request.GET.get('member', None)
+    data = []
+    employee_ids = []
+    if member is None :
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'member id is required',
+                    'fields' : [
+                        'member',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    appointment_logs = AppointmentLogs.objects.filter(member__id=member).order_by('-created_at')
+    serialized = AppointmenttLogSerializer(appointment_logs, many = True)
+    
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Appointment Logs',
+                    'error_message' : None,
+                    'appointment_logs' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
     

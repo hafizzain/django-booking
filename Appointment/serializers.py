@@ -7,7 +7,7 @@ from Client.models import Client
 #from Sale.serializers import LocationServiceSerializer
 from rest_framework import serializers
 from Appointment.Constants.durationchoice import DURATION_CHOICES
-from Appointment.models import Appointment, AppointmentCheckout, AppointmentNotes, AppointmentService
+from Appointment.models import Appointment, AppointmentCheckout, AppointmentNotes, AppointmentService, AppointmentLogs
 from Business.models import BusinessAddress
 from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer
 from Client.serializers import ClientAppointmentSerializer
@@ -758,6 +758,8 @@ class ServiceClientSaleSerializer(serializers.ModelSerializer):
         model = AppointmentService
         fields = ['id','service', 'created_at','booked_by','duration','location',
                   'price','appointment_status','member', 'is_favourite']
+
+
         
 class CheckoutSerializer(serializers.ModelSerializer):
     appointment_service_status = serializers.SerializerMethodField(read_only=True)
@@ -822,3 +824,69 @@ class ServiceEmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployeeSelectedService
         fields = ('id','employee','employee_name', 'location')
+
+
+
+class AppointmenttLogSerializer(serializers.ModelSerializer):
+    booking_id = serializers.SerializerMethodField(read_only=True)
+    # log_type = serializers.SerializerMethodField(read_only=True)
+    logged_by = serializers.SerializerMethodField(read_only=True)
+    # date_time = serializers.SerializerMethodField(read_only=True)
+    log_field = serializers.SerializerMethodField(read_only=True)
+    # services = serializers.SerializerMethodField(read_only=True)
+    # time = serializers.SerializerMethodField(read_only=True)
+    # assigned_staff = serializers.SerializerMethodField(read_only=True)
+
+    def get_log_details(self,obj):
+        appointments = AppointmentService.objects.filter(appointment = obj.appointment )
+
+        output = []
+        for appointment in appointments:
+            service = {
+                'service' : appointment.service.name,
+                'duration':appointment.duration,
+                'start_time':appointment.created_at,
+                'assigned_staff':appointment.member.full_name,
+                }
+        
+        return output
+
+
+
+    def get_booking_id(self, obj):
+        id = str(obj.id).split('-')[0:2]
+        id = ''.join(id)
+        return id
+    
+    # def get_log_type(self, obj):
+    #     try:
+    #         return obj.appointment.client_type
+    #     except Exception as err:
+    #         return None
+    
+    def get_logged_by(self, obj):
+        try:
+            return obj.employee.full_name
+        except Exception as err:
+            return str(err)
+
+
+    # def get_services(self, obj):
+    #     try:
+    #         services = AppointmentService.objects.get(id  = obj.service.id)
+    #         return ServiceSaleSerializer(services).data
+    #     except Exception as err:
+    #         print(err)
+
+    # def get_assigned_staff(self, obj):
+    #     try:
+    #         emp = Employee.objects.get(id  = obj.employee.id)
+    #         return emp.full_name
+    #     except Exception as err:
+    #         return str(err)
+    
+    class Meta:
+        model = AppointmentLogs
+        fields = ('booking_id','log_type','logged_by','created_at','log_details')
+
+    

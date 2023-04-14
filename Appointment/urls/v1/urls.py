@@ -10,6 +10,7 @@ urlpatterns = [
     path('get_single_appointments/', views.get_single_appointments),
     path('get_appointments_service/', views.get_appointments_service),
     
+
     path('get_appointments_device/', views.get_appointments_device),
     path('update_appointment_device/', views.update_appointment_device),
 
@@ -45,5 +46,6 @@ urlpatterns = [
     path('get_employee_check_availability_list/', views.get_employee_check_availability_list),
     #path('get_complimentry_voucher/', views.get_employee_check_availability_list),
 
-    
+    #Appointment Logs
+    path('get_appointment_logs/', views.get_appointment_logs),
 ]
