@@ -402,7 +402,7 @@ def create_appointment(request):
             discount_type=discount_type,
         )
     appointment_logs = AppointmentLogs.objects.create( 
-        
+        location =business_address_id,
         member = member,
         log_type = 'Create',
         customer_type = customer_type,            
@@ -2397,10 +2397,8 @@ def get_employee_check_availability_list(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_appointment_logs(request):
-    member = request.GET.get('member', None)
-    data = []
-    employee_ids = []
-    if member is None :
+    location_id = request.GET.get('location_id', None)
+    if location_id is None:
         return Response(
             {
                 'status' : False,
@@ -2408,17 +2406,32 @@ def get_appointment_logs(request):
                 'status_code_text' : 'MISSING_FIELDS_4001',
                 'response' : {
                     'message' : 'Invalid Data!',
-                    'error_message' : 'member id is required',
+                    'error_message' : 'All fields are required.',
                     'fields' : [
-                        'member',
+                        'location_id',
                     ]
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    try:
+        location = BusinessAddress.objects.get(id=location_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'OBJECT_NOT_FOUND',
+                'response' : {
+                    'message' : 'Business Location Not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
     
-    appointment_logs = AppointmentLogs.objects.filter(member__id=member).order_by('-created_at')
-    serialized = AppointmenttLogSerializer(appointment_logs, many = True)
+    appointment_logs = AppointmentLogs.objects.filter(location=location).order_by('-created_at')
+    serialized = AppointmenttLogSerializer(location, context = {'request' : request, })
     
     
     return Response(
