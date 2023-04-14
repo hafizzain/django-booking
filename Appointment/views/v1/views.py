@@ -407,6 +407,12 @@ def create_appointment(request):
         log_type = 'Create',
         customer_type = customer_type,            
         )
+    # appointment_logs = AppointmentLogs.objects.create( 
+        
+    #     member = member,
+    #     log_type = 'Create',
+    #     customer_type = customer_type,            
+    #     )
     
     
     

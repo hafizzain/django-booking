@@ -598,7 +598,7 @@ def get_client_appointment(request):
 def cancel_appointment_client(request):
     appointment_id = request.GET.get('appointment_id', None)
     hash = request.GET.get('hash', None)
-    appointment_notes = request.GET.get('appointment_notes', None)
+    appointment_notes = request.data.get('appointment_notes', None)
     
     data = []    
     if appointment_id and hash is None: 
@@ -666,7 +666,6 @@ def cancel_appointment_client(request):
                 text = appointment_notes
             )
         
-            
         serializer = AppointmentClientSerializer(appointment, context={'request' : request})
         data.append(serializer.data)
         # try:
