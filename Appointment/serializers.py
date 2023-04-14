@@ -836,7 +836,15 @@ class AppointmenttLogSerializer(serializers.ModelSerializer):
     # services = serializers.SerializerMethodField(read_only=True)
     # time = serializers.SerializerMethodField(read_only=True)
     # assigned_staff = serializers.SerializerMethodField(read_only=True)
-
+    location = serializers.SerializerMethodField(read_only=True)
+    
+    def get_location(self, obj):
+        try:
+            loc = BusinessAddress.objects.get(id = obj.business_address.id)
+            return LocationSerializer(loc).data
+        except Exception as err:
+            print(err)
+            
     def get_log_details(self,obj):
         appointments = AppointmentService.objects.filter(appointment = obj.appointment )
 
