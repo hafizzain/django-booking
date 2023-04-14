@@ -401,12 +401,12 @@ def create_appointment(request):
             payment_method=payment_method,
             discount_type=discount_type,
         )
-    appointment_logs = AppointmentLogs.objects.create( 
+    # appointment_logs = AppointmentLogs.objects.create( 
         
-        member = member,
-        log_type = 'Create',
-        customer_type = customer_type,            
-        )
+    #     member = member,
+    #     log_type = 'Create',
+    #     customer_type = customer_type,            
+    #     )
     
     
     
