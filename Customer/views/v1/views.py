@@ -9,7 +9,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from Appointment.Constants.durationchoice import DURATION_CHOICES
-from Appointment.models import Appointment, AppointmentService
+from Appointment.models import Appointment, AppointmentNotes, AppointmentService
 from Authentication.Constants.Email import send_welcome_email
 from Authentication.serializers import UserSerializerByClient, UserTenantLoginSerializer
 from Authentication.Constants import CreateTenant, AuthTokenConstants, OTP
@@ -598,6 +598,7 @@ def get_client_appointment(request):
 def cancel_appointment_client(request):
     appointment_id = request.GET.get('appointment_id', None)
     hash = request.GET.get('hash', None)
+    appointment_notes = request.GET.get('appointment_notes', None)
     
     data = []    
     if appointment_id and hash is None: 
@@ -653,6 +654,18 @@ def cancel_appointment_client(request):
         for app_service in appointment_service:
             app_service.appointment_status = 'Cancel'
             app_service.save()
+        
+        try:
+            appointment_notes = AppointmentNotes.objects.get( appointment = appointment)
+            appointment_notes.text = appointment_notes
+            appointment_notes.save()
+        except Exception as err:
+            #pass
+            AppointmentNotes.objects.create(
+                appointment = appointment,
+                text = appointment_notes
+            )
+        
             
         serializer = AppointmentClientSerializer(appointment, context={'request' : request})
         data.append(serializer.data)

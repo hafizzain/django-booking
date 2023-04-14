@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from Appointment.models import Appointment, AppointmentService, AppointmentCheckout
+from Appointment.models import Appointment, AppointmentNotes, AppointmentService, AppointmentCheckout
 from Business.models import BusinessAddress
 from Product.Constants.index import tenant_media_base_url
 from Employee.models import Employee, EmployeeProfessionalInfo
@@ -11,6 +11,10 @@ class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessAddress
         fields = ['id','address_name', 'address']
+class AppoinmentnotesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AppointmentNotes
+        fields = ['id','text',]
 
 class EmployeAppoinmentSerializer(serializers.ModelSerializer):
     designation = serializers.SerializerMethodField()
@@ -80,6 +84,11 @@ class AppointmentServiceClientSerializer(serializers.ModelSerializer):
 class AppointmentClientSerializer(serializers.ModelSerializer):
     appointment_service = serializers.SerializerMethodField()
     tip = serializers.SerializerMethodField()
+    notes = serializers.SerializerMethodField()
+    
+    def get_notes(self,obj):
+        service = AppointmentNotes.objects.filter(appointment = obj)
+        return AppoinmentnotesSerializer(service, many = True).data
 
     def get_appointment_service(self,obj):
         service = AppointmentService.objects.filter(appointment = obj)
