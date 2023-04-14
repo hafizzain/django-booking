@@ -11,6 +11,28 @@ from Client.models import Client, Membership, Promotion, Rewards, Vouchers
 from Employee.models import Employee
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 
+class AppointmentLogs(models.Model):
+    LOG_TYPE_CHOICES =[
+        ('Create' , 'Create'),
+        ('Edit', 'Edit'),
+        ('Reschedule', 'Reschedule'),
+        ('Cancel', 'Cancel'),
+    ]
+
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    member = models.ForeignKey(Employee, on_delete=models.SET_NULL, related_name='appointmentlogs_staffname', null=True, blank=True)
+
+    log_type = models.CharField(choices=LOG_TYPE_CHOICES, max_length=50, null=True, blank=True, )
+    customer_type =  models.CharField(max_length=50, null=True, blank=True, )
+    appointment = models.ForeignKey('Appointment', on_delete=models.SET_NULL, related_name='appointmentlogs_service_type', null=True, blank=True)
+    
+    is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+    
+    def __str__(self):
+        return str(self.id)
+
 
 class Appointment(models.Model):
     DISCOUNT_CHOICES =[
