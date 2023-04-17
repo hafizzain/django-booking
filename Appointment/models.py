@@ -25,13 +25,34 @@ class AppointmentLogs(models.Model):
     location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='appointmentlogs_location')
 
     log_type = models.CharField(choices=LOG_TYPE_CHOICES, max_length=50, null=True, blank=True, )
-    customer_type =  models.CharField(max_length=50, null=True, blank=True, )
+    customer_type =  models.CharField(max_length=50, null=True, blank=True, default='' )
+    # not in use : customer_type
+
     appointment = models.ForeignKey('Appointment', on_delete=models.SET_NULL, related_name='appointmentlogs_service_type', null=True, blank=True)
     
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
     
+    def __str__(self):
+        return str(self.id)
+    
+
+class LogDetails(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+
+    log = models.ForeignKey(AppointmentLogs, on_delete=models.CASCADE, related_name='appointment_log_details')
+    appointment_service = models.ForeignKey('AppointmentService', on_delete=models.CASCADE, related_name='app_service_logs')
+
+    start_time = models.TimeField()
+    duration = models.CharField(default='', max_length=400)
+    member = models.ForeignKey(Employee, on_delete=models.SET_NULL, related_name='member_log_details', null=True, blank=True)
+
+    is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+
+
     def __str__(self):
         return str(self.id)
 

@@ -38,7 +38,7 @@ from datetime import date, timedelta
 from threading import Thread
 from django.db.models import F
 
-from Appointment.models import Appointment, AppointmentService, AppointmentNotes , AppointmentCheckout , AppointmentLogs
+from Appointment.models import Appointment, AppointmentService, AppointmentNotes , AppointmentCheckout , AppointmentLogs, LogDetails
 from Appointment.serializers import  CheckoutSerializer, AppoinmentSerializer, ServiceClientSaleSerializer, ServiceEmployeeSerializer,SingleAppointmentSerializer ,BlockSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer, AppointmenttLogSerializer
 from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
@@ -401,20 +401,7 @@ def create_appointment(request):
             payment_method=payment_method,
             discount_type=discount_type,
         )
-    appointment_logs = AppointmentLogs.objects.create( 
-        location =business_address,
-        member = member,
-        appointment = appointment,
-        log_type = 'Create',
-        customer_type = customer_type,            
-        )
-    # appointment_logs = AppointmentLogs.objects.create( 
-        
-    #     member = member,
-    #     log_type = 'Create',
-    #     customer_type = customer_type,            
-    #     )
-    
+   
     
     if business_address_id is not None:
         appointment.business_address = business_address
@@ -447,6 +434,25 @@ def create_appointment(request):
                     text = note
                 )
     
+    active_user_staff = None
+    try:
+        active_user_staff = Employee.objects.get(
+            user = request.user,
+            is_deleted = False,
+            is_active = True,
+            is_blocked = False
+        )
+    except:
+        pass
+    
+    appointment_logs = AppointmentLogs.objects.create( 
+        location = business_address,
+        appointment = appointment,
+        log_type = 'Create',
+        member = active_user_staff
+    )
+
+    # log_details = []
     all_members = []
     for appoinmnt in appointments:
         member = appoinmnt['member']
@@ -647,6 +653,14 @@ def create_appointment(request):
         if business_address_id is not None:
             appointment_service.business_address = business_address
             appointment_service.save()
+        
+        LogDetails.objects.create(
+            log = appointment_logs,
+            appointment_service = appointment_service,
+            start_time = appointment_service.appointment_time,
+            duration = appointment_service.duration,
+            member = appointment_service.member
+        )
     
     service_commission = 0
     service_commission_type = ''
