@@ -437,7 +437,7 @@ def create_appointment(request):
     active_user_staff = None
     try:
         active_user_staff = Employee.objects.get(
-            user = request.user,
+            email = request.user.email,
             is_deleted = False,
             is_active = True,
             is_blocked = False
