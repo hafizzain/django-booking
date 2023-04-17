@@ -902,17 +902,17 @@ class ServiceEmployeeSerializer(serializers.ModelSerializer):
 
 class AppointmenttLogSerializer(serializers.ModelSerializer):
     logged_by = serializers.SerializerMethodField(read_only=True)
-    location = serializers.SerializerMethodField(read_only=True)
+    # location = serializers.SerializerMethodField(read_only=True)
     
     log_details = serializers.SerializerMethodField(read_only=True)
     # date_time = serializers.DateTimeField(source='created_at', format="%Y-%m-%d %H:%M:%S")
 
-    def get_location(self, obj):
-        try:
-            loc = BusinessAddress.objects.get(id=obj.location.id)
-            return LocationSerializer(loc).data
-        except Exception as err:
-            print(err)
+    # def get_location(self, obj):
+    #     try:
+    #         loc = BusinessAddress.objects.get(id=obj.location.id)
+    #         return LocationSerializer(loc).data
+    #     except Exception as err:
+    #         print(err)
 
     # def get_logged_by(self, obj):
     #     return f'{obj.member.full_name}'
