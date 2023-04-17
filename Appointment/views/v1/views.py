@@ -1056,7 +1056,7 @@ def update_appointment_service(request):
         
             member = member,
             log_type = 'Edit',
-            customer_type = customer_type,
+            customer_type = '',
             appointment = appointment,            
         )
     
