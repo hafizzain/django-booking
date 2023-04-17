@@ -1054,7 +1054,7 @@ def update_appointment_service(request):
     appointment_logs = AppointmentLogs.objects.create( 
         
             member = member,
-            log_type = 'Create',
+            log_type = 'Edit',
             customer_type = customer_type,
             appointment = appointment,            
         )
