@@ -404,6 +404,7 @@ def create_appointment(request):
     appointment_logs = AppointmentLogs.objects.create( 
         location =business_address,
         member = member,
+        appointment = appointment,
         log_type = 'Create',
         customer_type = customer_type,            
         )
@@ -415,10 +416,10 @@ def create_appointment(request):
     #     )
     
     
-    
     if business_address_id is not None:
         appointment.business_address = business_address
         appointment.save()
+
     
     if type(appointments) == str:
         appointments = appointments.replace("'" , '"')
@@ -979,13 +980,7 @@ def update_appointment_service(request):
     if client_type:
         appointment.client_type = client_type
         appointment.save()
-    if appointment_logs:
-        appointment_logs = AppointmentLogs.objects.create( 
-            
-                member = member,
-                log_type = 'Create',
-                customer_type = customer_type,            
-            )
+    
     if appointment_notes:
         try:
             notes = AppointmentNotes.objects.filter(appointment =appointment )
@@ -1055,6 +1050,14 @@ def update_appointment_service(request):
             text = f'reschedule_appointment {str(err)}'
         )
         pass
+
+    appointment_logs = AppointmentLogs.objects.create( 
+        
+            member = member,
+            log_type = 'Edit',
+            customer_type = customer_type,
+            appointment = appointment,            
+        )
     
     
     return Response(
