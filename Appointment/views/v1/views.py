@@ -402,7 +402,7 @@ def create_appointment(request):
             discount_type=discount_type,
         )
     appointment_logs = AppointmentLogs.objects.create( 
-        location =business_address_id,
+        location =business_address,
         member = member,
         log_type = 'Create',
         customer_type = customer_type,            

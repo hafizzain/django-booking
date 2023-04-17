@@ -928,7 +928,7 @@ class AppointmenttLogSerializer(serializers.ModelSerializer):
 
     def get_log_details(self, obj):
         try:
-            appointments = str(AppointmentService.objects.filter(appointment=obj.appointment))
+            appointments = AppointmentService.objects.filter(appointment=obj.appointment)
             output = []
             for appointment in appointments:
                 service = {
