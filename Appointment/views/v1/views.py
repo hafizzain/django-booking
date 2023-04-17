@@ -1009,6 +1009,25 @@ def update_appointment_service(request):
         except Exception as err:
             errors.append(str(err))
             
+            
+    active_user_staff = None
+    try:
+        active_user_staff = Employee.objects.get(
+            email = request.user.email,
+            is_deleted = False,
+            is_active = True,
+            is_blocked = False
+        )
+    except:
+        pass
+    
+    appointment_logs = AppointmentLogs.objects.create( 
+        location = appointment.business_address,
+        appointment = appointment,
+        log_type = 'Edit',
+        member = active_user_staff
+    )
+
     if appointments is not None:
         if type(appointments) == str:
             appointments = json.loads(appointments)
@@ -1053,6 +1072,14 @@ def update_appointment_service(request):
                     service_appointment.save()                    
                 except Exception as err:
                     errors.append(str(err))
+                else:
+                    LogDetails.objects.create(
+                        log = appointment_logs,
+                        appointment_service = service_appointment,
+                        start_time = service_appointment.appointment_time,
+                        duration = service_appointment.duration,
+                        member = service_appointment.member
+                    )
     
     try:
         ExceptionRecord.objects.create(
@@ -1066,15 +1093,6 @@ def update_appointment_service(request):
         )
         pass
 
-    appointment_logs = AppointmentLogs.objects.create( 
-        
-            member = member,
-            log_type = 'Edit',
-            customer_type = '',
-            appointment = appointment,            
-        )
-    
-    
     return Response(
         {
             'status' : True,
