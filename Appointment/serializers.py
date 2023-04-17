@@ -902,30 +902,29 @@ class ServiceEmployeeSerializer(serializers.ModelSerializer):
 
 class AppointmenttLogSerializer(serializers.ModelSerializer):
     logged_by = serializers.SerializerMethodField(read_only=True)
-    location = serializers.SerializerMethodField(read_only=True)
+    # location = serializers.SerializerMethodField(read_only=True)
     
-    log_details = serializers.ListField(
-        child=serializers.DictField(),
-        read_only=True,
-    )
+    log_details = serializers.SerializerMethodField(read_only=True)
     # date_time = serializers.DateTimeField(source='created_at', format="%Y-%m-%d %H:%M:%S")
 
-    def get_location(self, obj):
-        try:
-            loc = BusinessAddress.objects.get(id=obj.location.id)
-            return LocationSerializer(loc).data
-        except Exception as err:
-            print(err)
+    # def get_location(self, obj):
+    #     try:
+    #         loc = BusinessAddress.objects.get(id=obj.location.id)
+    #         return LocationSerializer(loc).data
+    #     except Exception as err:
+    #         print(err)
 
     # def get_logged_by(self, obj):
     #     return f'{obj.member.full_name}'
     
     def get_logged_by(self, obj):
         try:
-            return obj.member.full_name
+            if obj.member:
+                return obj.member.full_name
+            return ''
         except Exception as err:
             return str(err)
-
+    
     def get_log_details(self, obj):
         try:
             appointments = AppointmentService.objects.filter(appointment=obj.appointment)
@@ -934,7 +933,7 @@ class AppointmenttLogSerializer(serializers.ModelSerializer):
                 service = {
                     'service': appointment.service.name,
                     'duration': appointment.duration,
-                    'start_time': appointment.start_time,
+                    'appointment_time': appointment.appointment_time,
                     'assigned_staff': appointment.member.full_name,
                 }
                 output.append(service)
@@ -944,5 +943,5 @@ class AppointmenttLogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AppointmentLogs
-        fields = ('id', 'log_type', 'logged_by', 'log_details', 'location')
+        fields = ('id', 'log_type', 'logged_by', 'log_details')
         
