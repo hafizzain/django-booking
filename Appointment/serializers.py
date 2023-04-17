@@ -943,5 +943,5 @@ class AppointmenttLogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AppointmentLogs
-        fields = ('id', 'log_type', 'logged_by', 'log_details')
+        fields = ('id', 'log_type', 'logged_by', 'log_details','created_at')
         
