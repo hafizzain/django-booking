@@ -2422,7 +2422,8 @@ def get_employee_check_availability_list(request):
 @permission_classes([AllowAny])
 def get_appointment_logs(request):
     location_id = request.GET.get('location_id', None)
-    if location_id is None:
+
+    if not all([location_id]):
         return Response(
             {
                 'status' : False,
@@ -2438,24 +2439,28 @@ def get_appointment_logs(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    try:
-        location = BusinessAddress.objects.get(id=location_id, is_deleted=False)
-    except Exception as err:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : 404,
-                'status_code_text' : 'OBJECT_NOT_FOUND',
-                'response' : {
-                    'message' : 'Business Location Not found',
-                    'error_message' : str(err),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
-    appointment_logs = AppointmentLogs.objects.filter(location__id=location_id, location__is_deleted=False).order_by('-created_at')
+    # try:
+    #     location = BusinessAddress.objects.get(id=location_id, is_deleted=False)
+    # except Exception as err:
+    #     return Response(
+    #         {
+    #             'status' : False,
+    #             'status_code' : 404,
+    #             'status_code_text' : 'OBJECT_NOT_FOUND',
+    #             'response' : {
+    #                 'message' : 'Business Location Not found',
+    #                 'error_message' : str(err),
+    #             }
+    #         },
+    #         status=status.HTTP_404_NOT_FOUND
+    #     )
+
+    appointment_logs = AppointmentLogs.objects.filter(
+        location__id = location_id, 
+        location__is_deleted = False
+    ).order_by('-created_at')
     
-    serialized = AppointmenttLogSerializer(appointment_logs, many=True, context = {'request' : request, })
+    serialized = AppointmenttLogSerializer(appointment_logs, many=True)
     
     
     return Response(

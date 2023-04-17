@@ -7,7 +7,7 @@ from Client.models import Client
 #from Sale.serializers import LocationServiceSerializer
 from rest_framework import serializers
 from Appointment.Constants.durationchoice import DURATION_CHOICES
-from Appointment.models import Appointment, AppointmentCheckout, AppointmentNotes, AppointmentService, AppointmentLogs
+from Appointment.models import Appointment, AppointmentCheckout, AppointmentNotes, AppointmentService, AppointmentLogs, LogDetails
 from Business.models import BusinessAddress
 from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer
 from Client.serializers import ClientAppointmentSerializer
@@ -902,20 +902,8 @@ class ServiceEmployeeSerializer(serializers.ModelSerializer):
 
 class AppointmenttLogSerializer(serializers.ModelSerializer):
     logged_by = serializers.SerializerMethodField(read_only=True)
-    # location = serializers.SerializerMethodField(read_only=True)
-    
     log_details = serializers.SerializerMethodField(read_only=True)
-    # date_time = serializers.DateTimeField(source='created_at', format="%Y-%m-%d %H:%M:%S")
 
-    # def get_location(self, obj):
-    #     try:
-    #         loc = BusinessAddress.objects.get(id=obj.location.id)
-    #         return LocationSerializer(loc).data
-    #     except Exception as err:
-    #         print(err)
-
-    # def get_logged_by(self, obj):
-    #     return f'{obj.member.full_name}'
     
     def get_logged_by(self, obj):
         try:
@@ -926,20 +914,22 @@ class AppointmenttLogSerializer(serializers.ModelSerializer):
             return str(err)
     
     def get_log_details(self, obj):
-        try:
-            appointments = AppointmentService.objects.filter(appointment=obj.appointment)
-            output = []
-            for appointment in appointments:
-                service = {
-                    'service': appointment.service.name,
-                    'duration': appointment.duration,
-                    'appointment_time': appointment.appointment_time,
-                    'assigned_staff': appointment.member.full_name,
-                }
-                output.append(service)
-            return output
-        except Exception as err:
-            print(err)
+        log_details = LogDetails.objects.filter(
+            log = obj,
+            is_active = True,
+            is_deleted = False,
+        )
+        output = []
+        for log_detail in log_details:
+            log = {
+                'service': log_detail.appointment_service.service.name,
+                'duration': log_detail.duration,
+                'appointment_time': log_detail.start_time,
+                'assigned_staff': log_detail.member.full_name,
+            }
+            output.append(log)
+
+        return output
 
     class Meta:
         model = AppointmentLogs
