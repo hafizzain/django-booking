@@ -421,6 +421,7 @@ def create_appointment(request):
         appointment.save()
 
     
+    
     if type(appointments) == str:
         appointments = appointments.replace("'" , '"')
         appointments = json.loads(appointments)
