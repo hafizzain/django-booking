@@ -1051,13 +1051,13 @@ def update_appointment_service(request):
         )
         pass
 
-    if appointment_logs:
-        appointment_logs = AppointmentLogs.objects.create( 
-            
-                member = member,
-                log_type = 'Create',
-                customer_type = customer_type,            
-            )
+    appointment_logs = AppointmentLogs.objects.create( 
+        
+            member = member,
+            log_type = 'Create',
+            customer_type = customer_type,
+            appointment = appointment,            
+        )
     
     
     return Response(
