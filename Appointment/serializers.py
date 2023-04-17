@@ -827,74 +827,122 @@ class ServiceEmployeeSerializer(serializers.ModelSerializer):
 
 
 
+# class AppointmenttLogSerializer(serializers.ModelSerializer):
+#     # booking_id = serializers.SerializerMethodField(read_only=True)
+#     # log_type = serializers.SerializerMethodField(read_only=True)
+#     logged_by = serializers.SerializerMethodField(read_only=True)
+#     # date_time = serializers.SerializerMethodField(read_only=True)
+#     # log_field = serializers.SerializerMethodField(read_only=True)
+#     # services = serializers.SerializerMethodField(read_only=True)
+#     # time = serializers.SerializerMethodField(read_only=True)
+#     # assigned_staff = serializers.SerializerMethodField(read_only=True)
+#     location = serializers.SerializerMethodField(read_only=True)
+#     log_details = serializers.SerializerMethodField(read_only=True)
+#     # booked_by = serializers.SerializerMethodField(read_only=True)
+#     def get_location(self, obj):
+#         try:
+#             loc = BusinessAddress.objects.get(id = obj.business_address.id)
+#             return LocationSerializer(loc).data
+#         except Exception as err:
+#             print(err)
+            
+    
+
+#     # def get_booked_by(self, obj):
+#     #     return f'{obj.user.first_name} {obj.user.last_name}'
+
+#     # def get_booking_id(self, obj):
+#     #     id = str(obj.id).split('-')[0:2]
+#     #     id = ''.join(id)
+#     #     return id
+    
+#     # def get_log_type(self, obj):
+#     #     try:
+#     #         return obj.appointment.client_type
+#     #     except Exception as err:
+#     #         return None
+    
+#     def get_logged_by(self, obj):
+#         try:
+#             return obj.employee.full_name
+#         except Exception as err:
+#             return str(err)
+
+#     def get_log_details(self,obj):
+#         appointments = AppointmentService.objects.filter(appointment = obj.appointment)
+
+#         output = []
+#         for appointment in appointments:
+#             service = {
+#                 'service' : appointment.service.name,
+#                 'duration':appointment.duration,
+#                 'start_time':appointment.created_at,
+#                 'assigned_staff':appointment.member.full_name,
+#                 }
+#             output.append(service)
+#         return output
+    
+#     # def get_services(self, obj):
+#     #     try:
+#     #         services = AppointmentService.objects.get(id  = obj.service.id)
+#     #         return ServiceSaleSerializer(services).data
+#     #     except Exception as err:
+#     #         print(err)
+
+#     # def get_assigned_staff(self, obj):
+#     #     try:
+#     #         emp = Employee.objects.get(id  = obj.employee.id)
+#     #         return emp.full_name
+#     #     except Exception as err:
+#     #         return str(err)
+    
+#     class Meta:
+#         model = AppointmentLogs
+#         fields = ('id','log_type','logged_by','created_at','log_details','location')
+
 class AppointmenttLogSerializer(serializers.ModelSerializer):
-    booking_id = serializers.SerializerMethodField(read_only=True)
-    # log_type = serializers.SerializerMethodField(read_only=True)
     logged_by = serializers.SerializerMethodField(read_only=True)
-    # date_time = serializers.SerializerMethodField(read_only=True)
-    log_field = serializers.SerializerMethodField(read_only=True)
-    # services = serializers.SerializerMethodField(read_only=True)
-    # time = serializers.SerializerMethodField(read_only=True)
-    # assigned_staff = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
     
+    log_details = serializers.ListField(
+        child=serializers.DictField(),
+        read_only=True,
+    )
+    # date_time = serializers.DateTimeField(source='created_at', format="%Y-%m-%d %H:%M:%S")
+
     def get_location(self, obj):
         try:
-            loc = BusinessAddress.objects.get(id = obj.business_address.id)
+            loc = BusinessAddress.objects.get(id=obj.location.id)
             return LocationSerializer(loc).data
         except Exception as err:
             print(err)
-            
-    def get_log_details(self,obj):
-        appointments = AppointmentService.objects.filter(appointment = obj.appointment )
 
-        output = []
-        for appointment in appointments:
-            service = {
-                'service' : appointment.service.name,
-                'duration':appointment.duration,
-                'start_time':appointment.created_at,
-                'assigned_staff':appointment.member.full_name,
-                }
-            output.append(service)
-        return output
-
-
-
-    def get_booking_id(self, obj):
-        id = str(obj.id).split('-')[0:2]
-        id = ''.join(id)
-        return id
-    
-    # def get_log_type(self, obj):
-    #     try:
-    #         return obj.appointment.client_type
-    #     except Exception as err:
-    #         return None
+    # def get_logged_by(self, obj):
+    #     return f'{obj.member.full_name}'
     
     def get_logged_by(self, obj):
         try:
-            return obj.employee.full_name
+            return obj.member.full_name
         except Exception as err:
             return str(err)
 
+    def get_log_details(self, obj):
+        try:
+            appointments = AppointmentService.objects.filter(appointment=obj.appointment)
+            output = []
+            for appointment in appointments:
+                service = {
+                    'service': appointment.service.name,
+                    'duration': appointment.duration,
+                    'start_time': appointment.start_time,
+                    'assigned_staff': appointment.member.full_name,
+                }
+                output.append(service)
+            return output
+        except Exception as err:
+            print(err)
 
-    # def get_services(self, obj):
-    #     try:
-    #         services = AppointmentService.objects.get(id  = obj.service.id)
-    #         return ServiceSaleSerializer(services).data
-    #     except Exception as err:
-    #         print(err)
-
-    # def get_assigned_staff(self, obj):
-    #     try:
-    #         emp = Employee.objects.get(id  = obj.employee.id)
-    #         return emp.full_name
-    #     except Exception as err:
-    #         return str(err)
-    
     class Meta:
         model = AppointmentLogs
-        fields = ('booking_id','log_type','logged_by','created_at','log_details')
-
-    
+        fields = ('id', 'log_type', 'logged_by', 'log_details', 'location')
+        

@@ -402,7 +402,7 @@ def create_appointment(request):
             discount_type=discount_type,
         )
     appointment_logs = AppointmentLogs.objects.create( 
-        location =business_address_id,
+        location =business_address,
         member = member,
         log_type = 'Create',
         customer_type = customer_type,            
@@ -2435,9 +2435,9 @@ def get_appointment_logs(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    appointment_logs = AppointmentLogs.objects.filter(location__id=location_id, location__is_deleted=False).order_by('-created_at')
     
-    appointment_logs = AppointmentLogs.objects.filter(location=location).order_by('-created_at')
-    serialized = AppointmenttLogSerializer(appointment_logs, context = {'request' : request, })
+    serialized = AppointmenttLogSerializer(appointment_logs, many=True, context = {'request' : request, })
     
     
     return Response(
