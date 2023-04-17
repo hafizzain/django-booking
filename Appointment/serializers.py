@@ -903,6 +903,7 @@ class ServiceEmployeeSerializer(serializers.ModelSerializer):
 class AppointmenttLogSerializer(serializers.ModelSerializer):
     logged_by = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
+    
     log_details = serializers.ListField(
         child=serializers.DictField(),
         read_only=True,
@@ -916,6 +917,9 @@ class AppointmenttLogSerializer(serializers.ModelSerializer):
         except Exception as err:
             print(err)
 
+    # def get_logged_by(self, obj):
+    #     return f'{obj.member.full_name}'
+    
     def get_logged_by(self, obj):
         try:
             return obj.member.full_name
@@ -924,7 +928,7 @@ class AppointmenttLogSerializer(serializers.ModelSerializer):
 
     def get_log_details(self, obj):
         try:
-            appointments = AppointmentService.objects.filter(appointment=obj.appointment)
+            appointments = str(AppointmentService.objects.filter(appointment=obj.appointment))
             output = []
             for appointment in appointments:
                 service = {

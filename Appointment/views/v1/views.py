@@ -2437,7 +2437,7 @@ def get_appointment_logs(request):
         )
     appointment_logs = AppointmentLogs.objects.filter(location__id=location_id, location__is_deleted=False).order_by('-created_at')
     
-    serialized = AppointmenttLogSerializer(appointment_logs, context = {'request' : request, })
+    serialized = AppointmenttLogSerializer(appointment_logs, many=True, context = {'request' : request, })
     
     
     return Response(
