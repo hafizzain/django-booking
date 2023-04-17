@@ -904,10 +904,7 @@ class AppointmenttLogSerializer(serializers.ModelSerializer):
     logged_by = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
     
-    log_details = serializers.ListField(
-        child=serializers.DictField(),
-        read_only=True,
-    )
+    log_details = serializers.SerializerMethodField(read_only=True)
     # date_time = serializers.DateTimeField(source='created_at', format="%Y-%m-%d %H:%M:%S")
 
     def get_location(self, obj):
@@ -936,7 +933,7 @@ class AppointmenttLogSerializer(serializers.ModelSerializer):
                 service = {
                     'service': appointment.service.name,
                     'duration': appointment.duration,
-                    'start_time': appointment.start_time,
+                    'appointment_time': appointment.appointment_time,
                     'assigned_staff': appointment.member.full_name,
                 }
                 output.append(service)
@@ -946,5 +943,5 @@ class AppointmenttLogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AppointmentLogs
-        fields = ('id', 'log_type', 'logged_by', 'log_details', 'location')
+        fields = ('id', 'log_type', 'logged_by', 'log_details')
         
