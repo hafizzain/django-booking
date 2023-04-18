@@ -307,12 +307,19 @@ class AssetDocument(models.Model):
         return str(self.id)
     
 class Vacation(models.Model):
+
+    HOLIDAY_TYPE = (
+        ('Vacation', 'Vacation'),
+        ('Absence', 'Absence'),
+    )
     
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null = True, related_name='user_vacation')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, null = True , related_name='business_vacation')
     
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_vacation')
+
+    holiday_type = models.CharField(choices=HOLIDAY_TYPE, default='Vacation', max_length=100)
     
     from_date = models.DateField(verbose_name = 'From Date', null=True)
     to_date = models.DateField(verbose_name = 'To Date', null=True)
