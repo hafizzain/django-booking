@@ -379,7 +379,7 @@ class LoyaltyPoints(models.Model):
 class ClientLoyaltyPoint(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
 
-    location = models.ForeignKey(LoyaltyPoints, on_delete=models.CASCADE, related_name="location_client_loyalty_points")
+    location = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, related_name="location_client_loyalty_points")
     client = models.ForeignKey(Client, on_delete=models.CASCADE,  related_name="client_loyalty_points" )
     loyalty_points = models.ForeignKey(LoyaltyPoints, on_delete=models.CASCADE,  related_name="loyalty_points_clients" )
     total_earn = models.PositiveIntegerField(default=0, null=True, blank=True)
@@ -395,7 +395,7 @@ class ClientLoyaltyPoint(models.Model):
     
 class LoyaltyPointLogs(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
-    location = models.ForeignKey(LoyaltyPoints, on_delete=models.CASCADE, related_name="location_loyaltypointlogs")
+    location = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, related_name="location_loyaltypointlogs")
     client = models.ForeignKey(Client, on_delete=models.CASCADE,  related_name="client_loyaltypointlogs" )
     loyalty_points = models.PositiveIntegerField(default=0, null=True, blank=True)
     total_earn = models.PositiveIntegerField(default=0, null=True, blank=True)
