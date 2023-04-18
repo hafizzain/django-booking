@@ -3384,6 +3384,158 @@ def create_vacation_emp(request):
     #         },
     #         status=status.HTTP_201_CREATED
     #     ) 
+
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_absence(request):
+    user = request.user
+    business_id = request.data.get('business', None)
+    
+    employee = request.data.get('employee', None)
+    day = request.data.get('day', None)
+    
+    start_time = request.data.get('start_time', None)
+    end_time = request.data.get('end_time', None)
+    
+    start_time_shift = request.data.get('start_time_shift', None)
+    end_time_shift = request.data.get('end_time_shift', None)
+    
+    from_date = request.data.get('from_date', None)
+    to_date = request.data.get('to_date', None)
+    note = request.data.get('note', None)
+
+    is_vacation = request.data.get('is_vacation', None)
+    
+    is_leave = request.data.get('is_leave', None)
+    is_off = request.data.get('is_off', None)
+    
+    if not all([business_id,employee ]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                          'business',
+                          'employee'
+                            ]
+                    }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        business = Business.objects.get(id=business_id)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'response' : {
+                    'message' : 'Business not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    try:
+        employee_id=Employee.objects.get(id=employee, is_deleted = False)
+    except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'response' : {
+                    'message' : 'Employee not found',
+                    'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    
+    # from_date ='2023-01-04'
+    # to_date ='2023-01-06'
+    
+    from_date = datetime.strptime(from_date, "%Y-%m-%d")
+    to_date = datetime.strptime(to_date, "%Y-%m-%d")
+    diff = to_date - from_date 
+    #print(diff.days)
+    working_sch = None
+    days = int(diff.days)
+    if days > 0 :
+        for i, value in enumerate(range(days+1)):
+            if i == 0:
+                from_date = from_date + timedelta(days=i)
+            else:
+                from_date = from_date + timedelta(days=1)
+            try:
+                working_sch = EmployeDailySchedule.objects.get(
+                    employee = employee_id,   
+                    date = from_date
+                )
+            except Exception as err:
+                pass
+            
+            if working_sch is not None:
+                #date_obj = datetime.fromisoformat(from_date)
+                
+                working_sch.is_vacation = True
+                working_sch.from_date = from_date
+                working_sch.save()
+                working_sch = None
+                
+            else:   
+                working_schedule = EmployeDailySchedule.objects.create(
+                    user = user,
+                    business = business ,
+                    employee = employee_id,
+                    day = day,
+                    start_time = start_time,
+                    end_time = end_time,
+                    start_time_shift = start_time_shift,
+                    end_time_shift = end_time_shift,
+                    
+                    date = from_date,
+                    from_date =from_date,
+                    to_date = to_date,
+                    note = note,
+                    
+                )    
+                if is_vacation is not None:
+                    working_schedule.is_vacation = True
+                else:
+                    working_schedule.is_vacation = False
+                    
+                if is_leave is not None:
+                    working_schedule.is_leave = True
+                else:
+                    working_schedule.is_leave = False
+                if is_off is not None:
+                    working_schedule.is_off = True
+                else:
+                    working_schedule.is_off = False
+                
+                working_schedule.save()
+            
+    all_employe= EmployeDailySchedule.objects.all().order_by('created_at')
+    serialized = ScheduleSerializer(all_employe, many=True, context={'request' : request})
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Absense Schedule',
+                'error_message' : None,
+                'schedule' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+        
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -3522,6 +3674,26 @@ def get_workingschedule(request):
         status=status.HTTP_200_OK
     )
     
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_absence(request):
+    all_employe= EmployeDailySchedule.objects.all().order_by('created_at')
+    serialized = ScheduleSerializer(all_employe, many=True, context={'request' : request})
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Absense Schedule',
+                'error_message' : None,
+                'schedule' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_workingschedule(request):
@@ -3571,6 +3743,132 @@ def delete_workingschedule(request):
         },
         status=status.HTTP_200_OK
     )  
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_absence(request):
+    schedule_id = request.data.get('id', None)
+    if schedule_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        schedule = EmployeDailySchedule.objects.get(id=schedule_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Absense Schedule ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    schedule.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Absense Schedule deleted successfully',
+                'error_message' : None
+            }
+        },
+        status=status.HTTP_200_OK
+    )  
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_absence(request): 
+    schedule_id = request.data.get('schedule_id', None)
+    employee = request.data.get('employee', None)
+    
+    if schedule_id is None:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'schedule_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+        
+    try:
+        schedule = EmployeDailySchedule.objects.get(id = schedule_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code_text' : 'INVALID_SCHEDULE_ID',
+                'response' : {
+                    'message' : 'Absense Schedule Not Found',
+                    'error_message' : str(err),
+                }
+            },
+                status=status.HTTP_404_NOT_FOUND
+        )
+    
+    if employee is not None:
+        try:
+            emp = Employee.objects.get(id=employee)
+            schedule.employee = emp
+        except Exception as err:
+            pass
+        
+    schedule.save()
+    serializer = ScheduleSerializer(schedule, data=request.data, partial=True,context={'request' : request})
+    if not serializer.is_valid():
+        return Response(
+                {
+            'status' : False,
+            'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+            'response' : {
+                'message' : 'Schedule Serializer Invalid',
+                'error_message' : serializer.errors,
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+        )
+    serializer.save()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Absense Schedule Updated Successfully',
+                'error_message' : None,
+                'schedule' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+        )
+
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -3644,6 +3942,7 @@ def update_workingschedule(request):
         },
         status=status.HTTP_200_OK
         )
+
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

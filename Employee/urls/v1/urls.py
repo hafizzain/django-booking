@@ -67,6 +67,12 @@ urlpatterns = [
     path('get_vacation/', views.get_workingschedule),
     path('delete_vacation/', views.delete_workingschedule),
     path('update_vacation/', views.update_workingschedule),
+
+    # Absence for Employee
+    path('create_absence/', views.create_absence),
+    path('get_absence/', views.get_absence),
+    path('delete_absence/', views.delete_absence),
+    path('update_absence/', views.update_absence),
     
     #Working Schecule for Employee
     path('create_workingschedule/', views.create_workingschedule),
