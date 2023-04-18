@@ -1130,3 +1130,31 @@ class UserEmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'access_token', 'domain','employee',]
+
+
+
+class NewVacationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Vacation
+        fields = ('id', 'from_date', 'to_date')
+        
+class NewScheduleSerializer(serializers.ModelSerializer):
+    employee = serializers.SerializerMethodField(read_only=True)
+    vacation_details = serializers.SerializerMethodField(read_only=True)
+
+    def get_employee(self, obj):
+        try:
+            data = Employee.objects.get(id=str(obj.employee))
+            return EmployeeNameSerializer(data, context=self.context).data
+        except Exception as err:
+            print(err)
+    
+    def get_vacation_details(self, obj):
+        vacation_qs = obj.employee.vacations.filter(
+            from_date__lte=obj.date, to_date__gte=obj.date
+        )
+        return VacationSerializer(vacation_qs, many=True).data
+
+    class Meta:
+        model = EmployeDailySchedule
+        fields = ('id', 'image', 'employee', 'from_date', 'to_date', 'vacation_details')

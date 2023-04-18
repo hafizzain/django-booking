@@ -3861,7 +3861,7 @@ def update_absence(request):
             'status' : True,
             'status_code' : 200,
             'response' : {
-                'message' : 'Absense Schedule Updated Successfully',
+                'message' : 'Schedule Updated Successfully',
                 'error_message' : None,
                 'schedule' : serializer.data
             }

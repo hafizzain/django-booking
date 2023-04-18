@@ -349,6 +349,7 @@ class EmployeDailySchedule(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_employedailyschedule')
     day = models.CharField(choices=DAYS_CHOICE, default='Monday', max_length=50, null=True, blank = True)
     #today_date = models.DateField(verbose_name = 'Today Date', null=True)
+    vacation=models.ForeignKey(Vacation, on_delete=models.SET_NULL, null=True ,blank=True, related_name='vacation_employedailyschedules')
     
     start_time = models.TimeField(null=True, blank=True)
     end_time = models.TimeField(null=True, blank=True)
