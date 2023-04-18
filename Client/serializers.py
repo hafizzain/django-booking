@@ -6,7 +6,7 @@ from Product.models import Product
 from Service.models import Service
 from Utility.models import Country, State, City
 
-from Client.models import Client, ClientGroup, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription, Promotion , Rewards , Membership, Vouchers
+from Client.models import Client, ClientGroup, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription, Promotion , Rewards , Membership, Vouchers, ClientLoyaltyPoint
 
 class LocationSerializerLoyalty(serializers.ModelSerializer):
     
@@ -203,4 +203,18 @@ class LoyaltyPointsSerializer(serializers.ModelSerializer):
             print(err)
     class Meta:
         model = LoyaltyPoints
+        fields = '__all__'
+        
+
+class ClientLoyaltyPointSerializer(serializers.ModelSerializer):
+    # location = serializers.SerializerMethodField(read_only=True)
+    
+    # def get_location(self, obj):
+    #     try:
+    #         loc = BusinessAddress.objects.get(id = obj.location.id)
+    #         return LocationSerializerLoyalty(loc).data
+    #     except Exception as err:
+    #         print(err)
+    class Meta:
+        model = ClientLoyaltyPoint
         fields = '__all__'

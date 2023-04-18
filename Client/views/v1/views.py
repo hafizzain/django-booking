@@ -12,8 +12,8 @@ from Service.models import Service
 from Business.models import Business, BusinessAddress
 from Product.models import Product
 from Utility.models import Country, Currency, ExceptionRecord, Language, State, City
-from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers
-from Client.serializers import ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer
+from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers, ClientLoyaltyPoint
+from Client.serializers import ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer, ClientLoyaltyPointSerializer
 from Utility.models import NstyleFile
 
 import json
@@ -2392,6 +2392,68 @@ def get_loyalty(request):
                 'message' : 'All Loyalty',
                 'error_message' : None,
                 'loyalty' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+    
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_client_available_loyalty_points(request):
+    location_id = request.GET.get('location_id', None)
+    client_id = request.GET.get('client_id', None)
+
+    try:
+        loyalty_point = LoyaltyPoints.objects.get(
+            location__id = location_id,
+            is_active = True,
+            is_deleted = False
+        )
+    except Exception as error:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'response' : {
+                    'message' : 'No Loyalty point found on this location',
+                    'error_message' : str(error),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    try:
+        client_loyalty_points = ClientLoyaltyPoint.objects.get(
+            is_active = True,
+            is_deleted = False,
+            location__id = location_id,
+            client__id = client_id,
+            loyalty_points = loyalty_point
+        )
+    except Exception as error:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'response' : {
+                    'message' : 'No Loyalty point found on this location against this Client',
+                    'error_message' : str(error),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    data = ClientLoyaltyPointSerializer(client_loyalty_points).data
+       
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Client Available Loyalty Points',
+                'error_message' : None,
+                'client_loyalty_points' : data
             }
         },
         status=status.HTTP_200_OK
