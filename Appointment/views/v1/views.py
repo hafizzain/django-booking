@@ -780,6 +780,8 @@ def update_appointment(request):
         service_appointment.member = employee
         service_appointment.appointment_time = start_time
         service_appointment.save()
+
+        
     
     serializer = UpdateAppointmentSerializer(service_appointment , data=request.data, partial=True)
     if not serializer.is_valid():
@@ -803,6 +805,32 @@ def update_appointment(request):
         except Exception as err:
             print(err)
             pass
+    else:
+        active_user_staff = None
+        try:
+            active_user_staff = Employee.objects.get(
+                email = request.user.email,
+                is_deleted = False,
+                is_active = True,
+                is_blocked = False
+            )
+        except:
+            pass
+        
+        appointment_logs = AppointmentLogs.objects.create( 
+            location = service_appointment.business_address,
+            appointment = service_appointment,
+            log_type = 'Cancel',
+            member = active_user_staff
+        )
+        LogDetails.objects.create(
+            log = appointment_logs,
+            appointment_service = service_appointment,
+            start_time = service_appointment.appointment_time,
+            duration = service_appointment.duration,
+            member = service_appointment.member
+        )
+        
 
     # if appointment_status == 'Cancel':
     #     try:
@@ -812,7 +840,7 @@ def update_appointment(request):
     #         print(err)
     #         pass
         
-    else :
+    # else :
         # try:
         #     thrd = Thread(target=reschedule_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant})
         #     thrd.start()
