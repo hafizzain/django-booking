@@ -33,7 +33,7 @@ from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
 from django.db.models import Q
-from Client.models import Client, ClientPackageValidation, ClientPromotions, Membership, Promotion, Rewards, Vouchers, LoyaltyPoints
+from Client.models import Client, ClientPackageValidation, ClientPromotions, Membership, Promotion, Rewards, Vouchers, LoyaltyPoints, ClientLoyaltyPoint
 from datetime import date, timedelta
 from threading import Thread
 from django.db.models import F
@@ -1546,8 +1546,31 @@ def create_checkout(request):
     # checkout.business_address = service_appointment.business_address
     # checkout.save()
 
-    Loyal
-    
+
+    if appointments.client:
+        allowed_points = LoyaltyPoints.objects.filter(
+            Q(loyaltytype = 'Service') |
+            Q(loyaltytype = 'Both'),
+            location = business_address,
+            amount_spend = 0,
+            is_active = True,
+            is_deleted = False
+        )
+        if len(allowed_points) > 0:
+            point = allowed_points[0]
+            clinet_poitns, created = ClientLoyaltyPoint.objects.get_or_create(
+                location = business_address,
+                client = appointments.client,
+                loyalty_points = point
+            )
+
+            if created :
+                clinet_poitns.total_earn = point.number_points
+            else:
+                clinet_poitns.total_earn = int(clinet_poitns.total_earn) + int(point.number_points)
+            
+            clinet_poitns.save()
+            
     serialized = CheckoutSerializer(checkout)
     return Response(
             {
