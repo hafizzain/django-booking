@@ -33,7 +33,7 @@ from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
 from django.db.models import Q
-from Client.models import Client, ClientPackageValidation, ClientPromotions, Membership, Promotion, Rewards, Vouchers
+from Client.models import Client, ClientPackageValidation, ClientPromotions, Membership, Promotion, Rewards, Vouchers, LoyaltyPoints
 from datetime import date, timedelta
 from threading import Thread
 from django.db.models import F
@@ -1545,6 +1545,8 @@ def create_checkout(request):
     )
     # checkout.business_address = service_appointment.business_address
     # checkout.save()
+
+    Loyal
     
     serialized = CheckoutSerializer(checkout)
     return Response(
