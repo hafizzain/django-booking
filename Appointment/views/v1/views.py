@@ -1552,7 +1552,7 @@ def create_checkout(request):
             Q(loyaltytype = 'Service') |
             Q(loyaltytype = 'Both'),
             location = business_address,
-            amount_spend = 0,
+            amount_spend = checkout.total_price,
             is_active = True,
             is_deleted = False
         )
