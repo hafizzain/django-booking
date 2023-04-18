@@ -4,8 +4,29 @@ from .models import Client, ClientGroup, Subscription , Membership , Vouchers , 
 admin.site.register(DiscountMembership)
 admin.site.register(ClientPackageValidation)
 admin.site.register(CurrencyPriceMembership)
-admin.site.register(LoyaltyPoints)
-admin.site.register(ClientLoyaltyPoint)
+
+
+
+@admin.register(LoyaltyPoints)
+class LoyaltyPointsAdmin(admin.ModelAdmin):
+    list_display= [
+        'id',
+        'amount_spend',
+        'number_points',
+        'earn_points',
+        'total_earn_from_points',
+    ]
+
+
+@admin.register(ClientLoyaltyPoint)
+class ClientLoyaltyPointAdmin(admin.ModelAdmin):
+    list_display= [
+        'id',
+        'total_amount',
+        'total_earn',
+        'for_every_points',
+        'customer_will_get_amount',
+    ]
 @admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
     list_display= [

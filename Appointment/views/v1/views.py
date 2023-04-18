@@ -1566,6 +1566,10 @@ def create_checkout(request):
 
             if created :
                 clinet_poitns.total_earn = point.number_points
+                clinet_poitns.total_amount = point.amount_spend
+                clinet_poitns.for_every_points = point.earn_points
+                clinet_poitns.customer_will_get_amount = point.total_earn_from_points
+
             else:
                 clinet_poitns.total_earn = int(clinet_poitns.total_earn) + int(point.number_points)
             

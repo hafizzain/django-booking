@@ -382,7 +382,14 @@ class ClientLoyaltyPoint(models.Model):
     location = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, related_name="location_client_loyalty_points")
     client = models.ForeignKey(Client, on_delete=models.CASCADE,  related_name="client_loyalty_points" )
     loyalty_points = models.ForeignKey(LoyaltyPoints, on_delete=models.CASCADE,  related_name="loyalty_points_clients" )
-    total_earn = models.PositiveIntegerField(default=0, null=True, blank=True)
+
+
+    total_amount = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name='Number of Total Amount (Amount to Spend)')
+    total_earn = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name='Total Number Of Points')
+
+    for_every_points = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name='For every (this) points')
+    customer_will_get_amount = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name='a customer will get (this) amount')
+
 
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(auto_now_add=now, null=True)
