@@ -3733,7 +3733,9 @@ def get_vacations(request):
 
     allvacations = Vacation.objects.filter(
         # employee = employee, 
-        employee__location = location,     
+        location = location, 
+        is_deleted=False, 
+        is_blocked=False
     )
     
     serialized = NewVacationSerializer(allvacations, many=True, context={'request' : request})

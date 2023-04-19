@@ -218,3 +218,36 @@ class ClientLoyaltyPointSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientLoyaltyPoint
         fields = '__all__'
+    
+class CustomerLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
+
+    customer = serializers.SerializerMethodField()
+    loyalty = serializers.SerializerMethodField()
+    points_earned = serializers.SerializerMethodField()
+    points_redeemed = serializers.SerializerMethodField()
+    balance = serializers.SerializerMethodField()
+
+    def get_customer(self, c_points):
+        return {
+            'customer_id' : f'{c_points.client.client_id}',
+            'customer_name' : f'{c_points.client.full_name}',
+        }
+
+    def get_loyalty(self, c_points):
+        return {
+            'loyalty_name' : f'{c_points.loyalty_points.name}'
+        }
+
+    def get_points_earned(self, c_points):
+        return c_points.total_earn
+
+    def get_points_redeemed(self, c_points):
+        return c_points.points_redeemed
+
+    def get_balance(self, c_points):
+        return 0
+
+
+    class Meta:
+        model = ClientLoyaltyPoint
+        fields = ['customer', 'loyalty', 'points_earned', 'points_redeemed', 'balance']
