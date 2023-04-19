@@ -3,9 +3,14 @@ from django.contrib import admin
 from .models import(CommissionSchemeSetting, EmployeDailySchedule, Employee, EmployeeProfessionalInfo, EmployeePermissionSetting, EmployeeModulePermission, 
                     EmployeeMarketingPermission ,StaffGroup , CategoryCommission,
                     StaffGroupModulePermission , Attendance , 
-                    Payroll, Asset, AssetDocument, EmployeeSelectedService )
+                    Payroll, Asset, AssetDocument, EmployeeSelectedService, Vacation )
 # Register your models here.
 
+@admin.register(Vacation)
+class VacationAdmin:
+    list_display = ['id', 'from_date', 'to_date']
+
+    
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = [
