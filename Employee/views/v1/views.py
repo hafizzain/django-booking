@@ -3679,7 +3679,7 @@ def create_workingschedule(request):
 @permission_classes([AllowAny])
 def get_vacations(request):
     # employee_id = request.data.get('employee', None)
-    location = request.data.get('location', None)
+    location = request.GET.get('location', None)
 
     if not all([location]):
         return Response(

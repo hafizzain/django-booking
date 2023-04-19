@@ -2743,7 +2743,7 @@ def get_client_package(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_loyalty_points_logs(request):
+def get_customer_loyalty_points_logs(request):
     location_id = request.GET.get('location_id', None)
     client_id = request.GET.get('client_id', None)
 
