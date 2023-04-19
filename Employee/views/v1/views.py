@@ -20,7 +20,7 @@ from Employee.serializers import( EmployeSerializer , EmployeInformationsSeriali
                           ,  EmployeeMarketingSerializers, Payroll_Working_device_attendence_ScheduleSerializer, Payroll_Working_deviceScheduleSerializer, Payroll_WorkingScheduleSerializer, SallarySlipPayrolSerializers, ScheduleSerializer, SingleEmployeeInformationSerializer, StaffGroupSerializers , 
                           StaffpermisionSerializers , AttendanceSerializers
                           ,PayrollSerializers, UserEmployeeSerializer, VacationSerializer,singleEmployeeSerializer , CommissionSerializer
-                          , AssetSerializer, WorkingScheduleSerializer
+                          , AssetSerializer, WorkingScheduleSerializer,NewScheduleSerializer,NewVacationSerializer,
                         
                           
                                  )
@@ -3656,11 +3656,83 @@ def create_workingschedule(request):
             status=status.HTTP_201_CREATED
         ) 
 
+# @api_view(['GET'])
+# @permission_classes([AllowAny])
+# def get_workingschedule(request):
+#     all_employe= EmployeDailySchedule.objects.all().order_by('created_at')
+#     serialized = NewScheduleSerializer(all_employe, many=True, context={'request' : request})
+#     return Response(
+#         {
+#             'status' : 200,
+#             'status_code' : '200',
+#             'response' : {
+#                 'message' : 'All Schedule',
+#                 'error_message' : None,
+#                 'schedule' : serialized.data
+#             }
+#         },
+#         status=status.HTTP_200_OK
+#     )
+
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_workingschedule(request):
-    all_employe= EmployeDailySchedule.objects.all().order_by('created_at')
-    serialized = ScheduleSerializer(all_employe, many=True, context={'request' : request})
+def get_vacations(request):
+    employee_id = request.data.get('employee', None)
+    location = request.data.get('location', None)
+
+    if not all([employee_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Employee id are required',
+                    'fields' : [
+                        'employee_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try: 
+        employee = Employee.objects.get(id=employee_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                    'response' : {
+                        'message' : 'Employee Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    try:
+        location =  BusinessAddress.objects.get(id = str(location))
+    except Exception as err:
+        return Response(
+            {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                    'response' : {
+                        'message' : 'location is Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+        )
+    
+    # employee= Employee.objects.get(id = employee_id.id, is_deleted=False, is_blocked=False)
+
+    allvacations = Vacation.objects.filter(employee = employee, location = location, is_deleted=False, is_blocked=False)
+    serialized = NewVacationSerializer(allvacations, many=True, context={'request' : request})
     return Response(
         {
             'status' : 200,
@@ -3673,19 +3745,72 @@ def get_workingschedule(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_absence(request):
-    all_employe= EmployeDailySchedule.objects.all().order_by('created_at')
-    serialized = ScheduleSerializer(all_employe, many=True, context={'request' : request})
+    employee_id = request.data.get('employee', None)
+    location = request.data.get('location', None)
+
+    if not all([employee_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Employee id are required',
+                    'fields' : [
+                        'employee_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try: 
+        employee = Employee.objects.get(id=employee_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                    'response' : {
+                        'message' : 'Employee Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    try:
+        location =  BusinessAddress.objects.get(id = str(location))
+    except Exception as err:
+        return Response(
+            {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                    'response' : {
+                        'message' : 'location is Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+        )
+    
+    # employee= Employee.objects.get(id = employee_id.id, is_deleted=False, is_blocked=False)
+
+    allvacations = Vacation.objects.filter(employee = employee, location = location, is_deleted=False, is_blocked=False)
+    serialized = NewVacationSerializer(allvacations, many=True, context={'request' : request})
     return Response(
         {
             'status' : 200,
             'status_code' : '200',
             'response' : {
-                'message' : 'All Absense Schedule',
+                'message' : 'All Schedule',
                 'error_message' : None,
                 'schedule' : serialized.data
             }
@@ -3861,7 +3986,7 @@ def update_absence(request):
             'status' : True,
             'status_code' : 200,
             'response' : {
-                'message' : 'Absense Schedule Updated Successfully',
+                'message' : 'Schedule Updated Successfully',
                 'error_message' : None,
                 'schedule' : serializer.data
             }
