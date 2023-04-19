@@ -3726,7 +3726,7 @@ def get_vacations(request):
     #             status=status.HTTP_404_NOT_FOUND
     #         )
     try:
-        location =  Employee.objects.get(location =location)
+        location =  BusinessAddress.objects.get(id =location)
     except Exception as err:
         return Response(
             {
@@ -3745,9 +3745,9 @@ def get_vacations(request):
 
     allvacations = Vacation.objects.filter(
         # employee = employee, 
-        location = location, 
-        is_deleted=False, 
-        is_blocked=False
+        employee__location = location,
+        is_active = True,  
+        
     )
     
     serialized = NewVacationSerializer(allvacations, many=True, context={'request' : request})
@@ -3803,7 +3803,7 @@ def get_absence(request):
     #             status=status.HTTP_404_NOT_FOUND
     #         )
     try:
-        location =  Employee.objects.get(location =location)
+        location =  BusinessAddress.objects.get(id =location)
     except Exception as err:
         return Response(
             {
@@ -3822,9 +3822,9 @@ def get_absence(request):
 
     allvacations = Vacation.objects.filter(
         # employee = employee, 
-        location = location, 
-        is_deleted=False, 
-        is_blocked=False
+        employee__location = location,
+        is_active = True, 
+        
     )
     
     serialized = NewAbsenceSerializer(allvacations, many=True, context={'request' : request})
