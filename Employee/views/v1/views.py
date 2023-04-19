@@ -3678,10 +3678,10 @@ def create_workingschedule(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_vacations(request):
-    employee_id = request.data.get('employee', None)
+    # employee_id = request.data.get('employee', None)
     location = request.data.get('location', None)
 
-    if not all([employee_id]):
+    if not all([location]):
         return Response(
             {
                 'status' : False,
@@ -3689,30 +3689,30 @@ def get_vacations(request):
                 'status_code_text' : 'MISSING_FIELDS_4001',
                 'response' : {
                     'message' : 'Invalid Data!',
-                    'error_message' : 'Employee id are required',
+                    'error_message' : 'Missing Fields',
                     'fields' : [
-                        'employee_id',
+                        'location',
                     ]
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    try: 
-        employee = Employee.objects.get(id=employee_id, is_deleted=False)
-    except Exception as err:
-        return Response(
-                {
-                    'status' : False,
-                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
-                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
-                    'response' : {
-                        'message' : 'Employee Not Found',
-                        'error_message' : str(err),
-                    }
-                },
-                status=status.HTTP_404_NOT_FOUND
-            )
+    # try: 
+    #     employee = Employee.objects.get(id=employee_id, is_deleted=False)
+    # except Exception as err:
+    #     return Response(
+    #             {
+    #                 'status' : False,
+    #                 'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+    #                 'status_code_text' : 'INVALID_EMPLOYEE_4025',
+    #                 'response' : {
+    #                     'message' : 'Employee Not Found',
+    #                     'error_message' : str(err),
+    #                 }
+    #             },
+    #             status=status.HTTP_404_NOT_FOUND
+    #         )
     try:
         location =  BusinessAddress.objects.get(id = str(location))
     except Exception as err:
@@ -3731,7 +3731,12 @@ def get_vacations(request):
     
     # employee= Employee.objects.get(id = employee_id.id, is_deleted=False, is_blocked=False)
 
-    allvacations = Vacation.objects.filter(employee = employee, location = location, is_deleted=False, is_blocked=False)
+    allvacations = Vacation.objects.filter(
+        # employee = employee, 
+        location = location, 
+        is_deleted=False, 
+        is_blocked=False
+    )
     serialized = NewVacationSerializer(allvacations, many=True, context={'request' : request})
     return Response(
         {
