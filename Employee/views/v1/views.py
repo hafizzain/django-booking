@@ -3803,7 +3803,7 @@ def get_absence(request):
     
     # employee= Employee.objects.get(id = employee_id.id, is_deleted=False, is_blocked=False)
 
-    allvacations = Vacation.objects.get(employee = employee, location = location, is_deleted=False, is_blocked=False)
+    allvacations = Vacation.objects.filter(employee = employee, location = location, is_deleted=False, is_blocked=False)
     serialized = NewVacationSerializer(allvacations, many=True, context={'request' : request})
     return Response(
         {
