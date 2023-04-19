@@ -20,7 +20,7 @@ from Employee.serializers import( EmployeSerializer , EmployeInformationsSeriali
                           ,  EmployeeMarketingSerializers, Payroll_Working_device_attendence_ScheduleSerializer, Payroll_Working_deviceScheduleSerializer, Payroll_WorkingScheduleSerializer, SallarySlipPayrolSerializers, ScheduleSerializer, SingleEmployeeInformationSerializer, StaffGroupSerializers , 
                           StaffpermisionSerializers , AttendanceSerializers
                           ,PayrollSerializers, UserEmployeeSerializer, VacationSerializer,singleEmployeeSerializer , CommissionSerializer
-                          , AssetSerializer, WorkingScheduleSerializer,NewScheduleSerializer,
+                          , AssetSerializer, WorkingScheduleSerializer,NewScheduleSerializer,NewVacationSerializer,
                         
                           
                                  )
@@ -3656,11 +3656,48 @@ def create_workingschedule(request):
             status=status.HTTP_201_CREATED
         ) 
 
+# @api_view(['GET'])
+# @permission_classes([AllowAny])
+# def get_workingschedule(request):
+#     all_employe= EmployeDailySchedule.objects.all().order_by('created_at')
+#     serialized = NewScheduleSerializer(all_employe, many=True, context={'request' : request})
+#     return Response(
+#         {
+#             'status' : 200,
+#             'status_code' : '200',
+#             'response' : {
+#                 'message' : 'All Schedule',
+#                 'error_message' : None,
+#                 'schedule' : serialized.data
+#             }
+#         },
+#         status=status.HTTP_200_OK
+#     )
+
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_workingschedule(request):
-    all_employe= EmployeDailySchedule.objects.all().order_by('created_at')
-    serialized = ScheduleSerializer(all_employe, many=True, context={'request' : request})
+def get_vacations(request):
+    employee_id = request.GET.get('id', None)
+    
+    try: 
+        employee_id = Employee.objects.get(id=employee_id, is_deleted=False)
+    except Exception as err:
+        return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
+                    'response' : {
+                        'message' : 'Employee Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+    # all_employe= EmployeDailySchedule.objects.all().order_by('created_at')
+    serialized = NewVacationSerializer(employee_id, many=True, context={'request' : request})
     return Response(
         {
             'status' : 200,
@@ -3673,7 +3710,7 @@ def get_workingschedule(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
