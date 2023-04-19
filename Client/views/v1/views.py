@@ -13,7 +13,7 @@ from Business.models import Business, BusinessAddress
 from Product.models import Product
 from Utility.models import Country, Currency, ExceptionRecord, Language, State, City
 from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs
-from Client.serializers import ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer, ClientLoyaltyPointSerializer
+from Client.serializers import ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer, ClientLoyaltyPointSerializer, CustomerLoyaltyPointsLogsSerializer
 from Utility.models import NstyleFile
 
 import json
@@ -2746,11 +2746,31 @@ def get_client_package(request):
 def get_customers_loyalty_points_logs(request):
     location_id = request.GET.get('location_id', None)
 
+
+    if not all([location_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'location_id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
     customers_points = ClientLoyaltyPoint.objects.filter(
         location__id = location_id,
         is_active = True,
         is_deleted = False
     )
+
+    data = CustomerLoyaltyPointsLogsSerializer(customers_points, many=True).data
 
     return Response(
         {
@@ -2760,7 +2780,7 @@ def get_customers_loyalty_points_logs(request):
             'response' : {
                 'message' : 'Loyalty Points Logs',
                 'error_message' : None,
-                'data' : []
+                'data' : data
             }
         },
         status=status.HTTP_200_OK
