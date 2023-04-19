@@ -2497,8 +2497,9 @@ def get_employee_check_availability_list(request):
 @permission_classes([AllowAny])
 def get_appointment_logs(request):
     location_id = request.GET.get('location_id', None)
+    appointment_id = request.GET.get('appointment_id', None)
 
-    if not all([location_id]):
+    if not all([location_id, appointment_id]):
         return Response(
             {
                 'status' : False,
@@ -2509,6 +2510,7 @@ def get_appointment_logs(request):
                     'error_message' : 'All fields are required.',
                     'fields' : [
                         'location_id',
+                        'appointment_id',
                     ]
                 }
             },
@@ -2532,7 +2534,10 @@ def get_appointment_logs(request):
 
     appointment_logs = AppointmentLogs.objects.filter(
         location__id = location_id, 
-        location__is_deleted = False
+        appointment__id = appointment_id,
+        location__is_deleted = False,
+        is_deleted = False,
+        is_active = True,
     ).order_by('-created_at')
     
     serialized = AppointmenttLogSerializer(appointment_logs, many=True)

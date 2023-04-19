@@ -1156,7 +1156,7 @@ class NewVacationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Vacation
-        fields = ('id', 'image', 'employee', 'from_date', 'to_date', 'vacation_details',)
+        fields = ('id', 'employee', 'from_date', 'to_date', 'vacation_details',)
     
     
         
