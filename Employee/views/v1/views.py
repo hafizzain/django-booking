@@ -20,7 +20,7 @@ from Employee.serializers import( EmployeSerializer , EmployeInformationsSeriali
                           ,  EmployeeMarketingSerializers, Payroll_Working_device_attendence_ScheduleSerializer, Payroll_Working_deviceScheduleSerializer, Payroll_WorkingScheduleSerializer, SallarySlipPayrolSerializers, ScheduleSerializer, SingleEmployeeInformationSerializer, StaffGroupSerializers , 
                           StaffpermisionSerializers , AttendanceSerializers
                           ,PayrollSerializers, UserEmployeeSerializer, VacationSerializer,singleEmployeeSerializer , CommissionSerializer
-                          , AssetSerializer, WorkingScheduleSerializer
+                          , AssetSerializer, WorkingScheduleSerializer,NewScheduleSerializer,
                         
                           
                                  )
@@ -3679,7 +3679,7 @@ def get_workingschedule(request):
 @permission_classes([AllowAny])
 def get_absence(request):
     all_employe= EmployeDailySchedule.objects.all().order_by('created_at')
-    serialized = ScheduleSerializer(all_employe, many=True, context={'request' : request})
+    serialized = NewScheduleSerializer(all_employe, many=True, context={'request' : request})
     return Response(
         {
             'status' : 200,
