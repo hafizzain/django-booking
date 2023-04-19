@@ -3714,7 +3714,7 @@ def get_vacations(request):
     #             status=status.HTTP_404_NOT_FOUND
     #         )
     try:
-        location =  BusinessAddress.objects.get(id = str(location))
+        location =  Employee.objects.get(location =location)
     except Exception as err:
         return Response(
             {
@@ -3733,10 +3733,9 @@ def get_vacations(request):
 
     allvacations = Vacation.objects.filter(
         # employee = employee, 
-        location = location, 
-        is_deleted=False, 
-        is_blocked=False
+        employee__location = location,     
     )
+    
     serialized = NewVacationSerializer(allvacations, many=True, context={'request' : request})
     return Response(
         {
