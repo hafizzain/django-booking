@@ -7,10 +7,10 @@ from .models import(CommissionSchemeSetting, EmployeDailySchedule, Employee, Emp
 # Register your models here.
 
 @admin.register(Vacation)
-class VacationAdmin:
+class VacationAdmin(admin.ModelAdmin):
     list_display = ['id', 'from_date', 'to_date']
 
-    
+
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = [

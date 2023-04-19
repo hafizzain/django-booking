@@ -3756,7 +3756,7 @@ def get_vacations(request):
             'response' : {
                 'message' : 'All Schedule',
                 'error_message' : None,
-                'schedule' : serialized.data
+                'vacations' : serialized.data
             }
         },
         status=status.HTTP_200_OK
