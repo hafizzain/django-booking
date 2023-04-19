@@ -218,3 +218,8 @@ class ClientLoyaltyPointSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientLoyaltyPoint
         fields = '__all__'
+    
+class CustomerLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClientLoyaltyPoint
+        fields = ['customer', 'loyalty', 'points_earned', 'points_redeemed']

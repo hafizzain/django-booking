@@ -2743,18 +2743,15 @@ def get_client_package(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_customer_loyalty_points_logs(request):
+def get_customers_loyalty_points_logs(request):
     location_id = request.GET.get('location_id', None)
-    client_id = request.GET.get('client_id', None)
 
-    clients_ids = []
-    if client_id is not None:
-        clients_ids.append(client_id)
-
-    logs = LoyaltyPointLogs.objects.filter(
+    customers_points = ClientLoyaltyPoint.objects.filter(
         location__id = location_id,
-        client__id__in = clients_ids
+        is_active = True,
+        is_deleted = False
     )
+
     return Response(
         {
             'status' : True,

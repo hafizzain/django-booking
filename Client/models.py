@@ -387,6 +387,8 @@ class ClientLoyaltyPoint(models.Model):
     total_amount = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name='Number of Total Amount (Amount to Spend)')
     total_earn = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name='Total Number Of Points')
 
+    points_redeemed = models.PositiveIntegerField(default=0, verbose_name='Total Number Of Points Redeemed')
+
     for_every_points = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name='For every (this) points')
     customer_will_get_amount = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name='a customer will get (this) amount')
 
