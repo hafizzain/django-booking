@@ -3750,10 +3750,28 @@ def get_vacations(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_absence(request):
-    employee_id = request.GET.get('id', None)
+    employee_id = request.data.get('employee', None)
+    location = request.data.get('location', None)
+
+    if not all([employee_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Employee id are required',
+                    'fields' : [
+                        'employee_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
     
     try: 
-        employee_id = Employee.objects.get(id=employee_id, is_deleted=False)
+        employee = Employee.objects.get(id=employee_id, is_deleted=False)
     except Exception as err:
         return Response(
                 {
@@ -3767,9 +3785,26 @@ def get_absence(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
+    try:
+        location =  BusinessAddress.objects.get(id = str(location))
+    except Exception as err:
+        return Response(
+            {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                    'response' : {
+                        'message' : 'location is Not Found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+        )
+    
+    # employee= Employee.objects.get(id = employee_id.id, is_deleted=False, is_blocked=False)
 
-    # all_employe= EmployeDailySchedule.objects.all().order_by('created_at')
-    serialized = NewVacationSerializer(employee_id, many=True, context={'request' : request})
+    allvacations = Vacation.objects.get(employee = employee, location = location, is_deleted=False, is_blocked=False)
+    serialized = NewVacationSerializer(allvacations, many=True, context={'request' : request})
     return Response(
         {
             'status' : 200,
