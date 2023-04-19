@@ -58,6 +58,7 @@ urlpatterns = [
 
 
    path('get_client_available_loyalty_points/', views.get_client_available_loyalty_points),
+   path('get_loyalty_points_logs/', views.get_loyalty_points_logs),
    
    #client promotion
    path('get_complimentary/', views.get_complimentary),

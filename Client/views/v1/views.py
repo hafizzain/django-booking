@@ -12,7 +12,7 @@ from Service.models import Service
 from Business.models import Business, BusinessAddress
 from Product.models import Product
 from Utility.models import Country, Currency, ExceptionRecord, Language, State, City
-from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers, ClientLoyaltyPoint
+from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs
 from Client.serializers import ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer, ClientLoyaltyPointSerializer
 from Utility.models import NstyleFile
 
@@ -2734,6 +2734,36 @@ def get_client_package(request):
                 'error_message' : None,
                 'Errors': Error,
                 'is_expired':is_expired
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_loyalty_points_logs(request):
+    location_id = request.GET.get('location_id', None)
+    client_id = request.GET.get('client_id', None)
+
+    clients_ids = []
+    if client_id is not None:
+        clients_ids.append(client_id)
+
+    logs = LoyaltyPointLogs.objects.filter(
+        location__id = location_id,
+        client__id__in = clients_ids
+    )
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Loyalty Points Logs',
+                'error_message' : None,
+                'data' : []
             }
         },
         status=status.HTTP_200_OK
