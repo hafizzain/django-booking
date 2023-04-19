@@ -3835,7 +3835,7 @@ def get_absence(request):
             'response' : {
                 'message' : 'All Absence Schedule',
                 'error_message' : None,
-                'vacations' : serialized.data
+                'absences' : serialized.data
             }
         },
         status=status.HTTP_200_OK
