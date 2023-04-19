@@ -20,7 +20,7 @@ from Employee.serializers import( EmployeSerializer , EmployeInformationsSeriali
                           ,  EmployeeMarketingSerializers, Payroll_Working_device_attendence_ScheduleSerializer, Payroll_Working_deviceScheduleSerializer, Payroll_WorkingScheduleSerializer, SallarySlipPayrolSerializers, ScheduleSerializer, SingleEmployeeInformationSerializer, StaffGroupSerializers , 
                           StaffpermisionSerializers , AttendanceSerializers
                           ,PayrollSerializers, UserEmployeeSerializer, VacationSerializer,singleEmployeeSerializer , CommissionSerializer
-                          , AssetSerializer, WorkingScheduleSerializer,NewScheduleSerializer,NewVacationSerializer,
+                          , AssetSerializer, WorkingScheduleSerializer,NewScheduleSerializer,NewVacationSerializer,NewAbsenceSerializer,
                         
                           
                                  )
@@ -3726,7 +3726,7 @@ def get_vacations(request):
     #             status=status.HTTP_404_NOT_FOUND
     #         )
     try:
-        location =  BusinessAddress.objects.get(id = str(location))
+        location =  BusinessAddress.objects.get(id =location)
     except Exception as err:
         return Response(
             {
@@ -3745,9 +3745,11 @@ def get_vacations(request):
 
     allvacations = Vacation.objects.filter(
         # employee = employee, 
-        employee__location = location, 
-        is_active = True
+        employee__location = location,
+        is_active = True,  
+        
     )
+    
     serialized = NewVacationSerializer(allvacations, many=True, context={'request' : request})
     return Response(
         {
@@ -3766,10 +3768,9 @@ def get_vacations(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_absence(request):
-    employee_id = request.data.get('employee', None)
-    location = request.data.get('location', None)
+    location = request.GET.get('location', None)
 
-    if not all([employee_id]):
+    if not all([location]):
         return Response(
             {
                 'status' : False,
@@ -3777,32 +3778,32 @@ def get_absence(request):
                 'status_code_text' : 'MISSING_FIELDS_4001',
                 'response' : {
                     'message' : 'Invalid Data!',
-                    'error_message' : 'Employee id are required',
+                    'error_message' : 'Missing Fields',
                     'fields' : [
-                        'employee_id',
+                        'location',
                     ]
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    try: 
-        employee = Employee.objects.get(id=employee_id, is_deleted=False)
-    except Exception as err:
-        return Response(
-                {
-                    'status' : False,
-                    'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
-                    'status_code_text' : 'INVALID_EMPLOYEE_4025',
-                    'response' : {
-                        'message' : 'Employee Not Found',
-                        'error_message' : str(err),
-                    }
-                },
-                status=status.HTTP_404_NOT_FOUND
-            )
+    # try: 
+    #     employee = Employee.objects.get(id=employee_id, is_deleted=False)
+    # except Exception as err:
+    #     return Response(
+    #             {
+    #                 'status' : False,
+    #                 'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+    #                 'status_code_text' : 'INVALID_EMPLOYEE_4025',
+    #                 'response' : {
+    #                     'message' : 'Employee Not Found',
+    #                     'error_message' : str(err),
+    #                 }
+    #             },
+    #             status=status.HTTP_404_NOT_FOUND
+    #         )
     try:
-        location =  BusinessAddress.objects.get(id = str(location))
+        location =  BusinessAddress.objects.get(id =location)
     except Exception as err:
         return Response(
             {
@@ -3819,16 +3820,22 @@ def get_absence(request):
     
     # employee= Employee.objects.get(id = employee_id.id, is_deleted=False, is_blocked=False)
 
-    allvacations = Vacation.objects.filter(employee = employee, location = location, is_deleted=False, is_blocked=False)
-    serialized = NewVacationSerializer(allvacations, many=True, context={'request' : request})
+    allvacations = Vacation.objects.filter(
+        # employee = employee, 
+        employee__location = location,
+        is_active = True, 
+        
+    )
+    
+    serialized = NewAbsenceSerializer(allvacations, many=True, context={'request' : request})
     return Response(
         {
             'status' : 200,
             'status_code' : '200',
             'response' : {
-                'message' : 'All Schedule',
+                'message' : 'All Absence Schedule',
                 'error_message' : None,
-                'schedule' : serialized.data
+                'vacations' : serialized.data
             }
         },
         status=status.HTTP_200_OK
