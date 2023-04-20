@@ -6,7 +6,7 @@ from Product.models import Product
 from Service.models import Service
 from Utility.models import Country, State, City
 
-from Client.models import Client, ClientGroup, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription, Promotion , Rewards , Membership, Vouchers, ClientLoyaltyPoint
+from Client.models import Client, ClientGroup, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription, Promotion , Rewards , Membership, Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs
 
 class LocationSerializerLoyalty(serializers.ModelSerializer):
     
@@ -294,5 +294,5 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
 
 
     class Meta:
-        model = ClientLoyaltyPoint
+        model = LoyaltyPointLogs
         fields = ['customer', 'loyalty', 'points_earned', 'points_redeemed', 'balance', 'invoice', 'actual_sale_value_redeemed', 'date']

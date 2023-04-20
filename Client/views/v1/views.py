@@ -2811,7 +2811,7 @@ def get_customer_detailed_loyalty_points(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    customers_points = ClientLoyaltyPoint.objects.filter(
+    customers_points = LoyaltyPointLogs.objects.filter(
         client__id = client_id,
         location__id = location_id,
         is_active = True,
