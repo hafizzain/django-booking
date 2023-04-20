@@ -3495,7 +3495,7 @@ def create_absence(request):
             if working_sch is not None:
                 #date_obj = datetime.fromisoformat(from_date)
                 
-                working_sch.is_vacation = True
+                working_sch.is_leave = True
                 working_sch.from_date = from_date
                 working_sch.save()
                 working_sch = None
