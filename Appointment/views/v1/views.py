@@ -2208,7 +2208,7 @@ def get_employee_check_time(request):
                 'status' : True,
                 'status_code' : 200,
                 'response' : {
-                    'message' : f'{employee.full_name} isn’t available on the selected date, but your team member can still book appointments for them.',
+                    'message' : f'{employee.full_name} This staff is not working on this day but your team member can still book an appointment for them.',
                     'error_message' : f'This Employee day off, {employee.full_name} date {date} {str(err)}',
                     'Availability': False
                 }
@@ -2429,7 +2429,7 @@ def get_employee_check_availability_list(request):
                             'appointment_date': date,
                             'index': index,
                             'service': service,
-                            'message': f'{employee.full_name} isn’t available on the selected date, but your team member can still book appointments for them.',                            
+                            'message': f'{employee.full_name} This staff is not working on this day but your team member can still book an appointment for them.',                            
                         })
                 data_list.append(data_object)
                 continue

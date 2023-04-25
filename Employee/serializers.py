@@ -863,6 +863,8 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     
     schedule =  serializers.SerializerMethodField(read_only=True)
     vacation =  serializers.SerializerMethodField(read_only=True)
+
+    # absense = serializers.SerializerMethodField(read_only=True)
     
     image = serializers.SerializerMethodField()
     
@@ -880,6 +882,10 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
     def get_vacation(self, obj):
         vacation = Vacation.objects.filter(employee= obj )
         return VacationSerializer(vacation, many = True,context=self.context).data
+    
+    # def get_absense(self, obj):
+    #     absense = Vacation.objects.filter(employee= obj )
+    #     return VacationSerializer(absense, many = True,context=self.context).data
     
     def get_image(self, obj):
         if obj.image:

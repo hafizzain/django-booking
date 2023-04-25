@@ -3573,6 +3573,7 @@ def create_workingschedule(request):
     
     is_leave = request.data.get('is_leave', None)
     is_off = request.data.get('is_off', None)
+    # is_absense = request.data.get('is_leave', None)
     
     if not all([business_id,employee ]):
         return Response(
@@ -3652,6 +3653,11 @@ def create_workingschedule(request):
     else:
         working_schedule.is_off = False
     
+    # if is_absense is not None:
+    #     working_schedule.is_leave = True
+    # else:
+    #     working_schedule.is_leave = False
+
     working_schedule.save()
     serializers= ScheduleSerializer(working_schedule, context={'request' : request})
     
