@@ -3478,6 +3478,14 @@ def create_absence(request):
     #print(diff.days)
     working_sch = None
     days = int(diff.days)
+
+    empl_vacation = Vacation(
+        business = business,
+        employee = employee_id,
+        from_date = from_date,
+        to_date = to_date,
+        note = note
+    )
     if days > 0 :
         for i, value in enumerate(range(days+1)):
             if i == 0:
@@ -3496,6 +3504,8 @@ def create_absence(request):
                 #date_obj = datetime.fromisoformat(from_date)
                 
                 working_sch.is_leave = True
+                empl_vacation.save()
+                working_sch.vacation = empl_vacation
                 working_sch.from_date = from_date
                 working_sch.save()
                 working_sch = None
@@ -3524,8 +3534,11 @@ def create_absence(request):
                     
                 if is_leave is not None:
                     working_schedule.is_leave = True
+                    empl_vacation.save()
+                    working_schedule.vacation = empl_vacation
                 else:
                     working_schedule.is_leave = False
+
                 if is_off is not None:
                     working_schedule.is_off = True
                 else:
