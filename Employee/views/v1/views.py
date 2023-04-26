@@ -3548,7 +3548,7 @@ def create_absence(request):
                 working_schedule.save()
             
     # all_employe= EmployeDailySchedule.objects.all().order_by('created_at')
-    serialized = NewAbsenceSerializer(empl_absence, many=True, context={'request' : request})
+    serialized = NewAbsenceSerializer(empl_absence, context={'request' : request})
     return Response(
         {
             'status' : 200,
