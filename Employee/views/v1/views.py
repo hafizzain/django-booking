@@ -3496,7 +3496,7 @@ def create_absence(request):
             try:
                 working_sch = EmployeDailySchedule.objects.get(
                     employee = employee_id,   
-                    date = from_date
+                    date = from_date.strftime('%Y-%m-%d')
                 )
             except Exception as err:
                 pass
@@ -3507,7 +3507,7 @@ def create_absence(request):
                 working_sch.is_leave = True
                 empl_absence.save()
                 # working_sch.is_leave = empl_absence
-                working_sch.from_date = from_date
+                working_sch.from_date = from_date.strftime('%Y-%m-%d')
                 working_sch.save()
                 # working_sch = None
                 
@@ -3523,8 +3523,8 @@ def create_absence(request):
                     end_time_shift = end_time_shift,
                     
                     date = from_date,
-                    from_date =from_date,
-                    to_date = to_date,
+                    from_date =from_date.strftime('%Y-%m-%d'),
+                    to_date = to_date.strftime('%Y-%m-%d'),
                     note = note,
                     
                 )    
