@@ -1236,4 +1236,4 @@ class NewAbsenceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Vacation
-        fields = ('id', 'employee', 'from_date', 'to_date', 'absence_details',)
+        fields = ('id', 'employee', 'from_date', 'to_date', 'absence_details','holiday_type')
