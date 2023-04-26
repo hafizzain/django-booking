@@ -1231,7 +1231,7 @@ class NewAbsenceSerializer(serializers.ModelSerializer):
             print(err)
     
     def get_absence_details(self, obj):
-        vacation = EmployeDailySchedule.objects.filter(vacation = obj, is_vacation = True )
+        vacation = EmployeDailySchedule.objects.filter(vacation = obj, is_leave = True )
         return NewScheduleSerializer(vacation, many = True,context=self.context).data
 
     class Meta:
