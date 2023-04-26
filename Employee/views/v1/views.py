@@ -3506,10 +3506,10 @@ def create_absence(request):
                 
                 working_sch.is_leave = True
                 empl_absence.save()
-                working_sch.is_leave = empl_absence
+                # working_sch.is_leave = empl_absence
                 working_sch.from_date = from_date
                 working_sch.save()
-                working_sch = None
+                # working_sch = None
                 
             else:   
                 working_schedule = EmployeDailySchedule.objects.create(
