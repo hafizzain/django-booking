@@ -2793,7 +2793,8 @@ def get_customer_detailed_loyalty_points(request):
     client_id = request.GET.get('customer_id', None)
 
 
-    if not all([location_id, client_id]):
+    if not all([location_id]):
+        # client_id
         return Response(
             {
                 'status' : False,
@@ -2812,7 +2813,7 @@ def get_customer_detailed_loyalty_points(request):
         )
 
     customers_points = LoyaltyPointLogs.objects.filter(
-        client__id = client_id,
+        # client__id = client_id,
         location__id = location_id,
         is_active = True,
         is_deleted = False
