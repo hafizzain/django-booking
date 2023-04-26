@@ -3867,6 +3867,7 @@ def get_absence(request):
 @permission_classes([IsAuthenticated])
 def delete_workingschedule(request):
     schedule_id = request.data.get('id', None)
+    
     if schedule_id is None: 
        return Response(
             {
@@ -3898,8 +3899,17 @@ def delete_workingschedule(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    
     schedule.delete()
+    if schedule.vacation:
+        
+        vacation = schedule.vacation
+        remaingin_schedue = EmployeDailySchedule.objects.filter(
+            vacation = vacation,
+
+        ).exclude(id = schedule.id)
+        if len(remaingin_schedue) == 0:
+            vacation.delete()
+
     return Response(
         {
             'status' : True,
@@ -3951,6 +3961,16 @@ def delete_absence(request):
         )
     
     schedule.delete()
+
+    if schedule.vacation:
+        
+        absence = schedule.vacation
+        remaingin_schedue = EmployeDailySchedule.objects.filter(
+            vacation = absence,
+
+        ).exclude(id = schedule.id)
+        if len(remaingin_schedue) == 0:
+            absence.delete()
     return Response(
         {
             'status' : True,
