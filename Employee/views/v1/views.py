@@ -3500,16 +3500,16 @@ def create_absence(request):
                 )
             except Exception as err:
                 pass
-            
+
+            empl_absence.save()
             if working_sch is not None:
                 #date_obj = datetime.fromisoformat(from_date)
                 
                 working_sch.is_leave = True
-                empl_absence.save()
-                # working_sch.is_leave = empl_absence
+                
+                working_sch.vacation = empl_absence
                 working_sch.from_date = from_date.strftime('%Y-%m-%d')
                 working_sch.save()
-                # working_sch = None
                 
             else:   
                 working_schedule = EmployeDailySchedule.objects.create(
@@ -3521,7 +3521,7 @@ def create_absence(request):
                     end_time = end_time,
                     start_time_shift = start_time_shift,
                     end_time_shift = end_time_shift,
-                    
+                    vacation = empl_absence,
                     date = from_date,
                     from_date =from_date.strftime('%Y-%m-%d'),
                     to_date = to_date.strftime('%Y-%m-%d'),
@@ -3535,8 +3535,6 @@ def create_absence(request):
                     
                 if is_leave is not None:
                     working_schedule.is_leave = True
-                    empl_absence.save()
-                    working_schedule.vacation = empl_absence
                 else:
                     working_schedule.is_leave = False
 
