@@ -463,7 +463,7 @@ class EmployPayrollSerializers(serializers.ModelSerializer):
     income_type = serializers.SerializerMethodField(read_only=True)
     start_time = serializers.SerializerMethodField(read_only=True)
     end_time = serializers.SerializerMethodField(read_only=True)
-    payroll = serializers.SerializerMethodField(read_only=True)
+    # payroll = serializers.SerializerMethodField(read_only=True)
 
 
     # def get_salary(self, obj):
@@ -476,15 +476,15 @@ class EmployPayrollSerializers(serializers.ModelSerializer):
     def get_salary(self, obj):
         try:
             salary_info = EmployeeProfessionalInfo.objects.get(employee=obj)
-            income_type = salary_info.income_type
-            salary = salary_info.salary
+            # income_type = salary_info.income_type
+            # salary = salary_info.salary
             
-            if income_type == 'Daily_Income':
-                total_days = (datetime.today() - obj.date_of_joining).days
-                absent_days = Attendance.object.filter(out_time=True).count()
-                salary -= (absent_days * salary / total_days)
+            # if income_type == 'Daily_Income':
+            #     total_days = (datetime.today() - obj.date_of_joining).days
+            #     absent_days = Attendance.object.filter(out_time=True).count()
+            #     salary -= (absent_days * salary / total_days)
                 
-            return salary
+            return salary_info.salary
         except Exception:
             return None
         
@@ -510,38 +510,38 @@ class EmployPayrollSerializers(serializers.ModelSerializer):
         
 
 
-    def get_payroll(self, obj):
-        try:
-            salary_info = EmployeeProfessionalInfo.objects.get(employee=obj)
-            payroll = salary_info.salary
+    # def get_payroll(self, obj):
+    #     try:
+    #         salary_info = EmployeeProfessionalInfo.objects.get(employee=obj)
+    #         payroll = salary_info.salary
 
-            if salary_info.income_type == 'Hourly_Rate':
-                # Calculate payroll based on hourly rate
-                payroll_per_hour = payroll / 8
-                total_hours = 8
-                if total_hours:
-                    payroll -= total_hours * payroll_per_hour
-                else:
-                    payroll = 0
+    #         if salary_info.income_type == 'Hourly_Rate':
+    #             # Calculate payroll based on hourly rate
+    #             payroll_per_hour = payroll / 8
+    #             total_hours = 8
+    #             if total_hours:
+    #                 payroll -= total_hours * payroll_per_hour
+    #             else:
+    #                 payroll = 0
 
-            # Deduct payroll for absent day
-            if Attendance.object.filter(out_time=True).count():
-                if salary_info.income_type == 'Hourly_Rate':
-                    payroll -= payroll_per_hour
-                elif salary_info.income_type == 'Daily_Income':
-                    payroll = 0
-                elif salary_info.income_type == 'Monthly_Salary':
-                    payroll_per_day = payroll / 30
-                    payroll -= payroll_per_day
+    #         # Deduct payroll for absent day
+    #         if Attendance.object.filter(out_time=True).count():
+    #             if salary_info.income_type == 'Hourly_Rate':
+    #                 payroll -= payroll_per_hour
+    #             elif salary_info.income_type == 'Daily_Income':
+    #                 payroll = 0
+    #             elif salary_info.income_type == 'Monthly_Salary':
+    #                 payroll_per_day = payroll / 30
+    #                 payroll -= payroll_per_day
                     
-                    # Deduct additional payroll for each day of absence
-                    absent_days = Attendance.object.filter(out_time=True).count()
-                    payroll -= absent_days * payroll_per_day
+    #                 # Deduct additional payroll for each day of absence
+    #                 absent_days = Attendance.object.filter(out_time=True).count()
+    #                 payroll -= absent_days * payroll_per_day
 
-            return payroll
+    #         return payroll
 
-        except Exception:
-            return None
+    #     except Exception:
+    #         return None
                 
     
     class Meta:
@@ -554,7 +554,7 @@ class EmployPayrollSerializers(serializers.ModelSerializer):
             'start_time',
             'end_time',
             'employee_id',
-            'payroll',
+            # 'payroll',
             
          ]        
 
