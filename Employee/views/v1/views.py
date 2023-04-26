@@ -3505,7 +3505,7 @@ def create_absence(request):
                 
                 working_sch.is_leave = True
                 empl_vacation.save()
-                working_sch.vacation = empl_vacation
+                working_sch.is_leave = empl_vacation
                 working_sch.from_date = from_date
                 working_sch.save()
                 working_sch = None
