@@ -3484,7 +3484,8 @@ def create_absence(request):
         employee = employee_id,
         from_date = from_date,
         to_date = to_date,
-        note = note
+        note = note,
+        holiday_type = 'Absence'
     )
     if days > 0 :
         for i, value in enumerate(range(days+1)):
@@ -3842,6 +3843,7 @@ def get_absence(request):
     allvacations = Vacation.objects.filter(
         # employee = employee, 
         employee__location = location,
+        holiday_type ='Absence',
         is_active = True, 
         
     )
