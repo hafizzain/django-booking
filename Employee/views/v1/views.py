@@ -3479,7 +3479,7 @@ def create_absence(request):
     working_sch = None
     days = int(diff.days)
 
-    empl_vacation = Vacation(
+    empl_absence = Vacation(
         business = business,
         employee = employee_id,
         from_date = from_date,
@@ -3505,8 +3505,8 @@ def create_absence(request):
                 #date_obj = datetime.fromisoformat(from_date)
                 
                 working_sch.is_leave = True
-                empl_vacation.save()
-                working_sch.is_leave = empl_vacation
+                empl_absence.save()
+                working_sch.is_leave = empl_absence
                 working_sch.from_date = from_date
                 working_sch.save()
                 working_sch = None
@@ -3535,8 +3535,8 @@ def create_absence(request):
                     
                 if is_leave is not None:
                     working_schedule.is_leave = True
-                    empl_vacation.save()
-                    working_schedule.vacation = empl_vacation
+                    empl_absence.save()
+                    working_schedule.vacation = empl_absence
                 else:
                     working_schedule.is_leave = False
 
@@ -3547,8 +3547,8 @@ def create_absence(request):
                 
                 working_schedule.save()
             
-    all_employe= EmployeDailySchedule.objects.all().order_by('created_at')
-    serialized = ScheduleSerializer(all_employe, many=True, context={'request' : request})
+    # all_employe= EmployeDailySchedule.objects.all().order_by('created_at')
+    serialized = NewAbsenceSerializer(empl_absence, many=True, context={'request' : request})
     return Response(
         {
             'status' : 200,
