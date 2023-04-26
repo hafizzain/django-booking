@@ -3482,8 +3482,8 @@ def create_absence(request):
     empl_absence = Vacation(
         business = business,
         employee = employee_id,
-        from_date = from_date,
-        to_date = to_date,
+        from_date = from_date.strftime('%Y-%m-%d'),
+        to_date = to_date.strftime('%Y-%m-%d'),
         note = note,
         holiday_type = 'Absence'
     )
@@ -3496,20 +3496,20 @@ def create_absence(request):
             try:
                 working_sch = EmployeDailySchedule.objects.get(
                     employee = employee_id,   
-                    date = from_date
+                    date = from_date.strftime('%Y-%m-%d')
                 )
             except Exception as err:
                 pass
-            
+
+            empl_absence.save()
             if working_sch is not None:
                 #date_obj = datetime.fromisoformat(from_date)
                 
                 working_sch.is_leave = True
-                empl_absence.save()
-                # working_sch.is_leave = empl_absence
-                working_sch.from_date = from_date
+                
+                working_sch.vacation = empl_absence
+                working_sch.from_date = from_date.strftime('%Y-%m-%d')
                 working_sch.save()
-                # working_sch = None
                 
             else:   
                 working_schedule = EmployeDailySchedule.objects.create(
@@ -3521,31 +3521,13 @@ def create_absence(request):
                     end_time = end_time,
                     start_time_shift = start_time_shift,
                     end_time_shift = end_time_shift,
-                    
+                    vacation = empl_absence,
                     date = from_date,
-                    from_date =from_date,
-                    to_date = to_date,
+                    from_date = from_date.strftime('%Y-%m-%d'),
+                    to_date = to_date.strftime('%Y-%m-%d'),
                     note = note,
-                    
+                    is_leave = True
                 )    
-                if is_vacation is not None:
-                    working_schedule.is_vacation = True
-                else:
-                    working_schedule.is_vacation = False
-                    
-                if is_leave is not None:
-                    working_schedule.is_leave = True
-                    empl_absence.save()
-                    working_schedule.vacation = empl_absence
-                else:
-                    working_schedule.is_leave = False
-
-                if is_off is not None:
-                    working_schedule.is_off = True
-                else:
-                    working_schedule.is_off = False
-                
-                working_schedule.save()
             
     # all_employe= EmployeDailySchedule.objects.all().order_by('created_at')
     serialized = NewAbsenceSerializer(empl_absence, context={'request' : request})
