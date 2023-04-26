@@ -3748,6 +3748,7 @@ def get_vacations(request):
     allvacations = Vacation.objects.filter(
         # employee = employee, 
         employee__location = location,
+        holiday_type = 'Vacation',
         is_active = True,  
         
     )
