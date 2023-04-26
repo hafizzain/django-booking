@@ -3482,8 +3482,8 @@ def create_absence(request):
     empl_absence = Vacation(
         business = business,
         employee = employee_id,
-        from_date = from_date,
-        to_date = to_date,
+        from_date = from_date.strftime('%Y-%m-%d'),
+        to_date = to_date.strftime('%Y-%m-%d'),
         note = note,
         holiday_type = 'Absence'
     )
