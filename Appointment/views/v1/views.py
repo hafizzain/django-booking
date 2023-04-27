@@ -33,7 +33,7 @@ from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
 from django.db.models import Q
-from Client.models import Client, ClientPackageValidation, ClientPromotions, Membership, Promotion, Rewards, Vouchers, LoyaltyPoints, ClientLoyaltyPoint
+from Client.models import Client, ClientPackageValidation, ClientPromotions, Membership, Promotion, Rewards, Vouchers, LoyaltyPoints, ClientLoyaltyPoint, LoyaltyPointLogs
 from datetime import date, timedelta
 from threading import Thread
 from django.db.models import F
@@ -1447,6 +1447,11 @@ def create_checkout(request):
     gst_price = request.data.get('gst_price', 0)
     service_price = request.data.get('service_price', None)
     total_price = request.data.get('total_price', 0)
+
+
+    is_redeemed = request.data.get('is_redeemed', None)
+    redeemed_id = request.data.get('redeemed_id', None)
+    redeemed_points = request.data.get('redeemed_points', None)
     
     service_commission = 0
     service_commission_type = ''
@@ -1548,6 +1553,25 @@ def create_checkout(request):
 
 
     if appointments.client:
+        if all([is_redeemed, redeemed_id, redeemed_points]):
+            try:
+                client_points = ClientLoyaltyPoint.objects.get(id = redeemed_id)
+            except:
+                pass
+            else:
+                client_points.points_redeemed = client_points.points_redeemed + int(redeemed_points)
+                client_points.save()
+                LoyaltyPointLogs.objects.create(
+                    location = business_address,
+                    client = client_points.client,
+                    client_points = client_points,
+                    loyalty = client_points.loyalty_points,
+                    points_earned = 0,
+                    points_redeemed = redeemed_points,
+                    balance = 0
+                )
+
+
         allowed_points = LoyaltyPoints.objects.filter(
             Q(loyaltytype = 'Service') |
             Q(loyaltytype = 'Both'),
@@ -1556,24 +1580,38 @@ def create_checkout(request):
             is_active = True,
             is_deleted = False
         )
+
+        # is_redeemed
+        # redeemed_id
+        # redeemed_points
         if len(allowed_points) > 0:
             point = allowed_points[0]
-            clinet_poitns, created = ClientLoyaltyPoint.objects.get_or_create(
+            client_points, created = ClientLoyaltyPoint.objects.get_or_create(
                 location = business_address,
                 client = appointments.client,
                 loyalty_points = point
             )
 
             if created :
-                clinet_poitns.total_earn = point.number_points
+                client_points.total_earn = point.number_points
             else:
-                clinet_poitns.total_earn = int(clinet_poitns.total_earn) + int(point.number_points)
+                client_points.total_earn = int(client_points.total_earn) + int(point.number_points)
 
-            clinet_poitns.total_amount = point.amount_spend
-            clinet_poitns.for_every_points = point.earn_points
-            clinet_poitns.customer_will_get_amount = point.total_earn_from_points
+            client_points.total_amount = point.amount_spend
+            client_points.for_every_points = point.earn_points
+            client_points.customer_will_get_amount = point.total_earn_from_points
             
-            clinet_poitns.save()
+            client_points.save()
+
+            LoyaltyPointLogs.objects.create(
+                location = business_address,
+                client = client_points.client,
+                client_points = client_points,
+                loyalty = point,
+                points_earned = 0,
+                points_redeemed = 0,
+                balance = 0
+            )
             
     serialized = CheckoutSerializer(checkout)
     return Response(
