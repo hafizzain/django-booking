@@ -38,7 +38,7 @@ from datetime import date, timedelta
 from threading import Thread
 from django.db.models import F
 
-from Appointment.models import Appointment, AppointmentService, AppointmentNotes , AppointmentCheckout , AppointmentLogs, LogDetails
+from Appointment.models import Appointment, AppointmentService, AppointmentNotes , AppointmentCheckout , AppointmentLogs, LogDetails, AppointmentEmployeeTip
 from Appointment.serializers import  CheckoutSerializer, AppoinmentSerializer, ServiceClientSaleSerializer, ServiceEmployeeSerializer,SingleAppointmentSerializer ,BlockSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer, EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer, AppointmenttLogSerializer
 from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
@@ -1429,6 +1429,57 @@ def delete_block_time(request):
         },
         status=status.HTTP_200_OK
         )
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_appointment_employee_tip(request):
+    tips_id = request.data.get('tips_id', None)
+    if tips_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+       
+    try:
+        tip = AppointmentEmployeeTip.objects.get(id=tips_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Tips ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    tip.delete()
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Deleted Tip Successfully',
+                'error_message' : None,
+            }
+        },
+        status=status.HTTP_200_OK
+        )
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -1453,6 +1504,8 @@ def create_checkout(request):
     redeemed_id = request.data.get('redeemed_id', None)
     redeemed_points = request.data.get('redeemed_points', None)
     
+    # appointment_checkout = request.data.get('appointment_checkout', None)
+
     service_commission = 0
     service_commission_type = ''
     toValue = 0
@@ -1493,6 +1546,41 @@ def create_checkout(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+
+    # try:
+    #     appointment_checkout = AppointmentEmployeeTip.objects.get(
+    #         appointment = appointment,
+    #         business_address=business_address,
+    #         tip = tip,
+    #         gst = gst,
+    #         gst_price = gst_price,
+    #         service_price =service_price,
+    #         total_price =total_price_app,
+
+    #     )
+    # except Exception as err:
+    #     appointment_checkout = None
+    #     if tip is None:
+    #         total_price_app = int(gst) + int(service_price)
+    #     else:
+    #         total_price_app  = int(gst) + int(service_price) + int(tip)
+    
+    #     return Response(
+    #         {
+    #             'status' : False,
+    #             'status_code' : 404,
+    #             'status_code_text' : '404',
+    #             'response' : {
+    #                 'message' : 'Invalid Appointment ID!',
+    #                 'error_message' : str(err),
+    #             }
+    #         },
+    #         status=status.HTTP_404_NOT_FOUND
+    #     )
+    
+
+
+
     try:
         business_address=BusinessAddress.objects.get(id = str(business_address))
     except Exception as err:
