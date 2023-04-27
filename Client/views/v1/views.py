@@ -2817,7 +2817,7 @@ def get_customer_detailed_loyalty_points(request):
         clients_list.append(client_id)
 
     customers_points = LoyaltyPointLogs.objects.filter(
-        client__id__in = clients_list,
+        # client__id__in = clients_list,
         location__id = location_id,
         is_active = True,
         is_deleted = False
