@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Client, ClientGroup, Subscription , Membership , Vouchers , Promotion , Rewards , DiscountMembership, ClientPackageValidation, CurrencyPriceMembership, LoyaltyPoints, ClientLoyaltyPoint
+from .models import Client, ClientGroup, Subscription , Membership , Vouchers , Promotion , Rewards , DiscountMembership, ClientPackageValidation, CurrencyPriceMembership, LoyaltyPoints, ClientLoyaltyPoint, LoyaltyPointLogs
 # Register your models here.
 admin.site.register(DiscountMembership)
 admin.site.register(ClientPackageValidation)
@@ -7,6 +7,11 @@ admin.site.register(CurrencyPriceMembership)
 
 
 
+@admin.register(LoyaltyPointLogs)
+class LoyaltyPointLogsAdmin(admin.ModelAdmin):
+    list_display= [
+        'id',
+    ]
 @admin.register(LoyaltyPoints)
 class LoyaltyPointsAdmin(admin.ModelAdmin):
     list_display= [
