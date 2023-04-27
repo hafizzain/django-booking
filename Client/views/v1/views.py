@@ -2804,16 +2804,20 @@ def get_customer_detailed_loyalty_points(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'fields are required!',
                     'fields' : [
-                        'location_id',                      
-                        'customer_id',                      
+                        'location_id',
+                        'customer_id',
                     ]
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
         )
 
+    clients_list = []
+    if client_id is not None:
+        clients_list.append(client_id)
+
     customers_points = LoyaltyPointLogs.objects.filter(
-        # client__id = client_id,
+        client__id__in = clients_list,
         location__id = location_id,
         is_active = True,
         is_deleted = False
