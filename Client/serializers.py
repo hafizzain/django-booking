@@ -280,7 +280,7 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
 
     def get_loyalty(self, c_points):
         return {
-            'loyalty_name' : f'{c_points.loyalty_points.name}'
+            'loyalty_name' : ''
         }
 
     def get_points_earned(self, c_points):
