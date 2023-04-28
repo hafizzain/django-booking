@@ -1566,10 +1566,10 @@ def create_checkout(request):
                 # id = id,
                 business_address = business_address,
                 appointment = appointment,
-                gst = gst,
-                gst_price = gst_price,
-                service_price = service_price,
-                total_price = total_price,
+                # gst = gst,
+                # gst_price = gst_price,
+                # service_price = service_price,
+                # total_price = total_price,
             )        
         except Exception as err:
             pass

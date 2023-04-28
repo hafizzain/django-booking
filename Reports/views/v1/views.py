@@ -60,7 +60,12 @@ def get_commission_reports_by_staff(request):
     year = request.GET.get('year', None)
     range_end = request.GET.get('range_end', None)
     
-    employee = Employee.objects.filter(is_deleted=False).order_by('-created_at')
+    # employee = Employee.objects.filter(is_deleted=False).order_by('-created_at')
+    employee = Employee.objects.filter(
+        is_deleted = False,
+        is_active = True,
+    ).order_by('-created_at')
+    print(employee)
     serialized = ComissionReportsEmployeSerializer(employee,  many=True, context={
                         'request' : request, 
                         'range_start': range_start, 
