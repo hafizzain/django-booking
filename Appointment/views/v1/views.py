@@ -1504,7 +1504,8 @@ def create_checkout(request):
     redeemed_id = request.data.get('redeemed_id', None)
     redeemed_points = request.data.get('redeemed_points', None)
     
-    # appointment_checkout = request.data.get('appointment_checkout', None)
+    # appointment_checkout_tip = request.data.get('appointment_checkout', None)
+    employee_tip = request.data.get('employee_tip', None)
 
     service_commission = 0
     service_commission_type = ''
@@ -1547,40 +1548,33 @@ def create_checkout(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    # try:
-    #     appointment_checkout = AppointmentEmployeeTip.objects.get(
-    #         appointment = appointment,
-    #         business_address=business_address,
-    #         tip = tip,
-    #         gst = gst,
-    #         gst_price = gst_price,
-    #         service_price =service_price,
-    #         total_price =total_price_app,
+    if type(tip) == str:
+        tip = json.loads(tip)
 
-    #     )
-    # except Exception as err:
-    #     appointment_checkout = None
-    #     if tip is None:
-    #         total_price_app = int(gst) + int(service_price)
-    #     else:
-    #         total_price_app  = int(gst) + int(service_price) + int(tip)
-    
-    #     return Response(
-    #         {
-    #             'status' : False,
-    #             'status_code' : 404,
-    #             'status_code_text' : '404',
-    #             'response' : {
-    #                 'message' : 'Invalid Appointment ID!',
-    #                 'error_message' : str(err),
-    #             }
-    #         },
-    #         status=status.HTTP_404_NOT_FOUND
-    #     )
-    
+    elif type(tip) == list:
+        pass
 
-
-
+    for t in tip:
+        employee_id = t.get('employee', None)
+        checkout_tip = t.get('tip', None)
+        try:
+            employee_tips_id = Employee.objects.get(id=employee_id)
+            
+            create_tip = AppointmentEmployeeTip.objects.create(
+                member = employee_tips_id,
+                tip = checkout_tip,
+                # id = id,
+                business_address = business_address,
+                appointment = appointment,
+                # gst = gst,
+                # gst_price = gst_price,
+                # service_price = service_price,
+                # total_price = total_price,
+            )        
+        except Exception as err:
+            pass
+        
+        
     try:
         business_address=BusinessAddress.objects.get(id = str(business_address))
     except Exception as err:
