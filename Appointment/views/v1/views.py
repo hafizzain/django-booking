@@ -1563,7 +1563,7 @@ def create_checkout(request):
             create_tip = AppointmentEmployeeTip.objects.create(
                 member = employee_tips_id,
                 tip = checkout_tip,
-                id = id,
+                # id = id,
                 business_address = business_address,
                 appointment = appointment,
                 gst = gst,
