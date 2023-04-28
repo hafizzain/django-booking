@@ -1505,7 +1505,7 @@ def create_checkout(request):
     redeemed_points = request.data.get('redeemed_points', None)
     
     # appointment_checkout_tip = request.data.get('appointment_checkout', None)
-    employee_tip = request.data.get('employee_tip', None)
+    # employee_tip = request.data.get('employee_tip', None)
 
     service_commission = 0
     service_commission_type = ''
@@ -1554,25 +1554,26 @@ def create_checkout(request):
     elif type(tip) == list:
         pass
 
-    for t in tip:
-        employee_id = t.get('employee', None)
-        checkout_tip = t.get('tip', None)
-        try:
-            employee_tips_id = Employee.objects.get(id=employee_id)
-            
-            create_tip = AppointmentEmployeeTip.objects.create(
-                member = employee_tips_id,
-                tip = checkout_tip,
-                # id = id,
-                business_address = business_address,
-                appointment = appointment,
-                # gst = gst,
-                # gst_price = gst_price,
-                # service_price = service_price,
-                # total_price = total_price,
-            )        
-        except Exception as err:
-            pass
+        for t in tip:
+            employee_id = t.get('employee', None)
+            checkout_tip = t.get('tip', None)
+            # checkout_tip = int(checkout_tip)
+            try:
+                employee_tips_id = Employee.objects.get(id=employee_id)
+                
+                create_tip = AppointmentEmployeeTip.objects.create(
+                    member = employee_tips_id,
+                    tip = checkout_tip,
+                    # id = id,
+                    business_address = business_address,
+                    appointment = appointment,
+                    # gst = gst,
+                    # gst_price = gst_price,
+                    # service_price = service_price,
+                    # total_price = total_price,
+                )        
+            except Exception as err:
+                pass
         
         
     try:
@@ -1622,7 +1623,7 @@ def create_checkout(request):
         service= services,
         member=members,
         business_address=business_address,
-        tip = tip,
+        # tip = tip,
         gst = gst,
         gst_price = gst_price,
         service_price =service_price,
