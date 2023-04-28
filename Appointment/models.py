@@ -243,6 +243,31 @@ class AppointmentCheckout(models.Model):
     def fun():
         return 'rewards'
 
+class AppointmentEmployeeTip(models.Model):    
+    
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, null=True, blank=True , related_name='tips_checkout')    
+    member = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='checkout_member_tips', null=True, blank=True)
+    
+    business_address = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='appointment_address_tips')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, null=True, blank=True, related_name='business_appointment_tips') 
+
+    tip = models.PositiveIntegerField(default=0, null=True, blank=True)
+    gst = models.PositiveIntegerField(default=0, null=True, blank=True)
+    gst_price = models.FloatField(default=0, null=True, blank=True)
+    
+    service_price = models.PositiveIntegerField(default=0, null=True, blank=True)
+    total_price = models.PositiveIntegerField(default=0, null=True, blank=True)
+    
+    
+    is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+    
+    def __str__(self):
+        return str(self.id)
+
+
 
 class AppointmentNotes(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
