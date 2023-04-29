@@ -7,7 +7,7 @@ from Sale.Constants.stock_lowest import stock_lowest
 from Sale.Constants.tunrover import ProductTurnover
 
 from rest_framework import status
-from Appointment.models import Appointment, AppointmentCheckout, AppointmentService
+from Appointment.models import Appointment, AppointmentCheckout, AppointmentService, AppointmentEmployeeTip
 from Business.models import AdminNotificationSetting, Business, StaffNotificationSetting, StockNotificationSetting
 from Client.models import Client, Membership, Vouchers
 from Order.models import Checkout, MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
@@ -1378,6 +1378,32 @@ def create_sale_order(request):
     elif type(ids) == list:
             pass
         
+    if type(tip) == str:
+        tip = json.loads(tip)
+
+    elif type(tip) == list:
+        pass
+
+        for t in tip:
+            member_id = t.get('employee', None)
+            checkout_tip = t.get('tip', None)
+            # checkout_tip = int(checkout_tip)
+            try:
+                member_tips_id = Employee.objects.get(id=member_id)
+                
+                create_tip = AppointmentEmployeeTip.objects.create(
+                    member = member_tips_id,
+                    tip = checkout_tip,
+                    # id = id,
+                    business_address = business_address,
+                    # appointment = appointment,
+                    # gst = gst,
+                    # gst_price = gst_price,
+                    # service_price = service_price,
+                    # total_price = total_price,
+                )        
+            except Exception as err:
+                pass
     # service_total_price = int(float(service_total_price))
     # product_total_price = int(float(product_total_price))
     # voucher_total_price = int(float(voucher_total_price))
@@ -1403,7 +1429,7 @@ def create_sale_order(request):
         product_commission_type = product_commission_type,
         voucher_commission_type = voucher_commission_type ,  
         
-        tip = tip,
+        # tip = tip,
     )
     if bool(is_promotion) == True:
         checkout.is_promotion = True
