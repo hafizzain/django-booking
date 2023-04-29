@@ -1378,32 +1378,32 @@ def create_sale_order(request):
     elif type(ids) == list:
             pass
         
-    if type(tip) == str:
-        tip = json.loads(tip)
+    # if type(tip) == str:
+    #     tip = json.loads(tip)
 
-    elif type(tip) == list:
-        pass
+    # elif type(tip) == list:
+    #     pass
 
-        for t in tip:
-            member_id = t.get('employee', None)
-            checkout_tip = t.get('tip', None)
-            # checkout_tip = int(checkout_tip)
-            try:
-                member_tips_id = Employee.objects.get(id=member_id)
+    #     for t in tip:
+    #         member_id = t.get('employee', None)
+    #         checkout_tip = t.get('tip', None)
+    #         # checkout_tip = int(checkout_tip)
+    #         try:
+    #             member_tips_id = Employee.objects.get(id=member_id)
                 
-                create_tip = AppointmentEmployeeTip.objects.create(
-                    member = member_tips_id,
-                    tip = checkout_tip,
-                    # id = id,
-                    business_address = business_address,
-                    # appointment = appointment,
-                    # gst = gst,
-                    # gst_price = gst_price,
-                    # service_price = service_price,
-                    # total_price = total_price,
-                )        
-            except Exception as err:
-                pass
+    #             create_tip = AppointmentEmployeeTip.objects.create(
+    #                 member = member_tips_id,
+    #                 tip = checkout_tip,
+    #                 # id = id,
+    #                 business_address = business_address,
+    #                 # appointment = appointment,
+    #                 # gst = gst,
+    #                 # gst_price = gst_price,
+    #                 # service_price = service_price,
+    #                 # total_price = total_price,
+    #             )        
+    #         except Exception as err:
+    #             pass
     # service_total_price = int(float(service_total_price))
     # product_total_price = int(float(product_total_price))
     # voucher_total_price = int(float(voucher_total_price))
@@ -1471,7 +1471,35 @@ def create_sale_order(request):
                 checkout.total_service_price = int(float(total_price))
                 checkout.save()
                 test = False
+
+            
+    if type(tip) == str:
+        tip = json.loads(tip)
+
+    elif type(tip) == list:
+        pass
+
+        for t in tip:
+            member_id = t.get('employee', None)
+            checkout_tip = t.get('tip', None)
+            # checkout_tip = int(checkout_tip)
+            try:
+                member_tips_id = Employee.objects.get(id=member_id)
                 
+                create_tip = AppointmentEmployeeTip.objects.create(
+                    member = member_tips_id,
+                    tip = checkout_tip,
+                    # id = id,
+                    business_address = business_address,
+                    # appointment = appointment,
+                    # gst = gst,
+                    # gst_price = gst_price,
+                    # service_price = service_price,
+                    # total_price = total_price,
+                )        
+            except Exception as err:
+                pass
+
         if sale_type == 'PRODUCT':
             try:
                 product = Product.objects.get(id = service_id)
@@ -1548,7 +1576,7 @@ def create_sale_order(request):
                 checkout = checkout,
                 member = member,
                 location = business_address,
-                tip = tip,
+                # tip = tip,
                 total_price = total_price, 
                 payment_type= payment_type,
                 client_type = client_type,
@@ -1578,7 +1606,7 @@ def create_sale_order(request):
                     client = client,
                     member = member,
                     location = business_address,
-                    tip = tip,
+                    # tip = tip,
                     total_price = total_price, 
                     payment_type=payment_type,
                     client_type = client_type,
@@ -1618,7 +1646,7 @@ def create_sale_order(request):
                     checkout = checkout,
                     client = client,
                     member = member,
-                    tip = tip,
+                    # tip = tip,
                     total_price = total_price, 
                     payment_type =payment_type,
                     client_type = client_type,
@@ -1676,7 +1704,7 @@ def create_sale_order(request):
                     checkout = checkout,
                     client = client,
                     member = member,
-                    tip = tip,
+                    # tip = tip,
                     total_price = total_price, 
                     payment_type =payment_type,
                     client_type = client_type,
