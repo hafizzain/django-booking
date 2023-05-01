@@ -2950,7 +2950,7 @@ def create_fixed_price_service(request):
         user = user,
         business =  business,
         
-        duration = duration,
+        # duration = duration,
         spend_amount = spend_amount,
     )
     if service is not None:
