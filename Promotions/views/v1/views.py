@@ -523,13 +523,14 @@ def get_discount_and_promotions(request):
     flatordirect = DirectOrFlatDiscount.objects.filter(
         directorflat_daterestrictions__start_date__lte = selected_date,
         directorflat_daterestrictions__end_date__gte = selected_date,
+        directorflat_daterestrictions__business_address__id = selected_location,
         # directorflat_dayrestrictions__day__in = [None]
         **filter_queries['normal_queries'],
     # ).distinct()
     ).exclude(
         Q(directorflat_dayrestrictions__day__icontains = selected_day) |
-        Q(directorflat_blockdate__date = selected_date) |
-        Q(directorflat_daterestrictions__business_address__id = selected_location)
+        Q(directorflat_blockdate__date = selected_date) 
+        # Q(directorflat_daterestrictions__business_address__id = selected_location)
     ).distinct()
     #serialized = PromtoionsSerializers.AvailOfferDirectOrFlatDiscountSerializers(flatordirect,  many=True, context={'request' : request,})
     serialized = PromtoionsSerializers.DirectOrFlatDiscountSerializers(flatordirect,  many=True, context={'request' : request})
@@ -541,10 +542,11 @@ def get_discount_and_promotions(request):
         **filter_queries['normal_queries'],
         specificgroupdiscount_daterestrictions__start_date__lte = selected_date,
         specificgroupdiscount_daterestrictions__end_date__gte = selected_date,
+        specificgroupdiscount_daterestrictions__business_address__id = selected_location,
     ).exclude(
         Q(specificgroupdiscount_dayrestrictions__day__icontains = selected_day) |
-        Q(specificgroupdiscount_blockdate__date = selected_date,) |
-        Q(specificgroupdiscount_daterestrictions__business_address__id = selected_location)
+        Q(specificgroupdiscount_blockdate__date = selected_date,) 
+        # Q(specificgroupdiscount_daterestrictions__business_address__id = selected_location)
     ).distinct()
     #serialized = PromtoionsSerializers.AvailOfferSpecificGroupDiscountSerializers(specific_group,  many=True, context={'request' : request})
     serialized = PromtoionsSerializers.SpecificGroupDiscountSerializers(specific_group,  many=True, context={'request' : request})
@@ -559,10 +561,11 @@ def get_discount_and_promotions(request):
         **filter_queries['normal_queries'],
         purchasediscount_daterestrictions__start_date__lte = selected_date,
         purchasediscount_daterestrictions__end_date__gte = selected_date,
+        purchasediscount_daterestrictions__business_address__id = selected_location,
     ).exclude(
         Q(purchasediscount_dayrestrictions__day__icontains = selected_day,) |
-        Q(purchasediscount_blockdate__date = selected_date,) |
-        Q(purchasediscount_daterestrictions__business_address__id = selected_location)
+        Q(purchasediscount_blockdate__date = selected_date,) 
+        # Q(purchasediscount_daterestrictions__business_address__id = selected_location)
     ).distinct()
     #serialized = PromtoionsSerializers.AvailOfferPurchaseDiscountSerializers(purchase_discount,  many=True, context={'request' : request})
     serialized = PromtoionsSerializers.PurchaseDiscountSerializers(purchase_discount,  many=True, context={'request' : request})
@@ -576,10 +579,11 @@ def get_discount_and_promotions(request):
         **filter_queries['normal_queries'],
         specificbrand_daterestrictions__start_date__lte = selected_date,
         specificbrand_daterestrictions__end_date__gte = selected_date,
+        specificbrand_daterestrictions__business_address__id = selected_location,
     ).exclude(
         Q(specificbrand_dayrestrictions__day__icontains = selected_day,) |
-        Q(specificbrand_blockdate__date = selected_date,) |
-        Q(specificbrand_daterestrictions__business_address__id = selected_location)
+        Q(specificbrand_blockdate__date = selected_date,) 
+        # Q(specificbrand_daterestrictions__business_address__id = selected_location)
     ).distinct()
     #serialized = PromtoionsSerializers.AvailOfferSpecificBrandSerializers(specificbrand,  many=True, context={'request' : request})
     serialized = PromtoionsSerializers.SpecificBrandSerializers(specificbrand,  many=True, context={'request' : request})
@@ -608,10 +612,11 @@ def get_discount_and_promotions(request):
         **filter_queries['normal_queries'],
         spendsomeamount_daterestrictions__start_date__lte = selected_date,
         spendsomeamount_daterestrictions__end_date__gte = selected_date,
+        spendsomeamount_daterestrictions__business_address__id = selected_location,
     ).exclude(
         Q(spendsomeamount_dayrestrictions__day__icontains = selected_day,) |
-        Q(spendsomeamount_blockdate__date = selected_date,) |
-        Q(spendsomeamount_daterestrictions__business_address__id = selected_location)
+        Q(spendsomeamount_blockdate__date = selected_date,) 
+        # Q(spendsomeamount_daterestrictions__business_address__id = selected_location)
     ).distinct()
     #serialized = PromtoionsSerializers.AvailOfferSpendSomeAmountSerializers(spend_discount,  many=True, context={'request' : request})
     serialized = PromtoionsSerializers.SpendSomeAmountSerializers(spend_discount,  many=True, context={'request' : request})
@@ -624,10 +629,11 @@ def get_discount_and_promotions(request):
         **filter_queries['normal_queries'],
         fixedpriceservice_daterestrictions__start_date__lte = selected_date,
         fixedpriceservice_daterestrictions__end_date__gte = selected_date,
+        fixedpriceservice_daterestrictions__business_address__id = selected_location,
     ).exclude(
         Q(fixedpriceservice_dayrestrictions__day__icontains = selected_day,) |
-        Q(fixedpriceservice_blockdate__date = selected_date,) |
-        Q(fixedpriceservice_daterestrictions__business_address__id = selected_location)
+        Q(fixedpriceservice_blockdate__date = selected_date,) 
+        # Q(fixedpriceservice_daterestrictions__business_address__id = selected_location)
     ).distinct()
     #serialized = PromtoionsSerializers.AvailOfferFixedPriceServiceSerializers(fixed_price,  many=True, context={'request' : request})
     serialized = PromtoionsSerializers.FixedPriceServiceSerializers(fixed_price,  many=True, context={'request' : request})
@@ -640,10 +646,11 @@ def get_discount_and_promotions(request):
         **filter_queries['normal_queries'],
         mentionednumberservice_daterestrictions__start_date__lte = selected_date,
         mentionednumberservice_daterestrictions__end_date__gte = selected_date,
+        mentionednumberservice_daterestrictions__business_address__id = selected_location,
     ).exclude(
         Q(mentionednumberservice_dayrestrictions__day__icontains = selected_day,) |
-        Q(mentionednumberservice_blockdate__date = selected_date,) |
-        Q(mentionednumberservice_daterestrictions__business_address__id = selected_location)
+        Q(mentionednumberservice_blockdate__date = selected_date,) 
+        # Q(mentionednumberservice_daterestrictions__business_address__id = selected_location)
     ).distinct()
     #serialized = PromtoionsSerializers.AvailOfferMentionedNumberServiceSerializers(free_price,  many=True, context={'request' : request})
     serialized = PromtoionsSerializers.MentionedNumberServiceSerializers(free_price,  many=True, context={'request' : request})
@@ -656,10 +663,11 @@ def get_discount_and_promotions(request):
         **filter_queries['normal_queries'],
         bundlefixed_daterestrictions__start_date__lte = selected_date,
         bundlefixed_daterestrictions__end_date__gte = selected_date,
+        bundlefixed_daterestrictions__business_address__id = selected_location,
     ).exclude(
         Q(bundlefixed_dayrestrictions__day__icontains = selected_day,) |
-        Q(bundlefixed_blockdate__date = selected_date,) |
-        Q(bundlefixed_daterestrictions__business_address__id = selected_location)
+        Q(bundlefixed_blockdate__date = selected_date,) 
+        # Q(bundlefixed_daterestrictions__business_address__id = selected_location)
     ).distinct()
     #serialized = PromtoionsSerializers.AvailOfferBundleFixedSerializers(bundle,  many=True, context={'request' : request})
     serialized = PromtoionsSerializers.BundleFixedSerializers(bundle,  many=True, context={'request' : request})
@@ -672,10 +680,11 @@ def get_discount_and_promotions(request):
         **filter_queries['normal_queries'],
         retailandservice_daterestrictions__start_date__lte = selected_date,
         retailandservice_daterestrictions__end_date__gte = selected_date,
+        retailandservice_daterestrictions__business_address__id = selected_location,
     ).exclude(
         Q(retailandservice_dayrestrictions__day__icontains = selected_day,) |
-        Q(retailandservice_blockdate__date = selected_date,) |
-        Q(retailandservice_daterestrictions__business_address__id = selected_location)
+        Q(retailandservice_blockdate__date = selected_date,) 
+        # Q(retailandservice_daterestrictions__business_address__id = selected_location)
     ).distinct()
     #serialized = PromtoionsSerializers.AvailOfferRetailAndGetServiceSerializers(retail, many=True, context={'request' : request})
     serialized = PromtoionsSerializers.RetailAndGetServiceSerializers(retail, many=True, context={'request' : request})
@@ -688,10 +697,11 @@ def get_discount_and_promotions(request):
         **filter_queries['normal_queries'],
         userrestricteddiscount_daterestrictions__start_date__lte = selected_date,
         userrestricteddiscount_daterestrictions__end_date__gte = selected_date,
+        userrestricteddiscount_daterestrictions__business_address__id = selected_location,
     ).exclude(
         Q(userrestricteddiscount_dayrestrictions__day__icontains = selected_day,) |
-        Q(userrestricteddiscount_blockdate__date = selected_date,) |
-        Q(userrestricteddiscount_daterestrictions__business_address__id = selected_location)
+        Q(userrestricteddiscount_blockdate__date = selected_date,) 
+        # Q(userrestricteddiscount_daterestrictions__business_address__id = selected_location)
     ).distinct()
     #serialized = PromtoionsSerializers.AvailOfferUserRestrictedDiscountSerializers(restricted, many=True, context={'request' : request})
     serialized = PromtoionsSerializers.UserRestrictedDiscountSerializers(restricted, many=True, context={'request' : request})
@@ -704,10 +714,11 @@ def get_discount_and_promotions(request):
         **filter_queries['normal_queries'],
         complimentary_daterestrictions__start_date__lte = selected_date,
         complimentary_daterestrictions__end_date__gte = selected_date,
+        complimentary_daterestrictions__business_address__id = selected_location,
     ).exclude(
         Q(complimentary_dayrestrictions__day__icontains = selected_day,) |
-        Q(complimentary_blockdate__date = selected_date,) |
-        Q(complimentary_daterestrictions__business_address__id = selected_location)
+        Q(complimentary_blockdate__date = selected_date,) 
+        # Q(complimentary_daterestrictions__business_address__id = selected_location)
     ).distinct()
     #serialized = PromtoionsSerializers.AvailOfferComplimentaryDiscountSerializers(complimentry, many=True, context={'request' : request})
     serialized = PromtoionsSerializers.ComplimentaryDiscountSerializers(complimentry, many=True, context={'request' : request})
@@ -718,11 +729,12 @@ def get_discount_and_promotions(request):
     package = PackagesDiscount.objects.filter(
         package_daterestrictions__start_date__lte = selected_date,
         package_daterestrictions__end_date__gte = selected_date,
+        package_daterestrictions__business_address__id = selected_location,
         **filter_queries['normal_queries'],
     ).exclude(
         Q(package_dayrestrictions__day__icontains = selected_day,) |
-        Q(package_blockdate__date = selected_date) |
-        Q(package_daterestrictions__business_address__id = selected_location)
+        Q(package_blockdate__date = selected_date) 
+        # Q(package_daterestrictions__business_address__id = selected_location)
     ).distinct()
     #serialized = PromtoionsSerializers.AvailOfferPackagesDiscountSerializers(package, many=True, context={'request' : request})
     serialized = PromtoionsSerializers.PackagesDiscountSerializers(package, many=True, context={'request' : request})
