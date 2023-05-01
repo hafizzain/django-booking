@@ -2087,7 +2087,7 @@ def create_vouchers(request):
     price = request.data.get('price', None)
 
     currency_voucher_price = request.data.get('currency_voucher_price',None)
-    if not all([business_id , name ,sales, price, voucher_type, validity]):
+    if not all([business_id , name ,sales, voucher_type, validity]):
         return Response(
             {
                 'status' : False,
@@ -2134,11 +2134,13 @@ def create_vouchers(request):
         business = business, 
         name = name,
         #value = value,
+        validity=validity,
         voucher_type=voucher_type,
         #valid_for = valid_for,
         sales = sales,
-        # price = price,    
-        validity=validity 
+        # price = price,  
+        # 
+        # discount = discount,  
         
     )
     if currency_voucher_price is not None:
