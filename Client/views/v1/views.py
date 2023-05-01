@@ -1,5 +1,6 @@
 from datetime import date
 from threading import Thread
+
 from Client.Constants.Add_Employe import add_client
 from Employee.Constants.Add_Employe import add_employee
 from Promotions.models import ServiceDurationForSpecificTime
@@ -12,7 +13,7 @@ from Service.models import Service
 from Business.models import Business, BusinessAddress
 from Product.models import Product
 from Utility.models import Country, Currency, ExceptionRecord, Language, State, City
-from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs
+from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs,VoucherCurrencyPrice
 from Client.serializers import ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer, ClientLoyaltyPointSerializer, CustomerLoyaltyPointsLogsSerializer, CustomerDetailedLoyaltyPointsLogsSerializer
 from Utility.models import NstyleFile
 
@@ -2084,6 +2085,8 @@ def create_vouchers(request):
     
     sales = request.data.get('sales', None)
     price = request.data.get('price', None)
+
+    currency_voucher_price = request.data.get('currency_voucher_price',None)
     if not all([business_id , name ,sales, price, voucher_type, validity]):
         return Response(
             {
@@ -2099,7 +2102,7 @@ def create_vouchers(request):
                           'value',
                           'voucher_type' ,
                           'sales',
-                          'price', 
+                        #   'price', 
                           'validity',
                             ]
                 }
@@ -2134,10 +2137,38 @@ def create_vouchers(request):
         voucher_type=voucher_type,
         #valid_for = valid_for,
         sales = sales,
-        price = price,    
+        # price = price,    
         validity=validity 
         
     )
+    if currency_voucher_price is not None:
+        if type(currency_voucher_price) == str:
+            currency_voucher_price = currency_voucher_price.replace("'" , '"')
+            currency_voucher_price = json.loads(price)
+        else:
+            pass
+        for ser in currency_voucher_price:
+            curency = ser['currency']
+            price = ser['price']
+            
+            try:
+                currency_id = Currency.objects.get(id=curency)
+            except Exception as err:
+                return Response(
+                    {
+                        'status' : False,
+                        'response' : {
+                        'message' : 'Currency not found',
+                        'error_message' : str(err),
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            voucher_obj = VoucherCurrencyPrice.objects.create(
+                voucher = voucher,
+                currency = currency_id,
+                price = price,
+            )
     # voucher.days = days
     # voucher.months = months
     # voucher.save()

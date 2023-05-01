@@ -230,6 +230,19 @@ class Vouchers(models.Model):
     def __str__(self):
         return str(self.id)
 
+class VoucherCurrencyPrice(models.Model):
+    
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    
+    voucher = models.ForeignKey(Vouchers, on_delete=models.CASCADE, related_name='voucher_vouchercurrencyprice')
+    currency = models.ForeignKey(Currency, on_delete=models.SET_NULL, null=True, blank=True)
+    price = models.PositiveIntegerField(default=0)
+
+    is_deleted = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return str(self.id)
+    
 class Rewards(models.Model):
 
     REWARD_TYPES = [
