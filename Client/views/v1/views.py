@@ -2745,7 +2745,7 @@ def get_client_package(request):
 @permission_classes([AllowAny])
 def get_customers_loyalty_points_logs(request):
     location_id = request.GET.get('location_id', None)
-
+    customer_id = request.GET.get('customer_id',None)
 
     if not all([location_id]):
         return Response(
@@ -2757,7 +2757,8 @@ def get_customers_loyalty_points_logs(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'fields are required!',
                     'fields' : [
-                        'location_id'                         
+                        'location_id',
+                        'customer_id',                     
                     ]
                 }
             },
@@ -2766,6 +2767,7 @@ def get_customers_loyalty_points_logs(request):
 
     customers_points = ClientLoyaltyPoint.objects.filter(
         location__id = location_id,
+        client__id = customer_id,
         is_active = True,
         is_deleted = False
     )
