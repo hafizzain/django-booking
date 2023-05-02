@@ -2087,8 +2087,9 @@ def create_vouchers(request):
     price = request.data.get('price', None)
 
     currency_voucher_price = request.data.get('currency_voucher_price',None)
-    
-    if not all([business_id , name ,sales, voucher_type, validity]):
+    discount_percentage = request.data.get('discount_percentage',None)
+
+    if not all([business_id , discount_percentage,name ,sales, voucher_type, validity]):
         return Response(
             {
                 'status' : False,
@@ -2105,6 +2106,7 @@ def create_vouchers(request):
                           'sales',
                         #   'price', 
                           'validity',
+                          'discount_percentage',
                             ]
                 }
             },
@@ -2139,6 +2141,7 @@ def create_vouchers(request):
         voucher_type=voucher_type,
         #valid_for = valid_for,
         sales = sales,
+        discount_percentage = discount_percentage,
         # price = price,  
         # 
         # discount = discount,  
@@ -2176,7 +2179,31 @@ def create_vouchers(request):
     # voucher.days = days
     # voucher.months = months
     # voucher.save()
-    
+    # if voucher_type is not None:
+    #     if type(voucher_type) == str:
+    #         voucher_type = voucher_type.replace("'" , '"')
+    #         voucher_type = json.loads(voucher_type)
+    #     else:
+    #         pass
+    #     for ser in voucher_type:
+    #         percentage = ser.get('percentage', 0)
+    #         try:
+    #             voucher_type=Vouchers.objects.get(id=voucher_type)
+    #         except Exception as err:
+    #             return Response(
+    #                 {
+    #                     'status' : False,
+    #                     'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
+    #                     'response' : {
+    #                     'message' : 'percentage not found',
+    #                     'error_message' : str(err),
+    #                     }
+    #                 },
+    #                 status=status.HTTP_400_BAD_REQUEST
+    #             )
+    #         percentage_obj = DiscountMembership.objects.create(
+    #             percentage =percentage
+    #         )
     serialized = VoucherSerializer(voucher)
        
     return Response(
@@ -2329,14 +2356,14 @@ def create_loyalty(request):
     user = request.user
     business_id = request.data.get('business', None)
     name = request.data.get('name', None)
-    loyaltytype = request.data.get('loyaltytype', None)
+    # loyaltytype = request.data.get('loyaltytype', None)
     amount_spend = request.data.get('amount_spend', None)
     number_points = request.data.get('number_points', None)
     earn_points = request.data.get('earn_points', None)
     location = request.data.get('location', None)
     total_earn_from_points = request.data.get('total_earn_from_points', None)
     
-    if not all([business_id , name , loyaltytype ,amount_spend, number_points, earn_points]):
+    if not all([business_id , name ,amount_spend, number_points, earn_points]):
         return Response(
             {
                 'status' : False,
@@ -2348,7 +2375,7 @@ def create_loyalty(request):
                     'fields' : [
                           'business',
                           'name',
-                          'loyaltytype',
+                        #   'loyaltytype',
                           'amount_spend' ,
                           'number_points',
                           'earn_points', 
@@ -2390,7 +2417,7 @@ def create_loyalty(request):
         user = user,
         business = business,
         name =name,
-        loyaltytype = loyaltytype,
+        # loyaltytype = loyaltytype,
         amount_spend = amount_spend,
         number_points = number_points,
         earn_points = earn_points,

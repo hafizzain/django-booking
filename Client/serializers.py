@@ -199,7 +199,7 @@ class VoucherSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vouchers
         fields = ['id', 'name','user','business','voucher_type',
-                'validity','sales','is_deleted','is_active','created_at','currency_voucher_prices']
+                'validity','sales','is_deleted','is_active','created_at','currency_voucher_prices','discount_percentage']
 
 
 class ClientAppointmentSerializer(serializers.ModelSerializer):

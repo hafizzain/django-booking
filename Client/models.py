@@ -212,7 +212,7 @@ class Vouchers(models.Model):
     # product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_voucher')
     
     #valid_for = models.CharField(choices=VALIDITY_CHOICE, default='Months' , verbose_name='Validity for Days or Months', max_length=20)
-
+    discount_percentage = models.PositiveIntegerField(default=0,blank= True, null=True)
     # days = models.PositiveIntegerField(default=0, verbose_name='No. of Days', null=True, blank=True)
     # months = models.PositiveIntegerField(default=0, verbose_name='No. of Months', null=True, blank=True)
     #validity = models.PositiveIntegerField(default=0, verbose_name='No of Days/Month')
