@@ -2292,6 +2292,8 @@ def delete_vouchers(request):
 @permission_classes([IsAuthenticated])
 def update_vouchers(request):
     id = request.data.get('id', None)
+    currency_voucher = request.data.get('currency_voucher',None)
+
     if id is None: 
         return Response(
         {
@@ -2322,6 +2324,44 @@ def update_vouchers(request):
             },
                 status=status.HTTP_404_NOT_FOUND
         )
+
+    if currency_voucher:  
+        if type(currency_voucher) == str:
+            currency_voucher = currency_voucher.replace("'" , '"')
+            currency_voucher = json.loads(currency_voucher)
+
+        elif type(currency_voucher) == list:
+            pass 
+        
+        for curr in currency_voucher:
+            currency = curr.get('currency', None)
+            id = curr.get('id', None)
+            price = curr.get('price', None)
+            try:
+                currency_id = Currency.objects.get(id=currency)
+            except Exception as err:
+                pass
+            if id is not None:
+                try:
+                    currency_price = VoucherCurrencyPrice.objects.get(id=id)
+                except Exception as err:
+                    pass
+                
+                currency_price.price = price
+                currency_price.save()
+            
+            elif currency_id is not None: 
+                try:
+                    currency_price = VoucherCurrencyPrice.objects.get(currency=currency_id)
+                    currency_price.price = price
+                    currency_price.save()
+                except Exception as err:
+                    #pass
+                    services_obj = VoucherCurrencyPrice.objects.create(
+                        voucher = vouchers,
+                        currency = currency_id,
+                        price = price,
+                    )
     serializer = VoucherSerializer(vouchers, data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(
