@@ -2329,14 +2329,14 @@ def create_loyalty(request):
     user = request.user
     business_id = request.data.get('business', None)
     name = request.data.get('name', None)
-    loyaltytype = request.data.get('loyaltytype', None)
+    # loyaltytype = request.data.get('loyaltytype', None)
     amount_spend = request.data.get('amount_spend', None)
     number_points = request.data.get('number_points', None)
     earn_points = request.data.get('earn_points', None)
     location = request.data.get('location', None)
     total_earn_from_points = request.data.get('total_earn_from_points', None)
     
-    if not all([business_id , name , loyaltytype ,amount_spend, number_points, earn_points]):
+    if not all([business_id , name ,amount_spend, number_points, earn_points]):
         return Response(
             {
                 'status' : False,
@@ -2348,7 +2348,7 @@ def create_loyalty(request):
                     'fields' : [
                           'business',
                           'name',
-                          'loyaltytype',
+                        #   'loyaltytype',
                           'amount_spend' ,
                           'number_points',
                           'earn_points', 
@@ -2390,7 +2390,7 @@ def create_loyalty(request):
         user = user,
         business = business,
         name =name,
-        loyaltytype = loyaltytype,
+        # loyaltytype = loyaltytype,
         amount_spend = amount_spend,
         number_points = number_points,
         earn_points = earn_points,
