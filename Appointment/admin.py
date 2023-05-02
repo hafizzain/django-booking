@@ -2,7 +2,10 @@ from django.contrib import admin
 from Appointment.models import Appointment, AppointmentService, AppointmentNotes, AppointmentCheckout, AppointmentLogs, LogDetails
 
 
-admin.site.register(AppointmentLogs)
+@admin.register(AppointmentLogs)
+class AppointmentLogsAdmin(admin.ModelAdmin):
+    list_display = ['id', 'location', 'appointment', 'is_active', 'is_deleted']
+
 admin.site.register(LogDetails)
 
 admin.site.register(AppointmentNotes)
