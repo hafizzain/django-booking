@@ -31,6 +31,9 @@ class ServiceGroupDiscount(models.Model):
     servicegroup = models.ForeignKey(ServiceGroup, on_delete=models.CASCADE, related_name='servicegroup_specificgroupdiscount')
     discount = models.PositiveIntegerField(default=0, blank= True, null=True)
     
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, blank= True, null=True, related_name='brand_specificgroupdiscount')
+    brand_discount = models.PositiveIntegerField(default=0, blank= True, null=True)
+
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     

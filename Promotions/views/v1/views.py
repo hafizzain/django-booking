@@ -778,8 +778,10 @@ def create_specificgroupdiscount(request):
     blockdate = request.data.get('blockdate', None)
     
     servicegroup = request.data.get('servicegroup', None)    
-    
-    
+
+    # brand = request.data.get('brand', None)
+    # brand_discount = request.data.get('brand_discount', None)
+
     error = []
     
     if not all([business_id]):
@@ -847,14 +849,17 @@ def create_specificgroupdiscount(request):
             try:
                 service_group = cat.get('service_group', None)
                 discount = cat.get('discount', None)
-                
+                brand = cat.get('brand' , None)
+                brand_discount = cat.get('brand_discount' , None)
                 try:
                     service_grp = ServiceGroup.objects.get(id = str(service_group))
+                    brand =Brand.objects.get(id = str(brand))
                 except:
                     pass
                 ServiceGroupDiscount.objects.create(
                     specificgroupdiscount = sp_grp ,
-                    
+                    brand = brand,
+                    brand_discount = brand_discount,
                     servicegroup = service_grp,
                     discount = discount
                 )
