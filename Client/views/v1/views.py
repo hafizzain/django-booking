@@ -2172,6 +2172,7 @@ def create_vouchers(request):
                 currency = currency_id,
                 price = price,
             )
+            # voucher_obj.save()
     # voucher.days = days
     # voucher.months = months
     # voucher.save()

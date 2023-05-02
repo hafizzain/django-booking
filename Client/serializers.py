@@ -6,7 +6,7 @@ from Product.models import Product
 from Service.models import Service
 from Utility.models import Country, State, City
 
-from Client.models import Client, ClientGroup, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription, Promotion , Rewards , Membership, Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs
+from Client.models import Client, ClientGroup, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription, Promotion , Rewards , Membership, Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs , VoucherCurrencyPrice 
 
 class LocationSerializerLoyalty(serializers.ModelSerializer):
     
@@ -148,6 +148,14 @@ class CurrencyPriceMembershipSerializers(serializers.ModelSerializer):
         model = CurrencyPriceMembership
         fields = '__all__'
         
+
+class CurrencyPriceVoucherSerializers(serializers.ModelSerializer):
+    
+    class Meta:
+        model = VoucherCurrencyPrice
+        fields = '__all__'
+
+
 class MembershipSerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField()
     services = serializers.SerializerMethodField()
@@ -180,10 +188,18 @@ class MembershipSerializer(serializers.ModelSerializer):
         fields = ['id', 'name','valid_for','discount','description', 'term_condition','products', 'services', 'currency_membership']
 
 class VoucherSerializer(serializers.ModelSerializer):
+    currency_voucher_prices = serializers.SerializerMethodField(read_only=True)
     
+    def get_currency_voucher_price(self, obj):
+        try:
+            cvp = VoucherCurrencyPrice.objects.filter(voucher = obj).distinct()
+            return CurrencyPriceVoucherSerializers(cvp, many= True).data
+        except Exception as err:
+            print(err)
     class Meta:
         model = Vouchers
-        fields = '__all__'
+        fields = ['id', 'name','user','business','voucher_type',
+                'validity','sales','is_deleted','is_active','created_at','currency_voucher_prices']
 
 
 class ClientAppointmentSerializer(serializers.ModelSerializer):
