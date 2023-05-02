@@ -850,7 +850,7 @@ def create_specificgroupdiscount(request):
                 service_group = cat.get('service_group', None)
                 discount = cat.get('discount', None)
                 brand = cat.get('brand' , None)
-                brand_discount = cat.get('bran_discount' , None)
+                brand_discount = cat.get('brand_discount' , None)
                 try:
                     service_grp = ServiceGroup.objects.get(id = str(service_group))
                 except:
