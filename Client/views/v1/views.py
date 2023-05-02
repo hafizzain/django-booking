@@ -2147,7 +2147,7 @@ def create_vouchers(request):
     if currency_voucher_price is not None:
         if type(currency_voucher_price) == str:
             currency_voucher_price = currency_voucher_price.replace("'" , '"')
-            currency_voucher_price = json.loads(price)
+            currency_voucher_price = json.loads(currency_voucher_price)
         else:
             pass
         for ser in currency_voucher_price:
