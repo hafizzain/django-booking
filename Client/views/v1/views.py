@@ -2087,6 +2087,7 @@ def create_vouchers(request):
     price = request.data.get('price', None)
 
     currency_voucher_price = request.data.get('currency_voucher_price',None)
+    
     if not all([business_id , name ,sales, voucher_type, validity]):
         return Response(
             {
