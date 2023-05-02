@@ -188,9 +188,10 @@ class MembershipSerializer(serializers.ModelSerializer):
         fields = ['id', 'name','valid_for','discount','description', 'term_condition','products', 'services', 'currency_membership']
 
 class VoucherSerializer(serializers.ModelSerializer):
-    currency_voucher_prices = serializers.SerializerMethodField(read_only=True)
-    
-    def get_currency_voucher_price(self, obj):
+    # currency_voucher_prices = serializers.SerializerMethodField(read_only=True)
+    currency_voucher = serializers.SerializerMethodField()
+
+    def get_currency_voucher(self, obj):
         try:
             cvp = VoucherCurrencyPrice.objects.filter(voucher = obj).distinct()
             return CurrencyPriceVoucherSerializers(cvp, many= True).data
@@ -199,7 +200,7 @@ class VoucherSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vouchers
         fields = ['id', 'name','user','business','voucher_type',
-                'validity','sales','is_deleted','is_active','created_at','currency_voucher_prices','discount_percentage']
+                'validity','sales','is_deleted','is_active','created_at','currency_voucher','discount_percentage']
 
 
 class ClientAppointmentSerializer(serializers.ModelSerializer):
