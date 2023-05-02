@@ -219,7 +219,7 @@ class LoyaltyPointsSerializer(serializers.ModelSerializer):
             print(err)
     class Meta:
         model = LoyaltyPoints
-        fields = '__all__'
+        fields = ['id', 'user', 'business','location','name','amount_spend','number_points','earn_points','total_earn_from_points','is_active','is_deleted','is_blocked','created_at']
         
 
 class ClientLoyaltyPointSerializer(serializers.ModelSerializer):
