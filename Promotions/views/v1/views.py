@@ -779,8 +779,8 @@ def create_specificgroupdiscount(request):
     
     servicegroup = request.data.get('servicegroup', None)    
 
-    brand = request.data.get('brand', None)
-    brand_discount = request.data.get('brand_discount', None)
+    # brand = request.data.get('brand', None)
+    # brand_discount = request.data.get('brand_discount', None)
 
     error = []
     
