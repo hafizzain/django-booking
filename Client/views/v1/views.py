@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from threading import Thread
 
 from Client.Constants.Add_Employe import add_client
@@ -2849,6 +2849,9 @@ def get_customers_loyalty_points_logs(request):
     location_id = request.GET.get('location_id', None)
     customer_id = request.GET.get('customer_id',None)
 
+    start_date = request.GET.get('start_date', '2020-01-01')
+    end_date = request.GET.get('end_date', datetime.now().strftime('%Y-%m-%d'))
+
     if not all([location_id]):
         return Response(
             {
@@ -2873,6 +2876,8 @@ def get_customers_loyalty_points_logs(request):
 
     customers_points = ClientLoyaltyPoint.objects.filter(
         location__id = location_id,
+        created_at__gte = start_date,
+        created_at__lte = end_date,
         is_active = True,
         is_deleted = False,
         **queries
