@@ -1294,7 +1294,7 @@ def create_sale_order(request):
     sale_type = request.data.get('selection_type', None)
     client_id = request.data.get('client', None)
     sale_status = request.data.get('status', None)
-    member_id = request.data.get('member', None)
+    member_id = request.data.get('employee_id', None)
     location_id = request.data.get('location', None)
     payment_type = request.data.get('payment_type', None)
     client_type = request.data.get('client_type', None)
@@ -1362,7 +1362,7 @@ def create_sale_order(request):
                     'status' : False,
                     'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
                     'response' : {
-                    'message' : 'Employee not found',
+                    'message' : 'Member not found',
                     'error_message' : str(err),
                 }
             },
@@ -1449,28 +1449,16 @@ def create_sale_order(request):
             minus_price +=(price)
             #print(price)
     
-    for id in ids:          
+    for id in ids:  
+           
+    
         sale_type = id['selection_type']
         service_id = id['id']
         quantity = id['quantity']
         price = id['price']  
-        employee_id = id['employee_id']      
+        member_id = id['employee_id']      
         discount_price = id.get('discount_price', None)
         
-        try:
-            employee_id=Employee.objects.get(id = employee_id)
-        except Exception as err:
-            return Response(
-                {
-                        'status' : False,
-                        'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
-                        'response' : {
-                        'message' : 'Employee not found',
-                        'error_message' : str(err),
-                    }
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
         
         if discount_price is not None:
             price = int(discount_price) #* int(quantity)
@@ -1491,7 +1479,6 @@ def create_sale_order(request):
                 checkout.save()
                 test = False
 
-            
     if type(tip) == str:
         tip = json.loads(tip)
 
