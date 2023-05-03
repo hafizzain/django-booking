@@ -411,6 +411,11 @@ class ClientLoyaltyPoint(models.Model):
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
+
+
+    @property
+    def total_available_points(self, obj):
+        return int(obj.total_earn) - int(obj.points_redeemed)
     
     def __str__(self):
         return str(self.id)

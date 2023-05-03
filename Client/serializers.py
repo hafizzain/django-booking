@@ -225,6 +225,10 @@ class LoyaltyPointsSerializer(serializers.ModelSerializer):
 
 class ClientLoyaltyPointSerializer(serializers.ModelSerializer):
     # location = serializers.SerializerMethodField(read_only=True)
+    total_available_points = serializers.SerializerMethodField(read_only=True)
+
+    def get_total_available_points(self, obj):
+        return obj.total_available_points
     
     # def get_location(self, obj):
     #     try:

@@ -1637,9 +1637,11 @@ def create_checkout(request):
 
     if appointments.client:
         if all([is_redeemed, redeemed_id, redeemed_points]):
+            ExceptionRecord.objects.create(text=f'LOYALTY : is_redeemed : {is_redeemed} redeemed_id {redeemed_id} redeemed_points {redeemed_points}')
             try:
                 client_points = ClientLoyaltyPoint.objects.get(id = redeemed_id)
-            except:
+            except Exception as err:
+                ExceptionRecord.objects.create(text=f'LOYALTY : {err}')
                 pass
             else:
                 client_points.points_redeemed = client_points.points_redeemed + int(redeemed_points)
