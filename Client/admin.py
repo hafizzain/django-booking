@@ -39,6 +39,7 @@ class ClientLoyaltyPointAdmin(admin.ModelAdmin):
         'total_earn',
         'for_every_points',
         'customer_will_get_amount',
+        'total_available_points'
     ]
 @admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
