@@ -35,7 +35,7 @@ class Checkout(models.Model):
 
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client_checkout_orders', null=True, blank=True)
     location = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, related_name='location_checkout_orders', null=True, blank=True)
-    member = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='member_checkout_orders')
+    member = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='member_checkout_orders', null=True)
     client_type = models.CharField(choices = CLIENT_TYPE, max_length=50 , default = '' )
     payment_type = models.CharField(choices = PAYMENT_TYPE, max_length=50 , default = '' )
     
