@@ -7,6 +7,7 @@ from Business.models import BusinessAddress, BusinessTax
 from Product.Constants.index import tenant_media_base_url
 from django_tenants.utils import tenant_context
 from Product.models import Product 
+from Product.serializers import BrandSerializer
 from Promotions.models import BundleFixed, ComplimentaryDiscount, DirectOrFlatDiscount , CategoryDiscount , DateRestrictions , DayRestrictions, BlockDate, DiscountOnFreeService, FixedPriceService, FreeService, MentionedNumberService, PackagesDiscount, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, ServiceDurationForSpecificTime, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount, UserRestrictedDiscount, Service, ServiceGroup
 
 from Utility.models import Currency, ExceptionRecord
@@ -16,6 +17,7 @@ from Utility.models import Currency, ExceptionRecord
 
 class ServiceGroupDiscountSerializers(serializers.ModelSerializer):
     is_deleted = serializers.SerializerMethodField(read_only=True)
+    brand = BrandSerializer(read_only=True)
     
     
     def get_is_deleted(self, obj):
