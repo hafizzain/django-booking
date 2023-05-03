@@ -1324,10 +1324,13 @@ def create_sale_order(request):
     tip = request.data.get('tip', 0)
     total_price = request.data.get('total_price', None)
     minus_price = 0
+
+    # required_fields = [ids,client_type, location_id, total_price ]
+    # return_fields = ['ids','client_type', 'location_id','total_price']
     
     errors = []
     
-    if not all([member_id , client_type, location_id]):
+    if not all([ client_type, location_id]):
         return Response(
             {
                 'status' : False,
@@ -1337,7 +1340,7 @@ def create_sale_order(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'All fields are required.',
                     'fields' : [
-                          'member', 
+                        #   'member', 
                           'selection_type',
                           'location'
                             ]
@@ -1445,13 +1448,29 @@ def create_sale_order(request):
             price = item["price"]
             minus_price +=(price)
             #print(price)
-        
+    
     for id in ids:          
         sale_type = id['selection_type']
         service_id = id['id']
         quantity = id['quantity']
-        price = id['price']        
+        price = id['price']  
+        employee_id = id['employee_id']      
         discount_price = id.get('discount_price', None)
+        
+        try:
+            employee_id=Employee.objects.get(id = employee_id)
+        except Exception as err:
+            return Response(
+                {
+                        'status' : False,
+                        'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
+                        'response' : {
+                        'message' : 'Employee not found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
         if discount_price is not None:
             price = int(discount_price) #* int(quantity)
