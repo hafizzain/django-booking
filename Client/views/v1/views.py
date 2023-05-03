@@ -2867,11 +2867,15 @@ def get_customers_loyalty_points_logs(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+    queries = {}
+    if customer_id is not None:
+        queries['client__id'] = customer_id
+
     customers_points = ClientLoyaltyPoint.objects.filter(
         location__id = location_id,
-        client__id = customer_id,
         is_active = True,
-        is_deleted = False
+        is_deleted = False,
+        **queries
     )
 
     data = CustomerLoyaltyPointsLogsSerializer(customers_points, many=True).data
