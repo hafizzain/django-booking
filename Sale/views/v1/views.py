@@ -1448,20 +1448,7 @@ def create_sale_order(request):
             price = item["price"]
             minus_price +=(price)
             #print(price)
-    try:
-        employee_id=Employee.objects.get(id = employee_id)
-    except Exception as err:
-        return Response(
-            {
-                    'status' : False,
-                    'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
-                    'response' : {
-                    'message' : 'Employee not found',
-                    'error_message' : str(err),
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
+    
     for id in ids:          
         sale_type = id['selection_type']
         service_id = id['id']
@@ -1470,6 +1457,20 @@ def create_sale_order(request):
         employee_id = id['employee_id']      
         discount_price = id.get('discount_price', None)
         
+        try:
+            employee_id=Employee.objects.get(id = employee_id)
+        except Exception as err:
+            return Response(
+                {
+                        'status' : False,
+                        'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
+                        'response' : {
+                        'message' : 'Employee not found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
         if discount_price is not None:
             price = int(discount_price) #* int(quantity)
