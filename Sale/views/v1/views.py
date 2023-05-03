@@ -2002,7 +2002,7 @@ def new_create_sale_order(request):
 
     if type(tip) == str:
         tip = json.loads(tip)
-    elif type(tip) == list:
+    if type(tip) == list:
         pass
 
         for t in tip:
