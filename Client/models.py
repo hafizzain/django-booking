@@ -414,8 +414,8 @@ class ClientLoyaltyPoint(models.Model):
 
 
     @property
-    def total_available_points(self, obj):
-        return int(obj.total_earn) - int(obj.points_redeemed)
+    def total_available_points(self):
+        return int(self.total_earn) - int(self.points_redeemed)
     
     def __str__(self):
         return str(self.id)
