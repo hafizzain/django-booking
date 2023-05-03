@@ -1762,3 +1762,497 @@ def create_sale_order(request):
             },
             status=status.HTTP_201_CREATED
         )
+
+
+
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def new_create_sale_order(request):
+    user = request.user
+    
+    sale_type = request.data.get('selection_type', None)
+    client_id = request.data.get('client', None)
+    sale_status = request.data.get('status', None)
+    # member_id = request.data.get('employee_id', None)
+    
+    location_id = request.data.get('location', None)
+    payment_type = request.data.get('payment_type', None)
+    client_type = request.data.get('client_type', None)
+    ids = request.data.get('ids', None)
+    
+    free_services_quantity = request.data.get('free_services_quantity', None)
+    
+    service_total_price = request.data.get('service_total_price', None)
+    product_total_price = request.data.get('product_total_price', None)
+    voucher_total_price = request.data.get('voucher_total_price', None)
+    
+    service_commission = request.data.get('service_commission', None)
+    product_commission = request.data.get('product_commission', None)
+    voucher_commission = request.data.get('voucher_commission', None)
+    
+    service_commission_type = request.data.get('service_commission_type', '')
+    product_commission_type = request.data.get('product_commission_type', '')
+    voucher_commission_type = request.data.get('voucher_commission_type', '')
+    
+    is_promotion_availed = request.data.get('is_promotion_availed', None)
+    is_promotion = request.data.get('is_promotion', False)
+    duration = request.data.get('duration', None)
+    
+    start_date = request.data.get('start_date', None)
+    end_date = request.data.get('end_date', None)
+     
+    tip = request.data.get('tip', 0)
+    total_price = request.data.get('total_price', None)
+    minus_price = 0
+
+    # required_fields = [ids,client_type, location_id, total_price ]
+    # return_fields = ['ids','client_type', 'location_id','total_price']
+    
+    errors = []
+    
+    if not all([ client_type, location_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        #   'member', 
+                          'selection_type',
+                          'location'
+                            ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+        
+    try:
+        client = Client.objects.get(id = client_id)
+    except Exception as err:
+        client =  None
+                
+    # try:
+    #     member=Employee.objects.get(id = member_id)
+    # except Exception as err:
+    #     return Response(
+    #         {
+    #                 'status' : False,
+    #                 'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
+    #                 'response' : {
+    #                 'message' : 'Member not found',
+    #                 'error_message' : str(err),
+    #             }
+    #         },
+    #         status=status.HTTP_400_BAD_REQUEST
+    #     )
+        
+    try:
+        business_address = BusinessAddress.objects.get(id=location_id)
+    except Exception as err:
+        print(err)
+        pass
+
+    if type(ids) == str:
+        ids = json.loads(ids)
+
+    elif type(ids) == list:
+            pass
+        
+    # if type(tip) == str:
+    #     tip = json.loads(tip)
+
+    # elif type(tip) == list:
+    #     pass
+
+    #     for t in tip:
+    #         member_id = t.get('employee', None)
+    #         checkout_tip = t.get('tip', None)
+    #         # checkout_tip = int(checkout_tip)
+    #         try:
+    #             member_tips_id = Employee.objects.get(id=member_id)
+                
+    #             create_tip = AppointmentEmployeeTip.objects.create(
+    #                 member = member_tips_id,
+    #                 tip = checkout_tip,
+    #                 # id = id,
+    #                 business_address = business_address,
+    #                 # appointment = appointment,
+    #                 # gst = gst,
+    #                 # gst_price = gst_price,
+    #                 # service_price = service_price,
+    #                 # total_price = total_price,
+    #             )        
+    #         except Exception as err:
+    #             pass
+    # service_total_price = int(float(service_total_price))
+    # product_total_price = int(float(product_total_price))
+    # voucher_total_price = int(float(voucher_total_price))
+    
+    checkout = Checkout.objects.create(
+        user = user,
+        
+        client = client, 
+        location = business_address,
+        # member = member ,
+        client_type = client_type,
+        payment_type = payment_type,
+        
+        # service_commission = service_commission,
+        # product_commission = product_commission,
+        # voucher_commission = voucher_commission,   
+        
+        total_voucher_price = voucher_total_price,
+        total_service_price = service_total_price,
+        total_product_price = product_total_price,
+        
+        service_commission_type = service_commission_type,
+        product_commission_type = product_commission_type,
+        voucher_commission_type = voucher_commission_type ,  
+        
+        # tip = tip,
+    )
+    if bool(is_promotion) == True:
+        checkout.is_promotion = True
+        checkout.save()
+        
+    # ExceptionRecord.objects.create(
+    #             text = f' is_promotion condition {bool(is_promotion) == True} is_promotion {is_promotion}'
+    #         )
+    test = True
+    
+    if bool(is_promotion_availed) == True:
+        for item in ids:
+            price = item["price"]
+            minus_price +=(price)
+            #print(price)
+    
+    for id in ids:  
+           
+    
+        sale_type = id['selection_type']
+        service_id = id['id']
+        quantity = id['quantity']
+        price = id['price']  
+        employee_id = id['employee_id']      
+        discount_price = id.get('discount_price', None)
+        try:
+            employee_id=Employee.objects.get(id = employee_id)
+        except Exception as err:
+            return Response(
+                {
+                        'status' : False,
+                        'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
+                        'response' : {
+                        'message' : 'Employee not found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if discount_price is not None:
+            price = int(discount_price) #* int(quantity)
+        
+        # if price > 0 and bool(is_promotion_availed) == True:
+        #     minus_price += price
+        #     ExceptionRecord.objects.create(
+        #         text = f'price {price > 0} minus_price {minus_price}'
+        #     )
+        
+        if price == 0 and bool(is_promotion_availed) == True:
+            number = int(float(total_price))
+            rem_price = number - minus_price
+            price =  int(rem_price) / int(free_services_quantity)
+            
+            if test == True:
+                checkout.total_service_price = int(float(total_price))
+                checkout.save()
+                test = False
+
+    if type(tip) == str:
+        tip = json.loads(tip)
+
+    elif type(tip) == list:
+        pass
+
+        for t in tip:
+            member_id = t.get('employee', None)
+            checkout_tip = t.get('tip', None)
+            # checkout_tip = int(checkout_tip)
+            try:
+                member_tips_id = Employee.objects.get(id=member_id)
+                
+                create_tip = AppointmentEmployeeTip.objects.create(
+                    member = member_tips_id,
+                    tip = checkout_tip,
+                    # id = id,
+                    business_address = business_address,
+                    # appointment = appointment,
+                    # gst = gst,
+                    # gst_price = gst_price,
+                    # service_price = service_price,
+                    # total_price = total_price,
+                )        
+            except Exception as err:
+                pass
+
+        if sale_type == 'PRODUCT':
+            try:
+                product = Product.objects.get(id = service_id)
+            except Exception as err:
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
+                        'response' : {
+                        'message' : 'Something Went Wrong',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+                
+            try:
+                transfer = ProductStock.objects.get(product__id=product.id, location = business_address.id)
+                
+                if transfer.available_quantity >= int(quantity):
+                    stock_transfer = ProductOrderStockReport.objects.create(
+                    report_choice = 'Sold',
+                    product = product,
+                    user = request.user,
+                    location = business_address,
+                    #quantity = int(quantity), 
+                    before_quantity = transfer.available_quantity      
+                    )                    
+                    sold = transfer.available_quantity - int(quantity)
+                    transfer.available_quantity = sold
+                    transfer.sold_quantity += int(quantity)
+                    transfer.save()
+                    
+                    stock_transfer.after_quantity = sold
+                    stock_transfer.save()                    
+                    
+                else:
+                    errors.append('Available quantity issue')
+            
+            except Exception as err:
+                errors.append(str(err))
+            try:
+                admin_email = StockNotificationSetting.objects.get(business = str(business_address.business))
+                if admin_email.notify_stock_turnover == True and transfer.available_quantity <= 5:
+                    try:
+                        thrd = Thread(target=ProductTurnover, args=[], kwargs={'product' : product,'product_stock': transfer, 'business_address':business_address.id ,'tenant' : request.tenant})
+                        thrd.start()
+                    except Exception as err:
+                        ExceptionRecord.objects.create(
+                            text = f' error in Turnover email sale{str(err)}'
+                        )
+            except:
+                pass
+            
+            try:
+                admin_email = StockNotificationSetting.objects.get(business = str(business_address.business))
+                if admin_email.notify_for_lowest_stock == True and transfer.available_quantity <= 5:
+                    try:
+                        thrd = Thread(target=stock_lowest, args=[], kwargs={'product' : product,'product_stock': transfer, 'business_address':business_address.id ,'tenant' : request.tenant,'quantity': transfer.available_quantity})
+                        thrd.start()
+                    except Exception as err:
+                        ExceptionRecord.objects.create(
+                            text = f' error in Stock lowest email sale{str(err)}'
+                        )
+            except:
+                pass
+            
+
+            product_order = ProductOrder.objects.create(
+                user = user,
+                client = client,
+                product = product,
+                #status = sale_status,
+                checkout = checkout,
+                # member = member,
+                location = business_address,
+                # tip = tip,
+                total_price = total_price, 
+                payment_type= payment_type,
+                client_type = client_type,
+                quantity = quantity,
+                current_price = price,
+            )
+            product_order.sold_quantity += 1 # product_stock.sold_quantity
+            product_order.save()
+            checkout.product_commission = product_commission
+            checkout.save()
+
+        elif sale_type == 'SERVICE':
+            try:
+                service = Service.objects.get(id = service_id)
+                service_price = PriceService.objects.filter(service = service_id).first()
+                dur = service_price.duration
+                # ExceptionRecord.objects.create(
+                #     text = f'price {price} discount_price {discount_price}'
+                # )
+                
+                service_order = ServiceOrder.objects.create(
+                    user = user,
+                    service = service,
+                    duration= dur,
+                    checkout = checkout,
+                    
+                    client = client,
+                    # member = member,
+                    location = business_address,
+                    # tip = tip,
+                    total_price = total_price, 
+                    payment_type=payment_type,
+                    client_type = client_type,
+                    quantity = quantity,
+                    current_price = price,
+                    
+                )
+                checkout.service_commission = service_commission
+                checkout.save()
+            except Exception as err:
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
+                        'response' : {
+                        'message' : 'Service not found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        elif sale_type == 'MEMBERSHIP':
+            try:
+                membership = Membership.objects.get(id = service_id)
+                validity = int(membership.valid_for.split(" ")[0])
+                end_date_cal = membership.created_at +  timedelta(days= validity)
+                start_date_cal = membership.created_at
+                
+                membership_order = MemberShipOrder.objects.create(
+                    user= user,
+                    
+                    membership = membership,
+                    start_date = start_date_cal,
+                    end_date = end_date_cal,
+                    #status = sale_status,
+                    checkout = checkout,
+                    client = client,
+                    # member = member,
+                    # tip = tip,
+                    total_price = total_price, 
+                    payment_type =payment_type,
+                    client_type = client_type,
+                    quantity = quantity,
+                    location = business_address,
+                    current_price = price,
+                )
+            except Exception as err:
+                return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_MEMBERSHIP_ID_4040,
+                    'response' : {
+                    'message' : 'Membership not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+            
+        elif sale_type == 'VOUCHER':  
+              
+            #for vouchers in ids:  
+            try:
+                days = 0
+                voucher = Vouchers.objects.get(id = service_id)#str(vouchers))
+                test = voucher.validity.split(" ")[1]
+                
+                if test == 'Days':
+                    day = voucher.validity.split(" ")[0]
+                    day = int(day)
+                    days = day  
+                    
+                elif test == 'Months':
+                    day = voucher.validity.split(" ")[0]
+                    data = int(day)
+                    days = data *  30
+                    
+                                        
+                elif test == 'Years':
+                    day = voucher.validity.split(" ")[0]
+                    day = int(day)
+                    days = day * 360
+                print(days)
+                end_date_cal = voucher.created_at +  timedelta(days=days)
+                start_date_cal = voucher.created_at
+                
+                voucher_order =VoucherOrder.objects.create(
+                    user = user,
+                    
+                    voucher = voucher,
+                    start_date = start_date_cal,
+                    end_date = end_date_cal,
+                    #status = sale_status,
+                    checkout = checkout,
+                    client = client,
+                    # member = member,
+                    # tip = tip,
+                    total_price = total_price, 
+                    payment_type =payment_type,
+                    client_type = client_type,
+                    quantity = quantity,
+                    location = business_address,
+                    current_price = price,
+
+                )
+                checkout.voucher_commission = voucher_commission
+                checkout.save()
+            except Exception as err:
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : StatusCodes.INVALID_VOUCHER_ID_4041,
+                        'response' : {
+                        'message' : 'Voucher not found',
+                        'error_message' : str(err),
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    
+    # try:
+    #     thrd = Thread(target=StaffSaleEmail, args=[], kwargs={'ids' : ids, 'location': business_address.address_name ,'tenant' : request.tenant, 'member': member, 'invoice': checkout.id, 'client': client})
+    #     thrd.start()
+    # except Exception as err:
+    #     ExceptionRecord.objects.create(
+    #             text = f' error in email sale{str(err)}'
+    #         )
+    try:
+        thrd = Thread(target=StaffSaleEmail, args=[], kwargs={'ids' : ids,'location': business_address.address_name ,'tenant' : request.tenant, 'member': member, 'invoice': checkout.id, 'client': client})
+        thrd.start()
+    except Exception as err:
+        ExceptionRecord.objects.create(
+                text = f' error in email sale{str(err)}'
+            )
+    serialized = CheckoutSerializer(checkout, context = {'request' : request, })
+    
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'response' : {
+                    'message' : 'Product Order Sale Created!',
+                    'error_message' : errors,
+                    'sale' : serialized.data,
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
