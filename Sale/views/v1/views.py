@@ -1973,32 +1973,58 @@ def new_create_sale_order(request):
                 checkout.save()
                 test = False
 
+    # if type(tip) == str:
+    #     tip = json.loads(tip)
+
+    # elif type(tip) == list:
+    #     pass
+
+    #     for t in tip:
+    #         member_id = t.get('employee', None, )
+    #         checkout_tip = t.get('tip', None)
+    #         # checkout_tip = int(checkout_tip)
+    #         try:
+    #             member_tips_id = Employee.objects.get(id=member_id)
+                
+    #             create_tip = AppointmentEmployeeTip.objects.create(
+    #                 member = member_tips_id,
+    #                 tip = checkout_tip,
+    #                 # id = id,
+    #                 business_address = business_address,
+    #                 # appointment = appointment,
+    #                 # gst = gst,
+    #                 # gst_price = gst_price,
+    #                 # service_price = service_price,
+    #                 # total_price = total_price,
+    #             )        
+    #         except Exception as err:
+    #             pass
+
     if type(tip) == str:
         tip = json.loads(tip)
-
     elif type(tip) == list:
         pass
 
         for t in tip:
-            member_id = t.get('employee', None)
+            member_id = t.get('employee', None, )
             checkout_tip = t.get('tip', None)
             # checkout_tip = int(checkout_tip)
             try:
                 member_tips_id = Employee.objects.get(id=member_id)
-                
+            except Employee.DoesNotExist:
+                member_tips_id = None
+                    
+            if member_tips_id is not None:
                 create_tip = AppointmentEmployeeTip.objects.create(
-                    member = member_tips_id,
-                    tip = checkout_tip,
-                    # id = id,
-                    business_address = business_address,
-                    # appointment = appointment,
-                    # gst = gst,
-                    # gst_price = gst_price,
-                    # service_price = service_price,
-                    # total_price = total_price,
-                )        
-            except Exception as err:
-                pass
+                    member=member_tips_id,
+                    tip=checkout_tip,
+                    business_address=business_address,
+                    # appointment=appointment,
+                    # gst=gst,
+                    # gst_price=gst_price,
+                    # service_price=service_price,
+                    # total_price=total_price,
+                )
 
         if sale_type == 'PRODUCT':
             try:
