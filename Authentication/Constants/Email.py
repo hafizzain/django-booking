@@ -22,7 +22,15 @@ def send_otp_to_email(user=None, ):
                     text = f"VerificationOTP user for otp{user} {str(err)}"
                 )
     
-    html_file = render_to_string("otp_email.html", {'user_name': user_otp.user.username,'otp': user_otp.code, 'email':user_otp.user.email})
+    user_name = f'{user_otp.user.first_name}'
+    if user_otp.user.last_name:
+        user_name += f' {user_otp.user.last_name}'
+    html_file = render_to_string("otp_email.html", {
+        # 'user_name': user_otp.user.username,
+        'user_name': user_name,
+        'otp': user_otp.code, 
+        'email': user_otp.user.email
+    })
     text_content = strip_tags(html_file)
     
     email = EmailMultiAlternatives(
