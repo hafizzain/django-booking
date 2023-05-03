@@ -2905,6 +2905,9 @@ def get_customer_detailed_loyalty_points(request):
     location_id = request.GET.get('location_id', None)
     client_id = request.GET.get('customer_id', None)
 
+    start_date = request.GET.get('start_date', '2020-01-01')
+    end_date = request.GET.get('end_date', datetime.now().strftime('%Y-%m-%d'))
+
 
     if not all([location_id]):
         # client_id
@@ -2932,6 +2935,8 @@ def get_customer_detailed_loyalty_points(request):
     customers_points = LoyaltyPointLogs.objects.filter(
         # client__id__in = clients_list,
         location__id = location_id,
+        created_at__gte = start_date,
+        created_at__lte = end_date,
         is_active = True,
         is_deleted = False
     )
