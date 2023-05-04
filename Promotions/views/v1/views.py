@@ -4173,6 +4173,7 @@ def create_retail_get_service(request):
             try: 
                 product = pro.get('product', None)
                 service = pro.get('service', None)
+                pro_type = pro.get('type', 'Product')
                 
                 try:
                     product_id = Product.objects.get(id = product)

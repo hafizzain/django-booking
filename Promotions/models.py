@@ -266,12 +266,19 @@ class RetailAndGetService(models.Model):
         return str(self.id)  
 
 class ProductAndGetSpecific(models.Model):
+
+    PROMOTION_TYPE_CHOICES = (
+        ('Brand', 'Brand'),
+        ('Product', 'Product'),
+    )
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True, related_name='product_productandgetspecific')    
     service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='service_productandgetspecific')    
     
     retailandservice = models.ForeignKey(RetailAndGetService, on_delete=models.CASCADE, null=True, blank=True, related_name='retailandservice_productandgetspecific')
+
+    promotion_type = models.CharField(choices=PROMOTION_TYPE_CHOICES, default='Product', max_length=20)
 
     
     is_deleted = models.BooleanField(default=False)
