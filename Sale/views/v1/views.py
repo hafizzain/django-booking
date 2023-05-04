@@ -1774,7 +1774,6 @@ def new_create_sale_order(request):
     sale_type = request.data.get('selection_type', None)
     client_id = request.data.get('client', None)
     sale_status = request.data.get('status', None)
-    # member_id = request.data.get('employee_id', None)
     
     location_id = request.data.get('location', None)
     payment_type = request.data.get('payment_type', None)
@@ -1805,9 +1804,6 @@ def new_create_sale_order(request):
     tip = request.data.get('tip', 0)
     total_price = request.data.get('total_price', None)
     minus_price = 0
-
-    # required_fields = [ids,client_type, location_id, total_price ]
-    # return_fields = ['ids','client_type', 'location_id','total_price']
     
     errors = []
     
@@ -1820,8 +1816,7 @@ def new_create_sale_order(request):
                 'response' : {
                     'message' : 'Invalid Data!',
                     'error_message' : 'All fields are required.',
-                    'fields' : [
-                        #   'member', 
+                    'fields' : [ 
                           'selection_type',
                           'location'
                             ]
@@ -1834,21 +1829,6 @@ def new_create_sale_order(request):
         client = Client.objects.get(id = client_id)
     except Exception as err:
         client =  None
-                
-    # try:
-    #     member=Employee.objects.get(id = member_id)
-    # except Exception as err:
-    #     return Response(
-    #         {
-    #                 'status' : False,
-    #                 'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
-    #                 'response' : {
-    #                 'message' : 'Member not found',
-    #                 'error_message' : str(err),
-    #             }
-    #         },
-    #         status=status.HTTP_400_BAD_REQUEST
-    #     )
         
     try:
         business_address = BusinessAddress.objects.get(id=location_id)
@@ -1862,48 +1842,15 @@ def new_create_sale_order(request):
     elif type(ids) == list:
             pass
         
-    # if type(tip) == str:
-    #     tip = json.loads(tip)
-
-    # elif type(tip) == list:
-    #     pass
-
-    #     for t in tip:
-    #         member_id = t.get('employee', None)
-    #         checkout_tip = t.get('tip', None)
-    #         # checkout_tip = int(checkout_tip)
-    #         try:
-    #             member_tips_id = Employee.objects.get(id=member_id)
-                
-    #             create_tip = AppointmentEmployeeTip.objects.create(
-    #                 member = member_tips_id,
-    #                 tip = checkout_tip,
-    #                 # id = id,
-    #                 business_address = business_address,
-    #                 # appointment = appointment,
-    #                 # gst = gst,
-    #                 # gst_price = gst_price,
-    #                 # service_price = service_price,
-    #                 # total_price = total_price,
-    #             )        
-    #         except Exception as err:
-    #             pass
-    # service_total_price = int(float(service_total_price))
-    # product_total_price = int(float(product_total_price))
-    # voucher_total_price = int(float(voucher_total_price))
     
     checkout = Checkout.objects.create(
         user = user,
         
         client = client, 
         location = business_address,
-        # member = member ,
         client_type = client_type,
         payment_type = payment_type,
         
-        # service_commission = service_commission,
-        # product_commission = product_commission,
-        # voucher_commission = voucher_commission,   
         
         total_voucher_price = voucher_total_price,
         total_service_price = service_total_price,
@@ -1913,22 +1860,17 @@ def new_create_sale_order(request):
         product_commission_type = product_commission_type,
         voucher_commission_type = voucher_commission_type ,  
         
-        # tip = tip,
     )
     if bool(is_promotion) == True:
         checkout.is_promotion = True
         checkout.save()
         
-    # ExceptionRecord.objects.create(
-    #             text = f' is_promotion condition {bool(is_promotion) == True} is_promotion {is_promotion}'
-    #         )
     test = True
     
     if bool(is_promotion_availed) == True:
         for item in ids:
             price = item["price"]
             minus_price +=(price)
-            #print(price)
     
     for id in ids:  
            
@@ -1955,13 +1897,7 @@ def new_create_sale_order(request):
             )
         
         if discount_price is not None:
-            price = int(discount_price) #* int(quantity)
-        
-        # if price > 0 and bool(is_promotion_availed) == True:
-        #     minus_price += price
-        #     ExceptionRecord.objects.create(
-        #         text = f'price {price > 0} minus_price {minus_price}'
-        #     )
+            price = int(discount_price)
         
         if price == 0 and bool(is_promotion_availed) == True:
             number = int(float(total_price))
@@ -1973,58 +1909,6 @@ def new_create_sale_order(request):
                 checkout.save()
                 test = False
 
-    # if type(tip) == str:
-    #     tip = json.loads(tip)
-
-    # elif type(tip) == list:
-    #     pass
-
-    #     for t in tip:
-    #         member_id = t.get('employee', None, )
-    #         checkout_tip = t.get('tip', None)
-    #         # checkout_tip = int(checkout_tip)
-    #         try:
-    #             member_tips_id = Employee.objects.get(id=member_id)
-                
-    #             create_tip = AppointmentEmployeeTip.objects.create(
-    #                 member = member_tips_id,
-    #                 tip = checkout_tip,
-    #                 # id = id,
-    #                 business_address = business_address,
-    #                 # appointment = appointment,
-    #                 # gst = gst,
-    #                 # gst_price = gst_price,
-    #                 # service_price = service_price,
-    #                 # total_price = total_price,
-    #             )        
-    #         except Exception as err:
-    #             pass
-
-    if type(tip) == str:
-        tip = json.loads(tip)
-    elif type(tip) == list:
-        pass
-
-        for t in tip:
-            member_id = t.get('employee', None, )
-            checkout_tip = t.get('tip', None)
-            # checkout_tip = int(checkout_tip)
-            try:
-                member_tips_id = Employee.objects.get(id=member_id)
-            except Employee.DoesNotExist:
-                member_tips_id = None
-                    
-            if member_tips_id is not None:
-                create_tip = AppointmentEmployeeTip.objects.create(
-                    member=member_tips_id,
-                    tip=checkout_tip,
-                    business_address=business_address,
-                    # appointment=appointment,
-                    # gst=gst,
-                    # gst_price=gst_price,
-                    # service_price=service_price,
-                    # total_price=total_price,
-                )
 
         if sale_type == 'PRODUCT':
             try:
@@ -2051,7 +1935,6 @@ def new_create_sale_order(request):
                     product = product,
                     user = request.user,
                     location = business_address,
-                    #quantity = int(quantity), 
                     before_quantity = transfer.available_quantity      
                     )                    
                     sold = transfer.available_quantity - int(quantity)
@@ -2098,11 +1981,8 @@ def new_create_sale_order(request):
                 user = user,
                 client = client,
                 product = product,
-                #status = sale_status,
                 checkout = checkout,
-                # member = member,
                 location = business_address,
-                # tip = tip,
                 total_price = total_price, 
                 payment_type= payment_type,
                 client_type = client_type,
@@ -2119,9 +1999,6 @@ def new_create_sale_order(request):
                 service = Service.objects.get(id = service_id)
                 service_price = PriceService.objects.filter(service = service_id).first()
                 dur = service_price.duration
-                # ExceptionRecord.objects.create(
-                #     text = f'price {price} discount_price {discount_price}'
-                # )
                 
                 service_order = ServiceOrder.objects.create(
                     user = user,
@@ -2130,9 +2007,7 @@ def new_create_sale_order(request):
                     checkout = checkout,
                     
                     client = client,
-                    # member = member,
                     location = business_address,
-                    # tip = tip,
                     total_price = total_price, 
                     payment_type=payment_type,
                     client_type = client_type,
@@ -2168,11 +2043,9 @@ def new_create_sale_order(request):
                     membership = membership,
                     start_date = start_date_cal,
                     end_date = end_date_cal,
-                    #status = sale_status,
                     checkout = checkout,
                     client = client,
-                    # member = member,
-                    # tip = tip,
+
                     total_price = total_price, 
                     payment_type =payment_type,
                     client_type = client_type,
@@ -2181,6 +2054,9 @@ def new_create_sale_order(request):
                     current_price = price,
                 )
             except Exception as err:
+                ExceptionRecord.objects.create(
+                            text = f' error in member price{str(err)}'
+                        )
                 return Response(
                 {
                     'status' : False,
@@ -2220,17 +2096,17 @@ def new_create_sale_order(request):
                 end_date_cal = voucher.created_at +  timedelta(days=days)
                 start_date_cal = voucher.created_at
                 
+                discount_percentage = voucher.discount_percentage
+                
                 voucher_order =VoucherOrder.objects.create(
                     user = user,
                     
                     voucher = voucher,
                     start_date = start_date_cal,
                     end_date = end_date_cal,
-                    #status = sale_status,
                     checkout = checkout,
                     client = client,
-                    # member = member,
-                    # tip = tip,
+                    discount_percentage = discount_percentage,
                     total_price = total_price, 
                     payment_type =payment_type,
                     client_type = client_type,
@@ -2242,6 +2118,9 @@ def new_create_sale_order(request):
                 checkout.voucher_commission = voucher_commission
                 checkout.save()
             except Exception as err:
+                ExceptionRecord.objects.create(
+                            text = f' error in voucher price{str(err)}'
+                        )
                 return Response(
                     {
                         'status' : False,
@@ -2254,20 +2133,26 @@ def new_create_sale_order(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
     
-    # try:
-    #     thrd = Thread(target=StaffSaleEmail, args=[], kwargs={'ids' : ids, 'location': business_address.address_name ,'tenant' : request.tenant, 'member': member, 'invoice': checkout.id, 'client': client})
-    #     thrd.start()
-    # except Exception as err:
-    #     ExceptionRecord.objects.create(
-    #             text = f' error in email sale{str(err)}'
-    #         )
-    # try:
-    #     thrd = Thread(target=StaffSaleEmail, args=[], kwargs={'ids' : ids,'location': business_address.address_name ,'tenant' : request.tenant,'invoice': checkout.id, 'client': client})
-    #     thrd.start()
-    # except Exception as err:
-    #     ExceptionRecord.objects.create(
-    #             text = f' error in email sale{str(err)}'
-    #         )
+    if type(tip) == str:
+        tip = json.loads(tip)
+    if type(tip) == list:
+        pass
+
+        for t in tip:
+            member_id = t.get('employee', None, )
+            checkout_tip = t.get('tip', None)
+            try:
+                member_tips_id = Employee.objects.get(id=member_id)
+            except Employee.DoesNotExist:
+                member_tips_id = None
+                    
+            if member_tips_id is not None:
+                create_tip = AppointmentEmployeeTip.objects.create(
+                    member=member_tips_id,
+                    tip=checkout_tip,
+                    business_address=business_address,
+                )
+
     serialized = CheckoutSerializer(checkout, context = {'request' : request, })
     
     return Response(
