@@ -2572,7 +2572,7 @@ def get_client_all_vouchers(request):
     client_id = request.GET.get('client_id', None)
 
     try:
-        client_vouchers = VoucherOrder.objects.get(
+        client_vouchers = VoucherOrder.objects.filter(
             location__id = location_id,
             client__id = client_id,
         )
