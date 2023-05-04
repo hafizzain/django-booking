@@ -1,6 +1,8 @@
 from datetime import date, datetime
 from threading import Thread
 
+from Order.models import VoucherOrder, Vouchers
+
 from Client.Constants.Add_Employe import add_client
 from Employee.Constants.Add_Employe import add_employee
 from Promotions.models import ServiceDurationForSpecificTime
@@ -14,7 +16,7 @@ from Business.models import Business, BusinessAddress
 from Product.models import Product
 from Utility.models import Country, Currency, ExceptionRecord, Language, State, City
 from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs,VoucherCurrencyPrice
-from Client.serializers import ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer, ClientLoyaltyPointSerializer, CustomerLoyaltyPointsLogsSerializer, CustomerDetailedLoyaltyPointsLogsSerializer
+from Client.serializers import ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer, ClientLoyaltyPointSerializer, CustomerLoyaltyPointsLogsSerializer, CustomerDetailedLoyaltyPointsLogsSerializer, ClientVouchersSerializer
 from Utility.models import NstyleFile
 
 import json
@@ -2560,6 +2562,48 @@ def get_client_available_loyalty_points(request):
         },
         status=status.HTTP_200_OK
     )
+
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_client_all_vouchers(request):
+    location_id = request.GET.get('location_id', None)
+    client_id = request.GET.get('client_id', None)
+
+    try:
+        client_vouchers = VoucherOrder.objects.get(
+            location__id = location_id,
+            client__id = client_id,
+        )
+    except Exception as error:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'response' : {
+                    'message' : 'No Vouchers is found on this location against this Client',
+                    'error_message' : str(error),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    data = ClientVouchersSerializer(client_vouchers).data
+       
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Client Available Vuchers',
+                'error_message' : None,
+                'client_vouchers' : data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
     
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])

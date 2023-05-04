@@ -1,7 +1,7 @@
 from Business.models import BusinessAddress
 from rest_framework import serializers
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
-
+from Order.models import VoucherOrder
 from Product.models import Product
 from Service.models import Service
 from Utility.models import Country, State, City
@@ -240,6 +240,43 @@ class ClientLoyaltyPointSerializer(serializers.ModelSerializer):
         model = ClientLoyaltyPoint
         fields = '__all__'
     
+class ClientVouchersSerializer(serializers.ModelSerializer):
+    voucher = serializers.SerializerMethodField(read_only=True)
+    # location = serializers.SerializerMethodField(read_only=True)
+    order_type  = serializers.SerializerMethodField(read_only=True)
+    client = serializers.SerializerMethodField(read_only=True)
+    name  = serializers.SerializerMethodField(read_only=True)
+        
+    def get_order_type(self, obj):
+        return 'Voucher'
+    
+    def get_client(self, obj):
+        try:
+            serializers = ClientSerializer(obj.client).data
+            return serializers
+        except Exception as err:
+            return None
+    
+    def get_voucher(self, obj):
+        try:
+            return obj.voucher.name
+        except Exception as err:
+            return None
+    
+    def get_name(self, obj):
+        try:
+            return obj.voucher.name
+        except Exception as err:
+            return None
+
+    class Meta:
+        model = VoucherOrder
+        fields = ['id', 'voucher', 'client' , 'location' , 
+                 'member' ,'start_date', 'end_date','status','quantity',
+                 'total_price', 'payment_type' , 'order_type','voucher_price','price',
+                 'name','created_at','discount_percentage', ]
+
+
 class CustomerLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
 
     customer = serializers.SerializerMethodField()
