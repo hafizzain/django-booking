@@ -330,6 +330,7 @@ class FreeServiceSerializers(serializers.ModelSerializer):
         fields = '__all__'
 class ProductAndGetSpecificSerializers(serializers.ModelSerializer):
     is_deleted = serializers.SerializerMethodField(read_only=True)
+    brand = BrandSerializer()
     
     
     def get_is_deleted(self, obj):
