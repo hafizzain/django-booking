@@ -272,7 +272,7 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
     class Meta:
         model = VoucherOrder
         fields = ['id', 'voucher', 'client' , 'location' , 
-                  'start_date', 'end_date','status','quantity',
+                  'status','quantity',
                   'total_price', 'payment_type' , 'order_type','price',
                   'name','created_at','discount_percentage', ]
 
