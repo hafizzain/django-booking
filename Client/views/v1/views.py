@@ -2589,7 +2589,7 @@ def get_client_all_vouchers(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-    data = ClientVouchersSerializer(client_vouchers).data
+    serialized = ClientVouchersSerializer(client_vouchers,many=True)
        
     return Response(
         {
@@ -2598,7 +2598,7 @@ def get_client_all_vouchers(request):
             'response' : {
                 'message' : 'Client Available Vuchers',
                 'error_message' : None,
-                'client_vouchers' : data
+                'client_vouchers' : serialized.data
             }
         },
         status=status.HTTP_200_OK
