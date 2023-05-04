@@ -644,7 +644,7 @@ class VoucherOrderSerializer(serializers.ModelSerializer):
         model = VoucherOrder
         fields =['id', 'voucher', 'client' , 'location' , 
                  'member' ,'start_date', 'end_date','status','quantity',
-                 'total_price', 'payment_type' , 'order_type','voucher_price','price', 'name','created_at' ]
+                 'total_price', 'payment_type' , 'order_type','voucher_price','price', 'name','created_at','discount_percentage', ]
     
 
         
