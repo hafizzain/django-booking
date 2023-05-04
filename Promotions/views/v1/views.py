@@ -4172,13 +4172,22 @@ def create_retail_get_service(request):
         for pro in promotion:
             try: 
                 product = pro.get('product', None)
+                brand = pro.get('brand', None)
                 service = pro.get('service', None)
                 pro_type = pro.get('type', 'Product')
                 
                 try:
                     product_id = Product.objects.get(id = product)
                 except Exception as err:
+                    product_id = None
                     pass
+                
+                try:
+                    brand = Brand.objects.get(id = brand)
+                except Exception as err:
+                    brand = None
+                    pass
+
                 try:
                     service_id = Service.objects.get(id = service)
                 except Exception as err:
@@ -4187,6 +4196,7 @@ def create_retail_get_service(request):
                 ProductAndGetSpecific.objects.create(
                     retailandservice = retail_service,
                     product = product_id,
+                    brand = brand,
                     service = service_id,
                     promotion_type = pro_type
                 )
