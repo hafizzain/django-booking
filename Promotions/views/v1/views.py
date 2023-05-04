@@ -4188,6 +4188,7 @@ def create_retail_get_service(request):
                     retailandservice = retail_service,
                     product = product_id,
                     service = service_id,
+                    promotion_type = pro_type
                 )
                 
             except Exception as err:
