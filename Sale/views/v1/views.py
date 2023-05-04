@@ -2096,6 +2096,8 @@ def new_create_sale_order(request):
                 end_date_cal = voucher.created_at +  timedelta(days=days)
                 start_date_cal = voucher.created_at
                 
+                discount_percentage = voucher.discount_percentage
+                
                 voucher_order =VoucherOrder.objects.create(
                     user = user,
                     
@@ -2104,7 +2106,7 @@ def new_create_sale_order(request):
                     end_date = end_date_cal,
                     checkout = checkout,
                     client = client,
-
+                    discount_percentage = discount_percentage,
                     total_price = total_price, 
                     payment_type =payment_type,
                     client_type = client_type,
