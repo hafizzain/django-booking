@@ -4337,12 +4337,20 @@ def update_retail_get_service(request):
         for pro in promotion:
             id = pro.get('id', None)
             product = pro.get('product', None)
+            brand = pro.get('brand', None)
+            promotion_type = pro.get('type', None)
             service = pro.get('service', None)
             
             try:
                 product_id = Product.objects.get(id = product)
             except Exception as err:
-                pass
+                product_id = None
+
+            try:
+                brand = Brand.objects.get(id = brand)
+            except Exception as err:
+                brand = None
+
             try:
                 service_id = Service.objects.get(id = service)
             except Exception as err:
@@ -4356,6 +4364,9 @@ def update_retail_get_service(request):
                         productandget.delete()
                         continue
                     productandget.product = product_id
+                    if promotion_type:
+                        productandget.promotion_type = promotion_type
+                    productandget.brand = brand
                     productandget.service = service_id
                     productandget.save()
                     
@@ -4364,7 +4375,8 @@ def update_retail_get_service(request):
             else:
                 ProductAndGetSpecific.objects.create(
                     retailandservice = retail_price,
-                    
+                    brand = brand,
+                    promotion_type = promotion_type,
                     product = product_id,
                     service = service_id,
                 ) 
