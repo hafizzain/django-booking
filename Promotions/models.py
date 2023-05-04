@@ -274,6 +274,7 @@ class ProductAndGetSpecific(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True, related_name='product_productandgetspecific')    
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, null=True, blank=True, related_name='brand_productandgetspecific')    
     service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='service_productandgetspecific')    
     
     retailandservice = models.ForeignKey(RetailAndGetService, on_delete=models.CASCADE, null=True, blank=True, related_name='retailandservice_productandgetspecific')
