@@ -257,12 +257,12 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
     employee = serializers.SerializerMethodField()
     
 
-    def get_employee(self, checkout):
-        # serialized = EmployeeBusinessSerializer(checkout.member)
-        # return serialized.data
-        return {
-            'full_name' : str(checkout.member.full_name),
-        }
+    def get_employee(self, voucher_order):
+        if voucher_order.member:
+            return {
+                'full_name' : str(voucher_order.member.full_name),
+            }
+        return ''
 
     def get_location(self, obj):
         try:
