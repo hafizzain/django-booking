@@ -94,4 +94,5 @@ class VouchersAdmin(admin.ModelAdmin):
         'user', 
         'name', 
         'validity',
-        ] 
+        'price'
+    ]
