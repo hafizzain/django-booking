@@ -14,6 +14,8 @@ class SpecificGroupDiscount(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_specificgroup_discount')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='businessgroup_specific_discount')
+    promotion_name = models.CharField(default='Promotion Name', max_length=999)
+
     
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -48,6 +50,9 @@ class PurchaseDiscount(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_purchase_discount')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_purchase_discount')
+
+    promotion_name = models.CharField(default='Promotion Name', max_length=999)
+
     
     select_type= models.CharField(choices=TYPE_CHOICES, max_length=50, default = 'Product')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True, related_name='product_purchase_discount')
@@ -73,6 +78,8 @@ class DirectOrFlatDiscount(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_directorflatdiscount')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_directorflatdiscount')
+
+    promotion_name = models.CharField(default='Promotion Name', max_length=999)
     
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -92,6 +99,8 @@ class SpendDiscount(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_spend_discount')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_spend_discount')
     
+    promotion_name = models.CharField(default='Promotion Name', max_length=999)
+
     spend_amount = models.PositiveIntegerField(default=0, blank= True, null=True)
     select_type= models.CharField(choices=TYPE_CHOICES, max_length=50, default = 'Service')
     service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='service_spend_discount')
@@ -114,6 +123,8 @@ class SpendSomeAmount(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_spendsomeamount')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_spendsomeamount')
+    promotion_name = models.CharField(default='Promotion Name', max_length=999)
+
     
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -146,6 +157,9 @@ class FixedPriceService(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_fixedpriceservice')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_fixedpriceservice')
+
+    promotion_name = models.CharField(default='Promotion Name', max_length=999)
+
     
     spend_amount = models.PositiveIntegerField(default=0, blank= True, null=True)
     duration = models.CharField(max_length=100, default='')
@@ -164,6 +178,7 @@ class SpecificBrand(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_specific_brand')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_specific_brand')
+    promotion_name = models.CharField(default='Promotion Name', max_length=999)
     
     servicegroup = models.ForeignKey(ServiceGroup, on_delete=models.CASCADE, related_name='servicegroup_specific_brand')
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='brand_specific_brand')
@@ -204,6 +219,9 @@ class MentionedNumberService(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_mentionednumberservice')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_mentionednumberservice')
+
+    promotion_name = models.CharField(default='Promotion Name', max_length=999)
+
     
     service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='service_mentionednumberservice')    
 
@@ -238,6 +256,10 @@ class BundleFixed(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_bundlefixed')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_bundlefixed')
+
+    promotion_name = models.CharField(default='Promotion Name', max_length=999)
+    
+
     
     service = models.ManyToManyField(Service, null=True, blank=True, related_name='service_bundlefixed')    
     spend_amount = models.PositiveIntegerField(default=0, blank= True, null=True)
@@ -255,6 +277,9 @@ class RetailAndGetService(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_retailandgetservice')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_retailandgetservice')
+
+    promotion_name = models.CharField(default='Promotion Name', max_length=999)
+
     
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -299,6 +324,9 @@ class UserRestrictedDiscount(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_userrestricteddiscount', null= True, blank = True)
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_userrestricteddiscount')
+
+    promotion_name = models.CharField(default='Promotion Name', max_length=999)
+
     
     corporate_type = models.CharField(choices=CORPORATE_CHOICE, default='All_Service', max_length=50)
     client = models.ManyToManyField(Client, related_name='client_userrestricteddiscount')
@@ -317,6 +345,9 @@ class ComplimentaryDiscount(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_complimentrydiscount')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_complimentrydiscount')
+
+    promotion_name = models.CharField(default='Promotion Name', max_length=999)
+
         
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -331,6 +362,9 @@ class PackagesDiscount(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_packagesdiscount', null= True, blank = True)
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_packagesdiscount')
+
+    promotion_name = models.CharField(default='Promotion Name', max_length=999)
+
     
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
