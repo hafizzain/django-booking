@@ -1588,6 +1588,7 @@ def create_sale_order(request):
                 client_type = client_type,
                 quantity = quantity,
                 current_price = price,
+                price = price,
             )
             product_order.sold_quantity += 1 # product_stock.sold_quantity
             product_order.save()
@@ -1618,6 +1619,7 @@ def create_sale_order(request):
                     client_type = client_type,
                     quantity = quantity,
                     current_price = price,
+                    price = price,
                     
                 )
                 checkout.service_commission = service_commission
@@ -1659,6 +1661,7 @@ def create_sale_order(request):
                     quantity = quantity,
                     location = business_address,
                     current_price = price,
+                    price = price,
                 )
             except Exception as err:
                 return Response(
@@ -1717,6 +1720,7 @@ def create_sale_order(request):
                     quantity = quantity,
                     location = business_address,
                     current_price = price,
+                    price = price,
 
                 )
                 checkout.voucher_commission = voucher_commission
