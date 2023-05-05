@@ -279,10 +279,15 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
             return None
     
     def get_voucher(self, obj):
-        try:
-            return obj.voucher.name
-        except Exception as err:
-            return None
+        if obj.voucher:
+            return {
+                'voucher_type' : obj.voucher.voucher_type,
+                'name' : obj.voucher.name,
+                'start_date' : f'{obj.start_date}',
+                'end_date' : f'{obj.end_date}',
+            }
+        
+        return {}
     
     def get_name(self, obj):
         try:
