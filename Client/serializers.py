@@ -295,7 +295,7 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
         fields = ['id', 'voucher', 'client' , 'location' , 
                   'status','quantity', 'checkout','employee','start_date', 'end_date',
                   'total_price', 'payment_type' , 'order_type','price',
-                  'name','created_at','discount_percentage', ]
+                  'name','created_at','discount_percentage', 'voucher_price' ]
 
 
 class CustomerLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
