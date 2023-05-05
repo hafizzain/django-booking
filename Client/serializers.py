@@ -242,7 +242,7 @@ class ClientLoyaltyPointSerializer(serializers.ModelSerializer):
     
 class ClientVouchersSerializer(serializers.ModelSerializer):
     voucher = serializers.SerializerMethodField(read_only=True)
-    # location = serializers.SerializerMethodField(read_only=True)
+    location = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)
     name  = serializers.SerializerMethodField(read_only=True)
@@ -254,6 +254,23 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
     def get_voucher_price(self, obj):
         return obj.current_price
     
+    employee = serializers.SerializerMethodField()
+    
+
+    def get_employee(self, checkout):
+        # serialized = EmployeeBusinessSerializer(checkout.member)
+        # return serialized.data
+        return {
+            'full_name' : str(checkout.member.full_name),
+        }
+
+    def get_location(self, obj):
+        try:
+            loc = BusinessAddress.objects.get(id = obj.location.id)
+            return LocationSerializerLoyalty(loc).data
+        except Exception as err:
+            print(err)
+
     def get_client(self, obj):
         try:
             serializers = ClientSerializer(obj.client).data
@@ -276,8 +293,8 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
     class Meta:
         model = VoucherOrder
         fields = ['id', 'voucher', 'client' , 'location' , 
-                  'start_date', 'end_date','status','quantity',
-                  'total_price', 'payment_type' , 'order_type','voucher_price','price',
+                  'status','quantity', 'checkout','employee','start_date', 'end_date',
+                  'total_price', 'payment_type' , 'order_type','price',
                   'name','created_at','discount_percentage', ]
 
 
