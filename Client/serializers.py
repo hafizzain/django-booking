@@ -246,9 +246,13 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
     order_type  = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)
     name  = serializers.SerializerMethodField(read_only=True)
+    voucher_price  = serializers.SerializerMethodField(read_only=True)
         
     def get_order_type(self, obj):
         return 'Voucher'
+    
+    def get_voucher_price(self, obj):
+        return obj.current_price
     
     def get_client(self, obj):
         try:
