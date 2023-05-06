@@ -3311,7 +3311,7 @@ def create_vacation_emp(request):
     if days > 0 :
         for i, value in enumerate(range(days+1)):
             if i == 0:
-                from_date = from_date + timedelta(days=i)
+                from_date = from_date 
             else:
                 from_date = from_date + timedelta(days=1)
             try:
