@@ -3311,7 +3311,7 @@ def create_vacation_emp(request):
     if days > 0 :
         for i, value in enumerate(range(days+1)):
             if i == 0:
-                from_date = from_date + timedelta(days=i)
+                from_date = from_date 
             else:
                 from_date = from_date + timedelta(days=1)
             try:
@@ -3475,10 +3475,10 @@ def create_absence(request):
     from_date = datetime.strptime(from_date, "%Y-%m-%d")
     to_date = datetime.strptime(to_date, "%Y-%m-%d")
     diff = to_date - from_date 
-    #print(diff.days)
+    # print(diff.days)
     working_sch = None
     days = int(diff.days)
-
+    print(days)
     empl_absence = Vacation(
         business = business,
         employee = employee_id,
@@ -3488,7 +3488,7 @@ def create_absence(request):
         holiday_type = 'Absence'
     )
     if days > 0 :
-        for i, value in enumerate(range(days+1)):
+        for i, value in enumerate(range(days)):
             if i == 0:
                 from_date = from_date + timedelta(days=i)
             else:
@@ -3500,7 +3500,8 @@ def create_absence(request):
                 )
             except Exception as err:
                 pass
-
+            print(i)
+            print(from_date)
             empl_absence.save()
             if working_sch is not None:
                 #date_obj = datetime.fromisoformat(from_date)
