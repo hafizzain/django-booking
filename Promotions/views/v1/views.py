@@ -1897,6 +1897,7 @@ def update_specificbrand_discount(request):
     
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     error = []
     
@@ -1931,6 +1932,9 @@ def update_specificbrand_discount(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+
+    specific_discount.promotion_name = promotion_name
+    specific_discount.save()
         
     try:
         daterestriction = DateRestrictions.objects.get(specificbrand = specific_discount.id)
