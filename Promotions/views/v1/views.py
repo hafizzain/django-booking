@@ -383,6 +383,7 @@ def update_directorflat(request):
         datetestriction.end_date = end_date
 
     directorflat.promotion_name = promotion_name
+    directorflat.save()
     
     datetestriction.save()
     
