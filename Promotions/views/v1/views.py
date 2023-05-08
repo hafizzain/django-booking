@@ -4133,6 +4133,7 @@ def create_retail_get_service(request):
     business_id = request.data.get('business', None)
     
     promotion = request.data.get('promotion', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
@@ -4178,6 +4179,7 @@ def create_retail_get_service(request):
     retail_service = RetailAndGetService.objects.create(
         user = user,
         business =  business,
+        promotion_name =  promotion_name,
     )
     
     if promotion is not None:
