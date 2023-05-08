@@ -665,7 +665,11 @@ class CheckoutSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
     member  = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
+    promotion_name = serializers.SerializerMethodField(read_only=True)
     
+    def get_promotion_name(self, obj):
+        return 'promotion name'
+        
     def get_client(self, obj):
         try:
             serializers = ClientSerializer(obj.client).data
@@ -723,7 +727,7 @@ class CheckoutSerializer(serializers.ModelSerializer):
         fields = ['id', 'product', 'service', 'membership',
                   'voucher','client','location','member','created_at','payment_type', 'tip',
                   'service_commission', 'voucher_commission', 'product_commission', 'service_commission_type',
-                  'product_commission_type','voucher_commission_type'
+                  'product_commission_type','voucher_commission_type', 'promotion_name',
                   ]
 
 class ParentBusinessTax_RateSerializer(serializers.ModelSerializer):
@@ -746,7 +750,11 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
     price  = serializers.SerializerMethodField(read_only=True)
     voucher_discount_percentage = serializers.SerializerMethodField(read_only=True)
     appointment_service  = serializers.SerializerMethodField(read_only=True)
+    promotion_name  = serializers.SerializerMethodField(read_only=True)
     
+    def get_promotion_name(self, obj):
+        return 'promotion name'
+
     def get_appointment_service(self, obj):
         service = AppointmentService.objects.filter(appointment = obj.appointment)
         return UpdateAppointmentSerializer(service, many = True).data
@@ -799,7 +807,7 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
                  'service','member','business_address','voucher','promotion',
                  'membership','rewards','tip','gst','gst_price','service_price',
                  'total_price','service_commission','service_commission_type','voucher_discount_percentage',
-                 'is_active','is_deleted','created_at', 'order_type', 'client', 'location', 'price']
+                 'is_active','is_deleted','created_at', 'order_type', 'client', 'location', 'price', 'promotion_name']
         
 class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
