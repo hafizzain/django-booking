@@ -2589,7 +2589,7 @@ def get_client_all_vouchers(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-    serialized = ClientMembershipsSerializer(client_vouchers, many=True)
+    serialized = ClientVouchersSerializer(client_vouchers, many=True)
        
     return Response(
         {

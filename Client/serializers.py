@@ -304,7 +304,7 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
                   'name','created_at','discount_percentage', 'voucher_price' ]
 
 class ClientMembershipsSerializer(serializers.ModelSerializer):
-    membership = serializers.SerializerMethodField(read_only=True)
+    # membership = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)
@@ -342,14 +342,14 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
         except Exception as err:
             return None
     
-    def get_membership(self, obj):
-        if obj.membership:
-            return {
-                'membership_type' : obj.membership.membership_type,
-                'name' : obj.membership.name,
-                'start_date' : f'{obj.start_date}',
-                'end_date' : f'{obj.end_date}',
-            }
+    # def get_membership(self, obj):
+    #     if obj.membership:
+    #         return {
+    #             'membership_type' : obj.membership.membership_type,
+    #             'name' : obj.membership.name,
+    #             'start_date' : f'{obj.start_date}',
+    #             'end_date' : f'{obj.end_date}',
+    #         }
         
         return {}
     
@@ -364,7 +364,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = MemberShipOrder
-        fields = ['id', 'membership', 'client' , 'location' , 
+        fields = ['id', 'client' , 'location' , 
                   'status','quantity', 'checkout','employee','start_date', 'end_date',
                   'total_price', 'payment_type' , 'order_type','price',
                   'name','created_at','discount_percentage', 'membership_price', 'discount_type' ]
