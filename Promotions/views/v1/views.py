@@ -2677,6 +2677,7 @@ def update_spend_some_amount(request):
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
     end_date = request.data.get('end_date', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)
@@ -2715,6 +2716,9 @@ def update_spend_some_amount(request):
             status=status.HTTP_404_NOT_FOUND
         )
         
+    spend_some.promotion_name = promotion_name
+    spend_some.save()
+    
     try:
         daterestriction = DateRestrictions.objects.get(spendsomeamount = spend_some.id)
     except Exception as err:
