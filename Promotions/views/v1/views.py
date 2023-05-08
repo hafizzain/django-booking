@@ -43,6 +43,7 @@ def create_directorflat(request):
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
     end_date = request.data.get('end_date', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     dayrestrictions = request.data.get('dayrestrictions', None)
     categorydiscount = request.data.get('categorydiscount', None)
@@ -84,6 +85,7 @@ def create_directorflat(request):
     flatordirect = DirectOrFlatDiscount.objects.create(
         user = user,
         business =  business,
+        promotion_name = promotion_name
     )
     date_res = DateRestrictions.objects.create(
         directorflat = flatordirect ,
