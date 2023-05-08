@@ -1648,6 +1648,7 @@ def create_specificbrand_discount(request):
     
     discount_brand = request.data.get('discount_brand', None)
     discount_service_group = request.data.get('discount_service_group', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
@@ -1725,6 +1726,8 @@ def create_specificbrand_discount(request):
         brand = brand_id,
         discount_brand = discount_brand,
         discount_service_group = discount_service_group,
+
+        promotion_name = promotion_name,
     )
     
     date_res = DateRestrictions.objects.create(
