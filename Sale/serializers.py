@@ -559,12 +559,18 @@ class MemberShipOrderSerializer(serializers.ModelSerializer):
         
     def get_membership_price(self, obj):
         try:
-            return obj.membership.price
+            return obj.current_price
         except Exception as err:
             return None
+    # def get_price(self, obj):
+    #     try:
+    #         return obj.membership.price
+    #     except Exception as err:
+    #         return None
+    
     def get_price(self, obj):
         try:
-            return obj.membership.price
+            return obj.current_price
         except Exception as err:
             return None
     # ,'location' ,'start_date', 'end_date','status', 'total_price', 'payment_type', 'order_type'
