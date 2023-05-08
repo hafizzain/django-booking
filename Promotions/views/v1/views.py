@@ -3314,6 +3314,7 @@ def create_free_service(request):
     # duration = request.data.get('duration', None)
     freeservice = request.data.get('freeService', None)
     service = request.data.get('service', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
@@ -3374,6 +3375,7 @@ def create_free_service(request):
         business =  business,
         
         service = freeservice_id,
+        promotion_name = promotion_name,
         # duration = duration,
         # spend_amount = spend_amount,
     )
