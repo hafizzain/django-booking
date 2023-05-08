@@ -295,6 +295,9 @@ def get_commission_reports_by_commission_details_updated(request):
         status=status.HTTP_200_OK
     )
 
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def get_promotions_and_discounts_sales(request):
 
     dummy_data = [
