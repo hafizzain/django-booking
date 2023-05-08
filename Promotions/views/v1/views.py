@@ -4766,6 +4766,7 @@ def update_user_restricted_discount(request):
     clients = request.data.get('client', None)
     corporate_type = request.data.get('corporate_type', None)
     discount_percentage = request.data.get('discount_percentage', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     error = []
     
@@ -4801,6 +4802,8 @@ def update_user_restricted_discount(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    usr_res.promotion_name = promotion_name
+    usr_res.save()
     
     if corporate_type:
         usr_res.corporate_type = corporate_type
