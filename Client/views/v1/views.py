@@ -2596,7 +2596,7 @@ def get_client_all_vouchers(request):
             'status' : True,
             'status_code' : 200,
             'response' : {
-                'message' : 'Client Available Vuchers',
+                'message' : 'Client Available Vouchers',
                 'error_message' : None,
                 'client_vouchers' : serialized.data
             }
