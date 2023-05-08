@@ -3939,6 +3939,7 @@ def update_bundle_fixed_price(request):
     
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     service = request.data.get('service', None)
     spend_amount = request.data.get('spend_amount', None)
@@ -3977,6 +3978,9 @@ def update_bundle_fixed_price(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    
+    bundle_fixed.promotion_name = promotion_name
+    bundle_fixed.save()
     if spend_amount:
         bundle_fixed.spend_amount = spend_amount
         bundle_fixed.save()
