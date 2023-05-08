@@ -294,3 +294,29 @@ def get_commission_reports_by_commission_details_updated(request):
         },
         status=status.HTTP_200_OK
     )
+
+def get_promotions_and_discounts_sales(request):
+
+    dummy_data = [
+        {
+            'invoice' : {},
+            'discount_name' : 'Dummy Discount Name',
+            'date' : '2023-04-04',
+            'original_price' : 2023,
+            'discount' : 100,
+            'discount_price' : 2023,
+            'location' : 'hello world this is location',
+        }
+    ]
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Sale Orders against Promotions & Discounts',
+                'error_message' : None,
+                'sales' : dummy_data,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
