@@ -1414,7 +1414,7 @@ def update_purchasediscount(request):
     discount_product = request.data.get('discount_product', None)
     discount_service = request.data.get('discount_service', None)
     
-    discount_value = request.data.get('discount_value', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
@@ -1456,6 +1456,9 @@ def update_purchasediscount(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    
+    purchase_discount.promotion_name = promotion_name
+    purchase_discount.save()
         
     try:
         daterestriction = DateRestrictions.objects.get(purchasediscount = purchase_discount.id)
