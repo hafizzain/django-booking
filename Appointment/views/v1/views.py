@@ -1693,9 +1693,9 @@ def create_checkout(request):
                 client = client_points.client,
                 client_points = client_points,
                 loyalty = point,
-                points_earned = 0,
+                points_earned = point.number_points,
                 points_redeemed = 0,
-                balance = 0
+                balance = client_points.total_earn
             )
             
     serialized = CheckoutSerializer(checkout)
