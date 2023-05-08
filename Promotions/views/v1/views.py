@@ -4339,6 +4339,7 @@ def update_retail_get_service(request):
     
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     promotion = request.data.get('promotion', None)
     
@@ -4376,6 +4377,8 @@ def update_retail_get_service(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    retail_price.promotion_name = promotion_name
+    retail_price.save()
        
     if promotion is not None:
         if type(promotion) == str:
