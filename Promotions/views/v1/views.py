@@ -1199,6 +1199,7 @@ def create_purchasediscount(request):
     purchase = request.data.get('purchase', None)
     discount_product = request.data.get('discount_product', None)
     discount_service = request.data.get('discount_service', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     discount_value = request.data.get('discount_value', None)
     
@@ -1247,6 +1248,7 @@ def create_purchasediscount(request):
         select_type = select_type,
         purchase = purchase,
         discount_value = discount_value,
+        promotion_name = promotion_name,
     )
     if select_type == 'Product':
         try:
