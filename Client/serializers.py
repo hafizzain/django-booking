@@ -1,7 +1,8 @@
+
 from Business.models import BusinessAddress
 from rest_framework import serializers
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
-from Order.models import VoucherOrder
+from Order.models import VoucherOrder, MemberShipOrder
 from Product.models import Product
 from Service.models import Service
 from Utility.models import Country, State, City
@@ -301,6 +302,72 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
                   'status','quantity', 'checkout','employee','start_date', 'end_date',
                   'total_price', 'payment_type' , 'order_type','price',
                   'name','created_at','discount_percentage', 'voucher_price' ]
+
+class ClientMembershipsSerializer(serializers.ModelSerializer):
+    membership = serializers.SerializerMethodField(read_only=True)
+    location = serializers.SerializerMethodField(read_only=True)
+    order_type  = serializers.SerializerMethodField(read_only=True)
+    client = serializers.SerializerMethodField(read_only=True)
+    name  = serializers.SerializerMethodField(read_only=True)
+    membership_price  = serializers.SerializerMethodField(read_only=True)
+    discount_type = serializers.SerializerMethodField(read_only=True)
+
+    def get_order_type(self, obj):
+        return 'Membership'
+    
+    def get_membership_price(self, obj):
+        return obj.current_price
+    
+    employee = serializers.SerializerMethodField()
+    
+
+    def get_employee(self, membership_order):
+        if membership_order.member:
+            return {
+                'full_name' : str(membership_order.member.full_name),
+            }
+        return ''
+
+    def get_location(self, obj):
+        try:
+            loc = BusinessAddress.objects.get(id = obj.location.id)
+            return LocationSerializerLoyalty(loc).data
+        except Exception as err:
+            print(err)
+
+    def get_client(self, obj):
+        try:
+            serializers = ClientSerializer(obj.client).data
+            return serializers
+        except Exception as err:
+            return None
+    
+    def get_membership(self, obj):
+        if obj.membership:
+            return {
+                'membership_type' : obj.membership.membership_type,
+                'name' : obj.membership.name,
+                'start_date' : f'{obj.start_date}',
+                'end_date' : f'{obj.end_date}',
+            }
+        
+        return {}
+    
+    def get_name(self, obj):
+        try:
+            return obj.membership.name
+        except Exception as err:
+            return None
+
+    def get_discount_type(self, obj):
+        return obj.membership.discount
+    
+    class Meta:
+        model = MemberShipOrder
+        fields = ['id', 'membership', 'client' , 'location' , 
+                  'status','quantity', 'checkout','employee','start_date', 'end_date',
+                  'total_price', 'payment_type' , 'order_type','price',
+                  'name','created_at','discount_percentage', 'membership_price', 'discount_type' ]
 
 
 class CustomerLoyaltyPointsLogsSerializer(serializers.ModelSerializer):

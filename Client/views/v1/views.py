@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from threading import Thread
 
-from Order.models import VoucherOrder, Vouchers
+from Order.models import VoucherOrder, Vouchers, MemberShipOrder, Membership
 
 from Client.Constants.Add_Employe import add_client
 from Employee.Constants.Add_Employe import add_employee
@@ -16,7 +16,7 @@ from Business.models import Business, BusinessAddress
 from Product.models import Product
 from Utility.models import Country, Currency, ExceptionRecord, Language, State, City
 from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs,VoucherCurrencyPrice
-from Client.serializers import ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer, ClientLoyaltyPointSerializer, CustomerLoyaltyPointsLogsSerializer, CustomerDetailedLoyaltyPointsLogsSerializer, ClientVouchersSerializer
+from Client.serializers import ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer, ClientLoyaltyPointSerializer, CustomerLoyaltyPointsLogsSerializer, CustomerDetailedLoyaltyPointsLogsSerializer, ClientVouchersSerializer, ClientMembershipsSerializer
 from Utility.models import NstyleFile
 
 import json
@@ -2589,7 +2589,7 @@ def get_client_all_vouchers(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-    serialized = ClientVouchersSerializer(client_vouchers, many=True)
+    serialized = ClientMembershipsSerializer(client_vouchers, many=True)
        
     return Response(
         {
@@ -2604,7 +2604,47 @@ def get_client_all_vouchers(request):
         status=status.HTTP_200_OK
     )
 
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_client_all_memberships(request):
+    location_id = request.GET.get('location_id', None)
+    client_id = request.GET.get('client_id', None)
+
+    try:
+        client_membership = MemberShipOrder.objects.filter(
+            location__id = location_id,
+            client__id = client_id,
+        )
+    except Exception as error:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'response' : {
+                    'message' : 'No Membership is found on this location against this Client',
+                    'error_message' : str(error),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
     
+    serialized = ClientMembershipsSerializer(client_membership, many=True)
+       
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Client Available Memberships',
+                'error_message' : None,
+                'client_memberships' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_loyalty(request):
