@@ -64,6 +64,8 @@ urlpatterns = [
    #Vouchers client checkout 
    path('get_client_all_vouchers/', views.get_client_all_vouchers),
    
+   #Membership client checkout
+   path('get_client_all_memberships/', views.get_client_all_memberships),
    #client promotion
    path('get_complimentary/', views.get_complimentary),
    path('get_client_package/', views.get_client_package),
