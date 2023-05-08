@@ -314,19 +314,21 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField()
     services = serializers.SerializerMethodField()
 
+
     def get_products(self, obj):
         try:
-            pro = DiscountMembership.objects.filter(membership = obj, service__isnull = True)
-            return DiscountMembershipSerializers(pro, many= True).data
+            pro = DiscountMembership.objects.filter(membership=obj.membership, service__isnull=True)
+            return DiscountMembershipSerializers(pro, many=True).data
         except Exception as err:
             return str(err)
             
     def get_services(self, obj):
         try:
-            pro = DiscountMembership.objects.filter(membership = obj,  product__isnull = True)
-            return DiscountMembershipSerializers(pro, many= True).data
+            pro = DiscountMembership.objects.filter(membership=obj.membership, product__isnull=True)
+            return DiscountMembershipSerializers(pro, many=True).data
         except Exception as err:
             return str(err)
+    
 
     def get_order_type(self, obj):
         return 'Membership'
