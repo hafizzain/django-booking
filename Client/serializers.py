@@ -311,6 +311,22 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
     name  = serializers.SerializerMethodField(read_only=True)
     membership_price  = serializers.SerializerMethodField(read_only=True)
     discount_type = serializers.SerializerMethodField(read_only=True)
+    products = serializers.SerializerMethodField()
+    services = serializers.SerializerMethodField()
+
+    def get_products(self, obj):
+        try:
+            pro = DiscountMembership.objects.filter(membership = obj, service__isnull = True)
+            return DiscountMembershipSerializers(pro, many= True).data
+        except Exception as err:
+            print(err)
+            
+    def get_services(self, obj):
+        try:
+            pro = DiscountMembership.objects.filter(membership = obj,  product__isnull = True)
+            return DiscountMembershipSerializers(pro, many= True).data
+        except Exception as err:
+            print(err)
 
     def get_order_type(self, obj):
         return 'Membership'
@@ -342,16 +358,6 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
         except Exception as err:
             return None
     
-    # def get_membership(self, obj):
-    #     if obj.membership:
-    #         return {
-    #             'membership_type' : obj.membership.membership_type,
-    #             'name' : obj.membership.name,
-    #             'start_date' : f'{obj.start_date}',
-    #             'end_date' : f'{obj.end_date}',
-    #         }
-        
-        return {}
     
     def get_name(self, obj):
         try:
@@ -360,12 +366,16 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
             return None
 
     def get_discount_type(self, obj):
-        return obj.membership.discount
+        try:
+            return obj.membership.discount
+        except Exception as err:
+            return None
+        
     
     class Meta:
         model = MemberShipOrder
-        fields = ['id', 'client' , 'location' , 
-                  'status','quantity', 'checkout','employee','start_date', 'end_date',
+        fields = ['id','name', 'client' , 'location' , 
+                  'status','quantity','products', 'services', 'checkout','term_condition','employee','start_date', 'end_date',
                   'total_price', 'payment_type' , 'order_type','price',
                   'name','created_at','discount_percentage', 'membership_price', 'discount_type' ]
 
