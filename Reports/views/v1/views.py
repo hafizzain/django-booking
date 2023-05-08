@@ -299,27 +299,36 @@ def get_commission_reports_by_commission_details_updated(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_promotions_and_discounts_sales(request):
+    location_id = request.GET.get('location', None)
+    start_date =  request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
 
-    dummy_data = [
-        {
-            'invoice' : {},
-            'discount_name' : 'Dummy Discount Name',
-            'date' : '2023-04-04',
-            'original_price' : 2023,
-            'discount' : 100,
-            'discount_price' : 2023,
-            'location' : 'hello world this is location',
-        }
-    ]
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Sale Orders against Promotions & Discounts',
-                'error_message' : None,
-                'sales' : dummy_data,
-            }
-        },
-        status=status.HTTP_200_OK
+    paginator = CustomPagination()
+    paginator.page_size = 10
+
+    queries = {}
+
+    if start_date and end_date:
+        queries['created_at__range'] = (start_date, end_date)
+
+    
+    checkout_order = Checkout.objects.filter(
+        is_deleted=False,
+        location__id=location_id,
+        is_promotion = True,
+        **queries,
     )
+    appointment_checkout = AppointmentCheckout.objects.filter(
+        appointment_service__appointment_status='Done',
+        business_address__id=location_id,
+        **queries,
+    )
+
+    data_total = list(CheckoutSerializer(checkout_order, many=True, context={'request': request}).data) + \
+                 list(AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
+                 
+    sorted_data = sorted(data_total, key=lambda x: x['created_at'], reverse=True)
+
+    paginated_data = paginator.paginate_queryset(sorted_data, request)
+
+    return paginator.get_paginated_response(paginated_data, 'sales')
