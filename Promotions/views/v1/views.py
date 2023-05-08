@@ -3103,6 +3103,7 @@ def update_fixed_price_service(request):
     
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     spend_amount = request.data.get('spendAmount', None)
     duration = request.data.get('duration', None)
@@ -3141,6 +3142,9 @@ def update_fixed_price_service(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+
+    fixed_price.promotion_name = promotion_name
+    fixed_price.save()
         
     if service is not None:
         if type(service) == str:
