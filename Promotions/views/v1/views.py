@@ -5156,6 +5156,7 @@ def update_complimentrydiscount(request):
     blockdate = request.data.get('blockdate', None)
     
     freeservice = request.data.get('freeservice', None)  
+    promotion_name = request.data.get('promotion_name', '')  
     
     error = []
     
@@ -5192,6 +5193,8 @@ def update_complimentrydiscount(request):
             status=status.HTTP_404_NOT_FOUND
         )
         
+    complimentry_discount.promotion_name = promotion_name
+    complimentry_discount.save()
         
     if freeservice is not None:
         if type(freeservice) == str:
