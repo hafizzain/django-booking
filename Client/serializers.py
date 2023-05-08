@@ -375,7 +375,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
     class Meta:
         model = MemberShipOrder
         fields = ['id','name', 'client' , 'location' , 
-                  'status','quantity','products', 'services', 'checkout','term_condition','employee','start_date', 'end_date',
+                  'status','quantity','products', 'services', 'checkout','employee','start_date', 'end_date',
                   'total_price', 'payment_type' , 'order_type','price',
                   'name','created_at','discount_percentage', 'membership_price', 'discount_type' ]
 
