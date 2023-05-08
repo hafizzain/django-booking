@@ -3520,6 +3520,7 @@ def update_free_service(request):
     
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)
+    promotion_name = request.data.get('promotion_name', None)
     
     service = request.data.get('service', None)
     freeService = request.data.get('freeService', None)
@@ -3559,6 +3560,8 @@ def update_free_service(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    mention_service.promotion_name = promotion_name
+    mention_service.save()
     
     if freeService:
         try:
