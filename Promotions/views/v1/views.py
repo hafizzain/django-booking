@@ -4580,6 +4580,7 @@ def create_user_restricted_discount(request):
     corporate_type = request.data.get('corporate_type', None)
     discount_percentage = request.data.get('discount_percentage', None)
     clients = request.data.get('client', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
@@ -4624,7 +4625,7 @@ def create_user_restricted_discount(request):
     usr_res = UserRestrictedDiscount.objects.create(
         user = user,
         business =  business,
-        
+        promotion_name = promotion_name,
         corporate_type = corporate_type,
         discount_percentage = discount_percentage
     )
