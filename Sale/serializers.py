@@ -744,7 +744,7 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
     member  = serializers.SerializerMethodField(read_only=True)
     service  = serializers.SerializerMethodField(read_only=True)
     price  = serializers.SerializerMethodField(read_only=True)
-    
+    voucher_discount_percentage = serializers.SerializerMethodField(read_only=True)
     appointment_service  = serializers.SerializerMethodField(read_only=True)
     
     def get_appointment_service(self, obj):
@@ -790,9 +790,16 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
         
         except Exception as err:
             return None
+        
+    def get_voucher_discount_percentage(self, obj):
+        return 'voucher discount percentage'
     class Meta:
         model = AppointmentCheckout
-        fields = ('__all__')
+        fields = ['id','appointment','appointment_service','payment_method',
+                 'service','member','business_address','voucher','promotion',
+                 'membership','rewards','tip','gst','gst_price','service_price',
+                 'total_price','service_commission','service_commission_type','voucher_discount_percentage',
+                 'is_active','is_deleted','created_at']
         
 class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
