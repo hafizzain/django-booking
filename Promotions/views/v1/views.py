@@ -938,6 +938,7 @@ def update_specificgroupdiscount(request):
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
     end_date = request.data.get('end_date', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)
@@ -977,6 +978,9 @@ def update_specificgroupdiscount(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+
+    specific_group.promotion_name = promotion_name
+    specific_group.save()
         
         
     if servicegroup is not None:
