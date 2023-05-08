@@ -320,6 +320,7 @@ def update_directorflat(request):
     
     start_date = request.data.get('start_date', None)
     end_date = request.data.get('end_date', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     dayrestrictions = request.data.get('dayrestrictions', None)
     categorydiscount = request.data.get('categorydiscount', None)
@@ -380,6 +381,8 @@ def update_directorflat(request):
         datetestriction.start_date = start_date
     if end_date:
         datetestriction.end_date = end_date
+        
+    datetestriction.promotion_name = promotion_name
     
     datetestriction.save()
     
