@@ -2486,6 +2486,7 @@ def create_spend_some_amount(request):
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
     end_date = request.data.get('end_date', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)
@@ -2544,6 +2545,7 @@ def create_spend_some_amount(request):
     spend_some_amount = SpendSomeAmount.objects.create(
         user = user,
         business =  business,
+        promotion_name =  promotion_name,
         # service = service_id,
         # spend_amount = spend_amount,
     )
