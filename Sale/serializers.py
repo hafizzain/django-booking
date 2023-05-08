@@ -799,7 +799,7 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
                  'service','member','business_address','voucher','promotion',
                  'membership','rewards','tip','gst','gst_price','service_price',
                  'total_price','service_commission','service_commission_type','voucher_discount_percentage',
-                 'is_active','is_deleted','created_at', 'order_type']
+                 'is_active','is_deleted','created_at', 'order_type', 'client', 'location', 'price']
         
 class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
