@@ -3763,6 +3763,7 @@ def create_bundle_fixed_price(request):
     spend_amount = request.data.get('spend_amount', None)
     # duration = request.data.get('duration', None)
     service = request.data.get('service', None)
+    promotion_name = request.data.get('promotion_name', None)
     #service = request.data.get('service', None)
     
     location = request.data.get('location', None)
@@ -3810,6 +3811,7 @@ def create_bundle_fixed_price(request):
         business =  business,
         
         spend_amount = spend_amount,
+        promotion_name = promotion_name,
     )
     if service is not None:
         if type(service) == str:
