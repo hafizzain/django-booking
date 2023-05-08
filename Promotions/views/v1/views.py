@@ -43,6 +43,7 @@ def create_directorflat(request):
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
     end_date = request.data.get('end_date', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     dayrestrictions = request.data.get('dayrestrictions', None)
     categorydiscount = request.data.get('categorydiscount', None)
@@ -84,6 +85,7 @@ def create_directorflat(request):
     flatordirect = DirectOrFlatDiscount.objects.create(
         user = user,
         business =  business,
+        promotion_name = promotion_name
     )
     date_res = DateRestrictions.objects.create(
         directorflat = flatordirect ,
@@ -318,6 +320,7 @@ def update_directorflat(request):
     
     start_date = request.data.get('start_date', None)
     end_date = request.data.get('end_date', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     dayrestrictions = request.data.get('dayrestrictions', None)
     categorydiscount = request.data.get('categorydiscount', None)
@@ -378,6 +381,9 @@ def update_directorflat(request):
         datetestriction.start_date = start_date
     if end_date:
         datetestriction.end_date = end_date
+
+    directorflat.promotion_name = promotion_name
+    directorflat.save()
     
     datetestriction.save()
     
@@ -773,6 +779,7 @@ def create_specificgroupdiscount(request):
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
     end_date = request.data.get('end_date', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)
@@ -818,6 +825,7 @@ def create_specificgroupdiscount(request):
     sp_grp = SpecificGroupDiscount.objects.create(
         user = user,
         business =  business,
+        promotion_name = promotion_name
     )
     date_res = DateRestrictions.objects.create(
         specificgroupdiscount = sp_grp ,
@@ -931,6 +939,7 @@ def update_specificgroupdiscount(request):
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
     end_date = request.data.get('end_date', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)
@@ -970,6 +979,9 @@ def update_specificgroupdiscount(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+
+    specific_group.promotion_name = promotion_name
+    specific_group.save()
         
         
     if servicegroup is not None:
@@ -1195,6 +1207,7 @@ def create_purchasediscount(request):
     purchase = request.data.get('purchase', None)
     discount_product = request.data.get('discount_product', None)
     discount_service = request.data.get('discount_service', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     discount_value = request.data.get('discount_value', None)
     
@@ -1243,6 +1256,7 @@ def create_purchasediscount(request):
         select_type = select_type,
         purchase = purchase,
         discount_value = discount_value,
+        promotion_name = promotion_name,
     )
     if select_type == 'Product':
         try:
@@ -1400,7 +1414,7 @@ def update_purchasediscount(request):
     discount_product = request.data.get('discount_product', None)
     discount_service = request.data.get('discount_service', None)
     
-    discount_value = request.data.get('discount_value', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
@@ -1442,6 +1456,9 @@ def update_purchasediscount(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    
+    purchase_discount.promotion_name = promotion_name
+    purchase_discount.save()
         
     try:
         daterestriction = DateRestrictions.objects.get(purchasediscount = purchase_discount.id)
@@ -1642,6 +1659,7 @@ def create_specificbrand_discount(request):
     
     discount_brand = request.data.get('discount_brand', None)
     discount_service_group = request.data.get('discount_service_group', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
@@ -1719,6 +1737,8 @@ def create_specificbrand_discount(request):
         brand = brand_id,
         discount_brand = discount_brand,
         discount_service_group = discount_service_group,
+
+        promotion_name = promotion_name,
     )
     
     date_res = DateRestrictions.objects.create(
@@ -1877,6 +1897,7 @@ def update_specificbrand_discount(request):
     
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     error = []
     
@@ -1911,6 +1932,9 @@ def update_specificbrand_discount(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+
+    specific_discount.promotion_name = promotion_name
+    specific_discount.save()
         
     try:
         daterestriction = DateRestrictions.objects.get(specificbrand = specific_discount.id)
@@ -2477,6 +2501,7 @@ def create_spend_some_amount(request):
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
     end_date = request.data.get('end_date', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)
@@ -2535,6 +2560,7 @@ def create_spend_some_amount(request):
     spend_some_amount = SpendSomeAmount.objects.create(
         user = user,
         business =  business,
+        promotion_name =  promotion_name,
         # service = service_id,
         # spend_amount = spend_amount,
     )
@@ -2651,6 +2677,7 @@ def update_spend_some_amount(request):
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
     end_date = request.data.get('end_date', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)
@@ -2689,6 +2716,9 @@ def update_spend_some_amount(request):
             status=status.HTTP_404_NOT_FOUND
         )
         
+    spend_some.promotion_name = promotion_name
+    spend_some.save()
+    
     try:
         daterestriction = DateRestrictions.objects.get(spendsomeamount = spend_some.id)
     except Exception as err:
@@ -2921,6 +2951,7 @@ def create_fixed_price_service(request):
     spend_amount = request.data.get('spendAmount', None)
     duration = request.data.get('duration', None)
     service = request.data.get('service', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
@@ -2969,6 +3000,7 @@ def create_fixed_price_service(request):
         
         # duration = duration,
         spend_amount = spend_amount,
+        promotion_name = promotion_name,
     )
     if service is not None:
         if type(service) == str:
@@ -3071,6 +3103,7 @@ def update_fixed_price_service(request):
     
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     spend_amount = request.data.get('spendAmount', None)
     duration = request.data.get('duration', None)
@@ -3109,6 +3142,9 @@ def update_fixed_price_service(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+
+    fixed_price.promotion_name = promotion_name
+    fixed_price.save()
         
     if service is not None:
         if type(service) == str:
@@ -3305,6 +3341,7 @@ def create_free_service(request):
     # duration = request.data.get('duration', None)
     freeservice = request.data.get('freeService', None)
     service = request.data.get('service', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
@@ -3365,6 +3402,7 @@ def create_free_service(request):
         business =  business,
         
         service = freeservice_id,
+        promotion_name = promotion_name,
         # duration = duration,
         # spend_amount = spend_amount,
     )
@@ -3482,6 +3520,7 @@ def update_free_service(request):
     
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)
+    promotion_name = request.data.get('promotion_name', None)
     
     service = request.data.get('service', None)
     freeService = request.data.get('freeService', None)
@@ -3521,6 +3560,8 @@ def update_free_service(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    mention_service.promotion_name = promotion_name
+    mention_service.save()
     
     if freeService:
         try:
@@ -3748,6 +3789,7 @@ def create_bundle_fixed_price(request):
     spend_amount = request.data.get('spend_amount', None)
     # duration = request.data.get('duration', None)
     service = request.data.get('service', None)
+    promotion_name = request.data.get('promotion_name', None)
     #service = request.data.get('service', None)
     
     location = request.data.get('location', None)
@@ -3795,6 +3837,7 @@ def create_bundle_fixed_price(request):
         business =  business,
         
         spend_amount = spend_amount,
+        promotion_name = promotion_name,
     )
     if service is not None:
         if type(service) == str:
@@ -3896,6 +3939,7 @@ def update_bundle_fixed_price(request):
     
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     service = request.data.get('service', None)
     spend_amount = request.data.get('spend_amount', None)
@@ -3934,6 +3978,9 @@ def update_bundle_fixed_price(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    
+    bundle_fixed.promotion_name = promotion_name
+    bundle_fixed.save()
     if spend_amount:
         bundle_fixed.spend_amount = spend_amount
         bundle_fixed.save()
@@ -4116,6 +4163,7 @@ def create_retail_get_service(request):
     business_id = request.data.get('business', None)
     
     promotion = request.data.get('promotion', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
@@ -4161,6 +4209,7 @@ def create_retail_get_service(request):
     retail_service = RetailAndGetService.objects.create(
         user = user,
         business =  business,
+        promotion_name =  promotion_name,
     )
     
     if promotion is not None:
@@ -4290,6 +4339,7 @@ def update_retail_get_service(request):
     
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     promotion = request.data.get('promotion', None)
     
@@ -4327,6 +4377,8 @@ def update_retail_get_service(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    retail_price.promotion_name = promotion_name
+    retail_price.save()
        
     if promotion is not None:
         if type(promotion) == str:
@@ -4561,6 +4613,7 @@ def create_user_restricted_discount(request):
     corporate_type = request.data.get('corporate_type', None)
     discount_percentage = request.data.get('discount_percentage', None)
     clients = request.data.get('client', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
@@ -4605,7 +4658,7 @@ def create_user_restricted_discount(request):
     usr_res = UserRestrictedDiscount.objects.create(
         user = user,
         business =  business,
-        
+        promotion_name = promotion_name,
         corporate_type = corporate_type,
         discount_percentage = discount_percentage
     )
@@ -4713,6 +4766,7 @@ def update_user_restricted_discount(request):
     clients = request.data.get('client', None)
     corporate_type = request.data.get('corporate_type', None)
     discount_percentage = request.data.get('discount_percentage', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     error = []
     
@@ -4748,6 +4802,8 @@ def update_user_restricted_discount(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
+    usr_res.promotion_name = promotion_name
+    usr_res.save()
     
     if corporate_type:
         usr_res.corporate_type = corporate_type
@@ -4937,6 +4993,7 @@ def create_complimentrydiscount(request):
     location = request.data.get('location', None)
     start_date = request.data.get('start_date', None)
     end_date = request.data.get('end_date', None)
+    promotion_name = request.data.get('promotion_name', '')
     
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)
@@ -4980,6 +5037,7 @@ def create_complimentrydiscount(request):
     complimentry_discount = ComplimentaryDiscount.objects.create(
         user = user,
         business =  business,
+        promotion_name =  promotion_name,
     )
     
     date_res = DateRestrictions.objects.create(
@@ -5098,6 +5156,7 @@ def update_complimentrydiscount(request):
     blockdate = request.data.get('blockdate', None)
     
     freeservice = request.data.get('freeservice', None)  
+    promotion_name = request.data.get('promotion_name', '')  
     
     error = []
     
@@ -5134,6 +5193,8 @@ def update_complimentrydiscount(request):
             status=status.HTTP_404_NOT_FOUND
         )
         
+    complimentry_discount.promotion_name = promotion_name
+    complimentry_discount.save()
         
     if freeservice is not None:
         if type(freeservice) == str:
