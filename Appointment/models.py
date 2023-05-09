@@ -264,8 +264,11 @@ class AppointmentCheckout(models.Model):
         return str(self.id)
 
     def save(self, *args, **kwargs):
-        if self.appointment:
-            pass
+        if self.appointment and self.appointment.is_promotion:
+
+            self.is_promotion = self.appointment.is_promotion
+            self.selected_promotion_id = self.appointment.selected_promotion_id
+            self.selected_promotion_type = self.appointment.selected_promotion_type
 
         super(AppointmentCheckout, self).save(*args, **kwargs)
     
