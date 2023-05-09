@@ -12,6 +12,8 @@ admin.site.register(AppointmentNotes)
 @admin.register(AppointmentCheckout)
 class AppointmentCheckoutAdmin(admin.ModelAdmin):
     list_display = ['id', 'is_promotion']
+
+
 @admin.register(Appointment)
 class AppointmentAdmin(admin.ModelAdmin):
 
@@ -19,6 +21,7 @@ class AppointmentAdmin(admin.ModelAdmin):
         'id',
         'business_name',
         'is_active',
+        'is_promotion'
     ]
 @admin.register(AppointmentService)
 class AppointmentServiceAdmin(admin.ModelAdmin):
