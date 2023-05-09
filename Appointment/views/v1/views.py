@@ -1597,7 +1597,7 @@ def create_checkout(request):
             pass
     # if gst is None:
     #     gst = 0
-    total_price_app  = int(gst) + int(total_price)
+    total_price_app  = float(gst) + float(total_price)
     try:
         commission = CommissionSchemeSetting.objects.get(employee = str(member))
         category = CategoryCommission.objects.filter(commission = commission.id)
@@ -1609,10 +1609,10 @@ def create_checkout(request):
             if cat.category_comission == 'Service':
                 if (int(cat.from_value) <= total_price_app and  total_price_app <  toValue) or (int(cat.from_value) <= total_price_app and sign ):
                     if cat.symbol == '%':
-                        service_commission = total_price_app * int(cat.commission_percentage) / 100
+                        service_commission = total_price_app * float(cat.commission_percentage) / 100
                         service_commission_type = str(service_commission_type) + cat.symbol
                     else:
-                        service_commission = int(cat.commission_percentage)
+                        service_commission = float(cat.commission_percentage)
                         service_commission_type = str(service_commission) + cat.symbol
                                         
     except Exception as err:
@@ -1630,7 +1630,7 @@ def create_checkout(request):
         gst_price = gst_price,
         service_price =service_price,
         total_price =total_price,
-        service_commission = service_commission,
+        service_commission = float(service_commission),
         service_commission_type = service_commission_type,        
     )
     # checkout.business_address = service_appointment.business_address
