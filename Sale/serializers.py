@@ -1087,6 +1087,7 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
             promotion_type=obj.selected_promotion_type,
             promotion_id=obj.selected_promotion_id
         )
+        
         if promotion:
             return {
                 'promotion_name' : ''
