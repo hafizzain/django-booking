@@ -11,11 +11,14 @@ admin.site.register(LogDetails)
 admin.site.register(AppointmentNotes)
 @admin.register(AppointmentCheckout)
 class AppointmentCheckoutAdmin(admin.ModelAdmin):
+    ordering = ('-created_at')
     list_display = ['id', 'is_promotion', 'created_at']
+
 
 
 @admin.register(Appointment)
 class AppointmentAdmin(admin.ModelAdmin):
+    ordering = ('-created_at')
 
     list_display = [
         'id',
@@ -24,6 +27,7 @@ class AppointmentAdmin(admin.ModelAdmin):
         'is_promotion',
         'created_at',
     ]
+
 @admin.register(AppointmentService)
 class AppointmentServiceAdmin(admin.ModelAdmin):
     list_display = [
