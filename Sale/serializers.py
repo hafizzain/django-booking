@@ -1075,3 +1075,146 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
         fields = ['employee', 'location', 'commission', 'commission_rate', 'sale', 'created_at']
     
     
+
+class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
+    product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
+    service  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
+    membership  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
+    voucher  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
+    
+    client = serializers.SerializerMethodField(read_only=True)
+    member  = serializers.SerializerMethodField(read_only=True)
+    location = serializers.SerializerMethodField(read_only=True)
+    promotion_name = serializers.SerializerMethodField(read_only=True)
+    
+    def get_promotion_name(self, obj):
+        return 'promotion name'
+        
+    def get_client(self, obj):
+        try:
+            serializers = ClientSerializer(obj.client).data
+            return serializers
+        except Exception as err:
+            return None
+        
+    def get_member(self, obj):
+        try:
+            serializers = MemberSerializer(obj.member,context=self.context ).data
+            return serializers
+        except Exception as err:
+            return None
+    
+    def get_location(self, obj):
+        try:
+            serializers = LocationSerializer(obj.location).data
+            return serializers
+        except Exception as err:
+            return None
+        
+    def get_membership(self, obj):
+        try:
+            check = MemberShipOrder.objects.filter(checkout =  obj)
+            #all_service = obj.product.all()
+            return MemberShipOrderSerializer(check, many = True , context=self.context ).data
+        except Exception as err:
+            print(str(err))
+            
+    def get_voucher(self, obj):
+        try:
+            check = VoucherOrder.objects.filter(checkout =  obj)
+            #all_service = obj.product.all()
+            return VoucherOrderSerializer(check, many = True , context=self.context ).data
+        except Exception as err:
+            print(str(err))
+    def get_product(self, obj):
+        try:
+            check = ProductOrder.objects.filter(checkout =  obj)
+            #all_service = obj.product.all()
+            return ProductOrderSerializer(check, many = True , context=self.context ).data
+        except Exception as err:
+            print(str(err))
+            
+    def get_service(self, obj):
+        try:
+            service = ServiceOrder.objects.filter(checkout =  obj)
+            #all_service = obj.product.all()
+            return ServiceOrderSerializer(service, many = True , context=self.context ).data
+        except Exception as err:
+            print(str(err))
+    
+    class Meta:
+        model = Checkout
+        fields = ['id', 'product', 'service', 'membership',
+                  'voucher','client','location','member','created_at','payment_type', 'tip',
+                  'service_commission', 'voucher_commission', 'product_commission', 'service_commission_type',
+                  'product_commission_type','voucher_commission_type', 'promotion_name',
+                  ]
+
+class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializer):
+    location = serializers.SerializerMethodField(read_only=True)
+    client = serializers.SerializerMethodField(read_only=True)
+    order_type  = serializers.SerializerMethodField(read_only=True)
+    member  = serializers.SerializerMethodField(read_only=True)
+    service  = serializers.SerializerMethodField(read_only=True)
+    price  = serializers.SerializerMethodField(read_only=True)
+    voucher_discount_percentage = serializers.SerializerMethodField(read_only=True)
+    appointment_service  = serializers.SerializerMethodField(read_only=True)
+    promotion_name  = serializers.SerializerMethodField(read_only=True)
+    
+    def get_promotion_name(self, obj):
+        return 'promotion name'
+
+    def get_appointment_service(self, obj):
+        service = AppointmentService.objects.filter(appointment = obj.appointment)
+        return UpdateAppointmentSerializer(service, many = True).data
+    
+    def get_service(self, obj):
+        try:
+            cli = f"{obj.service.name}"
+            return cli
+
+        except Exception as err:
+            print(err)
+            
+    def get_order_type(self, obj):
+        return 'Appointment'
+    
+    def get_client(self, obj):
+        try:
+            serializers = ClientSerializer(obj.appointment.client).data
+            return serializers
+        except Exception as err:
+            return None
+        
+    def get_price(self, obj):
+        try:
+            return obj.appointment_service.price
+
+        except Exception as err:
+            print(err)
+            
+    def get_member(self, obj):
+        try:
+            serializers = MemberSerializer(obj.member,context=self.context ).data
+            return serializers
+        except Exception as err:
+            return None
+    
+    def get_location(self, obj):
+        try:
+            serializers = LocationSerializer(obj.business_address).data
+            return serializers
+        
+        except Exception as err:
+            return None
+        
+    def get_voucher_discount_percentage(self, obj):
+        return 'voucher discount percentage'
+    class Meta:
+        model = AppointmentCheckout
+        fields = ['id','appointment','appointment_service','payment_method',
+                 'service','member','business_address','voucher','promotion',
+                 'membership','rewards','tip','gst','gst_price','service_price',
+                 'total_price','service_commission','service_commission_type','voucher_discount_percentage',
+                 'is_active','is_deleted','created_at', 'order_type', 'client', 'location', 'price', 'promotion_name']
+        

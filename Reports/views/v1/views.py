@@ -28,7 +28,7 @@ from Product.models import Brand, Product, ProductOrderStockReport, ProductStock
 from django.db.models import Avg, Count, Min, Sum
 
 
-from Sale.serializers import AppointmentCheckout_ReportsSerializer, AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer, CheckoutCommissionSerializer
+from Sale.serializers import AppointmentCheckout_ReportsSerializer, PromotionNDiscount_AppointmentCheckoutSerializer, PromotionNDiscount_CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer, CheckoutCommissionSerializer
 
 
 @api_view(['GET'])
@@ -321,11 +321,12 @@ def get_promotions_and_discounts_sales(request):
     appointment_checkout = AppointmentCheckout.objects.filter(
         appointment_service__appointment_status='Done',
         business_address__id=location_id,
+        is_promotion = True,
         **queries,
     )
 
-    data_total = list(CheckoutSerializer(checkout_order, many=True, context={'request': request}).data) + \
-                 list(AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
+    data_total = list(PromotionNDiscount_CheckoutSerializer(checkout_order, many=True, context={'request': request}).data) + \
+                 list(PromotionNDiscount_AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
                  
     sorted_data = sorted(data_total, key=lambda x: x['created_at'], reverse=True)
 
