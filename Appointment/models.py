@@ -102,6 +102,11 @@ class Appointment(models.Model):
     
     service_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
     service_commission_type = models.CharField( max_length=50 , default = '')
+
+
+    is_promotion = models.BooleanField(default=False)
+    selected_promotion_id = models.CharField(default='', max_length=800)
+    selected_promotion_type = models.CharField(default='', max_length=400)
     
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
@@ -257,6 +262,12 @@ class AppointmentCheckout(models.Model):
     
     def __str__(self):
         return str(self.id)
+
+    def save(self, *args, **kwargs):
+        if self.appointment:
+            pass
+
+        super(AppointmentCheckout, self).save(*args, **kwargs)
     
     @property
     def fun():
