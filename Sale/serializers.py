@@ -12,7 +12,7 @@ from Order.models import Checkout, MemberShipOrder, Order, ProductOrder, Service
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
 from django_tenants.utils import tenant_context
 from Utility.models import Currency, ExceptionRecord
-
+from Sale.Constants.Promotion import get_promotions
 from Product.models import ProductStock
 
 from Service.models import PriceService, Service, ServiceGroup
@@ -1077,13 +1077,22 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
     
 
 class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
-    promotion_name = serializers.SerializerMethodField(read_only=True)
+    promotion = serializers.SerializerMethodField(read_only=True)
     invoice = serializers.SerializerMethodField(read_only=True)
     original_price = serializers.SerializerMethodField(read_only=True)
     discounted_price = serializers.SerializerMethodField(read_only=True)
     
-    def get_promotion_name(self, obj):
-        return 'promotion name'
+    def get_promotion(self, obj):
+        promotion = get_promotions(
+            promotion_type=obj.selected_promotion_type,
+            promotion_id=obj.selected_promotion_id
+        )
+        if promotion:
+            return {
+                'promotion_name' : ''
+            }
+
+        return None
         
     def get_invoice(self, obj):
         return {}
@@ -1097,17 +1106,26 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
         
     class Meta:
         model = Checkout
-        fields = ['id', 'promotion_name', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location']
+        fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location']
 
 class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
-    promotion_name = serializers.SerializerMethodField(read_only=True)
+    promotion = serializers.SerializerMethodField(read_only=True)
     invoice = serializers.SerializerMethodField(read_only=True)
     original_price = serializers.SerializerMethodField(read_only=True)
     discounted_price = serializers.SerializerMethodField(read_only=True)
     
-    def get_promotion_name(self, obj):
-        return 'promotion name'
+    def get_promotion(self, obj):
+        promotion = get_promotions(
+            promotion_type=obj.selected_promotion_type,
+            promotion_id=obj.selected_promotion_id
+        )
+        if promotion:
+            return {
+                'promotion_name' : ''
+            }
+
+        return None
         
     def get_invoice(self, obj):
         return {}
@@ -1129,5 +1147,5 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
         
     class Meta:
         model = AppointmentCheckout
-        fields = ['id', 'promotion_name', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location']
+        fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location']
         
