@@ -1499,6 +1499,8 @@ def create_checkout(request):
     service_price = request.data.get('service_price', None)
     total_price = request.data.get('total_price', 0)
 
+    is_promotion_availed = request.data.get('is_promotion_availed', False)
+    
 
     is_redeemed = request.data.get('is_redeemed', None)
     redeemed_id = request.data.get('redeemed_id', None)
@@ -1633,6 +1635,9 @@ def create_checkout(request):
     )
     # checkout.business_address = service_appointment.business_address
     # checkout.save()
+
+    if is_promotion_availed:
+        checkout.save()
 
 
     if appointments.client:
