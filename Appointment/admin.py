@@ -11,7 +11,7 @@ admin.site.register(LogDetails)
 admin.site.register(AppointmentNotes)
 @admin.register(AppointmentCheckout)
 class AppointmentCheckoutAdmin(admin.ModelAdmin):
-    list_display = ['id', 'is_promotion']
+    list_display = ['id', 'is_promotion', 'created_at']
 
 
 @admin.register(Appointment)
