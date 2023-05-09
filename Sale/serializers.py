@@ -1077,78 +1077,27 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
     
 
 class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
-    product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
-    service  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
-    membership  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
-    voucher  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
-    
-    client = serializers.SerializerMethodField(read_only=True)
-    member  = serializers.SerializerMethodField(read_only=True)
-    location = serializers.SerializerMethodField(read_only=True)
     promotion_name = serializers.SerializerMethodField(read_only=True)
+    invoice = serializers.SerializerMethodField(read_only=True)
+    original_price = serializers.SerializerMethodField(read_only=True)
+    discounted_price = serializers.SerializerMethodField(read_only=True)
     
     def get_promotion_name(self, obj):
         return 'promotion name'
         
-    def get_client(self, obj):
-        try:
-            serializers = ClientSerializer(obj.client).data
-            return serializers
-        except Exception as err:
-            return None
+    def get_invoice(self, obj):
+        return {}
         
-    def get_member(self, obj):
-        try:
-            serializers = MemberSerializer(obj.member,context=self.context ).data
-            return serializers
-        except Exception as err:
-            return None
+    def get_original_price(self, obj):
+        return 999
     
-    def get_location(self, obj):
-        try:
-            serializers = LocationSerializer(obj.location).data
-            return serializers
-        except Exception as err:
-            return None
+
+    def get_discounted_price(self, obj):
+        return 999
         
-    def get_membership(self, obj):
-        try:
-            check = MemberShipOrder.objects.filter(checkout =  obj)
-            #all_service = obj.product.all()
-            return MemberShipOrderSerializer(check, many = True , context=self.context ).data
-        except Exception as err:
-            print(str(err))
-            
-    def get_voucher(self, obj):
-        try:
-            check = VoucherOrder.objects.filter(checkout =  obj)
-            #all_service = obj.product.all()
-            return VoucherOrderSerializer(check, many = True , context=self.context ).data
-        except Exception as err:
-            print(str(err))
-    def get_product(self, obj):
-        try:
-            check = ProductOrder.objects.filter(checkout =  obj)
-            #all_service = obj.product.all()
-            return ProductOrderSerializer(check, many = True , context=self.context ).data
-        except Exception as err:
-            print(str(err))
-            
-    def get_service(self, obj):
-        try:
-            service = ServiceOrder.objects.filter(checkout =  obj)
-            #all_service = obj.product.all()
-            return ServiceOrderSerializer(service, many = True , context=self.context ).data
-        except Exception as err:
-            print(str(err))
-    
     class Meta:
         model = Checkout
-        fields = ['id', 'product', 'service', 'membership',
-                  'voucher','client','location','member','created_at','payment_type', 'tip',
-                  'service_commission', 'voucher_commission', 'product_commission', 'service_commission_type',
-                  'product_commission_type','voucher_commission_type', 'promotion_name',
-                  ]
+        fields = ['id', 'promotion_name', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location']
 
 class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
