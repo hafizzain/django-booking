@@ -1864,15 +1864,17 @@ def new_create_sale_order(request):
         product_commission_type = product_commission_type,
         voucher_commission_type = voucher_commission_type ,  
     )
-    if bool(is_promotion) == True:
+    # if is_promotion:
+    #     checkout.save()
+        
+        
+    test = True
+    
+    if is_promotion_availed :
         checkout.is_promotion = True
         checkout.selected_promotion_id = request.data.get('selected_promotion_id', '')
         checkout.selected_promotion_type = request.data.get('selected_promotion_type', '')
         checkout.save()
-        
-    test = True
-    
-    if bool(is_promotion_availed) == True:
         for item in ids:
             price = item["price"]
             minus_price +=(price)
