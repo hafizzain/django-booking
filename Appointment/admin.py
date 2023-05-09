@@ -21,7 +21,8 @@ class AppointmentAdmin(admin.ModelAdmin):
         'id',
         'business_name',
         'is_active',
-        'is_promotion'
+        'is_promotion',
+        'created_at',
     ]
 @admin.register(AppointmentService)
 class AppointmentServiceAdmin(admin.ModelAdmin):
