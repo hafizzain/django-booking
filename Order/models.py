@@ -57,7 +57,20 @@ class Checkout(models.Model):
     is_promotion = models.BooleanField(default=False)
     selected_promotion_id = models.CharField(default='', max_length=800)
     selected_promotion_type = models.CharField(default='', max_length=400)
-    
+    """
+        Direct Or Flat
+        Specific Group Discount
+        Purchase Discount
+        Specific Brand Discount
+        Spend_Some_Amount
+        Fixed_Price_Service
+        Mentioned_Number_Service
+        Bundle_Fixed_Service
+        Retail_and_Get_Service
+        User_Restricted_discount
+        Complimentary_Discount
+        Packages_Discount
+    """
     status =  models.CharField(choices=status_choice, max_length=100, default='Active')
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)

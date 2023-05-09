@@ -13,5 +13,9 @@ class VoucherOrderAdmin(admin.ModelAdmin):
 
 
 
-admin.site.register(Checkout)
+@admin.register(Checkout)
+class CheckoutAdmin(admin.ModelAdmin):
+    list_display = ['id', 'is_promotion']
+
+    
 admin.site.register(CheckoutPayment)

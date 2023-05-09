@@ -1863,10 +1863,11 @@ def new_create_sale_order(request):
         service_commission_type = service_commission_type,
         product_commission_type = product_commission_type,
         voucher_commission_type = voucher_commission_type ,  
-        
     )
     if bool(is_promotion) == True:
         checkout.is_promotion = True
+        checkout.selected_promotion_id = request.data.get('selected_promotion_id', '')
+        checkout.selected_promotion_type = request.data.get('selected_promotion_type', '')
         checkout.save()
         
     test = True
@@ -1877,7 +1878,6 @@ def new_create_sale_order(request):
             minus_price +=(price)
     
     for id in ids:  
-           
     
         sale_type = id['selection_type']
         service_id = id['id']
