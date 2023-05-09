@@ -55,6 +55,8 @@ class Checkout(models.Model):
     voucher_commission_type = models.CharField( max_length=50 , default = '')
     
     is_promotion = models.BooleanField(default=False)
+    selected_promotion_id = models.CharField(default='', max_length=800)
+    selected_promotion_type = models.CharField(default='', max_length=400)
     
     status =  models.CharField(choices=status_choice, max_length=100, default='Active')
     is_deleted = models.BooleanField(default=False)
