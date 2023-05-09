@@ -333,6 +333,8 @@ def create_appointment(request):
     
     selected_promotion_type = request.data.get('selected_promotion_type', None) 
     selected_promotion_id = request.data.get('selected_promotion_id', None) 
+    is_promotion_availed = request.data.get('is_promotion_availed', False)
+        
        
     Errors = []
     total_price_app= 0
@@ -401,6 +403,13 @@ def create_appointment(request):
             payment_method=payment_method,
             discount_type=discount_type,
         )
+
+    if is_promotion_availed:
+        appointment.is_promotion = True
+        appointment.selected_promotion_id = request.data.get('selected_promotion_id', '')
+        appointment.selected_promotion_type = request.data.get('selected_promotion_type', '')
+        appointment.save()
+
    
     
     if business_address_id is not None:
