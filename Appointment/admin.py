@@ -9,7 +9,9 @@ class AppointmentLogsAdmin(admin.ModelAdmin):
 admin.site.register(LogDetails)
 
 admin.site.register(AppointmentNotes)
-admin.site.register(AppointmentCheckout)
+@admin.register(AppointmentCheckout)
+class AppointmentCheckoutAdmin(admin.ModelAdmin):
+    list_display = ['id', 'is_promotion']
 @admin.register(Appointment)
 class AppointmentAdmin(admin.ModelAdmin):
 
