@@ -3,17 +3,17 @@ from Promotions import models as ProModel
 
 PROMOTION_TYPES_MODELS = {
     'Direct Or Flat' : ProModel.DirectOrFlatDiscount,
-    'Specific Group Discount' : ProModel.DirectOrFlatDiscount,
-    'Purchase Discount' : ProModel.DirectOrFlatDiscount,
-    'Specific Brand Discount' : ProModel.DirectOrFlatDiscount,
-    'Spend_Some_Amount' : ProModel.DirectOrFlatDiscount,
-    'Fixed_Price_Service' : ProModel.DirectOrFlatDiscount,
-    'Mentioned_Number_Service' : ProModel.DirectOrFlatDiscount,
-    'Bundle_Fixed_Service' : ProModel.DirectOrFlatDiscount,
-    'Retail_and_Get_Service' : ProModel.DirectOrFlatDiscount,
-    'User_Restricted_discount' : ProModel.DirectOrFlatDiscount,
-    'Complimentary_Discount' : ProModel.DirectOrFlatDiscount,
-    'Packages_Discount' : ProModel.DirectOrFlatDiscount,
+    'Specific Group Discount' : ProModel.SpecificGroupDiscount,
+    'Purchase Discount' : ProModel.PurchaseDiscount,
+    'Specific Brand Discount' : ProModel.SpecificBrand,
+    'Spend_Some_Amount' : ProModel.SpendSomeAmount,
+    'Fixed_Price_Service' : ProModel.FixedPriceService,
+    'Mentioned_Number_Service' : ProModel.MentionedNumberService,
+    'Bundle_Fixed_Service' : ProModel.BundleFixed,
+    'Retail_and_Get_Service' : ProModel.RetailAndGetService,
+    'User_Restricted_discount' : ProModel.UserRestrictedDiscount,
+    'Complimentary_Discount' : ProModel.ComplimentaryDiscount,
+    'Packages_Discount' : ProModel.PackagesDiscount,
 }
 
 
@@ -29,4 +29,6 @@ def get_promotions(promotion_type=None, promotion_id=None):
     except:
         return None
     else:
-        return instance
+        return {
+            'promotion_name' : instance.promotion_name,
+        }

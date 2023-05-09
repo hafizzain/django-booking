@@ -1089,9 +1089,7 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
         )
         
         if promotion:
-            return {
-                'promotion_name' : ''
-            }
+            return promotion
 
         return None
         
@@ -1122,9 +1120,7 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
             promotion_id=obj.selected_promotion_id
         )
         if promotion:
-            return {
-                'promotion_name' : ''
-            }
+            return promotion
 
         return None
         
