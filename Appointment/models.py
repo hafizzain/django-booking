@@ -223,7 +223,7 @@ class AppointmentCheckout(models.Model):
     rewards =models.ForeignKey(Rewards, on_delete=models.CASCADE, related_name='checkout_reward_appointments', null=True, blank=True) 
     
     tip = models.PositiveIntegerField(default=0, null=True, blank=True)
-    gst = models.PositiveIntegerField(default=0, null=True, blank=True)
+    gst = models.FloatField(default=0, null=True, blank=True)
     gst_price = models.FloatField(default=0, null=True, blank=True)
     
     service_price = models.PositiveIntegerField(default=0, null=True, blank=True)
