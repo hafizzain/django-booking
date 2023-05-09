@@ -1101,69 +1101,33 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
 
 class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
-    client = serializers.SerializerMethodField(read_only=True)
-    order_type  = serializers.SerializerMethodField(read_only=True)
-    member  = serializers.SerializerMethodField(read_only=True)
-    service  = serializers.SerializerMethodField(read_only=True)
-    price  = serializers.SerializerMethodField(read_only=True)
-    voucher_discount_percentage = serializers.SerializerMethodField(read_only=True)
-    appointment_service  = serializers.SerializerMethodField(read_only=True)
-    promotion_name  = serializers.SerializerMethodField(read_only=True)
+    promotion_name = serializers.SerializerMethodField(read_only=True)
+    invoice = serializers.SerializerMethodField(read_only=True)
+    original_price = serializers.SerializerMethodField(read_only=True)
+    discounted_price = serializers.SerializerMethodField(read_only=True)
     
     def get_promotion_name(self, obj):
         return 'promotion name'
-
-    def get_appointment_service(self, obj):
-        service = AppointmentService.objects.filter(appointment = obj.appointment)
-        return UpdateAppointmentSerializer(service, many = True).data
-    
-    def get_service(self, obj):
-        try:
-            cli = f"{obj.service.name}"
-            return cli
-
-        except Exception as err:
-            print(err)
-            
-    def get_order_type(self, obj):
-        return 'Appointment'
-    
-    def get_client(self, obj):
-        try:
-            serializers = ClientSerializer(obj.appointment.client).data
-            return serializers
-        except Exception as err:
-            return None
         
-    def get_price(self, obj):
-        try:
-            return obj.appointment_service.price
-
-        except Exception as err:
-            print(err)
-            
-    def get_member(self, obj):
-        try:
-            serializers = MemberSerializer(obj.member,context=self.context ).data
-            return serializers
-        except Exception as err:
-            return None
+    def get_invoice(self, obj):
+        return {}
+        
+    def get_original_price(self, obj):
+        return 999
     
+
+    def get_discounted_price(self, obj):
+        return 999
+    
+        
     def get_location(self, obj):
         try:
             serializers = LocationSerializer(obj.business_address).data
             return serializers
-        
         except Exception as err:
             return None
         
-    def get_voucher_discount_percentage(self, obj):
-        return 'voucher discount percentage'
     class Meta:
         model = AppointmentCheckout
-        fields = ['id','appointment','appointment_service','payment_method',
-                 'service','member','business_address','voucher','promotion',
-                 'membership','rewards','tip','gst','gst_price','service_price',
-                 'total_price','service_commission','service_commission_type','voucher_discount_percentage',
-                 'is_active','is_deleted','created_at', 'order_type', 'client', 'location', 'price', 'promotion_name']
+        fields = ['id', 'promotion_name', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location']
         
