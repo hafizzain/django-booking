@@ -1637,6 +1637,9 @@ def create_checkout(request):
     # checkout.save()
 
     if is_promotion_availed:
+        checkout.is_promotion = True
+        checkout.selected_promotion_id = request.data.get('selected_promotion_id', '')
+        checkout.selected_promotion_type = request.data.get('selected_promotion_type', '')
         checkout.save()
 
 
