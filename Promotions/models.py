@@ -508,3 +508,42 @@ class BlockDate(models.Model):
     
     def __str__(self):
         return str(self.id)
+
+
+
+class PromotionExcludedItem(models.Model):
+
+    EXCLUDED_TYPES = (
+        ('Product', 'Product'),
+        ('Service', 'Service'),
+        ('Voucher', 'Voucher'),
+    )
+
+    OBJECT_TYPES = (
+        ('Direct Or Flat' , 'Direct Or Flat'),
+        ('Specific Group Discount' , 'Specific Group Discount'),
+        ('Purchase Discount' , 'Purchase Discount'),
+        ('Specific Brand Discount' , 'Specific Brand Discount'),
+        ('Spend_Some_Amount' , 'Spend_Some_Amount'),
+        ('Fixed_Price_Service' , 'Fixed_Price_Service'),
+        ('Mentioned_Number_Service' , 'Mentioned_Number_Service'),
+        ('Bundle_Fixed_Service' , 'Bundle_Fixed_Service'),
+        ('Retail_and_Get_Service' , 'Retail_and_Get_Service'),
+        ('User_Restricted_discount' , 'User_Restricted_discount'),
+        ('Complimentary_Discount' , 'Complimentary_Discount'),
+        ('Packages_Discount' , 'Packages_Discount'),
+
+    )
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+
+    object_type = models.CharField(max_length=800, default='', choices=OBJECT_TYPES)
+    object_id = models.CharField(max_length=800, default='')
+
+    excluded_type = models.CharField(max_length=100, default='', choices=EXCLUDED_TYPES)
+    excluded_id = models.CharField(max_length=800, default='')
+
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.id)
