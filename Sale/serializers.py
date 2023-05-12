@@ -703,7 +703,6 @@ class CheckoutSerializer(serializers.ModelSerializer):
 
 
     def get_voucher(self, obj):
-        return []
         try:
             check = VoucherOrder.objects.filter(checkout =  obj)
             #all_service = obj.product.all()
