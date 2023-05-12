@@ -2060,7 +2060,7 @@ def create_sallaryslip(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_payrol_working(request):
-    all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
+    all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('employee_employedailyschedule__date')
     serialized = Payroll_WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request,} )
    
     return Response(
