@@ -1234,7 +1234,24 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
             # 'client','created_at' ,'user',
             #       'duration', 'location', 'member', 'total_price',
             #       'payment_type','tip','gst', 'order_type','created_at'
-        
+
+class SaleOrder_VoucherSerializer(serializers.ModelSerializer):
+    voucher_price = serializers.SerializerMethodField()
+    voucher = serializers.SerializerMethodField()
+
+    def get_voucher_price(self, obj):
+        return obj.current_price
+
+    def get_voucher(self, obj):
+            return obj.voucher.name
+            
+    class Meta:
+        model = VoucherOrder
+        fields =[ 'id', 'voucher', 'quantity', 'voucher_price' ]
+            # 'client', 'location' , 
+            #      'member' ,'start_date', 'end_date','status',
+            #      'total_price', 'payment_type' , 'order_type','price', 'name','created_at','discount_percentage'
+    
 
 class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
@@ -1280,15 +1297,18 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
 
     def get_voucher(self, obj):
         
-        check = VoucherOrder.objects.select_related(
-            'location',
-            'member',
-            'client',
+        check = VoucherOrder.objects.only(
+            'id',
+            'voucher',
+            'current_price',
+            'quantity',
+        ).select_related(
             'voucher',
         ).filter(
             checkout = obj
         )
-        return VoucherOrderSerializer(check, many = True , context=self.context ).data
+        # return VoucherOrderSerializer(check, many = True , context=self.context ).data
+        return SaleOrder_VoucherSerializer(check, many = True ).data
 
 
     def get_product(self, obj):
