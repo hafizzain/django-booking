@@ -506,6 +506,12 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
     type = serializers.SerializerMethodField(read_only=True)
     is_deleted = serializers.SerializerMethodField(read_only=True)
 
+
+    excluded_products = serializers.SerializerMethodField(read_only=True)
+    excluded_services = serializers.SerializerMethodField(read_only=True)
+    excluded_vouchers = serializers.SerializerMethodField(read_only=True)
+    
+
     def get_is_deleted(self, obj):
         if obj.is_deleted == True:
             return 'True'
@@ -538,7 +544,6 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
             return DayRestrictionsSerializers(ser, many = True).data
         except Exception as err:
             return []
-            pass
         
     def get_servicegroup_discount(self, obj):
         try:
@@ -546,7 +551,60 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
             return ServiceGroupDiscountSerializers(ser, many = True).data
         except Exception as err:
             return []
-            pass
+    
+
+    def get_excluded_products(self, obj):
+        excluded_proms = PromotionExcludedItem.objects.filter(
+            is_deleted = False,
+            is_active = True,
+            object_type = 'Specific Group Discount',
+            object_id = f'{obj.id}',
+            excluded_type = 'Product',
+        ).values_list('excluded_id', flat=True)
+
+        prods = Product.objects.filter(
+            id__in = list(excluded_proms),
+            is_active = True,
+            is_deleted = False
+        ).values('id', 'name')
+
+        return prods
+        
+    def get_excluded_services(self, obj):
+        excluded_proms = PromotionExcludedItem.objects.filter(
+            is_deleted = False,
+            is_active = True,
+            object_type = 'Specific Group Discount',
+            object_id = f'{obj.id}',
+            excluded_type = 'Service',
+        ).values_list('excluded_id', flat=True)
+
+        servs = Service.objects.filter(
+            id__in = list(excluded_proms),
+            is_active = True,
+            is_deleted = False
+        ).values('id', 'name')
+
+        return servs
+
+
+        
+    def get_excluded_vouchers(self, obj):
+        excluded_proms = PromotionExcludedItem.objects.filter(
+            is_deleted = False,
+            is_active = True,
+            object_type = 'Specific Group Discount',
+            object_id = f'{obj.id}',
+            excluded_type = 'Voucher',
+        ).values_list('excluded_id', flat=True)
+
+        vouchers = Vouchers.objects.filter(
+            id__in = list(excluded_proms),
+            is_active = True,
+            is_deleted = False
+        ).values('id', 'name')
+
+        return vouchers
     class Meta:
         model = SpecificGroupDiscount
         fields = '__all__'

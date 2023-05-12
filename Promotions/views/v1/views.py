@@ -835,6 +835,12 @@ def create_specificgroupdiscount(request):
     # brand = request.data.get('brand', None)
     # brand_discount = request.data.get('brand_discount', None)
 
+
+    products = request.data.get('product', [])
+    services = request.data.get('services', [])
+    vouchers = request.data.get('voucher', [])
+    
+
     error = []
     
     if not all([business_id]):
@@ -957,7 +963,53 @@ def create_specificgroupdiscount(request):
                 
             except Exception as err:
                error.append(str(err))
+    if type(products) == str:
+        try:
+            products = json.loads(products)
+        except:
+            products = []
     
+    if type(products) == list:
+        for product_id in products:
+            PromotionExcludedItem.objects.create(
+                object_type = 'Specific Group Discount',
+                object_id = f'{sp_grp.id}',
+                excluded_type = 'Product',
+                excluded_id = product_id,
+                is_active = True,
+            )
+
+    if type(services) == str:
+        try:
+            services = json.loads(services)
+        except:
+            services = []
+    
+    if type(services) == list:
+        for service_id in services:
+            PromotionExcludedItem.objects.create(
+                object_type = 'Specific Group Discount',
+                object_id = f'{sp_grp.id}',
+                excluded_type = 'Service',
+                excluded_id = service_id,
+                is_active = True,
+            )
+
+    if type(vouchers) == str:
+        try:
+            vouchers = json.loads(vouchers)
+        except:
+            vouchers = []
+    
+    if type(vouchers) == list:
+        for voucher_id in vouchers:
+            PromotionExcludedItem.objects.create(
+                object_type = 'Specific Group Discount',
+                object_id = f'{sp_grp.id}',
+                excluded_type = 'Voucher',
+                excluded_id = voucher_id,
+                is_active = True,
+            )
     serializers= PromtoionsSerializers.SpecificGroupDiscountSerializers(sp_grp, context={'request' : request})
     
     return Response(
