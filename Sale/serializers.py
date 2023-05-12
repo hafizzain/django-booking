@@ -1218,11 +1218,15 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
 class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
 
     service = serializers.SerializerMethodField()
+    price = serializers.SerializerMethodField()
 
     def get_service(self, obj):
         if obj.service:
-            return obj.service.name
+            return {'name' : obj.service.name}
         return None
+    
+    def get_price(self, obj):
+        return obj.current_price
 
     class Meta:
         model = ServiceOrder
@@ -1311,7 +1315,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
         service = ServiceOrder.objects.only(
             'id',
             'quantity',
-            'price',
+            'current_price',
             'service',
         ).select_related(
             'service',
