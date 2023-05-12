@@ -1293,17 +1293,18 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
         # service_data = ServiceOrderSerializer(services, many=True, context=self.context).data
         
         ids_data = []
-        ids_data.extend(self.get_product(obj))
-        ids_data.extend(self.get_service(obj))
+        ids_data.extend(self.product)
+        ids_data.extend(self.service)
 
         return ids_data
     
     
     class Meta:
         model = Checkout
-        fields = ['id', 'product', 'service', 'membership',
-                  'voucher','client','location','member','created_at','payment_type', 'tip',
-                  'service_commission', 'voucher_commission', 'product_commission', 'service_commission_type',
-                  'product_commission_type','voucher_commission_type','ids','membership_product',
-                  'membership_service','membership_type'
-                  ]
+        fields = [
+            'id', 'product', 'service', 'membership',
+            'voucher','client','location','member','created_at','payment_type', 'tip',
+            'service_commission', 'voucher_commission', 'product_commission', 'service_commission_type',
+            'product_commission_type','voucher_commission_type','ids','membership_product',
+            'membership_service','membership_type'
+        ]
