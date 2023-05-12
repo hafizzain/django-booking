@@ -1228,40 +1228,40 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
         return None
         
     def get_membership(self, obj):
-        # .select_related(
-        #     'client',
-        #     'location',
-        #     'member',
-        #     'membership',
-        # )
-        check = MemberShipOrder.objects.filter(
+        
+        check = MemberShipOrder.objects.select_related(
+            'client',
+            'location',
+            'member',
+            'membership',
+        ).filter(
             checkout = obj
         )
         return MemberShipOrderSerializer(check, many = True , context=self.context ).data
 
 
     def get_voucher(self, obj):
-        # .select_related(
-        #         'location',
-        #         'member',
-        #         'client',
-        #         'voucher',
-        #     )
-        check = VoucherOrder.objects.filter(
+        
+        check = VoucherOrder.objects.select_related(
+                'location',
+                'member',
+                'client',
+                'voucher',
+            ).filter(
             checkout = obj
         )
         return VoucherOrderSerializer(check, many = True , context=self.context ).data
 
 
     def get_product(self, obj):
-        # .select_related(
-        #         'product',
-        #         'checkout',
-        #         'location',
-        #         'member',
-        #         'client',
-        #     )
-        check = ProductOrder.objects.filter(
+        
+        check = ProductOrder.objects.select_related(
+                'product',
+                'checkout',
+                'location',
+                'member',
+                'client',
+            ).filter(
             checkout = obj
         )
         return ProductOrderSerializer(check, many = True , context=self.context ).data
@@ -1287,22 +1287,17 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
         return data
         
     def get_ids(self, obj):
-        return []
-        try:
-            products = ProductOrder.objects.filter(checkout=obj)
-            services = ServiceOrder.objects.filter(checkout=obj)
-            
+        products = ProductOrder.objects.filter(checkout=obj)
+        services = ServiceOrder.objects.filter(checkout=obj)
 
-            product_data = ProductOrderSerializer(products, many=True, context=self.context).data
-            service_data = ServiceOrderSerializer(services, many=True, context=self.context).data
-            
-            ids_data = []
-            ids_data.extend(product_data)
-            ids_data.extend(service_data)
+        product_data = ProductOrderSerializer(products, many=True, context=self.context).data
+        service_data = ServiceOrderSerializer(services, many=True, context=self.context).data
+        
+        ids_data = []
+        ids_data.extend(product_data)
+        ids_data.extend(service_data)
 
-            return ids_data
-        except Exception as err:
-            return None
+        return ids_data
     
     
     class Meta:
