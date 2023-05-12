@@ -827,7 +827,6 @@ def get_all_sale_orders_pagination(request):
     if range_start:
         queries['created_at__range'] = (range_start, range_end)
 
-        
     checkout_order = Checkout.objects.select_related(
         'location',
         'location__currency',
