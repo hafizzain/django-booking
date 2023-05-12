@@ -1215,6 +1215,23 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
             #       'location', 'member', 'tip', 'total_price' , 'payment_type','price','name',
             #       'gst', 'order_type', 'sold_quantity','product_details','total_product'
 
+class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
+
+    service = serializers.SerializerMethodField()
+
+    def get_service(self, obj):
+        if obj.service:
+            return obj.service.name
+        return None
+
+    class Meta:
+        model = ServiceOrder
+        fields = ['id', 'price', 'quantity', 'service' ]
+            # 'client','created_at' ,'user',
+            #       'duration', 'location', 'member', 'total_price',
+            #       'payment_type','tip','gst', 'order_type','created_at'
+        
+
 class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
     service  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
@@ -1291,16 +1308,18 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
         return self.product
 
     def get_service(self, obj):
-        service = ServiceOrder.objects.select_related(
-            'checkout',
-            'location',
-            'member',
-            'client',
+        service = ServiceOrder.objects.only(
+            'id',
+            'quantity',
+            'price',
+            'service',
+        ).select_related(
             'service',
         ).filter(
             checkout = obj
         )
-        data = ServiceOrderSerializer(service, many = True , context=self.context ).data
+        # data = ServiceOrderSerializer(service, many = True , context=self.context ).data
+        data = SaleOrder_ServiceSerializer(service, many = True ).data
         self.service = data
         return self.service
     
