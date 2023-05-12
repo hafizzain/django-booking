@@ -9,6 +9,7 @@ from django_tenants.utils import tenant_context
 from Product.models import Product 
 from Product.serializers import BrandSerializer
 from Promotions.models import BundleFixed, ComplimentaryDiscount, DirectOrFlatDiscount , CategoryDiscount , DateRestrictions , DayRestrictions, BlockDate, DiscountOnFreeService, FixedPriceService, FreeService, MentionedNumberService, PackagesDiscount, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, ServiceDurationForSpecificTime, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount, UserRestrictedDiscount, Service, ServiceGroup, PromotionExcludedItem
+from Client.models import Vouchers
 
 from Utility.models import Currency, ExceptionRecord
 
@@ -463,7 +464,15 @@ class DirectOrFlatDiscountSerializers(serializers.ModelSerializer):
             object_id = f'{obj.id}',
             excluded_type = 'Service',
         ).values_list('excluded_id', flat=True)
-        return PromotionExcludedItemSerializer(excluded_proms, many=True).data
+
+        servs = Service.objects.filter(
+            id__in = list(excluded_proms),
+            is_active = True,
+            is_deleted = False
+        ).values('id', 'name')
+
+        return servs
+
 
         
     def get_excluded_vouchers(self, obj):
@@ -474,7 +483,14 @@ class DirectOrFlatDiscountSerializers(serializers.ModelSerializer):
             object_id = f'{obj.id}',
             excluded_type = 'Voucher',
         ).values_list('excluded_id', flat=True)
-        return PromotionExcludedItemSerializer(excluded_proms, many=True).data
+
+        vouchers = Vouchers.objects.filter(
+            id__in = list(excluded_proms),
+            is_active = True,
+            is_deleted = False
+        ).values('id', 'name')
+
+        return vouchers
 
     
     class Meta:
