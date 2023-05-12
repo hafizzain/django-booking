@@ -8,7 +8,7 @@ from Product.Constants.index import tenant_media_base_url
 from django_tenants.utils import tenant_context
 from Product.models import Product 
 from Product.serializers import BrandSerializer
-from Promotions.models import BundleFixed, ComplimentaryDiscount, DirectOrFlatDiscount , CategoryDiscount , DateRestrictions , DayRestrictions, BlockDate, DiscountOnFreeService, FixedPriceService, FreeService, MentionedNumberService, PackagesDiscount, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, ServiceDurationForSpecificTime, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount, UserRestrictedDiscount, Service, ServiceGroup
+from Promotions.models import BundleFixed, ComplimentaryDiscount, DirectOrFlatDiscount , CategoryDiscount , DateRestrictions , DayRestrictions, BlockDate, DiscountOnFreeService, FixedPriceService, FreeService, MentionedNumberService, PackagesDiscount, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, ServiceDurationForSpecificTime, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount, UserRestrictedDiscount, Service, ServiceGroup, PromotionExcludedItem
 
 from Utility.models import Currency, ExceptionRecord
 
@@ -390,6 +390,10 @@ class DirectOrFlatDiscountSerializers(serializers.ModelSerializer):
     block_date = serializers.SerializerMethodField(read_only=True)
     type = serializers.SerializerMethodField(read_only=True)
     is_deleted = serializers.SerializerMethodField(read_only=True)
+
+    restricted_products = serializers.SerializerMethodField(read_only=True)
+    restricted_services = serializers.SerializerMethodField(read_only=True)
+    restricted_vouchers = serializers.SerializerMethodField(read_only=True)
     
     
     def get_is_deleted(self, obj):
@@ -432,7 +436,39 @@ class DirectOrFlatDiscountSerializers(serializers.ModelSerializer):
             return CategoryDiscountSerializers(ser, many = True).data
         except Exception as err:
             return []
-            pass
+    
+
+    def get_restricted_products(self, obj):
+        excluded_proms = PromotionExcludedItem.objects.filter(
+            is_deleted = False,
+            is_active = True,
+            object_type = 'Direct Or Flat',
+            object_id = f'{obj.id}',
+            excluded_type = 'Product',
+        )
+        return PromotionExcludedItemSerializer(excluded_proms, many=True).data
+        
+    def get_restricted_services(self, obj):
+        excluded_proms = PromotionExcludedItem.objects.filter(
+            is_deleted = False,
+            is_active = True,
+            object_type = 'Direct Or Flat',
+            object_id = f'{obj.id}',
+            excluded_type = 'Service',
+        )
+        return PromotionExcludedItemSerializer(excluded_proms, many=True).data
+
+        
+    def get_restricted_vouchers(self, obj):
+        excluded_proms = PromotionExcludedItem.objects.filter(
+            is_deleted = False,
+            is_active = True,
+            object_type = 'Direct Or Flat',
+            object_id = f'{obj.id}',
+            excluded_type = 'Voucher',
+        )
+        return PromotionExcludedItemSerializer(excluded_proms, many=True).data
+
     
     class Meta:
         model = DirectOrFlatDiscount
@@ -1946,3 +1982,10 @@ class AvailOfferSpecificBrandSerializers(serializers.ModelSerializer):
         model = SpecificBrand
         fields = ['id','service_group']
         # 'specific_brand', 'day_restrictions','date_restrictions','block_date'
+    
+
+class PromotionExcludedItemSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PromotionExcludedItem
+        fields = ['id', 'object_type', 'object_id', 'excluded_type', 'excluded_id']
