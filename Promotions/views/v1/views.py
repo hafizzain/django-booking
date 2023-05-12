@@ -5212,6 +5212,10 @@ def update_user_restricted_discount(request):
     discount_percentage = request.data.get('discount_percentage', None)
     promotion_name = request.data.get('promotion_name', '')
     
+    products = request.data.get('product', [])
+    services = request.data.get('services', [])
+    vouchers = request.data.get('voucher', [])
+    
     error = []
     
     if res_id is None: 
@@ -5359,7 +5363,81 @@ def update_user_restricted_discount(request):
                     userrestricteddiscount = usr_res,
                     date = date,
                 )
+    if type(products) == str:
+        try:
+            products = json.loads(products)
+        except:
+            products = []
+        
+    PromotionExcludedItem.objects.filter(
+        object_type = 'User_Restricted_discount',
+        object_id = f'{usr_res.id}',
+        excluded_type = 'Product',
+        is_active = True,
+    ).exclude(
+        excluded_id__in = products,
+    ).delete()
     
+    if type(products) == list:
+        for product_id in products:
+            PromotionExcludedItem.objects.get_or_create(
+                object_type = 'User_Restricted_discount',
+                object_id = f'{usr_res.id}',
+                excluded_type = 'Product',
+                excluded_id = product_id,
+                is_active = True,
+            )
+
+    if type(services) == str:
+        try:
+            services = json.loads(services)
+        except:
+            services = []
+
+    PromotionExcludedItem.objects.filter(
+        object_type = 'User_Restricted_discount',
+        object_id = f'{usr_res.id}',
+        excluded_type = 'Service',
+        is_active = True,
+    ).exclude(
+        excluded_id__in = services,
+    ).delete()
+
+    if type(services) == list:
+        for service_id in services:
+            PromotionExcludedItem.objects.get_or_create(
+                object_type = 'User_Restricted_discount',
+                object_id = f'{usr_res.id}',
+                excluded_type = 'Service',
+                excluded_id = service_id,
+                is_active = True,
+            )
+
+    if type(vouchers) == str:
+        try:
+            vouchers = json.loads(vouchers)
+        except:
+            vouchers = []
+
+    PromotionExcludedItem.objects.filter(
+        object_type = 'User_Restricted_discount',
+        object_id = f'{usr_res.id}',
+        excluded_type = 'Voucher',
+        is_active = True,
+    ).exclude(
+        excluded_id__in = vouchers,
+    ).delete()
+
+    if type(vouchers) == list:
+        for voucher_id in vouchers:
+            PromotionExcludedItem.objects.get_or_create(
+                object_type = 'User_Restricted_discount',
+                object_id = f'{usr_res.id}',
+                excluded_type = 'Voucher',
+                excluded_id = voucher_id,
+                is_active = True,
+            )
+
     serializers= PromtoionsSerializers.UserRestrictedDiscountSerializers(usr_res)#data=request.data, partial=True, context={'request' : request})
 
     return Response(
