@@ -844,15 +844,17 @@ def get_all_sale_orders_pagination(request):
             **queries
         )
 
-    data_total = list(CheckoutSerializer(checkout_order, many=True, context={'request': request}).data) + \
-                 list(AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
+    checkout_data = list(CheckoutSerializer(checkout_order, many=True, context={'request': request}).data)
+    appointment_data = list(AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
+
+    # data_total = checkout_data + appointment_data
                  
     # sorted_data = sorted(data_total, key=lambda x: x['created_at'], reverse=True)
 
 
     paginator = CustomPagination()
     paginator.page_size = 10
-    paginated_data = paginator.paginate_queryset(data_total, request)
+    paginated_data = paginator.paginate_queryset(checkout_data, request)
 
     return paginator.get_paginated_response(paginated_data, 'sales')
 
