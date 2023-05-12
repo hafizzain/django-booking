@@ -712,7 +712,6 @@ class CheckoutSerializer(serializers.ModelSerializer):
 
 
     def get_product(self, obj):
-        return []
         try:
             check = ProductOrder.objects.filter(checkout =  obj)
             #all_service = obj.product.all()
