@@ -703,14 +703,7 @@ class CheckoutSerializer(serializers.ModelSerializer):
             return MemberShipOrderSerializer(check, many = True , context=self.context ).data
         except Exception as err:
             print(str(err))
-    
-    def get_ids(self, obj):
-        try:
-            check = MemberShipOrder.objects.filter(checkout =  obj)
-            #all_service = obj.product.all()
-            return MemberShipOrderSerializer(check, many = True , context=self.context ).data
-        except Exception as err:
-            print(str(err))
+
 
     def get_voucher(self, obj):
         try:
@@ -753,10 +746,27 @@ class CheckoutSerializer(serializers.ModelSerializer):
     
     def get_membership_type(self, obj):
         try:
-            return obj.membership.discount
-
+            data = Membership.objects.filter(discount=obj).first()
+            return data
         except Exception as err:
-            print(err)
+            return None
+        
+    def get_ids(self, obj):
+        try:
+            products = ProductOrder.objects.filter(checkout=obj)
+            services = ServiceOrder.objects.filter(checkout=obj)
+            
+
+            product_data = ProductOrderSerializer(products, many=True, context=self.context).data
+            service_data = ServiceOrderSerializer(services, many=True, context=self.context).data
+            
+            ids_data = []
+            ids_data.extend(product_data)
+            ids_data.extend(service_data)
+
+            return ids_data
+        except Exception as err:
+            print(str(err))
     
     
     class Meta:
