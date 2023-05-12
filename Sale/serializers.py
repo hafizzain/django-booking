@@ -1253,6 +1253,24 @@ class SaleOrder_VoucherSerializer(serializers.ModelSerializer):
             #      'total_price', 'payment_type' , 'order_type','price', 'name','created_at','discount_percentage'
     
 
+class SaleOrder_MemberShipSerializer(serializers.ModelSerializer):
+    price = serializers.SerializerMethodField()
+    membership_price = serializers.SerializerMethodField()
+
+
+    def get_price(self, obj):
+        return obj.current_price
+    
+    def get_membership_price(self, obj):
+        return obj.current_price
+        
+    class Meta:
+        model = MemberShipOrder
+        fields =['id', 'membership', 'quantity', 'price', 'membership_price' ]
+            # 'order_type' ,'client','member', 'location' ,'start_date', 'end_date','status', 'total_price', 'name',
+            #      'payment_type','created_at'
+
+
 class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
     service  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
@@ -1284,15 +1302,18 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
         
     def get_membership(self, obj):
         
-        check = MemberShipOrder.objects.select_related(
-            'client',
-            'location',
-            'member',
+        check = MemberShipOrder.objects.only(
+            'id',
+            'membership',
+            'current_price',
+            'quantity',
+        ).select_related(
             'membership',
         ).filter(
             checkout = obj
         )
-        return MemberShipOrderSerializer(check, many = True , context=self.context ).data
+        # return MemberShipOrderSerializer(check, many = True , context=self.context ).data
+        return SaleOrder_MemberShipSerializer(check, many = True ).data
 
 
     def get_voucher(self, obj):
