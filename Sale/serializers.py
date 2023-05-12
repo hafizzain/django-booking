@@ -1199,7 +1199,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     voucher  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
     
     client = serializers.SerializerMethodField(read_only=True)
-    member  = serializers.SerializerMethodField(read_only=True)
+    # member  = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
 
     ids = serializers.SerializerMethodField(read_only=True)
@@ -1214,11 +1214,11 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             return serializers
         return None
     
-    def get_member(self, obj):
-        if obj.member:
-            serializers = MemberSerializer(obj.member, context=self.context ).data
-            return serializers
-        return None
+    # def get_member(self, obj):
+    #     if obj.member:
+    #         serializers = MemberSerializer(obj.member, context=self.context ).data
+    #         return serializers
+    #     return None
     
     def get_location(self, obj):
         if obj.location:
@@ -1264,7 +1264,9 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             ).filter(
             checkout = obj
         )
-        return ProductOrderSerializer(check, many = True , context=self.context ).data
+        data =  ProductOrderSerializer(check, many = True , context=self.context ).data
+        self.product = data
+        return self.product
             
     def get_membership_product(self, obj):
         return []
@@ -1273,7 +1275,9 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
 
     def get_service(self, obj):
         service = ServiceOrder.objects.filter(checkout =  obj)
-        return ServiceOrderSerializer(service, many = True , context=self.context ).data
+        data = ServiceOrderSerializer(service, many = True , context=self.context ).data
+        self.service = data
+        return self.service
     
     def get_membership_service(self, obj):
         return []
@@ -1302,8 +1306,11 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Checkout
         fields = [
-            'id', 'product', 'service', 'membership',
-            'voucher','client','location','member','created_at','payment_type', 'tip',
+            'id', 
+            'product', 'service', 'membership', 'voucher',
+            'client', 'location', 
+            # 'member', 
+            'created_at','payment_type', 'tip',
             'service_commission', 'voucher_commission', 'product_commission', 'service_commission_type',
             'product_commission_type','voucher_commission_type','ids','membership_product',
             'membership_service','membership_type'
