@@ -872,8 +872,8 @@ def get_all_sale_orders_pagination(request):
     response = paginator.get_paginated_response(paginated_data, 'sales')
     end_time = datetime.datetime.now()
 
-    response['seconds'] = (end_time - start_time).seconds
-    response['total_seconds'] = (end_time - start_time).total_seconds()
+    response['seconds'] = f'{(end_time - start_time).seconds} ms'
+    response['total_seconds'] = f'{(end_time - start_time).total_seconds()} ms'
     return response
 
 
