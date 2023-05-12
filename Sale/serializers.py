@@ -704,7 +704,6 @@ class CheckoutSerializer(serializers.ModelSerializer):
         except Exception as err:
             print(str(err))
 
-    
 
     def get_voucher(self, obj):
         try:
