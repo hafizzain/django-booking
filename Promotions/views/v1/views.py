@@ -4773,6 +4773,10 @@ def create_user_restricted_discount(request):
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)    
     
+    products = request.data.get('product', [])
+    services = request.data.get('services', [])
+    vouchers = request.data.get('voucher', [])
+    
     error = []
     
     if not all([business_id]):
@@ -4884,6 +4888,54 @@ def create_user_restricted_discount(request):
             except Exception as err:
                error.append(str(err))
                
+    if type(products) == str:
+        try:
+            products = json.loads(products)
+        except:
+            products = []
+    
+    if type(products) == list:
+        for product_id in products:
+            PromotionExcludedItem.objects.create(
+                object_type = 'User_Restricted_discount',
+                object_id = f'{usr_res.id}',
+                excluded_type = 'Product',
+                excluded_id = product_id,
+                is_active = True,
+            )
+
+    if type(services) == str:
+        try:
+            services = json.loads(services)
+        except:
+            services = []
+    
+    if type(services) == list:
+        for service_id in services:
+            PromotionExcludedItem.objects.create(
+                object_type = 'User_Restricted_discount',
+                object_id = f'{usr_res.id}',
+                excluded_type = 'Service',
+                excluded_id = service_id,
+                is_active = True,
+            )
+
+    if type(vouchers) == str:
+        try:
+            vouchers = json.loads(vouchers)
+        except:
+            vouchers = []
+    
+    if type(vouchers) == list:
+        for voucher_id in vouchers:
+            PromotionExcludedItem.objects.create(
+                object_type = 'User_Restricted_discount',
+                object_id = f'{usr_res.id}',
+                excluded_type = 'Voucher',
+                excluded_id = voucher_id,
+                is_active = True,
+            )
+ 
     serializers = PromtoionsSerializers.UserRestrictedDiscountSerializers(usr_res, context={'request' : request})
     
     return Response(
