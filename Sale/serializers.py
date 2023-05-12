@@ -712,6 +712,8 @@ class CheckoutSerializer(serializers.ModelSerializer):
             return VoucherOrderSerializer(check, many = True , context=self.context ).data
         except Exception as err:
             print(str(err))
+
+            
     def get_product(self, obj):
         try:
             check = ProductOrder.objects.filter(checkout =  obj)

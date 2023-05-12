@@ -828,24 +828,28 @@ def get_all_sale_orders_pagination(request):
         queries['created_at__range'] = (range_start, range_end)
 
         
-    # checkout_order = Checkout.objects.select_related(
-    #     'location'
-    # ).filter(
-    #     is_deleted=False,
-    #     location__id=location_id,
-    #     **queries
-    # )
-    appointment_checkout = AppointmentCheckout.objects.select_related(
-            'appointment_service', 
-            'business_address'
-        ).filter(
-            appointment_service__appointment_status='Done',
-            business_address__id=location_id,
-            **queries
-        )
+    checkout_order = Checkout.objects.select_related(
+        'location',
+        'client',
+        'member'
+    ).prefetch_related(
+        'checkout_orders'
+    ).filter(
+        is_deleted=False,
+        location__id=location_id,
+        **queries
+    )
+    # appointment_checkout = AppointmentCheckout.objects.select_related(
+    #         'appointment_service', 
+    #         'business_address'
+    #     ).filter(
+    #         appointment_service__appointment_status='Done',
+    #         business_address__id=location_id,
+    #         **queries
+    #     )
 
-    # checkout_data = list(CheckoutSerializer(checkout_order, many=True, context={'request': request}).data)
-    appointment_data = list(AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
+    checkout_data = list(CheckoutSerializer(checkout_order, many=True, context={'request': request}).data)
+    # appointment_data = list(AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
 
     # data_total = checkout_data + appointment_data
                  
@@ -854,7 +858,7 @@ def get_all_sale_orders_pagination(request):
 
     paginator = CustomPagination()
     paginator.page_size = 10
-    paginated_data = paginator.paginate_queryset(appointment_data, request)
+    paginated_data = paginator.paginate_queryset(checkout_data, request)
 
     return paginator.get_paginated_response(paginated_data, 'sales')
 
