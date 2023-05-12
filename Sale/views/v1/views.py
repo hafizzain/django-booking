@@ -30,7 +30,7 @@ from Product.models import Product, ProductOrderStockReport, ProductStock
 from django.db.models import Avg, Count, Min, Sum
 
 
-from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
+from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer, SaleOrders_CheckoutSerializer
 from rest_framework.pagination import PageNumberPagination
 
 
@@ -848,7 +848,7 @@ def get_all_sale_orders_pagination(request):
     #         **queries
     #     )
 
-    checkout_data = list(CheckoutSerializer(checkout_order, many=True, context={'request': request}).data)
+    checkout_data = list(SaleOrders_CheckoutSerializer(checkout_order, many=True, context={'request': request}).data)
     # appointment_data = list(AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
 
     # data_total = checkout_data + appointment_data
