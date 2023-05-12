@@ -1315,7 +1315,6 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
-    member  = serializers.SerializerMethodField(read_only=True)
     service  = serializers.SerializerMethodField(read_only=True)
     price  = serializers.SerializerMethodField(read_only=True)
     voucher_discount_percentage = serializers.SerializerMethodField(read_only=True)
