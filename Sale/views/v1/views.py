@@ -823,8 +823,6 @@ def get_all_sale_orders_pagination(request):
     range_start =  request.GET.get('range_start', None)
     range_end = request.GET.get('range_end', None)
 
-    paginator = CustomPagination()
-    paginator.page_size = 10
     
     if range_start:
         checkout_order = Checkout.objects.filter(
@@ -850,9 +848,13 @@ def get_all_sale_orders_pagination(request):
     data_total = list(CheckoutSerializer(checkout_order, many=True, context={'request': request}).data) + \
                  list(AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
                  
-    sorted_data = sorted(data_total, key=lambda x: x['created_at'], reverse=True)
+    # sorted_data = sorted(data_total, key=lambda x: x['created_at'], reverse=True)
 
-    paginated_data = paginator.paginate_queryset(sorted_data, request)
+
+    paginator = CustomPagination()
+    paginator.page_size = 10
+
+    paginated_data = paginator.paginate_queryset(data_total, request)
 
     return paginator.get_paginated_response(paginated_data, 'sales')
 
