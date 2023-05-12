@@ -1209,112 +1209,82 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     
         
     def get_client(self, obj):
-        # This is Optimized
-        try:
+        if obj.client:
             serializers = ClientSerializer(obj.client).data
             return serializers
-        except Exception as err:
-            return None
-        
+        return None
+    
     def get_member(self, obj):
-        # This is Optimized
-        try:
+        if obj.member:
             serializers = MemberSerializer(obj.member, context=self.context ).data
             return serializers
-        except Exception as err:
-            return None
+        return None
     
     def get_location(self, obj):
-        # This is Optimized
-        try:
+        if obj.location:
             serializers = LocationSerializer(obj.location).data
             return serializers
-        except Exception as err:
-            return None
+        
+        return None
         
     def get_membership(self, obj):
-        # This is Optimized
-        try:
-            check = MemberShipOrder.objects.select_related(
-                'client',
-                'location',
-                'member',
-                'membership',
-            ).filter(
-                checkout = obj
-            )
-            #all_service = obj.product.all()
-            return MemberShipOrderSerializer(check, many = True , context=self.context ).data
-        except Exception as err:
-            print(str(err))
+        # .select_related(
+        #     'client',
+        #     'location',
+        #     'member',
+        #     'membership',
+        # )
+        check = MemberShipOrder.objects.filter(
+            checkout = obj
+        )
+        return MemberShipOrderSerializer(check, many = True , context=self.context ).data
 
 
     def get_voucher(self, obj):
-        # This is Optimized
-        try:
-            check = VoucherOrder.objects.select_related(
-                'location',
-                'member',
-                'client',
-                'voucher',
-            ).filter(
-                checkout = obj
-            )
-            #all_service = obj.product.all()
-            return VoucherOrderSerializer(check, many = True , context=self.context ).data
-        except Exception as err:
-            print(str(err))
+        # .select_related(
+        #         'location',
+        #         'member',
+        #         'client',
+        #         'voucher',
+        #     )
+        check = VoucherOrder.objects.filter(
+            checkout = obj
+        )
+        return VoucherOrderSerializer(check, many = True , context=self.context ).data
 
 
     def get_product(self, obj):
-        try:
-            check = ProductOrder.objects.select_related(
-                'product',
-                'checkout',
-                'location',
-                'member',
-                'client',
-            ).filter(
-                checkout = obj
-            )
-            return ProductOrderSerializer(check, many = True , context=self.context ).data
-        except Exception as err:
-            print(str(err))
+        # .select_related(
+        #         'product',
+        #         'checkout',
+        #         'location',
+        #         'member',
+        #         'client',
+        #     )
+        check = ProductOrder.objects.filter(
+            checkout = obj
+        )
+        return ProductOrderSerializer(check, many = True , context=self.context ).data
             
     def get_membership_product(self, obj):
         return []
-        try:
-            check = ProductOrder.objects.filter(checkout =  obj)
-            #all_service = obj.product.all()
-            return ProductOrderSerializer(check, many = True , context=self.context ).data
-        except Exception as err:
-            print(str(err))
+        check = ProductOrder.objects.filter(checkout =  obj)
+        return ProductOrderSerializer(check, many = True , context=self.context ).data
 
     def get_service(self, obj):
         return []
-        try:
-            service = ServiceOrder.objects.filter(checkout =  obj)
-            #all_service = obj.product.all()
-            return ServiceOrderSerializer(service, many = True , context=self.context ).data
-        except Exception as err:
-            print(str(err))
+        service = ServiceOrder.objects.filter(checkout =  obj)
+        return ServiceOrderSerializer(service, many = True , context=self.context ).data
     
     def get_membership_service(self, obj):
         return []
-        try:
-            service = ServiceOrder.objects.filter(checkout =  obj)
-            #all_service = obj.product.all()
-            return ServiceOrderSerializer(service, many = True , context=self.context ).data
-        except Exception as err:
-            print(str(err))
+        service = ServiceOrder.objects.filter(checkout =  obj)
+        return ServiceOrderSerializer(service, many = True , context=self.context ).data
     
     def get_membership_type(self, obj):
         return {}
-        try:
-            data = Membership.objects.filter(discount=obj).first()
-            return data
-        except Exception as err:
-            return None
+        data = Membership.objects.filter(discount=obj).first()
+        return data
         
     def get_ids(self, obj):
         return []
@@ -1332,7 +1302,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
 
             return ids_data
         except Exception as err:
-            print(str(err))
+            return None
     
     
     class Meta:
