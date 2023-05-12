@@ -835,14 +835,14 @@ def get_all_sale_orders_pagination(request):
         location__id=location_id,
         **queries
     )
-    appointment_checkout = AppointmentCheckout.objects.select_related(
-            'appointment_service', 
-            'business_address'
-        ).filter(
-            appointment_service__appointment_status='Done',
-            business_address__id=location_id,
-            **queries
-        )
+    # appointment_checkout = AppointmentCheckout.objects.select_related(
+    #         'appointment_service', 
+    #         'business_address'
+    #     ).filter(
+    #         appointment_service__appointment_status='Done',
+    #         business_address__id=location_id,
+    #         **queries
+    #     )
 
     checkout_data = list(CheckoutSerializer(checkout_order, many=True, context={'request': request}).data)
     # appointment_data = list(AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
@@ -858,69 +858,6 @@ def get_all_sale_orders_pagination(request):
 
     return paginator.get_paginated_response(paginated_data, 'sales')
 
-# @api_view(['GET'])
-# @permission_classes([AllowAny])
-# def get_all_sale_orders_pagination(request):
-#     location_id = request.GET.get('location', None)
-#     range_start =  request.GET.get('range_start', None)
-#     range_end = request.GET.get('range_end', None)
-
-#     paginator = CustomPagination()
-#     paginator.page_size = 10
-#     if range_start:
-        
-#         checkout_order = Checkout.objects.filter(
-#             is_deleted=False,
-#             location__id = location_id,
-#             created_at__gte =  range_start ,
-#             created_at__lte = range_end
-#             )
-#         checkout_data = CheckoutSerializer(checkout_order, many=True, context={'request': request}).data
-        
-#         appointment_checkout = AppointmentCheckout.objects.filter(
-#             appointment_service__appointment_status='Done',
-#             business_address__id = location_id,
-#             created_at__gte =  range_start ,
-#             created_at__lte = range_end
-#             )
-#         appointment_checkout_data = AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data
-#     else:
-#         checkout_order = Checkout.objects.filter(
-#             is_deleted=False,
-#             location__id = location_id,
-#             )
-        
-#         checkout_data = CheckoutSerializer(checkout_order, many=True, context={'request': request}).data
-        
-#         appointment_checkout = AppointmentCheckout.objects.filter(
-#             appointment_service__appointment_status='Done',
-#             business_address__id = location_id,
-#             )
-#         appointment_checkout_data = AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data
-    
-#     data_total = checkout_data + appointment_checkout_data
-    
-#     paginated_appointment_checkout = paginator.paginate_queryset(data_total, request)
-    
-#     sorted_data = sorted(paginated_appointment_checkout, key=lambda x: x['created_at'], reverse=True)
-    
-#     return paginator.get_paginated_response(sorted_data, 'sales')
-    
-    # sale_data = paginator.get_paginated_response(sorted_data, 'sales')
-
-    # return Response(
-    #     {
-    #         'status' : 200,
-    #         'status_code' : '200',
-    #         'response' : {
-    #             'message' : 'All Sale Orders',
-    #             'error_message' : None,
-    #             'sales' : sale_data.data
-    #         }
-    #     },
-    #     status=status.HTTP_200_OK
-    # )
-    
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
