@@ -1192,6 +1192,15 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
 
 
 
+class SaleOrder_ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductOrder
+        fields = [
+            'id', 'product_name', 'quantity', 'product_price']
+            # 'client','status', 'created_at',
+            #       'location', 'member', 'tip', 'total_price' , 'payment_type','price','name',
+            #       'gst', 'order_type', 'sold_quantity','product_details','total_product'
+
 class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
     service  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
@@ -1258,7 +1267,8 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             ).filter(
             checkout = obj
         )
-        data =  ProductOrderSerializer(check, many = True , context=self.context ).data
+        # data =  ProductOrderSerializer(check, many = True , context=self.context ).data
+        data =  SaleOrder_ProductSerializer(check, many = True , context=self.context ).data
         self.product = data
         return self.product
             
@@ -1302,10 +1312,10 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             'product', 'service', 'membership', 'voucher',
             'client', 'location', 
             # 'member', 
-            'created_at','payment_type', 'tip',
+            'created_at', 'payment_type', 'tip',
             'service_commission', 'voucher_commission', 'product_commission', 'service_commission_type',
-            'product_commission_type','voucher_commission_type','ids','membership_product',
-            'membership_service','membership_type'
+            'product_commission_type', 'voucher_commission_type', 'ids', 'membership_product',
+            'membership_service', 'membership_type'
         ]
 
         # Remove Member from get all sale orders
@@ -1365,5 +1375,5 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
                  'business_address', 'voucher', 'promotion',
                  'membership', 'rewards', 'tip', 'gst', 'gst_price', 'service_price',
                  'total_price', 'service_commission', 'service_commission_type', 'voucher_discount_percentage',
-                 'is_active', 'is_deleted', 'created_at', 'order_type', 'client', 'location', 'price', 'promotion_name']
+                 'created_at', 'order_type', 'client', 'location', 'price', 'promotion_name']
         
