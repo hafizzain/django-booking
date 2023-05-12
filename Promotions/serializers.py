@@ -1985,7 +1985,11 @@ class AvailOfferSpecificBrandSerializers(serializers.ModelSerializer):
     
 
 class PromotionExcludedItemSerializer(serializers.ModelSerializer):
+    excluded_item = serializers.SerializerMethodField(read_only=True)
+
+    def get_excluded_item(self, obj):
+        return obj.excluded_id
 
     class Meta:
         model = PromotionExcludedItem
-        fields = ['id', 'object_type', 'object_id', 'excluded_type', 'excluded_id']
+        fields = ['id', 'excluded_item']
