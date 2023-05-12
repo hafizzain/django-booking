@@ -845,7 +845,7 @@ def get_all_sale_orders_pagination(request):
         )
 
     checkout_data = list(CheckoutSerializer(checkout_order, many=True, context={'request': request}).data)
-    appointment_data = list(AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
+    # appointment_data = list(AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
 
     # data_total = checkout_data + appointment_data
                  
