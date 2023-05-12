@@ -391,9 +391,9 @@ class DirectOrFlatDiscountSerializers(serializers.ModelSerializer):
     type = serializers.SerializerMethodField(read_only=True)
     is_deleted = serializers.SerializerMethodField(read_only=True)
 
-    restricted_products = serializers.SerializerMethodField(read_only=True)
-    restricted_services = serializers.SerializerMethodField(read_only=True)
-    restricted_vouchers = serializers.SerializerMethodField(read_only=True)
+    excluded_products = serializers.SerializerMethodField(read_only=True)
+    excluded_services = serializers.SerializerMethodField(read_only=True)
+    excluded_vouchers = serializers.SerializerMethodField(read_only=True)
     
     
     def get_is_deleted(self, obj):
@@ -438,35 +438,42 @@ class DirectOrFlatDiscountSerializers(serializers.ModelSerializer):
             return []
     
 
-    def get_restricted_products(self, obj):
+    def get_excluded_products(self, obj):
         excluded_proms = PromotionExcludedItem.objects.filter(
             is_deleted = False,
             is_active = True,
             object_type = 'Direct Or Flat',
             object_id = f'{obj.id}',
             excluded_type = 'Product',
-        )
-        return PromotionExcludedItemSerializer(excluded_proms, many=True).data
+        ).values_list('excluded_id', flat=True)
+
+        prods = Product.objects.filter(
+            id__in = list(excluded_proms),
+            is_active = True,
+            is_deleted = False
+        ).values('id', 'name')
+
+        return prods
         
-    def get_restricted_services(self, obj):
+    def get_excluded_services(self, obj):
         excluded_proms = PromotionExcludedItem.objects.filter(
             is_deleted = False,
             is_active = True,
             object_type = 'Direct Or Flat',
             object_id = f'{obj.id}',
             excluded_type = 'Service',
-        )
+        ).values_list('excluded_id', flat=True)
         return PromotionExcludedItemSerializer(excluded_proms, many=True).data
 
         
-    def get_restricted_vouchers(self, obj):
+    def get_excluded_vouchers(self, obj):
         excluded_proms = PromotionExcludedItem.objects.filter(
             is_deleted = False,
             is_active = True,
             object_type = 'Direct Or Flat',
             object_id = f'{obj.id}',
             excluded_type = 'Voucher',
-        )
+        ).values_list('excluded_id', flat=True)
         return PromotionExcludedItemSerializer(excluded_proms, many=True).data
 
     
