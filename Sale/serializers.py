@@ -1309,3 +1309,62 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
         ]
 
         # Remove Member from get all sale orders
+
+
+class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
+    location = serializers.SerializerMethodField(read_only=True)
+    client = serializers.SerializerMethodField(read_only=True)
+    order_type  = serializers.SerializerMethodField(read_only=True)
+    member  = serializers.SerializerMethodField(read_only=True)
+    service  = serializers.SerializerMethodField(read_only=True)
+    price  = serializers.SerializerMethodField(read_only=True)
+    voucher_discount_percentage = serializers.SerializerMethodField(read_only=True)
+    appointment_service  = serializers.SerializerMethodField(read_only=True)
+    promotion_name  = serializers.SerializerMethodField(read_only=True)
+    
+    def get_promotion_name(self, obj):
+        return 'promotion name'
+
+    def get_appointment_service(self, obj):
+        service = AppointmentService.objects.filter(appointment = obj.appointment)
+        return UpdateAppointmentSerializer(service, many = True).data
+    
+    def get_service(self, obj):
+        if obj.service:
+            cli = f"{obj.service.name}"
+            return cli
+        return None
+            
+    def get_order_type(self, obj):
+        return 'Appointment'
+    
+    def get_client(self, obj):
+        if obj.appointment and obj.appointment.client:
+            serializers = ClientSerializer(obj.appointment.client).data
+            return serializers
+        
+        return None
+        
+    def get_price(self, obj):
+        if obj.appointment_service:
+            return obj.appointment_service.price
+        
+        return None
+          
+    def get_location(self, obj):
+        if obj.business_address:
+            serializers = LocationSerializer(obj.business_address).data
+            return serializers
+    
+        return None
+        
+    def get_voucher_discount_percentage(self, obj):
+        return 'voucher discount percentage'
+    class Meta:
+        model = AppointmentCheckout
+        fields = ['id', 'appointment', 'appointment_service', 'payment_method', 'service',
+                 'business_address', 'voucher', 'promotion',
+                 'membership', 'rewards', 'tip', 'gst', 'gst_price', 'service_price',
+                 'total_price', 'service_commission', 'service_commission_type', 'voucher_discount_percentage',
+                 'is_active', 'is_deleted', 'created_at', 'order_type', 'client', 'location', 'price', 'promotion_name']
+        
