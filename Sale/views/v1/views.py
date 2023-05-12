@@ -819,6 +819,7 @@ def get_all_sale_orders(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_all_sale_orders_pagination(request):
+    start_time = datetime.datetime.now()
     location_id = request.GET.get('location', None)
     range_start =  request.GET.get('range_start', None)
     range_end = request.GET.get('range_end', None)
@@ -868,7 +869,12 @@ def get_all_sale_orders_pagination(request):
     paginator.page_size = 10
     paginated_data = paginator.paginate_queryset(sorted_data, request)
 
-    return paginator.get_paginated_response(paginated_data, 'sales')
+    response = paginator.get_paginated_response(paginated_data, 'sales')
+    end_time = datetime.datetime.now()
+
+    response['seconds'] = (end_time - start_time).seconds
+    response['total_seconds'] = (end_time - start_time).total_seconds()
+    return response
 
 
 @api_view(['GET'])
