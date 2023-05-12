@@ -1193,6 +1193,20 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
 
 
 class SaleOrder_ProductSerializer(serializers.ModelSerializer):
+    product_name  = serializers.SerializerMethodField(read_only=True)
+    product_price  = serializers.SerializerMethodField(read_only=True)
+
+    def get_product_price(self, obj):
+        return obj.current_price
+        
+
+    def get_product_name(self, obj):
+        if obj.product:
+            return obj.product.name
+        
+        return None
+
+
     class Meta:
         model = ProductOrder
         fields = [
@@ -1260,10 +1274,6 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
         
         check = ProductOrder.objects.select_related(
                 'product',
-                'checkout',
-                'location',
-                'member',
-                'client',
             ).filter(
             checkout = obj
         )
