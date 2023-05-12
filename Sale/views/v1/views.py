@@ -830,6 +830,7 @@ def get_all_sale_orders_pagination(request):
         
     checkout_order = Checkout.objects.select_related(
         'location',
+        'location__currency',
         'client',
         'member'
     ).prefetch_related(

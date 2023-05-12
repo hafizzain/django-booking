@@ -107,11 +107,8 @@ class LocationSerializer(serializers.ModelSerializer):
     currency = serializers.SerializerMethodField()
     
     def get_currency(self, obj):
-        try:
-            currency = Currency.objects.get(id = obj.currency.id)
-            return currency.code
-        except Exception as err:
-            return str(err)
+        return f'{obj.currency.code}'
+
     class Meta:
         model = BusinessAddress
         fields = ['id','address_name', 'currency']
@@ -534,7 +531,7 @@ class MemberShipOrderSerializer(serializers.ModelSerializer):
     
     def get_member(self, obj):
         try:
-            serializers = MemberSerializer(obj.member,context=self.context ).data
+            serializers = MemberSerializer(obj.member, context=self.context ).data
             return serializers
         except Exception as err:
             return None
@@ -593,8 +590,8 @@ class VoucherOrderSerializer(serializers.ModelSerializer):
     
     def get_location(self, obj):
         try:
-            app_location = BusinessAddress.objects.filter(id=str(obj.location))
-            return LocationSerializer(app_location, many = True).data
+            # app_location = BusinessAddress.objects.filter(id=str(obj.location))
+            return LocationSerializer(obj.location, many = True).data
         except Exception as err:
             return str(err)
     
@@ -1212,6 +1209,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     
         
     def get_client(self, obj):
+        # This is Optimized
         try:
             serializers = ClientSerializer(obj.client).data
             return serializers
@@ -1219,13 +1217,15 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             return None
         
     def get_member(self, obj):
+        # This is Optimized
         try:
-            serializers = MemberSerializer(obj.member,context=self.context ).data
+            serializers = MemberSerializer(obj.member, context=self.context ).data
             return serializers
         except Exception as err:
             return None
     
     def get_location(self, obj):
+        # This is Optimized
         try:
             serializers = LocationSerializer(obj.location).data
             return serializers
@@ -1233,8 +1233,16 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             return None
         
     def get_membership(self, obj):
+        # This is Optimized
         try:
-            check = MemberShipOrder.objects.filter(checkout =  obj)
+            check = MemberShipOrder.objects.select_related(
+                'client',
+                'location',
+                'member',
+                'membership',
+            ).filter(
+                checkout = obj
+            )
             #all_service = obj.product.all()
             return MemberShipOrderSerializer(check, many = True , context=self.context ).data
         except Exception as err:
@@ -1242,8 +1250,16 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
 
 
     def get_voucher(self, obj):
+        # This is Optimized
         try:
-            check = VoucherOrder.objects.filter(checkout =  obj)
+            check = VoucherOrder.objects.select_related(
+                'location',
+                'member',
+                'client',
+                'voucher',
+            ).filter(
+                checkout = obj
+            )
             #all_service = obj.product.all()
             return VoucherOrderSerializer(check, many = True , context=self.context ).data
         except Exception as err:
@@ -1252,8 +1268,15 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
 
     def get_product(self, obj):
         try:
-            check = ProductOrder.objects.filter(checkout =  obj)
-            #all_service = obj.product.all()
+            check = ProductOrder.objects.select_related(
+                'product',
+                'checkout',
+                'location',
+                'member',
+                'client',
+            ).filter(
+                checkout = obj
+            )
             return ProductOrderSerializer(check, many = True , context=self.context ).data
         except Exception as err:
             print(str(err))
