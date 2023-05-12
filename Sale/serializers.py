@@ -1256,6 +1256,7 @@ class SaleOrder_VoucherSerializer(serializers.ModelSerializer):
 class SaleOrder_MemberShipSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField()
     membership_price = serializers.SerializerMethodField()
+    membership = serializers.SerializerMethodField()
 
 
     def get_price(self, obj):
@@ -1263,6 +1264,9 @@ class SaleOrder_MemberShipSerializer(serializers.ModelSerializer):
     
     def get_membership_price(self, obj):
         return obj.current_price
+
+    def get_membership(self, obj):
+        return obj.membership.name
         
     class Meta:
         model = MemberShipOrder
