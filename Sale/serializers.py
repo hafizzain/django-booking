@@ -665,15 +665,12 @@ class CheckoutSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
     member  = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
-    promotion_name = serializers.SerializerMethodField(read_only=True)
 
     ids = serializers.SerializerMethodField(read_only=True)
     membership_product = serializers.SerializerMethodField(read_only=True)
     membership_service = serializers.SerializerMethodField(read_only=True)
     membership_type = serializers.SerializerMethodField(read_only=True)
     
-    def get_promotion_name(self, obj):
-        return 'promotion name'
         
     def get_client(self, obj):
         try:
@@ -697,6 +694,7 @@ class CheckoutSerializer(serializers.ModelSerializer):
             return None
         
     def get_membership(self, obj):
+        return []
         try:
             check = MemberShipOrder.objects.filter(checkout =  obj)
             #all_service = obj.product.all()
@@ -706,6 +704,7 @@ class CheckoutSerializer(serializers.ModelSerializer):
 
 
     def get_voucher(self, obj):
+        return []
         try:
             check = VoucherOrder.objects.filter(checkout =  obj)
             #all_service = obj.product.all()
@@ -713,8 +712,9 @@ class CheckoutSerializer(serializers.ModelSerializer):
         except Exception as err:
             print(str(err))
 
-            
+
     def get_product(self, obj):
+        return []
         try:
             check = ProductOrder.objects.filter(checkout =  obj)
             #all_service = obj.product.all()
@@ -723,6 +723,7 @@ class CheckoutSerializer(serializers.ModelSerializer):
             print(str(err))
             
     def get_membership_product(self, obj):
+        return []
         try:
             check = ProductOrder.objects.filter(checkout =  obj)
             #all_service = obj.product.all()
@@ -731,6 +732,7 @@ class CheckoutSerializer(serializers.ModelSerializer):
             print(str(err))
 
     def get_service(self, obj):
+        return []
         try:
             service = ServiceOrder.objects.filter(checkout =  obj)
             #all_service = obj.product.all()
@@ -739,6 +741,7 @@ class CheckoutSerializer(serializers.ModelSerializer):
             print(str(err))
     
     def get_membership_service(self, obj):
+        return []
         try:
             service = ServiceOrder.objects.filter(checkout =  obj)
             #all_service = obj.product.all()
@@ -747,6 +750,7 @@ class CheckoutSerializer(serializers.ModelSerializer):
             print(str(err))
     
     def get_membership_type(self, obj):
+        return {}
         try:
             data = Membership.objects.filter(discount=obj).first()
             return data
@@ -754,6 +758,7 @@ class CheckoutSerializer(serializers.ModelSerializer):
             return None
         
     def get_ids(self, obj):
+        return []
         try:
             products = ProductOrder.objects.filter(checkout=obj)
             services = ServiceOrder.objects.filter(checkout=obj)
@@ -776,7 +781,7 @@ class CheckoutSerializer(serializers.ModelSerializer):
         fields = ['id', 'product', 'service', 'membership',
                   'voucher','client','location','member','created_at','payment_type', 'tip',
                   'service_commission', 'voucher_commission', 'product_commission', 'service_commission_type',
-                  'product_commission_type','voucher_commission_type', 'promotion_name','ids','membership_product',
+                  'product_commission_type','voucher_commission_type','ids','membership_product',
                   'membership_service','membership_type'
                   ]
 
