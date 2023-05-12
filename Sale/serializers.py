@@ -1272,18 +1272,18 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
 
     def get_product(self, obj):
         
-        check = ProductOrder.objects.select_related(
-                'product',
-            ).values(
+        check = ProductOrder.objects.only(
                 'current_price', 
                 'id',
                 'quantity',
+                'product',
+            ).select_related(
                 'product',
             ).filter(
             checkout = obj
         )
         # data =  ProductOrderSerializer(check, many = True , context=self.context ).data
-        data =  SaleOrder_ProductSerializer(check, many = True , context=self.context ).data
+        data =  SaleOrder_ProductSerializer(check, many = True ).data
         self.product = data
         return self.product
             
