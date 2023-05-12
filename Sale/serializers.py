@@ -694,7 +694,6 @@ class CheckoutSerializer(serializers.ModelSerializer):
             return None
         
     def get_membership(self, obj):
-        return []
         try:
             check = MemberShipOrder.objects.filter(checkout =  obj)
             #all_service = obj.product.all()
