@@ -1272,7 +1272,6 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
         return ProductOrderSerializer(check, many = True , context=self.context ).data
 
     def get_service(self, obj):
-        return []
         service = ServiceOrder.objects.filter(checkout =  obj)
         return ServiceOrderSerializer(service, many = True , context=self.context ).data
     
@@ -1287,15 +1286,15 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
         return data
         
     def get_ids(self, obj):
-        products = ProductOrder.objects.filter(checkout=obj)
-        services = ServiceOrder.objects.filter(checkout=obj)
+        # products = ProductOrder.objects.filter(checkout=obj)
+        # services = ServiceOrder.objects.filter(checkout=obj)
 
-        product_data = ProductOrderSerializer(products, many=True, context=self.context).data
-        service_data = ServiceOrderSerializer(services, many=True, context=self.context).data
+        # product_data = ProductOrderSerializer(products, many=True, context=self.context).data
+        # service_data = ServiceOrderSerializer(services, many=True, context=self.context).data
         
         ids_data = []
-        ids_data.extend(product_data)
-        ids_data.extend(service_data)
+        ids_data.extend(self.get_product(obj))
+        ids_data.extend(self.get_service(obj))
 
         return ids_data
     

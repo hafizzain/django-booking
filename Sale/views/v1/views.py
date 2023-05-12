@@ -834,6 +834,7 @@ def get_all_sale_orders_pagination(request):
         'member'
     ).prefetch_related(
         'checkout_orders',
+        'checkout_orders__user',
         'checkout_orders__client',
         'checkout_orders__member',
         'checkout_orders__location',
