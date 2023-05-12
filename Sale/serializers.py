@@ -1214,12 +1214,6 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             return serializers
         return None
     
-    # def get_member(self, obj):
-    #     if obj.member:
-    #         serializers = MemberSerializer(obj.member, context=self.context ).data
-    #         return serializers
-    #     return None
-    
     def get_location(self, obj):
         if obj.location:
             serializers = LocationSerializer(obj.location).data
@@ -1269,20 +1263,28 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
         return self.product
             
     def get_membership_product(self, obj):
-        return []
-        check = ProductOrder.objects.filter(checkout =  obj)
-        return ProductOrderSerializer(check, many = True , context=self.context ).data
+        return self.product
+        # check = ProductOrder.objects.filter(checkout =  obj)
+        # return ProductOrderSerializer(check, many = True , context=self.context ).data
 
     def get_service(self, obj):
-        service = ServiceOrder.objects.filter(checkout =  obj)
+        service = ServiceOrder.objects.select_related(
+            'checkout',
+            'location',
+            'member',
+            'client',
+            'service',
+        ).filter(
+            checkout = obj
+        )
         data = ServiceOrderSerializer(service, many = True , context=self.context ).data
         self.service = data
         return self.service
     
     def get_membership_service(self, obj):
-        return []
-        service = ServiceOrder.objects.filter(checkout =  obj)
-        return ServiceOrderSerializer(service, many = True , context=self.context ).data
+        # service = ServiceOrder.objects.filter(checkout =  obj)
+        # return ServiceOrderSerializer(service, many = True , context=self.context ).data
+        return self.service
     
     def get_membership_type(self, obj):
         return {}
@@ -1315,3 +1317,5 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             'product_commission_type','voucher_commission_type','ids','membership_product',
             'membership_service','membership_type'
         ]
+
+        # Remove Member from get all sale orders
