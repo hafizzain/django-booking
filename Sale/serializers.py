@@ -1274,6 +1274,11 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
         
         check = ProductOrder.objects.select_related(
                 'product',
+            ).values(
+                'current_price', 
+                'id',
+                'quantity',
+                'product',
             ).filter(
             checkout = obj
         )
