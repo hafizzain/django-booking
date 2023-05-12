@@ -3237,7 +3237,7 @@ def create_vacation_emp(request):
     end_time_shift = request.data.get('end_time_shift', None)
     
     from_date = request.data.get('from_date', None)
-    to_date = request.data.get('to_date', None)
+    to_date = request.data.get('to_date', from_date)
     note = request.data.get('note', None)
 
     is_vacation = request.data.get('is_vacation', None)
@@ -3415,7 +3415,7 @@ def create_absence(request):
     end_time_shift = request.data.get('end_time_shift', None)
     
     from_date = request.data.get('from_date', None)
-    to_date = request.data.get('to_date', None)
+    to_date = request.data.get('to_date', from_date)
     note = request.data.get('note', None)
 
     is_vacation = request.data.get('is_vacation', None)
