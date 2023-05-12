@@ -844,26 +844,26 @@ def get_all_sale_orders_pagination(request):
         location__id=location_id,
         **queries
     )
-    # appointment_checkout = AppointmentCheckout.objects.select_related(
-    #         'appointment_service', 
-    #         'business_address'
-    #     ).filter(
-    #         appointment_service__appointment_status='Done',
-    #         business_address__id=location_id,
-    #         **queries
-    #     )
+    appointment_checkout = AppointmentCheckout.objects.select_related(
+            'appointment_service', 
+            'business_address'
+        ).filter(
+            appointment_service__appointment_status='Done',
+            business_address__id=location_id,
+            **queries
+        )
 
     checkout_data = list(SaleOrders_CheckoutSerializer(checkout_order, many=True, context={'request': request}).data)
-    # appointment_data = list(AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
+    appointment_data = list(AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
 
-    # data_total = checkout_data + appointment_data
+    data_total = checkout_data + appointment_data
                  
     # sorted_data = sorted(data_total, key=lambda x: x['created_at'], reverse=True)
 
 
     paginator = CustomPagination()
     paginator.page_size = 10
-    paginated_data = paginator.paginate_queryset(checkout_data, request)
+    paginated_data = paginator.paginate_queryset(data_total, request)
 
     return paginator.get_paginated_response(paginated_data, 'sales')
 

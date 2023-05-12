@@ -1237,11 +1237,11 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     def get_voucher(self, obj):
         
         check = VoucherOrder.objects.select_related(
-                'location',
-                'member',
-                'client',
-                'voucher',
-            ).filter(
+            'location',
+            'member',
+            'client',
+            'voucher',
+        ).filter(
             checkout = obj
         )
         return VoucherOrderSerializer(check, many = True , context=self.context ).data
@@ -1264,8 +1264,6 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             
     def get_membership_product(self, obj):
         return self.product
-        # check = ProductOrder.objects.filter(checkout =  obj)
-        # return ProductOrderSerializer(check, many = True , context=self.context ).data
 
     def get_service(self, obj):
         service = ServiceOrder.objects.select_related(
@@ -1282,21 +1280,13 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
         return self.service
     
     def get_membership_service(self, obj):
-        # service = ServiceOrder.objects.filter(checkout =  obj)
-        # return ServiceOrderSerializer(service, many = True , context=self.context ).data
         return self.service
     
     def get_membership_type(self, obj):
-        return {}
         data = Membership.objects.filter(discount=obj).first()
         return data
         
     def get_ids(self, obj):
-        # products = ProductOrder.objects.filter(checkout=obj)
-        # services = ServiceOrder.objects.filter(checkout=obj)
-
-        # product_data = ProductOrderSerializer(products, many=True, context=self.context).data
-        # service_data = ServiceOrderSerializer(services, many=True, context=self.context).data
         
         ids_data = []
         ids_data.extend(self.product)
