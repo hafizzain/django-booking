@@ -1661,7 +1661,7 @@ def create_checkout(request):
                 ExceptionRecord.objects.create(text=f'LOYALTY : {err}')
                 pass
             else:
-                client_points.points_redeemed = client_points.points_redeemed + int(redeemed_points)
+                client_points.points_redeemed = client_points.points_redeemed + float(redeemed_points)
                 client_points.save()
 
                 # for_every_points
