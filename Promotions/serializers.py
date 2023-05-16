@@ -1,4 +1,5 @@
 
+from rest_framework.fields import empty
 from Sale.serializers import AvailPriceServiceSerializers,PriceServiceSerializers
 from Service.models import PriceService
 from rest_framework import serializers
@@ -29,6 +30,11 @@ class ServiceGroupDiscountSerializers(serializers.ModelSerializer):
     class Meta:
         model = ServiceGroupDiscount
         fields = '__all__'
+    
+    def __init__(self, instance=None, data=..., **kwargs):
+        super().__init__(instance, data, **kwargs)
+
+        self.fields['brand'].context.update(self.context)
 
 
 class AvailOfferServiceGroupSerializer(serializers.ModelSerializer):
