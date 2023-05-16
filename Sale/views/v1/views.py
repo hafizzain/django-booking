@@ -2163,7 +2163,8 @@ def new_create_sale_order(request):
                 loyalty = point,
                 points_earned = point.number_points,
                 points_redeemed = 0,
-                balance = client_points.total_earn
+                balance = client_points.total_earn,
+                actual_sale_value_redeemed = 0
             )
 
 
