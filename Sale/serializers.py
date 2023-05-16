@@ -1195,8 +1195,17 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
 class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     product_name  = serializers.SerializerMethodField(read_only=True)
     product_price  = serializers.SerializerMethodField(read_only=True)
+    price  = serializers.SerializerMethodField(read_only=True)
+    selection_type  = serializers.SerializerMethodField(read_only=True)
+
+    def get_selection_type(self, obj):
+        return 'PRODUCT'
+
 
     def get_product_price(self, obj):
+        return obj.current_price
+    
+    def get_price(self, obj):
         return obj.current_price
         
 
@@ -1210,7 +1219,7 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductOrder
         fields = [
-            'id', 'product_name', 'quantity', 'product_price']
+            'id', 'product_name', 'quantity', 'product_price', 'price']
             # 'client','status', 'created_at',
             #       'location', 'member', 'tip', 'total_price' , 'payment_type','price','name',
             #       'gst', 'order_type', 'sold_quantity','product_details','total_product'
@@ -1219,6 +1228,11 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
 
     service = serializers.SerializerMethodField()
     price = serializers.SerializerMethodField()
+    selection_type  = serializers.SerializerMethodField(read_only=True)
+
+    def get_selection_type(self, obj):
+        return 'SERVICE'
+    
 
     def get_service(self, obj):
         if obj.service:
@@ -1257,7 +1271,10 @@ class SaleOrder_MemberShipSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField()
     membership_price = serializers.SerializerMethodField()
     membership = serializers.SerializerMethodField()
+    selection_type  = serializers.SerializerMethodField(read_only=True)
 
+    def get_selection_type(self, obj):
+        return 'MEMBERSHIP'
 
     def get_price(self, obj):
         return obj.current_price
