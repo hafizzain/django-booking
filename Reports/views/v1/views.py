@@ -303,6 +303,24 @@ def get_promotions_and_discounts_sales(request):
     start_date =  request.GET.get('start_date', None)
     end_date = request.GET.get('end_date', None)
 
+    if not all([location_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'location id is required',
+                    'fields' : [
+                        'location',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
     paginator = CustomPagination()
     paginator.page_size = 10
 
