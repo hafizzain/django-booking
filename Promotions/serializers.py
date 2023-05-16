@@ -607,7 +607,7 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
 
         # return list(vouchers)
         return []
-        
+    
     class Meta:
         model = SpecificGroupDiscount
         fields = '__all__'
