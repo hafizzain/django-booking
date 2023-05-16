@@ -547,11 +547,9 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
     def get_servicegroup_discount(self, obj):
         try:
             ser = ServiceGroupDiscount.objects.filter(specificgroupdiscount = obj)
-            # return ServiceGroupDiscountSerializers(ser, many = True).data
-            return []
+            return ServiceGroupDiscountSerializers(ser, many = True).data
         except Exception as err:
-            # return []
-            pass
+            return []
     
 
     # def get_excluded_products(self, obj):
