@@ -1740,6 +1740,10 @@ def new_create_sale_order(request):
     payment_type = request.data.get('payment_type', None)
     client_type = request.data.get('client_type', None)
     ids = request.data.get('ids', None)
+    is_membership_redeemed = request.data.get('is_membership_redeemed', False)
+    redeemed_membership_id = request.data.get('redeemed_membership_id', False)
+    membership_product = request.data.get('membership_product', None)
+    membership_service = request.data.get('membership_service', None)
     
     free_services_quantity = request.data.get('free_services_quantity', None)
     
@@ -2115,6 +2119,14 @@ def new_create_sale_order(request):
                     tip=checkout_tip,
                     business_address=business_address,
                 )
+    if is_membership_redeemed:
+        """
+            Handle Membership Redeemed Here...
+        """
+
+        # redeemed_membership_id
+        # membership_product
+        # membership_service
 
     serialized = CheckoutSerializer(checkout, context = {'request' : request, })
     
