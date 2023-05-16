@@ -567,7 +567,8 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
             is_deleted = False
         ).values('id', 'name')
 
-        return list(prods)
+        # return list(prods)
+        return []
         
     def get_excluded_services(self, obj):
         excluded_proms = PromotionExcludedItem.objects.filter(
@@ -584,7 +585,8 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
             is_deleted = False
         ).values('id', 'name')
 
-        return list(servs)
+        # return list(servs)
+        return []
 
 
         
@@ -603,7 +605,9 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
             is_deleted = False
         ).values('id', 'name')
 
-        return list(vouchers)
+        # return list(vouchers)
+        return []
+        
     class Meta:
         model = SpecificGroupDiscount
         fields = '__all__'
