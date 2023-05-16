@@ -429,7 +429,7 @@ class LoyaltyPointLogs(models.Model):
     loyalty = models.ForeignKey(LoyaltyPoints, on_delete=models.CASCADE,  related_name="loyalty_points_logs", null=True, blank=True )
 
     points_earned = models.PositiveIntegerField(default=0, null=True, blank=True)
-    points_redeemed = models.PositiveIntegerField(default=0, null=True, blank=True)
+    points_redeemed = models.FloatField(default=0)
     balance = models.PositiveIntegerField(default=0, null=True, blank=True)
     actual_sale_value_redeemed = models.FloatField(default=0)
 
