@@ -610,7 +610,26 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
     
     class Meta:
         model = SpecificGroupDiscount
-        fields = '__all__'
+        fields = ['id']
+        # id
+        # user
+        # business
+        # promotion_name
+        # is_deleted
+        # is_active
+        # is_blocked
+        # created_at
+        # updated_at
+
+        # servicegroup_discount
+        # day_restrictions
+        # date_restrictions
+        # block_date
+        # item_type
+
+        # excluded_products
+        # excluded_services
+        # excluded_vouchers
 
 
 
