@@ -2976,7 +2976,9 @@ def get_customers_loyalty_points_logs(request):
             'response' : {
                 'message' : 'Loyalty Points Logs',
                 'error_message' : None,
-                'data' : data
+                'data' : data,
+                'start_date' : start_date,
+                'end_date' : end_date,
             }
         },
         status=status.HTTP_200_OK
