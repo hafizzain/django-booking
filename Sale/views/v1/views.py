@@ -1801,7 +1801,7 @@ def new_create_sale_order(request):
         ids = json.loads(ids)
 
     elif type(ids) == list:
-            pass
+        pass
         
     
     checkout = Checkout.objects.create(

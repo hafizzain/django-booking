@@ -202,3 +202,17 @@ class CheckoutPayment(models.Model):
     def __str__(self):
         return str(self.id)
     
+class RedeemedMemberShip(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True,)
+
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_redeemed_memberships')
+    checkout = models.ForeignKey(Checkout, on_delete=models.CASCADE, related_name='checkout_redeemed_memberships')
+
+    membership = models.ForeignKey(Membership, on_delete=models.CASCADE, related_name='redeemed_memberships')
+
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+    
+    def __str__(self):
+        return str(self.id)
