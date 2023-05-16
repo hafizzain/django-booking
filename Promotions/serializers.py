@@ -499,7 +499,7 @@ class DirectOrFlatDiscountSerializers(serializers.ModelSerializer):
 
 
 class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
-    # servicegroup_discount = serializers.SerializerMethodField(read_only=True)
+    servicegroup_discount = serializers.SerializerMethodField(read_only=True)
     # day_restrictions = serializers.SerializerMethodField(read_only=True)
     # date_restrictions = serializers.SerializerMethodField(read_only=True)
     # block_date = serializers.SerializerMethodField(read_only=True)
@@ -544,12 +544,12 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
     #     except Exception as err:
     #         return []
         
-    # def get_servicegroup_discount(self, obj):
-    #     try:
-    #         ser = ServiceGroupDiscount.objects.filter(specificgroupdiscount = obj)
-    #         return ServiceGroupDiscountSerializers(ser, many = True).data
-    #     except Exception as err:
-    #         return []
+    def get_servicegroup_discount(self, obj):
+        try:
+            ser = ServiceGroupDiscount.objects.filter(specificgroupdiscount = obj)
+            return ServiceGroupDiscountSerializers(ser, many = True).data
+        except Exception as err:
+            return []
     
 
     # def get_excluded_products(self, obj):
@@ -610,9 +610,8 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
     
     class Meta:
         model = SpecificGroupDiscount
-        fields = ['id', 'promotion_name', 'is_deleted', 'is_active', 'created_at']
+        fields = ['id', 'promotion_name', 'is_deleted', 'is_active', 'created_at', 'servicegroup_discount']
 
-        # servicegroup_discount
         # day_restrictions
         # date_restrictions
         # block_date
