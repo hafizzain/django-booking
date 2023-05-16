@@ -23,7 +23,7 @@ from Business.models import Business, BusinessSocial, BusinessAddress, BusinessO
 from Product.models import Brand, Product, ProductStock
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
-from Promotions.models import BlockDate, BundleFixed, CategoryDiscount, ComplimentaryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount, DiscountOnFreeService, FixedPriceService, FreeService, MentionedNumberService, PackagesDiscount, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, ServiceDurationForSpecificTime, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount, UserRestrictedDiscount
+from Promotions.models import BlockDate, BundleFixed, CategoryDiscount, ComplimentaryDiscount, DateRestrictions, DayRestrictions, DirectOrFlatDiscount, DiscountOnFreeService, FixedPriceService, FreeService, MentionedNumberService, PackagesDiscount, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, ServiceDurationForSpecificTime, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount, UserRestrictedDiscount, PromotionExcludedItem
 # from Promotions.serializers import BundleFixedSerializers, ComplimentaryDiscountSerializers, DirectOrFlatDiscountSerializers, FixedPriceServiceSerializers, MentionedNumberServiceSerializers, PackagesDiscountSerializers, PurchaseDiscountSerializers, RetailAndGetServiceSerializers, SpecificBrandSerializers, SpecificGroupDiscountSerializers, SpendDiscountSerializers, SpendSomeAmountSerializers, UserRestrictedDiscountSerializers
 from Service.models import Service, ServiceGroup
 from Tenants.models import Domain, Tenant
@@ -48,6 +48,11 @@ def create_directorflat(request):
     dayrestrictions = request.data.get('dayrestrictions', None)
     categorydiscount = request.data.get('categorydiscount', None)
     blockdate = request.data.get('blockdate', None)
+
+
+    products = request.data.get('product', [])
+    services = request.data.get('services', [])
+    vouchers = request.data.get('voucher', [])
     
     error = []
     
@@ -116,20 +121,12 @@ def create_directorflat(request):
             try:
                 category = cat.get('category', None)
                 discount = cat.get('discount', None)
-                # all_category = cat.get('all_category', None)
-                # service_discount = cat.get('service_discount', None)
-                # retail_discount = cat.get('retail_discount', None)
-                # voucher_discount = cat.get('voucher_discount', None)
                 
                 category_discount = CategoryDiscount.objects.create(
                     directorflat = flatordirect ,
                     
                     category_type = category,
                     discount = discount,
-                    # all_category = all_category,
-                    # service_discount = service_discount,
-                    # retail_discount = retail_discount,
-                    # voucher_discount = voucher_discount
                 )
                 
             except Exception as err:
@@ -172,7 +169,56 @@ def create_directorflat(request):
             except Exception as err:
                error.append(str(err))
                
+    if type(products) == str:
+        try:
+            products = json.loads(products)
+        except:
+            products = []
+    
+    if type(products) == list:
+        for product_id in products:
+            PromotionExcludedItem.objects.create(
+                object_type = 'Direct Or Flat',
+                object_id = f'{flatordirect.id}',
+                excluded_type = 'Product',
+                excluded_id = product_id,
+                is_active = True,
+            )
+
+    if type(services) == str:
+        try:
+            services = json.loads(services)
+        except:
+            services = []
+    
+    if type(services) == list:
+        for service_id in services:
+            PromotionExcludedItem.objects.create(
+                object_type = 'Direct Or Flat',
+                object_id = f'{flatordirect.id}',
+                excluded_type = 'Service',
+                excluded_id = service_id,
+                is_active = True,
+            )
+
+    if type(vouchers) == str:
+        try:
+            vouchers = json.loads(vouchers)
+        except:
+            vouchers = []
+    
+    if type(vouchers) == list:
+        for voucher_id in vouchers:
+            PromotionExcludedItem.objects.create(
+                object_type = 'Direct Or Flat',
+                object_id = f'{flatordirect.id}',
+                excluded_type = 'Voucher',
+                excluded_id = voucher_id,
+                is_active = True,
+            )
+
     serializers= PromtoionsSerializers.DirectOrFlatDiscountSerializers(flatordirect, context={'request' : request})
+
     
     return Response(
             {
@@ -325,6 +371,12 @@ def update_directorflat(request):
     dayrestrictions = request.data.get('dayrestrictions', None)
     categorydiscount = request.data.get('categorydiscount', None)
     blockdate = request.data.get('blockdate', None)
+
+
+    products = request.data.get('product', [])
+    services = request.data.get('services', [])
+    vouchers = request.data.get('voucher', [])
+    
     
     error = []
     
@@ -485,7 +537,81 @@ def update_directorflat(request):
                     directorflat = directorflat,
                     date = date,
                 ) 
+    if type(products) == str:
+        try:
+            products = json.loads(products)
+        except:
+            products = []
+        
+    PromotionExcludedItem.objects.filter(
+        object_type = 'Direct Or Flat',
+        object_id = f'{directorflat.id}',
+        excluded_type = 'Product',
+        is_active = True,
+    ).exclude(
+        excluded_id__in = products,
+    ).delete()
     
+    if type(products) == list:
+        for product_id in products:
+            PromotionExcludedItem.objects.get_or_create(
+                object_type = 'Direct Or Flat',
+                object_id = f'{directorflat.id}',
+                excluded_type = 'Product',
+                excluded_id = product_id,
+                is_active = True,
+            )
+
+    if type(services) == str:
+        try:
+            services = json.loads(services)
+        except:
+            services = []
+
+    PromotionExcludedItem.objects.filter(
+        object_type = 'Direct Or Flat',
+        object_id = f'{directorflat.id}',
+        excluded_type = 'Service',
+        is_active = True,
+    ).exclude(
+        excluded_id__in = services,
+    ).delete()
+
+    if type(services) == list:
+        for service_id in services:
+            PromotionExcludedItem.objects.get_or_create(
+                object_type = 'Direct Or Flat',
+                object_id = f'{directorflat.id}',
+                excluded_type = 'Service',
+                excluded_id = service_id,
+                is_active = True,
+            )
+
+    if type(vouchers) == str:
+        try:
+            vouchers = json.loads(vouchers)
+        except:
+            vouchers = []
+
+    PromotionExcludedItem.objects.filter(
+        object_type = 'Direct Or Flat',
+        object_id = f'{directorflat.id}',
+        excluded_type = 'Voucher',
+        is_active = True,
+    ).exclude(
+        excluded_id__in = vouchers,
+    ).delete()
+
+    if type(vouchers) == list:
+        for voucher_id in vouchers:
+            PromotionExcludedItem.objects.get_or_create(
+                object_type = 'Direct Or Flat',
+                object_id = f'{directorflat.id}',
+                excluded_type = 'Voucher',
+                excluded_id = voucher_id,
+                is_active = True,
+            )
+
     serializers= PromtoionsSerializers.DirectOrFlatDiscountSerializers(directorflat, context={'request' : request})
        
     return Response(
@@ -789,6 +915,12 @@ def create_specificgroupdiscount(request):
     # brand = request.data.get('brand', None)
     # brand_discount = request.data.get('brand_discount', None)
 
+
+    products = request.data.get('product', [])
+    services = request.data.get('services', [])
+    vouchers = request.data.get('voucher', [])
+    
+
     error = []
     
     if not all([business_id]):
@@ -911,7 +1043,53 @@ def create_specificgroupdiscount(request):
                 
             except Exception as err:
                error.append(str(err))
+    if type(products) == str:
+        try:
+            products = json.loads(products)
+        except:
+            products = []
     
+    if type(products) == list:
+        for product_id in products:
+            PromotionExcludedItem.objects.create(
+                object_type = 'Specific Group Discount',
+                object_id = f'{sp_grp.id}',
+                excluded_type = 'Product',
+                excluded_id = product_id,
+                is_active = True,
+            )
+
+    if type(services) == str:
+        try:
+            services = json.loads(services)
+        except:
+            services = []
+    
+    if type(services) == list:
+        for service_id in services:
+            PromotionExcludedItem.objects.create(
+                object_type = 'Specific Group Discount',
+                object_id = f'{sp_grp.id}',
+                excluded_type = 'Service',
+                excluded_id = service_id,
+                is_active = True,
+            )
+
+    if type(vouchers) == str:
+        try:
+            vouchers = json.loads(vouchers)
+        except:
+            vouchers = []
+    
+    if type(vouchers) == list:
+        for voucher_id in vouchers:
+            PromotionExcludedItem.objects.create(
+                object_type = 'Specific Group Discount',
+                object_id = f'{sp_grp.id}',
+                excluded_type = 'Voucher',
+                excluded_id = voucher_id,
+                is_active = True,
+            )
     serializers= PromtoionsSerializers.SpecificGroupDiscountSerializers(sp_grp, context={'request' : request})
     
     return Response(
@@ -945,6 +1123,10 @@ def update_specificgroupdiscount(request):
     blockdate = request.data.get('blockdate', None)
     
     servicegroup = request.data.get('servicegroup', None)  
+    
+    products = request.data.get('product', [])
+    services = request.data.get('services', [])
+    vouchers = request.data.get('voucher', [])
     
     error = []
     
@@ -1106,7 +1288,82 @@ def update_specificgroupdiscount(request):
                     specificgroupdiscount = specific_group,
                     date = date,
                 ) 
+
+    if type(products) == str:
+        try:
+            products = json.loads(products)
+        except:
+            products = []
         
+    PromotionExcludedItem.objects.filter(
+        object_type = 'Specific Group Discount',
+        object_id = f'{specific_group.id}',
+        excluded_type = 'Product',
+        is_active = True,
+    ).exclude(
+        excluded_id__in = products,
+    ).delete()
+    
+    if type(products) == list:
+        for product_id in products:
+            PromotionExcludedItem.objects.get_or_create(
+                object_type = 'Specific Group Discount',
+                object_id = f'{specific_group.id}',
+                excluded_type = 'Product',
+                excluded_id = product_id,
+                is_active = True,
+            )
+
+    if type(services) == str:
+        try:
+            services = json.loads(services)
+        except:
+            services = []
+
+    PromotionExcludedItem.objects.filter(
+        object_type = 'Specific Group Discount',
+        object_id = f'{specific_group.id}',
+        excluded_type = 'Service',
+        is_active = True,
+    ).exclude(
+        excluded_id__in = services,
+    ).delete()
+
+    if type(services) == list:
+        for service_id in services:
+            PromotionExcludedItem.objects.get_or_create(
+                object_type = 'Specific Group Discount',
+                object_id = f'{specific_group.id}',
+                excluded_type = 'Service',
+                excluded_id = service_id,
+                is_active = True,
+            )
+
+    if type(vouchers) == str:
+        try:
+            vouchers = json.loads(vouchers)
+        except:
+            vouchers = []
+
+    PromotionExcludedItem.objects.filter(
+        object_type = 'Specific Group Discount',
+        object_id = f'{specific_group.id}',
+        excluded_type = 'Voucher',
+        is_active = True,
+    ).exclude(
+        excluded_id__in = vouchers,
+    ).delete()
+
+    if type(vouchers) == list:
+        for voucher_id in vouchers:
+            PromotionExcludedItem.objects.get_or_create(
+                object_type = 'Specific Group Discount',
+                object_id = f'{specific_group.id}',
+                excluded_type = 'Voucher',
+                excluded_id = voucher_id,
+                is_active = True,
+            )
+
     serializers= PromtoionsSerializers.SpecificGroupDiscountSerializers(specific_group, context={'request' : request})
        
     return Response(
@@ -1668,6 +1925,11 @@ def create_specificbrand_discount(request):
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)
     
+
+    products = request.data.get('product', [])
+    services = request.data.get('services', [])
+    vouchers = request.data.get('voucher', [])
+    
     error = []
     
     if not all([business_id]):
@@ -1796,7 +2058,55 @@ def create_specificbrand_discount(request):
                 
             except Exception as err:
                error.append(str(err))
+               
+    if type(products) == str:
+        try:
+            products = json.loads(products)
+        except:
+            products = []
     
+    if type(products) == list:
+        for product_id in products:
+            PromotionExcludedItem.objects.create(
+                object_type = 'Specific Brand Discount',
+                object_id = f'{specific_brand.id}',
+                excluded_type = 'Product',
+                excluded_id = product_id,
+                is_active = True,
+            )
+
+    if type(services) == str:
+        try:
+            services = json.loads(services)
+        except:
+            services = []
+    
+    if type(services) == list:
+        for service_id in services:
+            PromotionExcludedItem.objects.create(
+                object_type = 'Specific Brand Discount',
+                object_id = f'{specific_brand.id}',
+                excluded_type = 'Service',
+                excluded_id = service_id,
+                is_active = True,
+            )
+
+    if type(vouchers) == str:
+        try:
+            vouchers = json.loads(vouchers)
+        except:
+            vouchers = []
+    
+    if type(vouchers) == list:
+        for voucher_id in vouchers:
+            PromotionExcludedItem.objects.create(
+                object_type = 'Specific Brand Discount',
+                object_id = f'{specific_brand.id}',
+                excluded_type = 'Voucher',
+                excluded_id = voucher_id,
+                is_active = True,
+            )
+
     serializers= PromtoionsSerializers.SpecificBrandSerializers(specific_brand, context={'request' : request})
     
     return Response(
@@ -1898,6 +2208,10 @@ def update_specificbrand_discount(request):
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)
     promotion_name = request.data.get('promotion_name', '')
+    
+    products = request.data.get('product', [])
+    services = request.data.get('services', [])
+    vouchers = request.data.get('voucher', [])
     
     error = []
     
@@ -2024,6 +2338,7 @@ def update_specificbrand_discount(request):
                     specificbrand = specific_discount,
                     date = date,
                 )
+               
     serializers= PromtoionsSerializers.SpecificBrandSerializers(specific_discount, data=request.data, partial=True, context={'request' : request})
     if serializers.is_valid():
         serializers.save()
@@ -2039,6 +2354,83 @@ def update_specificbrand_discount(request):
         },
         status=status.HTTP_404_NOT_FOUND
     )
+
+
+    if type(products) == str:
+        try:
+            products = json.loads(products)
+        except:
+            products = []
+        
+    PromotionExcludedItem.objects.filter(
+        object_type = 'Specific Brand Discount',
+        object_id = f'{specific_discount.id}',
+        excluded_type = 'Product',
+        is_active = True,
+    ).exclude(
+        excluded_id__in = products,
+    ).delete()
+    
+    if type(products) == list:
+        for product_id in products:
+            PromotionExcludedItem.objects.get_or_create(
+                object_type = 'Specific Brand Discount',
+                object_id = f'{specific_discount.id}',
+                excluded_type = 'Product',
+                excluded_id = product_id,
+                is_active = True,
+            )
+
+    if type(services) == str:
+        try:
+            services = json.loads(services)
+        except:
+            services = []
+
+    PromotionExcludedItem.objects.filter(
+        object_type = 'Specific Brand Discount',
+        object_id = f'{specific_discount.id}',
+        excluded_type = 'Service',
+        is_active = True,
+    ).exclude(
+        excluded_id__in = services,
+    ).delete()
+
+    if type(services) == list:
+        for service_id in services:
+            PromotionExcludedItem.objects.get_or_create(
+                object_type = 'Specific Brand Discount',
+                object_id = f'{specific_discount.id}',
+                excluded_type = 'Service',
+                excluded_id = service_id,
+                is_active = True,
+            )
+
+    if type(vouchers) == str:
+        try:
+            vouchers = json.loads(vouchers)
+        except:
+            vouchers = []
+
+    PromotionExcludedItem.objects.filter(
+        object_type = 'Specific Brand Discount',
+        object_id = f'{specific_discount.id}',
+        excluded_type = 'Voucher',
+        is_active = True,
+    ).exclude(
+        excluded_id__in = vouchers,
+    ).delete()
+
+    if type(vouchers) == list:
+        for voucher_id in vouchers:
+            PromotionExcludedItem.objects.get_or_create(
+                object_type = 'Specific Brand Discount',
+                object_id = f'{specific_discount.id}',
+                excluded_type = 'Voucher',
+                excluded_id = voucher_id,
+                is_active = True,
+            )
+
     return Response(
         {
             'status' : True,
@@ -4622,6 +5014,10 @@ def create_user_restricted_discount(request):
     dayrestrictions = request.data.get('dayrestrictions', None)
     blockdate = request.data.get('blockdate', None)    
     
+    products = request.data.get('product', [])
+    services = request.data.get('services', [])
+    vouchers = request.data.get('voucher', [])
+    
     error = []
     
     if not all([business_id]):
@@ -4733,6 +5129,54 @@ def create_user_restricted_discount(request):
             except Exception as err:
                error.append(str(err))
                
+    if type(products) == str:
+        try:
+            products = json.loads(products)
+        except:
+            products = []
+    
+    if type(products) == list:
+        for product_id in products:
+            PromotionExcludedItem.objects.create(
+                object_type = 'User_Restricted_discount',
+                object_id = f'{usr_res.id}',
+                excluded_type = 'Product',
+                excluded_id = product_id,
+                is_active = True,
+            )
+
+    if type(services) == str:
+        try:
+            services = json.loads(services)
+        except:
+            services = []
+    
+    if type(services) == list:
+        for service_id in services:
+            PromotionExcludedItem.objects.create(
+                object_type = 'User_Restricted_discount',
+                object_id = f'{usr_res.id}',
+                excluded_type = 'Service',
+                excluded_id = service_id,
+                is_active = True,
+            )
+
+    if type(vouchers) == str:
+        try:
+            vouchers = json.loads(vouchers)
+        except:
+            vouchers = []
+    
+    if type(vouchers) == list:
+        for voucher_id in vouchers:
+            PromotionExcludedItem.objects.create(
+                object_type = 'User_Restricted_discount',
+                object_id = f'{usr_res.id}',
+                excluded_type = 'Voucher',
+                excluded_id = voucher_id,
+                is_active = True,
+            )
+ 
     serializers = PromtoionsSerializers.UserRestrictedDiscountSerializers(usr_res, context={'request' : request})
     
     return Response(
@@ -4767,6 +5211,10 @@ def update_user_restricted_discount(request):
     corporate_type = request.data.get('corporate_type', None)
     discount_percentage = request.data.get('discount_percentage', None)
     promotion_name = request.data.get('promotion_name', '')
+    
+    products = request.data.get('product', [])
+    services = request.data.get('services', [])
+    vouchers = request.data.get('voucher', [])
     
     error = []
     
@@ -4915,7 +5363,81 @@ def update_user_restricted_discount(request):
                     userrestricteddiscount = usr_res,
                     date = date,
                 )
+    if type(products) == str:
+        try:
+            products = json.loads(products)
+        except:
+            products = []
+        
+    PromotionExcludedItem.objects.filter(
+        object_type = 'User_Restricted_discount',
+        object_id = f'{usr_res.id}',
+        excluded_type = 'Product',
+        is_active = True,
+    ).exclude(
+        excluded_id__in = products,
+    ).delete()
     
+    if type(products) == list:
+        for product_id in products:
+            PromotionExcludedItem.objects.get_or_create(
+                object_type = 'User_Restricted_discount',
+                object_id = f'{usr_res.id}',
+                excluded_type = 'Product',
+                excluded_id = product_id,
+                is_active = True,
+            )
+
+    if type(services) == str:
+        try:
+            services = json.loads(services)
+        except:
+            services = []
+
+    PromotionExcludedItem.objects.filter(
+        object_type = 'User_Restricted_discount',
+        object_id = f'{usr_res.id}',
+        excluded_type = 'Service',
+        is_active = True,
+    ).exclude(
+        excluded_id__in = services,
+    ).delete()
+
+    if type(services) == list:
+        for service_id in services:
+            PromotionExcludedItem.objects.get_or_create(
+                object_type = 'User_Restricted_discount',
+                object_id = f'{usr_res.id}',
+                excluded_type = 'Service',
+                excluded_id = service_id,
+                is_active = True,
+            )
+
+    if type(vouchers) == str:
+        try:
+            vouchers = json.loads(vouchers)
+        except:
+            vouchers = []
+
+    PromotionExcludedItem.objects.filter(
+        object_type = 'User_Restricted_discount',
+        object_id = f'{usr_res.id}',
+        excluded_type = 'Voucher',
+        is_active = True,
+    ).exclude(
+        excluded_id__in = vouchers,
+    ).delete()
+
+    if type(vouchers) == list:
+        for voucher_id in vouchers:
+            PromotionExcludedItem.objects.get_or_create(
+                object_type = 'User_Restricted_discount',
+                object_id = f'{usr_res.id}',
+                excluded_type = 'Voucher',
+                excluded_id = voucher_id,
+                is_active = True,
+            )
+
     serializers= PromtoionsSerializers.UserRestrictedDiscountSerializers(usr_res)#data=request.data, partial=True, context={'request' : request})
 
     return Response(

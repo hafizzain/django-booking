@@ -30,7 +30,7 @@ from Product.models import Product, ProductOrderStockReport, ProductStock
 from django.db.models import Avg, Count, Min, Sum
 
 
-from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
+from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer, SaleOrders_CheckoutSerializer, SaleOrders_AppointmentCheckoutSerializer
 from rest_framework.pagination import PageNumberPagination
 
 
@@ -819,106 +819,63 @@ def get_all_sale_orders(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_all_sale_orders_pagination(request):
+    start_time = datetime.datetime.now()
     location_id = request.GET.get('location', None)
     range_start =  request.GET.get('range_start', None)
     range_end = request.GET.get('range_end', None)
 
-    paginator = CustomPagination()
-    paginator.page_size = 10
-    
+    queries = {}
     if range_start:
-        checkout_order = Checkout.objects.filter(
-            is_deleted=False,
-            location__id=location_id,
-            created_at__range=(range_start, range_end)
-        )
-        appointment_checkout = AppointmentCheckout.objects.filter(
-            appointment_service__appointment_status='Done',
-            business_address__id=location_id,
-            created_at__range=(range_start, range_end)
-        )
-    else:
-        checkout_order = Checkout.objects.filter(
-            is_deleted=False,
-            location__id=location_id,
-        )
-        appointment_checkout = AppointmentCheckout.objects.filter(
-            appointment_service__appointment_status='Done',
-            business_address__id=location_id,
+        queries['created_at__range'] = (range_start, range_end)
+
+    checkout_order = Checkout.objects.select_related(
+        'location',
+        'location__currency',
+        'client',
+        'member'
+    ).prefetch_related(
+        'checkout_orders',
+        'checkout_orders__user',
+        'checkout_orders__client',
+        'checkout_orders__member',
+        'checkout_orders__location',
+        'checkout_orders__location__currency',
+    ).filter(
+        is_deleted=False,
+        location__id=location_id,
+        **queries
+    )
+    appointment_checkout = AppointmentCheckout.objects.select_related(
+            'appointment_service', 
+            'business_address',
+            'appointment',
+            'appointment__client',
+            'service',
+        ).filter(
+            appointment_service__appointment_status = 'Done',
+            business_address__id = location_id,
+            **queries
         )
 
-    data_total = list(CheckoutSerializer(checkout_order, many=True, context={'request': request}).data) + \
-                 list(AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
+    checkout_data = list(SaleOrders_CheckoutSerializer(checkout_order, many=True, context={'request': request}).data)
+    appointment_data = list(SaleOrders_AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
+
+    data_total = checkout_data + appointment_data
                  
     sorted_data = sorted(data_total, key=lambda x: x['created_at'], reverse=True)
 
+
+    paginator = CustomPagination()
+    paginator.page_size = 10
     paginated_data = paginator.paginate_queryset(sorted_data, request)
 
-    return paginator.get_paginated_response(paginated_data, 'sales')
+    response = paginator.get_paginated_response(paginated_data, 'sales')
+    end_time = datetime.datetime.now()
 
-# @api_view(['GET'])
-# @permission_classes([AllowAny])
-# def get_all_sale_orders_pagination(request):
-#     location_id = request.GET.get('location', None)
-#     range_start =  request.GET.get('range_start', None)
-#     range_end = request.GET.get('range_end', None)
+    response['seconds'] = f'{(end_time - start_time).seconds} s'
+    response['total_seconds'] = f'{(end_time - start_time).total_seconds()} s'
+    return response
 
-#     paginator = CustomPagination()
-#     paginator.page_size = 10
-#     if range_start:
-        
-#         checkout_order = Checkout.objects.filter(
-#             is_deleted=False,
-#             location__id = location_id,
-#             created_at__gte =  range_start ,
-#             created_at__lte = range_end
-#             )
-#         checkout_data = CheckoutSerializer(checkout_order, many=True, context={'request': request}).data
-        
-#         appointment_checkout = AppointmentCheckout.objects.filter(
-#             appointment_service__appointment_status='Done',
-#             business_address__id = location_id,
-#             created_at__gte =  range_start ,
-#             created_at__lte = range_end
-#             )
-#         appointment_checkout_data = AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data
-#     else:
-#         checkout_order = Checkout.objects.filter(
-#             is_deleted=False,
-#             location__id = location_id,
-#             )
-        
-#         checkout_data = CheckoutSerializer(checkout_order, many=True, context={'request': request}).data
-        
-#         appointment_checkout = AppointmentCheckout.objects.filter(
-#             appointment_service__appointment_status='Done',
-#             business_address__id = location_id,
-#             )
-#         appointment_checkout_data = AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data
-    
-#     data_total = checkout_data + appointment_checkout_data
-    
-#     paginated_appointment_checkout = paginator.paginate_queryset(data_total, request)
-    
-#     sorted_data = sorted(paginated_appointment_checkout, key=lambda x: x['created_at'], reverse=True)
-    
-#     return paginator.get_paginated_response(sorted_data, 'sales')
-    
-    # sale_data = paginator.get_paginated_response(sorted_data, 'sales')
-
-    # return Response(
-    #     {
-    #         'status' : 200,
-    #         'status_code' : '200',
-    #         'response' : {
-    #             'message' : 'All Sale Orders',
-    #             'error_message' : None,
-    #             'sales' : sale_data.data
-    #         }
-    #     },
-    #     status=status.HTTP_200_OK
-    # )
-    
 
 @api_view(['GET'])
 @permission_classes([AllowAny])

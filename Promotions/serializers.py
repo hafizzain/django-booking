@@ -8,7 +8,8 @@ from Product.Constants.index import tenant_media_base_url
 from django_tenants.utils import tenant_context
 from Product.models import Product 
 from Product.serializers import BrandSerializer
-from Promotions.models import BundleFixed, ComplimentaryDiscount, DirectOrFlatDiscount , CategoryDiscount , DateRestrictions , DayRestrictions, BlockDate, DiscountOnFreeService, FixedPriceService, FreeService, MentionedNumberService, PackagesDiscount, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, ServiceDurationForSpecificTime, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount, UserRestrictedDiscount, Service, ServiceGroup
+from Promotions.models import BundleFixed, ComplimentaryDiscount, DirectOrFlatDiscount , CategoryDiscount , DateRestrictions , DayRestrictions, BlockDate, DiscountOnFreeService, FixedPriceService, FreeService, MentionedNumberService, PackagesDiscount, ProductAndGetSpecific, PurchaseDiscount, RetailAndGetService, ServiceDurationForSpecificTime, ServiceGroupDiscount, SpecificBrand, SpecificGroupDiscount, SpendDiscount, SpendSomeAmount, SpendSomeAmountAndGetDiscount, UserRestrictedDiscount, Service, ServiceGroup, PromotionExcludedItem
+from Client.models import Vouchers
 
 from Utility.models import Currency, ExceptionRecord
 
@@ -390,6 +391,10 @@ class DirectOrFlatDiscountSerializers(serializers.ModelSerializer):
     block_date = serializers.SerializerMethodField(read_only=True)
     type = serializers.SerializerMethodField(read_only=True)
     is_deleted = serializers.SerializerMethodField(read_only=True)
+
+    excluded_products = serializers.SerializerMethodField(read_only=True)
+    excluded_services = serializers.SerializerMethodField(read_only=True)
+    excluded_vouchers = serializers.SerializerMethodField(read_only=True)
     
     
     def get_is_deleted(self, obj):
@@ -432,7 +437,61 @@ class DirectOrFlatDiscountSerializers(serializers.ModelSerializer):
             return CategoryDiscountSerializers(ser, many = True).data
         except Exception as err:
             return []
-            pass
+    
+
+    def get_excluded_products(self, obj):
+        excluded_proms = PromotionExcludedItem.objects.filter(
+            is_deleted = False,
+            is_active = True,
+            object_type = 'Direct Or Flat',
+            object_id = f'{obj.id}',
+            excluded_type = 'Product',
+        ).values_list('excluded_id', flat=True)
+
+        prods = Product.objects.filter(
+            id__in = list(excluded_proms),
+            is_active = True,
+            is_deleted = False
+        ).values('id', 'name')
+
+        return prods
+        
+    def get_excluded_services(self, obj):
+        excluded_proms = PromotionExcludedItem.objects.filter(
+            is_deleted = False,
+            is_active = True,
+            object_type = 'Direct Or Flat',
+            object_id = f'{obj.id}',
+            excluded_type = 'Service',
+        ).values_list('excluded_id', flat=True)
+
+        servs = Service.objects.filter(
+            id__in = list(excluded_proms),
+            is_active = True,
+            is_deleted = False
+        ).values('id', 'name')
+
+        return servs
+
+
+        
+    def get_excluded_vouchers(self, obj):
+        excluded_proms = PromotionExcludedItem.objects.filter(
+            is_deleted = False,
+            is_active = True,
+            object_type = 'Direct Or Flat',
+            object_id = f'{obj.id}',
+            excluded_type = 'Voucher',
+        ).values_list('excluded_id', flat=True)
+
+        vouchers = Vouchers.objects.filter(
+            id__in = list(excluded_proms),
+            is_active = True,
+            is_deleted = False
+        ).values('id', 'name')
+
+        return vouchers
+
     
     class Meta:
         model = DirectOrFlatDiscount
@@ -446,6 +505,12 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
     block_date = serializers.SerializerMethodField(read_only=True)
     type = serializers.SerializerMethodField(read_only=True)
     is_deleted = serializers.SerializerMethodField(read_only=True)
+
+
+    excluded_products = serializers.SerializerMethodField(read_only=True)
+    excluded_services = serializers.SerializerMethodField(read_only=True)
+    excluded_vouchers = serializers.SerializerMethodField(read_only=True)
+    
 
     def get_is_deleted(self, obj):
         if obj.is_deleted == True:
@@ -479,7 +544,6 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
             return DayRestrictionsSerializers(ser, many = True).data
         except Exception as err:
             return []
-            pass
         
     def get_servicegroup_discount(self, obj):
         try:
@@ -487,7 +551,60 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
             return ServiceGroupDiscountSerializers(ser, many = True).data
         except Exception as err:
             return []
-            pass
+    
+
+    def get_excluded_products(self, obj):
+        excluded_proms = PromotionExcludedItem.objects.filter(
+            is_deleted = False,
+            is_active = True,
+            object_type = 'Specific Group Discount',
+            object_id = f'{obj.id}',
+            excluded_type = 'Product',
+        ).values_list('excluded_id', flat=True)
+
+        prods = Product.objects.filter(
+            id__in = list(excluded_proms),
+            is_active = True,
+            is_deleted = False
+        ).values('id', 'name')
+
+        return prods
+        
+    def get_excluded_services(self, obj):
+        excluded_proms = PromotionExcludedItem.objects.filter(
+            is_deleted = False,
+            is_active = True,
+            object_type = 'Specific Group Discount',
+            object_id = f'{obj.id}',
+            excluded_type = 'Service',
+        ).values_list('excluded_id', flat=True)
+
+        servs = Service.objects.filter(
+            id__in = list(excluded_proms),
+            is_active = True,
+            is_deleted = False
+        ).values('id', 'name')
+
+        return servs
+
+
+        
+    def get_excluded_vouchers(self, obj):
+        excluded_proms = PromotionExcludedItem.objects.filter(
+            is_deleted = False,
+            is_active = True,
+            object_type = 'Specific Group Discount',
+            object_id = f'{obj.id}',
+            excluded_type = 'Voucher',
+        ).values_list('excluded_id', flat=True)
+
+        vouchers = Vouchers.objects.filter(
+            id__in = list(excluded_proms),
+            is_active = True,
+            is_deleted = False
+        ).values('id', 'name')
+
+        return vouchers
     class Meta:
         model = SpecificGroupDiscount
         fields = '__all__'
@@ -599,6 +716,10 @@ class SpecificBrandSerializers(serializers.ModelSerializer):
     type = serializers.SerializerMethodField(read_only=True)
     is_deleted = serializers.SerializerMethodField(read_only=True)
 
+    excluded_products = serializers.SerializerMethodField(read_only=True)
+    excluded_services = serializers.SerializerMethodField(read_only=True)
+    excluded_vouchers = serializers.SerializerMethodField(read_only=True)
+    
     def get_is_deleted(self, obj):
         if obj.is_deleted == True:
             return 'True'
@@ -630,7 +751,60 @@ class SpecificBrandSerializers(serializers.ModelSerializer):
             return DayRestrictionsSerializers(ser, many = True).data
         except Exception as err:
             return []
-            pass
+
+    def get_excluded_products(self, obj):
+        excluded_proms = PromotionExcludedItem.objects.filter(
+            is_deleted = False,
+            is_active = True,
+            object_type = 'Specific Brand Discount',
+            object_id = f'{obj.id}',
+            excluded_type = 'Product',
+        ).values_list('excluded_id', flat=True)
+
+        prods = Product.objects.filter(
+            id__in = list(excluded_proms),
+            is_active = True,
+            is_deleted = False
+        ).values('id', 'name')
+
+        return prods
+        
+    def get_excluded_services(self, obj):
+        excluded_proms = PromotionExcludedItem.objects.filter(
+            is_deleted = False,
+            is_active = True,
+            object_type = 'Specific Brand Discount',
+            object_id = f'{obj.id}',
+            excluded_type = 'Service',
+        ).values_list('excluded_id', flat=True)
+
+        servs = Service.objects.filter(
+            id__in = list(excluded_proms),
+            is_active = True,
+            is_deleted = False
+        ).values('id', 'name')
+
+        return servs
+
+
+        
+    def get_excluded_vouchers(self, obj):
+        excluded_proms = PromotionExcludedItem.objects.filter(
+            is_deleted = False,
+            is_active = True,
+            object_type = 'Specific Brand Discount',
+            object_id = f'{obj.id}',
+            excluded_type = 'Voucher',
+        ).values_list('excluded_id', flat=True)
+
+        vouchers = Vouchers.objects.filter(
+            id__in = list(excluded_proms),
+            is_active = True,
+            is_deleted = False
+        ).values('id', 'name')
+
+        return vouchers
+
     class Meta:
         model = SpecificBrand
         fields = '__all__'
@@ -1155,6 +1329,10 @@ class UserRestrictedDiscountSerializers(serializers.ModelSerializer):
     type = serializers.SerializerMethodField(read_only=True)
     is_deleted = serializers.SerializerMethodField(read_only=True)
 
+    excluded_products = serializers.SerializerMethodField(read_only=True)
+    excluded_services = serializers.SerializerMethodField(read_only=True)
+    excluded_vouchers = serializers.SerializerMethodField(read_only=True)
+    
     def get_is_deleted(self, obj):
         if obj.is_deleted == True:
             return 'True'
@@ -1185,7 +1363,62 @@ class UserRestrictedDiscountSerializers(serializers.ModelSerializer):
             return DayRestrictionsSerializers(ser, many = True).data
         except Exception as err:
             return []
-            pass
+        
+
+    def get_excluded_products(self, obj):
+        excluded_proms = PromotionExcludedItem.objects.filter(
+            is_deleted = False,
+            is_active = True,
+            object_type = 'User_Restricted_discount',
+            object_id = f'{obj.id}',
+            excluded_type = 'Product',
+        ).values_list('excluded_id', flat=True)
+
+        prods = Product.objects.filter(
+            id__in = list(excluded_proms),
+            is_active = True,
+            is_deleted = False
+        ).values('id', 'name')
+
+        return prods
+        
+    def get_excluded_services(self, obj):
+        excluded_proms = PromotionExcludedItem.objects.filter(
+            is_deleted = False,
+            is_active = True,
+            object_type = 'User_Restricted_discount',
+            object_id = f'{obj.id}',
+            excluded_type = 'Service',
+        ).values_list('excluded_id', flat=True)
+
+        servs = Service.objects.filter(
+            id__in = list(excluded_proms),
+            is_active = True,
+            is_deleted = False
+        ).values('id', 'name')
+
+        return servs
+
+
+        
+    def get_excluded_vouchers(self, obj):
+        excluded_proms = PromotionExcludedItem.objects.filter(
+            is_deleted = False,
+            is_active = True,
+            object_type = 'User_Restricted_discount',
+            object_id = f'{obj.id}',
+            excluded_type = 'Voucher',
+        ).values_list('excluded_id', flat=True)
+
+        vouchers = Vouchers.objects.filter(
+            id__in = list(excluded_proms),
+            is_active = True,
+            is_deleted = False
+        ).values('id', 'name')
+
+        return vouchers
+
+    
     class Meta:
         model = UserRestrictedDiscount
         fields = '__all__'
@@ -1946,3 +2179,14 @@ class AvailOfferSpecificBrandSerializers(serializers.ModelSerializer):
         model = SpecificBrand
         fields = ['id','service_group']
         # 'specific_brand', 'day_restrictions','date_restrictions','block_date'
+    
+
+class PromotionExcludedItemSerializer(serializers.ModelSerializer):
+    excluded_item = serializers.SerializerMethodField(read_only=True)
+
+    def get_excluded_item(self, obj):
+        return obj.excluded_id
+
+    class Meta:
+        model = PromotionExcludedItem
+        fields = ['id', 'excluded_item']
