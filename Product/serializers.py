@@ -43,8 +43,7 @@ class BrandSerializer(serializers.ModelSerializer):
                 url = tenant_media_base_url(request)
                 return f'{url}{obj.image}'
             except Exception as err:
-                return str(err)
-                # return f'{obj.image}'
+                return f'{obj.image}'
         return None
     
     class Meta:
