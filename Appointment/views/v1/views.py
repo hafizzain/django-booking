@@ -1668,7 +1668,7 @@ def create_checkout(request):
                 # customer_will_get_amount
 
                 single_point_value = client_points.customer_will_get_amount / client_points.for_every_points
-                total_redeened_value = single_point_value * int(redeemed_points)
+                total_redeened_value = float(single_point_value) * float(redeemed_points)
 
                 LoyaltyPointLogs.objects.create(
                     location = business_address,
