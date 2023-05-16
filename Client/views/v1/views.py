@@ -3020,8 +3020,7 @@ def get_customer_detailed_loyalty_points(request):
     customers_points = LoyaltyPointLogs.objects.filter(
         # client__id__in = clients_list,
         location__id = location_id,
-        created_at__gte = start_date,
-        created_at__lte = end_date,
+        created_at__date__range = (start_date, end_date),
         is_active = True,
         is_deleted = False
     )
