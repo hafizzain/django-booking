@@ -527,7 +527,6 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
             return BlockDateSerializers(ser, many = True).data
         except Exception as err:
             return []
-            pass
     
     
     def get_date_restrictions(self, obj):
@@ -568,7 +567,7 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
             is_deleted = False
         ).values('id', 'name')
 
-        return prods
+        return list(prods)
         
     def get_excluded_services(self, obj):
         excluded_proms = PromotionExcludedItem.objects.filter(
@@ -585,7 +584,7 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
             is_deleted = False
         ).values('id', 'name')
 
-        return servs
+        return list(servs)
 
 
         
@@ -604,7 +603,7 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
             is_deleted = False
         ).values('id', 'name')
 
-        return vouchers
+        return list(vouchers)
     class Meta:
         model = SpecificGroupDiscount
         fields = '__all__'
