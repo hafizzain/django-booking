@@ -244,9 +244,9 @@ def get_directorflat(request):
     serialized = PromtoionsSerializers.DirectOrFlatDiscountSerializers(flatordirect,  many=True, context={'request' : request})
     data.extend(serialized.data)
     
-    # specific_group = SpecificGroupDiscount.objects.filter(is_deleted=False).order_by('-created_at').distinct()
-    # serialized = PromtoionsSerializers.SpecificGroupDiscountSerializers(specific_group,  many=True, context={'request' : request})
-    # data.extend(serialized.data)
+    specific_group = SpecificGroupDiscount.objects.filter(is_deleted=False).order_by('-created_at').distinct()
+    serialized = PromtoionsSerializers.SpecificGroupDiscountSerializers(specific_group,  many=True, context={'request' : request})
+    data.extend(serialized.data)
     
     # purchase_discount = PurchaseDiscount.objects.filter(is_deleted=False).order_by('-created_at').distinct()
     # serialized = PromtoionsSerializers.PurchaseDiscountSerializers(purchase_discount,  many=True, context={'request' : request})
