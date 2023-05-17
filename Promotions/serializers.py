@@ -509,7 +509,7 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
     day_restrictions = serializers.SerializerMethodField(read_only=True)
     date_restrictions = serializers.SerializerMethodField(read_only=True)
     block_date = serializers.SerializerMethodField(read_only=True)
-    item_type = serializers.SerializerMethodField(read_only=True)
+    type = serializers.SerializerMethodField(read_only=True)
     is_deleted = serializers.SerializerMethodField(read_only=True)
 
 
@@ -524,7 +524,7 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
         else:
             return 'False'
     
-    def get_item_type(self, obj):
+    def get_type(self, obj):
         return 'Specific Group Discount'
     
     def get_block_date(self, obj):
