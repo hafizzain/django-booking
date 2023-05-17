@@ -808,6 +808,8 @@ def update_appointment(request):
     serializer.save()
     
     if appointment_status == 'Cancel':
+        cancel_service_appointment = AppointmentService.objects.get(appointment=service_appointment.appointment)
+        
         try:
             thrd = Thread(target=cancel_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant} )
             thrd.start()
@@ -828,13 +830,13 @@ def update_appointment(request):
         
         appointment_logs = AppointmentLogs.objects.create( 
             location = service_appointment.business_address,
-            appointment = service_appointment,
+            appointment = cancel_service_appointment,
             log_type = 'Cancel',
             member = active_user_staff
         )
         LogDetails.objects.create(
             log = appointment_logs,
-            appointment_service = service_appointment,
+            appointment_service = cancel_service_appointment,
             start_time = service_appointment.appointment_time,
             duration = service_appointment.duration,
             member = service_appointment.member
@@ -1061,7 +1063,7 @@ def update_appointment_service(request):
     appointment_logs = AppointmentLogs.objects.create( 
         location = appointment.business_address,
         appointment = appointment,
-        log_type = 'Edit',
+        log_type = 'Reschedule',
         member = active_user_staff
     )
 
