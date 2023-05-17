@@ -78,6 +78,13 @@ class Product(models.Model):
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
 
+    @property
+    def short_id(self):
+        instance_id = f'{self.id}'
+        instance_id = instance_id.split('-')
+        instance_id = instance_id[0]
+        return f'{instance_id}'
+
 
     def __str__(self):
         return str(self.id)

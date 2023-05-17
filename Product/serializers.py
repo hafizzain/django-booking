@@ -254,7 +254,12 @@ class ProductSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField(read_only=True)
     size = serializers.SerializerMethodField(read_only=True)
+
+    short_id = serializers.SerializerMethodField(read_only=True)
     
+    def get_short_id(self,obj):
+        return obj.short_id
+
     def get_size(self,obj):
         try:
             return obj.product_size
@@ -329,6 +334,7 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = [
             'id', 
+            'short_id', 
             'name', 
             'currency_retail_price',
             'size',
