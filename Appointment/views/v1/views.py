@@ -808,7 +808,7 @@ def update_appointment(request):
     serializer.save()
     
     if appointment_status == 'Cancel':
-        cancel_service_appointment = AppointmentService.objects.get(appointment=service_appointment.appointment)
+        cancel_service_appointment = AppointmentService.objects.filter(appointment=service_appointment.appointment)
         
         try:
             thrd = Thread(target=cancel_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant} )
@@ -830,17 +830,19 @@ def update_appointment(request):
         
         appointment_logs = AppointmentLogs.objects.create( 
             location = service_appointment.business_address,
-            appointment = cancel_service_appointment,
+            appointment = appointment_service,
             log_type = 'Cancel',
             member = active_user_staff
         )
-        LogDetails.objects.create(
-            log = appointment_logs,
-            appointment_service = cancel_service_appointment,
-            start_time = service_appointment.appointment_time,
-            duration = service_appointment.duration,
-            member = service_appointment.member
-        )
+        cancel_service_appointment = AppointmentService.objects.filter(appointment=service_appointment.appointment)
+        for appointment_service in cancel_service_appointment:
+            LogDetails.objects.create(
+                log = appointment_logs,
+                appointment_service = appointment_service,
+                start_time = appointment_service.appointment_time,
+                duration = appointment_service.duration,
+                member = appointment_service.member
+            )
         
 
     # if appointment_status == 'Cancel':
