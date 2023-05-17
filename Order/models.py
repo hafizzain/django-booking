@@ -202,3 +202,32 @@ class CheckoutPayment(models.Model):
     def __str__(self):
         return str(self.id)
     
+class RedeemedMemberShip(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True,)
+
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True, blank=True, related_name='order_redeemed_memberships')
+    checkout = models.ForeignKey(Checkout, on_delete=models.CASCADE, null=True, blank=True, related_name='checkout_redeemed_memberships')
+
+    membership = models.ForeignKey(Membership, on_delete=models.CASCADE, related_name='redeemed_memberships')
+
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+    
+    def __str__(self):
+        return str(self.id)
+
+class RedeemMembershipItem(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True,)
+
+    redeemed_membership = models.ForeignKey(RedeemedMemberShip, on_delete=models.CASCADE, related_name='redeem_items')
+
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='redeemed_products')
+    service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='redeemed_services')
+
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=now)
+    
+    def __str__(self):
+        return str(self.id)

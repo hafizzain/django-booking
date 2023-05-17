@@ -2960,8 +2960,7 @@ def get_customers_loyalty_points_logs(request):
 
     customers_points = ClientLoyaltyPoint.objects.filter(
         location__id = location_id,
-        created_at__gte = start_date,
-        created_at__lte = end_date,
+        created_at__date__range = (start_date, end_date),
         is_active = True,
         is_deleted = False,
         **queries
@@ -2977,7 +2976,9 @@ def get_customers_loyalty_points_logs(request):
             'response' : {
                 'message' : 'Loyalty Points Logs',
                 'error_message' : None,
-                'data' : data
+                'data' : data,
+                'start_date' : start_date,
+                'end_date' : end_date,
             }
         },
         status=status.HTTP_200_OK
@@ -3019,8 +3020,7 @@ def get_customer_detailed_loyalty_points(request):
     customers_points = LoyaltyPointLogs.objects.filter(
         # client__id__in = clients_list,
         location__id = location_id,
-        created_at__gte = start_date,
-        created_at__lte = end_date,
+        created_at__date__range = (start_date, end_date),
         is_active = True,
         is_deleted = False
     )

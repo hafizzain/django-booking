@@ -1195,8 +1195,17 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
 class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     product_name  = serializers.SerializerMethodField(read_only=True)
     product_price  = serializers.SerializerMethodField(read_only=True)
+    price  = serializers.SerializerMethodField(read_only=True)
+    selection_type  = serializers.SerializerMethodField(read_only=True)
+
+    def get_selection_type(self, obj):
+        return 'PRODUCT'
+
 
     def get_product_price(self, obj):
+        return obj.current_price
+    
+    def get_price(self, obj):
         return obj.current_price
         
 
@@ -1210,7 +1219,7 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductOrder
         fields = [
-            'id', 'product_name', 'quantity', 'product_price']
+            'id', 'product_name', 'quantity', 'product_price', 'price', 'selection_type']
             # 'client','status', 'created_at',
             #       'location', 'member', 'tip', 'total_price' , 'payment_type','price','name',
             #       'gst', 'order_type', 'sold_quantity','product_details','total_product'
@@ -1219,6 +1228,11 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
 
     service = serializers.SerializerMethodField()
     price = serializers.SerializerMethodField()
+    selection_type  = serializers.SerializerMethodField(read_only=True)
+
+    def get_selection_type(self, obj):
+        return 'SERVICE'
+    
 
     def get_service(self, obj):
         if obj.service:
@@ -1230,7 +1244,7 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ServiceOrder
-        fields = ['id', 'price', 'quantity', 'service' ]
+        fields = ['id', 'price', 'quantity', 'service', 'selection_type' ]
             # 'client','created_at' ,'user',
             #       'duration', 'location', 'member', 'total_price',
             #       'payment_type','tip','gst', 'order_type','created_at'
@@ -1257,7 +1271,10 @@ class SaleOrder_MemberShipSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField()
     membership_price = serializers.SerializerMethodField()
     membership = serializers.SerializerMethodField()
+    selection_type  = serializers.SerializerMethodField(read_only=True)
 
+    def get_selection_type(self, obj):
+        return 'MEMBERSHIP'
 
     def get_price(self, obj):
         return obj.current_price
@@ -1270,7 +1287,7 @@ class SaleOrder_MemberShipSerializer(serializers.ModelSerializer):
         
     class Meta:
         model = MemberShipOrder
-        fields =['id', 'membership', 'quantity', 'price', 'membership_price' ]
+        fields =['id', 'membership', 'quantity', 'price', 'membership_price', 'selection_type' ]
             # 'order_type' ,'client','member', 'location' ,'start_date', 'end_date','status', 'total_price', 'name',
             #      'payment_type','created_at'
 

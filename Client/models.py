@@ -400,7 +400,7 @@ class ClientLoyaltyPoint(models.Model):
     total_amount = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name='Number of Total Amount (Amount to Spend)')
     total_earn = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name='Total Number Of Points')
 
-    points_redeemed = models.PositiveIntegerField(default=0, verbose_name='Total Number Of Points Redeemed')
+    points_redeemed = models.FloatField(default=0, verbose_name='Total Number Of Points Redeemed')
 
     for_every_points = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name='For every (this) points')
     customer_will_get_amount = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name='a customer will get (this) amount')
@@ -429,8 +429,9 @@ class LoyaltyPointLogs(models.Model):
     loyalty = models.ForeignKey(LoyaltyPoints, on_delete=models.CASCADE,  related_name="loyalty_points_logs", null=True, blank=True )
 
     points_earned = models.PositiveIntegerField(default=0, null=True, blank=True)
-    points_redeemed = models.PositiveIntegerField(default=0, null=True, blank=True)
+    points_redeemed = models.FloatField(default=0)
     balance = models.PositiveIntegerField(default=0, null=True, blank=True)
+    actual_sale_value_redeemed = models.FloatField(default=0)
 
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(auto_now_add=now, null=True)

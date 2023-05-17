@@ -9,7 +9,7 @@ from Sale.Constants.tunrover import ProductTurnover
 from rest_framework import status
 from Appointment.models import Appointment, AppointmentCheckout, AppointmentService, AppointmentEmployeeTip
 from Business.models import AdminNotificationSetting, Business, StaffNotificationSetting, StockNotificationSetting
-from Client.models import Client, Membership, Vouchers
+from Client.models import Client, Membership, Vouchers, LoyaltyPoints, LoyaltyPointLogs, ClientLoyaltyPoint
 from Order.models import Checkout, MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
 from Sale.Constants.Custom_pag import CustomPagination
 from Utility.Constants.Data.months import MONTHS
@@ -27,7 +27,7 @@ from Business.models import BusinessAddress
 from Service.models import PriceService, Service, ServiceGroup
 
 from Product.models import Product, ProductOrderStockReport, ProductStock
-from django.db.models import Avg, Count, Min, Sum
+from django.db.models import Avg, Count, Min, Sum, Q
 
 
 from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer, SaleOrders_CheckoutSerializer, SaleOrders_AppointmentCheckoutSerializer
@@ -1740,6 +1740,10 @@ def new_create_sale_order(request):
     payment_type = request.data.get('payment_type', None)
     client_type = request.data.get('client_type', None)
     ids = request.data.get('ids', None)
+    is_membership_redeemed = request.data.get('is_membership_redeemed', False)
+    redeemed_membership_id = request.data.get('redeemed_membership_id', False)
+    membership_product = request.data.get('membership_product', None)
+    membership_service = request.data.get('membership_service', None)
     
     free_services_quantity = request.data.get('free_services_quantity', None)
     
@@ -1801,7 +1805,7 @@ def new_create_sale_order(request):
         ids = json.loads(ids)
 
     elif type(ids) == list:
-            pass
+        pass
         
     
     checkout = Checkout.objects.create(
@@ -2108,13 +2112,70 @@ def new_create_sale_order(request):
                 member_tips_id = Employee.objects.get(id=member_id)
             except Employee.DoesNotExist:
                 member_tips_id = None
-                    
+
             if member_tips_id is not None:
                 create_tip = AppointmentEmployeeTip.objects.create(
                     member=member_tips_id,
                     tip=checkout_tip,
                     business_address=business_address,
                 )
+    
+    if checkout.client :
+        these_orders = Order.objects.filter(
+            checkout = checkout
+        ).values_list('total_price', flat=True)
+
+        these_orders = list(these_orders)
+        total_price = sum(these_orders)
+
+        allowed_points = LoyaltyPoints.objects.filter(
+            Q(loyaltytype = 'Service') |
+            Q(loyaltytype = 'Both'),
+            location = business_address,
+            amount_spend = total_price,
+            is_active = True,
+            is_deleted = False
+        )
+        if len(allowed_points) > 0:
+            point = allowed_points[0]
+            client_points, created = ClientLoyaltyPoint.objects.get_or_create(
+                location = business_address,
+                client = checkout.client,
+                loyalty_points = point
+            )
+
+            if created :
+                client_points.total_earn = point.number_points
+            else:
+                client_points.total_earn = int(client_points.total_earn) + int(point.number_points)
+
+                
+            client_points.total_amount = point.amount_spend
+            client_points.for_every_points = point.earn_points
+            client_points.customer_will_get_amount = point.total_earn_from_points
+            
+            client_points.save()
+
+            LoyaltyPointLogs.objects.create(
+                location = business_address,
+                client = client_points.client,
+                client_points = client_points,
+                loyalty = point,
+                points_earned = point.number_points,
+                points_redeemed = 0,
+                balance = client_points.total_earn,
+                actual_sale_value_redeemed = 0
+            )
+
+
+    if is_membership_redeemed:
+        """
+            Handle Membership Redeemed Here...
+        """
+
+        # redeemed_membership_id
+        # membership_product
+        # membership_service
 
     serialized = CheckoutSerializer(checkout, context = {'request' : request, })
     

@@ -1663,8 +1663,15 @@ def create_checkout(request):
                 ExceptionRecord.objects.create(text=f'LOYALTY : {err}')
                 pass
             else:
-                client_points.points_redeemed = client_points.points_redeemed + int(redeemed_points)
+                client_points.points_redeemed = client_points.points_redeemed + float(redeemed_points)
                 client_points.save()
+
+                # for_every_points
+                # customer_will_get_amount
+
+                single_point_value = client_points.customer_will_get_amount / client_points.for_every_points
+                total_redeened_value = float(single_point_value) * float(redeemed_points)
+
                 LoyaltyPointLogs.objects.create(
                     location = business_address,
                     client = client_points.client,
@@ -1672,7 +1679,8 @@ def create_checkout(request):
                     loyalty = client_points.loyalty_points,
                     points_earned = 0,
                     points_redeemed = redeemed_points,
-                    balance = 0
+                    balance = 0,
+                    actual_sale_value_redeemed = total_redeened_value
                 )
 
 
@@ -1714,7 +1722,8 @@ def create_checkout(request):
                 loyalty = point,
                 points_earned = point.number_points,
                 points_redeemed = 0,
-                balance = client_points.total_earn
+                balance = client_points.total_earn,
+                actual_sale_value_redeemed = 0
             )
             
     serialized = CheckoutSerializer(checkout)

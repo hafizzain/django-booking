@@ -59,13 +59,16 @@ def complete_user_account(request, user=None, data=None):
             user.social_platform = social_platform
         if social_id is not None:
             user.social_id = social_id
-    else:
+
+
+    user.save()
+    
+    if not social_account:
         try:
             OTP.generate_user_otp(user=user, code_for='Email')
         except Exception as error:
             ExceptionRecord.objects.create(text=f'error from create_tenant_thread \n{str(error)}')
 
-    user.save()
    
     # NewsLetterDetail.objects.create(
     #     user = user,

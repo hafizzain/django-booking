@@ -42,9 +42,10 @@ class BrandSerializer(serializers.ModelSerializer):
                 request = self.context["request"]
                 url = tenant_media_base_url(request)
                 return f'{url}{obj.image}'
-            except:
-                return obj.image
+            except Exception as err:
+                return f'{obj.image}'
         return None
+    
     class Meta:
         model = Brand
         fields = ['id', 'name', 'description', 'website', 'image', 'is_active']

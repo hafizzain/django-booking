@@ -430,7 +430,7 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
         return c_points.created_at.strftime('%Y-%m-%d')
 
     def get_actual_sale_value_redeemed(self, c_points):
-        return 0
+        return c_points.actual_sale_value_redeemed
 
     def get_invoice(self, c_points):
         return {}

@@ -1,4 +1,5 @@
 
+from rest_framework.fields import empty
 from Sale.serializers import AvailPriceServiceSerializers,PriceServiceSerializers
 from Service.models import PriceService
 from rest_framework import serializers
@@ -29,6 +30,11 @@ class ServiceGroupDiscountSerializers(serializers.ModelSerializer):
     class Meta:
         model = ServiceGroupDiscount
         fields = '__all__'
+    
+    def __init__(self, instance=None, data=..., **kwargs):
+        super().__init__(instance, data, **kwargs)
+
+        self.fields['brand'].context.update(self.context)
 
 
 class AvailOfferServiceGroupSerializer(serializers.ModelSerializer):
@@ -503,7 +509,7 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
     day_restrictions = serializers.SerializerMethodField(read_only=True)
     date_restrictions = serializers.SerializerMethodField(read_only=True)
     block_date = serializers.SerializerMethodField(read_only=True)
-    type = serializers.SerializerMethodField(read_only=True)
+    item_type = serializers.SerializerMethodField(read_only=True)
     is_deleted = serializers.SerializerMethodField(read_only=True)
 
 
@@ -518,7 +524,7 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
         else:
             return 'False'
     
-    def get_type(self, obj):
+    def get_item_type(self, obj):
         return 'Specific Group Discount'
     
     def get_block_date(self, obj):
@@ -527,7 +533,6 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
             return BlockDateSerializers(ser, many = True).data
         except Exception as err:
             return []
-            pass
     
     
     def get_date_restrictions(self, obj):
@@ -548,7 +553,7 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
     def get_servicegroup_discount(self, obj):
         try:
             ser = ServiceGroupDiscount.objects.filter(specificgroupdiscount = obj)
-            return ServiceGroupDiscountSerializers(ser, many = True).data
+            return ServiceGroupDiscountSerializers(ser, many = True, context=self.context).data
         except Exception as err:
             return []
     
@@ -568,7 +573,7 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
             is_deleted = False
         ).values('id', 'name')
 
-        return prods
+        return list(prods)
         
     def get_excluded_services(self, obj):
         excluded_proms = PromotionExcludedItem.objects.filter(
@@ -585,7 +590,7 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
             is_deleted = False
         ).values('id', 'name')
 
-        return servs
+        return list(servs)
 
 
         
@@ -604,10 +609,20 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
             is_deleted = False
         ).values('id', 'name')
 
-        return vouchers
+        return list(vouchers)
+    
     class Meta:
         model = SpecificGroupDiscount
         fields = '__all__'
+        # ['id', 'promotion_name', 'is_deleted', 'is_active', 'created_at', 'servicegroup_discount']
+        # day_restrictions
+        # date_restrictions
+        # block_date
+        # item_type
+
+        # excluded_products
+        # excluded_services
+        # excluded_vouchers
 
 
 
