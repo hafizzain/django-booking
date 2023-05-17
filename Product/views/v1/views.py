@@ -1947,7 +1947,7 @@ def update_orderstockproduct(request):
                 'status' : True,
                 'status_code' : 200,
                 'response' : {
-                    'message' : ' OrderStockProduct updated successfully',
+                    'message' : 'Purchase order status is updated successfully',
                     'error_message' : None,
                     'stock' :serializer.data,
                     'Error':error,
