@@ -2025,16 +2025,14 @@ def new_create_sale_order(request):
                             text = f' error in member price{str(err)}'
                         )
                 return Response(
-                {
-                    'status' : False,
-                    'status_code' : StatusCodes.INVALID_MEMBERSHIP_ID_4040,
-                    'response' : {
-                    'message' : 'Membership not found',
-                    'error_message' : str(err),
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
+                    {
+                        'status' : False,
+                        'status_code' : StatusCodes.INVALID_MEMBERSHIP_ID_4040,
+                        'response' : {
+                        'message' : 'Membership not found',
+                        'error_message' : str(err),
+                    }
+                },status=status.HTTP_400_BAD_REQUEST)
             
         elif sale_type == 'VOUCHER':  
               
