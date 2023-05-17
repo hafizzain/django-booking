@@ -38,3 +38,5 @@ class LanguageAdmin(admin.ModelAdmin):
 @admin.register(ExceptionRecord)
 class ExceptionRecordAdmin(admin.ModelAdmin):
     list_display = ['id', 'text', 'is_resolved', 'created_at']
+
+    ordering = ['-created_at']
