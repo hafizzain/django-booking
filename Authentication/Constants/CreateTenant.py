@@ -583,20 +583,11 @@ def create_tenant(request=None, user=None, data=None):
             except:
                 pass
             
-            # try:
-            #     service_thrd = Thread(target=create_employee, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
-            #     service_thrd.start()
-            # except:
-            #     pass
             try:
                 t_token = create_tenant_user_token(tenant_user=t_user, tenant=user_tenant)
             except:
                 pass
-            # NewsLetterDetail.objects.create(
-            #     user = t_user,
-            #     terms_condition=data.get('terms_condition', True),
-            #     is_subscribed=data.get('terms_condition', False)
-            # )
+            
             try:
                 create_employee(tenant = user_tenant , user = t_user, business = t_business)
             except:
@@ -608,12 +599,6 @@ def create_tenant(request=None, user=None, data=None):
                 create_tenant_account_type(tenant_user=t_user, tenant=user_tenant, account_type='Business')#data['account_type'])
             except:
                 pass
-            
-            # try:
-            #     service_thrd = Thread(target=create_service_user, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
-            #     service_thrd.start()
-            # except:
-            #     pass
                        
             try:
                 service_thrd = Thread(target=create_global_permission, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
@@ -626,23 +611,6 @@ def create_tenant(request=None, user=None, data=None):
                 payment_thrd.start()
             except:
                 pass
-
-            # try:
-            #     thrd = Thread(target=add_business_types, kwargs={'tenant' : user_tenant})
-            #     thrd.start()
-            # except:
-            #     pass
-            # try:
-            #     thrd = Thread(target=add_software_types, kwargs={'tenant' : user_tenant})
-            #     thrd.start()
-            # except:
-            #     pass
-            
-            # try:
-            #     thrd = Thread(target=add_data_to_tenant_thread, kwargs={'tenant' : user_tenant})
-            #     thrd.start()
-            # except:
-            #     pass
             
             try:
                 service_thrd = Thread(target=create_client, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
