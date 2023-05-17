@@ -433,7 +433,9 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
         return c_points.actual_sale_value_redeemed
 
     def get_invoice(self, c_points):
-        return {}
+        return {
+            'id' : f'{c_points.short_id}'
+        }
 
     def get_customer(self, c_points):
         return {
