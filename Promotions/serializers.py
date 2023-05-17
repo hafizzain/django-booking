@@ -456,7 +456,7 @@ class DirectOrFlatDiscountSerializers(serializers.ModelSerializer):
 
         prods = Product.objects.filter(
             id__in = list(excluded_proms),
-            is_active = True,
+            # is_active = True,
             is_deleted = False
         ).values('id', 'name')
 
@@ -569,7 +569,7 @@ class SpecificGroupDiscountSerializers(serializers.ModelSerializer):
 
         prods = Product.objects.filter(
             id__in = list(excluded_proms),
-            is_active = True,
+            # is_active = True,
             is_deleted = False
         ).values('id', 'name')
 
@@ -778,7 +778,7 @@ class SpecificBrandSerializers(serializers.ModelSerializer):
 
         prods = Product.objects.filter(
             id__in = list(excluded_proms),
-            is_active = True,
+            # is_active = True,
             is_deleted = False
         ).values('id', 'name')
 
@@ -1391,7 +1391,7 @@ class UserRestrictedDiscountSerializers(serializers.ModelSerializer):
 
         prods = Product.objects.filter(
             id__in = list(excluded_proms),
-            is_active = True,
+            # is_active = True,
             is_deleted = False
         ).values('id', 'name')
 
