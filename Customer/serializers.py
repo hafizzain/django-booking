@@ -54,10 +54,17 @@ class AppointmentServiceClientSerializer(serializers.ModelSerializer):
     member = serializers.SerializerMethodField()
     service = serializers.SerializerMethodField()
     
-    def get_business_address(self, obj):
+    # def get_business_address(self, obj):
+    #     try:
+    #         addres = BusinessAddress.objects.get(id = str(obj.business_address) )
+    #         return LocationSerializer(addres).data
+    #     except Exception as err:
+    #         pass
+
+    def get_business_addresses(self, obj):
         try:
-            addres = BusinessAddress.objects.get(id = str(obj.business_address) )
-            return LocationSerializer(addres).data
+            addresses = BusinessAddress.objects.filter(id__in=obj.business_addresses)
+            return LocationSerializer(addresses, many=True).data
         except Exception as err:
             pass
         
