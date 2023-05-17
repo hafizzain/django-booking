@@ -89,6 +89,7 @@ def add_cities(tenant=None):
 
     with tenant_context(tenant):
         with open('Utility/Files/cities.csv', 'r') as inp_file:
+            cities_objects = []
             for index, row in enumerate(inp_file):
                 unique_code = row.split(',')[0]
                 name = row.split(',')[1]
@@ -97,13 +98,16 @@ def add_cities(tenant=None):
                 state = State.objects.get(
                     unique_code=state_unique_code
                 )
-                City.objects.create(
-                    country=state.country,
-                    state=state,
-                    name=name,
-                    unique_code=unique_code
+                city_instance = City(
+                    country = state.country,
+                    state = state,
+                    name = name,
+                    unique_code = unique_code
                 )
+                cities_objects.append(city_instance)
                 print(f'Added City {index} ...')
+            
+            City.objects.bulk_create(cities_objects)
 
     print('Cities Created')
 

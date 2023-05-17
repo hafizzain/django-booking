@@ -1590,7 +1590,7 @@ def create_checkout(request):
         
         
     try:
-        business_address=BusinessAddress.objects.get(id = str(business_address))
+        business_address = BusinessAddress.objects.get(id = str(business_address))
     except Exception as err:
         business_address = None
     if type(appointment_service_obj) == str:
@@ -1629,18 +1629,18 @@ def create_checkout(request):
     except Exception as err:
         Errors.append(str(err))
         
-    checkout =AppointmentCheckout.objects.create(
+    checkout = AppointmentCheckout.objects.create(
         appointment = appointments,
         appointment_service = service_appointment,
-        payment_method =payment_method,
-        service= services,
-        member=members,
+        payment_method = payment_method,
+        service = services,
+        member = members,
         business_address=business_address,
         # tip = tip,
         gst = gst,
         gst_price = gst_price,
-        service_price =service_price,
-        total_price =total_price,
+        service_price = service_price,
+        total_price = total_price,
         service_commission = float(service_commission),
         service_commission_type = service_commission_type,        
     )
