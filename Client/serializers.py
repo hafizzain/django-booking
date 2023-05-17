@@ -408,7 +408,7 @@ class CustomerLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
         return c_points.points_redeemed
 
     def get_balance(self, c_points):
-        return 0
+        return c_points.total_available_points
 
 
     class Meta:
