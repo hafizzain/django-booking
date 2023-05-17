@@ -4,7 +4,11 @@ from .models import Category, Brand, CurrencyRetailPrice, Product, ProductMedia,
 
 admin.site.register(Category)
 admin.site.register(Brand)
-admin.site.register(Product)
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ['id', 'is_active']
+
+    
 admin.site.register(ProductMedia)
 #admin.site.register(ProductStock)
 admin.site.register(OrderStock)
