@@ -10,7 +10,7 @@ from rest_framework import status
 from django.db.models import Q
 import json
 import csv
-
+import datetime
 from rest_framework.views import APIView
 from rest_framework.settings import api_settings
 
@@ -1206,6 +1206,7 @@ def update_product(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_products(request):
+    start_time = datetime.datetime.now()
     location = request.GET.get('location', None)
     all_products = Product.objects.prefetch_related(
         'location'
@@ -1216,11 +1217,16 @@ def get_products(request):
                                    context={'request' : request,
                                             'location': location,
                                             })
+    end_time = datetime.datetime.now()
 
     return Response(
         {
             'status' : True,
             'status_code' : 200,
+            'request' : {
+                'seconds' : (end_time - start_time).seconds,
+                'total_seconds' : (end_time - start_time).total_seconds(),
+            },
             'response' : {
                 'message' : 'All business Products!',
                 'error_message' : None,
