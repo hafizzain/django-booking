@@ -692,7 +692,7 @@ def create_employee(request):
                 'status_code' : StatusCodes.INVALID_COUNTRY_STATE_CITY_4021,
                 'status_code_text' :'INVALID_COUNTRY_STATE_CITY_4021' ,
                 'response' : {
-                    'message' : 'Invalid Country, State, City not found!',
+                    'message' : 'Invalid Country, State, City not found!!',
                     'error_message' : str(err),
                 }
             },
