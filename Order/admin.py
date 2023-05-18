@@ -20,7 +20,7 @@ class CheckoutAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'total_price', 'price']
+    list_display = ['id', 'total_price', 'price', 'discount_price']
 
     
 admin.site.register(CheckoutPayment)
