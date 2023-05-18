@@ -1150,12 +1150,15 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
     
 
     def get_discounted_price(self, obj):
-        discs = Order.objects.filter(
+        chk_orders = Order.objects.filter(
             checkout = obj
-        ).values_list('discount_percentage', flat=True)
-        discs = list(discs)
-        discs = sum(discs)
-        return discs
+        )
+        d_price = 0
+        for ordr in chk_orders:
+            if ordr.discount_percentage and ordr.total_price:
+                d_price += ((ordr.discount_percentage * ordr.total_price) / 100)
+
+        return d_price
         
     class Meta:
         model = Checkout
@@ -1186,7 +1189,13 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
     
 
     def get_discounted_price(self, obj):
-        return 9
+        app_srevices = AppointmentService.objects.filter(
+            appointment = obj.appointment,
+            discount_price__gt = 0
+        ).values_list('discount_price', flat=True)
+        app_srevices = list(app_srevices)
+        app_srevices = sum(app_srevices)
+        return app_srevices
     
         
     def get_location(self, obj):
