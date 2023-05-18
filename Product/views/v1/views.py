@@ -1209,7 +1209,8 @@ def get_products(request):
     start_time = datetime.datetime.now()
     location = request.GET.get('location', None)
     all_products = Product.objects.prefetch_related(
-        'location'
+        'location',
+        'product_currencyretailprice'
     ).filter(
         is_deleted = False
     ).order_by('-created_at')
