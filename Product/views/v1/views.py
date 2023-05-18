@@ -1207,7 +1207,11 @@ def update_product(request):
 @permission_classes([AllowAny])
 def get_products(request):
     location = request.GET.get('location', None)
-    all_products = Product.objects.filter(is_deleted=False).order_by('-created_at')
+    all_products = Product.objects.prefetch_related(
+        'location'
+    ).filter(
+        is_deleted = False
+    ).order_by('-created_at')
     serialized = ProductSerializer(all_products, many=True, 
                                    context={'request' : request,
                                             'location': location,
