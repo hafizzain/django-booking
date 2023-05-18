@@ -1827,6 +1827,9 @@ def update_orderstockproduct(request):
     product_id = request.data.get('product_id', None)
     to_location = request.data.get('to_location', None)
     vendor_id = request.data.get('vendor_id', None)
+
+    is_finished = False
+
     error = []
     if stockproduct_id is None:
             return Response(
@@ -1866,6 +1869,8 @@ def update_orderstockproduct(request):
     if rec_quantity is not None:
         order_stock.rec_quantity = rec_quantity
         order_stock.save()
+    if order_stock.quantity == int(rec_quantity):
+        is_finished = True
     
     try:
         product = Product.objects.get(id=product_id)
@@ -1963,6 +1968,7 @@ def update_orderstockproduct(request):
             {
                 'status' : True,
                 'status_code' : 200,
+                'is_finished':is_finished,
                 'response' : {
                     'message' : ' OrderStockProduct updated successfully',
                     'error_message' : None,
