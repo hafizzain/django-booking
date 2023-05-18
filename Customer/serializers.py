@@ -63,7 +63,7 @@ class AppointmentServiceClientSerializer(serializers.ModelSerializer):
 
     def get_business_addresses(self, obj):
         try:
-            addresses = BusinessAddress.objects.filter(id__in=obj.business_addresses)
+            addresses = BusinessAddress.objects.filter(id=str(obj.business_addresses))
             return LocationSerializer(addresses, many=True).data
         except Exception as err:
             pass
