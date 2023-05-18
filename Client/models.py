@@ -415,7 +415,12 @@ class ClientLoyaltyPoint(models.Model):
 
     @property
     def total_available_points(self):
-        return int(self.total_earn) - int(self.points_redeemed)
+        return self.total_earn - self.points_redeemed
+
+    @property
+    def is_redeemable(self):
+        return True
+
     
     def __str__(self):
         return str(self.id)
@@ -438,6 +443,15 @@ class LoyaltyPointLogs(models.Model):
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
+
+    @property
+    def short_id(self):
+        instance_id = f'{self.id}'
+        instance_id = instance_id.split('-')
+        if len(instance_id) > 0:
+            return f'{instance_id[0]}'
+        
+        return ''
     
     def __str__(self):
         return str(self.id)

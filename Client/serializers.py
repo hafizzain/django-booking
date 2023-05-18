@@ -387,7 +387,7 @@ class CustomerLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
     customer = serializers.SerializerMethodField()
     loyalty = serializers.SerializerMethodField()
     points_earned = serializers.SerializerMethodField()
-    points_redeemed = serializers.SerializerMethodField()
+    # points_redeemed = serializers.SerializerMethodField()
     balance = serializers.SerializerMethodField()
 
     def get_customer(self, c_points):
@@ -404,11 +404,11 @@ class CustomerLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
     def get_points_earned(self, c_points):
         return c_points.total_earn
 
-    def get_points_redeemed(self, c_points):
-        return c_points.points_redeemed
+    # def get_points_redeemed(self, c_points):
+    #     return c_points.points_redeemed
 
     def get_balance(self, c_points):
-        return 0
+        return c_points.total_available_points
 
 
     class Meta:
@@ -433,7 +433,9 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
         return c_points.actual_sale_value_redeemed
 
     def get_invoice(self, c_points):
-        return {}
+        return {
+            'id' : f'{c_points.short_id}'
+        }
 
     def get_customer(self, c_points):
         return {

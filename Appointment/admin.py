@@ -12,7 +12,7 @@ admin.site.register(AppointmentNotes)
 @admin.register(AppointmentCheckout)
 class AppointmentCheckoutAdmin(admin.ModelAdmin):
     ordering = ['-created_at']
-    list_display = ['id', 'is_promotion', 'created_at']
+    list_display = ['id', 'is_promotion', 'created_at', 'total_price']
 
 
 
@@ -26,10 +26,13 @@ class AppointmentAdmin(admin.ModelAdmin):
         'is_active',
         'is_promotion',
         'created_at',
+        'discount_price',
+        'discount_percentage'
     ]
 
 @admin.register(AppointmentService)
 class AppointmentServiceAdmin(admin.ModelAdmin):
+    ordering = ['-created_at']
     list_display = [
         'id',
         'member_name',
@@ -39,4 +42,6 @@ class AppointmentServiceAdmin(admin.ModelAdmin):
         'appointment_end_time',
         'is_active',
         'is_blocked',
+        'discount_price',
+        'discount_percentage'
     ]

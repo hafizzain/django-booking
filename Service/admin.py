@@ -6,7 +6,8 @@ from .models import Service , PriceService , ServiceGroup
 class ServiceAdmin(admin.ModelAdmin):
     list_display = [
         'id',
-        'name'
+        'name',
+        'is_active'
     ]
 admin.site.register(PriceService)
 admin.site.register(ServiceGroup)
