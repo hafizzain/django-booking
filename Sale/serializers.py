@@ -1185,7 +1185,12 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
         return {}
         
     def get_original_price(self, obj):
-        return obj.total_price
+        app_srevices = AppointmentService.objects.filter(
+            appointment = obj.appointment,
+        ).values_list('total_price', flat=True)
+        app_srevices = list(app_srevices)
+        app_srevices = sum(app_srevices)
+        return app_srevices
     
 
     def get_discounted_price(self, obj):
