@@ -1182,7 +1182,7 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
         return {}
         
     def get_original_price(self, obj):
-        return 9
+        return obj.total_price
     
 
     def get_discounted_price(self, obj):

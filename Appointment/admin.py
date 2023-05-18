@@ -26,6 +26,8 @@ class AppointmentAdmin(admin.ModelAdmin):
         'is_active',
         'is_promotion',
         'created_at',
+        'discount_price',
+        'discount_percentage'
     ]
 
 @admin.register(AppointmentService)
