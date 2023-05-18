@@ -806,11 +806,36 @@ def update_appointment(request):
         status=status.HTTP_404_NOT_FOUND
         )
     serializer.save()
-    
+    try:
+        active_user_staff = Employee.objects.get(
+            email = request.user.email,
+            is_deleted = False,
+            is_active = True,
+            is_blocked = False
+        )
+    except:
+        active_user_staff = None
+    appointment_logs = AppointmentLogs.objects.create( 
+        location = service_appointment.business_address,
+        appointment = service_appointment.appointment,
+        log_type = 'Reschedule',
+        member = active_user_staff
+    )
     if appointment_status == 'Cancel':
-
+        appointment_logs.log_type = 'Cancel'
+        appointment_logs.save()
         cancel_service_appointment = AppointmentService.objects.filter(appointment=service_appointment.appointment)
+        for appointment_service in cancel_service_appointment:
+            appointment_service.appointment_status = 'Cancel'
+            appointment_service.save()
 
+            LogDetails.objects.create(
+                log = appointment_logs,
+                appointment_service = appointment_service,
+                start_time = appointment_service.appointment_time,
+                duration = appointment_service.duration,
+                member = active_user_staff
+            )
         
         try:
             thrd = Thread(target=cancel_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant} )
@@ -819,32 +844,28 @@ def update_appointment(request):
             print(err)
             pass
     else:
-        active_user_staff = None
-        try:
-            active_user_staff = Employee.objects.get(
-                email = request.user.email,
-                is_deleted = False,
-                is_active = True,
-                is_blocked = False
-            )
-        except:
-            pass
+        pass
+        # active_user_staff = None
+        # try:
+        #     active_user_staff = Employee.objects.get(
+        #         email = request.user.email,
+        #         is_deleted = False,
+        #         is_active = True,
+        #         is_blocked = False
+        #     )
+        # except:
+        #     pass
         
-        appointment_logs = AppointmentLogs.objects.create( 
-            location = service_appointment.business_address,
-            appointment = appointment_service,
-            log_type = 'Cancel',
-            member = active_user_staff
-        )
-        cancel_service_appointment = AppointmentService.objects.filter(appointment=service_appointment.appointment)
-        for appointment_service in cancel_service_appointment:
-            LogDetails.objects.create(
-                log = appointment_logs,
-                appointment_service = appointment_service,
-                start_time = appointment_service.appointment_time,
-                duration = appointment_service.duration,
-                member = appointment_service.member
-            )
+        
+        # cancel_service_appointment = AppointmentService.objects.filter(appointment=service_appointment.appointment)
+        # for appointment_service in cancel_service_appointment:
+            # LogDetails.objects.create(
+            #     log = appointment_logs,
+            #     appointment_service = appointment_service,
+            #     start_time = appointment_service.appointment_time,
+            #     duration = appointment_service.duration,
+            #     member = appointment_service.member
+            # )
         
 
     # if appointment_status == 'Cancel':
