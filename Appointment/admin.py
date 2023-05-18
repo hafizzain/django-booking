@@ -12,7 +12,7 @@ admin.site.register(AppointmentNotes)
 @admin.register(AppointmentCheckout)
 class AppointmentCheckoutAdmin(admin.ModelAdmin):
     ordering = ['-created_at']
-    list_display = ['id', 'is_promotion', 'created_at']
+    list_display = ['id', 'is_promotion', 'created_at', 'total_price']
 
 
 
