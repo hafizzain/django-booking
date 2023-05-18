@@ -1222,6 +1222,7 @@ def get_products(request):
                                    context={'request' : request,
                                             'location': location,
                                             })
+    data = serialized.data
     end_time = datetime.datetime.now()
 
     return Response(
@@ -1233,9 +1234,10 @@ def get_products(request):
                 'total_seconds' : (end_time - start_time).total_seconds(),
             },
             'response' : {
+                'total_count' : len(all_products),
                 'message' : 'All business Products!',
                 'error_message' : None,
-                'products' : serialized.data
+                'products' : data
             }
         },
         status=status.HTTP_200_OK
