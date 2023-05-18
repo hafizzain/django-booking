@@ -560,7 +560,7 @@ def login(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    if not social_account:
+    if not social_account and not user.is_active:
         user = authenticate(username=user.username, password=password)
         if user is None:
             return Response(
