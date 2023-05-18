@@ -168,7 +168,7 @@ def create_employee(tenant=None, user = None, business=None):
                     business = business,
                     user = user,
                     address = 'Dubai - United Arab Emirates',
-                    address_name = 'ABCD Address',
+                    address_name = 'Dubai',
                     email= user.email,
                     mobile_number= user.mobile_number,
                     country=country,
