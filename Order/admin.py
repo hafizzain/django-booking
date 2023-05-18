@@ -20,6 +20,7 @@ class CheckoutAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
+    ordering = ['-created_at']
     list_display = ['id', 'total_price', 'current_price', 'price', 'discount_price', 'discount_percentage']
 
     
