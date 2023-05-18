@@ -1143,8 +1143,10 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
     def get_original_price(self, obj):
         checkout_orders = Order.objects.filter(
             checkout = obj
-        )
-        return 999
+        ).values_list('total_price', flat=True)
+        checkout_orders = list(checkout_orders)
+        checkout_orders = sum(checkout_orders)
+        return checkout_orders
     
 
     def get_discounted_price(self, obj):
