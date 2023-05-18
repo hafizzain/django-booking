@@ -333,7 +333,7 @@ def get_promotions_and_discounts_sales(request):
     checkout_order = Checkout.objects.filter(
         is_deleted=False,
         location__id=location_id,
-        is_promotion = True,
+        # is_promotion = True,
         **queries,
     )
     appointment_checkout = AppointmentCheckout.objects.filter(
