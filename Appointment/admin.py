@@ -41,4 +41,6 @@ class AppointmentServiceAdmin(admin.ModelAdmin):
         'appointment_end_time',
         'is_active',
         'is_blocked',
+        'discount_price',
+        'discount_percentage'
     ]
