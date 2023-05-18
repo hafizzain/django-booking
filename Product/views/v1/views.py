@@ -1139,7 +1139,7 @@ def update_product(request):
                     ExceptionRecord.objects.create(text=str(err))
                 
                 if reorder_quantity is not None:
-                    product_stock.reorder_quantity += int(reorder_quantity) 
+                    product_stock.reorder_quantity = int(reorder_quantity) 
                     product_stock.save()
                 product_stock.available_quantity = int(current_stock)
                 product_stock.low_stock = int(low_stock)
@@ -1970,7 +1970,7 @@ def update_orderstockproduct(request):
                 'status_code' : 200,
                 'is_finished':is_finished,
                 'response' : {
-                    'message' : ' OrderStockProduct updated successfully',
+                    'message' : 'Purchase order status is updated successfully',
                     'error_message' : None,
                     'stock' :serializer.data,
                     'Error':error,

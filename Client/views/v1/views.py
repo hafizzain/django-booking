@@ -2474,7 +2474,7 @@ def create_loyalty(request):
                 'status' : True,
                 'status_code' : 201,
                 'response' : {
-                    'message' : 'LoyaltyPoints Create!',
+                    'message' : 'You have added a loyalty point',
                     'error_message' : None,
                     'loyalty' : serialized.data,
                 }

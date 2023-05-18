@@ -2165,7 +2165,22 @@ def new_create_sale_order(request):
                 actual_sale_value_redeemed = 0
             )
 
+    # payment_type_sales = Order.objects.values('payment_type').annotate(total_sales=Count('id')).order_by('payment_type')
+    try:
+        payment_type_sales = Order.objects.filter(
+            payment_type = payment_type,
+            total_sales = Count('id')
+        ).order_by('payment_type')
 
+        for payment_type_sale in payment_type_sales:
+            payment_type = payment_type_sale['payment_type']
+            total_sales = payment_type_sale['total_sales']
+            print(f"Payment Type: {payment_type}, Total Sales: {total_sales}")
+    except Exception as err:
+                ExceptionRecord.objects.create(
+                            text = f' error in payment method sale{str(err)}'
+                        )    
+    
     if is_membership_redeemed:
         """
             Handle Membership Redeemed Here...

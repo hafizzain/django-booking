@@ -906,12 +906,10 @@ class AppointmenttLogSerializer(serializers.ModelSerializer):
 
     
     def get_logged_by(self, obj):
-        try:
-            if obj.member:
-                return obj.member.full_name
-            return ''
-        except Exception as err:
-            return str(err)
+        if obj.member:
+            return obj.member.full_name
+            
+        return ''
     
     def get_log_details(self, obj):
         log_details = LogDetails.objects.filter(
