@@ -17,5 +17,10 @@ class VoucherOrderAdmin(admin.ModelAdmin):
 class CheckoutAdmin(admin.ModelAdmin):
     list_display = ['id', 'is_promotion']
 
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ['id', 'total_price', 'price']
+
     
 admin.site.register(CheckoutPayment)
