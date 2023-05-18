@@ -32,6 +32,7 @@ class AppointmentAdmin(admin.ModelAdmin):
 
 @admin.register(AppointmentService)
 class AppointmentServiceAdmin(admin.ModelAdmin):
+    ordering = ['-created_at']
     list_display = [
         'id',
         'member_name',
