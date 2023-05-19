@@ -62,7 +62,6 @@ def get_service(request):
     #     'title': title
     # }
     # sorted_value = SORTED_OPTIONS.get(title, '-created_at')
-    print("I was ccccccccccccccc")
     if title:
         service = Service.objects.filter(name__icontains = title , is_deleted=False, is_blocked=False, location__id = location).order_by('-created_at').distinct()
         service_count = service.count()
