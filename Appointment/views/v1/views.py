@@ -1680,6 +1680,8 @@ def create_checkout(request):
 
 
     if appointments.client:
+        logs_points_redeemed = 0
+        logs_total_redeened_value = 0
         if all([is_redeemed, redeemed_id, redeemed_points]):
             ExceptionRecord.objects.create(text=f'LOYALTY : is_redeemed : {is_redeemed} redeemed_id {redeemed_id} redeemed_points {redeemed_points}')
             try:
@@ -1697,16 +1699,10 @@ def create_checkout(request):
                 single_point_value = client_points.customer_will_get_amount / client_points.for_every_points
                 total_redeened_value = float(single_point_value) * float(redeemed_points)
 
-                LoyaltyPointLogs.objects.create(
-                    location = business_address,
-                    client = client_points.client,
-                    client_points = client_points,
-                    loyalty = client_points.loyalty_points,
-                    points_earned = 0,
-                    points_redeemed = redeemed_points,
-                    balance = 0,
-                    actual_sale_value_redeemed = total_redeened_value
-                )
+                # points_redeemed = redeemed_points,
+                logs_points_redeemed = redeemed_points
+                # actual_sale_value_redeemed = total_redeened_value
+                logs_total_redeened_value = total_redeened_value
 
 
         allowed_points = LoyaltyPoints.objects.filter(
@@ -1743,6 +1739,8 @@ def create_checkout(request):
             earned_amount = (earned_points / point.earn_points) * float(point.total_earn_from_points)
 
             if created :
+                client_points.for_every_points = point.earn_points
+                client_points.customer_will_get_amount = point.total_earn_from_points
                 client_points.total_earn = earned_points
                 client_points.total_amount = earned_amount
 
@@ -1750,10 +1748,6 @@ def create_checkout(request):
                 client_points.total_earn = float(client_points.total_earn) + earned_points
                 client_points.total_amount = client_points.total_amount + float(earned_amount)
 
-
-            client_points.for_every_points = point.earn_points
-            client_points.customer_will_get_amount = point.total_earn_from_points
-            
             client_points.save()
 
             LoyaltyPointLogs.objects.create(
@@ -1762,9 +1756,9 @@ def create_checkout(request):
                 client_points = client_points,
                 loyalty = point,
                 points_earned = float(earned_points),
-                points_redeemed = 0,
-                balance = client_points.total_amount,
-                actual_sale_value_redeemed = 0
+                points_redeemed = logs_points_redeemed,
+                balance = client_points.total_earn,
+                actual_sale_value_redeemed = logs_total_redeened_value
             )
             
     serialized = CheckoutSerializer(checkout)
