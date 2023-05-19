@@ -1222,11 +1222,11 @@ def get_products(request):
     
     all_products_count = all_products.count()
     
-    page_count = all_products_count / 5
+    page_count = all_products_count / 20
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_products, 5)
+    paginator = Paginator(all_products, 20)
     page_number = request.GET.get("page") 
     products = paginator.get_page(page_number)
 

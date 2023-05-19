@@ -1887,11 +1887,11 @@ def get_memberships(request):
     all_memberships= Membership.objects.all().order_by('-created_at')
     all_memberships_count = Membership.objects.all().count()
     
-    page_count = all_memberships_count / 3
+    page_count = all_memberships_count / 20
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_memberships, 3)
+    paginator = Paginator(all_memberships, 20)
     page_number = request.GET.get("page") 
     all_memberships = paginator.get_page(page_number)
 
@@ -2260,11 +2260,11 @@ def get_vouchers(request):
     all_voucher= Vouchers.objects.all().order_by('-created_at')
     all_voucher_count= Vouchers.objects.all().count()
 
-    page_count = all_voucher_count / 4
+    page_count = all_voucher_count / 20
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_voucher, 4)
+    paginator = Paginator(all_voucher, 20)
     page_number = request.GET.get("page") 
     all_voucher = paginator.get_page(page_number)
 
