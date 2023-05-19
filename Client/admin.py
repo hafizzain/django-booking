@@ -19,6 +19,10 @@ class VoucherCurrencyPriceAdmin(admin.ModelAdmin):
 class LoyaltyPointLogsAdmin(admin.ModelAdmin):
     list_display= [
         'id',
+        'points_earned',
+        'points_redeemed',
+        'balance',
+        'actual_sale_value_redeemed',
     ]
 @admin.register(LoyaltyPoints)
 class LoyaltyPointsAdmin(admin.ModelAdmin):
