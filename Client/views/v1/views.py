@@ -168,7 +168,7 @@ def get_single_client(request):
 @permission_classes([AllowAny])
 def get_client(request):
     all_client=Client.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at').distinct()
-    all_client_count=Client.objects.filter(is_deleted=False, is_blocked=False).distinct().count()
+    all_client_count=all_client.count()
 
     page_count = all_client_count / 20
     if page_count > int(page_count):
@@ -577,7 +577,7 @@ def delete_client(request):
 @permission_classes([AllowAny])
 def get_client_group(request):
     all_client_group= ClientGroup.objects.all().order_by('-created_at')
-    all_client_group_count= ClientGroup.objects.all().count()
+    all_client_group_count= all_client_group.count()
 
     page_count = all_client_group_count / 20
     if page_count > int(page_count):
@@ -1885,7 +1885,7 @@ def create_memberships(request):
 @permission_classes([AllowAny])
 def get_memberships(request):
     all_memberships= Membership.objects.all().order_by('-created_at')
-    all_memberships_count = Membership.objects.all().count()
+    all_memberships_count = all_memberships.count()
     
     page_count = all_memberships_count / 20
     if page_count > int(page_count):
@@ -2258,7 +2258,7 @@ def create_vouchers(request):
 @permission_classes([AllowAny])
 def get_vouchers(request):
     all_voucher= Vouchers.objects.all().order_by('-created_at')
-    all_voucher_count= Vouchers.objects.all().count()
+    all_voucher_count= all_voucher.count()
 
     page_count = all_voucher_count / 20
     if page_count > int(page_count):
@@ -3069,13 +3069,7 @@ def get_customer_detailed_loyalty_points(request):
         is_deleted = False
     )
 
-    all_loyality_logs_count= customers_points = LoyaltyPointLogs.objects.filter(
-        # client__id__in = clients_list,
-        location__id = location_id,
-        created_at__date__range = (start_date, end_date),
-        is_active = True,
-        is_deleted = False
-    ).count()
+    all_loyality_logs_count= customers_points.count()
 
     page_count = all_loyality_logs_count / 20
     if page_count > int(page_count):
