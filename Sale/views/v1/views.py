@@ -2151,7 +2151,7 @@ def new_create_sale_order(request):
             Q(loyaltytype = 'Service') |
             Q(loyaltytype = 'Both'),
             location = business_address,
-            amount_spend = total_price,
+            # amount_spend = total_price,
             is_active = True,
             is_deleted = False
         )
@@ -2162,14 +2162,24 @@ def new_create_sale_order(request):
                 client = checkout.client,
                 loyalty_points = point
             )
+            
+            loyalty_spend_amount = point.amount_spend
+            loyalty_earned_points = point.number_points # total earned points if user spend amount point.amount_spend
+
+            # gained points based on customer's total Checkout Bill
+
+            earned_points = (float(total_price) / float(loyalty_spend_amount)) * float(loyalty_earned_points)
+            earned_amount = (earned_points / point.earn_points) * float(point.total_earn_from_points)
 
             if created :
-                client_points.total_earn = point.number_points
+                client_points.total_earn = earned_points
+                client_points.total_amount = earned_amount
+
             else:
-                client_points.total_earn = int(client_points.total_earn) + int(point.number_points)
+                client_points.total_earn = int(client_points.total_earn) + int(earned_points)
+                client_points.total_amount = client_points.total_amount + float(earned_amount)
 
                 
-            client_points.total_amount = point.amount_spend
             client_points.for_every_points = point.earn_points
             client_points.customer_will_get_amount = point.total_earn_from_points
             
@@ -2180,9 +2190,9 @@ def new_create_sale_order(request):
                 client = client_points.client,
                 client_points = client_points,
                 loyalty = point,
-                points_earned = point.number_points,
+                points_earned = earned_points,
                 points_redeemed = 0,
-                balance = client_points.total_earn,
+                balance = client_points.total_amount,
                 actual_sale_value_redeemed = 0
             )
 
