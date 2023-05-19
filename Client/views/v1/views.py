@@ -3061,7 +3061,11 @@ def get_customer_detailed_loyalty_points(request):
     if client_id is not None:
         clients_list.append(client_id)
 
-    customers_points = LoyaltyPointLogs.objects.filter(
+    customers_points = LoyaltyPointLogs.objects.select_related(
+        'location',
+        'client',
+        'loyalty',
+    ).filter(
         # client__id__in = clients_list,
         location__id = location_id,
         created_at__date__range = (start_date, end_date),
@@ -3095,3 +3099,6 @@ def get_customer_detailed_loyalty_points(request):
         },
         status=status.HTTP_200_OK
     )
+
+# Select Related  => Single Object => (Inside FK + OTO Relaion)
+# prefetch related => Many to Many => (MTM + Outside FK)
