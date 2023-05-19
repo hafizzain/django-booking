@@ -1713,26 +1713,38 @@ def create_checkout(request):
             Q(loyaltytype = 'Service') |
             Q(loyaltytype = 'Both'),
             location = business_address,
-            amount_spend = checkout.total_price,
+            # amount_spend = checkout.total_price,
             is_active = True,
             is_deleted = False
         )
+
+        # spend_amount = 100
+        # will_get = 10 points 
 
         # is_redeemed
         # redeemed_id
         # redeemed_points
         if len(allowed_points) > 0:
             point = allowed_points[0]
+
             client_points, created = ClientLoyaltyPoint.objects.get_or_create(
                 location = business_address,
                 client = appointments.client,
                 loyalty_points = point
             )
 
+
+            loyalty_spend_amount = point.amount_spend
+            loyalty_earned_points = point.number_points # total earned points if user spend amount point.amount_spend
+
+            # gained points based on customer's total Checkout Bill
+
+            earned_points = (checkout.total_price / loyalty_spend_amount) * loyalty_earned_points
+
             if created :
-                client_points.total_earn = point.number_points
+                client_points.total_earn = earned_points
             else:
-                client_points.total_earn = int(client_points.total_earn) + int(point.number_points)
+                client_points.total_earn = float(client_points.total_earn) + earned_points
 
             client_points.total_amount = point.amount_spend
             client_points.for_every_points = point.earn_points
@@ -1745,7 +1757,7 @@ def create_checkout(request):
                 client = client_points.client,
                 client_points = client_points,
                 loyalty = point,
-                points_earned = point.number_points,
+                points_earned = earned_points,
                 points_redeemed = 0,
                 balance = client_points.total_earn,
                 actual_sale_value_redeemed = 0
