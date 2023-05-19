@@ -2453,7 +2453,17 @@ def get_commission(request):
     #     business=business,
     #     user=business.user,
     #     )
-    commission = CommissionSchemeSetting.objects.all().order_by('-created_at')   
+    commission = CommissionSchemeSetting.objects.all().order_by('-created_at') 
+    commission_count = CommissionSchemeSetting.objects.all().order_by('-created_at').count()  
+    
+    page_count = commission_count / 20
+    if page_count > int(page_count):
+        page_count = int(page_count) + 1
+
+    paginator = Paginator(commission, 20)
+    page_number = request.GET.get("page") 
+    commission = paginator.get_page(page_number)
+ 
     serializer = CommissionSerializer(commission, many = True, context={'request' : request})
     
     return Response(
@@ -2462,6 +2472,7 @@ def get_commission(request):
             'status_code' : '200',
             'response' : {
                 'message' : 'All Commission',
+                'page_count':page_count,
                 'error_message' : None,
                 'commission' : serializer.data
             }
@@ -3801,6 +3812,23 @@ def get_vacations(request):
         
     )
     
+    allvacations_count = Vacation.objects.filter(
+        # employee = employee, 
+        employee__location = location,
+        holiday_type = 'Vacation',
+        is_active = True,  
+        
+    )
+
+    page_count = allvacations_count / 20
+    if page_count > int(page_count):
+        page_count = int(page_count) + 1
+
+    paginator = Paginator(allvacations, 20)
+    page_number = request.GET.get("page") 
+    allvacations = paginator.get_page(page_number)
+
+    
     serialized = NewVacationSerializer(allvacations, many=True, context={'request' : request})
     return Response(
         {
@@ -3808,6 +3836,7 @@ def get_vacations(request):
             'status_code' : '200',
             'response' : {
                 'message' : 'All Schedule',
+                'page_count':page_count,
                 'error_message' : None,
                 'vacations' : serialized.data
             }
@@ -3879,6 +3908,22 @@ def get_absence(request):
         
     )
     
+    allvacations_count = Vacation.objects.filter(
+        # employee = employee, 
+        employee__location = location,
+        holiday_type ='Absence',
+        is_active = True, 
+        
+    )
+
+    page_count = allvacations_count / 20
+    if page_count > int(page_count):
+        page_count = int(page_count) + 1
+
+    paginator = Paginator(allvacations, 20)
+    page_number = request.GET.get("page") 
+    allvacations = paginator.get_page(page_number)
+    
     serialized = NewAbsenceSerializer(allvacations, many=True, context={'request' : request})
     return Response(
         {
@@ -3886,6 +3931,7 @@ def get_absence(request):
             'status_code' : '200',
             'response' : {
                 'message' : 'All Absence Schedule',
+                'page_count':page_count,
                 'error_message' : None,
                 'absences' : serialized.data
             }
