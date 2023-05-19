@@ -1718,11 +1718,15 @@ def create_checkout(request):
             is_deleted = False
         )
 
+        # spend_amount = 100
+        # will_get = 10 points 
+
         # is_redeemed
         # redeemed_id
         # redeemed_points
         if len(allowed_points) > 0:
             point = allowed_points[0]
+
             client_points, created = ClientLoyaltyPoint.objects.get_or_create(
                 location = business_address,
                 client = appointments.client,
