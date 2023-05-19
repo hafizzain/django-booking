@@ -2185,7 +2185,7 @@ def new_create_sale_order(request):
                 loyalty = point,
                 points_earned = earned_points,
                 points_redeemed = 0,
-                balance = (client_points.total_earn - client_points.points_redeemed),
+                balance = (float(client_points.total_earn) - float(client_points.points_redeemed)),
                 actual_sale_value_redeemed = 0
             )
 
