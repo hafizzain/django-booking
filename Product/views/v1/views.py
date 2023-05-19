@@ -1880,7 +1880,7 @@ def update_orderstockproduct(request):
     if rec_quantity is not None:
         order_stock.rec_quantity = rec_quantity
         order_stock.save()
-    if order_stock.quantity == int(rec_quantity):
+    if int(rec_quantity) >= order_stock.quantity:
         order_stock.is_finished = True
     else:
         order_stock.is_finished = False
