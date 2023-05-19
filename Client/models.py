@@ -435,7 +435,7 @@ class LoyaltyPointLogs(models.Model):
 
     points_earned = models.FloatField(default=0, null=True, blank=True)
     points_redeemed = models.FloatField(default=0)
-    balance = models.PositiveIntegerField(default=0, null=True, blank=True)
+    balance = models.FloatField(default=0, null=True, blank=True)
     actual_sale_value_redeemed = models.FloatField(default=0)
 
     created_at = models.DateTimeField(auto_now_add=now, null=True)
