@@ -1424,6 +1424,16 @@ def create_staff_group(request):
 @permission_classes([AllowAny])
 def get_staff_group(request):
     all_staff_group= StaffGroup.objects.filter(employees__is_deleted=False).order_by('-created_at').distinct()
+    all_staff_group_count= StaffGroup.objects.filter(employees__is_deleted=False).order_by('-created_at').distinct().count()
+
+    page_count = all_staff_group_count / 20
+    if page_count > int(page_count):
+        page_count = int(page_count) + 1
+
+    paginator = Paginator(all_staff_group, 20)
+    page_number = request.GET.get("page") 
+    all_staff_group = paginator.get_page(page_number)
+
     serialized = StaffGroupSerializers(all_staff_group, many=True, context={'request' : request})
     
     data = serialized.data
@@ -1451,6 +1461,7 @@ def get_staff_group(request):
             'status_code' : '200',
             'response' : {
                 'message' : 'All Staff Group',
+                'page_count':page_count,
                 'error_message' : None,
                 'staff_group' : data
             }

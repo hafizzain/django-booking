@@ -168,6 +168,15 @@ def get_single_client(request):
 @permission_classes([AllowAny])
 def get_client(request):
     all_client=Client.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at').distinct()
+    all_client_count=Client.objects.filter(is_deleted=False, is_blocked=False).distinct().count()
+
+    page_count = all_client_count / 20
+    if page_count > int(page_count):
+        page_count = int(page_count) + 1
+
+    paginator = Paginator(all_client, 20)
+    page_number = request.GET.get("page") 
+    all_client = paginator.get_page(page_number)
     serialized = ClientSerializer(all_client, many=True,  context={'request' : request})
     return Response(
         {
@@ -175,6 +184,7 @@ def get_client(request):
             'status_code' : '200',
             'response' : {
                 'message' : 'All Client',
+                'page_count':page_count,
                 'error_message' : None,
                 'client' : serialized.data
             }
@@ -567,6 +577,16 @@ def delete_client(request):
 @permission_classes([AllowAny])
 def get_client_group(request):
     all_client_group= ClientGroup.objects.all().order_by('-created_at')
+    all_client_group_count= ClientGroup.objects.all().count()
+
+    page_count = all_client_group_count / 20
+    if page_count > int(page_count):
+        page_count = int(page_count) + 1
+
+    paginator = Paginator(all_client_group, 20)
+    page_number = request.GET.get("page") 
+    all_client_group = paginator.get_page(page_number)
+
     serialized = ClientGroupSerializer(all_client_group, many=True,  context={'request' : request})
     return Response(
         {
@@ -574,6 +594,7 @@ def get_client_group(request):
             'status_code' : '200',
             'response' : {
                 'message' : 'All Client Group',
+                'page_count':page_count,
                 'error_message' : None,
                 'clientsgroup' : serialized.data
             }
@@ -3048,6 +3069,22 @@ def get_customer_detailed_loyalty_points(request):
         is_deleted = False
     )
 
+    all_loyality_logs_count= customers_points = LoyaltyPointLogs.objects.filter(
+        # client__id__in = clients_list,
+        location__id = location_id,
+        created_at__date__range = (start_date, end_date),
+        is_active = True,
+        is_deleted = False
+    ).count()
+
+    page_count = all_loyality_logs_count / 20
+    if page_count > int(page_count):
+        page_count = int(page_count) + 1
+
+    paginator = Paginator(customers_points, 20)
+    page_number = request.GET.get("page") 
+    customers_points = paginator.get_page(page_number)
+
     data = CustomerDetailedLoyaltyPointsLogsSerializer(customers_points, many=True).data
 
     return Response(
@@ -3057,6 +3094,7 @@ def get_customer_detailed_loyalty_points(request):
             'status_code_text' : '200',
             'response' : {
                 'message' : 'Loyalty Points Logs',
+                'page_count':page_count,
                 'error_message' : None,
                 'data' : data
             }

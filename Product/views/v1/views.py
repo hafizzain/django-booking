@@ -1219,7 +1219,7 @@ def get_products(request):
         'product_medias',
         'product_stock',
     ).filter(is_deleted=False).order_by('-created_at')
-    all_products_count = Product.objects.filter(is_deleted=False).count()
+    all_products_count = all_products.count()
     
     page_count = all_products_count / 5
     if page_count > int(page_count):
