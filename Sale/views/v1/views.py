@@ -64,7 +64,7 @@ def get_service(request):
     # sorted_value = SORTED_OPTIONS.get(title, '-created_at')
     if title:
         service = Service.objects.filter(name__icontains = title , is_deleted=False, is_blocked=False, location__id = location).order_by('-created_at').distinct()
-        service_count = Service.objects.filter(name__icontains = title , is_deleted=False, is_blocked=False, location__id = location).order_by('-created_at').distinct()
+        service_count = service.count()
 
         page_count = service_count / 20
         if page_count > int(page_count):
@@ -76,7 +76,7 @@ def get_service(request):
         serialized = ServiceSerializer(service,  many=True, context={'request' : request} )
     else:
         service= Service.objects.filter( is_deleted=False, is_blocked=False, location__id = location).order_by('-created_at').distinct()
-        service_count= Service.objects.filter( is_deleted=False, is_blocked=False, location__id = location).count()
+        service_count= service.count()
 
         page_count = service_count / 4
         if page_count > int(page_count):

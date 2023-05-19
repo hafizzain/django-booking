@@ -315,7 +315,7 @@ def search_employee(request):
 @permission_classes([AllowAny])
 def get_Employees(request):
     all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
-    all_employee_count = Employee.objects.filter(is_deleted=False, is_blocked=False).count()
+    all_employee_count = all_employe.count()
     
     page_count = all_employee_count / 20
     if page_count > int(page_count):
@@ -1424,7 +1424,7 @@ def create_staff_group(request):
 @permission_classes([AllowAny])
 def get_staff_group(request):
     all_staff_group= StaffGroup.objects.filter(employees__is_deleted=False).order_by('-created_at').distinct()
-    all_staff_group_count= StaffGroup.objects.filter(employees__is_deleted=False).order_by('-created_at').distinct().count()
+    all_staff_group_count= all_staff_group.count()
 
     page_count = all_staff_group_count / 20
     if page_count > int(page_count):
@@ -1656,7 +1656,7 @@ def get_attendence(request):
     
     
     all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
-    all_employe_count= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at').count()
+    all_employe_count= all_employe.count()
 
     page_count = all_employe_count / 20
     if page_count > int(page_count):
@@ -2096,7 +2096,7 @@ def create_sallaryslip(request):
 @permission_classes([AllowAny])
 def get_payrol_working(request):
     all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('employee_employedailyschedule__date')
-    all_employe_count= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('employee_employedailyschedule__date').count()
+    all_employe_count= all_employe.count()
 
     page_count = all_employe_count / 20
     if page_count > int(page_count):
@@ -2454,7 +2454,7 @@ def get_commission(request):
     #     user=business.user,
     #     )
     commission = CommissionSchemeSetting.objects.all().order_by('-created_at') 
-    commission_count = CommissionSchemeSetting.objects.all().order_by('-created_at').count()  
+    commission_count = commission.count()  
     
     page_count = commission_count / 20
     if page_count > int(page_count):
@@ -3812,13 +3812,7 @@ def get_vacations(request):
         
     )
     
-    allvacations_count = Vacation.objects.filter(
-        # employee = employee, 
-        employee__location = location,
-        holiday_type = 'Vacation',
-        is_active = True,  
-        
-    )
+    allvacations_count = allvacations.count()
 
     page_count = allvacations_count / 20
     if page_count > int(page_count):
@@ -3908,13 +3902,7 @@ def get_absence(request):
         
     )
     
-    allvacations_count = Vacation.objects.filter(
-        # employee = employee, 
-        employee__location = location,
-        holiday_type ='Absence',
-        is_active = True, 
-        
-    )
+    allvacations_count = allvacations.count()
 
     page_count = allvacations_count / 20
     if page_count > int(page_count):
