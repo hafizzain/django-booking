@@ -2084,6 +2084,17 @@ def create_sallaryslip(request):
 @permission_classes([AllowAny])
 def get_payrol_working(request):
     all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('employee_employedailyschedule__date')
+    all_employe_count= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('employee_employedailyschedule__date')
+
+    page_count = all_employe_count / 20
+    if page_count > int(page_count):
+        page_count = int(page_count) + 1
+
+    paginator = Paginator(all_employe, 20)
+    page_number = request.GET.get("page") 
+    all_employe = paginator.get_page(page_number)
+
+
     serialized = Payroll_WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request,} )
    
     return Response(
@@ -2092,6 +2103,7 @@ def get_payrol_working(request):
             'status_code' : '200',
             'response' : {
                 'message' : 'All Employee',
+                'page_count':page_count,
                 'error_message' : None,
                 'employees' : serialized.data
             }
