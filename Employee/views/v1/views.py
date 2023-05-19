@@ -46,6 +46,7 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
 from django.conf import settings
+from django.core.paginator import Paginator
 
 
 
@@ -314,6 +315,16 @@ def search_employee(request):
 @permission_classes([AllowAny])
 def get_Employees(request):
     all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
+    all_employee_count = Employee.objects.filter(is_deleted=False, is_blocked=False).count()
+    
+    page_count = all_employee_count / 20
+    if page_count > int(page_count):
+        page_count = int(page_count) + 1
+
+    paginator = Paginator(all_employe, 20)
+    page_number = request.GET.get("page") 
+    all_employe = paginator.get_page(page_number)
+
     serialized = singleEmployeeSerializer(all_employe,  many=True, context={'request' : request} )
     return Response(
         {
@@ -321,6 +332,7 @@ def get_Employees(request):
             'status_code' : '200',
             'response' : {
                 'message' : 'All Employee',
+                'page_count':page_count,
                 'error_message' : None,
                 'employees' : serialized.data
             }

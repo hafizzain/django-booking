@@ -32,7 +32,7 @@ from django.db.models import Avg, Count, Min, Sum, Q
 
 from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer, SaleOrders_CheckoutSerializer, SaleOrders_AppointmentCheckoutSerializer
 from rest_framework.pagination import PageNumberPagination
-
+from django.core.paginator import Paginator
 
 # @api_view(['GET'])
 # @permission_classes([IsAuthenticated])
@@ -66,13 +66,25 @@ def get_service(request):
         serialized = ServiceSerializer(service,  many=True, context={'request' : request} )
     else:
         service= Service.objects.filter( is_deleted=False, is_blocked=False).order_by('-created_at').distinct()
-        serialized = ServiceSerializer(service,  many=True, context={'request' : request} )
+        service_count= Service.objects.filter( is_deleted=False, is_blocked=False).count()
+
+        page_count = service_count / 4
+        if page_count > int(page_count):
+            page_count = int(page_count) + 1
+
+        paginator = Paginator(service, 4)
+        page_number = request.GET.get("page") 
+        services = paginator.get_page(page_number)
+        print("I was called")
+
+        serialized = ServiceSerializer(services,  many=True, context={'request' : request} )
     return Response(
         {
             'status' : 200,
             'status_code' : '200',
             'response' : {
                 'message' : 'All Service',
+                'page_count':page_count,
                 'error_message' : None,
                 'service' : serialized.data
             }

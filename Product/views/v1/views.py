@@ -24,6 +24,8 @@ from Business.models import Business, BusinessAddress, BusinessVendor
 from Product.serializers import (CategorySerializer, BrandSerializer, ProductOrderStockReportSerializer, ProductSerializer, ProductStockSerializer, ProductWithStockSerializer
                                  ,OrderSerializer , OrderProductSerializer, ProductConsumptionSerializer, ProductStockTransferSerializer
                                  )
+from django.core.paginator import Paginator
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -1208,7 +1210,17 @@ def update_product(request):
 def get_products(request):
     location = request.GET.get('location', None)
     all_products = Product.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = ProductSerializer(all_products, many=True, 
+    all_products_count = Product.objects.filter(is_deleted=False).count()
+    
+    page_count = all_products_count / 5
+    if page_count > int(page_count):
+        page_count = int(page_count) + 1
+
+    paginator = Paginator(all_products, 5)
+    page_number = request.GET.get("page") 
+    products = paginator.get_page(page_number)
+
+    serialized = ProductSerializer(products, many=True, 
                                    context={'request' : request,
                                             'location': location,
                                             })
@@ -1219,6 +1231,7 @@ def get_products(request):
             'status_code' : 200,
             'response' : {
                 'message' : 'All business Products!',
+                'page_count':page_count,
                 'error_message' : None,
                 'products' : serialized.data
             }
@@ -1811,8 +1824,6 @@ def update_orderstockproduct(request):
     to_location = request.data.get('to_location', None)
     vendor_id = request.data.get('vendor_id', None)
 
-    is_finished = False
-
     error = []
     if stockproduct_id is None:
             return Response(
@@ -1853,7 +1864,9 @@ def update_orderstockproduct(request):
         order_stock.rec_quantity = rec_quantity
         order_stock.save()
     if order_stock.quantity == int(rec_quantity):
-        is_finished = True
+        order_stock.is_finished = True
+    else:
+        order_stock.is_finished = False
     
     try:
         product = Product.objects.get(id=product_id)
@@ -1951,7 +1964,6 @@ def update_orderstockproduct(request):
             {
                 'status' : True,
                 'status_code' : 200,
-                'is_finished':is_finished,
                 'response' : {
                     'message' : ' OrderStockProduct updated successfully',
                     'error_message' : None,
