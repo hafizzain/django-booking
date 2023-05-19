@@ -392,7 +392,7 @@ class OrderProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderStockProduct
-        fields = ['id', 'order', 'quantity','rec_quantity', 'product', 'status', 'note']
+        fields = ['id', 'order', 'quantity','rec_quantity', 'product', 'status', 'note', 'is_finished']
 
 class OrderSerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField(read_only=True)

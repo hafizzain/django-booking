@@ -208,6 +208,7 @@ class OrderStockProduct(models.Model):
     note = models.TextField(default='', null=True, blank=True)
     rec_quantity= models.PositiveIntegerField(default=0, verbose_name= 'Received Quantity', null=True, blank=True)
     quantity = models.PositiveIntegerField(default=0)
+    is_finished = models.BooleanField(default=False)
     
     def __str__(self):
         return str(self.id)
