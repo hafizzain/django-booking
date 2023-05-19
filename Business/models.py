@@ -1,8 +1,8 @@
 from django.db import models
 from django.utils.timezone import now
 from Authentication.models import User
-from Profile.models import Profile
-from Utility.models import Country, State, City, Software, Currency
+from Profile.models import Profile, UserLanguage
+from Utility.models import Country, State, City, Software, Currency, Language
 import uuid
 
 
@@ -420,3 +420,29 @@ class BusinessVendor(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+
+# class BusinessSelectedLanguage(models.Model):
+#     PLATFORM_CHOICES = (
+#         ('Web', 'Web'),
+#         ('Mobile', 'Mobile'),
+#         ('Both', 'Both'),
+#     )
+#     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_tax')
+#     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_tax')
+#     location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='locations_taxs')
+
+#     platform = models.CharField(choices=PLATFORM_CHOICES, max_length=20, default='Both')
+#     user_lang = models.ForeignKey(UserLanguage, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_languages' )
+#     language = models.ForeignKey(Language, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_languages'  )
+
+#     is_active = models.BooleanField(default=True)
+#     is_primary = models.BooleanField(default=False)
+#     is_deleted = models.BooleanField(default=False)
+
+#     created_at = models.DateTimeField(auto_now_add=now)
+
+
+#     def __str__(self):
+#         return str(self.id)

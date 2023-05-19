@@ -12,7 +12,7 @@ from rest_framework import status
 from Authentication.serializers import UserTenantLoginSerializer
 from Business.models import BusinessAddressMedia, BusinessType
 from Business.serializers.v1_serializers import EmployeTenatSerializer, OpeningHoursSerializer,AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer
-from Client.models import Client
+from Client.models import Client, Vouchers
 from Employee.models import Employee
 
 from NStyle.Constants import StatusCodes
@@ -177,13 +177,18 @@ def create_directorflat(request):
     
     if type(products) == list:
         for product_id in products:
-            PromotionExcludedItem.objects.create(
-                object_type = 'Direct Or Flat',
-                object_id = f'{flatordirect.id}',
-                excluded_type = 'Product',
-                excluded_id = product_id,
-                is_active = True,
-            )
+            try:
+                product_instance = Product.objects.get(id = product_id)
+            except:
+                pass
+            else:
+                PromotionExcludedItem.objects.create(
+                    object_type = 'Direct Or Flat',
+                    object_id = f'{flatordirect.id}',
+                    excluded_type = 'Product',
+                    excluded_id = f'{product_instance.id}',
+                    is_active = True,
+                )
 
     if type(services) == str:
         try:
@@ -193,13 +198,18 @@ def create_directorflat(request):
     
     if type(services) == list:
         for service_id in services:
-            PromotionExcludedItem.objects.create(
-                object_type = 'Direct Or Flat',
-                object_id = f'{flatordirect.id}',
-                excluded_type = 'Service',
-                excluded_id = service_id,
-                is_active = True,
-            )
+            try:
+                service_instance = Service.objects.get(id = service_id)
+            except:
+                pass
+            else:
+                PromotionExcludedItem.objects.create(
+                    object_type = 'Direct Or Flat',
+                    object_id = f'{flatordirect.id}',
+                    excluded_type = 'Service',
+                    excluded_id = f'{service_instance.id}',
+                    is_active = True,
+                )
 
     if type(vouchers) == str:
         try:
@@ -209,13 +219,18 @@ def create_directorflat(request):
     
     if type(vouchers) == list:
         for voucher_id in vouchers:
-            PromotionExcludedItem.objects.create(
-                object_type = 'Direct Or Flat',
-                object_id = f'{flatordirect.id}',
-                excluded_type = 'Voucher',
-                excluded_id = voucher_id,
-                is_active = True,
-            )
+            try:
+                voucher_instance = Vouchers.objects.get(id = voucher_id)
+            except:
+                pass
+            else:
+                PromotionExcludedItem.objects.create(
+                    object_type = 'Direct Or Flat',
+                    object_id = f'{flatordirect.id}',
+                    excluded_type = 'Voucher',
+                    excluded_id = f'{voucher_instance.id}',
+                    is_active = True,
+                )
 
     serializers= PromtoionsSerializers.DirectOrFlatDiscountSerializers(flatordirect, context={'request' : request})
 

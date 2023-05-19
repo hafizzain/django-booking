@@ -298,6 +298,7 @@ def customer_verify_otp(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    otp = None
     try:
         if code_for == 'Email':
             otp = VerificationOTP.objects.get(
@@ -305,25 +306,22 @@ def customer_verify_otp(request):
                 user__email=email,
                 code=code
             )
-            otp.user.is_email_verified = True
-            otp.user.is_active = True
-            otp.user.save()
-            otp.delete()
+            user = otp.user
+            user.is_email_verified = True
+        
         elif code_for == 'Mobile':
             otp = VerificationOTP.objects.get(
                 code_for='Mobile',
                 user__mobile_number=mobile_number,
                 code=code
             )
-            otp.user.is_mobile_verified = True
-            otp.user.is_active = True
-            otp.user.save()
-            otp.delete()
+            user = otp.user
+            user.is_mobile_verified = True
         else:
             otp = None
             raise Exception('Verification OTP not found')
+
     except Exception as err:
-        print(err)
         return Response(
             {
                 'status' : False,
@@ -334,8 +332,30 @@ def customer_verify_otp(request):
                     'error_message' : str(err),
                 }
             },
-            status=status.HTTP_400_BAD_REQUEST
+            status = status.HTTP_400_BAD_REQUEST
         )
+    else:
+        user.is_active = True
+        user.save()
+        otp.delete()
+        try:
+            user_tenant = Tenant.objects.get(user = user)
+        except:
+            pass
+        else:
+            with tenant_context(user_tenant):
+                try:
+                    t_user = User.objects.get(email = user.email)
+                except:
+                    pass
+                else:
+                    t_user.is_active = True
+                    if code_for == 'Email':
+                        t_user.is_email_verified = True
+                    elif code_for == 'Mobile':
+                        t_user.is_mobile_verified = True
+
+                    t_user.save()
 
     if otp is None:
         return Response(
@@ -351,16 +371,13 @@ def customer_verify_otp(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    try:
-        token = Token.objects.get(user=otp.user)
-    except Token.DoesNotExist:
-        token = Token.objects.create(user=otp.user)
+    
+    token, created = Token.objects.get_or_create(user=otp.user)
         
     if change_password is None:
-        user = otp.user
         serialized = UserSerializerByClient(user)
     try:
-        thrd = Thread(target=send_welcome_email(user=otp.user))
+        thrd = Thread(target=send_welcome_email(user=user))
         thrd.start()
     except:
         pass

@@ -1302,6 +1302,9 @@ def add_business_language(request):
         is_default=is_default
     )
     language_obj.save()
+
+    prev_langs = UserLanguage.objects.all().exclude(id = language_obj.id)
+    prev_langs.delete()
     seralized = UserLanguageSerializer(language_obj)
     return Response(
         {

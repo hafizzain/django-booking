@@ -10,7 +10,7 @@ from rest_framework import status
 from django.db.models import Q
 import json
 import csv
-
+import datetime
 from rest_framework.views import APIView
 from rest_framework.settings import api_settings
 
@@ -1206,21 +1206,38 @@ def update_product(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_products(request):
+    start_time = datetime.datetime.now()
     location = request.GET.get('location', None)
-    all_products = Product.objects.filter(is_deleted=False).order_by('-created_at')
+    all_products = Product.objects.prefetch_related(
+        'location',
+        'product_currencyretailprice',
+        'products_stock_transfers',
+        'consumptions',
+        'product_medias',
+        'product_stock',
+    ).filter(
+        is_deleted = False
+    ).order_by('-created_at')
     serialized = ProductSerializer(all_products, many=True, 
                                    context={'request' : request,
                                             'location': location,
                                             })
+    data = serialized.data
+    end_time = datetime.datetime.now()
 
     return Response(
         {
             'status' : True,
             'status_code' : 200,
+            'request' : {
+                'seconds' : (end_time - start_time).seconds,
+                'total_seconds' : (end_time - start_time).total_seconds(),
+            },
             'response' : {
+                'total_count' : len(all_products),
                 'message' : 'All business Products!',
                 'error_message' : None,
-                'products' : serialized.data
+                'products' : data
             }
         },
         status=status.HTTP_200_OK
@@ -1810,6 +1827,9 @@ def update_orderstockproduct(request):
     product_id = request.data.get('product_id', None)
     to_location = request.data.get('to_location', None)
     vendor_id = request.data.get('vendor_id', None)
+
+    is_finished = False
+
     error = []
     if stockproduct_id is None:
             return Response(
@@ -1849,6 +1869,8 @@ def update_orderstockproduct(request):
     if rec_quantity is not None:
         order_stock.rec_quantity = rec_quantity
         order_stock.save()
+    if order_stock.quantity == int(rec_quantity):
+        is_finished = True
     
     try:
         product = Product.objects.get(id=product_id)
@@ -1946,6 +1968,7 @@ def update_orderstockproduct(request):
             {
                 'status' : True,
                 'status_code' : 200,
+                'is_finished':is_finished,
                 'response' : {
                     'message' : 'Purchase order status is updated successfully',
                     'error_message' : None,
