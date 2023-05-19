@@ -1209,7 +1209,7 @@ def update_product(request):
 @permission_classes([AllowAny])
 def get_products(request):
     start_time = datetime.datetime.now()
-    location = request.GET.get('location', None)
+    location = request.GET.get('location_id', None)
     
     all_products = Product.objects.prefetch_related(
         'location',
@@ -1218,7 +1218,8 @@ def get_products(request):
         'consumptions',
         'product_medias',
         'product_stock',
-    ).filter(is_deleted=False).order_by('-created_at')
+    ).filter(is_deleted=False, location__id = location).order_by('-created_at')
+    
     all_products_count = all_products.count()
     
     page_count = all_products_count / 5
