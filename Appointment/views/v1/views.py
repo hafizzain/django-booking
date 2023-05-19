@@ -1735,7 +1735,7 @@ def create_checkout(request):
 
 
             loyalty_spend_amount = point.amount_spend
-            loyalty_earned_points = point.amount_spend # total earned points if user spend amount point.amount_spend
+            loyalty_earned_points = point.number_points # total earned points if user spend amount point.amount_spend
 
             # gained points based on customer's total Checkout Bill
 
