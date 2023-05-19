@@ -22,7 +22,7 @@ from Product.models import ( Category, Brand, CurrencyRetailPrice , Product, Pro
                            )
 from Business.models import Business, BusinessAddress, BusinessVendor
 from Product.serializers import (CategorySerializer, BrandSerializer, ProductOrderStockReportSerializer, ProductSerializer, ProductStockSerializer, ProductWithStockSerializer
-                                 ,OrderSerializer , OrderProductSerializer, ProductConsumptionSerializer, ProductStockTransferSerializer
+                                 ,OrderSerializer , OrderProductSerializer, ProductConsumptionSerializer, ProductStockTransferSerializer, ProductOrderSerializer
                                  )
 from django.core.paginator import Paginator
 
@@ -2620,7 +2620,25 @@ def update_product_stock_transfer(request):
 @permission_classes([AllowAny])
 def get_product_stock_report(request):
     stock_report = ProductOrderStockReport.objects.filter(is_deleted=False).order_by('-created_at').distinct()
-    serialized = ProductOrderStockReportSerializer(stock_report, many=True)
+    
+    grouped_reports = {}
+    for report in stock_report:
+        product_id = report.product.id
+        if product_id not in grouped_reports:
+            grouped_reports[product_id] = []
+        grouped_reports[product_id].append(report)
+    
+    serialized_data = []
+    
+    # Serialize the grouped data
+    for product_id, reports in grouped_reports.items():
+        product = reports[0].product
+        serialized_reports = ProductOrderStockReportSerializer(reports, many=True).data
+        serialized_data.append({
+            'product': ProductOrderSerializer(product).data,
+            'reports': serialized_reports
+        })
+    
     return Response(
         {
             'status' : True,
@@ -2628,7 +2646,7 @@ def get_product_stock_report(request):
             'response' : {
                 'message' : 'Product Stock Reports',
                 'error_message' : None,
-                'product_stock_report' : serialized.data
+                'product_stock_report' : serialized_data
             }
         },
         status=status.HTTP_200_OK
