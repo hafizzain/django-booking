@@ -56,17 +56,27 @@ from django.core.paginator import Paginator
 @permission_classes([AllowAny])
 def get_service(request):
     title = request.GET.get('title', None)
+    location = request.GET.get('location_id', None)
     # SORTED_OPTIONS = {
     #     'default' : '-created_at',
     #     'title': title
     # }
     # sorted_value = SORTED_OPTIONS.get(title, '-created_at')
     if title:
-        service= Service.objects.filter(name__icontains = title , is_deleted=False, is_blocked=False).order_by('-created_at').distinct()
+        service = Service.objects.filter(name__icontains = title , is_deleted=False, is_blocked=False, location__id = location).order_by('-created_at').distinct()
+        service_count = Service.objects.filter(name__icontains = title , is_deleted=False, is_blocked=False, location__id = location).order_by('-created_at').distinct()
+
+        page_count = service_count / 20
+        if page_count > int(page_count):
+            page_count = int(page_count) + 1
+
+        paginator = Paginator(service, 20)
+        page_number = request.GET.get("page") 
+        services = paginator.get_page(page_number)
         serialized = ServiceSerializer(service,  many=True, context={'request' : request} )
     else:
-        service= Service.objects.filter( is_deleted=False, is_blocked=False).order_by('-created_at').distinct()
-        service_count= Service.objects.filter( is_deleted=False, is_blocked=False).count()
+        service= Service.objects.filter( is_deleted=False, is_blocked=False, location__id = location).order_by('-created_at').distinct()
+        service_count= Service.objects.filter( is_deleted=False, is_blocked=False, location__id = location).count()
 
         page_count = service_count / 4
         if page_count > int(page_count):
@@ -75,7 +85,6 @@ def get_service(request):
         paginator = Paginator(service, 4)
         page_number = request.GET.get("page") 
         services = paginator.get_page(page_number)
-        print("I was called")
 
         serialized = ServiceSerializer(services,  many=True, context={'request' : request} )
     return Response(

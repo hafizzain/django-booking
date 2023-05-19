@@ -1209,7 +1209,7 @@ def update_product(request):
 @permission_classes([AllowAny])
 def get_products(request):
     start_time = datetime.datetime.now()
-    location = request.GET.get('location', None)
+    location = request.GET.get('location_id', None)
     
     all_products = Product.objects.prefetch_related(
         'location',
@@ -1218,14 +1218,15 @@ def get_products(request):
         'consumptions',
         'product_medias',
         'product_stock',
-    ).filter(is_deleted=False).order_by('-created_at')
-    all_products_count = Product.objects.filter(is_deleted=False).count()
+    ).filter(is_deleted=False, location__id = location).order_by('-created_at')
     
-    page_count = all_products_count / 5
+    all_products_count = all_products.count()
+    
+    page_count = all_products_count / 20
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_products, 5)
+    paginator = Paginator(all_products, 20)
     page_number = request.GET.get("page") 
     products = paginator.get_page(page_number)
 
