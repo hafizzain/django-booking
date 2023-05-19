@@ -71,11 +71,11 @@ def get_service(request):
     ).order_by('-created_at').distinct()
     service_count= service.count()
 
-    page_count = service_count / 4
+    page_count = service_count / 20
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(service, 4)
+    paginator = Paginator(service, 20)
     page_number = request.GET.get("page") 
     services = paginator.get_page(page_number)
 
