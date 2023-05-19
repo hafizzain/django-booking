@@ -35,6 +35,7 @@ class LoyaltyPointsAdmin(admin.ModelAdmin):
 class ClientLoyaltyPointAdmin(admin.ModelAdmin):
     list_display= [
         'id',
+        'client_name',
         'total_amount',
         'total_earn',
         'for_every_points',
@@ -42,6 +43,12 @@ class ClientLoyaltyPointAdmin(admin.ModelAdmin):
         'total_available_points',
         'created_at',
     ]
+
+    def client_name(self, obj):
+        if obj.client:
+            return obj.client.full_name
+        return '-------'
+    
 @admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
     list_display= [
