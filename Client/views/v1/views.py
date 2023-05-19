@@ -3008,7 +3008,7 @@ def get_customers_loyalty_points_logs(request):
         is_active = True,
         is_deleted = False,
         **queries
-    )
+    ).order_by('-created_at')
 
     data = CustomerLoyaltyPointsLogsSerializer(customers_points, many=True).data
 
@@ -3071,7 +3071,7 @@ def get_customer_detailed_loyalty_points(request):
         created_at__date__range = (start_date, end_date),
         is_active = True,
         is_deleted = False
-    )
+    ).order_by('-created_at')
 
     all_loyality_logs_count= customers_points.count()
 
