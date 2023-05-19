@@ -1733,10 +1733,18 @@ def create_checkout(request):
                 loyalty_points = point
             )
 
+
+            loyalty_spend_amount = point.amount_spend
+            loyalty_earned_points = point.amount_spend # total earned points if user spend amount point.amount_spend
+
+            # gained points based on customer's total Checkout Bill
+
+            earned_points = (checkout.total_price / loyalty_spend_amount) * loyalty_earned_points
+
             if created :
-                client_points.total_earn = point.number_points
+                client_points.total_earn = earned_points
             else:
-                client_points.total_earn = int(client_points.total_earn) + int(point.number_points)
+                client_points.total_earn = float(client_points.total_earn) + earned_points
 
             client_points.total_amount = point.amount_spend
             client_points.for_every_points = point.earn_points
@@ -1749,7 +1757,7 @@ def create_checkout(request):
                 client = client_points.client,
                 client_points = client_points,
                 loyalty = point,
-                points_earned = point.number_points,
+                points_earned = earned_points,
                 points_redeemed = 0,
                 balance = client_points.total_earn,
                 actual_sale_value_redeemed = 0

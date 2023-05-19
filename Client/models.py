@@ -397,8 +397,8 @@ class ClientLoyaltyPoint(models.Model):
     loyalty_points = models.ForeignKey(LoyaltyPoints, on_delete=models.CASCADE,  related_name="loyalty_points_clients" )
 
 
-    total_amount = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name='Number of Total Amount (Amount to Spend)')
-    total_earn = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name='Total Number Of Points')
+    total_amount = models.FloatField(default=0, null=True, blank=True, verbose_name='Number of Total Amount (Amount to Spend)')
+    total_earn = models.FloatField(default=0, null=True, blank=True, verbose_name='Total Number Of Points')
 
     points_redeemed = models.FloatField(default=0, verbose_name='Total Number Of Points Redeemed')
 
@@ -433,7 +433,7 @@ class LoyaltyPointLogs(models.Model):
 
     loyalty = models.ForeignKey(LoyaltyPoints, on_delete=models.CASCADE,  related_name="loyalty_points_logs", null=True, blank=True )
 
-    points_earned = models.PositiveIntegerField(default=0, null=True, blank=True)
+    points_earned = models.FloatField(default=0, null=True, blank=True)
     points_redeemed = models.FloatField(default=0)
     balance = models.PositiveIntegerField(default=0, null=True, blank=True)
     actual_sale_value_redeemed = models.FloatField(default=0)
