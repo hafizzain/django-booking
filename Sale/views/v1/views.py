@@ -67,7 +67,7 @@ def get_service(request):
         name__icontains = title,
         is_deleted = False, 
         is_blocked = False, 
-        # location__id = location
+        location__id = location
     ).order_by('-created_at').distinct()
     service_count= service.count()
 
