@@ -9,6 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.views import APIView
 from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Authentication.serializers import UserTenantLoginSerializer
 
@@ -4020,3 +4021,25 @@ def get_common_tenant(request):
             },
             status=status.HTTP_200_OK
         )
+
+
+class getUserBusinessProfileCompletionProgress(APIView):
+    permission_classes = [AllowAny]
+
+
+
+    def get(self, request):
+        return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Profile completion progress!',
+                    'error_message' : None,
+                    'data' : {}
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    

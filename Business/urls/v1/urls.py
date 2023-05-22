@@ -77,4 +77,7 @@ urlpatterns = [
     path('get_user_default_data/', views.get_user_default_data),
     path('update_user_default_data/', views.update_user_default_data),
 
+
+    path('get_user_business_profile_completion_progress/', views.getUserBusinessProfileCompletionProgress.as_view()),
+
 ]
