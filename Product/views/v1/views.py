@@ -511,7 +511,7 @@ def add_brand(request):
     image = request.data.get('image', None)
     is_active = request.data.get('is_active', None)
 
-    if not all([name, image]):
+    if not all([name]):
         return Response(
             {
                 'status' : False,
@@ -523,7 +523,7 @@ def add_brand(request):
                     'fields' : [
                         'name',
                         'is_active',
-                        'image',
+                        # 'image',
                     ]
                 }
             },
