@@ -4054,13 +4054,13 @@ class getUserBusinessProfileCompletionProgress(APIView):
 
         return {
             'total_modules' : total_modules,
-            'completed_modules' : total_modules,
-            'values' : [
-                len(self.business.business_types.all()),
-                self.business.how_find_us,
-                self.business.team_size,
-                self.business.currency
-            ]
+            'completed_modules' : completed_modules,
+            # 'values' : [
+            #     len(self.business.business_types.all()),
+            #     self.business.how_find_us,
+            #     self.business.team_size,
+            #     self.business.currency
+            # ]
         }
 
     def get(self, request):
