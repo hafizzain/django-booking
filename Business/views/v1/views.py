@@ -4113,6 +4113,29 @@ class getUserBusinessProfileCompletionProgress(APIView):
             'completed_modules' : completed_modules,
         }
 
+    def get_business_services_progress(self, request):
+        total_modules = 2
+        completed_modules = 0
+
+        services = Service.objects.filter(
+            business = self.business
+        )
+
+        if len(services) > 0 :
+            completed_modules += 1
+
+            service_groups = services.filter(
+                parrent_service__isnull = False
+            )
+
+            if len(service_groups) > 0:
+                completed_modules += 1
+
+        return {
+            'total_modules' : total_modules,
+            'completed_modules' : completed_modules,
+        }
+
     def get(self, request):
         business_id = request.GET.get('business_id', None)
 
@@ -4166,6 +4189,7 @@ class getUserBusinessProfileCompletionProgress(APIView):
                         'business_info' : self.get_business_info_progress(request),
                         'business_settings' : self.get_business_setting_progress(request),
                         'financial_settings' : self.get_financial_settings_progress(request),
+                        'service_management' : self.get_business_services_progress(request),
                     }
                 }
             },
