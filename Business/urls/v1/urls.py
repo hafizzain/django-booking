@@ -75,5 +75,6 @@ urlpatterns = [
     path('get_common_tenant/', views.get_common_tenant),
 
     path('get_user_default_data/', views.get_user_default_data),
+    path('update_user_default_data/', views.update_user_default_data),
 
 ]

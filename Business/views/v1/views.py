@@ -109,13 +109,87 @@ def get_user_default_data(request):
             'status' : True,
             'status_code' : 200,
             'response' : {
-                'message' : 'All business types',
+                'message' : 'Business default Data',
                 'data' : data
             }
         }
     )
 
 
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def update_user_default_data(request):
+    location = request.data.get('location', None)
+    client = request.data.get('client', None)
+    service = request.data.get('service', None)
+    employee = request.data.get('employee', None)
+
+    if not all([location, client, service, employee]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'location',
+                        'client',
+                        'service',
+                        'employee',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    locations = BusinessAddress.objects.filter(
+        is_default = True
+    )
+
+    if len(locations) > 0:
+        location_instance = locations[0]
+        location_instance.address_name = location
+        location_instance.save()
+    
+    services = Service.objects.filter(
+        is_default = True
+    )
+
+    if len(services) > 0:
+        service_instance = services[0]
+        service_instance.name = service
+        service_instance.save()
+    
+    clients = Client.objects.filter(
+        is_default = True
+    )
+
+    if len(clients) > 0:
+        client_instance = clients[0]
+        client_instance.full_name = client
+        client_instance.save()
+    
+    employees = Employee.objects.filter(
+        is_default = True
+    )
+
+    if len(employees) > 0:
+        employee_instance = employees[0]
+        employee_instance.full_name = employee
+        employee_instance.save()
+    
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Business Default Data updated',
+            }
+        }
+    )
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
