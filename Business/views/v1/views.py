@@ -3,6 +3,7 @@
 
 from datetime import datetime, time, timedelta
 import email
+from typing import Any
 from django.conf import settings
 from operator import ge
 from rest_framework.decorators import api_view, permission_classes
@@ -4026,9 +4027,77 @@ def get_common_tenant(request):
 class getUserBusinessProfileCompletionProgress(APIView):
     permission_classes = [AllowAny]
 
+    def get_business_info_progress(self, request):
+        
+        if not self.business:
+            return {
+                'total_modules' : 0,
+                'completed_modules' : 0,
+            }
 
+        total_modules = 4
+        completed_modules = 0
+
+
+        if len(self.business.business_types.all()) > 0:
+            completed_modules += 1
+        
+        if self.business.how_find_us:
+            completed_modules += 1
+        
+        if self.business.team_size:
+            completed_modules += 1
+
+        if self.business.currency:
+            completed_modules += 1
+
+
+        return {
+            'total_modules' : total_modules,
+            'completed_modules' : total_modules,
+        }
 
     def get(self, request):
+        business_id = request.GET.get('business_id', None)
+
+        if not business_id:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                    'status_code_text' : 'MISSING_FIELDS_4001',
+                    'response' : {
+                        'message' : 'Invalid Data!',
+                        'error_message' : 'Following fields are required',
+                        'fields' : [
+                            'business_id',
+                        ]
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            business = Business.objects.get(
+                id = business_id
+            )
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
+                    'response' : {
+                        'message' : 'Business Doest exist',
+                        'error_message' : str(err)
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        else:
+            self.business = business
+            # Do everything after this Line self.business is IMP.
+
         return Response(
             {
                 'status' : True,
@@ -4037,7 +4106,9 @@ class getUserBusinessProfileCompletionProgress(APIView):
                 'response' : {
                     'message' : 'Profile completion progress!',
                     'error_message' : None,
-                    'data' : {}
+                    'data' : {
+                        'business_info' : self.get_business_info_progress(request)
+                    }
                 }
             },
             status=status.HTTP_200_OK
