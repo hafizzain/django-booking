@@ -222,6 +222,8 @@ def verify_otp(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+
+    is_asked_for_data_update = False
     try:
         if code_for == 'Email':
             otp = VerificationOTP.objects.get(
@@ -229,30 +231,17 @@ def verify_otp(request):
                 user__email = email,
                 code = code
             )
-            otp.user.is_email_verified = True
-            otp.user.is_active = True
-            otp.user.save()
-            otp.delete()
+        
         elif code_for == 'Mobile':
             otp = VerificationOTP.objects.get(
                 code_for='Mobile',
                 user__mobile_number=mobile_number,
                 code=code
             )
-            otp.user.is_mobile_verified = True
-            otp.user.is_active = True
-            otp.user.save()
-            otp.delete()
         else:
             otp = None
             raise Exception('Verification OTP not found')
         
-        try:
-            thrd = Thread(target=verify_tenant_email_mobile, args=[], kwargs={'prev_tenant_name': 'public', 'user' : otp.user ,'verify': code_for})
-            thrd.start()
-        except Exception as err:
-            print('ERROR Threading : ', err)
-            pass
     except Exception as err:
         return Response(
             {
@@ -266,6 +255,49 @@ def verify_otp(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    else:
+
+        user = otp.user
+        otp.delete()
+
+        try:
+            thrd = Thread(target=verify_tenant_email_mobile, args=[], kwargs={'prev_tenant_name': 'public', 'user' : user ,'verify': code_for})
+            thrd.start()
+        except Exception as err:
+            print('ERROR Threading : ', err)
+            pass
+
+
+        if code_for == 'Email':
+            user.is_email_verified = True
+        elif code_for == 'Mobile':
+            user.is_mobile_verified = True
+
+        user.is_active = True
+        user.save()
+
+
+        try:
+            user_tenant = Tenant.objects.get(
+                user = user
+            )
+        except:
+            pass
+        else:
+            with tenant_context(user_tenant):
+                try:
+                    tenant_user = User.objects.get(email = user.email)
+                except:
+                    pass
+                else:
+                    if code_for == 'Email':
+                        tenant_user.is_email_verified = True
+                    elif code_for == 'Mobile':
+                        tenant_user.is_mobile_verified = True
+
+                    tenant_user.is_active = True
+                    is_asked_for_data_update = tenant_user.is_asked_for_data_update
+                    tenant_user.save()
 
     if otp is None:
         return Response(
@@ -302,6 +334,8 @@ def verify_otp(request):
         thrd.start()
     except:
         pass
+
+    s_data['is_asked_for_data_update'] = is_asked_for_data_update
     return Response(
             {
                 'status' : True,
@@ -309,7 +343,7 @@ def verify_otp(request):
                 'status_code_text' : 'OTP_VERIFIED_2001',
                 'response' : {
                     'message' : 'OTP Verified',
-                    'data' : s_data
+                    'data' : s_data,
                 }
             },
             status=status.HTTP_200_OK
