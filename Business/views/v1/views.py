@@ -4028,12 +4028,6 @@ class getUserBusinessProfileCompletionProgress(APIView):
     permission_classes = [AllowAny]
 
     def get_business_info_progress(self, request):
-        
-        if not self.business:
-            return {
-                'total_modules' : 0,
-                'completed_modules' : 0,
-            }
 
         total_modules = 4
         completed_modules = 0
@@ -4055,12 +4049,43 @@ class getUserBusinessProfileCompletionProgress(APIView):
         return {
             'total_modules' : total_modules,
             'completed_modules' : completed_modules,
-            # 'values' : [
-            #     len(self.business.business_types.all()),
-            #     self.business.how_find_us,
-            #     self.business.team_size,
-            #     self.business.currency
-            # ]
+        }
+
+    def get_business_setting_progress(self, request):
+        
+        total_modules = 6
+        completed_modules = 0
+
+        if self.business.business_name:
+            completed_modules += 1
+        
+        if self.business.logo:
+            completed_modules += 1
+        
+        business_locations = BusinessAddress.objects.filter(
+            business = self.business
+        )
+
+        if len(business_locations) > 0:
+            completed_modules += 1
+            
+        try:
+            social_links = BusinessSocial.objects.get(
+                business = self.business
+            )
+        except:
+            pass
+        else:
+            if social_links.website:
+                completed_modules += 1
+            if social_links.facebook:
+                completed_modules += 1
+            if social_links.instagram:
+                completed_modules += 1
+
+        return {
+            'total_modules' : total_modules,
+            'completed_modules' : completed_modules,
         }
 
     def get(self, request):
