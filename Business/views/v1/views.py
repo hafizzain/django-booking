@@ -4164,7 +4164,8 @@ class getUserBusinessProfileCompletionProgress(APIView):
                     'error_message' : None,
                     'data' : {
                         'business_info' : self.get_business_info_progress(request),
-                        'business_setting' : self.get_business_setting_progress(request),
+                        'business_settings' : self.get_business_setting_progress(request),
+                        'financial_settings' : self.get_financial_settings_progress(request),
                     }
                 }
             },
