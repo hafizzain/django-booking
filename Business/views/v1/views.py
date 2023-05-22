@@ -4176,6 +4176,24 @@ class getUserBusinessProfileCompletionProgress(APIView):
         else:
             self.business = business
             # Do everything after this Line self.business is IMP.
+        
+        data = {
+            'business_info' : self.get_business_info_progress(request),
+            'business_settings' : self.get_business_setting_progress(request),
+            'financial_settings' : self.get_financial_settings_progress(request),
+            'service_management' : self.get_business_services_progress(request),
+        }
+
+        total_modules = 0
+        completed_modules = 0
+
+        for value in data.values():
+            total_modules += value['total_modules']
+            completed_modules += value['completed_modules']
+        
+        percentage_value = (completed_modules / total_modules) / 100
+
+        data['completion_percentage'] = percentage_value
 
         return Response(
             {
@@ -4185,12 +4203,7 @@ class getUserBusinessProfileCompletionProgress(APIView):
                 'response' : {
                     'message' : 'Profile completion progress!',
                     'error_message' : None,
-                    'data' : {
-                        'business_info' : self.get_business_info_progress(request),
-                        'business_settings' : self.get_business_setting_progress(request),
-                        'financial_settings' : self.get_financial_settings_progress(request),
-                        'service_management' : self.get_business_services_progress(request),
-                    }
+                    'data' : data
                 }
             },
             status=status.HTTP_200_OK
