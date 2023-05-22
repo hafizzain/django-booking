@@ -30,7 +30,7 @@ from Tenants.models import Domain, Tenant
 from Utility.models import Country, Currency, ExceptionRecord, Language, NstyleFile, Software, State, City
 from Utility.serializers import LanguageSerializer
 import json
-from django.db.models import Q
+from django.db.models import Q, F
 
 from django_tenants.utils import tenant_context
 
@@ -58,8 +58,51 @@ def get_user_default_data(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    data = {}
+
+    locations = BusinessAddress.objects.filter(
+        is_default = True
+    )
+
+    if len(locations) > 0:
+        location_instance = locations[0]
+        data['location'] = {
+            'name' : f'{location_instance.address_name}',
+            'id' : f'{location_instance.id}'
+        }
     
-    # BusinessAddress.objects.get()
+    services = Service.objects.filter(
+        is_default = True
+    )
+
+    if len(services) > 0:
+        service_instance = services[0]
+        data['service'] = {
+            'id' : f'{service_instance.id}',
+            'name' : f'{service_instance.name}'
+        }
+    
+    clients = Client.objects.filter(
+        is_default = True
+    )
+
+    if len(clients) > 0:
+        client_instance = clients[0]
+        data['client'] = {
+            'id' : f'{client_instance.id}',
+            'name' : f'{client_instance.full_name}'
+        }
+    
+    employees = Employee.objects.filter(
+        is_default = True
+    )
+
+    if len(employees) > 0:
+        employee_instance = employees[0]
+        data['employee'] = {
+            'id' : f'{employee_instance.id}',
+            'name' : f'{employee_instance.full_name}',
+        }
     
     return Response(
         {
@@ -67,12 +110,7 @@ def get_user_default_data(request):
             'status_code' : 200,
             'response' : {
                 'message' : 'All business types',
-                'data' : {
-                    'location' : {},
-                    'client' : {},
-                    'service' : {},
-                    'employee' : {},
-                }
+                'data' : data
             }
         }
     )
