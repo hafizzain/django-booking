@@ -4068,7 +4068,7 @@ class getUserBusinessProfileCompletionProgress(APIView):
 
         if len(business_locations) > 0:
             completed_modules += 1
-            
+
         try:
             social_links = BusinessSocial.objects.get(
                 business = self.business
@@ -4138,7 +4138,8 @@ class getUserBusinessProfileCompletionProgress(APIView):
                     'message' : 'Profile completion progress!',
                     'error_message' : None,
                     'data' : {
-                        'business_info' : self.get_business_info_progress(request)
+                        'business_info' : self.get_business_info_progress(request),
+                        'business_setting' : self.get_business_setting_progress(request),
                     }
                 }
             },
