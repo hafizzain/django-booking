@@ -1757,7 +1757,7 @@ def create_checkout(request):
                 loyalty = point,
                 points_earned = float(earned_points),
                 points_redeemed = logs_points_redeemed,
-                balance = client_points.total_earn,
+                balance = (float(client_points.total_earn) - float(logs_points_redeemed)),
                 actual_sale_value_redeemed = logs_total_redeened_value
             )
             
