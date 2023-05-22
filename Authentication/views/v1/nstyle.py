@@ -225,9 +225,9 @@ def verify_otp(request):
     try:
         if code_for == 'Email':
             otp = VerificationOTP.objects.get(
-                code_for='Email',
-                user__email=email,
-                code=code
+                code_for = 'Email',
+                user__email = email,
+                code = code
             )
             otp.user.is_email_verified = True
             otp.user.is_active = True
