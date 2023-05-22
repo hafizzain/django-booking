@@ -4191,7 +4191,7 @@ class getUserBusinessProfileCompletionProgress(APIView):
             total_modules += value['total_modules']
             completed_modules += value['completed_modules']
         
-        percentage_value = (completed_modules / total_modules) / 100
+        percentage_value = (completed_modules / total_modules) * 100
 
         data['completion_percentage'] = percentage_value
 
