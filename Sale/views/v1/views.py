@@ -1888,6 +1888,7 @@ def new_create_sale_order(request):
         voucher_commission_type = voucher_commission_type,  
 
     )
+    invoice.save()
     # if is_promotion:
     #     checkout.save()
         
@@ -1899,11 +1900,6 @@ def new_create_sale_order(request):
         checkout.selected_promotion_id = request.data.get('selected_promotion_id', '')
         checkout.selected_promotion_type = request.data.get('selected_promotion_type', '')
         checkout.save()
-
-        invoice.is_promotion = True
-        invoice.selected_promotion_id = request.data.get('selected_promotion_id', '')
-        invoice.selected_promotion_type = request.data.get('selected_promotion_type', '')
-        invoice.save()
 
         for item in ids:
             price = item["price"]
