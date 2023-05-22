@@ -33,6 +33,7 @@ from django.db.models import Avg, Count, Min, Sum, Q
 from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer, SaleOrders_CheckoutSerializer, SaleOrders_AppointmentCheckoutSerializer
 from rest_framework.pagination import PageNumberPagination
 from django.core.paginator import Paginator
+from Sale.models import SaleInvoice
 
 # @api_view(['GET'])
 # @permission_classes([IsAuthenticated])
@@ -67,15 +68,15 @@ def get_service(request):
         name__icontains = title,
         is_deleted = False, 
         is_blocked = False, 
-        # location__id = location
+        location__id = location
     ).order_by('-created_at').distinct()
     service_count= service.count()
 
-    page_count = service_count / 4
+    page_count = service_count / 20
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(service, 4)
+    paginator = Paginator(service, 20)
     page_number = request.GET.get("page") 
     services = paginator.get_page(page_number)
 
@@ -1401,13 +1402,36 @@ def create_sale_order(request):
         
         service_commission_type = service_commission_type,
         product_commission_type = product_commission_type,
-        voucher_commission_type = voucher_commission_type ,  
+        voucher_commission_type = voucher_commission_type,  
         
         # tip = tip,
     )
+
+    invoice = SaleInvoice.objects.create(
+        user = user,
+        
+        client = client, 
+        location = business_address,
+        member = member ,
+        client_type = client_type,
+        payment_type = payment_type,
+        
+        total_voucher_price = voucher_total_price,
+        total_service_price = service_total_price,
+        total_product_price = product_total_price,
+        
+        service_commission_type = service_commission_type,
+        product_commission_type = product_commission_type,
+        voucher_commission_type = voucher_commission_type,  
+
+    )
+
     if bool(is_promotion) == True:
         checkout.is_promotion = True
         checkout.save()
+        invoice.is_promotion = True
+        invoice.save()
+
         
     # ExceptionRecord.objects.create(
     #             text = f' is_promotion condition {bool(is_promotion) == True} is_promotion {is_promotion}'
@@ -1448,6 +1472,8 @@ def create_sale_order(request):
             if test == True:
                 checkout.total_service_price = int(float(total_price))
                 checkout.save()
+                invoice.total_service_price = int(float(total_price))
+                invoice.save()
                 test = False
 
     if type(tip) == str:
@@ -1565,6 +1591,8 @@ def create_sale_order(request):
             product_order.save()
             checkout.product_commission = product_commission
             checkout.save()
+            invoice.product_commission = product_commission
+            invoice.save()
 
         elif sale_type == 'SERVICE':
             try:
@@ -1595,6 +1623,8 @@ def create_sale_order(request):
                 )
                 checkout.service_commission = service_commission
                 checkout.save()
+                invoice.service_commission = service_commission
+                invoice.save()
             except Exception as err:
                 return Response(
                     {
@@ -1696,6 +1726,8 @@ def create_sale_order(request):
                 )
                 checkout.voucher_commission = voucher_commission
                 checkout.save()
+                invoice.voucher_commission = voucher_commission
+                invoice.save()
             except Exception as err:
                 return Response(
                     {
@@ -1839,6 +1871,23 @@ def new_create_sale_order(request):
         product_commission_type = product_commission_type,
         voucher_commission_type = voucher_commission_type ,  
     )
+    invoice = SaleInvoice.objects.create(
+        user = user,
+        
+        client = client, 
+        location = business_address,
+        client_type = client_type,
+        payment_type = payment_type,
+        
+        total_voucher_price = voucher_total_price,
+        total_service_price = service_total_price,
+        total_product_price = product_total_price,
+        
+        service_commission_type = service_commission_type,
+        product_commission_type = product_commission_type,
+        voucher_commission_type = voucher_commission_type,  
+
+    )
     # if is_promotion:
     #     checkout.save()
         
@@ -1850,6 +1899,12 @@ def new_create_sale_order(request):
         checkout.selected_promotion_id = request.data.get('selected_promotion_id', '')
         checkout.selected_promotion_type = request.data.get('selected_promotion_type', '')
         checkout.save()
+
+        invoice.is_promotion = True
+        invoice.selected_promotion_id = request.data.get('selected_promotion_id', '')
+        invoice.selected_promotion_type = request.data.get('selected_promotion_type', '')
+        invoice.save()
+
         for item in ids:
             price = item["price"]
             minus_price +=(price)
@@ -1888,6 +1943,8 @@ def new_create_sale_order(request):
             if test == True:
                 checkout.total_service_price = int(float(total_price))
                 checkout.save()
+                invoice.total_service_price = int(float(total_price))
+                invoice.save()
                 test = False
 
 
@@ -1974,6 +2031,8 @@ def new_create_sale_order(request):
             product_order.save()
             checkout.product_commission = product_commission
             checkout.save()
+            invoice.product_commission = product_commission
+            invoice.save()
 
         elif sale_type == 'SERVICE':
             try:
@@ -1998,6 +2057,9 @@ def new_create_sale_order(request):
                 )
                 checkout.service_commission = service_commission
                 checkout.save()
+                invoice.service_commission = service_commission
+                invoice.save()
+                
             except Exception as err:
                 return Response(
                     {
@@ -2096,6 +2158,8 @@ def new_create_sale_order(request):
                 )
                 checkout.voucher_commission = voucher_commission
                 checkout.save()
+                invoice.voucher_commission = voucher_commission
+                invoice.save()
             except Exception as err:
                 ExceptionRecord.objects.create(
                             text = f' error in voucher price{str(err)}'
