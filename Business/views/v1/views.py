@@ -4088,6 +4088,31 @@ class getUserBusinessProfileCompletionProgress(APIView):
             'completed_modules' : completed_modules,
         }
 
+    def get_financial_settings_progress(self, request):
+        total_modules = 4
+        completed_modules = 0
+
+        payment_methods = BusinessPaymentMethod.objects.filter(
+            business = self.business
+        )
+        if len(payment_methods) > 0:
+            completed_modules += 1
+        
+        business_taxes = BusinessTax.objects.filter(
+            business = self.business
+        ).values_list('tax_type', flat=True)
+        business_taxes = list(business_taxes)
+
+        for tax_type in ['Individual', 'Group', 'Location']:
+            if business_taxes.count(tax_type) > 0:
+                completed_modules += 1
+
+
+        return {
+            'total_modules' : total_modules,
+            'completed_modules' : completed_modules,
+        }
+
     def get(self, request):
         business_id = request.GET.get('business_id', None)
 
