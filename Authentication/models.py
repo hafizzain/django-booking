@@ -74,6 +74,8 @@ class User(AbstractBaseUser):
     mobile_number = models.CharField(max_length=20, null=True, blank=True)
     is_mobile_verified = models.BooleanField(default=False)
 
+    is_asked_for_data_update = models.BooleanField(default=False, verbose_name='Is Asked user to update his Default Data ( Location, Client, Employee, Service)? :')
+
 
     # maiden_name = models.CharField(max_length=128, null=True, blank=True)
     social_account = models.BooleanField(default=False)
