@@ -177,6 +177,7 @@ def create_employee(tenant=None, user = None, business=None):
                     is_active = True,
                     is_deleted = False,
                     is_closed = False,
+                    is_default = True
                 )
                 
                 employee = Employee.objects.create(
@@ -188,6 +189,7 @@ def create_employee(tenant=None, user = None, business=None):
                     address = 'Dubai Marina',
                     is_active =True,
                     employee_id = employe_id,
+                    is_default = True
                     
                 )
                 employee.location.add(business_address)
@@ -303,8 +305,8 @@ def create_client(tenant=None, user = None, business=None):
                 gender = 'Male',
                 language = language_id,
                 client_id = client_unique_id,
-                is_active = True
-                
+                is_active = True,
+                is_default = True,
             )
    
 def create_ServiceGroup(tenant=None, user = None, business=None):
@@ -334,7 +336,8 @@ def create_ServiceGroup(tenant=None, user = None, business=None):
                         business =business,
                         name = ser_name,
                         description = f'{ser_name} description',
-                        service_availible = 'Everyone',          
+                        service_availible = 'Everyone',    
+                        is_default = True,      
                     )
                     service.location.add(location)
                     service.save()

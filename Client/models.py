@@ -64,6 +64,8 @@ class Client(models.Model):
     postal_code = models.CharField(max_length=20, null=True, blank=True)
     address = models.TextField(default='')
     card_number = models.CharField(max_length=30, null=True, blank=True)
+
+    is_default = models.BooleanField(default=False)
     
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)

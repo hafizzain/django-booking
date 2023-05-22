@@ -41,6 +41,8 @@ class Employee(models.Model):
     to_present = models.BooleanField(default=False)
     ending_date = models.DateField(null=True, blank=True)
         
+    is_default = models.BooleanField(default=False)
+    
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)

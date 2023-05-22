@@ -113,6 +113,8 @@ class BusinessAddress(models.Model):
     
     description =  models.CharField(max_length=300, null=True, blank=True)
     banking = models.CharField(choices = BANKING_CHOICE , default = 'Disable' , max_length = 50)
+
+    is_default = models.BooleanField(default=False)
     
     is_publish = models.BooleanField(default=False)
     is_primary = models.BooleanField(default=False)

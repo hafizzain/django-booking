@@ -39,6 +39,48 @@ from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSeria
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
+def get_user_default_data(request):
+    business_id = request.GET.get('business_id', None)
+
+    if not all([business_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'business_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # BusinessAddress.objects.get()
+    
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'All business types',
+                'data' : {
+                    'location' : {},
+                    'client' : {},
+                    'service' : {},
+                    'employee' : {},
+                }
+            }
+        }
+    )
+
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def get_business_types(request):
     all_types = BusinessType.objects.filter(
         is_active=True,

@@ -73,4 +73,7 @@ urlpatterns = [
     
     #Tenant Detail
     path('get_common_tenant/', views.get_common_tenant),
+
+    path('get_user_default_data/', views.get_user_default_data),
+
 ]

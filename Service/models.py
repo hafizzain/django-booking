@@ -86,6 +86,8 @@ class Service(models.Model):
 
     price = models.PositiveIntegerField(default=0)
     
+    is_default = models.BooleanField(default=False)
+    
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
