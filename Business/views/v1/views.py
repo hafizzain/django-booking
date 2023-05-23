@@ -70,7 +70,8 @@ def get_user_default_data(request):
         location_instance = locations[0]
         data['location'] = {
             'name' : f'{location_instance.address_name}',
-            'id' : f'{location_instance.id}'
+            'id' : f'{location_instance.id}',
+            'type' : 'location'
         }
     
     services = Service.objects.filter(
@@ -81,7 +82,8 @@ def get_user_default_data(request):
         service_instance = services[0]
         data['service'] = {
             'id' : f'{service_instance.id}',
-            'name' : f'{service_instance.name}'
+            'name' : f'{service_instance.name}',
+            'type' : 'service'
         }
     
     clients = Client.objects.filter(
@@ -92,7 +94,8 @@ def get_user_default_data(request):
         client_instance = clients[0]
         data['client'] = {
             'id' : f'{client_instance.id}',
-            'name' : f'{client_instance.full_name}'
+            'name' : f'{client_instance.full_name}',
+            'type' : 'client'
         }
     
     employees = Employee.objects.filter(
@@ -104,6 +107,7 @@ def get_user_default_data(request):
         data['employee'] = {
             'id' : f'{employee_instance.id}',
             'name' : f'{employee_instance.full_name}',
+            'type' : 'employee'
         }
     
     return Response(
