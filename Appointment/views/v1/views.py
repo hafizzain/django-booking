@@ -1624,7 +1624,7 @@ def create_checkout(request):
 
     elif type(appointment_service_obj) == list:
         pass
-    for app in appointment_service_obj:
+    # for app in appointment_service_obj:
         id = app.get('id', None)
         try:
             service_appointment = AppointmentService.objects.get(id=id)
