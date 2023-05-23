@@ -44,7 +44,7 @@ from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
 from Utility.models import ExceptionRecord
 from django.db.models import Prefetch
-from Sale.models import SaleInvoice
+from Invoices.models import SaleInvoice
 
 
 @api_view(['GET'])
@@ -1673,7 +1673,7 @@ def create_checkout(request):
     invoice = SaleInvoice.objects.create(
         appointment = appointments,
         appointment_service = service_appointment,
-        payment_method = payment_method,
+        payment_type = payment_method,
         service = services,
         member = members,
         business_address=business_address,
