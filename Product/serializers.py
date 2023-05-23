@@ -487,6 +487,37 @@ class ProductOrderStockReportSerializer(serializers.ModelSerializer):
     
 
 
+class ProductStockReport_OrderStockReportsSerializer(serializers.ModelSerializer):
+    
+    from_location = BusiessAddressAppointmentSerializer()
+    to_location = BusiessAddressAppointmentSerializer()
+    location = BusiessAddressAppointmentSerializer()
+    consumed_location = BusiessAddressAppointmentSerializer()
+    vendor_name = serializers.SerializerMethodField(read_only=True)
+    # product = ProductOrderSerializer()
+    # stocks = serializers.SerializerMethodField(read_only=True)
+    
+    def get_vendor_name(self, obj):
+        try:
+            return obj.vendor.vendor_name
+        except Exception as err:
+            return None
+    
+    # def get_stocks(self, obj):
+    #     location = self.context.get('location')
+    #     if location is not None:
+    #         all_stocks = ProductStock.objects.filter(product=obj, is_deleted=False, location__id=location).order_by('-created_at')
+    #     else:
+    #         all_stocks = ProductStock.objects.filter(product=obj, is_deleted=False).order_by('-created_at')
+    #     return ProductStockSerializer(all_stocks, many=True).data
+    
+
+    class Meta:
+        model = ProductOrderStockReport
+        #fields = '__all__'#['id', 'from_location', 'to_location', 'product', 'quantity','note']
+        exclude = ('is_active','is_deleted', 'user')
+    
+
 
 class ProductStockReportSerializer(serializers.ModelSerializer):
     # avaiable = serializers.SerializerMethodField()
@@ -519,7 +550,7 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
             product = product_instance
         )
         
-        serialized_data = ProductOrderStockReportSerializer(product_reports, many=True)
+        serialized_data = ProductStockReport_OrderStockReportsSerializer(product_reports, many=True)
         return serialized_data.data
             
     class Meta:
