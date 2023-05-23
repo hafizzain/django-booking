@@ -205,6 +205,7 @@ def update_user_default_data(request):
             'status_code' : 200,
             'response' : {
                 'message' : 'Business Default Data updated',
+                'errors' : errors
             }
         }
     )
