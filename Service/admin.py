@@ -7,7 +7,8 @@ class ServiceAdmin(admin.ModelAdmin):
     list_display = [
         'id',
         'name',
-        'is_active'
+        'is_active',
+        'is_default'
     ]
 admin.site.register(PriceService)
 admin.site.register(ServiceGroup)
