@@ -285,7 +285,17 @@ def get_user(request):
             permisson.update(permissions)
                 
         except Exception as err:
-            return str(err)
+            return Response(
+                {
+                    'status' : True,
+                    'status_code' : 400,
+                    'response' : {
+                        'message' : 'Employee Authenticationn error',
+                        'error_message' : str(err)
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
     # else:
     #     permisson.update(employee)
     serialized = UserTenantLoginSerializer(user, context={'employee' : employee, })
