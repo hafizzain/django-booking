@@ -526,6 +526,10 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
     reports = serializers.SerializerMethodField()
 
     current_stock = serializers.SerializerMethodField()
+    created_at = serializers.SerializerMethodField()
+
+    def get_created_at(self, product_instance):
+        return f'{product_instance.created_at.strftime("%Y-%M-%d")}'
 
     def get_current_stock(self, product_instance):
         return 0
@@ -543,7 +547,7 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
             
     def get_retail_price(self, obj):
         currency_id = self.context.get('location_currency_id')
-        
+
         product_retails_ = CurrencyRetailPrice.objects.filter(
             product = obj,
             currency__id = currency_id,
