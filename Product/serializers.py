@@ -543,12 +543,18 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
             
     def get_retail_price(self, obj):
         currency_id = self.context.get('location_currency_id')
-        quantity = CurrencyRetailPrice.objects.filter(
+        
+        product_retails_ = CurrencyRetailPrice.objects.filter(
             product = obj,
             currency__id = currency_id,
             is_deleted = False
-        )#.order_by('-created_at').distinct()
-        return CurrencyRetailPriceSerializer(quantity, many = True).data
+        )
+
+        if len(product_retails_) > 0 :
+            retail_price_instance = product_retails_[0]
+            return CurrencyRetailPriceSerializer(retail_price_instance).data
+        
+        return {}
 
     def get_reports(slef, product_instance):
         product_reports = ProductOrderStockReport.objects.filter(
@@ -560,5 +566,5 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
             
     class Meta:
         model = Product
-        fields = ['id', 'retail_price', 'brand', 'reports', 'current_stock', 'cost_price', 'created_at']
+        fields = ['id', 'name', 'retail_price', 'brand', 'reports', 'current_stock', 'cost_price', 'created_at']
         #  'avaiable',
