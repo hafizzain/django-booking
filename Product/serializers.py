@@ -528,7 +528,6 @@ class ProductStockReport_OrderStockReportsSerializer(serializers.ModelSerializer
             'from_location', 
             'to_location', 
             'quantity', 
-            'note', 
             'short_id', 
             'location', 
             'consumed_location', 
