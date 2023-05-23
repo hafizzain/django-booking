@@ -2658,16 +2658,42 @@ def get_product_stock_report(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
+    try:
+        location = BusinessAddress.objects.get(
+            id = location_id
+        )
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'LOCATION DOES NOT EXIST',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+
     products = Product.objects.prefetch_related(
         'product_stock'
     ).filter(
-        product_stock__location__id = location_id,
+        product_stock__location = location,
         is_deleted = False
     )
     
-    serialized = ProductStockReportSerializer(products, many=True)
+    serialized = ProductStockReportSerializer(
+        products, 
+        many = True,
+        context = {
+            'location_id' : location.id,
+            'location_currency_id' : location.currency.id if location.currency else None
+        }
+    )
     data = serialized.data
-    
+
     return Response(
         {
             'status' : True,
