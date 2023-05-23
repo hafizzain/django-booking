@@ -60,7 +60,9 @@ def get_user_default_data(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    data = {}
+    data = {
+        'service' : []
+    }
 
     locations = BusinessAddress.objects.filter(
         is_default = True
@@ -79,11 +81,11 @@ def get_user_default_data(request):
     )
 
     for service_instance in services:
-        data['service'] = {
+        data['service'].append({
             'id' : f'{service_instance.id}',
             'name' : f'{service_instance.name}',
             'type' : 'service'
-        }
+        })
     
     clients = Client.objects.filter(
         is_default = True
