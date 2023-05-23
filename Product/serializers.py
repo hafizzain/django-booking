@@ -497,11 +497,15 @@ class ProductStockReport_OrderStockReportsSerializer(serializers.ModelSerializer
     # product = ProductOrderSerializer()
     # stocks = serializers.SerializerMethodField(read_only=True)
     created_at = serializers.SerializerMethodField()
-    
-    def get_created_at(self, product_instance):
-        return f'{product_instance.created_at.strftime("%Y-%m-%d")}'
+    short_id = serializers.SerializerMethodField()
 
-    
+    def get_short_id(self, report_instance):
+        return f'{report_instance.short_id}'
+
+
+    def get_created_at(self, report_instance):
+        return f'{report_instance.created_at.strftime("%Y-%m-%d")}'
+
     def get_vendor_name(self, obj):
         try:
             return obj.vendor.vendor_name
@@ -519,8 +523,25 @@ class ProductStockReport_OrderStockReportsSerializer(serializers.ModelSerializer
 
     class Meta:
         model = ProductOrderStockReport
-        #fields = '__all__'#['id', 'from_location', 'to_location', 'product', 'quantity','note']
-        exclude = ('is_active','is_deleted', 'user')
+        fields = [
+            'id', 
+            'from_location', 
+            'to_location', 
+            'quantity', 
+            'note', 
+            'short_id', 
+            'location', 
+            'consumed_location', 
+            'vendor_name', 
+            'report_choice', 
+            'quantity', 
+            'before_quantity', 
+            'after_quantity', 
+            'reorder_quantity', 
+            'created_at', 
+            'vendor', 
+        ]
+        # exclude = ('is_active','is_deleted', 'user')
     
 
 

@@ -279,6 +279,11 @@ class ProductOrderStockReport(models.Model):
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now, null= True)
+
+    def short_id(self):
+        instance_id = f'{self.id}'
+        instance_id = instance_id.split('-')[0]
+        return instance_id
     
     def __str__(self):
         return str(self.id)
