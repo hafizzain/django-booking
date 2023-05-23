@@ -510,7 +510,7 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
             return CurrencyRetailPriceSerializer( quantity, many = True).data
 
     def get_reports(slef, product_instance):
-        product_reports = ProductOrderStockReport(
+        product_reports = ProductOrderStockReport.objects.filter(
             product = product_instance
         )
         
