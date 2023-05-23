@@ -493,6 +493,11 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
     retail_price = serializers.SerializerMethodField()
     brand = serializers.SerializerMethodField()
     reports = serializers.SerializerMethodField()
+
+    current_stock = serializers.SerializerMethodField()
+
+    def get_current_stock(self, product_instance):
+        return 0
     
     def get_brand(self, obj):
         try:
@@ -519,4 +524,4 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
             
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = ['id', 'avaiable', 'retail_price', 'brand', 'reports', 'current_stock', 'cost_price', 'created_at']
