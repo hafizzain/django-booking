@@ -60,7 +60,9 @@ def get_user_default_data(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    data = {}
+    data = {
+        'service' : []
+    }
 
     locations = BusinessAddress.objects.filter(
         is_default = True
@@ -70,19 +72,20 @@ def get_user_default_data(request):
         location_instance = locations[0]
         data['location'] = {
             'name' : f'{location_instance.address_name}',
-            'id' : f'{location_instance.id}'
+            'id' : f'{location_instance.id}',
+            'type' : 'location'
         }
     
     services = Service.objects.filter(
         is_default = True
     )
 
-    if len(services) > 0:
-        service_instance = services[0]
-        data['service'] = {
+    for service_instance in services:
+        data['service'].append({
             'id' : f'{service_instance.id}',
-            'name' : f'{service_instance.name}'
-        }
+            'name' : f'{service_instance.name}',
+            'type' : 'service'
+        })
     
     clients = Client.objects.filter(
         is_default = True
@@ -92,7 +95,8 @@ def get_user_default_data(request):
         client_instance = clients[0]
         data['client'] = {
             'id' : f'{client_instance.id}',
-            'name' : f'{client_instance.full_name}'
+            'name' : f'{client_instance.full_name}',
+            'type' : 'client'
         }
     
     employees = Employee.objects.filter(
@@ -104,6 +108,7 @@ def get_user_default_data(request):
         data['employee'] = {
             'id' : f'{employee_instance.id}',
             'name' : f'{employee_instance.full_name}',
+            'type' : 'employee'
         }
     
     return Response(
@@ -146,6 +151,8 @@ def update_user_default_data(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    
+    errors = []
 
     locations = BusinessAddress.objects.filter(
         is_default = True
@@ -155,15 +162,24 @@ def update_user_default_data(request):
         location_instance = locations[0]
         location_instance.address_name = location
         location_instance.save()
-    
-    services = Service.objects.filter(
-        is_default = True
-    )
 
-    if len(services) > 0:
-        service_instance = services[0]
-        service_instance.name = service
-        service_instance.save()
+    if type(service) == str:
+        service = json.loads(service)
+    
+    if type(service) == list:
+        for service_obj in service:
+            try:
+                service_instance = Service.objects.get(
+                    id = service_obj['id']
+                )
+            except Exception as err:
+                errors.append(str(err))
+
+            else:
+                service_instance.name = service_obj['name']
+                service_instance.save()
+    else:
+        errors.append('Failed Condition :::: type(service) == list')
     
     clients = Client.objects.filter(
         is_default = True
@@ -189,6 +205,7 @@ def update_user_default_data(request):
             'status_code' : 200,
             'response' : {
                 'message' : 'Business Default Data updated',
+                'errors' : errors
             }
         }
     )
@@ -4088,6 +4105,54 @@ class getUserBusinessProfileCompletionProgress(APIView):
             'completed_modules' : completed_modules,
         }
 
+    def get_financial_settings_progress(self, request):
+        total_modules = 4
+        completed_modules = 0
+
+        payment_methods = BusinessPaymentMethod.objects.filter(
+            business = self.business
+        )
+        if len(payment_methods) > 0:
+            completed_modules += 1
+        
+        business_taxes = BusinessTax.objects.filter(
+            business = self.business
+        ).values_list('tax_type', flat=True)
+        business_taxes = list(business_taxes)
+
+        for tax_type in ['Individual', 'Group', 'Location']:
+            if business_taxes.count(tax_type) > 0:
+                completed_modules += 1
+
+
+        return {
+            'total_modules' : total_modules,
+            'completed_modules' : completed_modules,
+        }
+
+    def get_business_services_progress(self, request):
+        total_modules = 2
+        completed_modules = 0
+
+        services = Service.objects.filter(
+            business = self.business
+        )
+
+        if len(services) > 0 :
+            completed_modules += 1
+
+            service_groups = services.filter(
+                parrent_service__isnull = False
+            )
+
+            if len(service_groups) > 0:
+                completed_modules += 1
+
+        return {
+            'total_modules' : total_modules,
+            'completed_modules' : completed_modules,
+        }
+
     def get(self, request):
         business_id = request.GET.get('business_id', None)
 
@@ -4128,6 +4193,24 @@ class getUserBusinessProfileCompletionProgress(APIView):
         else:
             self.business = business
             # Do everything after this Line self.business is IMP.
+        
+        data = {
+            'business_info' : self.get_business_info_progress(request),
+            'business_settings' : self.get_business_setting_progress(request),
+            'financial_settings' : self.get_financial_settings_progress(request),
+            'service_management' : self.get_business_services_progress(request),
+        }
+
+        total_modules = 0
+        completed_modules = 0
+
+        for value in data.values():
+            total_modules += value['total_modules']
+            completed_modules += value['completed_modules']
+        
+        percentage_value = (completed_modules / total_modules) * 100
+
+        data['completion_percentage'] = percentage_value
 
         return Response(
             {
@@ -4137,10 +4220,7 @@ class getUserBusinessProfileCompletionProgress(APIView):
                 'response' : {
                     'message' : 'Profile completion progress!',
                     'error_message' : None,
-                    'data' : {
-                        'business_info' : self.get_business_info_progress(request),
-                        'business_setting' : self.get_business_setting_progress(request),
-                    }
+                    'data' : data
                 }
             },
             status=status.HTTP_200_OK
