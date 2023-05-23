@@ -33,7 +33,7 @@ from django.db.models import Avg, Count, Min, Sum, Q
 from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer, SaleOrders_CheckoutSerializer, SaleOrders_AppointmentCheckoutSerializer
 from rest_framework.pagination import PageNumberPagination
 from django.core.paginator import Paginator
-from invoices.models import SaleInvoice
+from Invoices.models import SaleInvoice
 
 # @api_view(['GET'])
 # @permission_classes([IsAuthenticated])

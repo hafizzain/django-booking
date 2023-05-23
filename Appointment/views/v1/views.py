@@ -44,7 +44,7 @@ from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
 from Utility.models import ExceptionRecord
 from django.db.models import Prefetch
-from invoices.models import SaleInvoice
+from Invoices.models import SaleInvoice
 
 
 @api_view(['GET'])
