@@ -496,6 +496,11 @@ class ProductStockReport_OrderStockReportsSerializer(serializers.ModelSerializer
     vendor_name = serializers.SerializerMethodField(read_only=True)
     # product = ProductOrderSerializer()
     # stocks = serializers.SerializerMethodField(read_only=True)
+    created_at = serializers.SerializerMethodField()
+    
+    def get_created_at(self, product_instance):
+        return f'{product_instance.created_at.strftime("%Y-%m-%d")}'
+
     
     def get_vendor_name(self, obj):
         try:
