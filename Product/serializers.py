@@ -529,7 +529,7 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
     created_at = serializers.SerializerMethodField()
 
     def get_created_at(self, product_instance):
-        return f'{product_instance.created_at.strftime("%Y-%M-%d")}'
+        return f'{product_instance.created_at.strftime("%Y-%m-%d")}'
 
     def get_current_stock(self, product_instance):
         return 0
