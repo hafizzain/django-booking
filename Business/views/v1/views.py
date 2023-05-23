@@ -151,6 +151,8 @@ def update_user_default_data(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    
+    errors = []
 
     locations = BusinessAddress.objects.filter(
         is_default = True
@@ -160,15 +162,24 @@ def update_user_default_data(request):
         location_instance = locations[0]
         location_instance.address_name = location
         location_instance.save()
-    
-    services = Service.objects.filter(
-        is_default = True
-    )
 
-    if len(services) > 0:
-        service_instance = services[0]
-        service_instance.name = service
-        service_instance.save()
+    if type(service) == str:
+        service = json.loads(service)
+    
+    if type(service) == list:
+        for service_obj in service:
+            try:
+                service_instance = Service.objects.get(
+                    id = service_obj['id']
+                )
+            except Exception as err:
+                errors.append(str(err))
+
+            else:
+                service_instance.name = service_obj['name']
+                service_instance.save()
+    else:
+        errors.append('Failed Condition :::: type(service) == list')
     
     clients = Client.objects.filter(
         is_default = True
