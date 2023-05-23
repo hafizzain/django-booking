@@ -11,6 +11,7 @@ from Client.models import Client, Membership, Promotion, Rewards, Vouchers
 from Employee.models import Employee
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 
+from Order.models import Checkout
 class AppointmentLogs(models.Model):
     LOG_TYPE_CHOICES =[
         ('Create' , 'Create'),
@@ -284,6 +285,8 @@ class AppointmentEmployeeTip(models.Model):
     
     business_address = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='appointment_address_tips')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, null=True, blank=True, related_name='business_appointment_tips') 
+
+    checkout = models.ForeignKey(Checkout, on_delete=models.CASCADE,related_name="checkout_tips", null=True, blank=True)
 
     tip = models.PositiveIntegerField(default=0, null=True, blank=True)
     gst = models.PositiveIntegerField(default=0, null=True, blank=True)

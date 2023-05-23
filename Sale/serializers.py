@@ -3,7 +3,7 @@ from pyexpat import model
 from Appointment.serializers import UpdateAppointmentSerializer
 from Business.serializers.v1_serializers import AppointmentServiceSerializer
 from rest_framework import serializers
-from Appointment.models import Appointment, AppointmentCheckout, AppointmentService
+from Appointment.models import Appointment, AppointmentCheckout, AppointmentService,AppointmentEmployeeTip
 from Client.models import Client, Membership
 
 from Employee.models import Employee, EmployeeProfessionalInfo, EmployeeSelectedService
@@ -1315,7 +1315,18 @@ class SaleOrder_MemberShipSerializer(serializers.ModelSerializer):
             # 'order_type' ,'client','member', 'location' ,'start_date', 'end_date','status', 'total_price', 'name',
             #      'payment_type','created_at'
 
+class CheckoutTipsSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = AppointmentEmployeeTip
+        fields = ['id', 'checkout', 'member', 'business_address', 'business', 'tip', 'gst', 'gst_price', 'service_price', 'total_price', 'is_active', 'is_deleted', 'created_at']
 
+class AppointmentTipsSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = AppointmentEmployeeTip
+        fields = ['id', 'appointment', 'member', 'business_address', 'business', 'tip', 'gst', 'gst_price', 'service_price', 'total_price', 'is_active', 'is_deleted', 'created_at']      
+       
 class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
     service  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
@@ -1331,7 +1342,19 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     membership_service = serializers.SerializerMethodField(read_only=True)
     membership_type = serializers.SerializerMethodField(read_only=True)
     
+    tips = serializers.SerializerMethodField(read_only=True)
         
+    def get_tips(self,obj):
+        tips =Checkout.objects.only(
+            'tip'
+            'employee'
+        ).select_related(
+            'tip'
+        ).filter(
+            checkout = obj
+        )
+        return None 
+
     def get_client(self, obj):
         if obj.client:
             serializers = ClientSerializer(obj.client).data
@@ -1428,6 +1451,10 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
 
         return ids_data
     
+    def get_tips(self, obj):
+        tips = AppointmentEmployeeTip.objects.filter(checkout=obj)
+        serialized_tips = CheckoutTipsSerializer(tips, many=True).data
+        return serialized_tips
     
     class Meta:
         model = Checkout
@@ -1436,7 +1463,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             'product', 'service', 'membership', 'voucher',
             'client', 'location', 
             # 'member', 
-            'created_at', 'payment_type', 'tip',
+            'created_at', 'payment_type', 'tip','tips',
             'service_commission', 'voucher_commission', 'product_commission', 'service_commission_type',
             'product_commission_type', 'voucher_commission_type', 'ids', 'membership_product',
             'membership_service', 'membership_type'
@@ -1455,6 +1482,8 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
     appointment_service  = serializers.SerializerMethodField(read_only=True)
     promotion_name  = serializers.SerializerMethodField(read_only=True)
     
+    tips = serializers.SerializerMethodField(read_only=True)
+
     def get_promotion_name(self, obj):
         return 'promotion name'
 
@@ -1490,13 +1519,19 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
             return serializers
     
         return None
-        
+    
     def get_voucher_discount_percentage(self, obj):
         return 'voucher discount percentage'
+    
+    def get_tips(self, obj):
+        tips = AppointmentEmployeeTip.objects.filter(appointment=obj)
+        serialized_tips = AppointmentTipsSerializer(tips, many=True).data
+        return serialized_tips
+    
     class Meta:
         model = AppointmentCheckout
         fields = ['id', 'appointment', 'appointment_service', 'payment_method', 'service',
-                 'business_address', 'voucher', 'promotion',
+                 'business_address', 'voucher', 'promotion', 'tips',
                  'membership', 'rewards', 'tip', 'gst', 'gst_price', 'service_price',
                  'total_price', 'service_commission', 'service_commission_type', 'voucher_discount_percentage',
                  'created_at', 'order_type', 'client', 'location', 'price', 'promotion_name']
