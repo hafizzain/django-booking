@@ -55,9 +55,9 @@ class SaleInvoice(models.Model):
     
     appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, null=True, blank=True)
     appointment_service = models.CharField(max_length=2000, default='')
-    service = models.CharField(max_length=2000, default='')
-    member = models.CharField(max_length=2000, default='')
-    business_address = models.CharField(max_length=2000, default='')
+    service = models.CharField(max_length=2000, default='', null=True)
+    member = models.CharField(max_length=2000, default='', null=True)
+    business_address = models.CharField(max_length=2000, default='', null=True)
 
     gst = models.FloatField(default=0, null=True, blank=True)
     gst_price = models.FloatField(default=0, null=True, blank=True)

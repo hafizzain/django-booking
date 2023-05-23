@@ -1871,6 +1871,10 @@ def new_create_sale_order(request):
         product_commission_type = product_commission_type,
         voucher_commission_type = voucher_commission_type ,  
     )
+    print("saving checkout")
+    checkout.save()
+    print("checkout saved")
+
     invoice = SaleInvoice.objects.create(
         user = user,
         
@@ -1888,7 +1892,10 @@ def new_create_sale_order(request):
         voucher_commission_type = voucher_commission_type,  
 
     )
+    print("saving invoice")
     invoice.save()
+    print("saved invoice")
+
     # if is_promotion:
     #     checkout.save()
         
