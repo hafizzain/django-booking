@@ -484,3 +484,28 @@ class ProductOrderStockReportSerializer(serializers.ModelSerializer):
         model = ProductOrderStockReport
         #fields = '__all__'#['id', 'from_location', 'to_location', 'product', 'quantity','note']
         exclude = ('is_active','is_deleted', 'user')
+    
+
+class ProductStockReportSerializer(serializers.ModelSerializer):
+    avaiable = serializers.SerializerMethodField()
+    retail_price = serializers.SerializerMethodField()
+    brand = serializers.SerializerMethodField()
+    
+    def get_brand(self, obj):
+        try:
+            return obj.brand.name
+        except Exception as err:
+            return None
+    
+    def get_avaiable(self, obj):
+            quantity = ProductStock.objects.filter(product = obj)
+            return ProductStockSerializer(quantity, many = True).data
+
+            
+    def get_retail_price(self, obj):
+            quantity = CurrencyRetailPrice.objects.filter(product = obj)#.order_by('-created_at').distinct()
+            return CurrencyRetailPriceSerializer( quantity, many = True).data
+            
+    class Meta:
+        model = Product
+        fields = '__all__'

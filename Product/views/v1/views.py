@@ -22,7 +22,7 @@ from Product.models import ( Category, Brand, CurrencyRetailPrice , Product, Pro
                            )
 from Business.models import Business, BusinessAddress, BusinessVendor
 from Product.serializers import (CategorySerializer, BrandSerializer, ProductOrderStockReportSerializer, ProductSerializer, ProductStockSerializer, ProductWithStockSerializer
-                                 ,OrderSerializer , OrderProductSerializer, ProductConsumptionSerializer, ProductStockTransferSerializer, ProductOrderSerializer
+                                 ,OrderSerializer , OrderProductSerializer, ProductConsumptionSerializer, ProductStockTransferSerializer, ProductOrderSerializer, ProductStockReportSerializer
                                  )
 from django.core.paginator import Paginator
 
@@ -2619,25 +2619,54 @@ def update_product_stock_transfer(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_product_stock_report(request):
-    stock_report = ProductOrderStockReport.objects.filter(is_deleted=False).order_by('-created_at').distinct()
+    # stock_report = ProductOrderStockReport.objects.filter(is_deleted=False).order_by('-created_at').distinct()
     
-    grouped_reports = {}
-    for report in stock_report:
-        product_id = report.product.id
-        if product_id not in grouped_reports:
-            grouped_reports[product_id] = []
-        grouped_reports[product_id].append(report)
+    # grouped_reports = {}
+    # for report in stock_report:
+    #     product_id = report.product.id
+    #     if product_id not in grouped_reports:
+    #         grouped_reports[product_id] = []
+    #     grouped_reports[product_id].append(report)
     
-    serialized_data = []
+    # serialized_data = []
     
-    # Serialize the grouped data
-    for product_id, reports in grouped_reports.items():
-        product = reports[0].product
-        serialized_reports = ProductOrderStockReportSerializer(reports, many=True).data
-        serialized_data.append({
-            'product': ProductOrderSerializer(product).data,
-            'reports': serialized_reports
-        })
+    # # Serialize the grouped data
+    # for product_id, reports in grouped_reports.items():
+    #     product = reports[0].product
+    #     serialized_reports = ProductOrderStockReportSerializer(reports, many=True).data
+    #     serialized_data.append({
+    #         'product': ProductOrderSerializer(product).data,
+    #         'reports': serialized_reports
+    #     })
+
+    location_id = request.GET.get('location_id', None)
+
+    if not all([location_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'location_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    products = Product.objects.prefetch_related(
+        'product_stock'
+    ).filter(
+        product_stock__location__id = location_id,
+        is_deleted = False
+    )
+    
+    serialized = ProductStockReportSerializer(products, many=True)
+    data = serialized.data
     
     return Response(
         {
@@ -2646,7 +2675,7 @@ def get_product_stock_report(request):
             'response' : {
                 'message' : 'Product Stock Reports',
                 'error_message' : None,
-                'product_stock_report' : serialized_data
+                'product_stock_report' : data
             }
         },
         status=status.HTTP_200_OK
