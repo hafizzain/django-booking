@@ -2676,12 +2676,24 @@ def get_product_stock_report(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
+    
+    brand_id = request.GET.get('brand_id', None)
+    query = request.GET.get('query', '')
+    report_type = request.GET.get('report_type', None)
+
+
+    filter_queries = {}
+
+    if brand_id:
+        filter_queries['brand__id'] = brand_id
 
     products = Product.objects.prefetch_related(
         'product_stock'
     ).filter(
         product_stock__location = location,
-        is_deleted = False
+        is_deleted = False,
+        name__icontains = query,
+        **filter_queries
     )
     
     serialized = ProductStockReportSerializer(
@@ -2689,7 +2701,8 @@ def get_product_stock_report(request):
         many = True,
         context = {
             'location_id' : location.id,
-            'location_currency_id' : location.currency.id if location.currency else None
+            'report_type' : report_type,
+            'location_currency_id' : location.currency.id if location.currency else None,
         }
     )
     data = serialized.data

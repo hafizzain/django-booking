@@ -585,9 +585,15 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
         
         return {}
 
-    def get_reports(slef, product_instance):
+    def get_reports(self, product_instance):
+        filter_query = {}
+        report_type = self.context.get('report_type', None)
+        if report_type:
+            filter_query['report_choice'] = report_type
+
         product_reports = ProductOrderStockReport.objects.filter(
-            product = product_instance
+            product = product_instance,
+            **filter_query
         )
         
         serialized_data = ProductStockReport_OrderStockReportsSerializer(product_reports, many=True)
