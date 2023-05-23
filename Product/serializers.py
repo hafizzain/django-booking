@@ -489,7 +489,7 @@ class ProductOrderStockReportSerializer(serializers.ModelSerializer):
 
 
 class ProductStockReportSerializer(serializers.ModelSerializer):
-    avaiable = serializers.SerializerMethodField()
+    # avaiable = serializers.SerializerMethodField()
     retail_price = serializers.SerializerMethodField()
     brand = serializers.SerializerMethodField()
     reports = serializers.SerializerMethodField()
@@ -505,9 +505,9 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
         except Exception as err:
             return None
     
-    def get_avaiable(self, obj):
-            quantity = ProductStock.objects.filter(product = obj)
-            return ProductStockSerializer(quantity, many = True).data
+    # def get_avaiable(self, obj):
+    #         quantity = ProductStock.objects.filter(product = obj)
+    #         return ProductStockSerializer(quantity, many = True).data
 
             
     def get_retail_price(self, obj):
@@ -524,4 +524,5 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
             
     class Meta:
         model = Product
-        fields = ['id', 'avaiable', 'retail_price', 'brand', 'reports', 'current_stock', 'cost_price', 'created_at']
+        fields = ['id', 'retail_price', 'brand', 'reports', 'current_stock', 'cost_price', 'created_at']
+        #  'avaiable',
