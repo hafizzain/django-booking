@@ -486,10 +486,13 @@ class ProductOrderStockReportSerializer(serializers.ModelSerializer):
         exclude = ('is_active','is_deleted', 'user')
     
 
+
+
 class ProductStockReportSerializer(serializers.ModelSerializer):
     avaiable = serializers.SerializerMethodField()
     retail_price = serializers.SerializerMethodField()
     brand = serializers.SerializerMethodField()
+    reports = serializers.SerializerMethodField()
     
     def get_brand(self, obj):
         try:
@@ -505,6 +508,14 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
     def get_retail_price(self, obj):
             quantity = CurrencyRetailPrice.objects.filter(product = obj)#.order_by('-created_at').distinct()
             return CurrencyRetailPriceSerializer( quantity, many = True).data
+
+    def get_reports(slef, product_instance):
+        product_reports = ProductOrderStockReport(
+            product = product_instance
+        )
+        
+        serialized_data = ProductOrderStockReportSerializer(product_reports, many=True)
+        return serialized_data.data
             
     class Meta:
         model = Product
