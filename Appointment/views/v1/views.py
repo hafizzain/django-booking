@@ -44,6 +44,7 @@ from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
 from Utility.models import ExceptionRecord
 from django.db.models import Prefetch
+from Sale.models import SaleInvoice
 
 
 @api_view(['GET'])
@@ -1669,6 +1670,21 @@ def create_checkout(request):
         service_commission = float(service_commission),
         service_commission_type = service_commission_type,        
     )
+    invoice = SaleInvoice.objects.create(
+        appointment = appointments,
+        appointment_service = service_appointment,
+        payment_method = payment_method,
+        service = services,
+        member = members,
+        business_address=business_address,
+        # tip = tip,
+        gst = gst,
+        gst_price = gst_price,
+        service_price = service_price,
+        total_price = total_price,
+        service_commission = float(service_commission),
+        service_commission_type = service_commission_type,        
+    )
     # checkout.business_address = service_appointment.business_address
     # checkout.save()
 
@@ -1677,6 +1693,10 @@ def create_checkout(request):
         checkout.selected_promotion_id = request.data.get('selected_promotion_id', '')
         checkout.selected_promotion_type = request.data.get('selected_promotion_type', '')
         checkout.save()
+        invoice.is_promotion = True
+        invoice.selected_promotion_id = request.data.get('selected_promotion_id', '')
+        invoice.selected_promotion_type = request.data.get('selected_promotion_type', '')
+        invoice.save()
 
 
     if appointments.client:
@@ -1865,6 +1885,19 @@ def create_checkout_device(request):
         total_price =total_price,
         
     )
+    invoice = SaleInvoice.objects.create(
+        appointment = appointments,
+        appointment_service = service_appointment,
+        payment_type = payment_method,
+        service = services,
+        member = members,
+        business_address=business_address,
+        # tip = tip,
+        gst = gst,
+        service_price = service_price,
+        total_price = total_price,
+    )
+    invoice.save()
     # checkout.business_address = service_appointment.business_address
     # checkout.save()
     

@@ -54,6 +54,19 @@ class SaleInvoice(models.Model):
     selected_promotion_id = models.CharField(default='', max_length=800)
     selected_promotion_type = models.CharField(default='', max_length=400)
     
+    appointment = models.CharField(max_length=2000, default='')
+    appointment_service = models.CharField(max_length=2000, default='')
+    service = models.CharField(max_length=2000, default='')
+    member = models.CharField(max_length=2000, default='')
+    business_address = models.CharField(max_length=2000, default='')
+
+    gst = models.FloatField(default=0, null=True, blank=True)
+    gst_price = models.FloatField(default=0, null=True, blank=True)
+    
+    service_price = models.PositiveIntegerField(default=0, null=True, blank=True)
+    total_price = models.PositiveIntegerField(default=0, null=True, blank=True)
+    
+
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(null=True, blank=True)
     
