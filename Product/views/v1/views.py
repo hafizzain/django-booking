@@ -2687,6 +2687,9 @@ def get_product_stock_report(request):
     if brand_id:
         filter_queries['brand__id'] = brand_id
 
+    if report_type:
+        filter_queries['product_stock_report__report_choice'] = report_type
+
     products = Product.objects.prefetch_related(
         'product_stock'
     ).filter(
@@ -2694,7 +2697,7 @@ def get_product_stock_report(request):
         is_deleted = False,
         name__icontains = query,
         **filter_queries
-    )
+    ).distinct()
     
     serialized = ProductStockReportSerializer(
         products, 
