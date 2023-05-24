@@ -999,9 +999,11 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
     def get_employee(self, checkout):
         # serialized = EmployeeBusinessSerializer(checkout.member)
         # return serialized.data
-        return {
-            'full_name' : str(checkout.member.full_name),
-        }
+        if checkout.member:
+            return {
+                'full_name' : str(checkout.member.full_name),
+            }
+        return None
 
     def get_commission(self, checkout):
         if checkout.service_commission and checkout.service_commission > 0:
