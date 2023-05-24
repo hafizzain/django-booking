@@ -2237,7 +2237,6 @@ def new_create_sale_order(request):
     if type(tip) == str:
         tip = json.loads(tip)
     if type(tip) == list:
-        pass
 
         for t in tip:
             employee_id = t.get('employee', None)
@@ -2255,6 +2254,7 @@ def new_create_sale_order(request):
                 else:
                     print(f"Error: Employee with ID {employee_id} does not exist")
             except Exception as err:
+                errors.append(str(err))
                 pass
             
             

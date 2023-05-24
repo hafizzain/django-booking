@@ -1591,7 +1591,6 @@ def create_checkout(request):
         tip = json.loads(tip)
 
     elif type(tip) == list:
-        pass
 
         for t in tip:
             employee_id = t.get('employee', None)
