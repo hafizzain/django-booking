@@ -3,7 +3,7 @@ from django.contrib import admin
 from .models import(CommissionSchemeSetting, EmployeDailySchedule, Employee, EmployeeProfessionalInfo, EmployeePermissionSetting, EmployeeModulePermission, 
                     EmployeeMarketingPermission ,StaffGroup , CategoryCommission,
                     StaffGroupModulePermission , Attendance , 
-                    Payroll, Asset, AssetDocument, EmployeeSelectedService, Vacation )
+                    Payroll, Asset, AssetDocument, EmployeeSelectedService, Vacation, EmployeeCommission )
 # Register your models here.
 
 @admin.register(Vacation)
@@ -118,3 +118,4 @@ admin.site.register(AssetDocument)
 admin.site.register(EmployeeSelectedService)
 admin.site.register(EmployeDailySchedule)
 admin.site.register(CategoryCommission)
+admin.site.register(EmployeeCommission)
