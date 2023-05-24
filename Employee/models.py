@@ -390,3 +390,46 @@ class EmployeDailySchedule(models.Model):
     
 #     def __str__(self):
 #         return str(self.id)
+
+
+class EmployeeCommission(models.Model):
+
+    CATEGORY_CHOICES =[
+        ('Service', 'Service'),
+        ('Retail', 'Retail'),
+        ('Voucher', 'Voucher'),
+    ]
+
+    COMMISSION_CHOICE = [
+        ('percentage', 'percentage'),
+        ('currency', 'currency'),
+    ]
+
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null = True, related_name='user_commissions')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_employee_commissions')
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='commissions')
+
+
+    commission = models.ForeignKey(CommissionSchemeSetting, on_delete=models.CASCADE, related_name='employee_commissions')
+    category_commission = models.ForeignKey(CategoryCommission, on_delete=models.CASCADE, related_name='employee_category_commissions')
+
+    from_value = models.FloatField(default=0)
+    to_value = models.FloatField(default=0)
+
+    commission_percentage = models.FloatField(default=0)
+    commission_category = models.CharField(choices=CATEGORY_CHOICES, max_length=50, default='Service')
+    commission_type = models.CharField(choices=COMMISSION_CHOICE, max_length=50, default='percentage')
+
+    symbol = models.CharField(max_length=50, null=True, blank= True)
+    
+
+
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=now)
+    updated_at = models.DateTimeField(auto_now_add=now)
+
+
+    def __str__(self):
+        return str(self.id)
