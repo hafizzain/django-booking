@@ -1859,55 +1859,45 @@ def new_create_sale_order(request):
     elif type(ids) == list:
         pass
         
-    try:
-        checkout = Checkout.objects.create(
-            user = user,
-            
-            client = client, 
-            location = business_address,
-            client_type = client_type,
-            payment_type = payment_type,
-            
-            
-            total_voucher_price = voucher_total_price,
-            total_service_price = service_total_price,
-            total_product_price = product_total_price,
-            
-            service_commission_type = service_commission_type,
-            product_commission_type = product_commission_type,
-            voucher_commission_type = voucher_commission_type ,  
-        )
-    except Exception as err:
-        ExceptionRecord.objects.create(
-            text=f'checkout not create {str(err)}'
-            )
-
+    
+    checkout = Checkout.objects.create(
+        user = user,
+        
+        client = client, 
+        location = business_address,
+        client_type = client_type,
+        payment_type = payment_type,
+        
+        
+        total_voucher_price = voucher_total_price,
+        total_service_price = service_total_price,
+        total_product_price = product_total_price,
+        
+        service_commission_type = service_commission_type,
+        product_commission_type = product_commission_type,
+        voucher_commission_type = voucher_commission_type ,  
+    )
     print("saving checkout")
     checkout.save()
     print("checkout saved")
 
-    try:
-        invoice = SaleInvoice.objects.create(
-            user = user,
-            
-            client = client, 
-            location = business_address,
-            client_type = client_type,
-            payment_type = payment_type,
-            
-            total_voucher_price = voucher_total_price,
-            total_service_price = service_total_price,
-            total_product_price = product_total_price,
-            
-            service_commission_type = service_commission_type,
-            product_commission_type = product_commission_type,
-            voucher_commission_type = voucher_commission_type,  
+    invoice = SaleInvoice.objects.create(
+        user = user,
+        
+        client = client, 
+        location = business_address,
+        client_type = client_type,
+        payment_type = payment_type,
+        
+        total_voucher_price = voucher_total_price,
+        total_service_price = service_total_price,
+        total_product_price = product_total_price,
+        
+        service_commission_type = service_commission_type,
+        product_commission_type = product_commission_type,
+        voucher_commission_type = voucher_commission_type,  
 
-        )
-    except Exception as err:
-        ExceptionRecord.objects.create(
-            text=f'invoice not created {str(err)}'
-            )
+    )
     print("saving invoice")
     invoice.save()
     print("saved invoice")
