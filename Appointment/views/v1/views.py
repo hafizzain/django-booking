@@ -1530,7 +1530,7 @@ def create_checkout(request):
     member = request.data.get('member', None)
     business_address = request.data.get('business_address', None)
     
-    tip = request.data.get('tip', None)
+    tip = request.data.get('tip', [])
     gst = request.data.get('gst', 0)
     gst_price = request.data.get('gst_price', 0)
     service_price = request.data.get('service_price', None)
@@ -1591,7 +1591,6 @@ def create_checkout(request):
         tip = json.loads(tip)
 
     elif type(tip) == list:
-        pass
 
         for t in tip:
             employee_id = t.get('employee', None)
@@ -1600,18 +1599,22 @@ def create_checkout(request):
             try:
                 employee_tips_id = Employee.objects.get(id=employee_id)
                 
-                create_tip = AppointmentEmployeeTip.objects.create(
-                    member = employee_tips_id,
-                    tip = checkout_tip,
-                    # id = id,
-                    business_address = business_address,
-                    appointment = appointment,
-                    # gst = gst,
-                    # gst_price = gst_price,
-                    # service_price = service_price,
-                    # total_price = total_price,
-                )        
+                if employee_tips_id is not None:
+                    create_tip = AppointmentEmployeeTip.objects.create(
+                        member = employee_tips_id,
+                        tip = checkout_tip,
+                        # id = id,
+                        business_address = business_address,
+                        appointment = appointments,
+                        # gst = gst,
+                        # gst_price = gst_price,
+                        # service_price = service_price,
+                        # total_price = total_price,
+                    )
+                else:
+                    print(f"Error: Employee with ID {employee_id} does not exist")
             except Exception as err:
+                Errors.append(str(err))
                 pass
         
         
