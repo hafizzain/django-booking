@@ -1319,13 +1319,13 @@ class CheckoutTipsSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = AppointmentEmployeeTip
-        fields = ['id', 'checkout', 'member', 'business_address', 'business', 'tip', 'gst', 'gst_price', 'service_price', 'total_price', 'is_active', 'is_deleted', 'created_at']
+        fields = ['id','member','tip']
 
 class AppointmentTipsSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = AppointmentEmployeeTip
-        fields = ['id', 'appointment', 'member', 'business_address', 'business', 'tip', 'gst', 'gst_price', 'service_price', 'total_price', 'is_active', 'is_deleted', 'created_at']      
+        fields = ['id','member','tip']
        
 class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
