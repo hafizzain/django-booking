@@ -2200,6 +2200,7 @@ def new_create_sale_order(request):
 
             if member_tips_id is not None:
                 create_tip = AppointmentEmployeeTip.objects.create(
+                    checkout=checkout,
                     member=member_tips_id,
                     tip=checkout_tip,
                     business_address=business_address,
