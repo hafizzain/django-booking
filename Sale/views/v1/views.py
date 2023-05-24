@@ -22,7 +22,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from Employee.models import CategoryCommission, CommissionSchemeSetting, Employee, EmployeeSelectedService
+from Employee.models import CategoryCommission, CommissionSchemeSetting, Employee, EmployeeSelectedService, EmployeeCommission
 from Business.models import BusinessAddress
 from Service.models import PriceService, Service, ServiceGroup
 
@@ -2074,13 +2074,30 @@ def new_create_sale_order(request):
             product_order.sold_quantity += 1 # product_stock.sold_quantity
             product_order.save()
             if commission:
-                calculated_commission = commission.commission_rate
+                calculated_commission = commission.commission_percentage
                 # checkout.product_commission = product_commission
                 checkout.product_commission = calculated_commission
                 # invoice.product_commission = product_commission
                 invoice.product_commission = calculated_commission
                 checkout.save()
                 invoice.save()
+
+                EmployeeCommission.objects.create(
+                    user = request.user,
+                    business = business_address.business,
+                    employee = employee_id,
+                    commission = commission.commission,
+                    category_commission = commission,
+                    commission_category = 'Retail',
+                    commission_type = 'percentage', # Need to change
+                    sale_value = price,
+                    commission_rate = commission.commission_percentage,
+                    commission_amount = commission.commission_percentage, # Need to change
+                    symbol = 'AED', # Need to change
+                    item_name = product.name,
+                    item_id = product.id,
+                    quantity = quantity
+                )
 
         elif sale_type == 'SERVICE':
             try:
@@ -2101,7 +2118,23 @@ def new_create_sale_order(request):
                     client_type = client_type,
                     quantity = quantity,
                     current_price = price,
-                    
+                )
+
+                EmployeeCommission.objects.create(
+                    user = request.user,
+                    business = business_address.business,
+                    employee = employee_id,
+                    commission = commission.commission,
+                    category_commission = commission,
+                    commission_category = 'Service',
+                    commission_type = 'percentage', # Need to change
+                    sale_value = price,
+                    commission_rate = commission.commission_percentage,
+                    commission_amount = commission.commission_percentage, # Need to change
+                    symbol = 'AED', # Need to change
+                    item_name = service.name,
+                    item_id = service.id,
+                    quantity = quantity
                 )
                 
             except Exception as err:
@@ -2117,7 +2150,7 @@ def new_create_sale_order(request):
                 )
             else:
                 if commission:
-                    calculated_commission = commission.commission_rate
+                    calculated_commission = commission.commission_percentage
                     # checkout.service_commission = service_commission
                     checkout.service_commission = calculated_commission
                     checkout.save()
@@ -2225,7 +2258,7 @@ def new_create_sale_order(request):
                 )
             else:
                 if commission:
-                    calculated_commission = commission.commission_rate
+                    calculated_commission = commission.commission_percentage
                     # checkout.voucher_commission = voucher_commission
                     checkout.voucher_commission = calculated_commission
                     checkout.save()
