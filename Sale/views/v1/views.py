@@ -1818,7 +1818,7 @@ def new_create_sale_order(request):
     start_date = request.data.get('start_date', None)
     end_date = request.data.get('end_date', None)
      
-    tip = request.data.get('tip', 0)
+    tip = request.data.get('tip', [])
     total_price = request.data.get('total_price', None)
     minus_price = 0
     
@@ -2191,7 +2191,7 @@ def new_create_sale_order(request):
         pass
 
         for t in tip:
-            member_id = t.get('employee', None, )
+            member_id = t.get('employee', None)
             checkout_tip = t.get('tip', None)
             try:
                 member_tips_id = Employee.objects.get(id=member_id)
