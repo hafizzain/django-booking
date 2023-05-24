@@ -1344,16 +1344,16 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     
     tips = serializers.SerializerMethodField(read_only=True)
         
-    def get_tips(self,obj):
-        tips =Checkout.objects.only(
-            'tip'
-            'employee'
-        ).select_related(
-            'tip'
-        ).filter(
-            checkout = obj
-        )
-        return None 
+    # def get_tips(self,obj):
+    #     tips =Checkout.objects.only(
+    #         'tip'
+    #         'employee'
+    #     ).select_related(
+    #         'tip'
+    #     ).filter(
+    #         checkout = obj
+    #     )
+    #     return None 
 
     def get_client(self, obj):
         if obj.client:
