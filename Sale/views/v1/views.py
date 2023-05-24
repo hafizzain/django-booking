@@ -34,6 +34,7 @@ from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSeria
 from rest_framework.pagination import PageNumberPagination
 from django.core.paginator import Paginator
 from Invoices.models import SaleInvoice
+from datetime import datetime as dt
 
 # @api_view(['GET'])
 # @permission_classes([IsAuthenticated])
@@ -837,7 +838,10 @@ def get_all_sale_orders_pagination(request):
     start_time = datetime.datetime.now()
     location_id = request.GET.get('location', None)
     range_start =  request.GET.get('range_start', None)
+
     range_end = request.GET.get('range_end', None)
+    range_end = dt.strptime(range_end, '%Y-%m-%d').date()
+    range_end = str(range_end + timedelta(days=1))
 
     queries = {}
     if range_start:
@@ -1871,6 +1875,10 @@ def new_create_sale_order(request):
         product_commission_type = product_commission_type,
         voucher_commission_type = voucher_commission_type ,  
     )
+    print("saving checkout")
+    checkout.save()
+    print("checkout saved")
+
     invoice = SaleInvoice.objects.create(
         user = user,
         
@@ -1888,7 +1896,10 @@ def new_create_sale_order(request):
         voucher_commission_type = voucher_commission_type,  
 
     )
+    print("saving invoice")
     invoice.save()
+    print("saved invoice")
+
     # if is_promotion:
     #     checkout.save()
         
