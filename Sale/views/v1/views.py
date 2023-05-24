@@ -2196,13 +2196,15 @@ def new_create_sale_order(request):
             try:
                 employee_tips_id = Employee.objects.get(id=employee_id)
         
-                # if member_tips_id is not None:
-                create_tip = AppointmentEmployeeTip.objects.create(
-                    checkout=checkout,
-                    member=employee_tips_id,
-                    tip=checkout_tip,
-                    business_address=business_address,
-                )
+                if employee_tips_id is not None:
+                    create_tip = AppointmentEmployeeTip.objects.create(
+                        checkout=checkout,
+                        member=employee_tips_id,
+                        tip=checkout_tip,
+                        business_address=business_address,
+                    )
+                else:
+                    print(f"Error: Employee with ID {employee_id} does not exist")
             except Exception as err:
                 pass
             
