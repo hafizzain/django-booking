@@ -1524,7 +1524,7 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
         return 'voucher discount percentage'
     
     def get_tips(self, obj):
-        tips = AppointmentEmployeeTip.objects.filter(appointment=obj)
+        tips = AppointmentEmployeeTip.objects.filter(appointment=obj.appointment)
         serialized_tips = AppointmentTipsSerializer(tips, many=True).data
         return serialized_tips
     
