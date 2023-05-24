@@ -1606,7 +1606,7 @@ def create_checkout(request):
                         tip = checkout_tip,
                         # id = id,
                         business_address = business_address,
-                        appointment = appointment,
+                        appointment = appointments,
                         # gst = gst,
                         # gst_price = gst_price,
                         # service_price = service_price,
@@ -1615,6 +1615,7 @@ def create_checkout(request):
                 else:
                     print(f"Error: Employee with ID {employee_id} does not exist")
             except Exception as err:
+                Errors.append(str(err))
                 pass
         
         
