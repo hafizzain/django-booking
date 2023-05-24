@@ -2191,21 +2191,22 @@ def new_create_sale_order(request):
         pass
 
         for t in tip:
-            member_id = t.get('employee', None)
+            employee_id = t.get('employee', None)
             checkout_tip = t.get('tip', None)
             try:
-                member_tips_id = Employee.objects.get(id=member_id)
-            except Employee.DoesNotExist:
-                member_tips_id = None
-
-            if member_tips_id is not None:
+                employee_tips_id = Employee.objects.get(id=employee_id)
+        
+                # if member_tips_id is not None:
                 create_tip = AppointmentEmployeeTip.objects.create(
                     checkout=checkout,
-                    member=member_tips_id,
+                    member=employee_tips_id,
                     tip=checkout_tip,
                     business_address=business_address,
                 )
-    
+            except Exception as err:
+                pass
+            
+            
     if checkout.client :
         these_orders = Order.objects.filter(
             checkout = checkout
