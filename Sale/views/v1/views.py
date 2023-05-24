@@ -838,10 +838,12 @@ def get_all_sale_orders_pagination(request):
     start_time = datetime.datetime.now()
     location_id = request.GET.get('location', None)
     range_start =  request.GET.get('range_start', None)
-
     range_end = request.GET.get('range_end', None)
-    range_end = dt.strptime(range_end, '%Y-%m-%d').date()
-    range_end = str(range_end + timedelta(days=1))
+
+    if range_end is not None:
+        range_end = dt.strptime(range_end, '%Y-%m-%d').date()
+        range_end = range_end + timedelta(days=1)
+        range_end = str(range_end)
 
     queries = {}
     if range_start:
