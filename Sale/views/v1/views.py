@@ -1988,7 +1988,7 @@ def new_create_sale_order(request):
         # from_value
 
         # to_value
-        # commission_percentage
+        # commission_rate
         # category_comission
         # symbol
 
@@ -2074,7 +2074,7 @@ def new_create_sale_order(request):
             product_order.sold_quantity += 1 # product_stock.sold_quantity
             product_order.save()
             if commission:
-                calculated_commission = commission.commission_percentage
+                calculated_commission = commission.commission_rate
                 # checkout.product_commission = product_commission
                 checkout.product_commission = calculated_commission
                 # invoice.product_commission = product_commission
@@ -2117,7 +2117,7 @@ def new_create_sale_order(request):
                 )
             else:
                 if commission:
-                    calculated_commission = commission.commission_percentage
+                    calculated_commission = commission.commission_rate
                     # checkout.service_commission = service_commission
                     checkout.service_commission = calculated_commission
                     checkout.save()
@@ -2225,7 +2225,7 @@ def new_create_sale_order(request):
                 )
             else:
                 if commission:
-                    calculated_commission = commission.commission_percentage
+                    calculated_commission = commission.commission_rate
                     # checkout.voucher_commission = voucher_commission
                     checkout.voucher_commission = calculated_commission
                     checkout.save()

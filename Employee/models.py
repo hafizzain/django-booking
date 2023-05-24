@@ -415,17 +415,22 @@ class EmployeeCommission(models.Model):
     commission = models.ForeignKey(CommissionSchemeSetting, on_delete=models.CASCADE, related_name='employee_commissions')
     category_commission = models.ForeignKey(CategoryCommission, on_delete=models.CASCADE, related_name='employee_category_commissions')
 
-    from_value = models.FloatField(default=0)
-    to_value = models.FloatField(default=0)
-
-    commission_percentage = models.FloatField(default=0)
     commission_category = models.CharField(choices=CATEGORY_CHOICES, max_length=50, default='Service')
     commission_type = models.CharField(choices=COMMISSION_CHOICE, max_length=50, default='percentage')
 
-    symbol = models.CharField(max_length=50, null=True, blank= True)
+    sale_value = models.FloatField(default=0, verbose_name='Sold Item Current Price')
+
+    commission_rate = models.FloatField(default=0, verbose_name='Commission Current rate, Percentage/Price')
+    #  Commission rate will be filtered based on COMMISSION_CHOICE, commission_type
+
+    commission_amount = models.FloatField(default=0)
+    symbol = models.CharField(max_length=50, default='', verbose_name='Percentage/Currency Symbol')
+
+    item_name = models.CharField(max_length=500, default='')
+    item_id = models.CharField(max_length=500, default='')
+    quantity = models.PositiveIntegerField(default=0)
+
     
-
-
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(auto_now_add=now)
