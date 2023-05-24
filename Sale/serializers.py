@@ -1452,7 +1452,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
         return ids_data
     
     def get_tips(self, obj):
-        tips = AppointmentEmployeeTip.objects.filter(checkout=obj.appointment)
+        tips = AppointmentEmployeeTip.objects.filter(checkout=obj)
         serialized_tips = CheckoutTipsSerializer(tips, many=True).data
         return serialized_tips
     
