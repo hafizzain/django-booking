@@ -1344,16 +1344,16 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     
     tips = serializers.SerializerMethodField(read_only=True)
         
-    def get_tips(self,obj):
-        tips =Checkout.objects.only(
-            'tip'
-            'employee'
-        ).select_related(
-            'tip'
-        ).filter(
-            checkout = obj
-        )
-        return None 
+    # def get_tips(self,obj):
+    #     tips =Checkout.objects.only(
+    #         'tip'
+    #         'employee'
+    #     ).select_related(
+    #         'tip'
+    #     ).filter(
+    #         checkout = obj
+    #     )
+    #     return None 
 
     def get_client(self, obj):
         if obj.client:
@@ -1452,7 +1452,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
         return ids_data
     
     def get_tips(self, obj):
-        tips = AppointmentEmployeeTip.objects.filter(checkout=obj)
+        tips = AppointmentEmployeeTip.objects.filter(checkout=obj.appointment)
         serialized_tips = CheckoutTipsSerializer(tips, many=True).data
         return serialized_tips
     
@@ -1524,7 +1524,7 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
         return 'voucher discount percentage'
     
     def get_tips(self, obj):
-        tips = AppointmentEmployeeTip.objects.filter(appointment=obj)
+        tips = AppointmentEmployeeTip.objects.filter(appointment=obj.appointment)
         serialized_tips = AppointmentTipsSerializer(tips, many=True).data
         return serialized_tips
     
