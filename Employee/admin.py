@@ -3,7 +3,7 @@ from django.contrib import admin
 from .models import(CommissionSchemeSetting, EmployeDailySchedule, Employee, EmployeeProfessionalInfo, EmployeePermissionSetting, EmployeeModulePermission, 
                     EmployeeMarketingPermission ,StaffGroup , CategoryCommission,
                     StaffGroupModulePermission , Attendance , 
-                    Payroll, Asset, AssetDocument, EmployeeSelectedService, Vacation )
+                    Payroll, Asset, AssetDocument, EmployeeSelectedService, Vacation, EmployeeCommission )
 # Register your models here.
 
 @admin.register(Vacation)
@@ -113,6 +113,23 @@ class CommissionSchemeSettingAdmin(admin.ModelAdmin):
         'service_price_before_membership_discount',
         'created_at', 
     ]
+
+@admin.register(EmployeeCommission)
+class EmployeeCommissionAdmin(admin.ModelAdmin):
+    list_display = [
+        'id', 
+        'commission_category',
+        'item_name',
+        'commission_type',
+        'commission_rate',
+        'symbol',
+        'sale_value',
+        'commission_amount',
+        'quantity',
+    ]
+
+
+
 admin.site.register(Asset)
 admin.site.register(AssetDocument)
 admin.site.register(EmployeeSelectedService)

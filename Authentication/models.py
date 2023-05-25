@@ -1,6 +1,6 @@
 from django.db import models
 
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 import uuid
 from django.utils.timezone import now
 
@@ -42,7 +42,7 @@ class MyAccountManager(BaseUserManager):
         user.save(using=self._db)
 
         return user
-
+    
 
 class User(AbstractBaseUser):
     SOCIAL_PLATFORM_CHOICES = [
@@ -107,7 +107,8 @@ class User(AbstractBaseUser):
     def account_type(self):
         return self.user_account_type.account_type
 
-
+    def get_all_permissions(self):
+        return []
 
 class AccountType(models.Model):
     ACCOUNT_TYPES = [
