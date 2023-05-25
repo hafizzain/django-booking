@@ -10,8 +10,8 @@ from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSION
 from Utility.models import Country, Currency, GlobalPermissionChoices, State, City
 from Service.models import Service
 from Permissions.models import EmployePermission
+# from datetime import datetime, timedelta
 from datetime import datetime, timedelta
-
 
 from rest_framework import serializers
 from .models import( EmployeDailySchedule, Employee, EmployeeProfessionalInfo ,
@@ -834,14 +834,14 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
                 time2 = datetime.strptime(str(obj.end_time_shift), "%H:%M:%S")
 
                 time_diff = time2 - time1
-                total_hours = time_diff - datetime.timedelta(hours=1)  # subtracting 1 hour for break
+                total_hours = time_diff - timedelta(hours=1)  # subtracting 1 hour for break
                 return f'{total_hours}'
             
             time1 = datetime.strptime(str(obj.start_time), "%H:%M:%S")
             time2 = datetime.strptime(str(obj.end_time), "%H:%M:%S")
 
             time_diff = time2 - time1
-            total_hours = time_diff - datetime.timedelta(hours=1)  # subtracting 1 hour for break
+            total_hours = time_diff - timedelta(hours=1)  # subtracting 1 hour for break
             return f'{total_hours}'
         
         except Exception as err:
@@ -849,7 +849,9 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
         
     class Meta:
         model = EmployeDailySchedule
-        fields = '__all__'
+        fields = ['id','user','business','employee','day','vacation','start_time','end_time',
+                  'start_time_shift','end_time_shift','from_date','to_date','total_hours','note',
+                  'date','is_leave','is_off','is_vacation','is_active','created_at','updated_at']
 
 class WorkingScheduleSerializer(serializers.ModelSerializer):
     start_time = serializers.SerializerMethodField(read_only=True)
