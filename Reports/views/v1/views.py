@@ -284,6 +284,8 @@ def get_commission_reports_by_commission_details_updated(request):
     ).filter(
         is_active = True,
         **query
+    ).order_by(
+        '-created_at'
     )
 
     # 'location', 'order_type', 'employee', 'commission', 'commission_rate', 'sale', 'created_at'
