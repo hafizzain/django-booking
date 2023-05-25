@@ -835,6 +835,7 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
 
                 time_diff = time2 - time1
                 total_hours = time_diff - timedelta(hours=1)  # subtracting 1 hour for break
+                total_hours = total_hours.strftime('%H')
                 return f'{total_hours}'
             
             time1 = datetime.strptime(str(obj.start_time), "%H:%M:%S")
@@ -846,7 +847,7 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
             return f'{total_hours}'
         
         except Exception as err:
-            return '00:00:00'
+            return '0'
         
     class Meta:
         model = EmployeDailySchedule
