@@ -1321,13 +1321,13 @@ class CheckoutTipsSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = AppointmentEmployeeTip
-        fields = ['id', 'checkout', 'member', 'business_address', 'business', 'tip', 'gst', 'gst_price', 'service_price', 'total_price', 'is_active', 'is_deleted', 'created_at']
+        fields = ['id','member','tip']
 
 class AppointmentTipsSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = AppointmentEmployeeTip
-        fields = ['id', 'appointment', 'member', 'business_address', 'business', 'tip', 'gst', 'gst_price', 'service_price', 'total_price', 'is_active', 'is_deleted', 'created_at']      
+        fields = ['id','member','tip']
        
 class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
@@ -1336,7 +1336,6 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     voucher  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
     
     client = serializers.SerializerMethodField(read_only=True)
-    # member  = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
 
     ids = serializers.SerializerMethodField(read_only=True)
@@ -1345,17 +1344,6 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     membership_type = serializers.SerializerMethodField(read_only=True)
     
     tip = serializers.SerializerMethodField(read_only=True)
-        
-    # def get_tips(self,obj):
-    #     tips =Checkout.objects.only(
-    #         'tip'
-    #         'employee'
-    #     ).select_related(
-    #         'tip'
-    #     ).filter(
-    #         checkout = obj
-    #     )
-    #     return None 
 
     def get_client(self, obj):
         if obj.client:
