@@ -833,16 +833,21 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
                 time1 = datetime.strptime(str(obj.start_time), "%H:%M:%S")
                 time2 = datetime.strptime(str(obj.end_time_shift), "%H:%M:%S")
 
-                time_diff = time2 - time1
-                total_hours = time_diff - datetime.timedelta(hours=1)  # subtracting 1 hour for break
-                return f'{total_hours}'
+                break_time = datetime.timedelta(hours=1)
+                # time_diff = time2 - time1
+                # total_hours = time_diff - datetime.timedelta(hours=1)  # subtracting 1 hour for break
+                total_hours = (time2 - time1) - break_time
+                return str(total_hours)
             
             time1 = datetime.strptime(str(obj.start_time), "%H:%M:%S")
             time2 = datetime.strptime(str(obj.end_time), "%H:%M:%S")
 
-            time_diff = time2 - time1
-            total_hours = time_diff - datetime.timedelta(hours=1)  # subtracting 1 hour for break
-            return f'{total_hours}'
+            break_time = datetime.timedelta(hours=1)
+            # time_diff = time2 - time1
+            # total_hours = time_diff - datetime.timedelta(hours=1)  # subtracting 1 hour for break
+            total_hours = (time2 - time1) - break_time
+            return str(total_hours)
+            # return f'{total_hours}'
         
         except Exception as err:
             return '00:00:00'
