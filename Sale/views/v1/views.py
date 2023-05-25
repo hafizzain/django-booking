@@ -64,12 +64,16 @@ def get_service(request):
     #     'title': title
     # }
     # sorted_value = SORTED_OPTIONS.get(title, '-created_at')
+
+    query = {}
+    if location:
+        query['location__id'] = location
     
     service= Service.objects.filter(
         name__icontains = title,
         is_deleted = False, 
         is_blocked = False, 
-        location__id = location
+        **query
     ).order_by('-created_at').distinct()
     service_count= service.count()
 
