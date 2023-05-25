@@ -119,12 +119,12 @@ class EmployeeCommissionAdmin(admin.ModelAdmin):
     list_display = [
         'id', 
         'commission_category',
-        'commission_type',
-        'sale_value',
-        'commission_rate',
-        'commission_amount',
-        'symbol',
         'item_name',
+        'commission_type',
+        'commission_rate',
+        'symbol',
+        'sale_value',
+        'commission_amount',
         'quantity',
     ]
 
