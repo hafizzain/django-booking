@@ -1589,27 +1589,20 @@ def create_checkout(request):
 
     if type(tip) == str:
         tip = json.loads(tip)
-
-    elif type(tip) == list:
+    if type(tip) == list:
 
         for t in tip:
             employee_id = t.get('employee', None)
             checkout_tip = t.get('tip', None)
-            # checkout_tip = int(checkout_tip)
             try:
                 employee_tips_id = Employee.objects.get(id=employee_id)
                 
                 if employee_tips_id is not None:
                     create_tip = AppointmentEmployeeTip.objects.create(
+                        appointment = appointments,
                         member = employee_tips_id,
                         tip = checkout_tip,
-                        # id = id,
                         business_address = business_address,
-                        appointment = appointments,
-                        # gst = gst,
-                        # gst_price = gst_price,
-                        # service_price = service_price,
-                        # total_price = total_price,
                     )
                 else:
                     print(f"Error: Employee with ID {employee_id} does not exist")
