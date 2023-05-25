@@ -28,7 +28,7 @@ from Sale.serializers import MemberShipOrderSerializer, ProductOrderSerializer, 
 
 #from Service.models import Service
 from Service.models import Service
-from Employee.models import CategoryCommission, CommissionSchemeSetting, EmployeDailySchedule, Employee, EmployeeSelectedService
+from Employee.models import CategoryCommission, CommissionSchemeSetting, EmployeDailySchedule, Employee, EmployeeSelectedService, EmployeeCommission
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
 import json
@@ -1628,6 +1628,38 @@ def create_checkout(request):
             service_appointment.save()
         except Exception as err:
             pass
+        else:
+            total_price = service_appointment.total_price * 1
+
+            sale_commissions = CategoryCommission.objects.filter(
+                commission__employee = service_appointment.member,
+                from_value__lte = total_price,
+                category_comission__iexact = 'Service'
+            ).order_by('-from_value')
+
+            if len(sale_commissions) > 0:
+                commission = sale_commissions[0]
+
+                calculated_commission = commission.calculated_commission(service_appointment.total_price)
+                employee_commission = EmployeeCommission.objects.create(
+                    user = request.user,
+                    business = business_address.business,
+                    location = business_address,
+                    employee = service_appointment.member,
+                    commission = commission.commission,
+                    category_commission = commission,
+                    commission_category = 'Service',
+                    commission_type = commission.comission_choice,
+                    sale_value = service_appointment.total_price,
+                    commission_rate = commission.commission_percentage,
+                    commission_amount = calculated_commission,
+                    symbol = commission.symbol,
+                    item_name = service_appointment.service.name,
+                    item_id = f'{service_appointment.service.id}',
+                    quantity = 1,
+                    tip = 0
+                )
+            
     # if gst is None:
     #     gst = 0
     total_price_app  = float(gst) + float(total_price)
@@ -1776,6 +1808,9 @@ def create_checkout(request):
                 balance = (float(client_points.total_earn) - float(logs_points_redeemed)),
                 actual_sale_value_redeemed = logs_total_redeened_value
             )
+    
+
+    
             
     serialized = CheckoutSerializer(checkout)
     return Response(
