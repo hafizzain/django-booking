@@ -64,12 +64,12 @@ NSTYLE_APPS = [
     'Customer.apps.CustomerConfig',
     'Promotions.apps.PromotionsConfig',
     'Reports.apps.ReportsConfig',
-    'Invoices.apps.InvoicesConfig'
+    'Invoices.apps.InvoicesConfig',
+    'Help.apps.HelpConfig'
 ]
 
 
 SHARED_APPS = [
-    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -100,7 +100,7 @@ TENANT_APPS = [
 
 ] + NSTYLE_APPS
 
-INSTALLED_APPS = list(set(SHARED_APPS + TENANT_APPS))
+INSTALLED_APPS = ['jazzmin'] + list(set(SHARED_APPS + TENANT_APPS))
 
 
 MIDDLEWARE = [
