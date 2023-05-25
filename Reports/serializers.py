@@ -207,19 +207,29 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             **query
         )
 
-        product_orders = employee_commissions.filter(commission_category = 'Retail')
-        total_product_price = product_orders.aggregate(total=Coalesce(Sum('sale_value'), float(0)))['total']
-        commission_total = sum([commission.full_commission for commission in employee_commissions])
+        commission_total = 0
+        product_commission = 0
+        service_commissions = 0
+        vouchers_commissions = 0
+        
+        total_product_price = 0
 
-        product_commission = sum([commission.full_commission for commission in product_orders])
+        for commission in employee_commissions:
+            full_commission = commission.full_commission
+            commission_total += commission.full_commission
 
+            # Mannaging Product Commission
+            if commission.commission_category == 'Retail':
+                product_commission += full_commission
+                total_product_price += commission.sale_value
 
-        service_orders = employee_commissions.filter(commission_category = 'Service')
-        service_commissions = sum([commission.full_commission for commission in service_orders])
+            # Mannaging Services Commission
+            elif commission.commission_category == 'Service':
+                service_commissions += full_commission
 
-
-        vouchers_orders = employee_commissions.filter(commission_category = 'Voucher')
-        vouchers_commissions = sum([commission.full_commission for commission in vouchers_orders])
+            # Mannaging Vouchers Commission
+            elif commission.commission_category == 'Voucher':
+                vouchers_commissions += full_commission
 
         data = {
             'product_sale_price': total_product_price,
