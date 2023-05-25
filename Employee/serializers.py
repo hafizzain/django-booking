@@ -1007,7 +1007,10 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
             return None
 
     def get_schedule(self, obj):
-        schedule =  EmployeDailySchedule.objects.filter(employee= obj ).order_by('employee__employee_employedailyschedule__date')            
+        schedule =  EmployeDailySchedule.objects.filter(
+            employee = obj
+        ).order_by('-created_at')
+        # ).order_by('employee__employee_employedailyschedule__date')            
         return WorkingSchedulePayrollSerializer(schedule, many = True,context=self.context).data
     
     def get_sallaryslip(self, obj):
