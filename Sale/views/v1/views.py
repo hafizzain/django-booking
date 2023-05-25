@@ -22,7 +22,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from Employee.models import CategoryCommission, CommissionSchemeSetting, Employee, EmployeeSelectedService
+from Employee.models import CategoryCommission, CommissionSchemeSetting, Employee, EmployeeSelectedService, EmployeeCommission
 from Business.models import BusinessAddress
 from Service.models import PriceService, Service, ServiceGroup
 
@@ -1936,6 +1936,7 @@ def new_create_sale_order(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+
         
         if discount_price is not None:
             price = int(discount_price)
@@ -1952,6 +1953,30 @@ def new_create_sale_order(request):
                 invoice.save()
                 test = False
 
+
+        sale_commission_type = sale_type
+        if sale_commission_type == 'PRODUCT':
+            sale_commission_type = 'Retail'
+        
+        sale_commissions = CategoryCommission.objects.filter(
+            commission__employee = employee_id,
+            from_value__lte = price,
+            category_comission__iexact = sale_commission_type
+        ).order_by('-from_value')
+
+        if len(sale_commissions) > 0:
+            commission = sale_commissions[0]
+
+        else:
+            commission = None
+
+        # commission
+        # from_value
+
+        # to_value
+        # commission_rate
+        # category_comission
+        # symbol
 
         if sale_type == 'PRODUCT':
             try:
@@ -2034,10 +2059,31 @@ def new_create_sale_order(request):
             )
             product_order.sold_quantity += 1 # product_stock.sold_quantity
             product_order.save()
-            checkout.product_commission = product_commission
-            checkout.save()
-            invoice.product_commission = product_commission
-            invoice.save()
+            if commission:
+                calculated_commission = commission.commission_percentage
+                # checkout.product_commission = product_commission
+                checkout.product_commission = calculated_commission
+                # invoice.product_commission = product_commission
+                invoice.product_commission = calculated_commission
+                checkout.save()
+                invoice.save()
+
+                EmployeeCommission.objects.create(
+                    user = request.user,
+                    business = business_address.business,
+                    employee = employee_id,
+                    commission = commission.commission,
+                    category_commission = commission,
+                    commission_category = 'Retail',
+                    commission_type = 'percentage', # Need to change
+                    sale_value = price,
+                    commission_rate = commission.commission_percentage,
+                    commission_amount = commission.commission_percentage, # Need to change
+                    symbol = 'AED', # Need to change
+                    item_name = product.name,
+                    item_id = product.id,
+                    quantity = quantity
+                )
 
         elif sale_type == 'SERVICE':
             try:
@@ -2058,12 +2104,24 @@ def new_create_sale_order(request):
                     client_type = client_type,
                     quantity = quantity,
                     current_price = price,
-                    
                 )
-                checkout.service_commission = service_commission
-                checkout.save()
-                invoice.service_commission = service_commission
-                invoice.save()
+
+                EmployeeCommission.objects.create(
+                    user = request.user,
+                    business = business_address.business,
+                    employee = employee_id,
+                    commission = commission.commission,
+                    category_commission = commission,
+                    commission_category = 'Service',
+                    commission_type = 'percentage', # Need to change
+                    sale_value = price,
+                    commission_rate = commission.commission_percentage,
+                    commission_amount = commission.commission_percentage, # Need to change
+                    symbol = 'AED', # Need to change
+                    item_name = service.name,
+                    item_id = service.id,
+                    quantity = quantity
+                )
                 
             except Exception as err:
                 return Response(
@@ -2071,12 +2129,20 @@ def new_create_sale_order(request):
                         'status' : False,
                         'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
                         'response' : {
-                        'message' : 'Service not found',
-                        'error_message' : str(err),
-                    }
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+                            'message' : 'Service not found',
+                            'error_message' : str(err),
+                        }
+                    },status=status.HTTP_400_BAD_REQUEST
+                )
+            else:
+                if commission:
+                    calculated_commission = commission.commission_percentage
+                    # checkout.service_commission = service_commission
+                    checkout.service_commission = calculated_commission
+                    checkout.save()
+                    # invoice.service_commission = service_commission
+                    invoice.service_commission = calculated_commission
+                    invoice.save()
             
         elif sale_type == 'MEMBERSHIP':
             try:
@@ -2161,10 +2227,7 @@ def new_create_sale_order(request):
                     current_price = price,
 
                 )
-                checkout.voucher_commission = voucher_commission
-                checkout.save()
-                invoice.voucher_commission = voucher_commission
-                invoice.save()
+                
             except Exception as err:
                 ExceptionRecord.objects.create(
                             text = f' error in voucher price{str(err)}'
@@ -2174,12 +2237,21 @@ def new_create_sale_order(request):
                         'status' : False,
                         'status_code' : StatusCodes.INVALID_VOUCHER_ID_4041,
                         'response' : {
-                        'message' : 'Voucher not found',
-                        'error_message' : str(err),
-                    }
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+                            'message' : 'Voucher not found',
+                            'error_message' : str(err),
+                        }
+                    },status=status.HTTP_400_BAD_REQUEST
+                )
+            else:
+                if commission:
+                    calculated_commission = commission.commission_percentage
+                    # checkout.voucher_commission = voucher_commission
+                    checkout.voucher_commission = calculated_commission
+                    checkout.save()
+                    # invoice.voucher_commission = voucher_commission
+                    invoice.voucher_commission = calculated_commission
+                    invoice.save()
+
     
     if type(tip) == str:
         tip = json.loads(tip)

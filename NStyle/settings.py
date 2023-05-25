@@ -69,6 +69,7 @@ NSTYLE_APPS = [
 
 
 SHARED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -83,6 +84,7 @@ SHARED_APPS = [
     'geoip2',
     'django_crontab',
     'debug_toolbar',
+    
 
     'Tenants.apps.TenantsConfig',
 ] +  NSTYLE_APPS
