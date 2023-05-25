@@ -113,9 +113,25 @@ class CommissionSchemeSettingAdmin(admin.ModelAdmin):
         'service_price_before_membership_discount',
         'created_at', 
     ]
+
+@admin.register(EmployeeCommission)
+class EmployeeCommissionAdmin(admin.ModelAdmin):
+    list_display = [
+        'id', 
+        'commission_category',
+        'commission_type',
+        'sale_value',
+        'commission_rate',
+        'commission_amount',
+        'symbol',
+        'item_name',
+        'quantity',
+    ]
+
+
+
 admin.site.register(Asset)
 admin.site.register(AssetDocument)
 admin.site.register(EmployeeSelectedService)
 admin.site.register(EmployeDailySchedule)
 admin.site.register(CategoryCommission)
-admin.site.register(EmployeeCommission)
