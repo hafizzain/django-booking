@@ -842,6 +842,7 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
 
             time_diff = time2 - time1
             total_hours = time_diff - datetime.timedelta(hours=1)  # subtracting 1 hour for break
+            total_hours = total_hours.strftime('%H')
             return f'{total_hours}'
         
         except Exception as err:
