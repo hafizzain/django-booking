@@ -91,7 +91,8 @@ celerybeat-schedule
 #*.mov
 #*.wmv
 
-
+./static
+/static
 /static/admin
 /static/admin/
 /static/admin/*
@@ -99,6 +100,7 @@ celerybeat-schedule
 /static/rest_framework
 /static/rest_framework/
 /static/rest_framework/*
+/static/jazzmin/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

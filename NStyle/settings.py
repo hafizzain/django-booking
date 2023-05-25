@@ -83,6 +83,7 @@ SHARED_APPS = [
     'geoip2',
     'django_crontab',
     'debug_toolbar',
+    'jazzmin',
 
     'Tenants.apps.TenantsConfig',
 ] +  NSTYLE_APPS
