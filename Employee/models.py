@@ -460,5 +460,10 @@ class EmployeeCommission(models.Model):
         return self.single_item_commission * self.quantity
 
 
+    @property
+    def total_price(self):
+        return self.sale_value * self.quantity
+
+
     def __str__(self):
         return str(self.id)

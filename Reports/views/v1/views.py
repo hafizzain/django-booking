@@ -273,8 +273,16 @@ def get_commission_reports_by_commission_details_updated(request):
     #     data.extend(serialized.data)
     #     sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
 
-    employee_commissions = EmployeeCommission.objects.filter(
-        is_active = True
+    query = {}
+    if range_start and range_end:
+        query['created_at__range'] = (range_start, range_end)
+
+    employee_commissions = EmployeeCommission.objects.select_related(
+        'employee',
+        'location',
+    ).filter(
+        is_active = True,
+        **query
     )
 
     # 'location', 'order_type', 'employee', 'commission', 'commission_rate', 'sale', 'created_at'

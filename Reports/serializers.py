@@ -223,61 +223,67 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
         }
         return data
         
-        app = AppointmentService.objects.filter(
-            member=obj,
-            appointment_status='Done',
-        )
-        if range_start:
-            range_start = datetime.strptime(range_start, '%Y-%m-%d').date()
-            range_end = datetime.strptime(range_end, '%Y-%m-%d').date()
-            app = app.filter(created_at__range=(range_start, range_end))
-        total_service_commission = app.aggregate(Sum('service_commission'))['service_commission__sum'] or 0
+        # app = AppointmentService.objects.filter(
+        #     member=obj,
+        #     appointment_status='Done',
+        # )
+        # if range_start:
+        #     range_start = datetime.strptime(range_start, '%Y-%m-%d').date()
+        #     range_end = datetime.strptime(range_end, '%Y-%m-%d').date()
+        #     app = app.filter(created_at__range=(range_start, range_end))
+        # total_service_commission = app.aggregate(Sum('service_commission'))['service_commission__sum'] or 0
 
-        product_orders = ProductOrder.objects.filter(
-            is_deleted=False,
-            member=obj,
-        )
-        if range_start:
-            product_orders = product_orders.filter(created_at__range=(range_start, range_end))
-        total_product_price = product_orders.aggregate(Sum('checkout__total_product_price'))['checkout__total_product_price__sum'] or 0
-        product_commission = product_orders.aggregate(Sum('checkout__product_commission'))['checkout__product_commission__sum'] or 0
+        # product_orders = ProductOrder.objects.filter(
+        #     is_deleted=False,
+        #     member=obj,
+        # )
+        # if range_start:
+        #     product_orders = product_orders.filter(created_at__range=(range_start, range_end))
+        # total_product_price = product_orders.aggregate(Sum('checkout__total_product_price'))['checkout__total_product_price__sum'] or 0
+        # product_commission = product_orders.aggregate(Sum('checkout__product_commission'))['checkout__product_commission__sum'] or 0
 
-        service_orders = ServiceOrder.objects.filter(
-            is_deleted=False,
-            member=obj,
-        )
-        if range_start:
-            service_orders = service_orders.filter(created_at__range=(range_start, range_end))
-        service_commission = service_orders.aggregate(Sum('checkout__service_commission'))['checkout__service_commission__sum'] or 0
+        # service_orders = ServiceOrder.objects.filter(
+        #     is_deleted=False,
+        #     member=obj,
+        # )
+        # if range_start:
+        #     service_orders = service_orders.filter(created_at__range=(range_start, range_end))
+        # service_commission = service_orders.aggregate(Sum('checkout__service_commission'))['checkout__service_commission__sum'] or 0
 
-        voucher_orders = VoucherOrder.objects.filter(
-            is_deleted=False,
-            member=obj,
-        )
-        if range_start:
-            voucher_orders = voucher_orders.filter(created_at__range=(range_start, range_end))
-        voucher_commission = voucher_orders.aggregate(Sum('checkout__voucher_commission'))['checkout__voucher_commission__sum'] or 0
+        # voucher_orders = VoucherOrder.objects.filter(
+        #     is_deleted=False,
+        #     member=obj,
+        # )
+        # if range_start:
+        #     voucher_orders = voucher_orders.filter(created_at__range=(range_start, range_end))
+        # voucher_commission = voucher_orders.aggregate(Sum('checkout__voucher_commission'))['checkout__voucher_commission__sum'] or 0
 
-        commission_total = total_service_commission + product_commission + voucher_commission
+        # commission_total = total_service_commission + product_commission + voucher_commission
         
-        ser_commission = int(service_commission) + int(total_service_commission)
-        data = {
-            'product_sale_price': total_product_price,
-            'commission_total': commission_total,
-            'service_commission': ser_commission,
-            'product_commission': product_commission,
-            'voucher_commission': voucher_commission,
-        }
-        return data
+        # ser_commission = int(service_commission) + int(total_service_commission)
+        # data = {
+        #     'product_sale_price': total_product_price,
+        #     'commission_total': commission_total,
+        #     'service_commission': ser_commission,
+        #     'product_commission': product_commission,
+        #     'voucher_commission': voucher_commission,
+        # }
+        # return data
             
     def get_service_sale_price(self, obj):
         range_start = self.context.get("range_start")
         range_end = self.context.get("range_end")
         
-        if range_start:
-            range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
-        if range_end:
-            range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
+
+        query = {}
+
+        if range_start and range_end:
+            query['created_at__range'] = (range_start, range_end)
+
+        # if range_start:
+        #     range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
+        # if range_end:
+        #     range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
             
         # appointments_total = 0
         # service_orders_total = 0
@@ -310,7 +316,8 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
         services_commissions = EmployeeCommission.objects.filter(
             employee = obj,
             commission_category = 'Service',
-            is_active = True
+            is_active = True,
+            **query
         )
 
         total_sale = sum([(commission.sale_value * commission.quantity) for commission in services_commissions])
@@ -366,9 +373,15 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
     #         return str(err)
         
     def get_voucher_sale_price(self, obj):
+        range_start = self.context["range_start"]
+        range_end = self.context["range_end"]            
+
+        query = {}
+
+        if range_start and range_end:
+            query['created_at__range'] = (range_start, range_end)
+
         # try:
-        #     range_start = self.context["range_start"]
-        #     range_end = self.context["range_end"]            
         #     year = self.context["year"]
             
         #     if range_start:
@@ -397,7 +410,8 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
         vouchers_commissions = EmployeeCommission.objects.filter(
             employee = obj,
             commission_category = 'Voucher',
-            is_active = True
+            is_active = True,
+            **query
         )
         total_sale = sum([(commission.sale_value * commission.quantity) for commission in vouchers_commissions])
         self.total_voucher_sale_price = total_sale
@@ -847,10 +861,11 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
         return 'Service'
 
     def get_commission(self, commission_instance):
-        return commission_instance.commission_amount
+        # return commission_instance.commission_amount
+        return commission_instance.full_commission
 
     def get_commission_rate(self, commission_instance):
-        return ''
+        return f'{commission_instance.commission_rate} {commission_instance.symbol}'
 
 
     def get_sale(self, commission_instance):
@@ -859,7 +874,8 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
             "id": f'{commission_instance.id}',
             "quantity": commission_instance.quantity,
             "name": commission_instance.item_name,
-            "price": commission_instance.sale_value,
+            "price": commission_instance.total_price,
+            # "price": commission_instance.sale_value,
             "order_type": commission_instance.commission_category,
             "payment_type": "Cash",
             "tip": commission_instance.tip,
