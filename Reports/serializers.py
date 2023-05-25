@@ -195,9 +195,16 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
         range_start = self.context.get("range_start", None)
         range_end = self.context.get("range_end", None)
 
+        query = {}
+
+        if range_start and range_end:
+            query['created_at__range'] = (range_start, range_end)
+
+
         employee_commissions = EmployeeCommission.objects.filter(
             employee = obj,
-            is_active = True
+            is_active = True,
+            **query
         )
 
         product_orders = employee_commissions.filter(commission_category = 'Retail')
