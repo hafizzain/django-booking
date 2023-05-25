@@ -116,6 +116,7 @@ class CommissionSchemeSettingAdmin(admin.ModelAdmin):
 
 @admin.register(EmployeeCommission)
 class EmployeeCommissionAdmin(admin.ModelAdmin):
+
     list_display = [
         'id', 
         'commission_category',
@@ -124,10 +125,19 @@ class EmployeeCommissionAdmin(admin.ModelAdmin):
         'commission_rate',
         'symbol',
         'sale_value',
-        'commission_amount',
         'quantity',
+        'total_sale_value',
+        'single_item_commission',
+        'full_commission',
     ]
 
+    def total_sale_value(self, instance):
+        return instance.sale_value * instance.quantity
+    
+    def single_item_commission(self, instance):
+        return instance.single_item_commission
+
+    single_item_commission.short_description = 'Commission/Item'
 
 
 admin.site.register(Asset)

@@ -274,10 +274,19 @@ class CategoryCommission(models.Model):
     commission_percentage = models.PositiveIntegerField(default=0, null=True, blank=True)
     
     category_comission = models.CharField(choices=CATEGORY_CHOICES, max_length=50, default='Service',)
-    #comission_choice = models.CharField(choices=COMMISSION_CHOICE, max_length=50, default='percentage',)
+    comission_choice = models.CharField(choices=COMMISSION_CHOICE, max_length=50, default='percentage',)
     symbol = models.CharField(max_length=50, null=True, blank= True)
     
     created_at = models.DateTimeField(auto_now_add=now)
+
+    
+    def calculated_commission(self, price):
+        value = self.commission_percentage
+        if self.comission_choice == 'percentage':
+            value = (self.commission_percentage * price) / 100
+
+        return value
+        
     
     def __str__(self):
         return str(self.id)
@@ -409,31 +418,46 @@ class EmployeeCommission(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, null = True, related_name='user_commissions')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_employee_commissions')
+    location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, related_name='location_employee_commissions')
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='commissions')
 
 
-    commission = models.ForeignKey(CommissionSchemeSetting, on_delete=models.CASCADE, related_name='employee_commissions')
-    category_commission = models.ForeignKey(CategoryCommission, on_delete=models.CASCADE, related_name='employee_category_commissions')
+    commission = models.ForeignKey(CommissionSchemeSetting, on_delete=models.SET_NULL, null=True, related_name='employee_commissions')
+    category_commission = models.ForeignKey(CategoryCommission, on_delete=models.SET_NULL, null=True, related_name='employee_category_commissions')
 
     commission_category = models.CharField(choices=CATEGORY_CHOICES, max_length=50, default='Service')
     commission_type = models.CharField(choices=COMMISSION_CHOICE, max_length=50, default='percentage')
 
-    sale_value = models.FloatField(default=0, verbose_name='Sold Item Current Price')
+    sale_value = models.FloatField(default=0, verbose_name='Single Sold Item Current Price')
 
-    commission_rate = models.FloatField(default=0, verbose_name='Commission Current rate, Percentage/Price')
+    commission_rate = models.FloatField(default=0, verbose_name='Commission Current rate for single sold item, Percentage/Price')
     #  Commission rate will be filtered based on COMMISSION_CHOICE, commission_type
 
-    commission_amount = models.FloatField(default=0)
+    commission_amount = models.FloatField(default=0, verbose_name='Commission Amount get by Single Item Sold')
     symbol = models.CharField(max_length=50, default='', verbose_name='Percentage/Currency Symbol')
 
-    item_name = models.CharField(max_length=500, default='')
+    item_name = models.CharField(max_length=500, default='', verbose_name='Sold Item Name')
     item_id = models.CharField(max_length=500, default='')
-    quantity = models.PositiveIntegerField(default=0)
+    quantity = models.PositiveIntegerField(default=0, verbose_name='Sold Items Quantity')
+
+    tip = models.FloatField(default=0)
 
     
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(auto_now_add=now)
+
+    @property
+    def employee_calculated_commissions(self,):
+        return float(0)
+
+    @property
+    def single_item_commission(self):
+        return self.commission_amount
+    
+    @property
+    def full_commission(self):
+        return self.single_item_commission * self.quantity
 
 
     def __str__(self):

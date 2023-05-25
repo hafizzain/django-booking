@@ -14,23 +14,23 @@ from django.contrib.gis.geoip2 import GeoIP2
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def country_code(request):
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+   x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
 
-    if x_forwarded_for:
+   if x_forwarded_for:
+      ip = x_forwarded_for.split(',')[0]
+   else:
+      ip = request.META.get('REMOTE_ADDR')
 
-       ip = x_forwarded_for.split(',')[0]
+   try:
+      g = GeoIP2()
+      location = g.city(ip)
+      location_country = location["country_code"]
+   except:
+      location_country = 'pk'
 
-    else:
-
-       ip = request.META.get('REMOTE_ADDR')
-       
-    g = GeoIP2()
-    location = g.city(ip)
-    location_country = location["country_code"]
-
-    return Response({
-        'country_code' : location_country,
-    })
+   return Response({
+      'country_code' : location_country,
+   })
 
     
 def EmailTemplate(request):

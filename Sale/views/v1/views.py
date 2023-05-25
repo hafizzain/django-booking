@@ -1936,6 +1936,9 @@ def new_create_sale_order(request):
         price = id['price']  
         employee_id = id['employee_id']      
         discount_price = id.get('discount_price', None)
+
+        item_name = ''
+        item_id = service_id
         try:
             employee_id=Employee.objects.get(id = employee_id)
         except Exception as err:
@@ -1967,22 +1970,8 @@ def new_create_sale_order(request):
                 invoice.save()
                 test = False
 
-
-        sale_commission_type = sale_type
-        if sale_commission_type == 'PRODUCT':
-            sale_commission_type = 'Retail'
         
-        sale_commissions = CategoryCommission.objects.filter(
-            commission__employee = employee_id,
-            from_value__lte = price,
-            category_comission__iexact = sale_commission_type
-        ).order_by('-from_value')
-
-        if len(sale_commissions) > 0:
-            commission = sale_commissions[0]
-
-        else:
-            commission = None
+        
 
         # commission
         # from_value
@@ -2007,6 +1996,8 @@ def new_create_sale_order(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+            else:
+                item_name = product.name
                 
             try:
                 transfer = ProductStock.objects.get(product__id=product.id, location = business_address.id)
@@ -2073,35 +2064,12 @@ def new_create_sale_order(request):
             )
             product_order.sold_quantity += 1 # product_stock.sold_quantity
             product_order.save()
-            if commission:
-                calculated_commission = commission.commission_percentage
-                # checkout.product_commission = product_commission
-                checkout.product_commission = calculated_commission
-                # invoice.product_commission = product_commission
-                invoice.product_commission = calculated_commission
-                checkout.save()
-                invoice.save()
-
-                EmployeeCommission.objects.create(
-                    user = request.user,
-                    business = business_address.business,
-                    employee = employee_id,
-                    commission = commission.commission,
-                    category_commission = commission,
-                    commission_category = 'Retail',
-                    commission_type = 'percentage', # Need to change
-                    sale_value = price,
-                    commission_rate = commission.commission_percentage,
-                    commission_amount = commission.commission_percentage, # Need to change
-                    symbol = 'AED', # Need to change
-                    item_name = product.name,
-                    item_id = product.id,
-                    quantity = quantity
-                )
+            
 
         elif sale_type == 'SERVICE':
             try:
                 service = Service.objects.get(id = service_id)
+                item_name = service.name
                 service_price = PriceService.objects.filter(service = service_id).first()
                 dur = service_price.duration
                 
@@ -2120,22 +2088,7 @@ def new_create_sale_order(request):
                     current_price = price,
                 )
 
-                EmployeeCommission.objects.create(
-                    user = request.user,
-                    business = business_address.business,
-                    employee = employee_id,
-                    commission = commission.commission,
-                    category_commission = commission,
-                    commission_category = 'Service',
-                    commission_type = 'percentage', # Need to change
-                    sale_value = price,
-                    commission_rate = commission.commission_percentage,
-                    commission_amount = commission.commission_percentage, # Need to change
-                    symbol = 'AED', # Need to change
-                    item_name = service.name,
-                    item_id = service.id,
-                    quantity = quantity
-                )
+                
                 
             except Exception as err:
                 return Response(
@@ -2148,16 +2101,7 @@ def new_create_sale_order(request):
                         }
                     },status=status.HTTP_400_BAD_REQUEST
                 )
-            else:
-                if commission:
-                    calculated_commission = commission.commission_percentage
-                    # checkout.service_commission = service_commission
-                    checkout.service_commission = calculated_commission
-                    checkout.save()
-                    # invoice.service_commission = service_commission
-                    invoice.service_commission = calculated_commission
-                    invoice.save()
-            
+                    
         elif sale_type == 'MEMBERSHIP':
             try:
                 membership = Membership.objects.get(id = service_id)
@@ -2167,7 +2111,6 @@ def new_create_sale_order(request):
                 
                 membership_order = MemberShipOrder.objects.create(
                     user= user,
-                    
                     membership = membership,
                     start_date = start_date_cal,
                     end_date = end_date_cal,
@@ -2201,6 +2144,7 @@ def new_create_sale_order(request):
             try:
                 days = 0
                 voucher = Vouchers.objects.get(id = service_id)#str(vouchers))
+                item_name = voucher.name
                 test = voucher.validity.split(" ")[1]
                 
                 if test == 'Days':
@@ -2224,7 +2168,7 @@ def new_create_sale_order(request):
                 
                 discount_percentage = voucher.discount_percentage
                 
-                voucher_order =VoucherOrder.objects.create(
+                voucher_order = VoucherOrder.objects.create(
                     user = user,
                     
                     voucher = voucher,
@@ -2256,15 +2200,47 @@ def new_create_sale_order(request):
                         }
                     },status=status.HTTP_400_BAD_REQUEST
                 )
-            else:
-                if commission:
-                    calculated_commission = commission.commission_percentage
-                    # checkout.voucher_commission = voucher_commission
-                    checkout.voucher_commission = calculated_commission
-                    checkout.save()
-                    # invoice.voucher_commission = voucher_commission
-                    invoice.voucher_commission = calculated_commission
-                    invoice.save()
+        
+        if sale_type in ['PRODUCT', 'SERVICE', 'VOUCHER']:
+
+            CommissionType = {
+                'PRODUCT' : 'Retail',
+                'SERVICE' : 'Service',
+                'VOUCHER' : 'Voucher',
+            }
+            commission_category = CommissionType[sale_type]
+
+            total_price = price * quantity
+
+            sale_commissions = CategoryCommission.objects.filter(
+                commission__employee = employee_id,
+                from_value__lte = total_price,
+                category_comission__iexact = commission_category
+            ).order_by('-from_value')
+
+            if len(sale_commissions) > 0:
+                commission = sale_commissions[0]
+
+                calculated_commission = commission.calculated_commission(price)
+                employee_commission = EmployeeCommission.objects.create(
+                    user = request.user,
+                    business = business_address.business,
+                    location = business_address,
+                    employee = employee_id,
+                    commission = commission.commission,
+                    category_commission = commission,
+                    commission_category = commission_category,
+                    commission_type = commission.comission_choice,
+                    sale_value = price,
+                    commission_rate = commission.commission_percentage,
+                    commission_amount = calculated_commission,
+                    symbol = commission.symbol,
+                    item_name = item_name,
+                    item_id = item_id,
+                    quantity = quantity,
+                    tip = 0
+                )
+            
 
     
     if type(tip) == str:
