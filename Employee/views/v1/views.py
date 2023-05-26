@@ -3913,11 +3913,11 @@ def get_absence(request):
     
     allvacations_count = allvacations.count()
 
-    page_count = allvacations_count / 20
+    page_count = allvacations_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(allvacations, 20)
+    paginator = Paginator(allvacations, 10)
     page_number = request.GET.get("page") 
     allvacations = paginator.get_page(page_number)
     
@@ -3929,8 +3929,8 @@ def get_absence(request):
             'response' : {
                 'message' : 'All Absence Schedule',
                 'count':allvacations_count,
-                'page_count':page_count,
-                'per_page_result':20,
+                'pages':page_count,
+                'per_page_result':10,
                 'error_message' : None,
                 'absences' : serialized.data
             }
