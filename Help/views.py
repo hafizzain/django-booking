@@ -13,7 +13,6 @@ import json
 def add_query(request):
     content = request.data.get('content')
     parent_comment = request.data.get('parent_comment', None)
-    is_parent = request.data.get('is_parent', None)
 
     if content is None:
         return Response(
@@ -77,27 +76,49 @@ def add_query(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_comment(request):
-    id = request.GET.get('id', None)
-    if id is not None:
-        pass
-    else:
-        all_comments = Comment.objects.filter(is_parent = True)
+    all_comments = Comment.objects.filter(is_parent = True)
 
-        comments = CommentSerializer(all_comments, many=True)
+    comments = CommentSerializer(all_comments, many=True)
 
-        return Response(
+    return Response(
+    {
+        'success':True,
+        'status_code':200,
+        'status_code_text' : '200',
+        'response':
+        {
+            'message':'Returned Successfully',
+            'response':comments.data,
+            'error_message': None
+        }
+    },
+    status=status.HTTP_200_OK
+)
+
+
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_comment_details(request):
+    id = request.GET.get('id')
+
+    all = Comment.objects.filter(parent_comment=id).order_by('content')
+    print(all)
+    
+    leng = len(all)
+
+    serializer = CommentSerializer(all, many=True)
+    
+    return Response(
         {
             'success':True,
-            'status_code':200,
-            'status_code_text' : '200',
-            'response':
-            {
-                'message':'Returned Successfully',
-                'response':comments.data,
-                'error_message': None
+            'length':leng,
+            'message':'Returned Successfully',
+            'response':{
+                'datas':serializer.data
             }
         },
-        status=status.HTTP_200_OK
+        status=status.HTTP_202_ACCEPTED
     )
 
-    
