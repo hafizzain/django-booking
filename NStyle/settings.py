@@ -64,7 +64,8 @@ NSTYLE_APPS = [
     'Customer.apps.CustomerConfig',
     'Promotions.apps.PromotionsConfig',
     'Reports.apps.ReportsConfig',
-    'Invoices.apps.InvoicesConfig'
+    'Invoices.apps.InvoicesConfig',
+    'Help.apps.HelpConfig'
 ]
 
 
