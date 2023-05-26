@@ -20,6 +20,8 @@ urlpatterns = [
     path('v1/promotions/', include('Promotions.urls.v1.urls')),
     path('v1/reports/', include('Reports.urls.v1.urls')),
     path('Emailtemplate/', views.EmailTemplate),
+    path('v1/help/', include('Help.urls.v1.urls')),
+
     
 
     ]
