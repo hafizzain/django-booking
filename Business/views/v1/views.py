@@ -482,6 +482,7 @@ def get_business_by_domain(request):
                 'response' : {
                     'message' : 'Tenants Not Found',
                     'error_message' : str(err),
+                    'domain_name' : domain_name,
                 }
             },
             status=status.HTTP_404_NOT_FOUND

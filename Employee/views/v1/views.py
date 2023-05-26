@@ -2763,7 +2763,13 @@ def update_commision(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+    try:
+        request.data._mutable = True
+    except:
+        pass
+
+    del request.data['commission_cycle']
+
     serializer = CommissionSerializer(commission, data=request.data, partial=True,  context={'request' : request})
     if not serializer.is_valid():
         return Response(
@@ -2772,7 +2778,8 @@ def update_commision(request):
             'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
             'response' : {
                 'message' : 'Commission Serializer Invalid',
-                'error_message' : str(err),
+                'error_message' : serializer.error_messages,
+                'errors' : serializer.errors,
             }
         },
         status=status.HTTP_404_NOT_FOUND

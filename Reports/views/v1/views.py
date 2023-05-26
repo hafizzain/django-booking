@@ -8,7 +8,7 @@ from Appointment.models import Appointment, AppointmentCheckout, AppointmentServ
 from Business.models import Business
 from Client.models import Client, Membership, Vouchers
 from Order.models import Checkout, MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
-from Reports.serializers import BusinesAddressReportSerializer, ComissionReportsEmployeSerializer, ReportBrandSerializer, ReportsEmployeSerializer, ServiceGroupReport, StaffCommissionReport
+from Reports.serializers import BusinesAddressReportSerializer, ComissionReportsEmployeSerializer, ReportBrandSerializer, ReportsEmployeSerializer, ServiceGroupReport, StaffCommissionReport, EmployeeCommissionReportsSerializer
 from Sale.Constants.Custom_pag import CustomPagination
 from Utility.Constants.Data.months import MONTHS
 from Utility.models import Country, Currency, ExceptionRecord, State, City
@@ -20,7 +20,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from Employee.models import Employee, EmployeeSelectedService
+from Employee.models import Employee, EmployeeSelectedService, EmployeeCommission
 from Business.models import BusinessAddress
 from Service.models import PriceService, Service, ServiceGroup
 
@@ -61,11 +61,12 @@ def get_commission_reports_by_staff(request):
     range_end = request.GET.get('range_end', None)
     
     # employee = Employee.objects.filter(is_deleted=False).order_by('-created_at')
-    employee = Employee.objects.filter(
+    employee = Employee.objects.prefetch_related(
+        'location'
+    ).filter(
         is_deleted = False,
         is_active = True,
     ).order_by('-created_at')
-    print(employee)
     serialized = ComissionReportsEmployeSerializer(employee,  many=True, context={
                         'request' : request, 
                         'range_start': range_start, 
@@ -230,49 +231,68 @@ def get_commission_reports_by_commission_details_updated(request):
     
     data = []
     
-    if range_start:
-        range_start = datetime.strptime(range_start, "%Y-%m-%d")
-        range_end = datetime.strptime(range_end, "%Y-%m-%d") + timedelta(days=1) - timedelta(seconds=1)
+    # if range_start:
+    #     range_start = datetime.strptime(range_start, "%Y-%m-%d")
+    #     range_end = datetime.strptime(range_end, "%Y-%m-%d") + timedelta(days=1) - timedelta(seconds=1)
 
-        checkout_order = Checkout.objects.filter(
-            is_deleted=False,
-            is_promotion = False,
-            created_at__gte =  range_start ,
-            created_at__lte = range_end
-        ).order_by('-created_at')
+    #     checkout_order = Checkout.objects.filter(
+    #         is_deleted=False,
+    #         is_promotion = False,
+    #         created_at__gte =  range_start ,
+    #         created_at__lte = range_end
+    #     ).order_by('-created_at')
 
-        serialized = CheckoutCommissionSerializer(checkout_order,  many=True, context={
-            'request' : request, 
-            })
-        data.extend(serialized.data)
+    #     serialized = CheckoutCommissionSerializer(checkout_order,  many=True, context={
+    #         'request' : request, 
+    #         })
+    #     data.extend(serialized.data)
             
-        appointment_checkout = AppointmentService.objects.filter(
-            appointment_status = 'Done', #appointment_service__
-            created_at__gte =  range_start ,
-            created_at__lte = range_end
-            )
-        serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True, context={
-            'request' : request, 
-            })
-        data.extend(serialized.data)
-        sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
-    else:
-        checkout_order = Checkout.objects.filter(
-            is_deleted=False,
-            is_promotion = False,
-            ).order_by('-created_at')
-        serialized = CheckoutCommissionSerializer(checkout_order,  many=True, context={
-            'request' : request, 
-            })
-        data.extend(serialized.data)
+    #     appointment_checkout = AppointmentService.objects.filter(
+    #         appointment_status = 'Done', #appointment_service__
+    #         created_at__gte =  range_start ,
+    #         created_at__lte = range_end
+    #         )
+    #     serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True, context={
+    #         'request' : request, 
+    #         })
+    #     data.extend(serialized.data)
+    #     sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
+    # else:
+    #     checkout_order = Checkout.objects.filter(
+    #         is_deleted=False,
+    #         is_promotion = False,
+    #         ).order_by('-created_at')
+    #     serialized = CheckoutCommissionSerializer(checkout_order,  many=True, context={
+    #         'request' : request, 
+    #         })
+    #     data.extend(serialized.data)
         
-        appointment_checkout = AppointmentService.objects.filter(appointment_status = 'Done')
-        serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True,context={
-            'request' : request, 
-            })
-        data.extend(serialized.data)
-        sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
-    
+    #     appointment_checkout = AppointmentService.objects.filter(appointment_status = 'Done')
+    #     serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True,context={
+    #         'request' : request, 
+    #         })
+    #     data.extend(serialized.data)
+    #     sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
+
+    query = {}
+    if range_start and range_end:
+        query['created_at__range'] = (range_start, range_end)
+
+    employee_commissions = EmployeeCommission.objects.select_related(
+        'employee',
+        'location',
+    ).filter(
+        is_active = True,
+        **query
+    ).order_by(
+        '-created_at'
+    )
+
+    # 'location', 'order_type', 'employee', 'commission', 'commission_rate', 'sale', 'created_at'
+
+    serialized = EmployeeCommissionReportsSerializer(employee_commissions, many=True)
+    data = serialized.data
+
     return Response(
         {
             'status' : 200,
@@ -280,7 +300,7 @@ def get_commission_reports_by_commission_details_updated(request):
             'response' : {
                 'message' : 'All Sale Orders',
                 'error_message' : None,
-                'sales' : sorted_data,
+                'sales' : data,
                 # 'sales' : [
                 #     {
                 #         'employee' : {},
