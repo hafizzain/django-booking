@@ -3837,7 +3837,9 @@ def get_vacations(request):
             'status_code' : '200',
             'response' : {
                 'message' : 'All Schedule',
-                'page_count':page_count,
+                'count':allvacations_count,
+                'pages':page_count,
+                'per_page_result':20,
                 'error_message' : None,
                 'vacations' : serialized.data
             }
@@ -3926,7 +3928,9 @@ def get_absence(request):
             'status_code' : '200',
             'response' : {
                 'message' : 'All Absence Schedule',
+                'count':allvacations_count,
                 'page_count':page_count,
+                'per_page_result':20,
                 'error_message' : None,
                 'absences' : serialized.data
             }
