@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from .models import Comment
 from rest_framework import status
 from .serializers import *
-
+import json
 
 
 @api_view(['POST'])
@@ -19,6 +19,8 @@ def add_query(request):
         return Response(
             {
                 'success':False,
+                'status_code':400,
+                'status_code_text' : '400',
                 'response':
                 {
                     'message':'Invalid data',
@@ -27,25 +29,45 @@ def add_query(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    comment = CommentSerializer(data = request.data)
-    if comment.is_valid():
-        comment.save()
+    # comment = CommentSerializer(data = request.data)
+    # if comment.is_valid():
+    #     comment.save()
 
-    # comment_obj = Comment.objects.create(content=content)
-    # if parent_comment is not None:
-    #     parent = Comment.objects.get(id = parent_comment)
-    #     parent.is_parent = True
-    #     parent.save()
-    #     comment_obj.parent_comment = parent
+    try:
+        comment_obj = Comment.objects.create(content=content)
+        if parent_comment is not None:
+            parent = Comment.objects.get(id = parent_comment)
+            parent.is_parent = True
+            parent.save()
+            comment_obj.parent_comment = parent
+    except Exception as e:
+        return Response(
+            {
+                'success':False,
+                'status_code':400,
+                'status_code_text' : '400',
+                'response':
+                {
+                    'message':str(e),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    else:
+        pass
 
-    # comment_obj.save()
+    comment_obj.save()
 
     return Response(
         {
             'success':True,
+            'status_code':200,
+            'status_code_text' : '200',
             'response':
             {
                 'message':'Created Successfully',
+                'response':json.loads(str(comment_obj)),
+                'error_message': None
             }
         },
         status=status.HTTP_200_OK
@@ -64,14 +86,18 @@ def get_comment(request):
         comments = CommentSerializer(all_comments, many=True)
 
         return Response(
+        {
+            'success':True,
+            'status_code':200,
+            'status_code_text' : '200',
+            'response':
             {
-                'success':True,
-                'response':
-                {
-                    'message':comments.data,
-                }
-            },
-            status=status.HTTP_200_OK
-        )
+                'message':'Returned Successfully',
+                'response':comments.data,
+                'error_message': None
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
     
