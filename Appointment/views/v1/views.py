@@ -1012,6 +1012,7 @@ def update_appointment_service(request):
     appointment_notes = request.data.get('appointment_notes', None)
     appointment_date = request.data.get('appointment_date', None)
     client = request.data.get('client', None)
+    action_type = request.data.get('action_type', None)
     
     errors = []
     if appointment_id is None: 
@@ -1089,7 +1090,7 @@ def update_appointment_service(request):
     appointment_logs = AppointmentLogs.objects.create( 
         location = appointment.business_address,
         appointment = appointment,
-        log_type = 'Reschedule',
+        log_type = 'Edit' if action_type == 'edit' else 'Reschedule',
         member = active_user_staff
     )
 
