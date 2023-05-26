@@ -1796,7 +1796,6 @@ def new_create_sale_order(request):
     payment_type = request.data.get('payment_type', None)
     client_type = request.data.get('client_type', None)
     ids = request.data.get('ids', None)
-    is_membership_redeemed = request.data.get('is_membership_redeemed', False)
     redeemed_membership_id = request.data.get('redeemed_membership_id', False)
     membership_product = request.data.get('membership_product', None)
     membership_service = request.data.get('membership_service', None)
@@ -1941,6 +1940,12 @@ def new_create_sale_order(request):
         employee_id = id['employee_id']      
         discount_price = id.get('discount_price', None)
 
+        is_membership_redeemed = id.get('is_membership_redeemed', None)
+        is_voucher_redeemed = id.get('is_voucher_redeemed', None)
+        redeemed_price = id.get('redeemed_price', None)
+
+        is_redeemed = is_membership_redeemed or is_voucher_redeemed
+
         item_name = ''
         item_id = service_id
         try:
@@ -1985,6 +1990,7 @@ def new_create_sale_order(request):
         # category_comission
         # symbol
 
+        order_instance = None
         if sale_type == 'PRODUCT':
             try:
                 product = Product.objects.get(id = service_id)
@@ -2068,6 +2074,7 @@ def new_create_sale_order(request):
             )
             product_order.sold_quantity += 1 # product_stock.sold_quantity
             product_order.save()
+            order_instance = product_order
             
 
         elif sale_type == 'SERVICE':
@@ -2091,6 +2098,8 @@ def new_create_sale_order(request):
                     quantity = quantity,
                     current_price = price,
                 )
+
+                order_instance = service_order
 
                 
                 
@@ -2141,6 +2150,8 @@ def new_create_sale_order(request):
                         'error_message' : str(err),
                     }
                 },status=status.HTTP_400_BAD_REQUEST)
+            else:
+                order_instance = membership_order
             
         elif sale_type == 'VOUCHER':  
               
@@ -2204,7 +2215,16 @@ def new_create_sale_order(request):
                         }
                     },status=status.HTTP_400_BAD_REQUEST
                 )
+            else:
+                order_instance = voucher_order
         
+        if order_instance is not None and is_redeemed:
+            order_instance.is_redeemed = True
+            order_instance.redeemed_type = 'Membership' if is_membership_redeemed else 'Voucher' if is_voucher_redeemed  else ''
+            order_instance.redeemed_price = redeemed_price
+            order_instance.redeemed_instance_id = redeemed_membership_id
+            order_instance.save()
+
         if sale_type in ['PRODUCT', 'SERVICE', 'VOUCHER']:
 
             CommissionType = {
@@ -2344,10 +2364,10 @@ def new_create_sale_order(request):
                             text = f' error in payment method sale{str(err)}'
                         )    
     
-    if is_membership_redeemed:
-        """
-            Handle Membership Redeemed Here...
-        """
+    # if is_membership_redeemed:
+    #     """
+    #         Handle Membership Redeemed Here...
+    #     """
 
         # redeemed_membership_id
         # membership_product

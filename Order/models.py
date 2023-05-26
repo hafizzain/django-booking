@@ -148,6 +148,11 @@ class Order(models.Model):
     discount_percentage = models.PositiveBigIntegerField(default= 0)
     discount_price = models.PositiveBigIntegerField(default= 0)
     price = models.PositiveBigIntegerField(default= 0)
+
+    is_redeemed = models.BooleanField(default=False)
+    redeemed_type = models.CharField(default='', max_length=300)
+    redeemed_price = models.FloatField(default=0)
+    redeemed_instance_id = models.CharField(default='', max_length=800)
     
     status =  models.CharField(choices=status_choice, max_length=100, default='Active')
     is_deleted = models.BooleanField(default=False)
