@@ -92,7 +92,9 @@ def get_service(request):
             'status_code' : '200',
             'response' : {
                 'message' : 'All Service',
-                'page_count':page_count,
+                'count':service_count,
+                'pages':page_count,
+                'per_page_result':20,
                 'error_message' : None,
                 'service' : serialized.data
             }

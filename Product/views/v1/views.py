@@ -1248,7 +1248,9 @@ def get_products(request):
             'response' : {
                 'total_count' : len(all_products),
                 'message' : 'All business Products!',
-                'page_count':page_count,
+                'count':all_products_count,
+                'pages':page_count,
+                'per_page_result':20,
                 'error_message' : None,
                 'products' : data
             }
