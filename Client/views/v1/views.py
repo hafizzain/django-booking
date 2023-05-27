@@ -184,7 +184,9 @@ def get_client(request):
             'status_code' : '200',
             'response' : {
                 'message' : 'All Client',
-                'page_count':page_count,
+                'count':all_client_count,
+                'pages':page_count,
+                'per_page_result':20,
                 'error_message' : None,
                 'client' : serialized.data
             }
@@ -594,7 +596,9 @@ def get_client_group(request):
             'status_code' : '200',
             'response' : {
                 'message' : 'All Client Group',
-                'page_count':page_count,
+                'count':all_client_group_count,
+                'pages':page_count,
+                'per_page_result':20,
                 'error_message' : None,
                 'clientsgroup' : serialized.data
             }
@@ -1902,7 +1906,9 @@ def get_memberships(request):
             'status_code' : '200',
             'response' : {
                 'message' : 'All Membership',
-                'page_count':page_count,
+                'count':all_memberships_count,
+                'pages':page_count,
+                'per_page_result':20,
                 'error_message' : None,
                 'membership' : serialized.data
             }
@@ -2275,7 +2281,9 @@ def get_vouchers(request):
             'status_code' : '200',
             'response' : {
                 'message' : 'All Voucher',
-                'page_count':page_count,
+                'count':all_voucher_count,
+                'pages':page_count,
+                'per_page_result':20,
                 'error_message' : None,
                 'vouchers' : serialized.data
             }
@@ -3092,7 +3100,9 @@ def get_customer_detailed_loyalty_points(request):
             'status_code_text' : '200',
             'response' : {
                 'message' : 'Loyalty Points Logs',
-                'page_count':page_count,
+                'count':all_loyality_logs_count,
+                'pages':page_count,
+                'per_page_result':20,
                 'error_message' : None,
                 'data' : data
             }

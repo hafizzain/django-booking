@@ -332,7 +332,9 @@ def get_Employees(request):
             'status_code' : '200',
             'response' : {
                 'message' : 'All Employee',
-                'page_count':page_count,
+                'count':all_employee_count,
+                'pages':page_count,
+                'per_page_result':20,
                 'error_message' : None,
                 'employees' : serialized.data
             }
@@ -1461,7 +1463,9 @@ def get_staff_group(request):
             'status_code' : '200',
             'response' : {
                 'message' : 'All Staff Group',
-                'page_count':page_count,
+                'count':all_staff_group_count,
+                'pages':page_count,
+                'per_page_result':20,
                 'error_message' : None,
                 'staff_group' : data
             }
@@ -1675,7 +1679,9 @@ def get_attendence(request):
             'status_code' : '200',
             'response' : {
                 'message' : 'All Attendance',
-                'page_count':page_count,
+                'count':all_employe_count,
+                'pages':page_count,
+                'per_page_result':20,
                 'error_message' : None,
                 'attendance' : serialized.data
             }
@@ -2115,7 +2121,9 @@ def get_payrol_working(request):
             'status_code' : '200',
             'response' : {
                 'message' : 'All Employee',
-                'page_count':page_count,
+                'count':all_employe_count,
+                'pages':page_count,
+                'per_page_result':20,
                 'error_message' : None,
                 'employees' : serialized.data
             }
@@ -2472,7 +2480,9 @@ def get_commission(request):
             'status_code' : '200',
             'response' : {
                 'message' : 'All Commission',
-                'page_count':page_count,
+                'count':commission_count,
+                'pages':page_count,
+                'per_page_result':20,
                 'error_message' : None,
                 'commission' : serializer.data
             }
