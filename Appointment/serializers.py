@@ -316,7 +316,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             end_time = exl_time['end_time']
             if start_time and end_time:
                 start_time_f = datetime.strptime(start_time, '%H:%M:%S')
-                end_time_f = datetime.strptime(end_time, '%H:%M:%S')
+                end_time_f = datetime.strptime( '23:59:59' if end_time == '00:00:00' else end_time, '%H:%M:%S')
 
                 difference = end_time_f - start_time_f
                 seconds = difference.seconds
