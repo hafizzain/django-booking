@@ -292,12 +292,15 @@ def get_all_appointments(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_calendar_appointment(request):
+    selected_date = request.GET.get('selected_date', None)
+
+
     all_memebers= Employee.objects.filter(
         is_deleted = False,
         is_active = True,
     ).order_by('-created_at')
     print(all_memebers)
-    serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request' : request})
+    serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request' : request, 'selected_date' : selected_date})
 
     return Response(
         {

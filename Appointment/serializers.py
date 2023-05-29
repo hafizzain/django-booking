@@ -11,11 +11,11 @@ from Appointment.models import Appointment, AppointmentCheckout, AppointmentNote
 from Business.models import BusinessAddress
 from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer
 from Client.serializers import ClientAppointmentSerializer
-from Employee.models import Employee, EmployeeProfessionalInfo, EmployeeSelectedService
+from Employee.models import Employee, EmployeeProfessionalInfo, EmployeeSelectedService, EmployeDailySchedule
 from Service.models import PriceService, Service
 from datetime import datetime, timedelta
 from Product.Constants.index import tenant_media_base_url
-from django.db.models import Q
+from django.db.models import Q, F
 
 
 
@@ -212,9 +212,165 @@ class BlockSerializer(serializers.ModelSerializer):
 class EmployeeAppointmentSerializer(serializers.ModelSerializer):    
     employee = serializers.SerializerMethodField()
     appointments = serializers.SerializerMethodField()
+    unavailable_time = serializers.SerializerMethodField()
 
     def get_appointment_id(self, obj):
         return None
+    
+
+    def get_unavailable_time(self, employee_instance):
+        return self.retreive_unavailable_time(employee_instance)
+
+    def retreive_unavailable_time(self, employee_instance):
+        selected_date = self.context.get('selected_date', None)
+        if not selected_date:
+            return []
+
+
+        data = []
+
+        exluded_times = []
+        try:
+            employee_working_schedule = EmployeDailySchedule.objects.get(
+                employee = employee_instance,
+                date = selected_date
+            )
+        except:
+            exluded_times.append({
+                'start_time' : "00:00:00",
+                'end_time' : "00:00:00",
+            })
+        else:
+            first_shift = [employee_working_schedule.start_time, employee_working_schedule.end_time]
+            second_shift = [employee_working_schedule.start_time_shift, employee_working_schedule.end_time_shift] if employee_working_schedule.start_time_shift else None
+
+            if employee_working_schedule.start_time.strftime('%H:%M:%S') == "00:00:00":
+                if employee_working_schedule.end_time.strftime('%H:%M:%S') == '00:00:00':
+                    pass
+                else:
+                    start_time = employee_working_schedule.end_time.strftime('%H:%M:%S')
+                    end_time = "00:00:00"
+                    if employee_working_schedule.start_time_shift:
+                        end_time = None
+
+                        if employee_working_schedule.end_time.strftime('%H:%M:%S') == employee_working_schedule.start_time_shift.strftime('%H:%M:%S'):
+                            if employee_working_schedule.end_time_shift.strftime('%H:%M:%S') == "00:00:00":
+                                start_time = None
+                                end_time = None
+                            else:
+                                start_time = employee_working_schedule.end_time_shift.strftime('%H:%M:%S')
+                                end_time = '00:00:00'
+
+                    if start_time and end_time:
+                        exluded_times.append({
+                            'start_time' : start_time,
+                            'end_time' : end_time,
+                        })
+            else:
+                start_time = "00:00:00"
+                end_time = employee_working_schedule.start_time.strftime('%H:%M:%S')
+                exluded_times.append({
+                    'start_time' : start_time,
+                    'end_time' : end_time,
+                })
+
+                start_time = employee_working_schedule.end_time.strftime('%H:%M:%S')
+                end_time = None
+
+                if employee_working_schedule.end_time_shift:
+                    if employee_working_schedule.end_time.strftime('%H:%M:%S') == employee_working_schedule.start_time_shift.strftime('%H:%M:%S'):
+                        start_time = None
+                        end_time = None
+                        if employee_working_schedule.end_time_shift.strftime('%H:%M:%S') == "00:00:00":
+                            pass
+                        else:
+                            start_time = employee_working_schedule.end_time_shift.strftime('%H:%M:%S')
+                            end_time = "00:00:00"
+                            exluded_times.append({
+                                'start_time' : start_time,
+                                'end_time' : end_time,
+                            })
+                    else:
+                        end_time = employee_working_schedule.start_time_shift.strftime('%H:%M:%S')
+                        exluded_times.append({
+                            'start_time' : start_time,
+                            'end_time' : end_time,
+                        })
+                        start_time = None
+                        end_time = None
+
+                        if employee_working_schedule.end_time_shift.strftime('%H:%M:%S') == "00:00:00":
+                            pass
+                        else:
+                            start_time = employee_working_schedule.end_time_shift.strftime('%H:%M:%S')
+                            end_time = "00:00:00"
+                            exluded_times.append({
+                                'start_time' : start_time,
+                                'end_time' : end_time,
+                            })
+                else:
+                    end_time = "00:00:00"
+                    
+        for exl_time in exluded_times:
+            start_time = exl_time['start_time']
+            end_time = exl_time['end_time']
+            if start_time and end_time:
+                start_time_f = datetime.strptime(start_time, '%H:%M:%S')
+                end_time_f = datetime.strptime(end_time, '%H:%M:%S')
+
+                difference = end_time_f - start_time_f
+                seconds = difference.seconds
+                minutes = seconds // 60
+
+                data.append([
+                    {
+                        "appointment_id": "51479f52-7943-44d1-b3b5-12e0125ca307",
+                        "appointment_date": selected_date,
+                        "appointment_time": start_time,
+                        "end_time": end_time,
+                        # 'difference' : f'{difference}min',
+                        # "duration": "35min",
+                        "duration": f'{minutes}min',
+                        "created_at": "2023-05-29T06:45:38.035196Z",
+                        "is_blocked": True,
+                        "is_unavailable": True,
+                    }
+                ])
+        return data
+
+
+
+
+        # single_data = {
+        #     "id": "51479f52-7943-44d1-b3b5-12e0125ca307",
+        #     "appointment_id": "51479f52-7943-44d1-b3b5-12e0125ca307",
+        #     "appointment_date": "2023-05-29",
+        #     "appointment_time": "00:00:00",
+        #     "end_time": "00:00:00",
+        #     "duration": "35min",
+        #     "created_at": "2023-05-29T06:45:38.035196Z",
+        #     "is_blocked": True,
+        # }
+
+        # data.append(single_data)
+        return data
+    
+
+# "appointment_status": "Appointment Booked",
+# "price": 0,
+# "total_price": 0,
+# "discount_price": 0,
+# "is_favourite": false,
+# "client_type": null,
+# "currency": "AED",
+# "service": {
+#     "name": "",
+#     "price": null
+# },
+# "client": null,
+# "location": null,
+# "details": "asdf"
+
 
     def get_appointments(self, obj):
         excluded_list = ['Cancel']
@@ -389,6 +545,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                     loop_return.append(serialized_service.data)
                 returned_list.append(loop_return)
 
+            returned_list.extend(self.retreive_unavailable_time(obj))
             return returned_list
 
         except Exception as err:
@@ -408,6 +565,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
         model = Employee
         fields = [
             'employee',
+            'unavailable_time',
             'appointments',
         ]
 
