@@ -373,12 +373,16 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
 
 
     def get_appointments(self, obj):
+        selected_date = self.context.get('selected_date', None)
+        if not selected_date:
+            return []
         excluded_list = ['Cancel']
         appoint_services = AppointmentService.objects.filter(
             member=obj,
             is_active = True,
-            is_deleted = False
+            is_deleted = False,
             #is_blocked = False
+            appointment_date = selected_date
         ).exclude(appointment_status__in=excluded_list).distinct()
         #selected_data = []
         
