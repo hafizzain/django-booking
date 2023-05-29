@@ -2485,26 +2485,46 @@ def get_commission(request):
         page_count = int(page_count) + 1
 
     paginator = Paginator(commission, 20)
-    page_number = request.GET.get("page") 
-    commission = paginator.get_page(page_number)
- 
-    serializer = CommissionSerializer(commission, many = True, context={'request' : request})
+    page_number = request.GET.get("page", None)
+    print(page_number, '********************')
+
+    if page_number is not None: 
+        commission = paginator.get_page(page_number)
     
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Commission',
-                'count':commission_count,
-                'pages':page_count,
-                'per_page_result':20,
-                'error_message' : None,
-                'commission' : serializer.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+        serializer = CommissionSerializer(commission, many = True, context={'request' : request})
+        
+        return Response(
+            {
+                'status' : 200,
+                'status_code' : '200',
+                'response' : {
+                    'message' : f'Page {page_number} Commission',
+                    'count':commission_count,
+                    'pages':page_count,
+                    'per_page_result':20,
+                    'error_message' : None,
+                    'commission' : serializer.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    else:
+        serializer = CommissionSerializer(commission, many = True, context={'request' : request})
+        
+        return Response(
+            {
+                'status' : 200,
+                'status_code' : '200',
+                'response' : {
+                    'message' : 'All Commission',
+                    'count':commission_count,
+                    'error_message' : None,
+                    'commission' : serializer.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -3855,26 +3875,43 @@ def get_vacations(request):
         page_count = int(page_count) + 1
 
     paginator = Paginator(allvacations, 20)
-    page_number = request.GET.get("page") 
-    allvacations = paginator.get_page(page_number)
+    page_number = request.GET.get("page", None)
+    if page_number is not None: 
+        allvacations = paginator.get_page(page_number)
 
-    
-    serialized = NewVacationSerializer(allvacations, many=True, context={'request' : request})
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Schedule',
-                'count':allvacations_count,
-                'pages':page_count,
-                'per_page_result':20,
-                'error_message' : None,
-                'vacations' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+        
+        serialized = NewVacationSerializer(allvacations, many=True, context={'request' : request})
+        return Response(
+            {
+                'status' : 200,
+                'status_code' : '200',
+                'response' : {
+                    'message' : f'Page {page_number} Schedule',
+                    'count':allvacations_count,
+                    'pages':page_count,
+                    'per_page_result':20,
+                    'error_message' : None,
+                    'vacations' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    else:
+        serialized = NewVacationSerializer(allvacations, many=True, context={'request' : request})
+        return Response(
+            {
+                'status' : 200,
+                'status_code' : '200',
+                'response' : {
+                    'message' : 'All Schedule',
+                    'count':allvacations_count,
+                    'error_message' : None,
+                    'vacations' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
 
 
 @api_view(['GET'])
@@ -3947,25 +3984,42 @@ def get_absence(request):
         page_count = int(page_count) + 1
 
     paginator = Paginator(allvacations, 10)
-    page_number = request.GET.get("page") 
-    allvacations = paginator.get_page(page_number)
-    
-    serialized = NewAbsenceSerializer(allvacations, many=True, context={'request' : request})
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Absence Schedule',
-                'count':allvacations_count,
-                'pages':page_count,
-                'per_page_result':10,
-                'error_message' : None,
-                'absences' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    page_number = request.GET.get("page", None)
+    if page_number is not None: 
+        allvacations = paginator.get_page(page_number)
+        
+        serialized = NewAbsenceSerializer(allvacations, many=True, context={'request' : request})
+        return Response(
+            {
+                'status' : 200,
+                'status_code' : '200',
+                'response' : {
+                    'message' : f'Page {page_number} Schedule',
+                    'count':allvacations_count,
+                    'pages':page_count,
+                    'per_page_result':10,
+                    'error_message' : None,
+                    'absences' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    else:
+        serialized = NewAbsenceSerializer(allvacations, many=True, context={'request' : request})
+        return Response(
+            {
+                'status' : 200,
+                'status_code' : '200',
+                'response' : {
+                    'message' : 'All Absence Schedule',
+                    'count':allvacations_count,
+                    'error_message' : None,
+                    'absences' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
     
 
 @api_view(['DELETE'])
