@@ -322,26 +322,42 @@ def get_Employees(request):
         page_count = int(page_count) + 1
 
     paginator = Paginator(all_employe, 20)
-    page_number = request.GET.get("page") 
-    all_employe = paginator.get_page(page_number)
+    page_number = request.GET.get("page", None)
 
-    serialized = singleEmployeeSerializer(all_employe,  many=True, context={'request' : request} )
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Employee',
-                'count':all_employee_count,
-                'pages':page_count,
-                'per_page_result':20,
-                'error_message' : None,
-                'employees' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
-    
+    if page_number is not None: 
+        all_employe = paginator.get_page(page_number)
+
+        serialized = singleEmployeeSerializer(all_employe,  many=True, context={'request' : request} )
+        return Response(
+            {
+                'status' : 200,
+                'status_code' : '200',
+                'response' : {
+                    'message' : f'Page {page_number} Employee',
+                    'count':all_employee_count,
+                    'pages':page_count,
+                    'per_page_result':20,
+                    'error_message' : None,
+                    'employees' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    else:
+        serialized = singleEmployeeSerializer(all_employe,  many=True, context={'request' : request} )
+        return Response(
+            {
+                'status' : 200,
+                'status_code' : '200',
+                'response' : {
+                    'message' : 'All Employee',
+                    'count':all_employee_count,
+                    'error_message' : None,
+                    'employees' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
