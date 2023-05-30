@@ -818,6 +818,30 @@ class ReportBrandSerializer(serializers.ModelSerializer):
             ).order_by('-created_at').distinct()
         return RetailTargetSerializers(retail_target, many = True).data
     
+    # def get_product_sale_price(self, obj):
+    #     try:
+    #         location = self.context["location"]
+    #         month = self.context["month"]
+    #         year = self.context["year"]
+    #         total = 0
+
+    #         service_orders = ProductOrder.objects.filter(
+    #             is_deleted=False, 
+    #             product__brand= obj,
+    #             created_at__icontains = year,
+    #             location__id =  location,  
+    #             )
+    #         for ord  in service_orders:
+    #             create = str(ord.created_at)
+    #             match = int(create.split(" ")[0].split("-")[1])
+    #             if int(month) == match:
+    #                 total += int(ord.checkout.total_product_price)
+            
+    #         return total
+                
+    #     except Exception as err:
+    #         return str(err)
+
     def get_product_sale_price(self, obj):
         try:
             location = self.context["location"]
@@ -827,24 +851,26 @@ class ReportBrandSerializer(serializers.ModelSerializer):
 
             service_orders = ProductOrder.objects.filter(
                 is_deleted=False, 
-                product__brand= obj,
-                created_at__icontains = year,
-                location__id =  location,  
-                )
-            for ord  in service_orders:
+                product__brand=obj,
+                created_at__icontains=year,
+                location__id=location,
+            )
+            
+            for ord in service_orders:
                 create = str(ord.created_at)
                 match = int(create.split(" ")[0].split("-")[1])
                 if int(month) == match:
-                    total += int(ord.checkout.total_product_price)
+                    if ord.checkout and ord.checkout.total_product_price:
+                        total += int(ord.checkout.total_product_price)
             
             return total
-                
+
         except Exception as err:
             return str(err)
     class Meta:
         model = Brand
         fields = ['id','name', 'product_sale_price', 'brand_target']
-    
+
 
 class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
 
