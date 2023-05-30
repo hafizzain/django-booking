@@ -1232,7 +1232,10 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
         return obj.current_price
     
     def get_price(self, obj):
-        return obj.current_price
+        if obj.is_redeemed == True:
+            return obj.redeemed_price
+        else:
+            return obj.current_price
         
 
     def get_product_name(self, obj):
@@ -1266,7 +1269,10 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
         return None
     
     def get_price(self, obj):
-        return obj.current_price
+        if obj.is_redeemed == True:
+            return obj.redeemed_price
+        else:
+            return obj.current_price
 
     class Meta:
         model = ServiceOrder
