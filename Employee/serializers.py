@@ -828,28 +828,45 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
                     
     
     def get_total_hours(self, obj):
-        try:
-            if obj.start_time_shift != None:
-                time1 = datetime.strptime(str(obj.start_time), "%H:%M:%S")
-                time2 = datetime.strptime(str(obj.end_time_shift), "%H:%M:%S")
+        # try:
+        #     if obj.start_time_shift != None:
+        #         time1 = datetime.strptime(str(obj.start_time), "%H:%M:%S")
+        #         time2 = datetime.strptime(str(obj.end_time_shift), "%H:%M:%S")
 
-                time_diff = time2 - time1
-                total_hours = time_diff - timedelta(hours=1)  # subtracting 1 hour for break
-                total_hours = datetime.strptime(str(total_hours), '%H:%M:%S')
-                total_hours = total_hours.strftime('%H')
-                return f'{total_hours}'
+        #         time_diff = time2 - time1
+        #         total_hours = time_diff - timedelta(hours=1)  # subtracting 1 hour for break
+        #         total_hours = datetime.strptime(str(total_hours), '%H:%M:%S')
+        #         total_hours = total_hours.strftime('%H')
+        #         return f'{total_hours}'
             
-            time1 = datetime.strptime(str(obj.start_time), "%H:%M:%S")
-            time2 = datetime.strptime(str(obj.end_time), "%H:%M:%S")
+        #     time1 = datetime.strptime(str(obj.start_time), "%H:%M:%S")
+        #     time2 = datetime.strptime(str(obj.end_time), "%H:%M:%S")
 
-            time_diff = time2 - time1
-            total_hours = time_diff - timedelta(hours=1)  # subtracting 1 hour for break
-            total_hours = datetime.strptime(str(total_hours), '%H:%M:%S')
-            total_hours = total_hours.strftime('%H')
-            return f'{total_hours}'
+        #     time_diff = time2 - time1
+        #     total_hours = time_diff - timedelta(hours=1)  # subtracting 1 hour for break
+        #     total_hours = datetime.strptime(str(total_hours), '%H:%M:%S')
+        #     total_hours = total_hours.strftime('%H')
+        #     return f'{total_hours}'
         
+        # except Exception as err:
+        #     return '0'
+        
+        try:
+            shift1_start = datetime.strptime(str(obj.start_time), "%H:%M:%S")
+            shift1_end = datetime.strptime(str(obj.end_time), "%H:%M:%S")
+            total_hours = shift1_end - shift1_start - timedelta(hours=1)  # subtracting 1 hour for break
+
+            if obj.start_time_shift and obj.end_time_shift:
+                shift2_start = datetime.strptime(str(obj.start_time_shift), "%H:%M:%S")
+                shift2_end = datetime.strptime(str(obj.end_time_shift), "%H:%M:%S")
+                shift2_hours = shift2_end - shift2_start
+                total_hours += shift2_hours
+
+            total_hours = total_hours.strftime('%H')  
+            return f'{total_hours}'
+
         except Exception as err:
-            return '0'
+            return 0
         
     class Meta:
         model = EmployeDailySchedule
