@@ -857,11 +857,19 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
 
             shift1_start = datetime.strptime(str(obj.start_time), "%H:%M:%S")
             shift1_end = datetime.strptime(str(obj.end_time), "%H:%M:%S")
+
+            if shift1_start > shift1_end:
+                shift1_end += timedelta(days=1)  # Add 1 day if the shift ends on the next day
+
             total_hours = shift1_end - shift1_start - timedelta(hours=1)  # subtracting 1 hour for break
 
             if obj.start_time_shift and obj.end_time_shift:
                 shift2_start = datetime.strptime(str(obj.start_time_shift), "%H:%M:%S")
                 shift2_end = datetime.strptime(str(obj.end_time_shift), "%H:%M:%S")
+
+                if shift2_start > shift2_end:
+                    shift2_end += timedelta(days=1)  # Add 1 day if the shift ends on the next day
+
                 shift2_hours = shift2_end - shift2_start
                 total_hours += shift2_hours
 
