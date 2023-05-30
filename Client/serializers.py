@@ -313,7 +313,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
     discount_type = serializers.SerializerMethodField(read_only=True)
     products = serializers.SerializerMethodField()
     services = serializers.SerializerMethodField()
-
+    employee = serializers.SerializerMethodField()
 
     def get_products(self, obj):
         try:
@@ -335,8 +335,6 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
     
     def get_membership_price(self, obj):
         return obj.current_price
-    
-    employee = serializers.SerializerMethodField()
     
 
     def get_employee(self, membership_order):

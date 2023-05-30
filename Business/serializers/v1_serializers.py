@@ -6,7 +6,7 @@ from Employee.models import EmployeDailySchedule, Employee
 from Utility.models import Currency, ExceptionRecord, State, Country,City
 from rest_framework import serializers
 from datetime import datetime, timedelta
-from Order.models import Checkout
+from Order.models import Checkout,Order
 
 from Business.models import BookingSetting, BusinessAddressMedia, BusinessType, Business, BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BusinessPaymentMethod, BusinessTax, BusinessVendor,BusinessOpeningHour
 from Authentication.serializers import UserSerializer
@@ -541,7 +541,7 @@ class PaymentMethodSerializer(serializers.ModelSerializer):
     method_type_count = serializers.SerializerMethodField(read_only=True)
 
     def get_method_type_count(self, obj):
-        checkout_count = Checkout.objects.filter(payment_type=obj.method_type).count()
+        checkout_count = Order.objects.filter(payment_type=obj.method_type).count()
         return checkout_count
 
     class Meta:
