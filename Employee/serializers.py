@@ -852,6 +852,9 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
         #     return '0'
         
         try:
+            if obj.start_time is None or obj.end_time is None:
+                return '0'  # Return 0 if any of the time values is None
+
             shift1_start = datetime.strptime(str(obj.start_time), "%H:%M:%S")
             shift1_end = datetime.strptime(str(obj.end_time), "%H:%M:%S")
             total_hours = shift1_end - shift1_start - timedelta(hours=1)  # subtracting 1 hour for break
@@ -867,6 +870,7 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
 
         except Exception as err:
             return str(err)
+
         
     class Meta:
         model = EmployeDailySchedule
