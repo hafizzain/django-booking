@@ -21,6 +21,6 @@ urlpatterns = [
     path('v1/reports/', include('Reports.urls.v1.urls')),
     path('Emailtemplate/', views.EmailTemplate),
     path('v1/help/', include('Help.urls.v1.urls')),
-    path('v1/translation/', include('Translation.urls.v1.urls')),
+    path('v1/translations/', include('Translations.urls.v1.urls')),
 
     ]
