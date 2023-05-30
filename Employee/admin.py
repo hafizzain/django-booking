@@ -140,8 +140,42 @@ class EmployeeCommissionAdmin(admin.ModelAdmin):
     single_item_commission.short_description = 'Commission/Item'
 
 
+@admin.register(EmployeDailySchedule)
+class EmployeDailyScheduleAdmin(admin.ModelAdmin):
+    ordering = ['-date']
+    list_filter = ['employee']
+    list_display = [
+        'id',
+        'employee_name',
+        'today_day',
+        'start_time',
+        'end_time',
+        'start_time_shift',
+        'end_time_shift',
+        # 'from_date',
+        # 'to_date',
+        'date',
+        'is_leave',
+        'is_off',
+        'is_vacation',
+        'is_active',
+        'created_at',
+    ]
+
+    @admin.display(empty_value='-------')
+    def today_day(self, employee_instance):
+        if employee_instance.date:
+            day = employee_instance.date.strftime('%A')
+            return day
+
+    @admin.display(empty_value='-------')
+    def employee_name(self, employee_instance):
+        if employee_instance.employee:
+            return f'{employee_instance.employee.full_name}'
+
+
+
 admin.site.register(Asset)
 admin.site.register(AssetDocument)
 admin.site.register(EmployeeSelectedService)
-admin.site.register(EmployeDailySchedule)
 admin.site.register(CategoryCommission)
