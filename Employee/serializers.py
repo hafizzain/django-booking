@@ -866,7 +866,7 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
             return f'{total_hours}'
 
         except Exception as err:
-            return 0
+            return str(err)
         
     class Meta:
         model = EmployeDailySchedule
