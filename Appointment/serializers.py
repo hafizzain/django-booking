@@ -516,7 +516,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                 app_date_time = datetime.combine(app_date, appointment_time)
 
                 # calculate the end time
-                duration = DURATION_CHOICES[app_duration]
+                duration = DURATION_CHOICES[app_duration.lower()]
                 end_time = (app_date_time + timedelta(minutes=duration)).time()
 
                 # check for overlaps

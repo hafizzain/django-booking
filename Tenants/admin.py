@@ -70,6 +70,27 @@ class EmployeeTenantDetailAdmin(admin.ModelAdmin):
         'is_tenant_staff',
     ]
     
-admin.site.register(ClientTenantAppDetail)
-admin.site.register(ClientIdUser)
+@admin.register(ClientTenantAppDetail)
+class ClientTenantAppDetailAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'user',
+        'tenant',
+        'client_id',
+        'is_appointment',
+        'is_tenant_staff',
+    ]
+
+
+@admin.register(ClientIdUser)
+class ClientIdUserAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'user',
+        'client_id',
+        'is_everyone',
+    ]
+
+
+
 #admin.site.register(EmployeeTenantDetail)

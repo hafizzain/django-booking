@@ -2148,6 +2148,8 @@ def create_appointment_client(request):
     
     payment_method = request.data.get('payment_method', None)
     discount_type = request.data.get('discount_type', None)
+
+    errors = []
     
     #if tenant_id is None:
     if not all([tenant_id , client_type, appointment_date, business_id  ]):
@@ -2195,7 +2197,10 @@ def create_appointment_client(request):
             is_appointment = True
         )
     except Exception as err:
+        errors.append(str(err))
         pass    
+    else:
+        errors.append('Tenant client app detail found')
     with tenant_context(tenant):
         try:
             business=Business.objects.get(id=business_id)
@@ -2231,6 +2236,7 @@ def create_appointment_client(request):
         try:
             client = Client.objects.get(id=client)
         except Exception as err:
+            errors.append('Client is none')
             client = None
             # return Response(
             #     {
@@ -2290,7 +2296,7 @@ def create_appointment_client(request):
             
             app_date_time = f'2000-01-01 {date_time}'
             
-            duration = DURATION_CHOICES[app_duration]
+            duration = DURATION_CHOICES[app_duration.lower()]
             app_date_time = datetime.fromisoformat(app_date_time)
             datetime_duration = app_date_time + timedelta(minutes=duration)
             datetime_duration = datetime_duration.strftime('%H:%M:%S')
@@ -2379,6 +2385,7 @@ def create_appointment_client(request):
                         'message' : 'Appointment Create!',
                         'error_message' : None,
                         'appointments' : serialized.data,
+                        'errors' : errors
                     }
                 },
                 status=status.HTTP_201_CREATED
