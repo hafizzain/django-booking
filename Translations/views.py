@@ -59,6 +59,11 @@ def add_data(request):
         status=status.HTTP_200_OK
     )
 
+    try:
+        lan = Language.objects.get(title = language)
+    except:
+        lang = Language.objects.create(title = language)
+        lang.save()
 
     for data in data:
         label = data.get('label')
