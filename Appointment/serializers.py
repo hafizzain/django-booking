@@ -244,6 +244,9 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             first_shift = [employee_working_schedule.start_time, employee_working_schedule.end_time]
             second_shift = [employee_working_schedule.start_time_shift, employee_working_schedule.end_time_shift] if employee_working_schedule.start_time_shift else None
 
+            if not first_shift[0] or not first_shift[1]:
+                return []
+
             if employee_working_schedule.start_time.strftime('%H:%M:%S') == "00:00:00":
                 if employee_working_schedule.end_time.strftime('%H:%M:%S') == '00:00:00':
                     pass
