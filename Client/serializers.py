@@ -191,6 +191,7 @@ class MembershipSerializer(serializers.ModelSerializer):
 class VoucherSerializer(serializers.ModelSerializer):
     # currency_voucher_prices = serializers.SerializerMethodField(read_only=True)
     currency_voucher = serializers.SerializerMethodField()
+    voucher_count = serializers.SerializerMethodField()
 
     def get_currency_voucher(self, obj):
         try:
@@ -198,10 +199,15 @@ class VoucherSerializer(serializers.ModelSerializer):
             return CurrencyPriceVoucherSerializers(cvp, many= True).data
         except Exception as err:
             print(err)
+
+    def get_voucher_count(self, obj):
+        count = VoucherOrder.objects.filter(voucher=obj).count()
+        return count
+
     class Meta:
         model = Vouchers
         fields = ['id', 'name','user','business','voucher_type',
-                'validity','sales','is_deleted','is_active','created_at','currency_voucher','discount_percentage']
+                'validity','sales','is_deleted','is_active','created_at','currency_voucher','discount_percentage', 'voucher_count']
 
 
 class ClientAppointmentSerializer(serializers.ModelSerializer):
@@ -313,7 +319,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
     discount_type = serializers.SerializerMethodField(read_only=True)
     products = serializers.SerializerMethodField()
     services = serializers.SerializerMethodField()
-
+    employee = serializers.SerializerMethodField()
 
     def get_products(self, obj):
         try:
@@ -335,8 +341,6 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
     
     def get_membership_price(self, obj):
         return obj.current_price
-    
-    employee = serializers.SerializerMethodField()
     
 
     def get_employee(self, membership_order):
