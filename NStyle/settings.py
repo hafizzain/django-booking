@@ -67,6 +67,7 @@ NSTYLE_APPS = [
     'Invoices.apps.InvoicesConfig',
     'Help.apps.HelpConfig',
     'Translations.apps.TranslationsConfig',
+    'SuperInsight.apps.SuperinsightConfig',
 ]
 
 
