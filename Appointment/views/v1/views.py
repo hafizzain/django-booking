@@ -1728,6 +1728,7 @@ def create_checkout(request):
         invoice.is_promotion = True
         invoice.selected_promotion_id = request.data.get('selected_promotion_id', '')
         invoice.selected_promotion_type = request.data.get('selected_promotion_type', '')
+        invoice.checkout = checkout
         invoice.save()
 
 
