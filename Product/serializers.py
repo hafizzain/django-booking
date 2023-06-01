@@ -603,3 +603,9 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
         model = Product
         fields = ['id', 'name', 'retail_price', 'brand', 'reports', 'current_stock', 'cost_price', 'created_at']
         #  'avaiable',
+
+
+class ProductInsightSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'top_sold_orders']
