@@ -474,6 +474,6 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
 from Invoices.models import SaleInvoice
 
 class SaleInvoiceSerializer(serializers.ModelSerializer):
-    class MEta:
+    class Meta:
         model = SaleInvoice
         fields = '__all__'
