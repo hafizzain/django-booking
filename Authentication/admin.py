@@ -41,6 +41,7 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(AccountType)
 class AccountTypeAdmin(admin.ModelAdmin):
+    search_fields = ['user__email']
     list_display = [
         'id',
         'account_type',
