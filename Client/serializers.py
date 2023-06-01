@@ -6,8 +6,8 @@ from Order.models import VoucherOrder, MemberShipOrder
 from Product.models import Product
 from Service.models import Service
 from Utility.models import Country, State, City
-
 from Client.models import Client, ClientGroup, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription, Promotion , Rewards , Membership, Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs , VoucherCurrencyPrice 
+from Invoices.models import SaleInvoice
 
 class LocationSerializerLoyalty(serializers.ModelSerializer):
     
@@ -437,9 +437,12 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
         return c_points.actual_sale_value_redeemed
 
     def get_invoice(self, c_points):
-        return {
-            'id' : f'{c_points.short_id}'
-        }
+        # return {
+        #     'id' : f'{c_points.short_id}'
+        # }
+        invoice = SaleInvoice.objects.filter(user = c_points.customer)
+        print(invoice)
+        return invoice
 
     def get_customer(self, c_points):
         return {
