@@ -564,7 +564,12 @@ def login(request):
             user = User.objects.filter(
                 email=email,
                 is_deleted=False
-            ).exclude(user_account_type__account_type = 'Everyone')[0]
+            )
+            # .exclude(user_account_type__account_type = 'Everyone')
+            if len(user) > 0:
+                user = user[0]
+            else:
+                raise Exception('User Does not exists with this Email')
         
         except Exception as err:
             ExceptionRecord.objects.create(
