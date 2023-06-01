@@ -423,7 +423,7 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
 
     date = serializers.SerializerMethodField()
     actual_sale_value_redeemed = serializers.SerializerMethodField()
-    invoice = serializers.SerializerMethodField()
+    invoice_data = serializers.SerializerMethodField()
     customer = serializers.SerializerMethodField()
     loyalty = serializers.SerializerMethodField()
     points_earned = serializers.SerializerMethodField()
@@ -436,9 +436,9 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
     def get_actual_sale_value_redeemed(self, c_points):
         return c_points.actual_sale_value_redeemed
 
-    def get_invoice(self, c_points):
+    def get_invoice_data(self, c_points):
         try:
-            invoice = SaleInvoice.objects.get(id__icontains = c_points.invoice)
+            invoice = SaleInvoice.objects.get(id = c_points.invoice)
             invoice_data = SaleInvoiceSerializer(invoice,many =True, context=self.context ).data
             return invoice_data
         except:
@@ -468,7 +468,7 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LoyaltyPointLogs
-        fields = ['customer', 'loyalty', 'points_earned', 'points_redeemed','balance', 'invoice', 'actual_sale_value_redeemed', 'date']
+        fields = ['customer', 'loyalty', 'points_earned', 'points_redeemed','balance', 'invoice', 'invoice_data' 'actual_sale_value_redeemed', 'date']
 
 
 from Invoices.models import SaleInvoice
