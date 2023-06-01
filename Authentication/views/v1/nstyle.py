@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.db import connection
 from django.db.models import Q
 from Authentication.Constants.CreateTenant import create_tenant
-from Authentication.Constants.UserConstants import create_user_account_type, complete_user_account
+from Authentication.Constants.UserConstants import complete_user_account
 
 # from django.contrib.auth.models import User
 from Authentication.models import User, VerificationOTP
@@ -22,6 +22,8 @@ from django.contrib.auth import authenticate
 from Authentication.serializers import UserLoginSerializer, UserSerializer, UserTenantSerializer
 from django_tenants.utils import tenant_context
 from Authentication.Constants.Email import send_welcome_email
+
+from Utility.models import ExceptionRecord
 # Create your views here.
 
 @api_view(['GET'])
@@ -506,6 +508,12 @@ def login(request):
     email = request.data.get('email', None)
     social_account = request.data.get('social_account', False)
     password = request.data.get('password', None)
+
+
+    ExceptionRecord.objects.create(
+        text = f'SAFARI LOGIN ERROR EMAIL : {email}; password : {password}'
+    )
+    
     
     user = None
     employee = False
@@ -546,13 +554,26 @@ def login(request):
         user = None
         
     if user == None:
+        ExceptionRecord.objects.create(
+            text = f'SAFARI LOGIN ERROR user is None'
+        )
         try:
+            ExceptionRecord.objects.create(
+                text = f'SAFARI LOGIN ERROR EMAIL : {email}; password : {password}'
+            )
             user = User.objects.filter(
                 email=email,
                 is_deleted=False
-            ).exclude(user_account_type__account_type = 'Everyone')[0]
+            ).exclude(user_account_type__account_type = 'Everyone')
+            if len(user) > 0:
+                user = user[0]
+            else:
+                raise Exception('User Does not exists with this Email')
         
         except Exception as err:
+            ExceptionRecord.objects.create(
+                text = f'SAFARI LOGIN ERROR EMAIL : {str(err)}'
+            )
             return Response(
                 {
                     'status' : False,
