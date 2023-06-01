@@ -1461,7 +1461,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             serializer = SaleInvoiceSerializer(invoice)
             return serializer.data
         except Exception as e:
-            return str(e)
+            return str(e) + self.obj.id
     
     class Meta:
         model = Checkout
