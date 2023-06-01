@@ -127,6 +127,9 @@ class AccountType(models.Model):
     def username(self):
         return str(self.user.username)
 
+    def email(self):
+        return str(self.user.email)
+
     def is_everyone(self):
         if self.account_type == 'Everyone':
             return True
