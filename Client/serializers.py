@@ -9,9 +9,6 @@ from Utility.models import Country, State, City
 
 from Client.models import Client, ClientGroup, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription, Promotion , Rewards , Membership, Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs , VoucherCurrencyPrice 
 from Invoices.models import SaleInvoice
-from Appointment.models import AppointmentCheckout
-from Order.models import Checkout
-from Sale.serializers import SaleOrders_AppointmentCheckoutSerializer, SaleOrders_CheckoutSerializer
 
 class LocationSerializerLoyalty(serializers.ModelSerializer):
     
@@ -433,7 +430,6 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
     points_earned = serializers.SerializerMethodField()
     points_redeemed = serializers.SerializerMethodField()
     balance = serializers.SerializerMethodField()
-    customer_data = serializers.SerializerMethodField()
 
     def get_date(self, c_points):
         return c_points.created_at.strftime('%Y-%m-%d')
@@ -469,30 +465,11 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
 
     def get_balance(self, c_points):
         return c_points.balance
-    
-    def get_customer_data(self, c_points):
-        invoice = SaleInvoice.objects.get(id__icontains = c_points.invoice)
-        # checkout = 
-        try:
-            checkout_order = Checkout.objects.filter(invocie = invoice.checkout)
-        except:
-            pass
-        try:
-            appointment_checkout = AppointmentCheckout.objects.filter(invoice = invoice.checkout)
-        except:
-            pass
-
-        checkout_data = list(SaleOrders_CheckoutSerializer(checkout_order, many=True).data)
-        appointment_data = list(SaleOrders_AppointmentCheckoutSerializer(appointment_checkout, many=True).data)
-
-        data_total = checkout_data + appointment_data
-        
-        return data_total
 
 
     class Meta:
         model = LoyaltyPointLogs
-        fields = ['customer', 'loyalty', 'points_earned', 'points_redeemed','balance', 'invoice', 'invoice_data', 'actual_sale_value_redeemed', 'date', 'customer_data']
+        fields = ['customer', 'loyalty', 'points_earned', 'points_redeemed','balance', 'invoice', 'invoice_data', 'actual_sale_value_redeemed', 'date']
 
 
 
