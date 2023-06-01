@@ -13,6 +13,8 @@ def create_user_account_type(user=None, account_type=None):
             print('Account Type already exist')
             return user_account_type
         except:
+            if account_type not in ['Everyone', 'Business', 'Employee']:
+                account_type = 'Business'
             user_account_type = AccountType.objects.create(
                 user=user,
                 account_type=account_type

@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.db import connection
 from django.db.models import Q
 from Authentication.Constants.CreateTenant import create_tenant
-from Authentication.Constants.UserConstants import create_user_account_type, complete_user_account
+from Authentication.Constants.UserConstants import complete_user_account
 
 # from django.contrib.auth.models import User
 from Authentication.models import User, VerificationOTP
