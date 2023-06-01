@@ -472,8 +472,20 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
         fields = ['customer', 'loyalty', 'points_earned', 'points_redeemed','balance', 'invoice', 'invoice_data', 'actual_sale_value_redeemed', 'date']
 
 
-
+from Appointment.models import AppointmentCheckout
+from Order.models import Checkout
+from Sale.serializers import SaleOrders_CheckoutSerializer
 class SaleInvoiceSerializer(serializers.ModelSerializer):
+    c_data = serializers.SerializerMethodField()
+
+    def get__c_data(self,obj):
+        try:
+            checkout_order = Checkout.objects.get(invoice = obj.id)
+        except Exception as e:
+            return str(e)
+        c_data = SaleOrders_CheckoutSerializer(checkout_order, many=True)
+        return c_data.data
+
     class Meta:
         model = SaleInvoice
         fields = '__all__'
