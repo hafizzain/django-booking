@@ -1437,6 +1437,9 @@ def create_sale_order(request):
         voucher_commission_type = voucher_commission_type,  
 
     )
+    checkout.save()
+    invoice.checkout = checkout
+
 
     if bool(is_promotion) == True:
         checkout.is_promotion = True
@@ -1485,7 +1488,6 @@ def create_sale_order(request):
                 checkout.total_service_price = int(float(total_price))
                 checkout.save()
                 invoice.total_service_price = int(float(total_price))
-                invoice.checkout = checkout
                 invoice.save()
                 test = False
 
@@ -1902,6 +1904,7 @@ def new_create_sale_order(request):
         voucher_commission_type = voucher_commission_type,  
 
     )
+    invoice.checkout = checkout
     invoice.save()
 
     # if is_promotion:
