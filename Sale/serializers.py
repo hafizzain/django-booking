@@ -1460,12 +1460,8 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             invoice = SaleInvoice.objects.get(checkout__icontains = obj)
             serializer = SaleInvoiceSerializer(invoice)
             return serializer.data
-        except:
-            try:
-                invoice = SaleInvoice.objects.get(checkout__icontains = obj)
-                return invoice
-            except:
-                return 'abc'
+        except Exception as e:
+            return str(e)
     
     class Meta:
         model = Checkout
