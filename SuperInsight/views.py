@@ -4,4 +4,4 @@ from django.shortcuts import render
 
 
 def DashboardPage(request):
-    return render(request, 'SuperInsights/home_page.html')
+    return render(request, 'SuperAdminPanel/SuperInsights/home_page.html')
