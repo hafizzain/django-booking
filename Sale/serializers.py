@@ -1457,7 +1457,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     
     def get_invoice(self, obj):
         try:
-            invoice = SaleInvoice.objects.get(checkout = str(self.obj.id))
+            invoice = SaleInvoice.objects.get(checkout__icontains = self.obj.id)
             serializer = SaleInvoiceSerializer(invoice)
             return serializer.data
         except Exception as e:
