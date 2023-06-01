@@ -1349,7 +1349,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     membership_product = serializers.SerializerMethodField(read_only=True)
     membership_service = serializers.SerializerMethodField(read_only=True)
     membership_type = serializers.SerializerMethodField(read_only=True)
-    invocie = serializers.SerializerMethodField(read_only=True)
+    invoice = serializers.SerializerMethodField(read_only=True)
     
     
     tip = serializers.SerializerMethodField(read_only=True)
@@ -1473,7 +1473,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             'created_at', 'payment_type', 'tip',
             'service_commission', 'voucher_commission', 'product_commission', 'service_commission_type',
             'product_commission_type', 'voucher_commission_type', 'ids', 'membership_product',
-            'membership_service', 'membership_type'
+            'membership_service', 'membership_type', 'invoice'
         ]
 
         # Remove Member from get all sale orders
