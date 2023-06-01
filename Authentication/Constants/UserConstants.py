@@ -75,5 +75,8 @@ def complete_user_account(request, user=None, data=None):
     #     terms_condition=data.get('terms_condition', True),
     #     is_subscribed=data.get('terms_condition', False)
     # )
+
+    if not account_type:
+        account_type = 'Business'
     create_user_account_type(user=user, account_type=account_type)
     AuthTokenConstants.create_user_token(user=user)
