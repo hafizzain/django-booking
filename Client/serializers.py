@@ -441,8 +441,8 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
         #     'id' : f'{c_points.short_id}'
         # }
         invoice = SaleInvoice.objects.filter(user = c_points.customer)
-        print(invoice)
-        return invoice
+        invoice_data = InvoiceSerializer(data = invoice, many = True)
+        return invoice_data
 
     def get_customer(self, c_points):
         return {
@@ -469,3 +469,8 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
     class Meta:
         model = LoyaltyPointLogs
         fields = ['customer', 'loyalty', 'points_earned', 'points_redeemed', 'balance', 'invoice', 'actual_sale_value_redeemed', 'date']
+
+class InvoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SaleInvoice
+        fields = '__all__'
