@@ -1965,6 +1965,7 @@ def new_create_sale_order(request):
                 checkout.total_service_price = int(float(total_price))
                 checkout.save()
                 invoice.total_service_price = int(float(total_price))
+                invoice.checkout = checkout
                 invoice.save()
                 test = False
 
