@@ -437,11 +437,11 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
         return c_points.actual_sale_value_redeemed
 
     def get_invoice(self, c_points):
-        if c_points.invoice is not None:
+        try:
             invoice = SaleInvoice.objects.get(id__icontains = c_points.invoice)
-            invoice_data = SaleInvoiceSerializer(data = invoice)
+            invoice_data = SaleInvoiceSerializer(invoice,many =True, context=self.context ).data
             return invoice_data
-        else:
+        except:
             return ''
 
     def get_customer(self, c_points):
