@@ -8,6 +8,7 @@ from Service.models import Service
 from Utility.models import Country, State, City
 
 from Client.models import Client, ClientGroup, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription, Promotion , Rewards , Membership, Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs , VoucherCurrencyPrice 
+from Invoices.models import SaleInvoice
 
 class LocationSerializerLoyalty(serializers.ModelSerializer):
     
@@ -471,7 +472,6 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
         fields = ['customer', 'loyalty', 'points_earned', 'points_redeemed','balance', 'invoice', 'invoice_data', 'actual_sale_value_redeemed', 'date']
 
 
-from Invoices.models import SaleInvoice
 
 class SaleInvoiceSerializer(serializers.ModelSerializer):
     class Meta:
