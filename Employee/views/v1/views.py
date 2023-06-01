@@ -1173,7 +1173,7 @@ def update_employee(request):
             value = request.data.get(permit, None)
                 
             if value is not None:
-                #PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
+                PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
                 try:
                     value = json.loads(value)
                 except (TypeError, json.JSONDecodeError, AttributeError) as e:
