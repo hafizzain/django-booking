@@ -46,6 +46,7 @@ class AccountTypeAdmin(admin.ModelAdmin):
         'id',
         'account_type',
         'username',
+        'email',
     ]
 
 
