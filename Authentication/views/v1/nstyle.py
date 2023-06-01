@@ -564,8 +564,7 @@ def login(request):
             user = User.objects.filter(
                 email=email,
                 is_deleted=False
-            )
-            # .exclude(user_account_type__account_type = 'Everyone')
+            ).exclude(user_account_type__account_type = 'Everyone')
             if len(user) > 0:
                 user = user[0]
             else:
