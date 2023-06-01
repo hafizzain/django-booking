@@ -439,12 +439,10 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
     def get_invoice_data(self, c_points):
         try:
             invoice = SaleInvoice.objects.filter(id__icontains = c_points.invoice)
-            # invoice_data = str(invoice_data)
-            # invoice = SaleInvoice.objects.get(id = c_points.invoice)
             serializer = SaleInvoiceSerializer(invoice, many=True)
             return serializer.data
-        except:
-            return 'null'
+        except Exception as e:
+            return str(e)
 
     def get_customer(self, c_points):
         return {
