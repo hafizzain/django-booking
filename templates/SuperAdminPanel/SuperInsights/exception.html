@@ -1,0 +1,46 @@
+{% extends 'SuperAdminPanel/SuperInsights/main.html' %} {% block body %}
+<script>
+  SideBarActive("exception");
+</script>
+<div class="flex flex-col gap-6">
+  <h1 class="font-semibold text-2xl">Exception Records</h1>
+  <div class="border rounded-lg">
+    <div class="overflow-x-auto">
+      <div
+        class="inline-grid xl:grid grid-cols-[repeat(6,minmax(195px,1fr))] px-12 py-3 bg-[#FBFCFF] text-sm font-semibold min-w-full w-fit"
+      >
+        <p>Store Name</p>
+        <p>Total Service target</p>
+        <p>Total Service Sales</p>
+        <p>Total Retail Target</p>
+        <p>Total Retail Sales</p>
+        <p>Total Voucher Target</p>
+      </div>
+      <div class="odd-bg text-[#3A3A3A] transition-all">
+        <div
+          class="px-12 py-3 inline-grid xl:grid grid-cols-[repeat(6,minmax(200px,1fr))]"
+        >
+          <div class="flex items-center"><p class="text-sm">m</p></div>
+          <div class="flex items-center"><p class="text-sm">0 EUR</p></div>
+          <div class="flex items-center"><p class="text-sm">0 EUR</p></div>
+          <div class="flex items-center"><p class="text-sm">0 EUR</p></div>
+          <div class="flex items-center"><p class="text-sm">0 EUR</p></div>
+          <div class="flex items-center"><a href="{% url 'ExceptionDetailPage' %}" class="text-sm underline">See Details</a></div>
+        </div>
+        <div
+          class="px-12 py-3 inline-grid xl:grid grid-cols-[repeat(6,minmax(200px,1fr))]"
+        >
+          <div class="flex items-center">
+            <p class="text-sm">ABCD Address</p>
+          </div>
+          <div class="flex items-center"><p class="text-sm">0 AED</p></div>
+          <div class="flex items-center"><p class="text-sm">0 AED</p></div>
+          <div class="flex items-center"><p class="text-sm">0 AED</p></div>
+          <div class="flex items-center"><p class="text-sm">2023</p></div>
+          <div class="flex items-center"><a href="{% url 'ExceptionDetailPage' %}" class="text-sm underline">See Details</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock body %}

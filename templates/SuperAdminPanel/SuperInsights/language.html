@@ -1,0 +1,82 @@
+{% extends 'SuperAdminPanel/SuperInsights/main.html' %} {% block body %}
+<script>
+  SideBarActive("language");
+</script>
+
+<div class="cursor-pointer lg:hidden block">
+  <svg
+    class="w-[1.375rem] h-[1.125rem]"
+    viewBox="0 0 22 18"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+   >
+    <rect width="21.2727" height="3.27273" fill="#101928"></rect>
+    <rect y="7.36353" width="14.7273" height="3.27273" fill="#101928"></rect>
+    <rect y="14.7273" width="21.2727" height="3.27273" fill="#101928"></rect>
+  </svg>
+</div>
+<div
+  class="flex items-center gap-5 lg:w-fit w-full lg:px-0 lg:pb-[2rem] lg:py-0 p-3 pb-8"
+>
+  <h2 class="font-semibold text-2xl">Languages</h2>
+</div>
+<div
+  class="grid xl:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-[2rem] xl:pr-[4rem] pr-0"
+ >
+  <a
+    href='{% url "LanguageSectionPage" %}'
+    class="hover:bg-slate-100 relative transition-all cursor-pointer shadow-login-card px-[1.25rem] py-[1rem] rounded-xl flex flex-col gap-2"
+   >
+    <svg
+      width="40"
+      height="40"
+      viewBox="0 0 40 40"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M35 2H5C3.34315 2 2 3.34315 2 5V35C2 36.6569 3.34315 38 5 38H35C36.6569 38 38 36.6569 38 35V5C38 3.34315 36.6569 2 35 2Z"
+        stroke="#666666"
+        stroke-width="4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M20 12C18.08 12 16.5 13.58 16.5 15.5C16.5 16.43 16.88 17.28 17.5 17.91C15.97 18.91 15 20.62 15 22.5C15 25.53 17.47 28 20.5 28C22.26 28 24 27.54 25.5 26.66L24.5 24.93C23.28 25.63 21.9 26 20.5 26C18.56 26 17 24.45 17 22.5C16.9982 21.7298 17.2513 20.9806 17.7198 20.3692C18.1883 19.7578 18.8458 19.3186 19.59 19.12L24.8 17.72L24.28 15.79L19.83 17C19.08 16.9 18.5 16.28 18.5 15.5C18.5 14.66 19.16 14 20 14C20.26 14 20.5 14.07 20.75 14.2L21.75 12.47C21.22 12.16 20.61 12 20 12Z"
+        fill="#666666"
+      />
+    </svg>
+    <h2 class="font-semibold text-xl">Arabic</h2>
+  </a>
+  <a
+    href='{% url "LanguageSectionPage" %}'
+    class="hover:bg-slate-100 relative transition-all cursor-pointer shadow-login-card px-[1.25rem] py-[1rem] rounded-xl flex flex-col gap-2"
+   >
+    <svg
+      width="40"
+      height="40"
+      viewBox="0 0 40 40"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M35 2H5C3.34315 2 2 3.34315 2 5V35C2 36.6569 3.34315 38 5 38H35C36.6569 38 38 36.6569 38 35V5C38 3.34315 36.6569 2 35 2Z"
+        stroke="#666666"
+        stroke-width="4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M17.1818 15H11V26H16.7955M11 20.5H16.7955M21.0455 16.5714V26V20.8929C21.0455 19.9551 21.4118 19.0558 22.0639 18.3927C22.716 17.7297 23.6005 17.3571 24.5227 17.3571C25.445 17.3571 26.3294 17.7297 26.9815 18.3927C27.6336 19.0558 28 19.9551 28 20.8929V26"
+        stroke="#666666"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+
+    <h2 class="font-semibold text-xl">English</h2>
+  </a>
+</div>
+
+{% endblock body %}
