@@ -473,10 +473,10 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
         is_checkout = False
         try:
             try:
-                data = Checkout.objects.get(id = c_points.checkout)
+                data = Checkout.objects.filter(id = c_points.checkout)
                 is_checkout = True
             except:
-                data = AppointmentCheckout.objects.get(id = c_points.checkout)
+                data = AppointmentCheckout.objects.filter(id = c_points.checkout)
         except Exception as e:
             return str(e)
 
