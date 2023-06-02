@@ -2202,6 +2202,7 @@ def create_appointment_client(request):
         user_details = {
             'email' : f'{request.user.email}',
             'full_name' : f'{request.user.username}',
+            'mobile_number' : f'{request.user.mobile_number}',
         }
         client_id = None
     else:
@@ -2250,7 +2251,10 @@ def create_appointment_client(request):
 
         if created:
             client.full_name = user_details['full_name']
+            client.mobile_number = user_details['mobile_number']
             client.is_email_verified = True
+            client.is_mobile_verified = True
+
             client.is_active = True
             client.save()
         
