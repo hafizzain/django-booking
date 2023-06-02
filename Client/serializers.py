@@ -422,7 +422,6 @@ class CustomerLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
         model = ClientLoyaltyPoint
         fields = ['customer', 'loyalty', 'points_earned', 'points_redeemed', 'balance']
 
-from Sale.serializers import SaleOrders_CheckoutSerializer
 class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
 
     date = serializers.SerializerMethodField()
@@ -471,6 +470,8 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
         return c_points.balance
 
     def get_checkout_data(self, c_points):
+        from Sale.serializers import SaleOrders_CheckoutSerializer
+
         is_checkout = False
         try:
             try:
