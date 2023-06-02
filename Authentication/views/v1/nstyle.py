@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.db import connection
 from django.db.models import Q
 from Authentication.Constants.CreateTenant import create_tenant
-from Authentication.Constants.UserConstants import create_user_account_type, complete_user_account
+from Authentication.Constants.UserConstants import complete_user_account
 
 # from django.contrib.auth.models import User
 from Authentication.models import User, VerificationOTP
@@ -22,6 +22,8 @@ from django.contrib.auth import authenticate
 from Authentication.serializers import UserLoginSerializer, UserSerializer, UserTenantSerializer
 from django_tenants.utils import tenant_context
 from Authentication.Constants.Email import send_welcome_email
+
+from Utility.models import ExceptionRecord
 # Create your views here.
 
 @api_view(['GET'])
@@ -506,7 +508,7 @@ def login(request):
     email = request.data.get('email', None)
     social_account = request.data.get('social_account', False)
     password = request.data.get('password', None)
-    
+
     user = None
     employee = False
     if social_account:
@@ -550,7 +552,11 @@ def login(request):
             user = User.objects.filter(
                 email=email,
                 is_deleted=False
-            ).exclude(user_account_type__account_type = 'Everyone')[0]
+            ).exclude(user_account_type__account_type = 'Everyone')
+            if len(user) > 0:
+                user = user[0]
+            else:
+                raise Exception('User Does not exists with this Email')
         
         except Exception as err:
             return Response(
@@ -562,6 +568,22 @@ def login(request):
                         'message' : 'User does not exist with this email',
                         'error_message' : str(err),
                         'fields' : ['email']
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    
+    if not social_account :
+        user = authenticate(username=user.username, password=password)
+        if user is None:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
+                    'status_code_text' : 'INVALID_CREDENTIALS_4013',
+                    'response' : {
+                        'message' : 'Incorrect Password',
+                        'fields' : ['password']
                     }
                 },
                 status=status.HTTP_404_NOT_FOUND
@@ -594,21 +616,7 @@ def login(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    if not social_account and not user.is_active:
-        user = authenticate(username=user.username, password=password)
-        if user is None:
-            return Response(
-                {
-                    'status' : False,
-                    'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
-                    'status_code_text' : 'INVALID_CREDENTIALS_4013',
-                    'response' : {
-                        'message' : 'Incorrect Password',
-                        'fields' : ['password']
-                    }
-                },
-                status=status.HTTP_404_NOT_FOUND
-            )
+
 
     if not social_account and not user.is_email_verified:
         return Response(

@@ -16,6 +16,7 @@ from Sale.Constants.Promotion import get_promotions
 from Product.models import ProductStock
 
 from Service.models import PriceService, Service, ServiceGroup
+from Invoices.models import SaleInvoice
 
 class PriceServiceSerializers(serializers.ModelSerializer):
     currency_name = serializers.SerializerMethodField(read_only=True)
@@ -1348,6 +1349,8 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     membership_product = serializers.SerializerMethodField(read_only=True)
     membership_service = serializers.SerializerMethodField(read_only=True)
     membership_type = serializers.SerializerMethodField(read_only=True)
+    invoice = serializers.SerializerMethodField(read_only=True)
+    
     
     tip = serializers.SerializerMethodField(read_only=True)
 
@@ -1452,6 +1455,14 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
         serialized_tips = CheckoutTipsSerializer(tips, many=True).data
         return serialized_tips
     
+    def get_invoice(self, obj):
+        try:
+            invoice = SaleInvoice.objects.get(checkout__icontains = obj)
+            serializer = SaleInvoiceSerializer(invoice)
+            return serializer.data
+        except Exception as e:
+            return str(e)
+    
     class Meta:
         model = Checkout
         fields = [
@@ -1462,12 +1473,15 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             'created_at', 'payment_type', 'tip',
             'service_commission', 'voucher_commission', 'product_commission', 'service_commission_type',
             'product_commission_type', 'voucher_commission_type', 'ids', 'membership_product',
-            'membership_service', 'membership_type'
+            'membership_service', 'membership_type', 'invoice'
         ]
 
         # Remove Member from get all sale orders
 
-
+class SaleInvoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SaleInvoice
+        fields = '__all__'
 class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)

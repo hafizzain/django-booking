@@ -1728,6 +1728,7 @@ def create_checkout(request):
         invoice.is_promotion = True
         invoice.selected_promotion_id = request.data.get('selected_promotion_id', '')
         invoice.selected_promotion_type = request.data.get('selected_promotion_type', '')
+        invoice.checkout = checkout
         invoice.save()
 
 
@@ -1810,7 +1811,9 @@ def create_checkout(request):
                 points_earned = float(earned_points),
                 points_redeemed = logs_points_redeemed,
                 balance = (float(client_points.total_earn) - float(logs_points_redeemed)),
-                actual_sale_value_redeemed = logs_total_redeened_value
+                actual_sale_value_redeemed = logs_total_redeened_value,
+                invoice = invoice,
+                checkout = checkout
             )
     
 
@@ -2341,6 +2344,7 @@ def create_appointment_client(request):
                 service = service,
                 member = member,
                 price = price,
+                total_price = price,
                 
                 
                 # voucher = voucher,

@@ -8,6 +8,7 @@ from Service.models import Service
 from Utility.models import Country, State, City
 
 from Client.models import Client, ClientGroup, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription, Promotion , Rewards , Membership, Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs , VoucherCurrencyPrice 
+from Invoices.models import SaleInvoice
 
 class LocationSerializerLoyalty(serializers.ModelSerializer):
     
@@ -423,7 +424,7 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
 
     date = serializers.SerializerMethodField()
     actual_sale_value_redeemed = serializers.SerializerMethodField()
-    invoice = serializers.SerializerMethodField()
+    invoice_data = serializers.SerializerMethodField()
     customer = serializers.SerializerMethodField()
     loyalty = serializers.SerializerMethodField()
     points_earned = serializers.SerializerMethodField()
@@ -436,10 +437,13 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
     def get_actual_sale_value_redeemed(self, c_points):
         return c_points.actual_sale_value_redeemed
 
-    def get_invoice(self, c_points):
-        return {
-            'id' : f'{c_points.short_id}'
-        }
+    def get_invoice_data(self, c_points):
+        try:
+            invoice = SaleInvoice.objects.get(id__icontains = c_points.invoice)
+            serializer = SaleInvoiceSerializer(invoice)
+            return serializer.data
+        except Exception as e:
+            return str(e)
 
     def get_customer(self, c_points):
         return {
@@ -465,4 +469,11 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LoyaltyPointLogs
-        fields = ['customer', 'loyalty', 'points_earned', 'points_redeemed', 'balance', 'invoice', 'actual_sale_value_redeemed', 'date']
+        fields = ['customer', 'loyalty', 'points_earned', 'points_redeemed','balance', 'invoice', 'invoice_data', 'actual_sale_value_redeemed', 'date']
+
+
+
+class SaleInvoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SaleInvoice
+        fields = '__all__'

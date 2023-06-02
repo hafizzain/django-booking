@@ -426,7 +426,7 @@ class ClientLoyaltyPoint(models.Model):
     
     def __str__(self):
         return str(self.id)
-    
+
 class LoyaltyPointLogs(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     location = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, related_name="location_loyaltypointlogs")
@@ -439,6 +439,10 @@ class LoyaltyPointLogs(models.Model):
     points_redeemed = models.FloatField(default=0)
     balance = models.FloatField(default=0, null=True, blank=True)
     actual_sale_value_redeemed = models.FloatField(default=0)
+
+    invoice = models.CharField(max_length=128, null=True, blank=True)
+    checkout = models.CharField(max_length=128, null=True, blank=True)
+
 
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(auto_now_add=now, null=True)

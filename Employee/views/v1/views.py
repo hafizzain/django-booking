@@ -352,6 +352,8 @@ def get_Employees(request):
                 'response' : {
                     'message' : 'All Employee',
                     'count':all_employee_count,
+                    'pages':page_count,
+                    'per_page_result':20,
                     'error_message' : None,
                     'employees' : serialized.data
                 }
@@ -1173,7 +1175,7 @@ def update_employee(request):
             value = request.data.get(permit, None)
                 
             if value is not None:
-                #PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
+                PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
                 try:
                     value = json.loads(value)
                 except (TypeError, json.JSONDecodeError, AttributeError) as e:

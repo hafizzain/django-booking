@@ -1437,6 +1437,9 @@ def create_sale_order(request):
         voucher_commission_type = voucher_commission_type,  
 
     )
+    checkout.save()
+    invoice.checkout = checkout.id
+
 
     if bool(is_promotion) == True:
         checkout.is_promotion = True
@@ -1901,6 +1904,7 @@ def new_create_sale_order(request):
         voucher_commission_type = voucher_commission_type,  
 
     )
+    invoice.checkout = checkout.id
     invoice.save()
 
     # if is_promotion:
@@ -2333,7 +2337,9 @@ def new_create_sale_order(request):
                 points_earned = earned_points,
                 points_redeemed = 0,
                 balance = (float(client_points.total_earn) - float(client_points.points_redeemed)),
-                actual_sale_value_redeemed = 0
+                actual_sale_value_redeemed = 0,
+                invoice = invoice,
+                checkout = checkout
             )
 
     # payment_type_sales = Order.objects.values('payment_type').annotate(total_sales=Count('id')).order_by('payment_type')
