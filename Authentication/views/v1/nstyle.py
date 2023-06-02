@@ -509,12 +509,6 @@ def login(request):
     social_account = request.data.get('social_account', False)
     password = request.data.get('password', None)
 
-
-    ExceptionRecord.objects.create(
-        text = f'SAFARI LOGIN ERROR EMAIL : {email}; password : {password}'
-    )
-    
-    
     user = None
     employee = False
     if social_account:
@@ -554,13 +548,7 @@ def login(request):
         user = None
         
     if user == None:
-        ExceptionRecord.objects.create(
-            text = f'SAFARI LOGIN ERROR user is None'
-        )
         try:
-            ExceptionRecord.objects.create(
-                text = f'SAFARI LOGIN ERROR EMAIL : {email}; password : {password}'
-            )
             user = User.objects.filter(
                 email=email,
                 is_deleted=False
@@ -571,9 +559,6 @@ def login(request):
                 raise Exception('User Does not exists with this Email')
         
         except Exception as err:
-            ExceptionRecord.objects.create(
-                text = f'SAFARI LOGIN ERROR EMAIL : {str(err)}'
-            )
             return Response(
                 {
                     'status' : False,
@@ -583,6 +568,22 @@ def login(request):
                         'message' : 'User does not exist with this email',
                         'error_message' : str(err),
                         'fields' : ['email']
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    
+    if not social_account :
+        user = authenticate(username=user.username, password=password)
+        if user is None:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
+                    'status_code_text' : 'INVALID_CREDENTIALS_4013',
+                    'response' : {
+                        'message' : 'Incorrect Password',
+                        'fields' : ['password']
                     }
                 },
                 status=status.HTTP_404_NOT_FOUND
@@ -615,21 +616,7 @@ def login(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    if not social_account :
-        user = authenticate(username=user.username, password=password)
-        if user is None:
-            return Response(
-                {
-                    'status' : False,
-                    'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
-                    'status_code_text' : 'INVALID_CREDENTIALS_4013',
-                    'response' : {
-                        'message' : 'Incorrect Password',
-                        'fields' : ['password']
-                    }
-                },
-                status=status.HTTP_404_NOT_FOUND
-            )
+
 
     if not social_account and not user.is_email_verified:
         return Response(
