@@ -2249,14 +2249,14 @@ def create_appointment_client(request):
                 business = business,
             )
 
-        if created:
-            client.full_name = user_details['full_name']
-            client.mobile_number = user_details['mobile_number']
-            client.is_email_verified = True
-            client.is_mobile_verified = True
+            if created:
+                client.full_name = user_details['full_name']
+                client.mobile_number = user_details['mobile_number']
+                client.is_email_verified = True
+                client.is_mobile_verified = True
 
-            client.is_active = True
-            client.save()
+                client.is_active = True
+                client.save()
         
         client_id = f'{client.id}'
         tenant_client.client_id = client_id
