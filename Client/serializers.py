@@ -9,6 +9,8 @@ from Utility.models import Country, State, City
 
 from Client.models import Client, ClientGroup, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription, Promotion , Rewards , Membership, Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs , VoucherCurrencyPrice 
 from Invoices.models import SaleInvoice
+from Appointment.models import AppointmentCheckout
+from Order.models import Checkout
 
 class LocationSerializerLoyalty(serializers.ModelSerializer):
     
@@ -430,6 +432,7 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
     points_earned = serializers.SerializerMethodField()
     points_redeemed = serializers.SerializerMethodField()
     balance = serializers.SerializerMethodField()
+    checkout_data = serializers.SerializerMethodField()
 
     def get_date(self, c_points):
         return c_points.created_at.strftime('%Y-%m-%d')
@@ -466,6 +469,25 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
     def get_balance(self, c_points):
         return c_points.balance
 
+    def get_checkout_data(self, c_points):
+        is_checkout = False
+        try:
+            try:
+                data = Checkout.objects.get(id = c_points.checkout)
+                is_checkout = True
+            except:
+                data = AppointmentCheckout.objects.get(id = c_points.checkout)
+        except Exception as e:
+            return str(e)
+
+        if is_checkout == True:
+            serializer = CheckoutSerializer(data, many=True)
+        else:
+            serializer = AppointmentCheckoutSerializer(data, many=True)
+        return serializer.data
+        
+
+
 
     class Meta:
         model = LoyaltyPointLogs
@@ -476,4 +498,15 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
 class SaleInvoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = SaleInvoice
+        fields = '__all__'
+
+
+class CheckoutSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Checkout
+        fields = '__all__'
+
+class AppointmentCheckoutSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AppointmentCheckout
         fields = '__all__'
