@@ -1812,7 +1812,8 @@ def create_checkout(request):
                 points_redeemed = logs_points_redeemed,
                 balance = (float(client_points.total_earn) - float(logs_points_redeemed)),
                 actual_sale_value_redeemed = logs_total_redeened_value,
-                invoice = invoice
+                invoice = invoice,
+                checkout = checkout
             )
     
 
@@ -2343,6 +2344,7 @@ def create_appointment_client(request):
                 service = service,
                 member = member,
                 price = price,
+                total_price = price,
                 
                 
                 # voucher = voucher,

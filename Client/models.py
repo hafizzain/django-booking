@@ -441,6 +441,7 @@ class LoyaltyPointLogs(models.Model):
     actual_sale_value_redeemed = models.FloatField(default=0)
 
     invoice = models.CharField(max_length=128, null=True, blank=True)
+    checkout = models.CharField(max_length=128, null=True, blank=True)
 
 
     created_at = models.DateTimeField(auto_now_add=now, null=True)
