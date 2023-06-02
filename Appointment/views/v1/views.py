@@ -2194,6 +2194,7 @@ def create_appointment_client(request):
         )
 
     tenant_client, tennant_client_created = ClientTenantAppDetail.objects.get_or_create(
+        user = request.user,
         tenant = tenant,
         is_appointment = True
     )
