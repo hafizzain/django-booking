@@ -401,6 +401,8 @@ def customer_login(request):
     email = request.data.get('email', None)
     social_account = request.data.get('social_account', False)
     password = request.data.get('password', None)
+    
+    tenant_id = request.GET.get('tenant_id', None)
 
     if social_account:
         social_platform = request.data.get('social_platform', None)
@@ -533,7 +535,7 @@ def customer_login(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    serialized = UserSerializerByClient(user)
+    serialized = UserSerializerByClient(user, context={'tenant_id' : tenant_id})
     
     return Response(
             {
@@ -879,6 +881,7 @@ def get_client_detail(request):
     hash = request.GET.get('hash', None)
     client_id = request.GET.get('client_id', None)
     
+    errors = []
     data = []    
     if hash is None: 
        return Response(
@@ -919,6 +922,7 @@ def get_client_detail(request):
             serialized = Client_TenantSerializer(all_client, context={'request' : request,'tenant' : tenant.schema_name })
             data.append(serialized.data)
         except Exception as err:
+            errors.append(str(err))
             pass
             
     return Response(
@@ -927,7 +931,7 @@ def get_client_detail(request):
             'status_code' : '200',
             'response' : {
                 'message' : 'All Client',
-                'error_message' : None,
+                'error_message' : errors,
                 'client' : data
             }
         },

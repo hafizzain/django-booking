@@ -5,6 +5,9 @@ from Employee.serializers import EmployeSerializer
 from rest_framework import serializers
 from Authentication.models import AccountType, User
 from Tenants.models import ClientIdUser, Domain, Tenant
+from Client.models import Client
+
+from django_tenants.utils import tenant_context
 
 class UserSerializer(serializers.ModelSerializer):
     # access_token = serializers.SerializerMethodField()
@@ -171,6 +174,23 @@ class UserSerializerByClient(serializers.ModelSerializer):
     client_id = serializers.SerializerMethodField()
     
     def get_client_id(self,obj):
+        tenant_id = self.context.get('tenant_id', None)
+        if tenant_id:
+            try:
+                tenant = Tenant.objects.get(id = tenant_id)
+            except Exception as err:
+                pass
+            else:
+                with tenant_context(tenant):
+                    try:
+                        client = Client.objects.get(email = obj.email)
+                    except Exception as err:
+                        pass
+                    else:
+                        return f'{client.id}'
+        
+        return None
+
         try:
             id = ClientIdUser.objects.get(user = obj)
             return id.client_id

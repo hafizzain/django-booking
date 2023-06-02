@@ -20,7 +20,7 @@ class TenantAdmin(admin.ModelAdmin):
     ]
 
     list_filter = ['is_ready', 'is_active']
-    search_fields = ['id', 'domain', 'schema_name']
+    search_fields = ['id', 'domain', 'schema_name', 'user__email']
 
     def domain_name(self, obj):
         if obj.domain:
