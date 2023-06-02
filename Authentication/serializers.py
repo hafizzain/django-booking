@@ -178,16 +178,18 @@ class UserSerializerByClient(serializers.ModelSerializer):
         if tenant_id:
             try:
                 tenant = Tenant.objects.get(id = tenant_id)
-            except:
-                pass
+            except Exception as err:
+                return str(err)
             else:
                 with tenant_context(tenant):
                     try:
                         client = Client.objects.get(email = obj.email)
-                    except:
-                        pass
+                    except Exception as err:
+                        return str(err)
                     else:
                         return f'{client.id}'
+        else:
+            return f'{tenant_id} => not found'
 
         try:
             id = ClientIdUser.objects.get(user = obj)
