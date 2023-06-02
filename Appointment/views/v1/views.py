@@ -2137,7 +2137,7 @@ def get_client_sale(request):
         )
     
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def create_appointment_client(request):
     #user = request.user
     tenant_id = request.data.get('hash', None)
@@ -2148,6 +2148,7 @@ def create_appointment_client(request):
 
     client = request.data.get('client', None)
     client_type = request.data.get('client_type', None)
+    client_email = request.data.get('client_email', None)
     
     payment_method = request.data.get('payment_method', None)
     discount_type = request.data.get('discount_type', None)
@@ -2191,19 +2192,21 @@ def create_appointment_client(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    
-    try:
-        tenant_client = ClientTenantAppDetail.objects.create(
-            # user = user 
-            tenant = tenant,
-            client_id = client,
-            is_appointment = True
-        )
-    except Exception as err:
-        errors.append(str(err))
-        pass    
+
+    tenant_client, tennant_client_created = ClientTenantAppDetail.objects.get_or_create(
+        tenant = tenant,
+        is_appointment = True
+    )
+
+    if tennant_client_created:
+        user_details = {
+            'email' : f'{request.user.email}',
+            'full_name' : f'{request.user.username}',
+        }
+        client_id = None
     else:
-        errors.append('Tenant client app detail found')
+        client_id = tenant_client.client_id
+
     with tenant_context(tenant):
         try:
             business=Business.objects.get(id=business_id)
@@ -2236,21 +2239,21 @@ def create_appointment_client(request):
                     }
                 }
             )
-        try:
-            client = Client.objects.get(id=client)
-        except Exception as err:
-            errors.append('Client is none')
-            client = None
-            # return Response(
-            #     {
-            #             'status' : False,
-            #             'status_code' : StatusCodes.INVALID_CLIENT_4032,
-            #             'response' : {
-            #             'message' : 'Client not found',
-            #             'error_message' : str(err),
-            #         }
-            #     }
-            # )
+        
+        if client_id:
+            client = Client.objects.get(id = client_id)
+        else:
+            client, created = Client.objects.get_or_create(email = user_details['email'])
+
+        if created:
+            client.full_name = user_details['full_name']
+            client.is_email_verified = True
+            client.is_active = True
+            client.save()
+        
+        client_id = f'{client.id}'
+        tenant_client.client_id = client_id
+        tenant_client.save()
         
                 
         appointment = Appointment.objects.create(
