@@ -350,7 +350,7 @@ def create_client(request):
                             'status_code' : 404,
                             'status_code_text' : '404',
                             'response' : {
-                                'message' : f'Client Already exist with this {email}!',
+                                'message' : f'Client already exist with this email.',
                                 'error_message' : None,
                             }
                         },
@@ -369,7 +369,7 @@ def create_client(request):
                             'status_code' : 404,
                             'status_code_text' : '404',
                             'response' : {
-                                'message' : f'Client Already exist with this {mobile_number}!',
+                                'message' : f'Client already exist with this phone number',
                                 'error_message' : None, 
                             }
                         },
