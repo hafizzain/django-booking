@@ -352,6 +352,8 @@ def get_Employees(request):
                 'response' : {
                     'message' : 'All Employee',
                     'count':all_employee_count,
+                    'pages':page_count,
+                    'per_page_result':20,
                     'error_message' : None,
                     'employees' : serialized.data
                 }
