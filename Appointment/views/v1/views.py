@@ -2399,6 +2399,7 @@ def create_appointment_client(request):
                         'message' : 'Appointment Create!',
                         'error_message' : None,
                         'appointments' : serialized.data,
+                        'client_id' : client_id,
                         'errors' : errors
                     }
                 },
