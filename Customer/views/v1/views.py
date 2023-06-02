@@ -401,6 +401,7 @@ def customer_login(request):
     email = request.data.get('email', None)
     social_account = request.data.get('social_account', False)
     password = request.data.get('password', None)
+    tenant_id = request.data.get('tenant_id', None)
 
     if social_account:
         social_platform = request.data.get('social_platform', None)
@@ -533,7 +534,7 @@ def customer_login(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    serialized = UserSerializerByClient(user)
+    serialized = UserSerializerByClient(user, context={'tenant_id' : tenant_id})
     
     return Response(
             {
