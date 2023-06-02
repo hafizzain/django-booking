@@ -879,6 +879,7 @@ def get_client_detail(request):
     hash = request.GET.get('hash', None)
     client_id = request.GET.get('client_id', None)
     
+    errors = []
     data = []    
     if hash is None: 
        return Response(
@@ -919,6 +920,7 @@ def get_client_detail(request):
             serialized = Client_TenantSerializer(all_client, context={'request' : request,'tenant' : tenant.schema_name })
             data.append(serialized.data)
         except Exception as err:
+            errors.append(str(err))
             pass
             
     return Response(
@@ -927,7 +929,7 @@ def get_client_detail(request):
             'status_code' : '200',
             'response' : {
                 'message' : 'All Client',
-                'error_message' : None,
+                'error_message' : errors,
                 'client' : data
             }
         },
