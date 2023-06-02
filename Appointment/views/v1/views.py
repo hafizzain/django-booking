@@ -1686,9 +1686,6 @@ def create_checkout(request):
                                         
     except Exception as err:
         Errors.append(str(err))
-
-    exception = ExceptionRecord.objects.create(text='inside 1')
-    exception.save()
         
     checkout = AppointmentCheckout.objects.create(
         appointment = appointments,
@@ -1720,12 +1717,6 @@ def create_checkout(request):
         service_commission = float(service_commission),
         service_commission_type = service_commission_type,        
     )
-    exception = ExceptionRecord.objects.create(text='inside 2')
-    exception.save()
-
-    invoice.save()
-    exception = ExceptionRecord.objects.create(text=str(invoice))
-    exception.save()
     # checkout.business_address = service_appointment.business_address
     # checkout.save()
 
