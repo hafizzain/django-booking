@@ -2343,6 +2343,7 @@ def create_appointment_client(request):
                 service = service,
                 member = member,
                 price = price,
+                total_price = price,
                 
                 
                 # voucher = voucher,
