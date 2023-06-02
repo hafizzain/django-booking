@@ -1,173 +1,53 @@
 {% extends 'SuperAdminPanel/SuperInsights/main.html' %} {% block body %}
 <script>
-  SideBarActive('dashboard')
+  SideBarActive("dashboard");
 </script>
+
+<style>
+  .box {
+    box-shadow: 0px 1px 22px -12px #607d8b;
+    background-color: #fff;
+    padding: 12px;
+    border: 1px solid #ddd;
+  }
+</style>
 <div class="h-full w-full">
   <div class="md:w-[70%] flex flex-col gap-[1.6rem]">
     <h1 class="font-semibold text-2xl">Super Admin Dashboard</h1>
-    <div class="flex items-center gap-3 flex-wrap">
-      <div
-        class="bg-white p-4 rounded-xl w-[15rem] shadow-lg flex flex-col gap-4 transition-all hover:bg-[#DBDAFF] cursor-pointer"
-      >
-        <div class="flex justify-between items-center">
-          <svg
-            width="1.75rem"
-            height="1.75rem"
-            viewBox="0 0 28 28"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M14 27.3334C6.63599 27.3334 0.666656 21.3641 0.666656 14.0001C0.666656 6.63608 6.63599 0.666748 14 0.666748C21.364 0.666748 27.3333 6.63608 27.3333 14.0001C27.3333 21.3641 21.364 27.3334 14 27.3334ZM14 24.6667C16.829 24.6667 19.5421 23.5429 21.5425 21.5426C23.5429 19.5422 24.6667 16.8291 24.6667 14.0001C24.6667 11.1711 23.5429 8.458 21.5425 6.45761C19.5421 4.45722 16.829 3.33341 14 3.33341C11.171 3.33341 8.45791 4.45722 6.45752 6.45761C4.45713 8.458 3.33332 11.1711 3.33332 14.0001C3.33332 16.8291 4.45713 19.5422 6.45752 21.5426C8.45791 23.5429 11.171 24.6667 14 24.6667ZM9.33332 16.6667H16.6667C16.8435 16.6667 17.013 16.5965 17.1381 16.4715C17.2631 16.3465 17.3333 16.1769 17.3333 16.0001C17.3333 15.8233 17.2631 15.6537 17.1381 15.5287C17.013 15.4037 16.8435 15.3334 16.6667 15.3334H11.3333C10.4493 15.3334 9.60142 14.9822 8.9763 14.3571C8.35118 13.732 7.99999 12.8841 7.99999 12.0001C7.99999 11.116 8.35118 10.2682 8.9763 9.64306C9.60142 9.01794 10.4493 8.66675 11.3333 8.66675H12.6667V6.00008H15.3333V8.66675H18.6667V11.3334H11.3333C11.1565 11.3334 10.9869 11.4037 10.8619 11.5287C10.7369 11.6537 10.6667 11.8233 10.6667 12.0001C10.6667 12.1769 10.7369 12.3465 10.8619 12.4715C10.9869 12.5965 11.1565 12.6667 11.3333 12.6667H16.6667C17.5507 12.6667 18.3986 13.0179 19.0237 13.6431C19.6488 14.2682 20 15.116 20 16.0001C20 16.8841 19.6488 17.732 19.0237 18.3571C18.3986 18.9822 17.5507 19.3334 16.6667 19.3334H15.3333V22.0001H12.6667V19.3334H9.33332V16.6667Z"
-              fill="#3F3F44"
-            ></path>
-          </svg>
-          <p class="text-[#007930] font-semibold text-xl">EUR 0</p>
-        </div>
-        <div class="flex justify-between items-center">
-          <p class="text-[#3F3F44] text-sm font-semibold">Total Revenue</p>
-          <svg
-            width="43"
-            height="23"
-            viewBox="0 0 43 23"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M2 21L7.71429 15.5L12.3896 18.5L22.3377 8.5L29.5325 14.5L41 2"
-              stroke="url(#paint0_linear_55_152)"
-              stroke-width="3"
-              stroke-linecap="round"
-            ></path>
-            <defs>
-              <linearGradient
-                id="paint0_linear_55_152"
-                x1="54"
-                y1="-4.00001"
-                x2="-18.5"
-                y2="30"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop stop-color="#007930"></stop>
-                <stop offset="1" stop-color="#CCEABB" stop-opacity="0"></stop>
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-      </div>
-      <div
-        class="bg-white p-4 rounded-xl w-[15rem] shadow-lg flex flex-col gap-4 transition-all hover:bg-[#DBDAFF] cursor-pointer"
-      >
-        <div class="flex justify-between items-center">
-          <svg
-            class="w-[1.625rem] h-[1.875rem]"
-            viewBox="0 0 26 30"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M11 17.6666V20.3333C8.87826 20.3333 6.84343 21.1761 5.34314 22.6764C3.84285 24.1767 2.99999 26.2115 2.99999 28.3333H0.333328C0.333328 25.5043 1.45713 22.7912 3.45752 20.7908C5.45791 18.7904 8.17102 17.6666 11 17.6666ZM11 16.3333C6.57999 16.3333 2.99999 12.7533 2.99999 8.33325C2.99999 3.91325 6.57999 0.333252 11 0.333252C15.42 0.333252 19 3.91325 19 8.33325C19 12.7533 15.42 16.3333 11 16.3333ZM11 13.6666C13.9467 13.6666 16.3333 11.2799 16.3333 8.33325C16.3333 5.38659 13.9467 2.99992 11 2.99992C8.05333 2.99992 5.66666 5.38659 5.66666 8.33325C5.66666 11.2799 8.05333 13.6666 11 13.6666ZM19 27.6666L15.0813 29.7266L15.8293 25.3639L12.66 22.2733L17.0413 21.6359L19 17.6666L20.96 21.6359L25.34 22.2733L22.1707 25.3639L22.9173 29.7266L19 27.6666Z"
-              fill="#3F3F44"
-            ></path>
-          </svg>
-          <p class="text-[#007930] font-semibold text-xl">2</p>
-        </div>
-        <div class="flex justify-between items-center">
-          <p class="text-[#3F3F44] text-sm font-semibold">Total Clients</p>
-          <svg
-            width="43"
-            height="23"
-            viewBox="0 0 43 23"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M2 21L7.71429 15.5L12.3896 18.5L22.3377 8.5L29.5325 14.5L41 2"
-              stroke="url(#paint0_linear_55_152)"
-              stroke-width="3"
-              stroke-linecap="round"
-            ></path>
-            <defs>
-              <linearGradient
-                id="paint0_linear_55_152"
-                x1="54"
-                y1="-4.00001"
-                x2="-18.5"
-                y2="30"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop stop-color="#007930"></stop>
-                <stop offset="1" stop-color="#CCEABB" stop-opacity="0"></stop>
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-      </div>
-      <div
-        class="bg-white p-4 rounded-xl w-[15rem] shadow-lg flex flex-col gap-4 transition-all hover:bg-[#DBDAFF] cursor-pointer"
-      >
-        <div class="flex justify-between items-center">
-          <svg
-            height="1.438rem"
-            width="1.438rem"
-            viewBox="0 0 23 23"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M17.25 2.3H21.85C22.155 2.3 22.4475 2.42116 22.6632 2.63683C22.8788 2.85249 23 3.145 23 3.45V21.85C23 22.155 22.8788 22.4475 22.6632 22.6632C22.4475 22.8788 22.155 23 21.85 23H1.15C0.845001 23 0.552494 22.8788 0.336827 22.6632C0.12116 22.4475 0 22.155 0 21.85V3.45C0 3.145 0.12116 2.85249 0.336827 2.63683C0.552494 2.42116 0.845001 2.3 1.15 2.3H5.75V0H8.05V2.3H14.95V0H17.25V2.3ZM20.7 11.5H2.3V20.7H20.7V11.5ZM14.95 4.6H8.05V6.9H5.75V4.6H2.3V9.2H20.7V4.6H17.25V6.9H14.95V4.6ZM4.6 13.8H6.9V16.1H4.6V13.8ZM10.35 13.8H12.65V16.1H10.35V13.8ZM16.1 13.8H18.4V16.1H16.1V13.8Z"
-              fill="#3F3F44"
-            ></path>
-          </svg>
-          <p class="text-[#007930] font-semibold text-xl">0</p>
-        </div>
-        <div class="flex justify-between items-center">
-          <p class="text-[#3F3F44] text-sm font-semibold">Total Appointments</p>
-          <svg
-            width="43"
-            height="23"
-            viewBox="0 0 43 23"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M2 2L7.71429 7.5L12.3896 4.5L22.3377 14.5L29.5325 8.5L41 21"
-              stroke="url(#paint0_linear_55_171)"
-              stroke-width="3"
-              stroke-linecap="round"
-            ></path>
-            <defs>
-              <linearGradient
-                id="paint0_linear_55_171"
-                x1="42.5"
-                y1="20.5"
-                x2="-10.5"
-                y2="-5"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop stop-color="#F52525"></stop>
-                <stop offset="1" stop-color="#FDCB9E" stop-opacity="0"></stop>
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-      </div>
-    </div>
 
-    <div class="flex flex-col gap-6">
-      <p class="font-semibold text-xl text-primary">Revenue</p>
-      <div class="rounded-xl lg:pb-0 pb-4">
-        <div
-          class="rounded-2xl border w-full flex items-center justify-center text-center p-3"
-          id="chart"
-        ></div>
+    <div class="main">
+      <div class="gap-5 grid md:grid-cols-3 mt-4 mb-4">
+        <div class="box box1 !pb-0 !px-0">
+          <div id="spark1"></div>
+        </div>
+        <div class="box box2 !pb-0 !px-0">
+          <div id="spark2"></div>
+        </div>
+        <div class="box box3 !pb-0 !px-0">
+          <div id="spark3"></div>
+        </div>
       </div>
-    </div>
-    <div class="flex items-center gap-5 sm:flex-row flex-col">
-      <div class="md:flex-1 md:w-fit w-full border rounded-2xl relative p-3 " id="chart_second">
+
+      <div class="gap-5 grid md:grid-cols-2 mt-5 mb-4">
+        <div class="box">
+          <div id="bar"></div>
+        </div>
+        <div class="box">
+          <div id="donut"></div>
+        </div>
       </div>
-      <div class="md:flex-1 md:w-fit w-full border rounded-2xl relative p-3" id="chart_third">
-        
+
+      <div class="gap-5 grid md:grid-cols-2 mt-4 mb-4">
+        <div class="col-md-6">
+          <div class="box">
+            <div id="area"></div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="box">
+            <div id="line"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -176,145 +56,851 @@
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
 <script>
-  var options = {
+  var data = {
+    prices: [
+      7114.25, 7126.6, 7116.95, 7203.7, 7233.75, 7451.0, 7381.15, 7348.95,
+      7347.75, 7311.25, 7266.4, 7253.25, 7215.45, 7266.35, 7315.25, 7237.2,
+      7191.4, 7238.95, 7222.6, 7217.9, 7359.3, 7371.55, 7371.15, 7469.2,
+      7429.25, 7434.65, 7451.1, 7475.25, 7566.25, 7556.8, 7525.55, 7555.45,
+      7560.9, 7490.7, 7527.6, 7551.9, 7514.85, 7577.95, 7592.3, 7621.95,
+      7707.95, 7859.1, 7815.7, 7739.0, 7778.7, 7839.45, 7756.45, 7669.2,
+      7580.45, 7452.85, 7617.25, 7701.6, 7606.8, 7620.05, 7513.85, 7498.45,
+      7575.45, 7601.95, 7589.1, 7525.85, 7569.5, 7702.5, 7812.7, 7803.75,
+      7816.3, 7851.15, 7912.2, 7972.8, 8145.0, 8161.1, 8121.05, 8071.25, 8088.2,
+      8154.45, 8148.3, 8122.05, 8132.65, 8074.55, 7952.8, 7885.55, 7733.9,
+      7897.15, 7973.15, 7888.5, 7842.8, 7838.4, 7909.85, 7892.75, 7897.75,
+      7820.05, 7904.4, 7872.2, 7847.5, 7849.55, 7789.6, 7736.35, 7819.4,
+      7875.35, 7871.8, 8076.5, 8114.8, 8193.55, 8217.1, 8235.05, 8215.3, 8216.4,
+      8301.55, 8235.25, 8229.75, 8201.95, 8164.95, 8107.85, 8128.0, 8122.9,
+      8165.5, 8340.7, 8423.7, 8423.5, 8514.3, 8481.85, 8487.7, 8506.9, 8626.2,
+    ],
+    dates: [
+      "02 Jun 2017",
+      "05 Jun 2017",
+      "06 Jun 2017",
+      "07 Jun 2017",
+      "08 Jun 2017",
+      "09 Jun 2017",
+      "12 Jun 2017",
+      "13 Jun 2017",
+      "14 Jun 2017",
+      "15 Jun 2017",
+      "16 Jun 2017",
+      "19 Jun 2017",
+      "20 Jun 2017",
+      "21 Jun 2017",
+      "22 Jun 2017",
+      "23 Jun 2017",
+      "27 Jun 2017",
+      "28 Jun 2017",
+      "29 Jun 2017",
+      "30 Jun 2017",
+      "03 Jul 2017",
+      "04 Jul 2017",
+      "05 Jul 2017",
+      "06 Jul 2017",
+      "07 Jul 2017",
+      "10 Jul 2017",
+      "11 Jul 2017",
+      "12 Jul 2017",
+      "13 Jul 2017",
+      "14 Jul 2017",
+      "17 Jul 2017",
+      "18 Jul 2017",
+      "19 Jul 2017",
+      "20 Jul 2017",
+      "21 Jul 2017",
+      "24 Jul 2017",
+      "25 Jul 2017",
+      "26 Jul 2017",
+      "27 Jul 2017",
+      "28 Jul 2017",
+      "31 Jul 2017",
+      "01 Aug 2017",
+      "02 Aug 2017",
+      "03 Aug 2017",
+      "04 Aug 2017",
+      "07 Aug 2017",
+      "08 Aug 2017",
+      "09 Aug 2017",
+      "10 Aug 2017",
+      "11 Aug 2017",
+      "14 Aug 2017",
+      "16 Aug 2017",
+      "17 Aug 2017",
+      "18 Aug 2017",
+      "21 Aug 2017",
+      "22 Aug 2017",
+      "23 Aug 2017",
+      "24 Aug 2017",
+      "28 Aug 2017",
+      "29 Aug 2017",
+      "30 Aug 2017",
+      "31 Aug 2017",
+      "01 Sep 2017",
+      "04 Sep 2017",
+      "05 Sep 2017",
+      "06 Sep 2017",
+      "07 Sep 2017",
+      "08 Sep 2017",
+      "11 Sep 2017",
+      "12 Sep 2017",
+      "13 Sep 2017",
+      "14 Sep 2017",
+      "15 Sep 2017",
+      "18 Sep 2017",
+      "19 Sep 2017",
+      "20 Sep 2017",
+      "21 Sep 2017",
+      "22 Sep 2017",
+      "25 Sep 2017",
+      "26 Sep 2017",
+      "27 Sep 2017",
+      "28 Sep 2017",
+      "29 Sep 2017",
+      "03 Oct 2017",
+      "04 Oct 2017",
+      "05 Oct 2017",
+      "06 Oct 2017",
+      "09 Oct 2017",
+      "10 Oct 2017",
+      "11 Oct 2017",
+      "12 Oct 2017",
+      "13 Oct 2017",
+      "16 Oct 2017",
+      "17 Oct 2017",
+      "18 Oct 2017",
+      "19 Oct 2017",
+      "23 Oct 2017",
+      "24 Oct 2017",
+      "25 Oct 2017",
+      "26 Oct 2017",
+      "27 Oct 2017",
+      "30 Oct 2017",
+      "31 Oct 2017",
+      "01 Nov 2017",
+      "02 Nov 2017",
+      "03 Nov 2017",
+      "06 Nov 2017",
+      "07 Nov 2017",
+      "08 Nov 2017",
+      "09 Nov 2017",
+      "10 Nov 2017",
+      "13 Nov 2017",
+      "14 Nov 2017",
+      "15 Nov 2017",
+      "16 Nov 2017",
+      "17 Nov 2017",
+      "20 Nov 2017",
+      "21 Nov 2017",
+      "22 Nov 2017",
+      "23 Nov 2017",
+      "24 Nov 2017",
+      "27 Nov 2017",
+      "28 Nov 2017",
+    ],
+  };
+
+  var monthDataSeries1 = {
+    prices: [
+      8107.85, 8128.0, 8122.9, 8165.5, 8340.7, 8423.7, 8423.5, 8514.3, 8481.85,
+      8487.7, 8506.9, 8626.2, 8668.95, 8602.3, 8607.55, 8512.9, 8496.25,
+      8600.65, 8881.1, 9340.85,
+    ],
+    dates: [
+      "13 Nov 2017",
+      "14 Nov 2017",
+      "15 Nov 2017",
+      "16 Nov 2017",
+      "17 Nov 2017",
+      "20 Nov 2017",
+      "21 Nov 2017",
+      "22 Nov 2017",
+      "23 Nov 2017",
+      "24 Nov 2017",
+      "27 Nov 2017",
+      "28 Nov 2017",
+      "29 Nov 2017",
+      "30 Nov 2017",
+      "01 Dec 2017",
+      "04 Dec 2017",
+      "05 Dec 2017",
+      "06 Dec 2017",
+      "07 Dec 2017",
+      "08 Dec 2017",
+    ],
+  };
+
+  var monthDataSeries2 = {
+    prices: [
+      8423.7, 8423.5, 8514.3, 8481.85, 8487.7, 8506.9, 8626.2, 8668.95, 8602.3,
+      8607.55, 8512.9, 8496.25, 8600.65, 8881.1, 9040.85, 8340.7, 8165.5,
+      8122.9, 8107.85, 8128.0,
+    ],
+  };
+
+  Apex.grid = {
+    padding: {
+      right: 0,
+      left: 0,
+    },
+  };
+
+  Apex.dataLabels = {
+    enabled: false,
+  };
+
+  var randomizeArray = function (arg) {
+    var array = arg.slice();
+    var currentIndex = array.length,
+      temporaryValue,
+      randomIndex;
+
+    while (0 !== currentIndex) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+
+      temporaryValue = array[currentIndex];
+      array[currentIndex] = array[randomIndex];
+      array[randomIndex] = temporaryValue;
+    }
+
+    return array;
+  };
+
+  // data for the sparklines that appear below header area
+  var sparklineData = [
+    47, 45, 54, 38, 56, 24, 65, 31, 37, 39, 62, 51, 35, 41, 35, 27, 93, 53, 61,
+    27, 54, 43, 19, 46,
+  ];
+
+  // the default colorPalette for this dashboard
+  //var colorPalette = ['#01BFD6', '#5564BE', '#F7A600', '#EDCD24', '#F74F58'];
+  var colorPalette = ["#00D8B6", "#008FFB", "#FEB019", "#FF4560", "#775DD0"];
+
+  var spark1 = {
+    chart: {
+      id: "sparkline1",
+      group: "sparklines",
+      type: "area",
+      height: 160,
+      sparkline: {
+        enabled: true,
+      },
+    },
+    stroke: {
+      curve: "straight",
+    },
+    fill: {
+      opacity: 1,
+    },
     series: [
       {
-        name: "series1",
-        data: [31, 40, 28, 51, 42, 109, 100],
-      },
-      {
-        name: "series2",
-        data: [11, 32, 45, 32, 34, 52, 41],
+        name: "Sales",
+        data: randomizeArray(sparklineData),
       },
     ],
+    labels: [...Array(24).keys()].map((n) => `2018-09-0${n + 1}`),
+    yaxis: {
+      min: 0,
+    },
+    xaxis: {
+      type: "datetime",
+    },
+    colors: ["#DCE6EC"],
+    title: {
+      text: "$424,652",
+      offsetX: 30,
+      style: {
+        fontSize: "24px",
+        cssClass: "apexcharts-yaxis-title",
+      },
+    },
+    subtitle: {
+      text: "Sales",
+      offsetX: 30,
+      style: {
+        fontSize: "14px",
+        cssClass: "apexcharts-yaxis-title",
+      },
+    },
+  };
+
+  var spark2 = {
     chart: {
-      height: 300,
+      id: "sparkline2",
+      group: "sparklines",
       type: "area",
+      height: 160,
+      sparkline: {
+        enabled: true,
+      },
+    },
+    stroke: {
+      curve: "straight",
+    },
+    fill: {
+      opacity: 1,
+    },
+    series: [
+      {
+        name: "Expenses",
+        data: randomizeArray(sparklineData),
+      },
+    ],
+    labels: [...Array(24).keys()].map((n) => `2018-09-0${n + 1}`),
+    yaxis: {
+      min: 0,
+    },
+    xaxis: {
+      type: "datetime",
+    },
+    colors: ["#DCE6EC"],
+    title: {
+      text: "$235,312",
+      offsetX: 30,
+      style: {
+        fontSize: "24px",
+        cssClass: "apexcharts-yaxis-title",
+      },
+    },
+    subtitle: {
+      text: "Expenses",
+      offsetX: 30,
+      style: {
+        fontSize: "14px",
+        cssClass: "apexcharts-yaxis-title",
+      },
+    },
+  };
+
+  var spark3 = {
+    chart: {
+      id: "sparkline3",
+      group: "sparklines",
+      type: "area",
+      height: 160,
+      sparkline: {
+        enabled: true,
+      },
+    },
+    stroke: {
+      curve: "straight",
+    },
+    fill: {
+      opacity: 1,
+    },
+    series: [
+      {
+        name: "Profits",
+        data: randomizeArray(sparklineData),
+      },
+    ],
+    labels: [...Array(24).keys()].map((n) => `2018-09-0${n + 1}`),
+    xaxis: {
+      type: "datetime",
+    },
+    yaxis: {
+      min: 0,
+    },
+    colors: ["#008FFB"],
+    //colors: ['#5564BE'],
+    title: {
+      text: "$135,965",
+      offsetX: 30,
+      style: {
+        fontSize: "24px",
+        cssClass: "apexcharts-yaxis-title",
+      },
+    },
+    subtitle: {
+      text: "Profits",
+      offsetX: 30,
+      style: {
+        fontSize: "14px",
+        cssClass: "apexcharts-yaxis-title",
+      },
+    },
+  };
+
+  var monthlyEarningsOpt = {
+    chart: {
+      type: "area",
+      height: 260,
+      background: "#eff4f7",
+      sparkline: {
+        enabled: true,
+      },
+      offsetY: 20,
+    },
+    stroke: {
+      curve: "straight",
+    },
+    fill: {
+      type: "solid",
+      opacity: 1,
+    },
+    series: [
+      {
+        data: randomizeArray(sparklineData),
+      },
+    ],
+    xaxis: {
+      crosshairs: {
+        width: 1,
+      },
+    },
+    yaxis: {
+      min: 0,
+      max: 130,
+    },
+    colors: ["#dce6ec"],
+
+    title: {
+      text: "Total Earned",
+      offsetX: -30,
+      offsetY: 100,
+      align: "right",
+      style: {
+        color: "#7c939f",
+        fontSize: "16px",
+        cssClass: "apexcharts-yaxis-title",
+      },
+    },
+    subtitle: {
+      text: "$135,965",
+      offsetX: -30,
+      offsetY: 100,
+      align: "right",
+      style: {
+        color: "#7c939f",
+        fontSize: "24px",
+        cssClass: "apexcharts-yaxis-title",
+      },
+    },
+  };
+
+  new ApexCharts(document.querySelector("#spark1"), spark1).render();
+  new ApexCharts(document.querySelector("#spark2"), spark2).render();
+  new ApexCharts(document.querySelector("#spark3"), spark3).render();
+
+  var monthlyEarningsChart = new ApexCharts(
+    document.querySelector("#monthly-earnings-chart"),
+    monthlyEarningsOpt
+  );
+
+  var optionsArea = {
+    chart: {
+      height: 340,
+      type: "area",
+      zoom: {
+        enabled: false,
+      },
+    },
+    stroke: {
+      curve: "straight",
+    },
+    colors: colorPalette,
+    series: [
+      {
+        name: "Blog",
+        data: [
+          {
+            x: 0,
+            y: 0,
+          },
+          {
+            x: 4,
+            y: 5,
+          },
+          {
+            x: 5,
+            y: 3,
+          },
+          {
+            x: 9,
+            y: 8,
+          },
+          {
+            x: 14,
+            y: 4,
+          },
+          {
+            x: 18,
+            y: 5,
+          },
+          {
+            x: 25,
+            y: 0,
+          },
+        ],
+      },
+      {
+        name: "Social Media",
+        data: [
+          {
+            x: 0,
+            y: 0,
+          },
+          {
+            x: 4,
+            y: 6,
+          },
+          {
+            x: 5,
+            y: 4,
+          },
+          {
+            x: 14,
+            y: 8,
+          },
+          {
+            x: 18,
+            y: 5.5,
+          },
+          {
+            x: 21,
+            y: 6,
+          },
+          {
+            x: 25,
+            y: 0,
+          },
+        ],
+      },
+      {
+        name: "External",
+        data: [
+          {
+            x: 0,
+            y: 0,
+          },
+          {
+            x: 2,
+            y: 5,
+          },
+          {
+            x: 5,
+            y: 4,
+          },
+          {
+            x: 10,
+            y: 11,
+          },
+          {
+            x: 14,
+            y: 4,
+          },
+          {
+            x: 18,
+            y: 8,
+          },
+          {
+            x: 25,
+            y: 0,
+          },
+        ],
+      },
+    ],
+    fill: {
+      opacity: 1,
+    },
+    title: {
+      text: "Daily Visits Insights",
+      align: "left",
+      style: {
+        fontSize: "18px",
+      },
+    },
+    markers: {
+      size: 0,
+      style: "hollow",
+      hover: {
+        opacity: 5,
+      },
+    },
+    tooltip: {
+      intersect: true,
+      shared: false,
+    },
+    xaxis: {
+      tooltip: {
+        enabled: false,
+      },
+      labels: {
+        show: false,
+      },
+      axisTicks: {
+        show: false,
+      },
+    },
+    yaxis: {
+      tickAmount: 4,
+      max: 12,
+      axisBorder: {
+        show: false,
+      },
+      axisTicks: {
+        show: false,
+      },
+      labels: {
+        style: {
+          colors: "#78909c",
+        },
+      },
+    },
+    legend: {
+      show: false,
+    },
+  };
+
+  var chartArea = new ApexCharts(document.querySelector("#area"), optionsArea);
+  chartArea.render();
+
+  var optionsBar = {
+    chart: {
+      type: "bar",
+      height: 340,
+      width: "100%",
+      stacked: true,
+    },
+    plotOptions: {
+      bar: {
+        columnWidth: "45%",
+      },
+    },
+    colors: colorPalette,
+    series: [
+      {
+        name: "Clothing",
+        data: [42, 52, 16, 55, 59, 51, 45, 32, 26, 33, 44, 51, 42, 56],
+      },
+      {
+        name: "Food Products",
+        data: [6, 12, 4, 7, 5, 3, 6, 4, 3, 3, 5, 6, 7, 4],
+      },
+    ],
+    labels: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
+    xaxis: {
+      labels: {
+        show: false,
+      },
+      axisBorder: {
+        show: false,
+      },
+      axisTicks: {
+        show: false,
+      },
+    },
+    yaxis: {
+      axisBorder: {
+        show: false,
+      },
+      axisTicks: {
+        show: false,
+      },
+      labels: {
+        style: {
+          colors: "#78909c",
+        },
+      },
+    },
+    title: {
+      text: "Monthly Sales",
+      align: "left",
+      style: {
+        fontSize: "18px",
+      },
+    },
+  };
+
+  var chartBar = new ApexCharts(document.querySelector("#bar"), optionsBar);
+  chartBar.render();
+
+  var optionDonut = {
+    chart: {
+      type: "donut",
+      width: "100%",
+      height: 340,
     },
     dataLabels: {
       enabled: false,
     },
-    stroke: {
-      curve: "smooth",
-    },
-    xaxis: {
-      type: "datetime",
-      categories: [
-        "2018-09-19T00:00:00.000Z",
-        "2018-09-19T01:30:00.000Z",
-        "2018-09-19T02:30:00.000Z",
-        "2018-09-19T03:30:00.000Z",
-        "2018-09-19T04:30:00.000Z",
-        "2018-09-19T05:30:00.000Z",
-        "2018-09-19T06:30:00.000Z",
-      ],
-    },
-    tooltip: {
-      x: {
-        format: "dd/MM/yy HH:mm",
+    plotOptions: {
+      pie: {
+        customScale: 0.8,
+        donut: {
+          size: "75%",
+        },
+        offsetY: 20,
       },
+      stroke: {
+        colors: undefined,
+      },
+    },
+    colors: colorPalette,
+    title: {
+      text: "Department Sales",
+      style: {
+        fontSize: "18px",
+      },
+    },
+    series: [21, 23, 19, 14, 6],
+    labels: [
+      "Clothing",
+      "Food Products",
+      "Electronics",
+      "Kitchen Utility",
+      "Gardening",
+    ],
+    legend: {
+      position: "left",
+      offsetY: 80,
     },
   };
 
-  var chart = new ApexCharts(document.querySelector("#chart"), options);
-  chart.render();
+  var donut = new ApexCharts(document.querySelector("#donut"), optionDonut);
+  donut.render();
 
-  var second_options = {
+  function trigoSeries(cnt, strength) {
+    var data = [];
+    for (var i = 0; i < cnt; i++) {
+      data.push(
+        (Math.sin(i / strength) * (i / strength) + i / strength + 1) *
+          (strength * 2)
+      );
+    }
+
+    return data;
+  }
+
+  var optionsLine = {
+    chart: {
+      height: 340,
+      type: "line",
+      zoom: {
+        enabled: false,
+      },
+    },
+    plotOptions: {
+      stroke: {
+        width: 4,
+        curve: "smooth",
+      },
+    },
+    colors: colorPalette,
     series: [
       {
-        name: "Series 1",
-        data: [80, 50, 30, 40, 100, 20],
+        name: "Day Time",
+        data: trigoSeries(52, 20),
       },
       {
-        name: "Series 2",
-        data: [20, 30, 40, 80, 20, 80],
-      },
-      {
-        name: "Series 3",
-        data: [44, 76, 78, 13, 43, 10],
+        name: "Night Time",
+        data: trigoSeries(52, 27),
       },
     ],
-    chart: {
-      height: 330,
-      type: "radar",
-      dropShadow: {
-        enabled: true,
-        blur: 1,
-        left: 1,
-        top: 1,
+    title: {
+      floating: false,
+      text: "Customers",
+      align: "left",
+      style: {
+        fontSize: "18px",
       },
     },
-    title: {
-      text: "Radar Chart - Multi Series",
-    },
-    stroke: {
-      width: 2,
-    },
-    fill: {
-      opacity: 0.1,
+    subtitle: {
+      text: "168,215",
+      align: "center",
+      margin: 30,
+      offsetY: 40,
+      style: {
+        color: "#222",
+        fontSize: "24px",
+      },
     },
     markers: {
       size: 0,
     },
+
+    grid: {},
     xaxis: {
-      categories: ["2011", "2012", "2013", "2014", "2015", "2016"],
+      labels: {
+        show: false,
+      },
+      axisTicks: {
+        show: false,
+      },
+      tooltip: {
+        enabled: false,
+      },
+    },
+    yaxis: {
+      tickAmount: 2,
+      labels: {
+        show: false,
+      },
+      axisBorder: {
+        show: false,
+      },
+      axisTicks: {
+        show: false,
+      },
+      min: 0,
+    },
+    legend: {
+      position: "top",
+      horizontalAlign: "left",
+      offsetY: -20,
+      offsetX: -30,
     },
   };
 
-  var second_chart = new ApexCharts(
-    document.querySelector("#chart_second"),
-    second_options
-  );
-  second_chart.render();
+  var chartLine = new ApexCharts(document.querySelector("#line"), optionsLine);
 
+  // a small hack to extend height in website sample dashboard
+  chartLine.render().then(function () {
+    var ifr = document.querySelector("#wrapper");
+    if (ifr.contentDocument) {
+      ifr.style.height = ifr.contentDocument.body.scrollHeight + 20 + "px";
+    }
+  });
 
-
-
-
-  var third_options = {
-    series: [
-      {
-        data: [44, 55, 41, 64, 22, 43, 21],
-      },
-      {
-        data: [53, 32, 33, 52, 13, 44, 32],
-      },
-    ],
-    chart: {
-      type: "bar",
-      height: 330,
-    },
-    plotOptions: {
-      bar: {
-        horizontal: true,
-        dataLabels: {
-          position: "top",
+  // on smaller screen, change the legends position for donut
+  var mobileDonut = function () {
+    if ($(window).width() < 768) {
+      donut.updateOptions(
+        {
+          plotOptions: {
+            pie: {
+              offsetY: -15,
+            },
+          },
+          legend: {
+            position: "bottom",
+          },
         },
-      },
-    },
-    dataLabels: {
-      enabled: true,
-      offsetX: -6,
-      style: {
-        fontSize: "12px",
-        colors: ["#fff"],
-      },
-    },
-    stroke: {
-      show: true,
-      width: 1,
-      colors: ["#fff"],
-    },
-    tooltip: {
-      shared: true,
-      intersect: false,
-    },
-    xaxis: {
-      categories: [2001, 2002, 2003, 2004, 2005, 2006, 2007],
-    },
+        false,
+        false
+      );
+    } else {
+      donut.updateOptions(
+        {
+          plotOptions: {
+            pie: {
+              offsetY: 20,
+            },
+          },
+          legend: {
+            position: "left",
+          },
+        },
+        false,
+        false
+      );
+    }
   };
 
-  var third_chart = new ApexCharts(document.querySelector("#chart_third"), third_options);
-  third_chart.render();
+  $(window).resize(function () {
+    mobileDonut();
+  });
 </script>
 {% endblock body %}
