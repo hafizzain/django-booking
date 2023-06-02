@@ -401,7 +401,8 @@ def customer_login(request):
     email = request.data.get('email', None)
     social_account = request.data.get('social_account', False)
     password = request.data.get('password', None)
-    tenant_id = request.data.get('tenant_id', None)
+    
+    tenant_id = request.GET.get('tenant_id', None)
 
     if social_account:
         social_platform = request.data.get('social_platform', None)
