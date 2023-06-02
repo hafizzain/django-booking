@@ -1572,7 +1572,7 @@ div[class$="-Input"] {
 }
 
 .input-label {
-  font-size: 0.875rem /* 14px */;
+  font-size: 0.8rem /* 14px */;
   line-height: 1.25rem /* 20px */;
   display: flex;
   align-items: center;
@@ -1612,7 +1612,7 @@ div[class$="-Input"] {
 .input-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem /* 8px */;
+  gap: 0.35rem /* 8px */;
   position: relative;
 }
 
