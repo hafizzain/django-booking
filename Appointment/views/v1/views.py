@@ -2243,10 +2243,12 @@ def create_appointment_client(request):
         if client_id:
             client = Client.objects.get(id = client_id)
         else:
-            client, created = Client.objects.get_or_create(email = user_details['email'])
+            client, created = Client.objects.get_or_create(
+                email = user_details['email'],
+                business = business,
+            )
 
         if created:
-            client.business = business
             client.full_name = user_details['full_name']
             client.is_email_verified = True
             client.is_active = True
