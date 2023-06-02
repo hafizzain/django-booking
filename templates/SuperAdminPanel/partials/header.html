@@ -1,3 +1,18 @@
 {% load static %}
-
-<link rel="stylesheet" href="{% static 'css/custom.css' %}">
+<link rel="stylesheet" href="{% static 'css/custom.css' %}" />
+<script src="{% static 'libs/tailwind.js' %}"></script>
+<script>
+  function SideBarActive(params) {
+    let active_sidebar = document.querySelectorAll(".active_sidebar");
+    if (params != "dashboard") {
+      active_sidebar.forEach((item) => {
+        let p = item.querySelector("p");
+        if (p.innerText.toLowerCase().includes(params)) {
+          item.classList.add("active_sidebar_active");
+        }
+      });
+    } else {
+        active_sidebar[0].classList.add('active_sidebar_active');
+    }
+  }
+</script>

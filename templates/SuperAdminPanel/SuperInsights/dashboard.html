@@ -1,0 +1,320 @@
+{% extends 'SuperAdminPanel/SuperInsights/main.html' %} {% block body %}
+<script>
+  SideBarActive('dashboard')
+</script>
+<div class="h-full w-full">
+  <div class="md:w-[70%] flex flex-col gap-[1.6rem]">
+    <h1 class="font-semibold text-2xl">Super Admin Dashboard</h1>
+    <div class="flex items-center gap-3 flex-wrap">
+      <div
+        class="bg-white p-4 rounded-xl w-[15rem] shadow-lg flex flex-col gap-4 transition-all hover:bg-[#DBDAFF] cursor-pointer"
+      >
+        <div class="flex justify-between items-center">
+          <svg
+            width="1.75rem"
+            height="1.75rem"
+            viewBox="0 0 28 28"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M14 27.3334C6.63599 27.3334 0.666656 21.3641 0.666656 14.0001C0.666656 6.63608 6.63599 0.666748 14 0.666748C21.364 0.666748 27.3333 6.63608 27.3333 14.0001C27.3333 21.3641 21.364 27.3334 14 27.3334ZM14 24.6667C16.829 24.6667 19.5421 23.5429 21.5425 21.5426C23.5429 19.5422 24.6667 16.8291 24.6667 14.0001C24.6667 11.1711 23.5429 8.458 21.5425 6.45761C19.5421 4.45722 16.829 3.33341 14 3.33341C11.171 3.33341 8.45791 4.45722 6.45752 6.45761C4.45713 8.458 3.33332 11.1711 3.33332 14.0001C3.33332 16.8291 4.45713 19.5422 6.45752 21.5426C8.45791 23.5429 11.171 24.6667 14 24.6667ZM9.33332 16.6667H16.6667C16.8435 16.6667 17.013 16.5965 17.1381 16.4715C17.2631 16.3465 17.3333 16.1769 17.3333 16.0001C17.3333 15.8233 17.2631 15.6537 17.1381 15.5287C17.013 15.4037 16.8435 15.3334 16.6667 15.3334H11.3333C10.4493 15.3334 9.60142 14.9822 8.9763 14.3571C8.35118 13.732 7.99999 12.8841 7.99999 12.0001C7.99999 11.116 8.35118 10.2682 8.9763 9.64306C9.60142 9.01794 10.4493 8.66675 11.3333 8.66675H12.6667V6.00008H15.3333V8.66675H18.6667V11.3334H11.3333C11.1565 11.3334 10.9869 11.4037 10.8619 11.5287C10.7369 11.6537 10.6667 11.8233 10.6667 12.0001C10.6667 12.1769 10.7369 12.3465 10.8619 12.4715C10.9869 12.5965 11.1565 12.6667 11.3333 12.6667H16.6667C17.5507 12.6667 18.3986 13.0179 19.0237 13.6431C19.6488 14.2682 20 15.116 20 16.0001C20 16.8841 19.6488 17.732 19.0237 18.3571C18.3986 18.9822 17.5507 19.3334 16.6667 19.3334H15.3333V22.0001H12.6667V19.3334H9.33332V16.6667Z"
+              fill="#3F3F44"
+            ></path>
+          </svg>
+          <p class="text-[#007930] font-semibold text-xl">EUR 0</p>
+        </div>
+        <div class="flex justify-between items-center">
+          <p class="text-[#3F3F44] text-sm font-semibold">Total Revenue</p>
+          <svg
+            width="43"
+            height="23"
+            viewBox="0 0 43 23"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M2 21L7.71429 15.5L12.3896 18.5L22.3377 8.5L29.5325 14.5L41 2"
+              stroke="url(#paint0_linear_55_152)"
+              stroke-width="3"
+              stroke-linecap="round"
+            ></path>
+            <defs>
+              <linearGradient
+                id="paint0_linear_55_152"
+                x1="54"
+                y1="-4.00001"
+                x2="-18.5"
+                y2="30"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stop-color="#007930"></stop>
+                <stop offset="1" stop-color="#CCEABB" stop-opacity="0"></stop>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+      </div>
+      <div
+        class="bg-white p-4 rounded-xl w-[15rem] shadow-lg flex flex-col gap-4 transition-all hover:bg-[#DBDAFF] cursor-pointer"
+      >
+        <div class="flex justify-between items-center">
+          <svg
+            class="w-[1.625rem] h-[1.875rem]"
+            viewBox="0 0 26 30"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M11 17.6666V20.3333C8.87826 20.3333 6.84343 21.1761 5.34314 22.6764C3.84285 24.1767 2.99999 26.2115 2.99999 28.3333H0.333328C0.333328 25.5043 1.45713 22.7912 3.45752 20.7908C5.45791 18.7904 8.17102 17.6666 11 17.6666ZM11 16.3333C6.57999 16.3333 2.99999 12.7533 2.99999 8.33325C2.99999 3.91325 6.57999 0.333252 11 0.333252C15.42 0.333252 19 3.91325 19 8.33325C19 12.7533 15.42 16.3333 11 16.3333ZM11 13.6666C13.9467 13.6666 16.3333 11.2799 16.3333 8.33325C16.3333 5.38659 13.9467 2.99992 11 2.99992C8.05333 2.99992 5.66666 5.38659 5.66666 8.33325C5.66666 11.2799 8.05333 13.6666 11 13.6666ZM19 27.6666L15.0813 29.7266L15.8293 25.3639L12.66 22.2733L17.0413 21.6359L19 17.6666L20.96 21.6359L25.34 22.2733L22.1707 25.3639L22.9173 29.7266L19 27.6666Z"
+              fill="#3F3F44"
+            ></path>
+          </svg>
+          <p class="text-[#007930] font-semibold text-xl">2</p>
+        </div>
+        <div class="flex justify-between items-center">
+          <p class="text-[#3F3F44] text-sm font-semibold">Total Clients</p>
+          <svg
+            width="43"
+            height="23"
+            viewBox="0 0 43 23"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M2 21L7.71429 15.5L12.3896 18.5L22.3377 8.5L29.5325 14.5L41 2"
+              stroke="url(#paint0_linear_55_152)"
+              stroke-width="3"
+              stroke-linecap="round"
+            ></path>
+            <defs>
+              <linearGradient
+                id="paint0_linear_55_152"
+                x1="54"
+                y1="-4.00001"
+                x2="-18.5"
+                y2="30"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stop-color="#007930"></stop>
+                <stop offset="1" stop-color="#CCEABB" stop-opacity="0"></stop>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+      </div>
+      <div
+        class="bg-white p-4 rounded-xl w-[15rem] shadow-lg flex flex-col gap-4 transition-all hover:bg-[#DBDAFF] cursor-pointer"
+      >
+        <div class="flex justify-between items-center">
+          <svg
+            height="1.438rem"
+            width="1.438rem"
+            viewBox="0 0 23 23"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M17.25 2.3H21.85C22.155 2.3 22.4475 2.42116 22.6632 2.63683C22.8788 2.85249 23 3.145 23 3.45V21.85C23 22.155 22.8788 22.4475 22.6632 22.6632C22.4475 22.8788 22.155 23 21.85 23H1.15C0.845001 23 0.552494 22.8788 0.336827 22.6632C0.12116 22.4475 0 22.155 0 21.85V3.45C0 3.145 0.12116 2.85249 0.336827 2.63683C0.552494 2.42116 0.845001 2.3 1.15 2.3H5.75V0H8.05V2.3H14.95V0H17.25V2.3ZM20.7 11.5H2.3V20.7H20.7V11.5ZM14.95 4.6H8.05V6.9H5.75V4.6H2.3V9.2H20.7V4.6H17.25V6.9H14.95V4.6ZM4.6 13.8H6.9V16.1H4.6V13.8ZM10.35 13.8H12.65V16.1H10.35V13.8ZM16.1 13.8H18.4V16.1H16.1V13.8Z"
+              fill="#3F3F44"
+            ></path>
+          </svg>
+          <p class="text-[#007930] font-semibold text-xl">0</p>
+        </div>
+        <div class="flex justify-between items-center">
+          <p class="text-[#3F3F44] text-sm font-semibold">Total Appointments</p>
+          <svg
+            width="43"
+            height="23"
+            viewBox="0 0 43 23"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M2 2L7.71429 7.5L12.3896 4.5L22.3377 14.5L29.5325 8.5L41 21"
+              stroke="url(#paint0_linear_55_171)"
+              stroke-width="3"
+              stroke-linecap="round"
+            ></path>
+            <defs>
+              <linearGradient
+                id="paint0_linear_55_171"
+                x1="42.5"
+                y1="20.5"
+                x2="-10.5"
+                y2="-5"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stop-color="#F52525"></stop>
+                <stop offset="1" stop-color="#FDCB9E" stop-opacity="0"></stop>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-6">
+      <p class="font-semibold text-xl text-primary">Revenue</p>
+      <div class="rounded-xl lg:pb-0 pb-4">
+        <div
+          class="rounded-2xl border w-full flex items-center justify-center text-center p-3"
+          id="chart"
+        ></div>
+      </div>
+    </div>
+    <div class="flex items-center gap-5 sm:flex-row flex-col">
+      <div class="md:flex-1 md:w-fit w-full border rounded-2xl relative p-3 " id="chart_second">
+      </div>
+      <div class="md:flex-1 md:w-fit w-full border rounded-2xl relative p-3" id="chart_third">
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+<script>
+  var options = {
+    series: [
+      {
+        name: "series1",
+        data: [31, 40, 28, 51, 42, 109, 100],
+      },
+      {
+        name: "series2",
+        data: [11, 32, 45, 32, 34, 52, 41],
+      },
+    ],
+    chart: {
+      height: 300,
+      type: "area",
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    stroke: {
+      curve: "smooth",
+    },
+    xaxis: {
+      type: "datetime",
+      categories: [
+        "2018-09-19T00:00:00.000Z",
+        "2018-09-19T01:30:00.000Z",
+        "2018-09-19T02:30:00.000Z",
+        "2018-09-19T03:30:00.000Z",
+        "2018-09-19T04:30:00.000Z",
+        "2018-09-19T05:30:00.000Z",
+        "2018-09-19T06:30:00.000Z",
+      ],
+    },
+    tooltip: {
+      x: {
+        format: "dd/MM/yy HH:mm",
+      },
+    },
+  };
+
+  var chart = new ApexCharts(document.querySelector("#chart"), options);
+  chart.render();
+
+  var second_options = {
+    series: [
+      {
+        name: "Series 1",
+        data: [80, 50, 30, 40, 100, 20],
+      },
+      {
+        name: "Series 2",
+        data: [20, 30, 40, 80, 20, 80],
+      },
+      {
+        name: "Series 3",
+        data: [44, 76, 78, 13, 43, 10],
+      },
+    ],
+    chart: {
+      height: 330,
+      type: "radar",
+      dropShadow: {
+        enabled: true,
+        blur: 1,
+        left: 1,
+        top: 1,
+      },
+    },
+    title: {
+      text: "Radar Chart - Multi Series",
+    },
+    stroke: {
+      width: 2,
+    },
+    fill: {
+      opacity: 0.1,
+    },
+    markers: {
+      size: 0,
+    },
+    xaxis: {
+      categories: ["2011", "2012", "2013", "2014", "2015", "2016"],
+    },
+  };
+
+  var second_chart = new ApexCharts(
+    document.querySelector("#chart_second"),
+    second_options
+  );
+  second_chart.render();
+
+
+
+
+
+  var third_options = {
+    series: [
+      {
+        data: [44, 55, 41, 64, 22, 43, 21],
+      },
+      {
+        data: [53, 32, 33, 52, 13, 44, 32],
+      },
+    ],
+    chart: {
+      type: "bar",
+      height: 330,
+    },
+    plotOptions: {
+      bar: {
+        horizontal: true,
+        dataLabels: {
+          position: "top",
+        },
+      },
+    },
+    dataLabels: {
+      enabled: true,
+      offsetX: -6,
+      style: {
+        fontSize: "12px",
+        colors: ["#fff"],
+      },
+    },
+    stroke: {
+      show: true,
+      width: 1,
+      colors: ["#fff"],
+    },
+    tooltip: {
+      shared: true,
+      intersect: false,
+    },
+    xaxis: {
+      categories: [2001, 2002, 2003, 2004, 2005, 2006, 2007],
+    },
+  };
+
+  var third_chart = new ApexCharts(document.querySelector("#chart_third"), third_options);
+  third_chart.render();
+</script>
+{% endblock body %}

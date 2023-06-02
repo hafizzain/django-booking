@@ -5,8 +5,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', insightViews.DashboardPage),
+    path('admin/', insightViews.DashboardPage, name='DashboardPage'),
+    path('exception/', insightViews.ExceptionPage, name='ExceptionPage'),
+    path('exception-detail/', insightViews.ExceptionDetailPage, name='ExceptionDetailPage'),
+    path('language/', insightViews.LanguagePage, name='LanguagePage'),
+    path('language/detail/', insightViews.LanguageDetailPage, name='LanguageDetailPage'),
 ]
-
-urlpatterns+= static(settings.STATIC_URL, document_root = settings.STATIC_ROOT)
-urlpatterns+= static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

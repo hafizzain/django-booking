@@ -1,0 +1,90 @@
+{% extends 'SuperAdminPanel/SuperInsights/main.html' %} {% block body %}
+<script>
+  SideBarActive("language");
+</script>
+
+<div class="flex flex-col gap-6">
+  <h2 class="font-semibold text-2xl flex items-center gap-3">
+    <a href="{% url 'LanguagePage' %}">
+      <svg
+        width="2rem"
+        height="1.25rem"
+        viewBox="0 0 17 10"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M4.75527 0.908165L0.936728 4.72671C0.702404 4.96103 0.702404 5.34095 0.936728 5.57527L4.75527 9.39382C4.9896 9.62814 5.36951 9.62814 5.60384 9.39382C5.83816 9.15949 5.83816 8.77958 5.60384 8.54525L2.8096 5.75102L16.7217 5.75102V4.55096L2.8096 4.55096L5.60384 1.75673C5.83816 1.52241 5.83816 1.14249 5.60384 0.908165C5.36951 0.673841 4.9896 0.673841 4.75527 0.908165Z"
+          fill="#101928"
+        ></path>
+      </svg>
+    </a>
+    <p>Language Detail</p>
+  </h2>
+  <div class="grid xl:grid-cols-3 md:grid-cols-2 gap-4">
+    <div>
+      <div class="input-wrapper">
+        <div class="input-label">First Name</div>
+        <input
+          type="text"
+          placeholder="Enter your business name"
+          class="input"
+        />
+      </div>
+    </div>
+    <div>
+      <div class="input-wrapper">
+        <div class="input-label">First Name</div>
+        <input
+          type="text"
+          placeholder="Enter your business name"
+          class="input"
+        />
+      </div>
+    </div>
+    <div>
+      <div class="input-wrapper">
+        <div class="input-label">First Name</div>
+        <input
+          type="text"
+          placeholder="Enter your business name"
+          class="input"
+        />
+      </div>
+    </div>
+    <div>
+      <div class="input-wrapper">
+        <div class="input-label">First Name</div>
+        <input
+          type="text"
+          placeholder="Enter your business name"
+          class="input"
+        />
+      </div>
+    </div>
+    <div>
+      <div class="input-wrapper">
+        <div class="input-label">First Name</div>
+        <input
+          type="text"
+          placeholder="Enter your business name"
+          class="input"
+        />
+      </div>
+    </div>
+    <div>
+      <div class="input-wrapper">
+        <div class="input-label">First Name</div>
+        <input
+          type="text"
+          placeholder="Enter your business name"
+          class="input"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock body %}
