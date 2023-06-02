@@ -15,5 +15,8 @@ def ExceptionDetailPage(request):
 def LanguagePage(request):
     return render(request, 'SuperAdminPanel/SuperInsights/language.html')
 
-def LanguageDetailPage(request):
-    return render(request, 'SuperAdminPanel/SuperInsights/language-detail.html')
+def LanguageSectionPage(request):
+    return render(request, 'SuperAdminPanel/SuperInsights/language-section.html')
+
+def LanguageSectionDetailPage(request):
+    return render(request, 'SuperAdminPanel/SuperInsights/language-section-detail.html')

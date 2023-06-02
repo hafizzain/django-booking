@@ -1,0 +1,166 @@
+{% extends 'SuperAdminPanel/SuperInsights/main.html' %} {% block body %}
+<script>
+  SideBarActive("language");
+</script>
+
+<div class="flex flex-col gap-6">
+  <h2 class="font-semibold text-2xl flex items-center gap-3">
+    <a href="{% url 'LanguagePage' %}">
+      <svg
+        width="2rem"
+        height="1.25rem"
+        viewBox="0 0 17 10"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M4.75527 0.908165L0.936728 4.72671C0.702404 4.96103 0.702404 5.34095 0.936728 5.57527L4.75527 9.39382C4.9896 9.62814 5.36951 9.62814 5.60384 9.39382C5.83816 9.15949 5.83816 8.77958 5.60384 8.54525L2.8096 5.75102L16.7217 5.75102V4.55096L2.8096 4.55096L5.60384 1.75673C5.83816 1.52241 5.83816 1.14249 5.60384 0.908165C5.36951 0.673841 4.9896 0.673841 4.75527 0.908165Z"
+          fill="#101928"
+        ></path>
+      </svg>
+    </a>
+    <p>Sections</p>
+  </h2>
+
+  <div
+    class="grid xl:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-[2rem] xl:pr-[4rem] pr-0"
+  >
+    <a
+      href='{% url "LanguageSectionDetailPage" %}'
+      class="hover:bg-slate-100 relative transition-all cursor-pointer shadow-login-card px-[1.25rem] py-[1rem] rounded-xl flex flex-col gap-2"
+    >
+      <svg
+        width="40"
+        height="40"
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M18.3333 7.1013V3.31797C18.3333 2.14297 17.8 1.66797 16.475 1.66797H13.1083C11.7833 1.66797 11.25 2.14297 11.25 3.31797V7.09297C11.25 8.2763 11.7833 8.74297 13.1083 8.74297H16.475C17.8 8.7513 18.3333 8.2763 18.3333 7.1013Z"
+          stroke="#292D32"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M18.3333 16.475V13.1083C18.3333 11.7833 17.8 11.25 16.475 11.25H13.1083C11.7833 11.25 11.25 11.7833 11.25 13.1083V16.475C11.25 17.8 11.7833 18.3333 13.1083 18.3333H16.475C17.8 18.3333 18.3333 17.8 18.3333 16.475Z"
+          stroke="#292D32"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M8.74935 7.1013V3.31797C8.74935 2.14297 8.21602 1.66797 6.89102 1.66797H3.52435C2.19935 1.66797 1.66602 2.14297 1.66602 3.31797V7.09297C1.66602 8.2763 2.19935 8.74297 3.52435 8.74297H6.89102C8.21602 8.7513 8.74935 8.2763 8.74935 7.1013Z"
+          stroke="#292D32"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M8.74935 16.475V13.1083C8.74935 11.7833 8.21602 11.25 6.89102 11.25H3.52435C2.19935 11.25 1.66602 11.7833 1.66602 13.1083V16.475C1.66602 17.8 2.19935 18.3333 3.52435 18.3333H6.89102C8.21602 18.3333 8.74935 17.8 8.74935 16.475Z"
+          stroke="#292D32"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      <h2 class="font-semibold text-xl">Dashboard</h2>
+    </a>
+    <a
+      href='{% url "LanguageSectionDetailPage" %}'
+      class="hover:bg-slate-100 relative transition-all cursor-pointer shadow-login-card px-[1.25rem] py-[1rem] rounded-xl flex flex-col gap-2"
+    >
+    <svg width="40" height="40" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2.57812 7.83932H17.4314" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M13.7025 11.0932H13.7102" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M10.0032 11.0932H10.011" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6.29816 11.0932H6.30588" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M13.7025 14.3315H13.7102" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M10.0032 14.3315H10.011" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6.29816 14.3315H6.30588" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M13.3704 1.66797V4.41029" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6.63795 1.66797V4.41029" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M13.5319 2.98438H6.4758C4.02856 2.98438 2.5 4.34765 2.5 6.85356V14.3949C2.5 16.9402 4.02856 18.335 6.4758 18.335H13.5242C15.9791 18.335 17.5 16.9639 17.5 14.458V6.85356C17.5077 4.34765 15.9868 2.98438 13.5319 2.98438Z" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>      
+
+      <h2 class="font-semibold text-xl">Calendar</h2>
+    </a>
+    <a
+      href='{% url "LanguageSectionDetailPage" %}'
+      class="hover:bg-slate-100 relative transition-all cursor-pointer shadow-login-card px-[1.25rem] py-[1rem] rounded-xl flex flex-col gap-2"
+    >
+    <svg width="40" height="40" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g clip-path="url(#clip0_2467_3393)">
+      <path d="M12.291 6.80078C12.8951 6.80078 13.3848 6.31109 13.3848 5.70703C13.3848 5.10297 12.8951 4.61328 12.291 4.61328C11.687 4.61328 11.1973 5.10297 11.1973 5.70703C11.1973 6.31109 11.687 6.80078 12.291 6.80078Z" stroke="#101928" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M1.09375 10.3438L9.84375 1.59375H16.4062V8.15625L7.65625 16.9062L1.09375 10.3438Z" stroke="#101928" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+      <defs>
+      <clipPath id="clip0_2467_3393">
+      <rect width="17.5" height="17.5" fill="white" transform="translate(0 0.5)"/>
+      </clipPath>
+      </defs>
+      </svg>
+       
+
+      <h2 class="font-semibold text-xl">Sales</h2>
+    </a>
+   
+    <a
+      href='{% url "LanguageSectionDetailPage" %}'
+      class="hover:bg-slate-100 relative transition-all cursor-pointer shadow-login-card px-[1.25rem] py-[1rem] rounded-xl flex flex-col gap-2"
+    >
+    <svg width="40" height="40" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M9.98712 12.7852C6.7641 12.7852 4.01172 13.2725 4.01172 15.224C4.01172 17.1756 6.74664 17.6804 9.98712 17.6804C13.2101 17.6804 15.9617 17.1923 15.9617 15.2415C15.9617 13.2907 13.2276 12.7852 9.98712 12.7852Z" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M9.98643 10.0033C12.1015 10.0033 13.8158 8.28819 13.8158 6.17311C13.8158 4.05804 12.1015 2.34375 9.98643 2.34375C7.87135 2.34375 6.15627 4.05804 6.15627 6.17311C6.14913 8.28105 7.8523 9.99613 9.95945 10.0033H9.98643Z" stroke="#130F26" stroke-width="1.42857" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+            
+
+      <h2 class="font-semibold text-xl">Employee</h2>
+    </a>
+    <a
+      href='{% url "LanguageSectionDetailPage" %}'
+      class="hover:bg-slate-100 relative transition-all cursor-pointer shadow-login-card px-[1.25rem] py-[1rem] rounded-xl flex flex-col gap-2"
+    >
+    <svg width="40" height="40" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M7.99268 12.6719C11.0668 12.6719 13.6943 13.1377 13.6943 14.9985C13.6943 16.8594 11.0843 17.3385 7.99268 17.3385C4.91768 17.3385 2.29102 16.8769 2.29102 15.0152C2.29102 13.1535 4.90018 12.6719 7.99268 12.6719Z" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M7.99289 10.0154C5.97456 10.0154 4.33789 8.37953 4.33789 6.3612C4.33789 4.34287 5.97456 2.70703 7.99289 2.70703C10.0104 2.70703 11.6471 4.34287 11.6471 6.3612C11.6546 8.37203 10.0296 10.0079 8.01872 10.0154H7.99289Z" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M13.7363 9.06839C15.0705 8.88089 16.098 7.73589 16.1005 6.35005C16.1005 4.98422 15.1047 3.85089 13.7988 3.63672" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M15.4961 12.2773C16.7886 12.4698 17.6911 12.9232 17.6911 13.8565C17.6911 14.499 17.2661 14.9157 16.5794 15.1765" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+        
+
+      <h2 class="font-semibold text-xl">Clients</h2>
+    </a>
+
+    <a
+      href='{% url "LanguageSectionDetailPage" %}'
+      class="hover:bg-slate-100 relative transition-all cursor-pointer shadow-login-card px-[1.25rem] py-[1rem] rounded-xl flex flex-col gap-2"
+    >
+    <svg width="40" height="40" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M1.5 12.6962C6.71071 12.2913 11.922 13.4561 17.1327 16.2127V3.01562C11.8494 6.01342 6.64163 7.1562 1.5 6.70183V12.6962ZM1.5 12.6962L3.29606 16.9839H7.27823L5.57328 12.6998M8.63539 6.29033V13.125M17.1327 8.24836C17.8872 8.24836 18.5 8.85936 18.5 9.61387C18.5 10.3684 17.8872 10.9794 17.1327 10.9794" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      
+      
+        
+
+      <h2 class="font-semibold text-xl">Online Profile</h2>
+    </a>
+
+
+    <a
+      href='{% url "LanguageSectionDetailPage" %}'
+      class="hover:bg-slate-100 relative transition-all cursor-pointer shadow-login-card px-[1.25rem] py-[1rem] rounded-xl flex flex-col gap-2"
+    >
+    <svg width="40" height="40" viewBox="0 0 19 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 0V16H18V18H0V0H2ZM17.293 3.293L18.707 4.707L13 10.414L10 7.415L5.707 11.707L4.293 10.293L10 4.586L13 7.585L17.293 3.293Z" fill="#101928"></path></svg>
+        
+
+      <h2 class="font-semibold text-xl">Reports</h2>
+    </a>
+
+  </div>
+</div>
+
+{% endblock body %}

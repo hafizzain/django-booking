@@ -9,5 +9,6 @@ urlpatterns = [
     path('exception/', insightViews.ExceptionPage, name='ExceptionPage'),
     path('exception-detail/', insightViews.ExceptionDetailPage, name='ExceptionDetailPage'),
     path('language/', insightViews.LanguagePage, name='LanguagePage'),
-    path('language/detail/', insightViews.LanguageDetailPage, name='LanguageDetailPage'),
+    path('language/section/', insightViews.LanguageSectionPage, name='LanguageSectionPage'),
+    path('language/section-detail', insightViews.LanguageSectionDetailPage, name='LanguageSectionDetailPage'),
 ]
