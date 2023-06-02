@@ -2338,7 +2338,8 @@ def new_create_sale_order(request):
                 points_redeemed = 0,
                 balance = (float(client_points.total_earn) - float(client_points.points_redeemed)),
                 actual_sale_value_redeemed = 0,
-                invoice = invoice
+                invoice = invoice,
+                checkout = checkout
             )
 
     # payment_type_sales = Order.objects.values('payment_type').annotate(total_sales=Count('id')).order_by('payment_type')
