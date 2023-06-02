@@ -1,0 +1,55 @@
+{% extends 'SuperAdminPanel/main.html' %} {% block body %}
+<script>
+  SideBarActive("exception");
+</script>
+
+<div class="flex flex-col gap-6">
+  <h1 class="font-semibold text-2xl flex items-center gap-3">
+    <a href="{% url 'ExceptionPage' %}">
+      <svg width="2rem" height="1.25rem" viewBox="0 0 17 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.75527 0.908165L0.936728 4.72671C0.702404 4.96103 0.702404 5.34095 0.936728 5.57527L4.75527 9.39382C4.9896 9.62814 5.36951 9.62814 5.60384 9.39382C5.83816 9.15949 5.83816 8.77958 5.60384 8.54525L2.8096 5.75102L16.7217 5.75102V4.55096L2.8096 4.55096L5.60384 1.75673C5.83816 1.52241 5.83816 1.14249 5.60384 0.908165C5.36951 0.673841 4.9896 0.673841 4.75527 0.908165Z" fill="#101928"></path></svg>
+    </a>
+    <p>Exception Detail</p>
+  </h1>
+  <div class="flex flex-col gap-3">
+    <p class="text-[#101928] text-sm">
+      Lorem ipsum dolor, sit amet consectetur adipisicing elit. Debitis enim
+      dolorum obcaecati!
+    </p>
+    <div class="code-container">
+      <pre><code class="code">
+        // Your code goes here...
+        function helloWorld() {
+          console.log("Hello, world!");
+        }
+      </code></pre>
+    </div>
+    <p class="text-[#101928] text-sm">
+      Lorem ipsum dolor, sit amet consectetur adipisicing elit. Debitis enim
+      dolorum obcaecati!
+    </p>
+    <div class="code-container">
+      <pre><code class="code">
+        {
+          "name": "John Doe",
+          "age": 30,
+          "email": "johndoe@example.com",
+          "address": {
+            "street": "123 Main St",
+            "city": "Exampleville",
+            "state": "ABC",
+            "country": "XYZ"
+          },
+          "interests": [
+            "coding",
+            "reading",
+            "traveling"
+          ],
+          "isActive": true
+        }
+        
+      </code></pre>
+    </div>
+  </div>
+</div>
+
+{% endblock body %}
