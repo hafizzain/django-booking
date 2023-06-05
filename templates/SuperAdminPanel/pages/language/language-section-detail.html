@@ -23,67 +23,76 @@
     </a>
     <p>Language Detail</p>
   </h2>
+
+  {% for label in labels %}
+    <div class="grid xl:grid-cols-3 md:grid-cols-2 gap-4">
+      <form style="display:flex;" action="/api/v1/translations/add_labels/" method="POST">
+        {% csrf_token %}
+        <input name="lang" value={{lang}} hidden>
+        <input name="section" value={{section}} hidden>
+        <div>
+          <div class="input-wrapper">
+            <div class="input-label">Label</div>
+            <input
+              type="text"
+              name="label"
+              value="{{label.label}}"
+              class="input"
+              required readonly
+            />
+          </div>
+        </div>
+        <div style=" margin-left:3rem;">
+          <div class="input-wrapper">
+            <div class="input-label">Value</div>
+            <input
+              type="text"
+              name="value"
+              value={{label.value}}
+              class="input"
+              required
+            />
+          </div>
+        </div>
+        <button style=" margin-left:3rem;" type='submit'>Edit</button>
+      </form>
+    </div>
+  {% endfor %}
+
+
+
+
   <div class="grid xl:grid-cols-3 md:grid-cols-2 gap-4">
-    <div>
-      <div class="input-wrapper">
-        <div class="input-label">First Name</div>
-        <input
-          type="text"
-          placeholder="Enter your business name"
-          class="input"
-        />
+    <form style="display:flex;" action="/api/v1/translations/add_labels/" method="POST">
+      {% csrf_token %}
+      <input name="lang" value={{lang}} hidden>
+      <input name="section" value={{section}} hidden>
+      <div>
+        <div class="input-wrapper">
+          <div class="input-label">Label</div>
+          <input
+            type="text"
+            name="label"
+            placeholder="Enter your business name"
+            class="input"
+            required
+          />
+        </div>
       </div>
-    </div>
-    <div>
-      <div class="input-wrapper">
-        <div class="input-label">First Name</div>
-        <input
-          type="text"
-          placeholder="Enter your business name"
-          class="input"
-        />
+      <div style=" margin-left:3rem;">
+        <div class="input-wrapper">
+          <div class="input-label">Value</div>
+          <input
+            type="text"
+            name="value"
+            placeholder="Enter your business name"
+            class="input"
+            required
+          />
+        </div>
       </div>
-    </div>
-    <div>
-      <div class="input-wrapper">
-        <div class="input-label">First Name</div>
-        <input
-          type="text"
-          placeholder="Enter your business name"
-          class="input"
-        />
-      </div>
-    </div>
-    <div>
-      <div class="input-wrapper">
-        <div class="input-label">First Name</div>
-        <input
-          type="text"
-          placeholder="Enter your business name"
-          class="input"
-        />
-      </div>
-    </div>
-    <div>
-      <div class="input-wrapper">
-        <div class="input-label">First Name</div>
-        <input
-          type="text"
-          placeholder="Enter your business name"
-          class="input"
-        />
-      </div>
-    </div>
-    <div>
-      <div class="input-wrapper">
-        <div class="input-label">First Name</div>
-        <input
-          type="text"
-          placeholder="Enter your business name"
-          class="input"
-        />
-      </div>
-    </div>
+      <button style=" margin-left:3rem;" type='submit'>Add</button>
+    </form>
   </div>
 </div>
 

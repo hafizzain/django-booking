@@ -1010,7 +1010,7 @@ def add_business_location(request):
                 'status_code' : 201,
                 'status_code_text' : 'Created',
                 'response' : {
-                    'message' : 'Location Added successful',
+                    'message' : 'Location Added successfully',
                     'error_message' : None,
                     'locations' : serialized.data
                 }
