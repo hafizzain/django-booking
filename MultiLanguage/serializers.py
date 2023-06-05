@@ -1,7 +1,7 @@
-# from .models import *
-# from rest_framework import serializers
+from .models import *
+from rest_framework import serializers
 
-# class LabelSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Labels
-#         fields = '__all__'
+class LabelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Labels
+        fields = '__all__'

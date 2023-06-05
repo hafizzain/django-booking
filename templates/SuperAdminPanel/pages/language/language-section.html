@@ -38,7 +38,7 @@
     {% endfor %}
   </div>
 </div>
-<form action= '/api/v1/translations/add_section/?language={{language}}' method="POST">
+<form action= '/api/v1/multilanguage/add_section/?language={{language}}' method="POST">
   {% csrf_token %}
   <label>Enter Header Name</label>
   <input name="title" required placeholder="Enter Section Name">  
