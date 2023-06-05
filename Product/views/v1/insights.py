@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 from rest_framework.views import APIView
 
-from django.db.models import Count, F
+from django.db.models import Count, F, Sum
 from Product.serializers import ProductInsightSerializer
 import re
 
@@ -33,7 +33,7 @@ class FilteredInsightProducts(APIView):
 
         if self.top_sold :
             self.queries['order_by'].append('-top_sold_orders')
-            self.queries['annotate']['top_sold_orders'] = Count('product_orders__quantity')
+            self.queries['annotate']['top_sold_orders'] = Sum('product_orders__quantity')
             if self.top_sold in TOP_SOLD_CHOICES or re.match(DATE_REGEX, self.top_sold):
                 if self.top_sold != 'TOP_SOLD_PRODUCTS':
                     value = self.top_sold
@@ -59,7 +59,7 @@ class FilteredInsightProducts(APIView):
 
         if self.most_consumed :
             self.queries['order_by'].append('-most_consumed_products')
-            self.queries['annotate']['most_consumed_products'] = Count('consumptions__quantity')
+            self.queries['annotate']['most_consumed_products'] = Sum('consumptions__quantity')
             if self.most_consumed in MOST_COMSUMED_CHOICES or re.match(DATE_REGEX, self.most_consumed):
                 if self.most_consumed != 'MOST_COMSUMED_PRODUCTS':
                     value = self.most_consumed
@@ -86,7 +86,7 @@ class FilteredInsightProducts(APIView):
         if self.most_ordered :
             MOST_ORDERED_CHOICES = {'MOST_ORDERED_PRODUCTS' : None, 'LAST_7_DAYS' : self.days_before_7 , 'LAST_30_DAYS' : self.days_before_30 }
             self.queries['order_by'].append('-most_ordered_products')
-            self.queries['annotate']['most_ordered_products'] = Count('product_order_stock__rec_quantity')
+            self.queries['annotate']['most_ordered_products'] = Sum('product_order_stock__rec_quantity')
             if self.most_ordered in MOST_ORDERED_CHOICES or re.match(DATE_REGEX, self.most_ordered):
                 if self.most_ordered != 'MOST_ORDERED_PRODUCTS':
                     value = self.most_ordered
@@ -113,7 +113,7 @@ class FilteredInsightProducts(APIView):
         if self.most_transferred :
             MOST_TRANSFERRED_CHOICES = {'MOST_TRANSFERRED_PRODUCTS' : None, 'LAST_7_DAYS' : self.days_before_7 , 'LAST_30_DAYS' : self.days_before_30 }
             self.queries['order_by'].append('-most_transferred_products')
-            self.queries['annotate']['most_transferred_products'] = Count('products_stock_transfers__quantity')
+            self.queries['annotate']['most_transferred_products'] = Sum('products_stock_transfers__quantity')
             if self.most_transferred in MOST_TRANSFERRED_CHOICES or re.match(DATE_REGEX, self.most_transferred):
                 if self.most_transferred != 'MOST_TRANSFERRED_PRODUCTS':
                     value = self.most_transferred
@@ -137,26 +137,55 @@ class FilteredInsightProducts(APIView):
         self.low_stock_products = request.GET.get('low_stock_products', None)
 
         if self.low_stock_products:
-            self.queries['annotate']['sum_of_total_available_stock'] = Count('product_stock__available_quantity')
-            self.queries['annotate']['sum_of_total_lowest_stock_amount'] = Count('product_stock__low_stock')
+            self.queries['annotate']['sum_of_total_available_stock'] = Sum('product_stock__available_quantity')
+            self.queries['annotate']['sum_of_total_lowest_stock_amount'] = Sum('product_stock__low_stock')
+            self.queries['annotate']['remaing_stock'] = F('sum_of_total_available_stock') - F('sum_of_total_lowest_stock_amount')
 
             self.queries['filter']['sum_of_total_available_stock__lte'] = F('sum_of_total_lowest_stock_amount')
 
 
+    def retreive_out_of_stock_products_query(self, request):
+        self.out_of_stock_products = request.GET.get('out_of_stock_products', None)
+
+        if self.out_of_stock_products:
+
+            self.queries['filter']['product_stock__available_quantity__lte'] = 0
+
+
 
     def get(self, request):
-        out_of_stock_products = request.GET.get('out_of_stock_products', None)
+
+        location_id = request.GET.get('location', None)
+
+        if not location_id:
+            Response(
+                {
+                    'status' : False,
+                    'status_code' : 400,
+                    'response' : {
+                        'message' : 'Please provide following missing fields',
+                        'error_message' : 'Missing fields error',
+                        'fields' : [
+                            'location'
+                        ]
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
 
         
         self.retreive_top_sold_query(request)
         self.retreive_most_consumed_query(request)
         self.retreive_most_ordered_query(request)
         self.retreive_most_transferred_query(request)
+        self.retreive_low_stock_products_query(request)
+        self.retreive_out_of_stock_products_query(request)
 
         filtered_products = Product.objects.annotate(
             **self.queries['annotate'],
         ).filter(
             is_deleted = False,
+            product_stock__location__id = location_id,
             **self.queries['filter'],
         ).distinct().order_by(*self.queries['order_by'])
 
@@ -183,6 +212,10 @@ class FilteredInsightProducts(APIView):
             if self.low_stock_products:
                 product['sum_of_total_available_stock'] = int(product_instance.sum_of_total_available_stock)
                 product['sum_of_total_lowest_stock_amount'] = int(product_instance.sum_of_total_lowest_stock_amount)
+                product['lowest_stock'] = int(product_instance.remaing_stock)
+
+            # if self.out_of_stock_products:
+            #     product['available_stock'] = int(product_instance.product_stock.all().available_quantity)
 
             data.append(product)
 
