@@ -235,3 +235,57 @@ class FilteredInsightProducts(APIView):
             status=status.HTTP_200_OK
         )
         return response
+    
+
+def get_filtered_chat_products(request):
+    location_id = request.GET.get('location', None)
+    selected_year = request.GET.get('selected_year', '2023')
+
+    if not location_id:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'response' : {
+                    'message' : 'Please provide following missing fields',
+                    'error_message' : 'Missing fields error',
+                    'fields' : [
+                        'location'
+                    ]
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    
+    products = Product.objects.annotate(
+        most_transferred_products = Sum('products_stock_transfers__quantity')
+    ).filter(
+        product_stock__location__id = location_id,
+        is_deleted = False,
+        products_stock_transfers__created_at__range = ('2020-01-01', f'{selected_year}-12-31')
+    ).order_by('-most_transferred_products')[:10]
+
+
+    data = []
+    for product_instance in products:
+        product = {
+            # 'id' : f'{product_instance.id}',
+            'name' : f'{product_instance.name}',
+            'data' : int(product_instance.most_transferred_products),
+        }
+
+        data.append(product)
+
+
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Insight Products',
+                    'error_message' : None,
+                    'products' : data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
