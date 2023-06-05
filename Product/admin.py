@@ -13,7 +13,14 @@ admin.site.register(ProductMedia)
 #admin.site.register(ProductStock)
 admin.site.register(OrderStock)
 admin.site.register(OrderStockProduct)
-admin.site.register(ProductConsumption)
+@admin.register(ProductConsumption)
+class ProductConsumptionAdmin(admin.ModelAdmin):
+    list_display= [
+        'id', 
+        'created_at', 
+    ]
+
+
 admin.site.register(CurrencyRetailPrice)
 #admin.site.register(ProductOrderStockReport)
 @admin.register(ProductStock)
