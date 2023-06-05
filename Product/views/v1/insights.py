@@ -237,6 +237,9 @@ class FilteredInsightProducts(APIView):
         return response
     
 
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def get_filtered_chat_products(request):
     location_id = request.GET.get('location', None)
     selected_year = request.GET.get('selected_year', '2023')
