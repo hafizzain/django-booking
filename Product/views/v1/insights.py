@@ -273,7 +273,7 @@ def get_filtered_chat_products(request):
     for product_instance in products:
         product = {
             # 'id' : f'{product_instance.id}',
-            'name' : f'{product_instance.name}',
+            'key' : f'{product_instance.name}',
             'data' : int(product_instance.most_transferred_products),
         }
 
