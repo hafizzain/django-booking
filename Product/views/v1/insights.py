@@ -158,7 +158,7 @@ class FilteredInsightProducts(APIView):
         location_id = request.GET.get('location', None)
 
         if not location_id:
-            Response(
+            return Response(
                 {
                     'status' : False,
                     'status_code' : 400,
