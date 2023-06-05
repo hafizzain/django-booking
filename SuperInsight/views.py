@@ -1,5 +1,5 @@
 from django.shortcuts import render
-
+from Translations.models import *
 # Create your views here.
 
 
@@ -13,10 +13,28 @@ def ExceptionDetailPage(request):
     return render(request, 'SuperAdminPanel/pages/exception/exception-detail.html')
 
 def LanguagePage(request):
-    return render(request, 'SuperAdminPanel/pages/language/language.html')
+    languages = Language.objects.all()
+    context = {}
+    context['languages'] = languages
+    return render(request, 'SuperAdminPanel/pages/language/language.html', context)
 
 def LanguageSectionPage(request):
-    return render(request, 'SuperAdminPanel/pages/language/language-section.html')
+    lang = request.GET.get('language')
+    sections = Section.objects.filter(language__title=lang)
+    
+    return render(request, 'SuperAdminPanel/pages/language/language-section.html', {'sections':sections, 'language':lang})
 
 def LanguageSectionDetailPage(request):
-    return render(request, 'SuperAdminPanel/pages/language/language-section-detail.html')
+    lang = request.GET.get('language')
+    section = request.GET.get('section')
+
+    labels = Labels.objects.filter(section__title=section, section__language__title = lang)
+    context = {}
+    context['lang'] = lang
+    context['section'] = section
+    context['labels'] = labels
+
+    return render(request, 'SuperAdminPanel/pages/language/language-section-detail.html', context)
+
+
+
