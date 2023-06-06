@@ -3905,8 +3905,10 @@ def get_vacations(request):
                 'status' : 200,
                 'status_code' : '200',
                 'response' : {
-                    'message' : 'All Schedule',
+                    'message' : f'Page {page_number} Schedule',
                     'count':allvacations_count,
+                    'pages':page_count,
+                    'per_page_result':10,
                     'error_message' : None,
                     'vacations' : serialized.data
                 }
