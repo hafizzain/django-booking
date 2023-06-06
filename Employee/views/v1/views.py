@@ -3872,11 +3872,11 @@ def get_vacations(request):
     
     allvacations_count = allvacations.count()
 
-    page_count = allvacations_count / 20
+    page_count = allvacations_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(allvacations, 20)
+    paginator = Paginator(allvacations, 10)
     page_number = request.GET.get("page", None)
     if page_number is not None: 
         allvacations = paginator.get_page(page_number)
@@ -3891,7 +3891,7 @@ def get_vacations(request):
                     'message' : f'Page {page_number} Schedule',
                     'count':allvacations_count,
                     'pages':page_count,
-                    'per_page_result':20,
+                    'per_page_result':10,
                     'error_message' : None,
                     'vacations' : serialized.data
                 }
