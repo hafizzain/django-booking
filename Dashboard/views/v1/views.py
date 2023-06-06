@@ -88,6 +88,27 @@ def get_busines_client_appointment(request):
     #     appointment +=1
     #     if check.total_price is not None:
     #         revenue += check.total_price
+
+
+
+    # ////////////////////////
+
+    total = 0
+    appointmemnt_sale = 0
+    order_sale = 0
+    orders_price = Order.objects.filter(is_deleted=False)
+    for order in orders_price:
+        order_sale +=1
+        if order.total_price is not  None:
+            total += order.total_price
+    #orders_price = Order.objects.aggregate(Total= Sum('total_price'))
+    
+    price = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Paid', )#appointment_service__appointment_status = 'Done')
+    for order in price:
+        appointmemnt_sale +=1
+        if order.total_price is not None:
+            total += order.total_price
+    # //////////////////////////
     
     avg = footfalls / all_apps_clients if all_apps_clients > 0 else 0
     return Response(
@@ -97,7 +118,7 @@ def get_busines_client_appointment(request):
             'response' : {
                 'message' : 'Total Revenue',
                 'error_message' : None,
-                'revenue' : total_price,
+                'revenue' : total,
                 'client_count':all_apps_clients,
                 'footfalls': footfalls,
                 'clients_booked':all_apps_clients,

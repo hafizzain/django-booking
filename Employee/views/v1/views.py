@@ -1680,11 +1680,11 @@ def get_attendence(request):
     all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
     all_employe_count= all_employe.count()
 
-    page_count = all_employe_count / 20
+    page_count = all_employe_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_employe, 20)
+    paginator = Paginator(all_employe, 10)
     page_number = request.GET.get("page") 
     all_employe = paginator.get_page(page_number)
 
@@ -1699,7 +1699,7 @@ def get_attendence(request):
                 'message' : 'All Attendance',
                 'count':all_employe_count,
                 'pages':page_count,
-                'per_page_result':20,
+                'per_page_result':10,
                 'error_message' : None,
                 'attendance' : serialized.data
             }
@@ -2122,11 +2122,11 @@ def get_payrol_working(request):
     all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('employee_employedailyschedule__date')
     all_employe_count= all_employe.count()
 
-    page_count = all_employe_count / 20
+    page_count = all_employe_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_employe, 20)
+    paginator = Paginator(all_employe, 10)
     page_number = request.GET.get("page") 
     all_employe = paginator.get_page(page_number)
 
@@ -2141,7 +2141,7 @@ def get_payrol_working(request):
                 'message' : 'All Employee',
                 'count':all_employe_count,
                 'pages':page_count,
-                'per_page_result':20,
+                'per_page_result':10,
                 'error_message' : None,
                 'employees' : serialized.data
             }
@@ -3872,11 +3872,11 @@ def get_vacations(request):
     
     allvacations_count = allvacations.count()
 
-    page_count = allvacations_count / 20
+    page_count = allvacations_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(allvacations, 20)
+    paginator = Paginator(allvacations, 10)
     page_number = request.GET.get("page", None)
     if page_number is not None: 
         allvacations = paginator.get_page(page_number)
@@ -3891,7 +3891,7 @@ def get_vacations(request):
                     'message' : f'Page {page_number} Schedule',
                     'count':allvacations_count,
                     'pages':page_count,
-                    'per_page_result':20,
+                    'per_page_result':10,
                     'error_message' : None,
                     'vacations' : serialized.data
                 }
@@ -3905,8 +3905,10 @@ def get_vacations(request):
                 'status' : 200,
                 'status_code' : '200',
                 'response' : {
-                    'message' : 'All Schedule',
+                    'message' : f'Page {page_number} Schedule',
                     'count':allvacations_count,
+                    'pages':page_count,
+                    'per_page_result':10,
                     'error_message' : None,
                     'vacations' : serialized.data
                 }
