@@ -1680,11 +1680,11 @@ def get_attendence(request):
     all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
     all_employe_count= all_employe.count()
 
-    page_count = all_employe_count / 20
+    page_count = all_employe_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_employe, 20)
+    paginator = Paginator(all_employe, 10)
     page_number = request.GET.get("page") 
     all_employe = paginator.get_page(page_number)
 
@@ -1699,7 +1699,7 @@ def get_attendence(request):
                 'message' : 'All Attendance',
                 'count':all_employe_count,
                 'pages':page_count,
-                'per_page_result':20,
+                'per_page_result':10,
                 'error_message' : None,
                 'attendance' : serialized.data
             }
