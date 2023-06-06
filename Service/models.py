@@ -134,7 +134,7 @@ class PriceService(models.Model):
     currency = models.ForeignKey(Currency, on_delete=models.SET_NULL, null=True, blank=True, related_name='priceservice_currency')
 
     duration = models.CharField(max_length=50, null=True, blank=True, choices=DURATION_CHOICES )
-    price = models.PositiveIntegerField(default=0)
+    price = models.FloatField(default=0)
 
     def __str__(self):
         return str(self.id)
