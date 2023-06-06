@@ -195,8 +195,11 @@ class FilteredInsightProducts(APIView):
 
         for product_instance in filtered_products:
             product = {
-                # 'id' : f'{product_instance.id}',
+                'id' : f'{product_instance.short_id}',
                 'name' : f'{product_instance.name}',
+                'product_type' : f'{product_instance.product_type}',
+                'brand_name' : f'{product_instance.brand.name}',
+                'category_name' : f'{product_instance.category.name}',
             }
 
             if self.top_sold:
