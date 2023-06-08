@@ -133,7 +133,7 @@ class Business_GetSerializer(serializers.ModelSerializer):
 
             currencies = Currency.objects.filter(code__icontains = location_country)
             if len(currencies) > 0:
-                return f'{currencies[0].id}'
+                return CurrencySerializer(currencies[0]).data
             
             return None
     
