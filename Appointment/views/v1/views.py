@@ -1699,7 +1699,7 @@ def create_checkout(request):
         gst_price = gst_price,
         service_price = service_price,
         total_price = total_price,
-        service_commission = float(service_commission),
+        service_commission = 10,
         service_commission_type = service_commission_type,        
     )
     invoice = SaleInvoice.objects.create(
@@ -1714,7 +1714,7 @@ def create_checkout(request):
         gst_price = gst_price,
         service_price = service_price,
         total_price = total_price,
-        service_commission = float(total_price_app),
+        service_commission = 100,
         service_commission_type = service_commission_type,        
     )
     # checkout.business_address = service_appointment.business_address
