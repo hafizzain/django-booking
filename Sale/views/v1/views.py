@@ -1956,7 +1956,9 @@ def new_create_sale_order(request):
             )
 
         
+        discount_percentage = 0
         if discount_price is not None:
+            discount_percentage = (int(discount_price) / price) * 100
             price = int(discount_price)
     
         if price == 0 and bool(is_promotion_availed) == True:
@@ -2063,6 +2065,7 @@ def new_create_sale_order(request):
                 client_type = client_type,
                 quantity = quantity,
                 current_price = price,
+                discount_percentage = discount_percentage,
             )
             product_order.sold_quantity += 1 # product_stock.sold_quantity
             product_order.save()
@@ -2089,6 +2092,7 @@ def new_create_sale_order(request):
                     client_type = client_type,
                     quantity = quantity,
                     current_price = price,
+                    discount_percentage = discount_percentage,
                 )
 
                 order_instance = service_order
@@ -2128,6 +2132,7 @@ def new_create_sale_order(request):
                     quantity = quantity,
                     location = business_address,
                     current_price = price,
+                    discount_percentage = discount_percentage,
                 )
             except Exception as err:
                 ExceptionRecord.objects.create(
@@ -2190,6 +2195,7 @@ def new_create_sale_order(request):
                     quantity = quantity,
                     location = business_address,
                     current_price = price,
+                    discount_percentage = discount_percentage,
 
                 )
                 
