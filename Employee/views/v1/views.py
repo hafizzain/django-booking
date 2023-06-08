@@ -2351,6 +2351,7 @@ def create_commission(request):
                     commission_percentage = commission_per,
                     symbol = symbol,
                     category_comission = 'Service',
+                    comission_choice = 'percentage' if '%' in symbol else 'currency'
                 )
             except Exception as err:
                 ExceptionRecord.objects.create(
