@@ -1958,7 +1958,11 @@ def new_create_sale_order(request):
         
         if discount_price is not None:
             price = int(discount_price)
-        
+            checkout.total_service_price = price
+            checkout.save()
+            invoice.total_service_price = price
+            invoice.save()
+    
         if price == 0 and bool(is_promotion_availed) == True:
             number = int(float(total_price))
             rem_price = number - minus_price
@@ -1967,8 +1971,8 @@ def new_create_sale_order(request):
             if test == True:
                 checkout.total_service_price = int(float(total_price))
                 checkout.save()
-                invoice.total_service_price = int(float(total_price))
-                invoice.save()
+                # invoice.total_service_price = int(float(total_price))
+                # invoice.save()
                 test = False
 
         
