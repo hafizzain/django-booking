@@ -2195,7 +2195,6 @@ def new_create_sale_order(request):
                     quantity = quantity,
                     location = business_address,
                     current_price = price,
-                    discount_percentage = discount_percentage,
 
                 )
                 
