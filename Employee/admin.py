@@ -181,7 +181,7 @@ admin.site.register(EmployeeSelectedService)
 @admin.register(CategoryCommission)
 class CategoryCommissionAdmin(admin.ModelAdmin):
     ordering = ['commission__employee', 'category_comission', 'from_value']
-    list_display = ['id', 'employee', 'from_value', 'to_value','commission_percentage','category_comission','comission_choice','symbol']
+    list_display = ['id', 'employee', 'category_comission', 'from_value', 'to_value','commission_percentage','comission_choice','symbol']
 
     def employee(self, obj):
         if obj.commission and obj.commission.employee:
