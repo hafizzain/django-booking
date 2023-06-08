@@ -180,7 +180,7 @@ admin.site.register(AssetDocument)
 admin.site.register(EmployeeSelectedService)
 @admin.register(CategoryCommission)
 class CategoryCommissionAdmin(admin.ModelAdmin):
-    list_display = ['id', 'from_value', 'to_value','commission_percentage','category_comission','comission_choice','symbol']
+    list_display = ['id', 'employee', 'from_value', 'to_value','commission_percentage','category_comission','comission_choice','symbol']
 
     def employee(self, obj):
         if obj.commission and obj.commission.employee:
