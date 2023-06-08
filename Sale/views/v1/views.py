@@ -2226,11 +2226,11 @@ def new_create_sale_order(request):
             }
             commission_category = CommissionType[sale_type]
 
-            total_price = price * quantity
+            total_from_value = price * quantity
 
             sale_commissions = CategoryCommission.objects.filter(
                 commission__employee = employee_id,
-                from_value__lte = total_price,
+                from_value__lte = total_from_value,
                 category_comission__iexact = commission_category
             ).order_by('-from_value')
 
