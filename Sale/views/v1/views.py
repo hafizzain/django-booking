@@ -1956,9 +1956,9 @@ def new_create_sale_order(request):
             )
 
         
-        discount_percentage = 0
+        # discount_percentage = 0
         if discount_price is not None:
-            discount_percentage = (int(discount_price) / price) * 100
+            # discount_percentage = (int(discount_price) / price) * 100
             price = int(discount_price)
     
         if price == 0 and bool(is_promotion_availed) == True:
