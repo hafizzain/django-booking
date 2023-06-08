@@ -180,6 +180,7 @@ admin.site.register(AssetDocument)
 admin.site.register(EmployeeSelectedService)
 @admin.register(CategoryCommission)
 class CategoryCommissionAdmin(admin.ModelAdmin):
+    ordering = ['commission__employee', 'from_value']
     list_display = ['id', 'employee', 'from_value', 'to_value','commission_percentage','category_comission','comission_choice','symbol']
 
     def employee(self, obj):
