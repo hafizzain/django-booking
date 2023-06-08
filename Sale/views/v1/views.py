@@ -2270,21 +2270,19 @@ def new_create_sale_order(request):
         for t in tip:
             employee_id = t.get('employee', None)
             checkout_tip = t.get('tip', None)
+            
             try:
                 employee_tips_id = Employee.objects.get(id=employee_id)
-        
-                if employee_tips_id is not None:
-                    create_tip = AppointmentEmployeeTip.objects.create(
-                        checkout=checkout,
-                        member=employee_tips_id,
-                        tip=checkout_tip,
-                        business_address=business_address,
-                    )
-                else:
-                    print(f"Error: Employee with ID {employee_id} does not exist")
             except Exception as err:
+                print(f"Error: Employee with ID {employee_id} does not exist")
                 errors.append(str(err))
-                pass
+            else:
+                create_tip = AppointmentEmployeeTip.objects.create(
+                    checkout=checkout,
+                    member=employee_tips_id,
+                    tip=checkout_tip,
+                    business_address=business_address,
+                )
             
             
     if checkout.client :

@@ -216,7 +216,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
 
         for commission in employee_commissions:
             full_commission = commission.full_commission
-            commission_total += commission.full_commission
+            commission_total += full_commission
 
             # Mannaging Product Commission
             if commission.commission_category == 'Retail':

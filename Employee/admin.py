@@ -178,4 +178,12 @@ class EmployeDailyScheduleAdmin(admin.ModelAdmin):
 admin.site.register(Asset)
 admin.site.register(AssetDocument)
 admin.site.register(EmployeeSelectedService)
-admin.site.register(CategoryCommission)
+@admin.register(CategoryCommission)
+class CategoryCommissionAdmin(admin.ModelAdmin):
+    list_display = ['id', 'from_value', 'to_value','commission_percentage','category_comission','comission_choice','symbol']
+
+    def employee(self, obj):
+        if obj.commission and obj.commission.employee:
+            return f'{obj.commission.employee.full_name}'
+        
+        return '-------'
