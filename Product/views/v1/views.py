@@ -1881,6 +1881,7 @@ def update_orderstockproduct(request):
         order_stock.save()
     if rec_quantity is not None:
         exp = ExceptionRecord.objects.create(text= f'{order_stock.rec_quantity} ++ {rec_quantity}')
+        exp.save()
         order_stock.rec_quantity += int(rec_quantity)
         order_stock.save()
     if int(rec_quantity) >= order_stock.quantity:
