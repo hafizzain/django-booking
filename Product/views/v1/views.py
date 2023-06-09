@@ -1880,12 +1880,11 @@ def update_orderstockproduct(request):
         order_stock.note = note
         order_stock.save()
     if rec_quantity is not None:
-        rec_quantity = order_stock.rec_quantity + int(rec_quantity)
+        recc_quantity = order_stock.rec_quantity + int(rec_quantity)
 
-        order_stock.rec_quantity = rec_quantity
+        order_stock.rec_quantity = recc_quantity
         order_stock.save()
-        exp = ExceptionRecord.objects.create(text= f'{order_stock.rec_quantity} ++ {rec_quantity}')
-        exp.save()
+        
     if int(rec_quantity) >= order_stock.quantity:
         order_stock.is_finished = True
     else:
@@ -1968,7 +1967,6 @@ def update_orderstockproduct(request):
     
     serializer = OrderProductSerializer(order_stock, data=request.data, partial=True, context={'request' : request})
     if serializer.is_valid():
-        #    serializer = serializer.save()
         created_obj = serializer.save()
         rec_quantity = order_stock.rec_quantity + int(rec_quantity)
         created_obj.rec_quantity = rec_quantity
