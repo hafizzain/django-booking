@@ -1877,14 +1877,14 @@ def update_orderstockproduct(request):
                    status=status.HTTP_404_NOT_FOUND
               )
     if note is not None:
-        order_stock.note = note
+        final_quantity = order_stock.rec_quantity + int(rec_quantity)
+        order_stock.note = note + str(final_quantity)
         order_stock.save()
     if rec_quantity is not None:
   
         final_quantity = order_stock.rec_quantity + int(rec_quantity)
   
-        order_stock.rec_quantity = 100
-        # order_stock.rec_quantity = final_quantity
+        order_stock.rec_quantity = final_quantity
         order_stock.save()
 
         exp = ExceptionRecord.objects.create(text= f'{order_stock.rec_quantity} ++ {rec_quantity} ++ {final_quantity}')
@@ -2394,7 +2394,7 @@ def add_product_stock_transfer(request):
         from_location = from_location,
         to_location = to_location,
         quantity = quantity,
-        note = note,
+        note = note + 'test1',
     )
     try:
         transfer = ProductStock.objects.get(product__id=product.id, location = from_location )
@@ -2607,7 +2607,7 @@ def update_product_stock_transfer(request):
         stock_transfer.from_location = from_location
         stock_transfer.to_location = to_location
         stock_transfer.quantity = quantity
-        stock_transfer.note = note
+        stock_transfer.note = note + 'test2'
         stock_transfer.save()
 
         serialized = ProductStockTransferSerializer(stock_transfer)
