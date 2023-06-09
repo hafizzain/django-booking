@@ -1877,14 +1877,14 @@ def update_orderstockproduct(request):
                    status=status.HTTP_404_NOT_FOUND
               )
     if note is not None:
-        order_stock.note = note
+        final_quantity = order_stock.rec_quantity + int(rec_quantity)
+        order_stock.note = note + str(final_quantity)
         order_stock.save()
     if rec_quantity is not None:
   
         final_quantity = order_stock.rec_quantity + int(rec_quantity)
   
-        order_stock.rec_quantity = 100
-        # order_stock.rec_quantity = final_quantity
+        order_stock.rec_quantity = final_quantity
         order_stock.save()
 
         exp = ExceptionRecord.objects.create(text= f'{order_stock.rec_quantity} ++ {rec_quantity} ++ {final_quantity}')
