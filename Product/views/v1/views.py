@@ -1968,6 +1968,8 @@ def update_orderstockproduct(request):
     
     serializer = OrderProductSerializer(order_stock, data=request.data, partial=True, context={'request' : request})
     if serializer.is_valid():
+           qty_sum = order_stock.rec_quantity + int(rec_quantity)
+           serializer.rec_quantity = qty_sum
            serializer.save()
     else: 
         return Response(
