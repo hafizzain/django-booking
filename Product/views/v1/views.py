@@ -1966,23 +1966,23 @@ def update_orderstockproduct(request):
             text= f'Issue raised in orderstockproduct quantity line 1795 {str(err)}'
         )
     
-    serializer = OrderProductSerializer(order_stock, data=request.data, partial=True, context={'request' : request})
-    if serializer.is_valid():
-           qty_sum = order_stock.rec_quantity + int(rec_quantity)
-           serializer.rec_quantity = qty_sum
-           serializer.save()
-    else: 
-        return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
-                'response' : {
-                    'message' : 'Invialid Data',
-                    'error_message' : str(serializer.errors),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
+    # serializer = OrderProductSerializer(order_stock, data=request.data, partial=True, context={'request' : request})
+    # if serializer.is_valid():
+    #        qty_sum = order_stock.rec_quantity + int(rec_quantity)
+    #        serializer.order_stock.rec_quantity = qty_sum
+    #        serializer.save()
+    # else: 
+    #     return Response(
+    #         {
+    #             'status' : False,
+    #             'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
+    #             'response' : {
+    #                 'message' : 'Invialid Data',
+    #                 'error_message' : str(serializer.errors),
+    #             }
+    #         },
+    #         status=status.HTTP_404_NOT_FOUND
+    #     )
     
         
     return Response(
@@ -1992,7 +1992,7 @@ def update_orderstockproduct(request):
                 'response' : {
                     'message' : 'Purchase order status is updated successfully',
                     'error_message' : None,
-                    'stock' :serializer.data,
+                    # 'stock' :serializer.data,
                     'Error':error,
                 }
             },
