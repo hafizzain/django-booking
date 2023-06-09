@@ -1883,8 +1883,10 @@ def update_orderstockproduct(request):
   
         final_quantity = order_stock.rec_quantity + int(rec_quantity)
   
-        order_stock.rec_quantity = final_quantity
+        order_stock.rec_quantity = 100
+        # order_stock.rec_quantity = final_quantity
         order_stock.save()
+
         exp = ExceptionRecord.objects.create(text= f'{order_stock.rec_quantity} ++ {rec_quantity} ++ {final_quantity}')
         exp.save()
     if int(rec_quantity) >= order_stock.quantity:
