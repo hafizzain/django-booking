@@ -1955,7 +1955,7 @@ def new_create_sale_order(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # original_price = price
+        original_price = price
         # discount_percentage = 0
         # order_discount_price = 0
         if discount_price is not None:
@@ -2010,11 +2010,11 @@ def new_create_sale_order(request):
                 
                 if transfer.available_quantity >= int(quantity):
                     stock_transfer = ProductOrderStockReport.objects.create(
-                    report_choice = 'Sold',
-                    product = product,
-                    user = request.user,
-                    location = business_address,
-                    before_quantity = transfer.available_quantity      
+                        report_choice = 'Sold',
+                        product = product,
+                        user = request.user,
+                        location = business_address,
+                        before_quantity = transfer.available_quantity      
                     )                    
                     sold = transfer.available_quantity - int(quantity)
                     transfer.available_quantity = sold
@@ -2062,7 +2062,8 @@ def new_create_sale_order(request):
                 product = product,
                 checkout = checkout,
                 location = business_address,
-                total_price = total_price, 
+                # total_price = total_price, 
+                total_price = original_price, 
                 payment_type= payment_type,
                 client_type = client_type,
                 quantity = quantity,
@@ -2090,7 +2091,8 @@ def new_create_sale_order(request):
                     
                     client = client,
                     location = business_address,
-                    total_price = total_price, 
+                    # total_price = total_price, 
+                    total_price = original_price, 
                     payment_type=payment_type,
                     client_type = client_type,
                     quantity = quantity,
@@ -2130,7 +2132,8 @@ def new_create_sale_order(request):
                     checkout = checkout,
                     client = client,
 
-                    total_price = total_price, 
+                    # total_price = total_price, 
+                    total_price = original_price, 
                     payment_type =payment_type,
                     client_type = client_type,
                     quantity = quantity,
@@ -2194,7 +2197,8 @@ def new_create_sale_order(request):
                     checkout = checkout,
                     client = client,
                     discount_percentage = discount_percentage,
-                    total_price = total_price, 
+                    # total_price = total_price, 
+                    total_price = original_price, 
                     payment_type =payment_type,
                     client_type = client_type,
                     quantity = quantity,
