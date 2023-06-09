@@ -1955,13 +1955,7 @@ def new_create_sale_order(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        original_price = price
-        discount_percentage = 0
-        order_discount_price = 0
-        if discount_price is not None:
-            order_discount_price = discount_price
-            discount_percentage = (int(discount_price) / original_price) * 100
-            price = int(discount_price)
+        
     
         if price == 0 and bool(is_promotion_availed) == True:
             number = int(float(total_price))
@@ -1974,9 +1968,21 @@ def new_create_sale_order(request):
                 invoice.total_service_price = int(float(total_price))
                 invoice.save()
                 test = False
+        
+        original_price = price
+        discount_percentage = 0
+        order_discount_price = 0
+        
+        if discount_price is not None:
+            order_discount_price = discount_price
+            discount_percentage = (int(discount_price) / original_price) * 100
+            price = int(discount_price)
 
         
-        
+        # discounted_price
+        # discounted_percentage 
+        # original_price
+
 
         # commission
         # from_value
