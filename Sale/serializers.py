@@ -17,6 +17,7 @@ from Product.models import ProductStock
 
 from Service.models import PriceService, Service, ServiceGroup
 from Invoices.models import SaleInvoice
+from django.db.models import Sum
 
 class PriceServiceSerializers(serializers.ModelSerializer):
     currency_name = serializers.SerializerMethodField(read_only=True)
@@ -1155,7 +1156,8 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
     def get_discounted_price(self, obj):
         chk_orders = Order.objects.filter(
             checkout = obj
-        )
+        ).values_list('discount_price', flat=True)
+        return sum(list(chk_orders))
         d_price = 0
         for ordr in chk_orders:
             if ordr.discount_percentage and ordr.total_price:
