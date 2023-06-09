@@ -1795,15 +1795,15 @@ def new_create_sale_order(request):
     
     sale_type = request.data.get('selection_type', None)
     client_id = request.data.get('client', None)
-    sale_status = request.data.get('status', None)
+    # sale_status = request.data.get('status', None)
     
     location_id = request.data.get('location', None)
     payment_type = request.data.get('payment_type', None)
     client_type = request.data.get('client_type', None)
     ids = request.data.get('ids', None)
     redeemed_membership_id = request.data.get('redeemed_membership_id', False)
-    membership_product = request.data.get('membership_product', None)
-    membership_service = request.data.get('membership_service', None)
+    # membership_product = request.data.get('membership_product', None)
+    # membership_service = request.data.get('membership_service', None)
     
     free_services_quantity = request.data.get('free_services_quantity', None)
     
@@ -1811,20 +1811,20 @@ def new_create_sale_order(request):
     product_total_price = request.data.get('product_total_price', None)
     voucher_total_price = request.data.get('voucher_total_price', None)
     
-    service_commission = request.data.get('service_commission', None)
-    product_commission = request.data.get('product_commission', None)
-    voucher_commission = request.data.get('voucher_commission', None)
+    # service_commission = request.data.get('service_commission', None)
+    # product_commission = request.data.get('product_commission', None)
+    # voucher_commission = request.data.get('voucher_commission', None)
     
     service_commission_type = request.data.get('service_commission_type', '')
     product_commission_type = request.data.get('product_commission_type', '')
     voucher_commission_type = request.data.get('voucher_commission_type', '')
     
     is_promotion_availed = request.data.get('is_promotion_availed', None)
-    is_promotion = request.data.get('is_promotion', False)
-    duration = request.data.get('duration', None)
+    # is_promotion = request.data.get('is_promotion', False)
+    # duration = request.data.get('duration', None)
     
-    start_date = request.data.get('start_date', None)
-    end_date = request.data.get('end_date', None)
+    # start_date = request.data.get('start_date', None)
+    # end_date = request.data.get('end_date', None)
      
     tip = request.data.get('tip', [])
     total_price = request.data.get('total_price', None)
@@ -2253,7 +2253,7 @@ def new_create_sale_order(request):
                 commission = sale_commissions[0]
 
                 calculated_commission = commission.calculated_commission(price)
-                employee_commission = EmployeeCommission.objects.create(
+                EmployeeCommission.objects.create(
                     user = request.user,
                     business = business_address.business,
                     location = business_address,
@@ -2288,7 +2288,7 @@ def new_create_sale_order(request):
                 print(f"Error: Employee with ID {employee_id} does not exist")
                 errors.append(str(err))
             else:
-                create_tip = AppointmentEmployeeTip.objects.create(
+                AppointmentEmployeeTip.objects.create(
                     checkout=checkout,
                     member=employee_tips_id,
                     tip=checkout_tip,

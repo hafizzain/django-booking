@@ -1158,12 +1158,12 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
             checkout = obj
         ).values_list('discount_price', flat=True)
         return sum(list(chk_orders))
-        d_price = 0
-        for ordr in chk_orders:
-            if ordr.discount_percentage and ordr.total_price:
-                d_price += ((ordr.discount_percentage * ordr.total_price) / 100)
+        # d_price = 0
+        # for ordr in chk_orders:
+        #     if ordr.discount_percentage and ordr.total_price:
+        #         d_price += ((ordr.discount_percentage * ordr.total_price) / 100)
 
-        return d_price
+        # return d_price
         
     class Meta:
         model = Checkout
