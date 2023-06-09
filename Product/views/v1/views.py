@@ -1968,10 +1968,12 @@ def update_orderstockproduct(request):
     
     serializer = OrderProductSerializer(order_stock, data=request.data, partial=True, context={'request' : request})
     if serializer.is_valid():
-           serializer = serializer.save()
-           rec_quantity = order_stock.rec_quantity + int(rec_quantity)
-           serializer.rec_quantity = rec_quantity
-           serializer.save()
+        #    serializer = serializer.save()
+        created_obj = serializer.save()
+        rec_quantity = order_stock.rec_quantity + int(rec_quantity)
+        created_obj.rec_quantity = rec_quantity
+        created_obj.save()
+           
     else: 
         return Response(
             {
