@@ -2394,7 +2394,7 @@ def add_product_stock_transfer(request):
         from_location = from_location,
         to_location = to_location,
         quantity = quantity,
-        note = note,
+        note = note + 'test1',
     )
     try:
         transfer = ProductStock.objects.get(product__id=product.id, location = from_location )
@@ -2607,7 +2607,7 @@ def update_product_stock_transfer(request):
         stock_transfer.from_location = from_location
         stock_transfer.to_location = to_location
         stock_transfer.quantity = quantity
-        stock_transfer.note = note
+        stock_transfer.note = note + 'test2'
         stock_transfer.save()
 
         serialized = ProductStockTransferSerializer(stock_transfer)
