@@ -922,6 +922,7 @@ def get_client_detail(request):
             serialized = Client_TenantSerializer(all_client, context={'request' : request,'tenant' : tenant.schema_name })
             data.append(serialized.data)
         except Exception as err:
+            # client_id = request.GET.get('client_id', None)
             errors.append(str(err))
             pass
             

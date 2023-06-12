@@ -1976,7 +1976,7 @@ def new_create_sale_order(request):
         if discount_price is not None:
             order_discount_price = discount_price
             discount_percentage = (int(discount_price) / original_price) * 100
-            price = int(discount_price)
+            # price = int(discount_price)
 
         
         # discounted_price
