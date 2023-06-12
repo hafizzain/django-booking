@@ -288,6 +288,9 @@ def get_commission_reports_by_commission_details_updated(request):
         '-created_at'
     )
 
+    exception = ExceptionRecord.objects.create(text= "filter issue:" + str(employee_commissions)) 
+    exception.save()
+
     # 'location', 'order_type', 'employee', 'commission', 'commission_rate', 'sale', 'created_at'
 
     serialized = EmployeeCommissionReportsSerializer(employee_commissions, many=True)
