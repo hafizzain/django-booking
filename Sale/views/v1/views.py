@@ -2273,7 +2273,7 @@ def new_create_sale_order(request):
                     category_commission = commission,
                     commission_category = commission_category,
                     commission_type = commission.comission_choice,
-                    sale_value = price,
+                    sale_value = order_discount_price if order_discount_price else price,
                     commission_rate = commission.commission_percentage,
                     commission_amount = calculated_commission,
                     symbol = commission.symbol,
