@@ -283,7 +283,7 @@ def get_commission_reports_by_commission_details_updated(request):
         'location',
     ).filter(
         is_active = True,
-        **query
+        # **query
     ).order_by(
         '-created_at'
     )
