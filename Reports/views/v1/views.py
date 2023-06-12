@@ -233,6 +233,8 @@ def get_commission_reports_by_commission_details_updated(request):
         range_end = dt.strptime(range_end, '%Y-%m-%d').date()
         range_end = range_end + timedelta(days=1)
         range_end = str(range_end)
+
+    print( range_start, range_end)
     
     data = []
     
@@ -288,8 +290,8 @@ def get_commission_reports_by_commission_details_updated(request):
         'location',
     ).filter(
         is_active = True,
-        created_at__gte = range_start,
-        created_at__lte = range_end,
+        # created_at__gte = range_start,
+        # created_at__lte = range_end,
         **query
     ).order_by(
         '-created_at'
