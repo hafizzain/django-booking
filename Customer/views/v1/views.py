@@ -244,7 +244,7 @@ def create_client_business(request):
             'status_code' : 200,
             'status_code_text' : '200',
             'response' : {
-                'message' : 'End OTP to User email Please verify!',
+                'message' : 'We have sent the OTP on your email!',
                 'error_message' : None,
                 'client': data,
             }
