@@ -1795,6 +1795,8 @@ def new_create_sale_order(request):
     
     sale_type = request.data.get('selection_type', None)
     client_id = request.data.get('client', None)
+    tax_amount = request.data.get('tax_amount', 0)
+    tax_applied = request.data.get('tax_applied', 0)
     # sale_status = request.data.get('status', None)
     
     location_id = request.data.get('location', None)
@@ -1884,6 +1886,8 @@ def new_create_sale_order(request):
         service_commission_type = service_commission_type,
         product_commission_type = product_commission_type,
         voucher_commission_type = voucher_commission_type ,  
+        tax_amount = tax_amount,
+        tax_applied = tax_applied,
     )
     checkout.save()
 
