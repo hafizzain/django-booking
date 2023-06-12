@@ -1889,6 +1889,7 @@ def new_create_sale_order(request):
         tax_amount = tax_amount,
         tax_applied = tax_applied,
     )
+
     checkout.save()
 
     invoice = SaleInvoice.objects.create(
