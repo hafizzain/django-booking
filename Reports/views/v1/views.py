@@ -29,6 +29,7 @@ from django.db.models import Avg, Count, Min, Sum
 
 
 from Sale.serializers import AppointmentCheckout_ReportsSerializer, PromotionNDiscount_AppointmentCheckoutSerializer, PromotionNDiscount_CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer, CheckoutCommissionSerializer
+from datetime import datetime as dt
 
 
 @api_view(['GET'])
@@ -193,7 +194,7 @@ def get_service_target_report(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_retail_target_report(request):
@@ -221,13 +222,17 @@ def get_retail_target_report(request):
         status=status.HTTP_200_OK
     )
 
-    
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_commission_reports_by_commission_details_updated(request):
     range_start = request.GET.get('range_start', None) # 2023-02-23
     year = request.GET.get('year', None) # non used
     range_end = request.GET.get('range_end', None) # 2023-02-25
+    if range_end is not None:
+        range_end = dt.strptime(range_end, '%Y-%m-%d').date()
+        range_end = range_end + timedelta(days=1)
+        range_end = str(range_end)
     
     data = []
     
@@ -283,13 +288,13 @@ def get_commission_reports_by_commission_details_updated(request):
         'location',
     ).filter(
         is_active = True,
+        created_at__gte = range_start,
+        created_at__lte = range_end,
         **query
     ).order_by(
         '-created_at'
     )
 
-    exception = ExceptionRecord.objects.create(text= "filter issue:" + str(employee_commissions)) 
-    exception.save()
 
     # 'location', 'order_type', 'employee', 'commission', 'commission_rate', 'sale', 'created_at'
 
