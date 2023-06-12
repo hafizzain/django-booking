@@ -40,6 +40,9 @@ class Checkout(models.Model):
     payment_type = models.CharField(choices = PAYMENT_TYPE, max_length=50 , default = '' )
     
     tip = models.PositiveBigIntegerField(default = 0)
+
+    tax_applied = models.FloatField(default=0, verbose_name='Tax Applied in Percentage')
+    tax_amount = models.FloatField(default=0, verbose_name='Tax total amount')
     
     total_service_price = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
     total_product_price = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
