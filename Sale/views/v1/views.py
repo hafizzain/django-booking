@@ -1962,7 +1962,7 @@ def new_create_sale_order(request):
 
         
     
-        if price == 0 and bool(is_promotion_availed) == True:
+        if price == 0 and free_services_quantity and bool(is_promotion_availed) == True:
             number = int(float(total_price))
             rem_price = number - minus_price
             price =  int(rem_price) / int(free_services_quantity)
