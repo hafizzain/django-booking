@@ -110,7 +110,8 @@ def get_busines_client_appointment(request):
             total += order.total_price
     # //////////////////////////
     
-    avg = footfalls / all_apps_clients if all_apps_clients > 0 else 0
+    # avg = footfalls / all_apps_clients if all_apps_clients > 0 else 0
+    avg = appointment / all_apps_clients if all_apps_clients > 0 else 0
     return Response(
         {
             'status' : 200,
