@@ -120,11 +120,12 @@ def get_busines_client_appointment(request):
                 'message' : 'Total Revenue',
                 'error_message' : None,
                 'revenue' : total,
-                'client_count':all_apps_clients,
+                # 'client_count':all_apps_clients,
+                'client_count':avg,
                 'footfalls': footfalls,
                 'clients_booked':all_apps_clients,
                 'appointments_count': appointment,
-                'average_appointent':avg,
+                'average_appointment':avg,
             }
         },
         status=status.HTTP_200_OK
