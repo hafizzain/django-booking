@@ -49,6 +49,8 @@ class DomainAdmin(admin.ModelAdmin):
         'created_at',
     ]
 
+    search_fields = ['user__email']
+
     def domain_schema_name(self, obj):
         return str(obj.tenant.schema_name)
 
