@@ -575,9 +575,8 @@ def login(request):
     
     if not social_account :
         # user = authenticate(username=user.username, password=password)
-        if not user.check_password(password):
-            ExceptionRecord.objects.create(text= 'Invalid password')
         # if user is None:
+        if not user.check_password(password):
             return Response(
                 {
                     'status' : False,
