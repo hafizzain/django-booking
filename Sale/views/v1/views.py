@@ -1940,6 +1940,9 @@ def new_create_sale_order(request):
         is_membership_redeemed = id.get('is_membership_redeemed', None)
         is_voucher_redeemed = id.get('is_voucher_redeemed', None)
         redeemed_price = id.get('redeemed_price', None)
+        
+        if redeemed_price is None:
+            redeemed_price = 0
 
         is_redeemed = is_membership_redeemed or is_voucher_redeemed
 

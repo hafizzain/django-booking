@@ -2435,7 +2435,7 @@ def update_vouchers(request):
             'status' : True,
             'status_code' : 200,
             'response' : {
-                'message' : 'Update Voucher Successfully',
+                'message' : 'You have updated the Voucher',
                 'error_message' : None,
                 'voucher' : serializer.data
             }
