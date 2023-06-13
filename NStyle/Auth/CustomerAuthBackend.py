@@ -25,6 +25,7 @@ from django.db.models import Q
 
 class CustomerAuthBackend(backends.ModelBackend):
 
+
     def authenticate(self, username=None, password=None, **kwargs):
         usermodel = get_user_model()
         try:
