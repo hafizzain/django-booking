@@ -175,6 +175,11 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 
+# AUTHENTICATION_BACKENDS = (
+#     'NStyle.CustomerAuthBackend.CustomerAuthBackend',
+#     'django.contrib.auth.backends.ModelBackend',
+# )
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
