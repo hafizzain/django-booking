@@ -83,11 +83,6 @@ def get_busines_client_appointment(request):
         for price in checkouts:
             appointment +=1
             total_price += int(price.total_price or 0)
-        location_total = 0
-        for order in checkouts:
-            # appointmemnt_sale +=1
-            if order.total_price is not None:
-                location_total += order.total_price
     #     checkouts = AppointmentCheckout.objects.filter(business_address__id = business_id)
     # for check in checkouts:
     #     appointment +=1
@@ -108,7 +103,7 @@ def get_busines_client_appointment(request):
             total += order.total_price
     #orders_price = Order.objects.aggregate(Total= Sum('total_price'))
     
-    price = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Paid', )#appointment_service__appointment_status = 'Done')
+    price = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Paid', business_address__id = business_id)#appointment_service__appointment_status = 'Done')
     for order in price:
         appointmemnt_sale +=1
         if order.total_price is not None:
@@ -124,7 +119,6 @@ def get_busines_client_appointment(request):
                 'message' : 'Total Revenue',
                 'error_message' : None,
                 'revenue' : total,
-                'location_revenue' : location_total,
                 'client_count':all_apps_clients,
                 'footfalls': footfalls,
                 'clients_booked':all_apps_clients,
