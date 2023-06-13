@@ -886,51 +886,8 @@ def get_client_detail(request):
     data = []
     errors = []
 
-    try:
-        user = User.objects.get(
-            email = client_email,
-            user_account_type__account_type = 'Everyone'
-        )
-    except:
-        errors.append(str(err))
-    else:
-        user_data = {
-            'id' : f'{user.id}',
-            'full_name' : f'{user.first_name} {user.last_name if user.last_name else ""}',
-            'image' : '',
-            'client_id' : '',
-            'email' : '',
-            'mobile_number' : '',
-            'dob' : '',
-            'postal_code' : '',
-            'address' : '',
-            'gender' : '',
-            'card_number' : '',
-            'country' : '',
-            'city' : '',
-            'state' : '',
-            'is_active' : '',
-            'language' : '',
-            'about_us' : '',
-            'marketing' : '',
-            'country_obj' : '',
-            'customer_note' : '',
-            'created_at' : '',
-        }
-        data.append(user_data)
-        return Response(
-            {
-                'status' : 200,
-                'status_code' : '200',
-                'response' : {
-                    'message' : 'All Client',
-                    'error_message' : errors,
-                    'client' : data
-                }
-            },
-            status=status.HTTP_200_OK
-        )
-
+    client = None
+    
     if hash is None: 
        return Response(
             {
@@ -951,29 +908,51 @@ def get_client_detail(request):
     try:
         tenant = Tenant.objects.get(id = hash)
     except Exception as err:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : 400,
-                'status_code_text' : 'Invalid Data',
-                'response' : {
-                    'message' : 'Invalid Tenant Id',
-                    'error_message' : str(err),
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )    
-    
-    with tenant_context(tenant):
+        client = None
+    else:
+        with tenant_context(tenant):
+            try:
+                all_client=Client.objects.get(id = client_id)
+                serialized = Client_TenantSerializer(all_client, context={'request' : request,'tenant' : tenant.schema_name })
+                data.append(serialized.data)
+            except Exception as first_err:
+                client = None
+                errors.append(str(first_err))
+
+    if client is None:
         try:
-            all_client=Client.objects.get(id = client_id)
-            serialized = Client_TenantSerializer(all_client, context={'request' : request,'tenant' : tenant.schema_name })
-            data.append(serialized.data)
+            user = User.objects.get(
+                email = client_email,
+                user_account_type__account_type = 'Everyone'
+            )
         except Exception as err:
-            # client_id = request.GET.get('client_id', None)
             errors.append(str(err))
-            pass
-            
+        else:
+            user_data = {
+                'id' : f'{user.id}',
+                'full_name' : f'{user.first_name} {user.last_name if user.last_name else ""}',
+                'image' : '',
+                'client_id' : '',
+                'email' : '',
+                'mobile_number' : '',
+                'dob' : '',
+                'postal_code' : '',
+                'address' : '',
+                'gender' : '',
+                'card_number' : '',
+                'country' : '',
+                'city' : '',
+                'state' : '',
+                'is_active' : '',
+                'language' : '',
+                'about_us' : '',
+                'marketing' : '',
+                'country_obj' : '',
+                'customer_note' : '',
+                'created_at' : '',
+            }
+            data.append(user_data)
+
     return Response(
         {
             'status' : 200,
