@@ -880,9 +880,57 @@ def generate_id(request):
 def get_client_detail(request):
     hash = request.GET.get('hash', None)
     client_id = request.GET.get('client_id', None)
-    
+    client_email = request.GET.get('client_email', None)
+
+
+    data = []
     errors = []
-    data = []    
+
+    try:
+        user = User.objects.get(
+            email = client_email,
+            user_account_type__account_type = 'Everyone'
+        )
+    except:
+        errors.append(str(err))
+    else:
+        user_data = {
+            'id' : f'{user.id}',
+            'full_name' : f'{user.first_name} {user.last_name if user.last_name else ""}',
+            'image' : '',
+            'client_id' : '',
+            'email' : '',
+            'mobile_number' : '',
+            'dob' : '',
+            'postal_code' : '',
+            'address' : '',
+            'gender' : '',
+            'card_number' : '',
+            'country' : '',
+            'city' : '',
+            'state' : '',
+            'is_active' : '',
+            'language' : '',
+            'about_us' : '',
+            'marketing' : '',
+            'country_obj' : '',
+            'customer_note' : '',
+            'created_at' : '',
+        }
+        data.append(user_data)
+        return Response(
+            {
+                'status' : 200,
+                'status_code' : '200',
+                'response' : {
+                    'message' : 'All Client',
+                    'error_message' : errors,
+                    'client' : data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
     if hash is None: 
        return Response(
             {
