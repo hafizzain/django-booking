@@ -323,9 +323,22 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
 
                 difference = end_time_f - start_time_f
                 seconds = difference.seconds
-                minutes = seconds
+                minutes = seconds // 60
                 hours = minutes // 60
+                remaining_minutes = minutes % 60
+                
+                remaining_time = remaining_minutes // 5
+                remaining_time = remaining_time * 5
 
+                # remianing_time_less_than_five = remaining_minutes % 5
+                # if remianing_time_less_than_five > 2:
+                #     remianing_time = remianing_time + 5
+
+                
+
+
+
+                
 
                 data.append([
                     {
@@ -335,7 +348,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                         "end_time": end_time,
                         # 'difference' : f'{difference}min',
                         # "duration": "35min",
-                        "duration": f'{hours} h {minutes}min',
+                        "duration": f'{hours}h {remaining_time}min',
                         "created_at": "2023-05-29T06:45:38.035196Z",
                         "is_blocked": True,
                         "is_unavailable": True,
