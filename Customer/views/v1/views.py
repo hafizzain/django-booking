@@ -480,8 +480,9 @@ def customer_login(request):
         )
 
     if not social_account:
-        user = authenticate(username=user.username, password=password)
-        if user is None:
+        # user = authenticate(username=user.username, password=password)
+        # if user is None:
+        if not user.check_password(password):
             return Response(
                 {
                     'status' : False,
