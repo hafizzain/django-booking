@@ -896,7 +896,7 @@ def get_client_detail(request):
     else:
         user_data = {
             'id' : f'{user.id}',
-            'full_name' : f'{user.full_name}',
+            'full_name' : f'{user.first_name} {user.last_name}',
             'image' : '',
             'client_id' : '',
             'email' : '',
