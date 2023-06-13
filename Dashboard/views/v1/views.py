@@ -96,14 +96,14 @@ def get_busines_client_appointment(request):
     total = 0
     appointmemnt_sale = 0
     order_sale = 0
-    orders_price = Order.objects.filter(is_deleted=False)
+    orders_price = Order.objects.filter(is_deleted=False, location__id = business_id)
     for order in orders_price:
         order_sale +=1
         if order.total_price is not  None:
             total += order.total_price
     #orders_price = Order.objects.aggregate(Total= Sum('total_price'))
     
-    price = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Paid')#appointment_service__appointment_status = 'Done')
+    price = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Paid', business_address__id = business_id)#appointment_service__appointment_status = 'Done')
     for order in price:
         appointmemnt_sale +=1
         if order.total_price is not None:
