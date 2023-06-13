@@ -112,6 +112,7 @@ def get_busines_client_appointment(request):
     
     # avg = footfalls / all_apps_clients if all_apps_clients > 0 else 0
     avg = appointment / all_apps_clients if all_apps_clients > 0 else 0
+    avg = round(avg, 2)
     return Response(
         {
             'status' : 200,
