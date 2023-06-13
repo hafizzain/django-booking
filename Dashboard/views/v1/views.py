@@ -85,7 +85,7 @@ def get_busines_client_appointment(request):
             total_price += int(price.total_price or 0)
         location_total = 0
         for order in checkouts:
-            appointmemnt_sale +=1
+            # appointmemnt_sale +=1
             if order.total_price is not None:
                 location_total += order.total_price
     #     checkouts = AppointmentCheckout.objects.filter(business_address__id = business_id)
