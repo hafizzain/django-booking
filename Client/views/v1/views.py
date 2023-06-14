@@ -2415,7 +2415,7 @@ def update_vouchers(request):
             
             elif currency_id is not None: 
                 try:
-                    currency_price = VoucherCurrencyPrice.objects.get(currency=currency_id, voucher = voucher_id)
+                    currency_price = VoucherCurrencyPrice.objects.get(currency=currency_id)
                     currency_price.price = price
                     currency_price.save()
                 except Exception as err:
