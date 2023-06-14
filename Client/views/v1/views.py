@@ -2348,6 +2348,8 @@ def update_vouchers(request):
     id = request.data.get('id', None)
     currency_voucher = request.data.get('currency_voucher',None)
 
+
+
     if id is None: 
         return Response(
         {
@@ -2378,6 +2380,15 @@ def update_vouchers(request):
             },
                 status=status.HTTP_404_NOT_FOUND
         )
+
+    vch = VoucherCurrencyPrice.objects.filter(voucher = vouchers)
+    for i in vch:
+        try:
+            v = VoucherCurrencyPrice.objects.get(id = i.id)
+            v.delete()
+        except:
+            pass
+
 
     if currency_voucher:  
         if type(currency_voucher) == str:
@@ -2419,13 +2430,6 @@ def update_vouchers(request):
                     currency_price.price = price
                     currency_price.save()
                 except Exception as err:
-                    vch = VoucherCurrencyPrice.objects.filter(voucher = vouchers)
-                    for i in vch:
-                        try:
-                            v = VoucherCurrencyPrice.objects.get(id = i.id)
-                            v.delete()
-                        except:
-                            pass
                     services_obj = VoucherCurrencyPrice.objects.create(
                         voucher = vouchers,
                         currency = currency_id,
