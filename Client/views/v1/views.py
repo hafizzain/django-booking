@@ -2381,13 +2381,6 @@ def update_vouchers(request):
                 status=status.HTTP_404_NOT_FOUND
         )
 
-    vch = VoucherCurrencyPrice.objects.filter(voucher = vouchers)
-    for i in vch:
-        try:
-            v = VoucherCurrencyPrice.objects.get(id = i.id)
-            v.delete()
-        except:
-            pass
 
 
     if currency_voucher:  
@@ -2403,6 +2396,15 @@ def update_vouchers(request):
             id = curr.get('id', None)
             price = curr.get('price', None)
             voucher = curr.get('voucher', None)
+
+            if id is None:
+                vch = VoucherCurrencyPrice.objects.filter(voucher = vouchers)
+                for i in vch:
+                    try:
+                        v = VoucherCurrencyPrice.objects.get(id = i.id)
+                        v.delete()
+                    except:
+                        pass
 
             try:
                 currency_id = Currency.objects.get(id=currency)
@@ -2453,7 +2455,7 @@ def update_vouchers(request):
         {
             'status' : True,
             'status_code' : 200,
-            'message':str(vch),
+            'message':'',
             'response' : {
                 'message' : 'You have updated the Voucher',
                 'error_message' : None,
