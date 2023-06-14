@@ -574,8 +574,6 @@ def login(request):
             )
     
     if not social_account :
-        # user = authenticate(username=user.username, password=password)
-        # if user is None:
         if not user.check_password(password):
             return Response(
                 {
@@ -589,8 +587,6 @@ def login(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-        else:
-            ExceptionRecord.objects.create(text= 'user matched')
         
     if not social_account and not user.is_active:
         return Response(
