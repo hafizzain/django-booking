@@ -2347,6 +2347,7 @@ def delete_vouchers(request):
 def update_vouchers(request):
     id = request.data.get('id', None)
     currency_voucher = request.data.get('currency_voucher',None)
+    check = True
 
 
 
@@ -2397,7 +2398,7 @@ def update_vouchers(request):
             price = curr.get('price', None)
             voucher = curr.get('voucher', None)
 
-            check = True
+            
 
             if id is None:
                 if check == True:
