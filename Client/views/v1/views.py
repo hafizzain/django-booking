@@ -2397,14 +2397,18 @@ def update_vouchers(request):
             price = curr.get('price', None)
             voucher = curr.get('voucher', None)
 
+            check = True
+
             if id is None:
-                vch = VoucherCurrencyPrice.objects.filter(voucher = vouchers)
-                for i in vch:
-                    try:
-                        v = VoucherCurrencyPrice.objects.get(id = i.id)
-                        v.delete()
-                    except:
-                        pass
+                if check == True:
+                    vch = VoucherCurrencyPrice.objects.filter(voucher = vouchers)
+                    check = False
+                    for i in vch:
+                        try:
+                            v = VoucherCurrencyPrice.objects.get(id = i.id)
+                            v.delete()
+                        except:
+                            pass
 
             try:
                 currency_id = Currency.objects.get(id=currency)
