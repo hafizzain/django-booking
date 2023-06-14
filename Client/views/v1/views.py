@@ -2391,6 +2391,7 @@ def update_vouchers(request):
             currency = curr.get('currency', None)
             id = curr.get('id', None)
             price = curr.get('price', None)
+            voucher = curr.get('voucher', None)
             try:
                 currency_id = Currency.objects.get(id=currency)
             except Exception as err:
