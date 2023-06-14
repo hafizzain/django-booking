@@ -2424,6 +2424,9 @@ def update_vouchers(request):
                     # pass
                     old_price = VoucherCurrencyPrice.objects.filter(voucher = voucher_id)
                     old_data = str(old_price)
+                    for i in old_data:
+                        voucher = VoucherCurrencyPrice.objects.filter(voucher = voucher_id)
+                        voucher.delete()
                     expt = ExceptionRecord.objects.create(text=str(old_data))
                     expt.save()
                     services_obj = VoucherCurrencyPrice.objects.create(
