@@ -2396,6 +2396,13 @@ def update_vouchers(request):
                 currency_id = Currency.objects.get(id=currency)
             except Exception as err:
                 pass
+            try:
+                voucher_id = Vouchers.objects.get(id=voucher)
+            except Exception as err:
+                expt = ExceptionRecord.objects.create(text= 'voucher find ' + str(err))
+                expt.save()
+                pass
+            
             if id is not None:
                 try:
                     currency_price = VoucherCurrencyPrice.objects.get(id=id)
@@ -2407,7 +2414,7 @@ def update_vouchers(request):
             
             elif currency_id is not None: 
                 try:
-                    currency_price = VoucherCurrencyPrice.objects.get(currency=currency_id, voucher__id = voucher)
+                    currency_price = VoucherCurrencyPrice.objects.get(currency=currency_id, voucher = voucher_id)
                     currency_price.price = price
                     currency_price.save()
                 except Exception as err:
