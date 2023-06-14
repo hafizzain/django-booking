@@ -13,7 +13,7 @@ from uuid import uuid4
 def CreateDummyTenants():
     total_tenants = Tenant.objects.all()
     total_tenants = len(total_tenants)
-    for i in range(3):
+    for i in range(10):
         count = total_tenants + i
 
         name = f'NST-{count}'
