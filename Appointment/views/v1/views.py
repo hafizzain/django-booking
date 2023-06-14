@@ -1590,7 +1590,11 @@ def create_checkout(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-
+    try:
+        business_address = BusinessAddress.objects.get(id = str(business_address))
+    except Exception as err:
+        business_address = None
+        
     if type(tip) == str:
         tip = json.loads(tip)
     if type(tip) == list:
@@ -1615,10 +1619,7 @@ def create_checkout(request):
                 pass
         
         
-    try:
-        business_address = BusinessAddress.objects.get(id = str(business_address))
-    except Exception as err:
-        business_address = None
+    
     if type(appointment_service_obj) == str:
             appointment_service_obj = json.loads(appointment_service_obj)
 

@@ -4503,8 +4503,7 @@ def employee_login(request):
             is_deleted=False,
             #user_account_type__account_type = 'Employee'
         )
-        user = authenticate(username=user_id.username, password=password)
-        if user is None:
+        if not user_id.check_password(password):
             return Response(
                 {
                     'status' : False,
@@ -4517,6 +4516,8 @@ def employee_login(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
+        else:
+            user = user_id
         try:
             token = Token.objects.get(user=user)
         except Token.DoesNotExist:
