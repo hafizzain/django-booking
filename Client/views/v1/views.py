@@ -2419,14 +2419,10 @@ def update_vouchers(request):
                     currency_price.price = price
                     currency_price.save()
                 except Exception as err:
-                    # expt = ExceptionRecord.objects.create(text= 'v test' + str(err))
-                    # expt.save()
-                    # pass
-                    old_price = VoucherCurrencyPrice.objects.filter(voucher = voucher_id)
-                    old_data = str(old_price)
+                    old_data = VoucherCurrencyPrice.objects.filter(voucher = vouchers)
                     for i in old_data:
-                        voucher = VoucherCurrencyPrice.objects.filter(voucher = voucher_id)
-                        voucher.delete()
+                        voucher_price = VoucherCurrencyPrice.objects.get(voucher = i)
+                        voucher_price.delete()
                     expt = ExceptionRecord.objects.create(text=str(old_data))
                     expt.save()
                     services_obj = VoucherCurrencyPrice.objects.create(
