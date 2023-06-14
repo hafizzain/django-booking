@@ -2398,18 +2398,6 @@ def update_vouchers(request):
             price = curr.get('price', None)
             voucher = curr.get('voucher', None)
 
-            
-
-            if id is None:
-                if check == True:
-                    vch = VoucherCurrencyPrice.objects.filter(voucher = vouchers)
-                    check = False
-                    for i in vch:
-                        try:
-                            v = VoucherCurrencyPrice.objects.get(id = i.id)
-                            v.delete()
-                        except:
-                            pass
 
             try:
                 currency_id = Currency.objects.get(id=currency)
@@ -2437,6 +2425,15 @@ def update_vouchers(request):
                     currency_price.price = price
                     currency_price.save()
                 except Exception as err:
+                    if check == True:
+                        vch = VoucherCurrencyPrice.objects.filter(voucher = vouchers)
+                        check = False
+                        for i in vch:
+                            try:
+                                v = VoucherCurrencyPrice.objects.get(id = i.id)
+                                v.delete()
+                            except:
+                                pass
                     services_obj = VoucherCurrencyPrice.objects.create(
                         voucher = vouchers,
                         currency = currency_id,
