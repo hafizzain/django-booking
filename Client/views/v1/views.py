@@ -2407,20 +2407,20 @@ def update_vouchers(request):
                 currency_price.price = price
                 currency_price.save()
             
-            elif currency_id is not None: 
-                try:
-                    currency_price = VoucherCurrencyPrice.objects.get(currency__id=currency)
-                    currency_price.price = price
-                    currency_price.save()
-                except Exception as err:
-                    #pass
-                    expt = ExceptionRecord.objects.create(text = '2' + str(err))
-                    expt.save()
-                    services_obj = VoucherCurrencyPrice.objects.create(
-                        voucher = vouchers,
-                        currency = currency_id,
-                        price = price,
-                    )
+            # elif currency_id is not None: 
+            #     try:
+            #         currency_price = VoucherCurrencyPrice.objects.get(currency=currency)
+            #         currency_price.price = price
+            #         currency_price.save()
+            #     except Exception as err:
+            #         #pass
+            #         expt = ExceptionRecord.objects.create(text = '2' + str(err))
+            #         expt.save()
+            #         services_obj = VoucherCurrencyPrice.objects.create(
+            #             voucher = vouchers,
+            #             currency = currency_id,
+            #             price = price,
+            #         )
     serializer = VoucherSerializer(vouchers, data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(
