@@ -2415,9 +2415,12 @@ def update_vouchers(request):
             
             elif currency_id is not None: 
                 try:
-                    currency_price = VoucherCurrencyPrice.objects.get(currency=currency_id)
-                    currency_price.price = price
-                    currency_price.save()
+                    if voucher_id is not None: 
+                        currency_price = VoucherCurrencyPrice.objects.get(currency=currency_id, voucher = voucher_id)
+                        currency_price.price = price
+                        currency_price.save()
+                    else:
+                        pass
                 except Exception as err:
                     old_data = VoucherCurrencyPrice.objects.filter(voucher = vouchers)
                     for i in old_data:
