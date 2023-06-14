@@ -20,7 +20,7 @@ class TenantAdmin(admin.ModelAdmin):
     ]
 
     list_filter = ['is_ready', 'is_active']
-    search_fields = ['id', 'domain', 'schema_name']
+    search_fields = ['id', 'domain', 'schema_name', 'user__email']
 
     def domain_name(self, obj):
         if obj.domain:
@@ -49,6 +49,8 @@ class DomainAdmin(admin.ModelAdmin):
         'created_at',
     ]
 
+    search_fields = ['user__email']
+
     def domain_schema_name(self, obj):
         return str(obj.tenant.schema_name)
 
@@ -70,6 +72,27 @@ class EmployeeTenantDetailAdmin(admin.ModelAdmin):
         'is_tenant_staff',
     ]
     
-admin.site.register(ClientTenantAppDetail)
-admin.site.register(ClientIdUser)
+@admin.register(ClientTenantAppDetail)
+class ClientTenantAppDetailAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'user',
+        'tenant',
+        'client_id',
+        'is_appointment',
+        'is_tenant_staff',
+    ]
+
+
+@admin.register(ClientIdUser)
+class ClientIdUserAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'user',
+        'client_id',
+        'is_everyone',
+    ]
+
+
+
 #admin.site.register(EmployeeTenantDetail)

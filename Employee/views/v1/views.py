@@ -352,6 +352,8 @@ def get_Employees(request):
                 'response' : {
                     'message' : 'All Employee',
                     'count':all_employee_count,
+                    'pages':page_count,
+                    'per_page_result':20,
                     'error_message' : None,
                     'employees' : serialized.data
                 }
@@ -1173,7 +1175,7 @@ def update_employee(request):
             value = request.data.get(permit, None)
                 
             if value is not None:
-                #PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
+                PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
                 try:
                     value = json.loads(value)
                 except (TypeError, json.JSONDecodeError, AttributeError) as e:
@@ -1678,11 +1680,11 @@ def get_attendence(request):
     all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
     all_employe_count= all_employe.count()
 
-    page_count = all_employe_count / 20
+    page_count = all_employe_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_employe, 20)
+    paginator = Paginator(all_employe, 10)
     page_number = request.GET.get("page") 
     all_employe = paginator.get_page(page_number)
 
@@ -1697,7 +1699,7 @@ def get_attendence(request):
                 'message' : 'All Attendance',
                 'count':all_employe_count,
                 'pages':page_count,
-                'per_page_result':20,
+                'per_page_result':10,
                 'error_message' : None,
                 'attendance' : serialized.data
             }
@@ -2120,11 +2122,11 @@ def get_payrol_working(request):
     all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('employee_employedailyschedule__date')
     all_employe_count= all_employe.count()
 
-    page_count = all_employe_count / 20
+    page_count = all_employe_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_employe, 20)
+    paginator = Paginator(all_employe, 10)
     page_number = request.GET.get("page") 
     all_employe = paginator.get_page(page_number)
 
@@ -2139,7 +2141,7 @@ def get_payrol_working(request):
                 'message' : 'All Employee',
                 'count':all_employe_count,
                 'pages':page_count,
-                'per_page_result':20,
+                'per_page_result':10,
                 'error_message' : None,
                 'employees' : serialized.data
             }
@@ -2349,6 +2351,7 @@ def create_commission(request):
                     commission_percentage = commission_per,
                     symbol = symbol,
                     category_comission = 'Service',
+                    comission_choice = 'percentage' if '%' in symbol else 'currency'
                 )
             except Exception as err:
                 ExceptionRecord.objects.create(
@@ -2700,6 +2703,7 @@ def update_commision(request):
                     commision_ser.to_value = to_value
                     commision_ser.commission_percentage = commission_per
                     commision_ser.symbol = symbol
+                    commision_ser.comission_choice = 'percentage' if '%' in symbol else 'currency'
                     commision_ser.save()           
                     
                 except Exception as err:
@@ -2712,6 +2716,7 @@ def update_commision(request):
                     commission_percentage = commission_per,
                     symbol = symbol,
                     category_comission = 'Service',
+                    comission_choice = 'percentage' if '%' in symbol else 'currency'
                 )
                 
     if product_comission is not None:
@@ -3870,11 +3875,11 @@ def get_vacations(request):
     
     allvacations_count = allvacations.count()
 
-    page_count = allvacations_count / 20
+    page_count = allvacations_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(allvacations, 20)
+    paginator = Paginator(allvacations, 10)
     page_number = request.GET.get("page", None)
     if page_number is not None: 
         allvacations = paginator.get_page(page_number)
@@ -3889,7 +3894,7 @@ def get_vacations(request):
                     'message' : f'Page {page_number} Schedule',
                     'count':allvacations_count,
                     'pages':page_count,
-                    'per_page_result':20,
+                    'per_page_result':10,
                     'error_message' : None,
                     'vacations' : serialized.data
                 }
@@ -3903,8 +3908,10 @@ def get_vacations(request):
                 'status' : 200,
                 'status_code' : '200',
                 'response' : {
-                    'message' : 'All Schedule',
+                    'message' : f'Page {page_number} Schedule',
                     'count':allvacations_count,
+                    'pages':page_count,
+                    'per_page_result':10,
                     'error_message' : None,
                     'vacations' : serialized.data
                 }
@@ -4496,8 +4503,7 @@ def employee_login(request):
             is_deleted=False,
             #user_account_type__account_type = 'Employee'
         )
-        user = authenticate(username=user_id.username, password=password)
-        if user is None:
+        if not user_id.check_password(password):
             return Response(
                 {
                     'status' : False,
@@ -4510,6 +4516,8 @@ def employee_login(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
+        else:
+            user = user_id
         try:
             token = Token.objects.get(user=user)
         except Token.DoesNotExist:

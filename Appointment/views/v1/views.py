@@ -1590,7 +1590,11 @@ def create_checkout(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-
+    try:
+        business_address = BusinessAddress.objects.get(id = str(business_address))
+    except Exception as err:
+        business_address = None
+        
     if type(tip) == str:
         tip = json.loads(tip)
     if type(tip) == list:
@@ -1615,10 +1619,7 @@ def create_checkout(request):
                 pass
         
         
-    try:
-        business_address = BusinessAddress.objects.get(id = str(business_address))
-    except Exception as err:
-        business_address = None
+    
     if type(appointment_service_obj) == str:
             appointment_service_obj = json.loads(appointment_service_obj)
 
@@ -1728,6 +1729,7 @@ def create_checkout(request):
         invoice.is_promotion = True
         invoice.selected_promotion_id = request.data.get('selected_promotion_id', '')
         invoice.selected_promotion_type = request.data.get('selected_promotion_type', '')
+        invoice.checkout = checkout
         invoice.save()
 
 
@@ -1810,7 +1812,9 @@ def create_checkout(request):
                 points_earned = float(earned_points),
                 points_redeemed = logs_points_redeemed,
                 balance = (float(client_points.total_earn) - float(logs_points_redeemed)),
-                actual_sale_value_redeemed = logs_total_redeened_value
+                actual_sale_value_redeemed = logs_total_redeened_value,
+                invoice = invoice,
+                checkout = checkout
             )
     
 
@@ -2134,7 +2138,7 @@ def get_client_sale(request):
         )
     
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def create_appointment_client(request):
     #user = request.user
     tenant_id = request.data.get('hash', None)
@@ -2145,9 +2149,12 @@ def create_appointment_client(request):
 
     client = request.data.get('client', None)
     client_type = request.data.get('client_type', None)
+    client_email = request.data.get('client_email', None)
     
     payment_method = request.data.get('payment_method', None)
     discount_type = request.data.get('discount_type', None)
+
+    errors = []
     
     #if tenant_id is None:
     if not all([tenant_id , client_type, appointment_date, business_id  ]):
@@ -2186,16 +2193,23 @@ def create_appointment_client(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    
-    try:
-        tenant_client = ClientTenantAppDetail.objects.create(
-            # user = user 
-            tenant = tenant,
-            client_id = client,
-            is_appointment = True
-        )
-    except Exception as err:
-        pass    
+
+    tenant_client, tennant_client_created = ClientTenantAppDetail.objects.get_or_create(
+        user = request.user,
+        tenant = tenant,
+        is_appointment = True
+    )
+
+    if tennant_client_created:
+        user_details = {
+            'email' : f'{request.user.email}',
+            'full_name' : f'{request.user.username}',
+            'mobile_number' : f'{request.user.mobile_number}',
+        }
+        client_id = None
+    else:
+        client_id = tenant_client.client_id
+
     with tenant_context(tenant):
         try:
             business=Business.objects.get(id=business_id)
@@ -2228,20 +2242,27 @@ def create_appointment_client(request):
                     }
                 }
             )
-        try:
-            client = Client.objects.get(id=client)
-        except Exception as err:
-            client = None
-            # return Response(
-            #     {
-            #             'status' : False,
-            #             'status_code' : StatusCodes.INVALID_CLIENT_4032,
-            #             'response' : {
-            #             'message' : 'Client not found',
-            #             'error_message' : str(err),
-            #         }
-            #     }
-            # )
+        
+        if client_id:
+            client = Client.objects.get(id = client_id)
+        else:
+            client, created = Client.objects.get_or_create(
+                email = user_details['email'],
+                business = business,
+            )
+
+            if created:
+                client.full_name = user_details['full_name']
+                client.mobile_number = user_details['mobile_number']
+                client.is_email_verified = True
+                client.is_mobile_verified = True
+
+                client.is_active = True
+                client.save()
+        
+        client_id = f'{client.id}'
+        tenant_client.client_id = client_id
+        tenant_client.save()
         
                 
         appointment = Appointment.objects.create(
@@ -2290,7 +2311,7 @@ def create_appointment_client(request):
             
             app_date_time = f'2000-01-01 {date_time}'
             
-            duration = DURATION_CHOICES[app_duration]
+            duration = DURATION_CHOICES[app_duration.lower()]
             app_date_time = datetime.fromisoformat(app_date_time)
             datetime_duration = app_date_time + timedelta(minutes=duration)
             datetime_duration = datetime_duration.strftime('%H:%M:%S')
@@ -2335,6 +2356,7 @@ def create_appointment_client(request):
                 service = service,
                 member = member,
                 price = price,
+                total_price = price,
                 
                 
                 # voucher = voucher,
@@ -2379,6 +2401,8 @@ def create_appointment_client(request):
                         'message' : 'Appointment Create!',
                         'error_message' : None,
                         'appointments' : serialized.data,
+                        'client_id' : client_id,
+                        'errors' : errors
                     }
                 },
                 status=status.HTTP_201_CREATED

@@ -1437,6 +1437,9 @@ def create_sale_order(request):
         voucher_commission_type = voucher_commission_type,  
 
     )
+    checkout.save()
+    invoice.checkout = checkout.id
+
 
     if bool(is_promotion) == True:
         checkout.is_promotion = True
@@ -1792,15 +1795,17 @@ def new_create_sale_order(request):
     
     sale_type = request.data.get('selection_type', None)
     client_id = request.data.get('client', None)
-    sale_status = request.data.get('status', None)
+    tax_amount = request.data.get('tax_amount', 0)
+    tax_applied = request.data.get('tax_applied', 0)
+    # sale_status = request.data.get('status', None)
     
     location_id = request.data.get('location', None)
     payment_type = request.data.get('payment_type', None)
     client_type = request.data.get('client_type', None)
     ids = request.data.get('ids', None)
     redeemed_membership_id = request.data.get('redeemed_membership_id', False)
-    membership_product = request.data.get('membership_product', None)
-    membership_service = request.data.get('membership_service', None)
+    # membership_product = request.data.get('membership_product', None)
+    # membership_service = request.data.get('membership_service', None)
     
     free_services_quantity = request.data.get('free_services_quantity', None)
     
@@ -1808,20 +1813,20 @@ def new_create_sale_order(request):
     product_total_price = request.data.get('product_total_price', None)
     voucher_total_price = request.data.get('voucher_total_price', None)
     
-    service_commission = request.data.get('service_commission', None)
-    product_commission = request.data.get('product_commission', None)
-    voucher_commission = request.data.get('voucher_commission', None)
+    # service_commission = request.data.get('service_commission', None)
+    # product_commission = request.data.get('product_commission', None)
+    # voucher_commission = request.data.get('voucher_commission', None)
     
     service_commission_type = request.data.get('service_commission_type', '')
     product_commission_type = request.data.get('product_commission_type', '')
     voucher_commission_type = request.data.get('voucher_commission_type', '')
     
     is_promotion_availed = request.data.get('is_promotion_availed', None)
-    is_promotion = request.data.get('is_promotion', False)
-    duration = request.data.get('duration', None)
+    # is_promotion = request.data.get('is_promotion', False)
+    # duration = request.data.get('duration', None)
     
-    start_date = request.data.get('start_date', None)
-    end_date = request.data.get('end_date', None)
+    # start_date = request.data.get('start_date', None)
+    # end_date = request.data.get('end_date', None)
      
     tip = request.data.get('tip', [])
     total_price = request.data.get('total_price', None)
@@ -1881,7 +1886,10 @@ def new_create_sale_order(request):
         service_commission_type = service_commission_type,
         product_commission_type = product_commission_type,
         voucher_commission_type = voucher_commission_type ,  
+        tax_amount = tax_amount,
+        tax_applied = tax_applied,
     )
+
     checkout.save()
 
     invoice = SaleInvoice.objects.create(
@@ -1901,6 +1909,7 @@ def new_create_sale_order(request):
         voucher_commission_type = voucher_commission_type,  
 
     )
+    invoice.checkout = checkout.id
     invoice.save()
 
     # if is_promotion:
@@ -1931,6 +1940,9 @@ def new_create_sale_order(request):
         is_membership_redeemed = id.get('is_membership_redeemed', None)
         is_voucher_redeemed = id.get('is_voucher_redeemed', None)
         redeemed_price = id.get('redeemed_price', None)
+        
+        if redeemed_price is None:
+            redeemed_price = 0
 
         is_redeemed = is_membership_redeemed or is_voucher_redeemed
 
@@ -1952,10 +1964,8 @@ def new_create_sale_order(request):
             )
 
         
-        if discount_price is not None:
-            price = int(discount_price)
-        
-        if price == 0 and bool(is_promotion_availed) == True:
+    
+        if price == 0 and free_services_quantity and bool(is_promotion_availed) == True:
             number = int(float(total_price))
             rem_price = number - minus_price
             price =  int(rem_price) / int(free_services_quantity)
@@ -1966,9 +1976,21 @@ def new_create_sale_order(request):
                 invoice.total_service_price = int(float(total_price))
                 invoice.save()
                 test = False
+        
+        original_price = price
+        discount_percentage = 0
+        order_discount_price = 0
+        
+        if discount_price is not None:
+            order_discount_price = discount_price
+            discount_percentage = (int(discount_price) / original_price) * 100
+            # price = int(discount_price)
 
         
-        
+        # discounted_price
+        # discounted_percentage 
+        # original_price
+
 
         # commission
         # from_value
@@ -2002,11 +2024,11 @@ def new_create_sale_order(request):
                 
                 if transfer.available_quantity >= int(quantity):
                     stock_transfer = ProductOrderStockReport.objects.create(
-                    report_choice = 'Sold',
-                    product = product,
-                    user = request.user,
-                    location = business_address,
-                    before_quantity = transfer.available_quantity      
+                        report_choice = 'Sold',
+                        product = product,
+                        user = request.user,
+                        location = business_address,
+                        before_quantity = transfer.available_quantity      
                     )                    
                     sold = transfer.available_quantity - int(quantity)
                     transfer.available_quantity = sold
@@ -2054,11 +2076,14 @@ def new_create_sale_order(request):
                 product = product,
                 checkout = checkout,
                 location = business_address,
-                total_price = total_price, 
+                # total_price = total_price, 
+                total_price = original_price, 
                 payment_type= payment_type,
                 client_type = client_type,
                 quantity = quantity,
                 current_price = price,
+                discount_percentage = discount_percentage,
+                discount_price = order_discount_price,
             )
             product_order.sold_quantity += 1 # product_stock.sold_quantity
             product_order.save()
@@ -2080,11 +2105,14 @@ def new_create_sale_order(request):
                     
                     client = client,
                     location = business_address,
-                    total_price = total_price, 
+                    # total_price = total_price, 
+                    total_price = original_price, 
                     payment_type=payment_type,
                     client_type = client_type,
                     quantity = quantity,
                     current_price = price,
+                    discount_percentage = discount_percentage,
+                    discount_price = order_discount_price,
                 )
 
                 order_instance = service_order
@@ -2118,12 +2146,15 @@ def new_create_sale_order(request):
                     checkout = checkout,
                     client = client,
 
-                    total_price = total_price, 
+                    # total_price = total_price, 
+                    total_price = original_price, 
                     payment_type =payment_type,
                     client_type = client_type,
                     quantity = quantity,
                     location = business_address,
                     current_price = price,
+                    discount_percentage = discount_percentage,
+                    discount_price = order_discount_price,
                 )
             except Exception as err:
                 ExceptionRecord.objects.create(
@@ -2180,12 +2211,14 @@ def new_create_sale_order(request):
                     checkout = checkout,
                     client = client,
                     discount_percentage = discount_percentage,
-                    total_price = total_price, 
+                    # total_price = total_price, 
+                    total_price = original_price, 
                     payment_type =payment_type,
                     client_type = client_type,
                     quantity = quantity,
                     location = business_address,
                     current_price = price,
+                    discount_price = order_discount_price,
 
                 )
                 
@@ -2222,11 +2255,11 @@ def new_create_sale_order(request):
             }
             commission_category = CommissionType[sale_type]
 
-            total_price = price * quantity
+            total_from_value = price * quantity
 
             sale_commissions = CategoryCommission.objects.filter(
                 commission__employee = employee_id,
-                from_value__lte = total_price,
+                from_value__lte = total_from_value,
                 category_comission__iexact = commission_category
             ).order_by('-from_value')
 
@@ -2234,7 +2267,7 @@ def new_create_sale_order(request):
                 commission = sale_commissions[0]
 
                 calculated_commission = commission.calculated_commission(price)
-                employee_commission = EmployeeCommission.objects.create(
+                EmployeeCommission.objects.create(
                     user = request.user,
                     business = business_address.business,
                     location = business_address,
@@ -2243,7 +2276,7 @@ def new_create_sale_order(request):
                     category_commission = commission,
                     commission_category = commission_category,
                     commission_type = commission.comission_choice,
-                    sale_value = price,
+                    sale_value = order_discount_price if order_discount_price else price,
                     commission_rate = commission.commission_percentage,
                     commission_amount = calculated_commission,
                     symbol = commission.symbol,
@@ -2262,21 +2295,19 @@ def new_create_sale_order(request):
         for t in tip:
             employee_id = t.get('employee', None)
             checkout_tip = t.get('tip', None)
+            
             try:
                 employee_tips_id = Employee.objects.get(id=employee_id)
-        
-                if employee_tips_id is not None:
-                    create_tip = AppointmentEmployeeTip.objects.create(
-                        checkout=checkout,
-                        member=employee_tips_id,
-                        tip=checkout_tip,
-                        business_address=business_address,
-                    )
-                else:
-                    print(f"Error: Employee with ID {employee_id} does not exist")
             except Exception as err:
+                print(f"Error: Employee with ID {employee_id} does not exist")
                 errors.append(str(err))
-                pass
+            else:
+                AppointmentEmployeeTip.objects.create(
+                    checkout=checkout,
+                    member=employee_tips_id,
+                    tip=checkout_tip,
+                    business_address=business_address,
+                )
             
             
     if checkout.client :
@@ -2333,7 +2364,9 @@ def new_create_sale_order(request):
                 points_earned = earned_points,
                 points_redeemed = 0,
                 balance = (float(client_points.total_earn) - float(client_points.points_redeemed)),
-                actual_sale_value_redeemed = 0
+                actual_sale_value_redeemed = 0,
+                invoice = invoice,
+                checkout = checkout
             )
 
     # payment_type_sales = Order.objects.values('payment_type').annotate(total_sales=Count('id')).order_by('payment_type')

@@ -1010,7 +1010,7 @@ def add_business_location(request):
                 'status_code' : 201,
                 'status_code_text' : 'Created',
                 'response' : {
-                    'message' : 'Location Added successful',
+                    'message' : 'Location Added successfully',
                     'error_message' : None,
                     'locations' : serialized.data
                 }
@@ -3196,7 +3196,7 @@ def get_check_availability(request):
             
             app_date_time = f'2000-01-01 {start_time}'
         
-            duration = DURATION_CHOICES[duration]
+            duration = DURATION_CHOICES[duration.lower()]
             app_date_time = datetime.fromisoformat(app_date_time)
             datetime_duration = app_date_time + timedelta(minutes=duration)
             datetime_duration = datetime_duration.strftime('%H:%M:%S')

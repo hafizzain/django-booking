@@ -350,7 +350,7 @@ def create_client(request):
                             'status_code' : 404,
                             'status_code_text' : '404',
                             'response' : {
-                                'message' : f'Client Already exist with this {email}!',
+                                'message' : f'Client already exist with this email.',
                                 'error_message' : None,
                             }
                         },
@@ -369,7 +369,7 @@ def create_client(request):
                             'status_code' : 404,
                             'status_code_text' : '404',
                             'response' : {
-                                'message' : f'Client Already exist with this {mobile_number}!',
+                                'message' : f'Client already exist with this phone number',
                                 'error_message' : None, 
                             }
                         },
@@ -2391,10 +2391,19 @@ def update_vouchers(request):
             currency = curr.get('currency', None)
             id = curr.get('id', None)
             price = curr.get('price', None)
+            voucher = curr.get('voucher', None)
+
             try:
                 currency_id = Currency.objects.get(id=currency)
             except Exception as err:
                 pass
+            try:
+                voucher_id = Vouchers.objects.get(id=voucher)
+            except Exception as err:
+                expt = ExceptionRecord.objects.create(text= 'voucher find ' + str(err))
+                expt.save()
+                pass
+            
             if id is not None:
                 try:
                     currency_price = VoucherCurrencyPrice.objects.get(id=id)
@@ -2406,11 +2415,20 @@ def update_vouchers(request):
             
             elif currency_id is not None: 
                 try:
-                    currency_price = VoucherCurrencyPrice.objects.get(currency=currency_id)
+                    currency_price = VoucherCurrencyPrice.objects.get(currency=currency_id, voucher = voucher_id)
                     currency_price.price = price
                     currency_price.save()
                 except Exception as err:
-                    #pass
+                    # expt = ExceptionRecord.objects.create(text= 'v test' + str(err))
+                    # expt.save()
+                    # pass
+                    old_price = VoucherCurrencyPrice.objects.filter(voucher = voucher_id)
+                    old_data = str(old_price)
+                    for i in old_data:
+                        voucher = VoucherCurrencyPrice.objects.filter(voucher = voucher_id)
+                        voucher.delete()
+                    expt = ExceptionRecord.objects.create(text=str(old_data))
+                    expt.save()
                     services_obj = VoucherCurrencyPrice.objects.create(
                         voucher = vouchers,
                         currency = currency_id,
@@ -2435,7 +2453,7 @@ def update_vouchers(request):
             'status' : True,
             'status_code' : 200,
             'response' : {
-                'message' : 'Update Voucher Successfully',
+                'message' : 'You have updated the Voucher',
                 'error_message' : None,
                 'voucher' : serializer.data
             }

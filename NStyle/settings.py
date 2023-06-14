@@ -65,7 +65,9 @@ NSTYLE_APPS = [
     'Promotions.apps.PromotionsConfig',
     'Reports.apps.ReportsConfig',
     'Invoices.apps.InvoicesConfig',
-    'Help.apps.HelpConfig'
+    'Help.apps.HelpConfig',
+    'MultiLanguage.apps.MultilanguageConfig',
+    'SuperInsight.apps.SuperinsightConfig',
 ]
 
 
@@ -173,6 +175,7 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -228,7 +231,10 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 BACKEND_DOMAIN_NAME=env('BACKEND_DOMAIN_NAME')
 BACKEND_HOST=env('BACKEND_HOST')

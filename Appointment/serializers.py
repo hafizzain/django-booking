@@ -123,7 +123,7 @@ class TodayAppoinmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentService
         fields = ('id', 'appointment_time', 'appointment_date','duration',
-                  'member' , 'service', 'end_time', 'location' )
+                  'member' , 'service', 'end_time', 'location', 'appointment' )
         
 class AppointmentServiceSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
@@ -244,6 +244,9 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             first_shift = [employee_working_schedule.start_time, employee_working_schedule.end_time]
             second_shift = [employee_working_schedule.start_time_shift, employee_working_schedule.end_time_shift] if employee_working_schedule.start_time_shift else None
 
+            if not first_shift[0] or not first_shift[1]:
+                return []
+
             if employee_working_schedule.start_time.strftime('%H:%M:%S') == "00:00:00":
                 if employee_working_schedule.end_time.strftime('%H:%M:%S') == '00:00:00':
                     pass
@@ -321,6 +324,21 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                 difference = end_time_f - start_time_f
                 seconds = difference.seconds
                 minutes = seconds // 60
+                hours = minutes // 60
+                remaining_minutes = minutes % 60
+                
+                remaining_time = remaining_minutes // 5
+                remaining_time = remaining_time * 5
+
+                # remianing_time_less_than_five = remaining_minutes % 5
+                # if remianing_time_less_than_five > 2:
+                #     remianing_time = remianing_time + 5
+
+                
+
+
+
+                
 
                 data.append([
                     {
@@ -330,7 +348,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                         "end_time": end_time,
                         # 'difference' : f'{difference}min',
                         # "duration": "35min",
-                        "duration": f'{minutes}min',
+                        "duration": f'{hours}h {remaining_time}min',
                         "created_at": "2023-05-29T06:45:38.035196Z",
                         "is_blocked": True,
                         "is_unavailable": True,
@@ -516,7 +534,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                 app_date_time = datetime.combine(app_date, appointment_time)
 
                 # calculate the end time
-                duration = DURATION_CHOICES[app_duration]
+                duration = DURATION_CHOICES[app_duration.lower()]
                 end_time = (app_date_time + timedelta(minutes=duration)).time()
 
                 # check for overlaps

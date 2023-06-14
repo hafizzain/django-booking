@@ -16,6 +16,8 @@ from Sale.Constants.Promotion import get_promotions
 from Product.models import ProductStock
 
 from Service.models import PriceService, Service, ServiceGroup
+from Invoices.models import SaleInvoice
+from django.db.models import Sum
 
 class PriceServiceSerializers(serializers.ModelSerializer):
     currency_name = serializers.SerializerMethodField(read_only=True)
@@ -1154,13 +1156,14 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
     def get_discounted_price(self, obj):
         chk_orders = Order.objects.filter(
             checkout = obj
-        )
-        d_price = 0
-        for ordr in chk_orders:
-            if ordr.discount_percentage and ordr.total_price:
-                d_price += ((ordr.discount_percentage * ordr.total_price) / 100)
+        ).values_list('discount_price', flat=True)
+        return sum(list(chk_orders))
+        # d_price = 0
+        # for ordr in chk_orders:
+        #     if ordr.discount_percentage and ordr.total_price:
+        #         d_price += ((ordr.discount_percentage * ordr.total_price) / 100)
 
-        return d_price
+        # return d_price
         
     class Meta:
         model = Checkout
@@ -1232,7 +1235,12 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
         return obj.current_price
     
     def get_price(self, obj):
-        return obj.current_price
+        if obj.is_redeemed == True:
+            return obj.redeemed_price
+        elif obj.discount_price:
+            return obj.discount_price
+        else:
+            return obj.current_price
         
 
     def get_product_name(self, obj):
@@ -1266,7 +1274,12 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
         return None
     
     def get_price(self, obj):
-        return obj.current_price
+        if obj.is_redeemed == True:
+            return obj.redeemed_price
+        elif obj.discount_price:
+            return obj.discount_price
+        else:
+            return obj.current_price
 
     class Meta:
         model = ServiceOrder
@@ -1342,6 +1355,8 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     membership_product = serializers.SerializerMethodField(read_only=True)
     membership_service = serializers.SerializerMethodField(read_only=True)
     membership_type = serializers.SerializerMethodField(read_only=True)
+    invoice = serializers.SerializerMethodField(read_only=True)
+    
     
     tip = serializers.SerializerMethodField(read_only=True)
 
@@ -1446,6 +1461,14 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
         serialized_tips = CheckoutTipsSerializer(tips, many=True).data
         return serialized_tips
     
+    def get_invoice(self, obj):
+        try:
+            invoice = SaleInvoice.objects.get(checkout__icontains = obj)
+            serializer = SaleInvoiceSerializer(invoice)
+            return serializer.data
+        except Exception as e:
+            return str(e)
+    
     class Meta:
         model = Checkout
         fields = [
@@ -1456,12 +1479,15 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             'created_at', 'payment_type', 'tip',
             'service_commission', 'voucher_commission', 'product_commission', 'service_commission_type',
             'product_commission_type', 'voucher_commission_type', 'ids', 'membership_product',
-            'membership_service', 'membership_type'
+            'membership_service', 'membership_type', 'invoice'
         ]
 
         # Remove Member from get all sale orders
 
-
+class SaleInvoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SaleInvoice
+        fields = '__all__'
 class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)

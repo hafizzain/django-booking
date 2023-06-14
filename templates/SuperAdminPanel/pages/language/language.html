@@ -1,0 +1,49 @@
+{% extends 'SuperAdminPanel/main.html' %} {% block body %}
+<script>
+  SideBarActive("language");
+</script>
+
+<div class="cursor-pointer lg:hidden block">
+  <svg
+    class="w-[1.375rem] h-[1.125rem]"
+    viewBox="0 0 22 18"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+   >
+    <rect width="21.2727" height="3.27273" fill="#101928"></rect>
+    <rect y="7.36353" width="14.7273" height="3.27273" fill="#101928"></rect>
+    <rect y="14.7273" width="21.2727" height="3.27273" fill="#101928"></rect>
+  </svg>
+</div>
+<div
+  class="flex items-center gap-5 lg:w-fit w-full lg:px-0 lg:pb-[2rem] lg:py-0 p-3 pb-8"
+>
+  <h2 class="font-semibold text-2xl">Languages</h2>
+</div>
+<div
+  class="grid xl:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-[2rem] xl:pr-[4rem] pr-0"
+ >
+  {% for lang in languages %}
+  <a
+    href='{% url "LanguageSectionPage" %}?language={{lang.title}}'
+    class="hover:bg-slate-100 relative transition-all cursor-pointer shadow-login-card px-[1.25rem] py-[1rem] rounded-xl flex flex-col gap-2"
+   >
+   {{lang.icon|safe}}
+    <h2 class="font-semibold text-xl">{{lang.title}}</h2>
+  </a>
+  {% endfor %}
+</div>
+
+<div>
+  <form action="/api/v1/multilanguage/add_language/" method="POST">
+    {% csrf_token %}
+    <label>Enter Language</label>
+    <input type="text" name="language" required placeholder="Language">
+
+    <label>Enter Icon</label>
+    <input type="text" name="icon" required placeholder="Icon">
+    <button type="submit">Add</button>
+  </form>
+</div>
+
+{% endblock body %}

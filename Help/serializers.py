@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from .models import Comment
+from .models import HelpContent
 
-class CommentSerializer(serializers.ModelSerializer):
+class HelpContentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Comment
+        model = HelpContent
         fields = ['content', 'parent_comment', 'is_parent']

@@ -18,6 +18,7 @@ def add_employee(emp_name, emp_email, mobile_number , template,busines_name , te
         ExceptionRecord.objects.create(
             text='Email is None'
         )
+        return []
 
     try:
         tenant = Tenant.objects.get(id=tenant_id)
@@ -33,7 +34,7 @@ def add_employee(emp_name, emp_email, mobile_number , template,busines_name , te
             text_content = strip_tags(html_file)
 
             email = EmailMultiAlternatives(
-                'Employee Created',
+                'Join NStyle',
                 text_content,
                 settings.EMAIL_HOST_USER,
                 to=[emp_email],

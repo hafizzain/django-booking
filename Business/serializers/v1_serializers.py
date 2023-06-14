@@ -6,7 +6,8 @@ from Employee.models import EmployeDailySchedule, Employee
 from Utility.models import Currency, ExceptionRecord, State, Country,City
 from rest_framework import serializers
 from datetime import datetime, timedelta
-from Order.models import Checkout
+from Order.models import Checkout,Order
+from django.contrib.gis.geoip2 import GeoIP2
 
 from Business.models import BookingSetting, BusinessAddressMedia, BusinessType, Business, BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BusinessPaymentMethod, BusinessTax, BusinessVendor,BusinessOpeningHour
 from Authentication.serializers import UserSerializer
@@ -104,10 +105,37 @@ class Business_GetSerializer(serializers.ModelSerializer):
     website = serializers.SerializerMethodField()
     facebook = serializers.SerializerMethodField()
     instagram = serializers.SerializerMethodField()
-    currency =CurrencySerializer()
+    currency = serializers.SerializerMethodField()
 
     logo = serializers.SerializerMethodField()
     
+    def get_currency(self, obj):
+        if obj.currency:
+            return CurrencySerializer(obj.currency).data
+        else:
+            request = self.context.get('request', None)
+            if not request:
+                return None
+
+            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+
+            if x_forwarded_for:
+                ip = x_forwarded_for.split(',')[0]
+            else:
+                ip = request.META.get('REMOTE_ADDR')
+
+            try:
+                g = GeoIP2()
+                location = g.city(ip)
+                location_country = location["country_code"]
+            except:
+                location_country = 'ae'
+
+            currencies = Currency.objects.filter(code__icontains = location_country)
+            if len(currencies) > 0:
+                return CurrencySerializer(currencies[0]).data
+            
+            return None
     
     def get_logo(self, obj):
         if obj.logo :
@@ -541,7 +569,7 @@ class PaymentMethodSerializer(serializers.ModelSerializer):
     method_type_count = serializers.SerializerMethodField(read_only=True)
 
     def get_method_type_count(self, obj):
-        checkout_count = Checkout.objects.filter(payment_type=obj.method_type).count()
+        checkout_count = Order.objects.filter(payment_type=obj.method_type).count()
         return checkout_count
 
     class Meta:

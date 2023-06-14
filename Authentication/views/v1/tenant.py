@@ -93,7 +93,10 @@ def login(request):
         )
 
     if not social_account:
-        user = authenticate(username=user.username, password=password)
+        if user.check_password(password):
+            pass
+        else:
+            user = None
 
     if user is None:
         return Response(

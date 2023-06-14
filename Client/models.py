@@ -8,7 +8,7 @@ from uuid import uuid4
 from Authentication.models import User
 from Business.models import Business, BusinessAddress
 #from Promotions.models import ComplimentaryDiscount
-
+from django.db import connection
 from Utility.models import Country, Currency, Language, State, City
 from django.utils.timezone import now
 from Product.models import Product
@@ -75,6 +75,39 @@ class Client(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+    def save(self, *args, **kwargs):
+        if not self.client_id:
+            tenant = connection.get_tenant()
+
+            tenant_name = str(tenant.domain).split('.')[0]
+            tenant_name = tenant_name.split('-')
+            tenant_name = [word[0].upper() for word in tenant_name if word]  # Use upper() to capitalize letters and add a check to skip empty strings
+
+            count = Client.objects.all().count()
+            count += 1
+            new_id = ''
+        
+            return_loop = True
+            while return_loop:
+                if 0 < count <= 9 : 
+                    count = f'000{count}'
+                elif 9 < count <= 99 :
+                    count = f'00{count}'
+                elif 99 < count <= 999:
+                    count = f'0{count}'
+                new_id =f'{tenant_name}-CLI-{count}'
+                
+                try:
+                    Client.objects.get(client_id=new_id)
+                    count += 1
+                except:
+                    return_loop = False
+                    break
+
+            self.client_id = new_id
+        super(Client, self).save(*args, **kwargs)
+
     
     
 class ClientGroup(models.Model):
@@ -378,7 +411,7 @@ class LoyaltyPoints(models.Model):
     
     name = models.CharField(max_length=100, default='')
     loyaltytype = models.CharField(choices=LOYALTY_CHOICE, default='Service' , verbose_name='Loyalty Type', max_length=50)
-    amount_spend = models.PositiveIntegerField(default=0, null=True, blank=True)
+    amount_spend = models.FloatField(default=0, null=True, blank=True)
     number_points = models.PositiveIntegerField(default=0, null=True, blank=True)
     earn_points = models.FloatField(default=0, null=True, blank=True)
     total_earn_from_points = models.PositiveIntegerField(default=0, null=True, blank=True)
@@ -426,7 +459,7 @@ class ClientLoyaltyPoint(models.Model):
     
     def __str__(self):
         return str(self.id)
-    
+
 class LoyaltyPointLogs(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     location = models.ForeignKey(BusinessAddress, on_delete=models.CASCADE, related_name="location_loyaltypointlogs")
@@ -439,6 +472,10 @@ class LoyaltyPointLogs(models.Model):
     points_redeemed = models.FloatField(default=0)
     balance = models.FloatField(default=0, null=True, blank=True)
     actual_sale_value_redeemed = models.FloatField(default=0)
+
+    invoice = models.CharField(max_length=128, null=True, blank=True)
+    checkout = models.CharField(max_length=128, null=True, blank=True)
+
 
     created_at = models.DateTimeField(auto_now_add=now, null=True)
     updated_at = models.DateTimeField(auto_now_add=now, null=True)

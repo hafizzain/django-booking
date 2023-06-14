@@ -64,6 +64,7 @@ class SaleInvoice(models.Model):
     
     service_price = models.FloatField(default=0, null=True, blank=True)
     total_price = models.FloatField(default=0, null=True, blank=True)
+    checkout = models.CharField(max_length=128, null=True, blank=True)
     
 
     created_at = models.DateTimeField(auto_now_add=now)

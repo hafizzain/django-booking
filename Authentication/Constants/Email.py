@@ -37,7 +37,7 @@ def send_otp_to_email(user=None, ):
         'Email Verification OTP',
         text_content,
         settings.EMAIL_HOST_USER,
-        to = [user_otp.user.email, 'huzaifa.officialmail@gmail.com']
+        to = [user_otp.user.email,]
     )
     
     email.attach_alternative(html_file, "text/html")
