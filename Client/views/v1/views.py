@@ -2418,14 +2418,14 @@ def update_vouchers(request):
                     currency_price.price = price
                     currency_price.save()
                 except Exception as err:
-                    expt = ExceptionRecord.objects.create(text= 'v test' + str(err))
-                    expt.save()
-                    pass
-                    # services_obj = VoucherCurrencyPrice.objects.create(
-                    #     voucher = vouchers,
-                    #     currency = currency_id,
-                    #     price = price,
-                    # )
+                    # expt = ExceptionRecord.objects.create(text= 'v test' + str(err))
+                    # expt.save()
+                    # pass
+                    services_obj = VoucherCurrencyPrice.objects.create(
+                        voucher = vouchers,
+                        currency = currency_id,
+                        price = price,
+                    )
     serializer = VoucherSerializer(vouchers, data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(
