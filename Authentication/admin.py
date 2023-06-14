@@ -25,6 +25,8 @@ class UserAdmin(admin.ModelAdmin):
     ]
 
     list_filter = ['is_email_verified', 'is_mobile_verified']
+
+    actions = ['unlink_tenant_and_delete_user']
     
     def is_tenant_user(self, user_obj):
         try:
@@ -35,6 +37,25 @@ class UserAdmin(admin.ModelAdmin):
             return False
         else:
             return True
+
+    @admin.action(description='Unlink Tenant & Delete User')
+    def unlink_tenant_and_delete_user(modeladmin, request, queryset):
+        for user in queryset:
+            
+            user_tenants = Tenant.objects.filter(user = user)
+            ids = list(user_tenants.values_list('id', flat=True))
+            user_tenants.update(
+                name = '',
+                user = None,
+                is_active = False,
+                is_ready = True,
+            )
+            Domain.objects.filter(
+                tenant__id__in = ids
+            ).delete()
+
+            user.delete()
+
 
     is_tenant_user.boolean = True
 
