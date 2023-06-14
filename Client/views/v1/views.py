@@ -2420,7 +2420,9 @@ def update_vouchers(request):
                     currency_price.save()
                 except Exception as err:
                     vch = VoucherCurrencyPrice.objects.filter(voucher = vouchers)
-                    vch = str(vch)
+                    for i in vch:
+                        v = VoucherCurrencyPrice.objects.get(id = i)
+                        v.delete()
                     services_obj = VoucherCurrencyPrice.objects.create(
                         voucher = vouchers,
                         currency = currency_id,
