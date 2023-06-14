@@ -2420,9 +2420,12 @@ def update_vouchers(request):
                     currency_price.save()
                 except Exception as err:
                     vch = VoucherCurrencyPrice.objects.filter(voucher = vouchers)
-                    for i in vch:
-                        v = VoucherCurrencyPrice.objects.get(id = i)
-                        v.delete()
+                    # for i in vch:
+                    #     try:
+                    #         v = VoucherCurrencyPrice.objects.get(id = i)
+                    #         v.delete()
+                    #     except:
+                    #         pass
                     services_obj = VoucherCurrencyPrice.objects.create(
                         voucher = vouchers,
                         currency = currency_id,
@@ -2446,7 +2449,7 @@ def update_vouchers(request):
         {
             'status' : True,
             'status_code' : 200,
-            'message':'passed',
+            'message':str(vch),
             'response' : {
                 'message' : 'You have updated the Voucher',
                 'error_message' : None,
