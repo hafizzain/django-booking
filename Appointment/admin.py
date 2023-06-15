@@ -39,6 +39,7 @@ class AppointmentServiceAdmin(admin.ModelAdmin):
         'appointment_date',
         'appointment_time',
         'total_price',
+        'price',
         'duration',
         'appointment_end_time',
         'is_active',
