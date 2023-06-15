@@ -476,18 +476,15 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
         try:
             try:
                 data = Checkout.objects.filter(id = c_points.checkout)
-                if len(data) == 0:
-                    raise Exception('No Checkout Data found')
-                is_checkout = True
+                serializer = SaleOrders_CheckoutSerializer(data, many=True)
+                
             except:
                 data = AppointmentCheckout.objects.filter(id = c_points.checkout)
+                serializer = AppointmentCheckoutSerializer(data, many=True)
+
         except Exception as e:
             return str(e)
 
-        if is_checkout == True:
-            serializer = SaleOrders_CheckoutSerializer(data, many=True)
-        else:
-            serializer = AppointmentCheckoutSerializer(data, many=True)
         return serializer.data
         
 
