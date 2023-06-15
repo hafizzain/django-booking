@@ -1634,11 +1634,12 @@ def create_checkout(request):
         except Exception as err:
             pass
         else:
-            total_price = service_appointment.total_price * 1
+            service_total_price = service_appointment.total_price * 1
 
             sale_commissions = CategoryCommission.objects.filter(
                 commission__employee = service_appointment.member,
-                from_value__lte = total_price,
+                # from_value__lte = total_price,
+                from_value__lte = service_total_price,
                 category_comission__iexact = 'Service'
             ).order_by('-from_value')
 
