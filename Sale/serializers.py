@@ -1129,6 +1129,14 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
     invoice = serializers.SerializerMethodField(read_only=True)
     original_price = serializers.SerializerMethodField(read_only=True)
     discounted_price = serializers.SerializerMethodField(read_only=True)
+    location = serializers.SerializerMethodField(read_only=True)
+
+    def get_location(self, obj):
+        try:
+            serializers = LocationSerializer(obj.location).data
+            return serializers
+        except Exception as err:
+            return str(err)
     
     def get_promotion(self, obj):
         promotion = get_promotions(
