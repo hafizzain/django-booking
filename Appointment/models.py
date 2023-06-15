@@ -161,7 +161,7 @@ class AppointmentService(models.Model):
     appointment_status = models.CharField(choices=BOOKED_CHOICES, max_length=100, default='Appointment Booked')
     tip = models.PositiveIntegerField(default=0, null=True, blank=True)
     
-    price = models.PositiveIntegerField(default=0, null=True, blank=True)
+    price = models.FloatField(default=0, null=True, blank=True)
     
     service_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
     service_commission_type = models.CharField( max_length=50 , default = '')
