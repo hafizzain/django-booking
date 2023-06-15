@@ -1142,7 +1142,13 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
         return None
         
     def get_invoice(self, obj):
-        return {}
+        try:
+            invoice = SaleInvoice.objects.get(checkout = obj.id)
+            serializer = SaleInvoiceSerializer(invoice)
+            return serializer.data
+        except Exception as e:
+            return str(e)
+        
         
     def get_original_price(self, obj):
         checkout_orders = Order.objects.filter(
@@ -1187,7 +1193,12 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
         return None
         
     def get_invoice(self, obj):
-        return {}
+        try:
+            invoice = SaleInvoice.objects.get(appointment = obj.appointment)
+            serializer = SaleInvoiceSerializer(invoice)
+            return serializer.data
+        except Exception as e:
+            return str(e)
         
     def get_original_price(self, obj):
         app_srevices = AppointmentService.objects.filter(
