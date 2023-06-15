@@ -9,8 +9,9 @@ from Utility.models import Country, State, City
 
 from Client.models import Client, ClientGroup, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription, Promotion , Rewards , Membership, Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs , VoucherCurrencyPrice 
 from Invoices.models import SaleInvoice
-from Appointment.models import AppointmentCheckout
+from Appointment.models import AppointmentCheckout, AppointmentEmployeeTip
 from Order.models import Checkout
+
 
 class LocationSerializerLoyalty(serializers.ModelSerializer):
     
@@ -507,6 +508,16 @@ class CheckoutSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class AppointmentCheckoutSerializer(serializers.ModelSerializer):
+    tip = serializers.SerializerMethodField(read_only = True)
+
+
+    def get_tip(self, appointment_checkout):
+        tips = AppointmentEmployeeTip.objects.filter(
+            appointment = appointment_checkout.appointment
+        ).values('member', 'tip')
+        tips = list(tips)
+        return tips
+        
     class Meta:
         model = AppointmentCheckout
         fields = '__all__'
