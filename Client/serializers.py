@@ -514,10 +514,10 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
     def get_tip(self, appointment_checkout):
         tips = AppointmentEmployeeTip.objects.filter(
             appointment = appointment_checkout.appointment
-        ).values('member', 'tip')
+        ).values('member', 'tip', 'id')
         tips = list(tips)
         return tips
-        
+
     class Meta:
         model = AppointmentCheckout
         fields = '__all__'
