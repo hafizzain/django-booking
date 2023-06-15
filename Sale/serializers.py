@@ -1194,7 +1194,7 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
         
     def get_invoice(self, obj):
         try:
-            invoice = SaleInvoice.objects.get(appointment__icontains = str(obj.appointment))
+            invoice = SaleInvoice.objects.get(appointment = obj.appointment)
             serializer = SaleInvoiceSerializer(invoice)
             return serializer.data
         except Exception as e:
@@ -1228,7 +1228,7 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
         
     class Meta:
         model = AppointmentCheckout
-        fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location']
+        fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location', 'appointment']
 
 
 
