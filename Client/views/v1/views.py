@@ -2347,6 +2347,9 @@ def delete_vouchers(request):
 def update_vouchers(request):
     id = request.data.get('id', None)
     currency_voucher = request.data.get('currency_voucher',None)
+    check = True
+
+
 
     if id is None: 
         return Response(
@@ -2379,6 +2382,8 @@ def update_vouchers(request):
                 status=status.HTTP_404_NOT_FOUND
         )
 
+
+
     if currency_voucher:  
         if type(currency_voucher) == str:
             currency_voucher = currency_voucher.replace("'" , '"')
@@ -2391,31 +2396,44 @@ def update_vouchers(request):
             currency = curr.get('currency', None)
             id = curr.get('id', None)
             price = curr.get('price', None)
+            voucher = curr.get('voucher', None)
+
+
             try:
                 currency_id = Currency.objects.get(id=currency)
             except Exception as err:
-                expt = ExceptionRecord.objects.create(text = '0' + str(err))
+                pass
+            try:
+                voucher_id = Vouchers.objects.get(id=voucher)
+            except Exception as err:
+                expt = ExceptionRecord.objects.create(text= 'voucher find ' + str(err))
                 expt.save()
                 pass
+            
             if id is not None:
                 try:
                     currency_price = VoucherCurrencyPrice.objects.get(id=id)
                 except Exception as err:
-                    expt = ExceptionRecord.objects.create(text = '1' + str(err))
-                    expt.save()
+                    pass
                 
                 currency_price.price = price
                 currency_price.save()
             
             elif currency_id is not None: 
                 try:
-                    currency_price = VoucherCurrencyPrice.objects.get(currency__id=currency)
+                    currency_price = VoucherCurrencyPrice.objects.get(currency=currency_id, voucher = voucher_id)
                     currency_price.price = price
                     currency_price.save()
                 except Exception as err:
-                    #pass
-                    expt = ExceptionRecord.objects.create(text = '2' + str(err))
-                    expt.save()
+                    if check == True:
+                        vch = VoucherCurrencyPrice.objects.filter(voucher = vouchers)
+                        check = False
+                        for i in vch:
+                            try:
+                                v = VoucherCurrencyPrice.objects.get(id = i.id)
+                                v.delete()
+                            except:
+                                pass
                     services_obj = VoucherCurrencyPrice.objects.create(
                         voucher = vouchers,
                         currency = currency_id,
@@ -2439,6 +2457,7 @@ def update_vouchers(request):
         {
             'status' : True,
             'status_code' : 200,
+            'message':'',
             'response' : {
                 'message' : 'You have updated the Voucher',
                 'error_message' : None,
