@@ -1155,7 +1155,7 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
             serializer = SaleInvoiceSerializer(invoice)
             return serializer.data
         except Exception as e:
-            return str(e)
+            return f" {str(e)} + {obj.id}"
         
         
     def get_original_price(self, obj):
@@ -1208,7 +1208,7 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
             serializer = SaleInvoiceSerializer(invoice)
             return serializer.data
         except Exception as e:
-            return str(e)
+            return f" {str(e)} + {obj.appointment}"
         
     def get_original_price(self, obj):
         app_srevices = AppointmentService.objects.filter(
