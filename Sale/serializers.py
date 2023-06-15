@@ -17,7 +17,7 @@ from Product.models import ProductStock
 
 from Service.models import PriceService, Service, ServiceGroup
 from Invoices.models import SaleInvoice
-from django.db.models import Sum
+from django.db.models import Sum, F
 
 class PriceServiceSerializers(serializers.ModelSerializer):
     currency_name = serializers.SerializerMethodField(read_only=True)
@@ -1155,7 +1155,9 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
     def get_original_price(self, obj):
         checkout_orders = Order.objects.filter(
             checkout = obj
-        ).values_list('total_price', flat=True)
+        ).annotate(
+            totalPrice = F('total_price') * F('quantity')
+        ).values_list('totalPrice', flat=True)
         checkout_orders = list(checkout_orders)
         checkout_orders = sum(checkout_orders)
         return checkout_orders
