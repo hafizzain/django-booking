@@ -474,11 +474,10 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
 
         is_checkout = False
         try:
-            try:
-                data = Checkout.objects.filter(id = c_points.checkout)
-                serializer = SaleOrders_CheckoutSerializer(data, many=True)
-                
-            except:
+            data = Checkout.objects.filter(id = c_points.checkout)
+            serializer = SaleOrders_CheckoutSerializer(data, many=True)
+
+            if len(data) == 0:                
                 data = AppointmentCheckout.objects.filter(id = c_points.checkout)
                 serializer = AppointmentCheckoutSerializer(data, many=True)
 
