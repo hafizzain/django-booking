@@ -1194,7 +1194,7 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
         
     def get_invoice(self, obj):
         try:
-            invoice = SaleInvoice.objects.filter(appointment = obj.appointment)
+            invoice = SaleInvoice.objects.get(appointment = obj.appointment)
             serializer = SaleInvoiceSerializer(invoice)
             return serializer.data
         except Exception as e:
