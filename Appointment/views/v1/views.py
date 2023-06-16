@@ -23,7 +23,7 @@ from rest_framework import status
 from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Business.models import Business , BusinessAddress, ClientNotificationSetting, StaffNotificationSetting
 from datetime import datetime
-from Order.models import Checkout, MemberShipOrder, ProductOrder, VoucherOrder
+from Order.models import Checkout, MemberShipOrder, ProductOrder, VoucherOrder, ServiceOrder
 from Sale.serializers import MemberShipOrderSerializer, ProductOrderSerializer, VoucherOrderSerializer
 
 #from Service.models import Service
@@ -1970,13 +1970,20 @@ def service_appointment_count(request):
     services = Service.objects.all()
     return_data =[]
     for ser in services:
+        count = 0
         if duration is not None:
             today = datetime.today()
             day = today - timedelta(days=int(duration))
             app_service = AppointmentService.objects.filter(service = ser, business_address =adds , created_at__gte = day )
+            count += app_service.count()
+            sale_services = ServiceOrder.objects.filter(service = ser, created_at__gte = day)
+            count += sale_services.count()
         else:
             app_service = AppointmentService.objects.filter(service = ser, business_address =adds )
-        count = app_service.count()
+            count += app_service.count()
+            sale_services = ServiceOrder.objects.filter(service = ser)
+            count += sale_services.count()
+
         data = {
             # 'id' : str(ser.id),
             'name' : str(ser.name),
