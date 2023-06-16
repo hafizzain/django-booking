@@ -148,7 +148,7 @@ class Order(models.Model):
     total_price = models.DecimalField(default = 0 , max_digits=10, decimal_places=5)
     sold_quantity = models.PositiveBigIntegerField(default = 0)
     
-    discount_percentage = models.PositiveBigIntegerField(default= 0)
+    discount_percentage = models.FloatField(default= 0)
     discount_price = models.FloatField(default= 0)
     price = models.PositiveBigIntegerField(default= 0)
 
