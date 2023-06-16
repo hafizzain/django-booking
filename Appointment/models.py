@@ -166,8 +166,8 @@ class AppointmentService(models.Model):
     service_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
     service_commission_type = models.CharField( max_length=50 , default = '')
     
-    discount_price = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
-    discount_percentage = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
+    discount_price = models.FloatField(default = 0 , null=True, blank=True)    
+    discount_percentage = models.FloatField(default = 0 , null=True, blank=True)
         
     total_price = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
     
