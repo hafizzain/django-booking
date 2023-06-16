@@ -1974,15 +1974,18 @@ def service_appointment_count(request):
         if duration is not None:
             today = datetime.today()
             day = today - timedelta(days=int(duration))
+
             app_service = AppointmentService.objects.filter(service = ser, business_address =adds , created_at__gte = day )
-            count += app_service.count()
             sale_services = ServiceOrder.objects.filter(service = ser, created_at__gte = day)
-            count += sale_services.count()
         else:
             app_service = AppointmentService.objects.filter(service = ser, business_address =adds )
-            count += app_service.count()
             sale_services = ServiceOrder.objects.filter(service = ser)
-            count += sale_services.count()
+
+
+        count += app_service.count()
+
+        for service_order in sale_services:
+            count += service_order.quantity
 
         data = {
             # 'id' : str(ser.id),
