@@ -149,7 +149,7 @@ class Order(models.Model):
     sold_quantity = models.PositiveBigIntegerField(default = 0)
     
     discount_percentage = models.PositiveBigIntegerField(default= 0)
-    discount_price = models.PositiveBigIntegerField(default= 0)
+    discount_price = models.FloatField(default= 0)
     price = models.PositiveBigIntegerField(default= 0)
 
     is_redeemed = models.BooleanField(default=False)
