@@ -1315,9 +1315,20 @@ class ProductSerializer_CheckoutSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'cost_price']
 
 class ServiceSerializer_CheckoutSerializer(serializers.ModelSerializer):
+    price_service = serializers.SerializerMethodField(read_only=True)
+    
+    def get_price_service(self, obj):
+        price = PriceService.objects.filter(service = str(obj))
+        return PriceServiceSaleSerializer(price, many = True).data
     class Meta:
         model = Service
         fields = ['id', 'name', 'price']
+
+class PriceServiceSaleSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = PriceService
+        fields = ['id','service', 'duration', 'price']
 
 
 class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializer):
