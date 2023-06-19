@@ -1241,8 +1241,7 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
         serialized_tips = CheckoutTipsSerializer(tips, many=True).data
         return serialized_tips
 
-    def get_original_price(self, obj):
-        pass
+        
     
     def get_invoice(self, obj):
         try:
@@ -1411,14 +1410,12 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
         fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location', 'appointment', 'client', 'order_type','service', 'price', 'voucher_discount_percentage', 'appointment_service', 'promotion_name', 'tip']
 
 
-from Product.models import Product
 
 class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     product_name  = serializers.SerializerMethodField(read_only=True)
     product_price  = serializers.SerializerMethodField(read_only=True)
     price  = serializers.SerializerMethodField(read_only=True)
     selection_type  = serializers.SerializerMethodField(read_only=True)
-    # product_original_price  = serializers.SerializerMethodField(read_only=True)
 
     def get_selection_type(self, obj):
         return 'PRODUCT'
@@ -1426,14 +1423,6 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
 
     def get_product_price(self, obj):
         return obj.current_price
-    
-    # def get_product_original_price(self, obj):
-    #     try:
-    #         data = Product.objects.filter(id = str(obj.product))
-    #     except Exception as e:
-    #         return f"This is error {e} -- {obj.product}"
-    #     else:
-    #         return ProductSerializer_CheckoutSerializer(data, many=True).data
     
     def get_price(self, obj):
         if obj.is_redeemed == True:
@@ -1458,12 +1447,6 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
             # 'client','status', 'created_at',
             #       'location', 'member', 'tip', 'total_price' , 'payment_type','price','name',
             #       'gst', 'order_type', 'sold_quantity','product_details','total_product'
-
-class ProductSerializer_CheckoutSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = ['id', 'name', 'cost_price']
-
 
 class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
 
