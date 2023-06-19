@@ -18,6 +18,8 @@ from Product.models import ProductStock
 from Service.models import PriceService, Service, ServiceGroup
 from Invoices.models import SaleInvoice
 from django.db.models import Sum, F
+from Product.models import Product
+from Service.models import Service
 
 class PriceServiceSerializers(serializers.ModelSerializer):
     currency_name = serializers.SerializerMethodField(read_only=True)
@@ -1143,8 +1145,9 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
     membership_service = serializers.SerializerMethodField(read_only=True)
     membership_type = serializers.SerializerMethodField(read_only=True)
     
-    
     tip = serializers.SerializerMethodField(read_only=True)
+    all_products = serializers.SerializerMethodField(read_only=True)
+    all_services = serializers.SerializerMethodField(read_only=True)
 
     def get_client(self, obj):
         if obj.client:
@@ -1280,6 +1283,11 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
         checkout_orders = sum(checkout_orders)
         return checkout_orders
     
+    def get_all_products(self, obj):
+        products = Product.objects.all()
+        return ProductSerializer_CheckoutSerializer(products, many=True).data
+
+    
 
     def get_discounted_price(self, obj):
         chk_orders = Order.objects.filter(
@@ -1296,6 +1304,12 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Checkout
         fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location', 'product', 'service', 'membership', 'voucher', 'client', 'ids', 'membership_product', 'membership_service', 'membership_type', 'tip']
+
+class ProductSerializer_CheckoutSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'cost_price']
+
 
 class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
