@@ -1294,7 +1294,7 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
         
     class Meta:
         model = Checkout
-        fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location', 'product', 'service', 'membership', 'voucher', 'client', 'ids', 'membership_product', 'membership_service', 'membership_type']
+        fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location', 'product', 'service', 'membership', 'voucher', 'client', 'ids', 'membership_product', 'membership_service', 'membership_type', 'tip']
 
 class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
