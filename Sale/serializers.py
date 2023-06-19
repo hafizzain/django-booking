@@ -1454,7 +1454,7 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductOrder
         fields = [
-            'id', 'product_name', 'quantity', 'product_price', 'price', 'selection_type']
+            'id', 'product_name', 'quantity', 'product_price', 'price', 'selection_type', 'product_original_price']
             # 'client','status', 'created_at',
             #       'location', 'member', 'tip', 'total_price' , 'payment_type','price','name',
             #       'gst', 'order_type', 'sold_quantity','product_details','total_product'
