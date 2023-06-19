@@ -1473,11 +1473,15 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
         
         return None
 
-    def get_product_original_price(self, obj):
-        if obj.product:
-            return obj.product.cost_price
+    # def get_product_original_price(self, obj):
+    #     if obj.product:
+    #         return obj.product.cost_price
         
-        return None
+    #     return None
+    
+    def get_product_original_price(self, obj):
+        price = PriceService.objects.filter(service = str(obj))
+        return PriceServiceSaleSerializer(price, many = True).data
 
 
     class Meta:
