@@ -1412,7 +1412,6 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
 
 
 from Product.models import Product
-from Product.serializers import ProductSerializer
 
 class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     product_name  = serializers.SerializerMethodField(read_only=True)
@@ -1434,7 +1433,7 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
         except Exception as e:
             return f"This is error {e} -- {obj.product}"
         else:
-            return ProductSerializer(data, many=True).data
+            return ProductSerializer_CheckoutSerializer(data, many=True).data
     
     def get_price(self, obj):
         if obj.is_redeemed == True:
@@ -1459,6 +1458,12 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
             # 'client','status', 'created_at',
             #       'location', 'member', 'tip', 'total_price' , 'payment_type','price','name',
             #       'gst', 'order_type', 'sold_quantity','product_details','total_product'
+
+class ProductSerializer_CheckoutSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        field = ['id', 'name', 'cost_price']
+
 
 class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
 
