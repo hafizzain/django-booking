@@ -1122,7 +1122,7 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
         model = Checkout
         fields = ['employee', 'location', 'commission', 'commission_rate', 'sale', 'created_at']
     
-from Product.models import Product
+    
 
 class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
     promotion = serializers.SerializerMethodField(read_only=True)
@@ -1142,8 +1142,6 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
     membership_product = serializers.SerializerMethodField(read_only=True)
     membership_service = serializers.SerializerMethodField(read_only=True)
     membership_type = serializers.SerializerMethodField(read_only=True)
-
-    product_original_price = serializers.SerializerMethodField(read_only=True)
     
     
     tip = serializers.SerializerMethodField(read_only=True)
@@ -1242,16 +1240,7 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
         tips = AppointmentEmployeeTip.objects.filter(checkout=obj)
         serialized_tips = CheckoutTipsSerializer(tips, many=True).data
         return serialized_tips
-
-    def get_product_original_price(self, obj):
-        try:
-            data = Product.objects.filter(id = str(obj.product))
-        except Exception as e:
-            return f"This is error {e} -- {obj.product}"
-        else:
-            return ProductSerializer_CheckoutSerializer(data, many=True).data
-    
-    
+        
     
     def get_invoice(self, obj):
         try:
@@ -1306,13 +1295,7 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
         
     class Meta:
         model = Checkout
-        fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location', 'product', 'service', 'membership', 'voucher', 'client', 'ids', 'membership_product', 'membership_service', 'membership_type', 'tip', 'product_original_price']
-
-class ProductSerializer_CheckoutSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = ['id', 'name', 'cost_price']
-
+        fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location', 'product', 'service', 'membership', 'voucher', 'client', 'ids', 'membership_product', 'membership_service', 'membership_type', 'tip']
 
 class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
