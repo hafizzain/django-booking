@@ -1288,8 +1288,8 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
         return ProductSerializer_CheckoutSerializer(products, many=True).data
 
     def get_all_services(self, obj):
-        products = Product.objects.all()
-        return ProductSerializer_CheckoutSerializer(products, many=True).data
+        services = Service.objects.all()
+        return ServiceSerializer_CheckoutSerializer(services, many=True).data
 
     
 
@@ -1313,6 +1313,11 @@ class ProductSerializer_CheckoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'name', 'cost_price']
+
+class ServiceSerializer_CheckoutSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Service
+        fields = ['id', 'name', 'price']
 
 
 class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializer):
