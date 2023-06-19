@@ -325,6 +325,7 @@ def get_commission_reports_by_commission_details_updated(request):
         status=status.HTTP_200_OK
     )
 
+from Sale.serializers import SaleOrders_AppointmentCheckoutSerializer, SaleOrders_CheckoutSerializer
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -373,8 +374,8 @@ def get_promotions_and_discounts_sales(request):
         **queries,
     )
 
-    data_total = list(PromotionNDiscount_CheckoutSerializer(checkout_order, many=True, context={'request': request}).data) + \
-                 list(PromotionNDiscount_AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
+    data_total = list(SaleOrders_CheckoutSerializer(checkout_order, many=True, context={'request': request}).data) + \
+                 list(SaleOrders_AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
                  
     sorted_data = sorted(data_total, key=lambda x: x['created_at'], reverse=True)
 
