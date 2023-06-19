@@ -1405,7 +1405,7 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
         
     class Meta:
         model = AppointmentCheckout
-        fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location', 'appointment', 'client', 'order_type','service', 'price', 'voucher_discount_percentage', 'appointment_service', 'promotion_name']
+        fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location', 'appointment', 'client', 'order_type','service', 'price', 'voucher_discount_percentage', 'appointment_service', 'promotion_name', 'tip']
 
 
 
