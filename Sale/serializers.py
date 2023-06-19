@@ -1322,7 +1322,7 @@ class ServiceSerializer_CheckoutSerializer(serializers.ModelSerializer):
         return PriceServiceSaleSerializer(price, many = True).data
     class Meta:
         model = Service
-        fields = ['id', 'name', 'price']
+        fields = ['id', 'name', 'price_service']
 
 class PriceServiceSaleSerializer(serializers.ModelSerializer):
     
