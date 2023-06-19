@@ -1449,6 +1449,7 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     product_price  = serializers.SerializerMethodField(read_only=True)
     price  = serializers.SerializerMethodField(read_only=True)
     selection_type  = serializers.SerializerMethodField(read_only=True)
+    product_original_price = serializers.SerializerMethodField(read_only=True)
 
     def get_selection_type(self, obj):
         return 'PRODUCT'
@@ -1468,7 +1469,13 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
 
     def get_product_name(self, obj):
         if obj.product:
-            return {'name' : obj.product.name, 'price':obj.product.cost_price}
+            return obj.product.name
+        
+        return None
+
+    def get_product_original_price(self, obj):
+        if obj.product:
+            return obj.product.price
         
         return None
 
@@ -1476,7 +1483,7 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductOrder
         fields = [
-            'id', 'product_name', 'quantity', 'product_price', 'price', 'selection_type']
+            'id', 'product_name', 'product_original_price', 'quantity', 'product_price', 'price', 'selection_type']
             # 'client','status', 'created_at',
             #       'location', 'member', 'tip', 'total_price' , 'payment_type','price','name',
             #       'gst', 'order_type', 'sold_quantity','product_details','total_product'
@@ -1486,6 +1493,7 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
     service = serializers.SerializerMethodField()
     price = serializers.SerializerMethodField()
     selection_type  = serializers.SerializerMethodField(read_only=True)
+    service_original_price  = serializers.SerializerMethodField(read_only=True)
 
     def get_selection_type(self, obj):
         return 'SERVICE'
@@ -1493,7 +1501,13 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
 
     def get_service(self, obj):
         if obj.service:
-            return {'name' : obj.service.name, 'price':obj.service.price}
+            return {'name' : obj.service.name}
+        return None
+    
+    def get_service_original_price(self, obj):
+        if obj.product:
+            return obj.product.price
+        
         return None
     
     def get_price(self, obj):
@@ -1506,7 +1520,7 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ServiceOrder
-        fields = ['id', 'price', 'quantity', 'service', 'selection_type' ]
+        fields = ['id', 'price', 'service_original_price', 'quantity', 'service', 'selection_type' ]
             # 'client','created_at' ,'user',
             #       'duration', 'location', 'member', 'total_price',
             #       'payment_type','tip','gst', 'order_type','created_at'
