@@ -1430,10 +1430,11 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     
     def get_product_original_price(self, obj):
         try:
-            data = Product.objects.filter(id = obj.product)
-        except:
-            pass
-        return ProductSerializer(data, many=True).data
+            data = Product.objects.filter(id = str(obj.product))
+        except Exception as e:
+            return f"This is error {e} -- {obj.product}"
+        else:
+            return ProductSerializer(data, many=True).data
     
     def get_price(self, obj):
         if obj.is_redeemed == True:
