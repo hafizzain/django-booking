@@ -1418,7 +1418,7 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     product_price  = serializers.SerializerMethodField(read_only=True)
     price  = serializers.SerializerMethodField(read_only=True)
     selection_type  = serializers.SerializerMethodField(read_only=True)
-    product_original_price  = serializers.SerializerMethodField(read_only=True)
+    # product_original_price  = serializers.SerializerMethodField(read_only=True)
 
     def get_selection_type(self, obj):
         return 'PRODUCT'
@@ -1427,13 +1427,13 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     def get_product_price(self, obj):
         return obj.current_price
     
-    def get_product_original_price(self, obj):
-        try:
-            data = Product.objects.filter(id = str(obj.product))
-        except Exception as e:
-            return f"This is error {e} -- {obj.product}"
-        else:
-            return ProductSerializer_CheckoutSerializer(data, many=True).data
+    # def get_product_original_price(self, obj):
+    #     try:
+    #         data = Product.objects.filter(id = str(obj.product))
+    #     except Exception as e:
+    #         return f"This is error {e} -- {obj.product}"
+    #     else:
+    #         return ProductSerializer_CheckoutSerializer(data, many=True).data
     
     def get_price(self, obj):
         if obj.is_redeemed == True:
@@ -1454,7 +1454,7 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductOrder
         fields = [
-            'id', 'product_name', 'quantity', 'product_price', 'price', 'selection_type', 'product_original_price']
+            'id', 'product_name', 'quantity', 'product_price', 'price', 'selection_type']
             # 'client','status', 'created_at',
             #       'location', 'member', 'tip', 'total_price' , 'payment_type','price','name',
             #       'gst', 'order_type', 'sold_quantity','product_details','total_product'
