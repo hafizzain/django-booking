@@ -1468,7 +1468,7 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
 
     def get_product_name(self, obj):
         if obj.product:
-            return obj.product.name
+            return {'name' : obj.product.name, 'price':obj.product.cost_price}
         
         return None
 
@@ -1493,7 +1493,7 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
 
     def get_service(self, obj):
         if obj.service:
-            return {'name' : obj.service.name}
+            return {'name' : obj.service.name, 'price':obj.service.price}
         return None
     
     def get_price(self, obj):
