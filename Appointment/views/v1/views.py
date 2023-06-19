@@ -2427,11 +2427,13 @@ def get_employee_check_time(request):
     start_time = request.data.get('app_time', None)
     date = request.data.get('date', None)
     
-    dtime = datetime.strptime(start_time, "%H:%M:%S")
-    start_time = dtime.time()
+    if start_time is not None:
+        dtime = datetime.strptime(start_time, "%H:%M:%S")
+        start_time = dtime.time()
     
-    dt = datetime.strptime(date, "%Y-%m-%d")
-    date = dt.date()
+    if date is not None:
+        dt = datetime.strptime(date, "%Y-%m-%d")
+        date = dt.date()
     
     app_date_time = f'2000-01-01 {start_time}'
 
