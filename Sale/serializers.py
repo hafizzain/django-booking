@@ -1462,7 +1462,7 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
 class ProductSerializer_CheckoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        field = ['id', 'name', 'cost_price']
+        fields = ['id', 'name', 'cost_price']
 
 
 class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
