@@ -2072,16 +2072,16 @@ def update_memberships(request):
                 currency_id = Currency.objects.get(id=currency)
             except Exception as err:
                 pass
-            if id is not None:
-                try:
-                    currency_price = CurrencyPriceMembership.objects.get(id=id)
-                except Exception as err:
-                    pass
-                else:                
-                    currency_price.price = price
-                    currency_price.save()
+            # if id is not None:
+            #     try:
+            #         currency_price = CurrencyPriceMembership.objects.get(id=id)
+            #     except Exception as err:
+            #         pass
+            #     else:                
+            #         currency_price.price = price
+            #         currency_price.save()
             
-            elif currency_id is not None: 
+            if currency_id is not None: 
                 try:
                     currency_price = CurrencyPriceMembership.objects.get(currency=currency_id)
                     currency_price.price = price
