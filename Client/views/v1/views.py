@@ -2078,10 +2078,10 @@ def update_memberships(request):
                     currency_price = CurrencyPriceMembership.objects.get(currency=currency_id)
                     currency_price.price = price
                     currency_price.save()
-                    expt = ExceptionRecord.object.create(text=str(f"i was called expt akela"))
+                    expt = ExceptionRecord.objects.create(text=str(f"i was called expt akela"))
                     expt.save()
                 except Exception as err:
-                    expt = ExceptionRecord.object.create(text=str(f"i was called expt ---{err}"))
+                    expt = ExceptionRecord.objects.create(text=str(f"i was called expt ---{err}"))
                     expt.save()
                     if check == True:
                         vch = CurrencyPriceMembership.objects.filter(membership = membership)
