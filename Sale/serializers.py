@@ -1686,8 +1686,12 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
         return self.service
     
     def get_membership_type(self, obj):
-        data = Membership.objects.filter(discount=obj).first()
+        try:
+            data = Membership.objects.filter(discount=obj).first()
+        except:
+            pass
         return data
+ 
         
     def get_ids(self, obj):
         
