@@ -101,6 +101,7 @@ class AppointmentClientSerializer(serializers.ModelSerializer):
         ).annotate(
             member_name = F('member__full_name')
         ).values('member_name', 'tip')
+        return list(tips)
     
     def get_notes(self,obj):
         service = AppointmentNotes.objects.filter(appointment = obj)
