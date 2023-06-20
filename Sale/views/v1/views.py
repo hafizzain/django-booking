@@ -2266,7 +2266,7 @@ def new_create_sale_order(request):
             if len(sale_commissions) > 0:
                 commission = sale_commissions[0]
 
-                calculated_commission = commission.calculated_commission(price)
+                calculated_commission = commission.calculated_commission(order_discount_price if order_discount_price else price)
                 EmployeeCommission.objects.create(
                     user = request.user,
                     business = business_address.business,
