@@ -354,7 +354,8 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                         "created_at": "2023-05-29T06:45:38.035196Z",
                         "is_blocked": True,
                         "is_unavailable": True,
-                        'errors' : errors
+                        'errors' : errors,
+                        'exluded_times' : exluded_times
                     }
                 ])
         return data
