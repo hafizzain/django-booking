@@ -1976,6 +1976,7 @@ def update_memberships(request):
     product = request.data.get('product',None)
     membership_type = request.data.get('membership_type',None)
     currency_membership = request.data.get('currency_membership',None)
+    check = True
     
     if id is None: 
         return Response(
