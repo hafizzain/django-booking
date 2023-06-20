@@ -2085,7 +2085,7 @@ def update_memberships(request):
             
             elif currency_id is not None: 
                 try:
-                    currency_price = CurrencyPriceMembership.objects.get(currency=currency_id, membership = membership_id)
+                    currency_price = CurrencyPriceMembership.objects.get(currency=currency_id)
                     currency_price.price = price
                     currency_price.save()
                     expt = ExceptionRecord.objects.create(text= 'call 4 membership find')
