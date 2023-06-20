@@ -1976,6 +1976,7 @@ def update_memberships(request):
     product = request.data.get('product',None)
     membership_type = request.data.get('membership_type',None)
     currency_membership = request.data.get('currency_membership',None)
+    check = True
     
     if id is None: 
         return Response(
@@ -2045,6 +2046,16 @@ def update_memberships(request):
         membership.save()
      
     if currency_membership:  
+        if check == True:
+            vch = CurrencyPriceMembership.objects.filter(membership = membership)
+            check = False
+            for i in vch:
+                try:
+                    v = CurrencyPriceMembership.objects.get(id = i.id)
+                    v.delete()
+                except:
+                    pass
+
         if type(currency_membership) == str:
             currency_membership = currency_membership.replace("'" , '"')
             currency_membership = json.loads(currency_membership)
@@ -2061,22 +2072,22 @@ def update_memberships(request):
                 currency_id = Currency.objects.get(id=currency)
             except Exception as err:
                 pass
-            if id is not None:
-                try:
-                    currency_price = CurrencyPriceMembership.objects.get(id=id)
-                except Exception as err:
-                    pass
-                
-                currency_price.price = price
-                currency_price.save()
+            # if id is not None:
+            #     try:
+            #         currency_price = CurrencyPriceMembership.objects.get(id=id)
+            #     except Exception as err:
+            #         pass
+            #     else:                
+            #         currency_price.price = price
+            #         currency_price.save()
             
-            elif currency_id is not None: 
+            if currency_id is not None: 
                 try:
                     currency_price = CurrencyPriceMembership.objects.get(currency=currency_id)
                     currency_price.price = price
                     currency_price.save()
                 except Exception as err:
-                    #pass
+                    
                     services_obj = CurrencyPriceMembership.objects.create(
                         membership = membership,
                         currency = currency_id,

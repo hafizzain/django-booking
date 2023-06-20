@@ -1146,8 +1146,8 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
     membership_type = serializers.SerializerMethodField(read_only=True)
     
     tip = serializers.SerializerMethodField(read_only=True)
-    all_products = serializers.SerializerMethodField(read_only=True)
-    all_services = serializers.SerializerMethodField(read_only=True)
+    # all_products = serializers.SerializerMethodField(read_only=True)
+    # all_services = serializers.SerializerMethodField(read_only=True)
 
     def get_client(self, obj):
         if obj.client:
@@ -1283,13 +1283,13 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
         checkout_orders = sum(checkout_orders)
         return checkout_orders
     
-    def get_all_products(self, obj):
-        products = Product.objects.all()
-        return ProductSerializer_CheckoutSerializer(products, many=True).data
+    # def get_all_products(self, obj):
+    #     products = Product.objects.all()
+    #     return ProductSerializer_CheckoutSerializer(products, many=True).data
 
-    def get_all_services(self, obj):
-        services = Service.objects.all()
-        return ServiceSerializer_CheckoutSerializer(services, many=True).data
+    # def get_all_services(self, obj):
+    #     services = Service.objects.all()
+    #     return ServiceSerializer_CheckoutSerializer(services, many=True).data
 
     
 
@@ -1307,7 +1307,7 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
         
     class Meta:
         model = Checkout
-        fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location', 'product', 'service', 'membership', 'voucher', 'client', 'ids', 'membership_product', 'membership_service', 'membership_type', 'tip', 'all_products', 'all_services']
+        fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location', 'product', 'service', 'membership', 'voucher', 'client', 'ids', 'membership_product', 'membership_service', 'membership_type', 'tip']
 
 class ProductSerializer_CheckoutSerializer(serializers.ModelSerializer):
     class Meta:
