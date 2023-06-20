@@ -1578,10 +1578,16 @@ class CheckoutTipsSerializer(serializers.ModelSerializer):
         fields = ['id','member','tip']
 
 class AppointmentTipsSerializer(serializers.ModelSerializer):
+    member_name = serializers.SerializerMethodField(read_only=True)
+
+    def get_member_name(self, tip_obj):
+        if tip_obj.member and tip_obj.member.full_name:
+            return f'{tip_obj.member.full_name}'
+        return ''
     
     class Meta:
         model = AppointmentEmployeeTip
-        fields = ['id','member','tip']
+        fields = ['id','member','tip', 'member_name']
        
 class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
