@@ -2076,7 +2076,16 @@ def update_memberships(request):
                     currency_price.price = price
                     currency_price.save()
                 except Exception as err:
-                    #pass
+                    if check == True:
+                        vch = CurrencyPriceMembership.objects.filter(membership = membership)
+                        check = False
+                        for i in vch:
+                            try:
+                                v = CurrencyPriceMembership.objects.get(id = i.id)
+                                v.delete()
+                            except:
+                                pass
+
                     services_obj = CurrencyPriceMembership.objects.create(
                         membership = membership,
                         currency = currency_id,
