@@ -881,7 +881,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
             appointment = obj
         ).annotate(
             member_name = F('member__full_name')
-        ).values('id', 'member_name', 'tip')
+        ).values('member_name', 'tip')
         return list(tips)
     
     def get_customer_note(self, obj):
