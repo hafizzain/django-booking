@@ -1976,6 +1976,7 @@ def update_memberships(request):
     product = request.data.get('product',None)
     membership_type = request.data.get('membership_type',None)
     currency_membership = request.data.get('currency_membership',None)
+    check = True
     
     if id is None: 
         return Response(
@@ -2055,12 +2056,14 @@ def update_memberships(request):
         for curr in currency_membership:
             currency = curr.get('currency', None)
             id = curr.get('id', None)
-            #membership = curr.get('membership', None)
+            # membership = curr.get('membership', None)
             price = curr.get('price', None)
+            
             try:
                 currency_id = Currency.objects.get(id=currency)
             except Exception as err:
                 pass
+
             if id is not None:
                 try:
                     currency_price = CurrencyPriceMembership.objects.get(id=id)
@@ -2075,7 +2078,20 @@ def update_memberships(request):
                     currency_price = CurrencyPriceMembership.objects.get(currency=currency_id)
                     currency_price.price = price
                     currency_price.save()
+                    expt = ExceptionRecord.object.create(text=str(f"i was called expt akela"))
+                    expt.save()
                 except Exception as err:
+                    expt = ExceptionRecord.object.create(text=str(f"i was called expt ---{err}"))
+                    expt.save()
+                    if check == True:
+                        vch = CurrencyPriceMembership.objects.filter(membership = membership)
+                        check = False
+                        for i in vch:
+                            try:
+                                v = CurrencyPriceMembership.objects.get(id = i.id)
+                                v.delete()
+                            except:
+                                pass
                     #pass
                     services_obj = CurrencyPriceMembership.objects.create(
                         membership = membership,
@@ -2403,6 +2419,7 @@ def update_vouchers(request):
                 currency_id = Currency.objects.get(id=currency)
             except Exception as err:
                 pass
+
             try:
                 voucher_id = Vouchers.objects.get(id=voucher)
             except Exception as err:
