@@ -1976,6 +1976,7 @@ def update_memberships(request):
     product = request.data.get('product',None)
     membership_type = request.data.get('membership_type',None)
     currency_membership = request.data.get('currency_membership',None)
+    check = True
     
     if id is None: 
         return Response(
@@ -2076,6 +2077,15 @@ def update_memberships(request):
                     currency_price.price = price
                     currency_price.save()
                 except Exception as err:
+                    if check == True:
+                        vch = CurrencyPriceMembership.objects.filter(membership = membership)
+                        check = False
+                        for i in vch:
+                            try:
+                                v = CurrencyPriceMembership.objects.get(id = i.id)
+                                v.delete()
+                            except:
+                                pass
                     #pass
                     services_obj = CurrencyPriceMembership.objects.create(
                         membership = membership,
