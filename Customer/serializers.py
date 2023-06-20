@@ -1,10 +1,11 @@
 from rest_framework import serializers
 
-from Appointment.models import Appointment, AppointmentNotes, AppointmentService, AppointmentCheckout
+from Appointment.models import Appointment, AppointmentNotes, AppointmentService, AppointmentCheckout, AppointmentEmployeeTip
 from Business.models import BusinessAddress
 from Product.Constants.index import tenant_media_base_url
 from Employee.models import Employee, EmployeeProfessionalInfo
 from Service.models import PriceService, Service
+from django.db.models import F
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -91,7 +92,15 @@ class AppointmentServiceClientSerializer(serializers.ModelSerializer):
 class AppointmentClientSerializer(serializers.ModelSerializer):
     appointment_service = serializers.SerializerMethodField()
     tip = serializers.SerializerMethodField()
+    appointment_tips = serializers.SerializerMethodField()
     notes = serializers.SerializerMethodField()
+
+    def get_appointment_tips(self, obj):
+        tips = AppointmentEmployeeTip.objects.filter(
+            appointment = obj
+        ).annotate(
+            member_name = F('member__full_name')
+        ).values('member_name', 'tip')
     
     def get_notes(self,obj):
         service = AppointmentNotes.objects.filter(appointment = obj)
