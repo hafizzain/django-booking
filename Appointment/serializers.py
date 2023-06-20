@@ -315,6 +315,10 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                             })
                 else:
                     end_time = "00:00:00"
+                    exluded_times.append({
+                        'start_time' : start_time,
+                        'end_time' : end_time,
+                    })
                     
         for exl_time in exluded_times:
             start_time = exl_time['start_time']
