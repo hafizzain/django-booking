@@ -222,6 +222,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
         return self.retreive_unavailable_time(employee_instance)
 
     def retreive_unavailable_time(self, employee_instance):
+        errors = []
         selected_date = self.context.get('selected_date', None)
         if not selected_date:
             return []
@@ -235,7 +236,8 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                 employee = employee_instance,
                 date = selected_date
             )
-        except:
+        except Exception as err:
+            errors.append(str(err))
             exluded_times.append({
                 'start_time' : "00:00:00",
                 'end_time' : "00:00:00",
@@ -352,6 +354,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                         "created_at": "2023-05-29T06:45:38.035196Z",
                         "is_blocked": True,
                         "is_unavailable": True,
+                        'errors' : errors
                     }
                 ])
         return data
