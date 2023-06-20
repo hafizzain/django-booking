@@ -2076,8 +2076,7 @@ def update_memberships(request):
                     currency_price.price = price
                     currency_price.save()
                 except Exception as err:
-                    expt = ExceptionRecord.objects.create(text=str(err))
-                    expt.save()
+                    #pass
                     services_obj = CurrencyPriceMembership.objects.create(
                         membership = membership,
                         currency = currency_id,
