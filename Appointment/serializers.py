@@ -7,7 +7,7 @@ from Client.models import Client
 #from Sale.serializers import LocationServiceSerializer
 from rest_framework import serializers
 from Appointment.Constants.durationchoice import DURATION_CHOICES
-from Appointment.models import Appointment, AppointmentCheckout, AppointmentNotes, AppointmentService, AppointmentLogs, LogDetails
+from Appointment.models import Appointment, AppointmentCheckout, AppointmentNotes, AppointmentService, AppointmentLogs, LogDetails, AppointmentEmployeeTip
 from Business.models import BusinessAddress
 from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer
 from Client.serializers import ClientAppointmentSerializer
@@ -874,6 +874,15 @@ class SingleNoteSerializer(serializers.ModelSerializer):
     notes = serializers.SerializerMethodField(read_only=True)
     customer_note = serializers.SerializerMethodField(read_only=True)
     appointmnet_service = serializers.SerializerMethodField(read_only=True)
+    appointment_tips = serializers.SerializerMethodField(read_only=True)
+
+    def get_appointment_tips(self, obj):
+        tips = AppointmentEmployeeTip.objects.filter(
+            appointment = obj
+        ).annotate(
+            member_name = F('member__full_name')
+        ).values('id', 'member_name', 'tip')
+        return list(tips)
     
     def get_customer_note(self, obj):
         try:
@@ -897,7 +906,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
             #return serializers
     class Meta:
         model = Appointment
-        fields = ['id', 'client', 'notes', 'business_address','client_type','appointmnet_service', 'customer_note']
+        fields = ['id', 'client', 'appointment_tips', 'notes', 'business_address','client_type','appointmnet_service', 'customer_note']
   
 class AppointmentServiceSeriailzer(serializers.ModelSerializer):
     class Meta:
