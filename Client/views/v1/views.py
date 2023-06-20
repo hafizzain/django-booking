@@ -2056,7 +2056,7 @@ def update_memberships(request):
         for curr in currency_membership:
             currency = curr.get('currency', None)
             id = curr.get('id', None)
-            #membership = curr.get('membership', None)
+            membership = curr.get('membership', None)
             price = curr.get('price', None)
             try:
                 currency_id = Currency.objects.get(id=currency)
@@ -2093,21 +2093,22 @@ def update_memberships(request):
                 except Exception as err:
                     expt = ExceptionRecord.objects.create(text= 'call 5 membership find ' + str(err))
                     expt.save()
-                    if check == True:
-                        vch = CurrencyPriceMembership.objects.filter(membership = membership)
-                        check = False
-                        for i in vch:
-                            try:
-                                v = CurrencyPriceMembership.objects.get(id = i.id)
-                                v.delete()
-                            except:
-                                pass
-
-                    services_obj = CurrencyPriceMembership.objects.create(
-                        membership = membership,
-                        currency = currency_id,
-                        price = 100,
-                    )                
+                    
+                    if membership is None:
+                        if check == True:
+                            vch = CurrencyPriceMembership.objects.filter(membership = membership)
+                            check = False
+                            for i in vch:
+                                try:
+                                    v = CurrencyPriceMembership.objects.get(id = i.id)
+                                    v.delete()
+                                except:
+                                    pass
+                        services_obj = CurrencyPriceMembership.objects.create(
+                            membership = membership,
+                            currency = currency_id,
+                            price = price,
+                        )                
                 
                 
     serializer = MembershipSerializer(membership, data=request.data, partial=True)
