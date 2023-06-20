@@ -129,6 +129,7 @@ class EmployeeCommissionAdmin(admin.ModelAdmin):
         'total_sale_value',
         'single_item_commission',
         'full_commission',
+        'created_at',
     ]
 
     def total_sale_value(self, instance):
