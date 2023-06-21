@@ -470,16 +470,17 @@ def update_service(request):
         error.append(str(err)) 
     
     
-    if priceservice is not None:  
+    if priceservice is not None:
         if check == True:
             vch = PriceService.objects.filter(service = service_id)
             check = False
             for i in vch:
                 try:
-                    v = PriceService.objects.get(id = i.id)
-                    v.delete()
+                    voucher = PriceService.objects.get(id = i.id)
+                    voucher.delete()
                 except:
                     pass
+        
         if type(priceservice) == str:
             priceservice = priceservice.replace("'" , '"')
             priceservice = json.loads(priceservice)
@@ -511,6 +512,12 @@ def update_service(request):
                     price_service.save()
                     
                 except Exception as err:
+                    error.append(str(err))
+                    print(err)
+            else:
+                if bool(is_deleted) == True:
+                    pass
+                else:
                     ser = Service.objects.get(id=id)
                     PriceService.objects.create(
                         service=ser,
@@ -518,19 +525,6 @@ def update_service(request):
                         price=price,
                         currency = currency_id
                     )
-                    # error.append(str(err))
-                    # print(err)
-            # else:
-                # # if bool(is_deleted) == True:
-                # #     pass
-                # # else:
-                # ser = Service.objects.get(id=id)
-                # PriceService.objects.create(
-                #     service=ser,
-                #     duration = duration,
-                #     price=price,
-                #     currency = currency_id
-                # )
 
     serializer= ServiceSerializer(service_id, context={'request' : request} , data=request.data, partial=True)
     if serializer.is_valid():
