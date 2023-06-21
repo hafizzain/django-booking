@@ -496,23 +496,23 @@ def update_service(request):
             except Exception as err:
                 pass
                 
-            # if s_service_id is not None:
-            #     try: 
-            #         price_service = PriceService.objects.get(id=ser['id'])
+            if s_service_id is not None:
+                try: 
+                    price_service = PriceService.objects.get(id=ser['id'])
                     
-            #         if bool(is_deleted) == True:
-            #             price_service.delete()
-            #             continue
-            #         servic = Service.objects.get(id=ser['service'])
-            #         price_service.service = servic
-            #         price_service.duration = ser['duration']
-            #         price_service.price = ser['price']
-            #         price_service.currency = currency_id
-            #         price_service.save()
+                    if bool(is_deleted) == True:
+                        price_service.delete()
+                        continue
+                    servic = Service.objects.get(id=ser['service'])
+                    price_service.service = servic
+                    price_service.duration = ser['duration']
+                    price_service.price = ser['price']
+                    price_service.currency = currency_id
+                    price_service.save()
                     
-            #     except Exception as err:
-            #         error.append(str(err))
-            #         print(err)
+                except Exception as err:
+                    error.append(str(err))
+                    print(err)
             else:
                 if bool(is_deleted) == True:
                     pass
@@ -1191,10 +1191,10 @@ def get_total_revenue(request):
     ).distinct()
     # appointment_service__appointment_status = 'Done')
     # appointment_service__appointment_status = 'Paid', 
-    # for checkout_instance in appointment_checkouts:
-    #     appointmemnt_sale +=1
-    #     if checkout_instance.total_price is not None:
-    #         total += checkout_instance.total_price
+    for checkout_instance in appointment_checkouts:
+        appointmemnt_sale +=1
+        if checkout_instance.total_price is not None:
+            total += checkout_instance.total_price
     
     return Response(
         {
