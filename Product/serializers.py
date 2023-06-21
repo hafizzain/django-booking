@@ -9,7 +9,7 @@ from django.conf import settings
 from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer
 
 from Utility.models import  ExceptionRecord
-from django.db.models import Avg, Count, Min, Sum
+from django.db.models import Avg, Count, Min, Sum, Q
 
 
 
@@ -588,10 +588,15 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
     def get_reports(self, product_instance):
         filter_query = {}
         report_type = self.context.get('report_type', None)
+        location_id = self.context.get('location_id', None)
+
         if report_type:
             filter_query['report_choice'] = report_type
 
         product_reports = ProductOrderStockReport.objects.filter(
+            Q(report_choice = 'Transfer_from', from_location__id = location_id) |
+            Q(report_choice = 'to_location', to_location__id = location_id) |
+            Q(report_choice__in = ['Purchase', 'Consumed', 'Sold']),
             product = product_instance,
             **filter_query
         ).order_by('-created_at')
