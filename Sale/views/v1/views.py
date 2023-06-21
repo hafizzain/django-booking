@@ -514,16 +514,16 @@ def update_service(request):
             #         error.append(str(err))
             #         print(err)
             else:
-                if bool(is_deleted) == True:
-                    pass
-                else:
-                    ser = Service.objects.get(id=id)
-                    PriceService.objects.create(
-                        service=ser,
-                        duration = duration,
-                        price=price,
-                        currency = currency_id
-                    )
+                # if bool(is_deleted) == True:
+                #     pass
+                # else:
+                ser = Service.objects.get(id=id)
+                PriceService.objects.create(
+                    service=ser,
+                    duration = duration,
+                    price=price,
+                    currency = currency_id
+                )
 
     serializer= ServiceSerializer(service_id, context={'request' : request} , data=request.data, partial=True)
     if serializer.is_valid():
