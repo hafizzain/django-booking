@@ -375,6 +375,7 @@ def update_service(request):
     employeeslist=request.data.get('employee', None)
     service=request.data.get('service', None)
     location=request.data.get('location', None)
+    check = True
     
     if id is None: 
         return Response(
