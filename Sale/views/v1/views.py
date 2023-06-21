@@ -1191,10 +1191,10 @@ def get_total_revenue(request):
     ).distinct()
     # appointment_service__appointment_status = 'Done')
     # appointment_service__appointment_status = 'Paid', 
-    for checkout_instance in appointment_checkouts:
-        appointmemnt_sale +=1
-        if checkout_instance.total_price is not None:
-            total += checkout_instance.total_price
+    # for checkout_instance in appointment_checkouts:
+    #     appointmemnt_sale +=1
+    #     if checkout_instance.total_price is not None:
+    #         total += checkout_instance.total_price
     
     return Response(
         {
