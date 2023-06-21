@@ -2566,7 +2566,9 @@ def get_employee_check_time(request):
                         #data.append(f'{employee.full_name} isn’t available between {st_time} and {ed_time}, but your team member can still book appointments for them.')
                                                                 
                 else:
-                    data.append(f'The selected staff is not available at this time  {employee.full_name}')
+                    data.append(f'The selected staff is not available at this time {employee.full_name}')
+                    data.append(f'{tested}')
+                    data.append(f'{ser.appointment_time}')
                     return Response(
                             {
                                 'status' : True,
