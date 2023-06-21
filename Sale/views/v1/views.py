@@ -486,7 +486,9 @@ def update_service(request):
             priceservice = json.loads(priceservice)
         else:
             pass
+        sum = 0
         for ser in priceservice:
+            sum = sum +1
             s_service_id = ser.get('id', None)
             duration = ser.get('duration', None)
             price = ser.get('price', None)
@@ -497,34 +499,34 @@ def update_service(request):
             except Exception as err:
                 pass
                 
-            if s_service_id is not None:
-                try: 
-                    price_service = PriceService.objects.get(id=ser['id'])
+            # if s_service_id is not None:
+            #     try: 
+            #         price_service = PriceService.objects.get(id=ser['id'])
                     
-                    if bool(is_deleted) == True:
-                        price_service.delete()
-                        continue
-                    servic = Service.objects.get(id=ser['service'])
-                    price_service.service = servic
-                    price_service.duration = ser['duration']
-                    price_service.price = ser['price']
-                    price_service.currency = currency_id
-                    price_service.save()
+            #         if bool(is_deleted) == True:
+            #             price_service.delete()
+            #             continue
+            #         servic = Service.objects.get(id=ser['service'])
+            #         price_service.service = servic
+            #         price_service.duration = ser['duration']
+            #         price_service.price = ser['price']
+            #         price_service.currency = currency_id
+            #         price_service.save()
                     
-                except Exception as err:
-                    error.append(str(err))
-                    print(err)
-            else:
-                if bool(is_deleted) == True:
-                    pass
-                else:
-                    ser = Service.objects.get(id=id)
-                    PriceService.objects.create(
-                        service=ser,
-                        duration = duration,
-                        price=price,
-                        currency = currency_id
-                    )
+            #     except Exception as err:
+            #         error.append(str(err))
+            #         print(err)
+            # else:
+            #     if bool(is_deleted) == True:
+            #         pass
+            #     else:
+            ser = Service.objects.get(id=id)
+            PriceService.objects.create(
+                service=ser,
+                duration = duration,
+                price=price,
+                currency = currency_id
+            )
 
     serializer= ServiceSerializer(service_id, context={'request' : request} , data=request.data, partial=True)
     if serializer.is_valid():
@@ -537,7 +539,8 @@ def update_service(request):
                     'message' : ' Service updated successfully',
                     'error_message' : None,
                     'error': error,
-                    'service' : serializer.data
+                    'service' : serializer.data,
+                    'sum':sum,
                 
                 }
             },
