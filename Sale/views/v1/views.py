@@ -486,7 +486,9 @@ def update_service(request):
             priceservice = json.loads(priceservice)
         else:
             pass
+        sum = 0
         for ser in priceservice:
+            sum = sum +1
             s_service_id = ser.get('id', None)
             duration = ser.get('duration', None)
             price = ser.get('price', None)
@@ -497,34 +499,34 @@ def update_service(request):
             except Exception as err:
                 pass
                 
-            if s_service_id is not None:
-                try: 
-                    price_service = PriceService.objects.get(id=ser['id'])
+            # if s_service_id is not None:
+            #     try: 
+            #         price_service = PriceService.objects.get(id=ser['id'])
                     
-                    if bool(is_deleted) == True:
-                        price_service.delete()
-                        continue
-                    servic = Service.objects.get(id=ser['service'])
-                    price_service.service = servic
-                    price_service.duration = ser['duration']
-                    price_service.price = ser['price']
-                    price_service.currency = currency_id
-                    price_service.save()
+            #         if bool(is_deleted) == True:
+            #             price_service.delete()
+            #             continue
+            #         servic = Service.objects.get(id=ser['service'])
+            #         price_service.service = servic
+            #         price_service.duration = ser['duration']
+            #         price_service.price = ser['price']
+            #         price_service.currency = currency_id
+            #         price_service.save()
                     
-                except Exception as err:
-                    error.append(str(err))
-                    print(err)
-            else:
-                if bool(is_deleted) == True:
-                    pass
-                else:
-                    ser = Service.objects.get(id=id)
-                    PriceService.objects.create(
-                        service=ser,
-                        duration = duration,
-                        price=price,
-                        currency = currency_id
-                    )
+            #     except Exception as err:
+            #         error.append(str(err))
+            #         print(err)
+            # else:
+            #     if bool(is_deleted) == True:
+            #         pass
+            #     else:
+                ser = Service.objects.get(id=id)
+                PriceService.objects.create(
+                    service=ser,
+                    duration = duration,
+                    price=price,
+                    currency = currency_id
+                )
 
     serializer= ServiceSerializer(service_id, context={'request' : request} , data=request.data, partial=True)
     if serializer.is_valid():
@@ -537,7 +539,8 @@ def update_service(request):
                     'message' : ' Service updated successfully',
                     'error_message' : None,
                     'error': error,
-                    'service' : serializer.data
+                    'service' : serializer.data,
+                    'sum':sum,
                 
                 }
             },
@@ -1186,11 +1189,16 @@ def get_total_revenue(request):
             total += order.total_price
     #orders_price = Order.objects.aggregate(Total= Sum('total_price'))
     
-    price = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Paid', )#appointment_service__appointment_status = 'Done')
-    for order in price:
+    appointment_checkouts = AppointmentCheckout.objects.filter(
+        Q(appointment_service__appointment_status = 'Paid') |
+        Q(appointment_service__appointment_status = 'Done')
+    ).distinct()
+    # appointment_service__appointment_status = 'Done')
+    # appointment_service__appointment_status = 'Paid', 
+    for checkout_instance in appointment_checkouts:
         appointmemnt_sale +=1
-        if order.total_price is not None:
-            total += order.total_price
+        if checkout_instance.total_price is not None:
+            total += checkout_instance.total_price
     
     return Response(
         {
@@ -2277,7 +2285,7 @@ def new_create_sale_order(request):
             if len(sale_commissions) > 0:
                 commission = sale_commissions[0]
 
-                calculated_commission = commission.calculated_commission(price)
+                calculated_commission = commission.calculated_commission(order_discount_price if order_discount_price else price)
                 EmployeeCommission.objects.create(
                     user = request.user,
                     business = business_address.business,
