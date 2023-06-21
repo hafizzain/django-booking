@@ -697,7 +697,29 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
     employee_list = serializers.SerializerMethodField(read_only=True)
     designation = serializers.SerializerMethodField(read_only=True)
     status = serializers.SerializerMethodField(read_only=True)
+    appointment_service_member = serializers.SerializerMethodField(read_only=True)
+
     
+    def get_appointment_service_member(self, obj):   
+        if obj.member:
+
+            try:
+                employee_service = EmployeeSelectedService.objects.get(
+                    service = obj.service,
+                    employee = obj.member
+                )
+            except:
+                level = 'Average'
+            else:
+                level = employee_service.level
+
+            return {
+                'id' : f'{obj.member.id}',
+                'full_name' : f'{obj.member.full_name}',
+                'level' : f'{level}',
+            }
+        return {}
+
     def get_designation(self, obj):        
         try:
             designation = EmployeeProfessionalInfo.objects.get(employee=obj.member.id)
@@ -789,7 +811,7 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
         fields= ('id', 'service', 'member', 'price', 'client', 'designation',
                  'appointment_date', 'appointment_time', 'duration','srv_name','status',
                  'booked_by' , 'booking_id', 'appointment_type','client_can_book','slot_availible_for_online',
-                 'appointment_status', 'location','employee_list', 'created_at', 'is_deleted')
+                 'appointment_status', 'location','employee_list', 'created_at', 'is_deleted', 'appointment_service_member')
         
       
 class SingleAppointmentSerializer(serializers.ModelSerializer):
