@@ -375,6 +375,7 @@ def update_service(request):
     employeeslist=request.data.get('employee', None)
     service=request.data.get('service', None)
     location=request.data.get('location', None)
+    check = True
     
     if id is None: 
         return Response(
@@ -469,7 +470,16 @@ def update_service(request):
         error.append(str(err)) 
     
     
-    if priceservice is not None:
+    if priceservice is not None:  
+        if check == True:
+            vch = PriceService.objects.filter(service = service_id)
+            check = False
+            for i in vch:
+                try:
+                    v = PriceService.objects.get(id = i.id)
+                    v.delete()
+                except:
+                    pass
         if type(priceservice) == str:
             priceservice = priceservice.replace("'" , '"')
             priceservice = json.loads(priceservice)
