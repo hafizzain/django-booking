@@ -36,6 +36,7 @@ class AppointmentServiceAdmin(admin.ModelAdmin):
     list_display = [
         'id',
         'member_name',
+        'appointment_status',
         'appointment_date',
         'appointment_time',
         'total_price',

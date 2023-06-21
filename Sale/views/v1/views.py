@@ -1175,11 +1175,11 @@ def get_total_revenue(request):
             total += order.total_price
     #orders_price = Order.objects.aggregate(Total= Sum('total_price'))
     
-    price = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Paid', )#appointment_service__appointment_status = 'Done')
-    for order in price:
+    appointment_checkouts = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Paid', )#appointment_service__appointment_status = 'Done')
+    for checkout_instance in appointment_checkouts:
         appointmemnt_sale +=1
-        if order.total_price is not None:
-            total += order.total_price
+        if checkout_instance.total_price is not None:
+            total += checkout_instance.total_price
     
     return Response(
         {
