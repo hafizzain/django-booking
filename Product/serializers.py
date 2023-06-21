@@ -595,7 +595,7 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
 
         product_reports = ProductOrderStockReport.objects.filter(
             Q(report_choice = 'Transfer_from', from_location__id = location_id) |
-            Q(report_choice = 'to_location', to_location__id = location_id) |
+            Q(report_choice = 'Transfer_to', to_location__id = location_id) |
             Q(report_choice__in = ['Purchase', 'Consumed', 'Sold']),
             product = product_instance,
             **filter_query
