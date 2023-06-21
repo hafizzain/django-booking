@@ -2527,7 +2527,25 @@ def get_employee_check_time(request):
                 member__id = employee.id,
                 appointment_date = date,
                 #is_blocked = False,
+                appointment_time__range = (start_time, tested),
+                end_time__range = (start_time, tested),
             )
+            if len(av_staff_ids) > 0:
+                st_time = convert_24_to_12(str(start_time))
+                ed_time = convert_24_to_12(str(tested))
+                return Response(
+                    {
+                        'status' : True,
+                        'status_code' : 200,
+                        'status_code_text' : '200',
+                        'response' : {
+                            'message' : f'{employee.full_name} isn’t available between {st_time} and {ed_time}, but your team member can still book appointments for them.',
+                            'error_message' : None,
+                            'employee':data,
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
             
             for ser in av_staff_ids:
                 if tested <= ser.appointment_time:
