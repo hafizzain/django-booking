@@ -46,5 +46,7 @@ class ProductOrderStockReportAdmin(admin.ModelAdmin):
                 'id', 
                 'product',
                 'location', 
+                'from_location',
+                'to_location',
                 'report_choice',
-                   ]
+            ]
