@@ -2091,6 +2091,7 @@ def new_create_sale_order(request):
 
             product_order = ProductOrder.objects.create(
                 user = user,
+                member = employee_id,
                 client = client,
                 product = product,
                 checkout = checkout,
@@ -2118,6 +2119,7 @@ def new_create_sale_order(request):
                 
                 service_order = ServiceOrder.objects.create(
                     user = user,
+                    member = employee_id,
                     service = service,
                     duration= dur,
                     checkout = checkout,
@@ -2159,6 +2161,7 @@ def new_create_sale_order(request):
                 
                 membership_order = MemberShipOrder.objects.create(
                     user= user,
+                    member = employee_id,
                     membership = membership,
                     start_date = start_date_cal,
                     end_date = end_date_cal,
@@ -2223,7 +2226,7 @@ def new_create_sale_order(request):
                 
                 voucher_order = VoucherOrder.objects.create(
                     user = user,
-                    
+                    member = employee_id,
                     voucher = voucher,
                     start_date = start_date_cal,
                     end_date = end_date_cal,
