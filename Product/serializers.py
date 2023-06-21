@@ -594,7 +594,7 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
         product_reports = ProductOrderStockReport.objects.filter(
             product = product_instance,
             **filter_query
-        )
+        ).order_by('-created_at')
         
         serialized_data = ProductStockReport_OrderStockReportsSerializer(product_reports, many=True)
         return serialized_data.data
