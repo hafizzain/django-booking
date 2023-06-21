@@ -1626,11 +1626,27 @@ def create_checkout(request):
     elif type(appointment_service_obj) == list:
         pass
     for app in appointment_service_obj:
+        active_user_staff = None
+        try:
+            active_user_staff = Employee.objects.get(
+                email = request.user.email,
+                is_deleted = False,
+                is_active = True,
+                is_blocked = False
+            )
+        except:
+            pass
         id = app.get('id', None)
         try:
             service_appointment = AppointmentService.objects.get(id=id)
             service_appointment.appointment_status= 'Done'
             service_appointment.save()
+            appointment_logs = AppointmentLogs.objects.create( 
+                location = service_appointment.business_address,
+                appointment = service_appointment.appointment,
+                log_type = 'Done',
+                member = active_user_staff
+            )
         except Exception as err:
             pass
         else:
