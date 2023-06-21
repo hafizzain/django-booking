@@ -26,7 +26,7 @@ class CheckoutAdmin(admin.ModelAdmin):
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     ordering = ['-created_at']
-    list_display = ['id', 'total_price', 'quantity', 'current_price', 'price', 'discount_price', 'discount_percentage']
+    list_display = ['id', 'total_price', 'member', 'quantity', 'current_price', 'price', 'discount_price', 'discount_percentage']
 
     
 admin.site.register(CheckoutPayment)
