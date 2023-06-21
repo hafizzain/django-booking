@@ -470,6 +470,16 @@ def update_service(request):
     
     
     if priceservice is not None:
+        if check == True:
+            vch = PriceService.objects.filter(service = service_id)
+            check = False
+            for i in vch:
+                try:
+                    voucher = PriceService.objects.get(id = i.id)
+                    voucher.delete()
+                except:
+                    pass
+        
         if type(priceservice) == str:
             priceservice = priceservice.replace("'" , '"')
             priceservice = json.loads(priceservice)
