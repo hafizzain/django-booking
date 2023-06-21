@@ -1188,7 +1188,7 @@ def get_total_revenue(request):
     appointment_checkouts = AppointmentCheckout.objects.filter(
         Q(appointment_service__appointment_status = 'Paid') |
         Q(appointment_service__appointment_status = 'Done')
-    )
+    ).distinct()
     # appointment_service__appointment_status = 'Done')
     # appointment_service__appointment_status = 'Paid', 
     for checkout_instance in appointment_checkouts:
