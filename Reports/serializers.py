@@ -1040,8 +1040,8 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
         return 'Service'
 
     def get_commission(self, commission_instance):
-        # return commission_instance.commission_amount
-        return commission_instance.full_commission
+        return commission_instance.commission_amount
+        # return commission_instance.full_commission
 
     def get_commission_rate(self, commission_instance):
         return f'{commission_instance.commission_rate} {commission_instance.symbol}'
