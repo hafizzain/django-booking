@@ -3597,6 +3597,7 @@ def create_absence(request):
     # print(diff.days)
     working_sch = None
     days = int(diff.days)
+    days = days + 1
     print(days)
     empl_absence = Vacation(
         business = business,
@@ -3606,7 +3607,6 @@ def create_absence(request):
         note = note,
         holiday_type = 'Absence'
     )
-    to_date = to_date + timedelta(days=1)
     if days > 0 :
         for i, value in enumerate(range(days)):
             if i == 0:
