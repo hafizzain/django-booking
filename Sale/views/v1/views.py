@@ -2277,7 +2277,13 @@ def new_create_sale_order(request):
             }
             commission_category = CommissionType[sale_type]
 
-            total_from_value = price * quantity
+            sale_price = 0
+            if order_discount_price:
+                sale_price = order_discount_price
+            else:
+                sale_price = price
+
+            total_from_value = sale_price * quantity
 
             sale_commissions = CategoryCommission.objects.filter(
                 commission__employee = employee_id,
@@ -2288,7 +2294,7 @@ def new_create_sale_order(request):
             if len(sale_commissions) > 0:
                 commission = sale_commissions[0]
 
-                calculated_commission = commission.calculated_commission(order_discount_price if order_discount_price else price)
+                calculated_commission = commission.calculated_commission(total_from_value)
                 EmployeeCommission.objects.create(
                     user = request.user,
                     business = business_address.business,
