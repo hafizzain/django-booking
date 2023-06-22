@@ -661,7 +661,12 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
                 # match = int(create.split(" ")[0].split("-")[1])
                 # if int(month) == match:
                     # total += int(ord.checkout.total_voucher_price) if ord.checkout.total_voucher_price is not None else 0
-                total += (ord.quantity * ord.total_price)
+                price = 0
+                if ord.discount_price:
+                    price = ord.discount_price
+                else:
+                    price = ord.total_price
+                total += (float(ord.quantity) * float(price))
 
             return total
 
