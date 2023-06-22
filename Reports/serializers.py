@@ -89,13 +89,21 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
             service_orders = ProductOrder.objects.filter(
                 is_deleted=False, 
                 member = obj, 
-                created_at__icontains = year
+                created_at__year = year,
+                created_at__month = month,
                 )
             for ord  in service_orders:
-                create = str(ord.created_at)
-                match = int(create.split(" ")[0].split("-")[1])
-                if int(month) == match:
-                    total += int(ord.total_price)
+                # create = str(ord.created_at)
+                # match = int(create.split(" ")[0].split("-")[1])
+                # if int(month) == match:
+                #     total += int(ord.total_price)
+                price = 0
+                if ord.discount_price:
+                    price = ord.discount_price
+                else:
+                    price = ord.total_price
+                
+                total += float(price) * float(ord.quantity)
             
             return f'{total}'
                 
@@ -107,29 +115,38 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
             month = self.context["month"]
             year = self.context["year"]
             total = 0
-            app   = AppointmentService.objects.filter(
+            app = AppointmentService.objects.filter(
                 member = obj,
                 appointment_status = 'Done',
                 created_at__icontains = year
             )
         
-            service_orders = ServiceOrder.objects.filter(is_deleted=False, 
-                        member = obj,
-                        created_at__icontains = year
-                        )
+            service_orders = ServiceOrder.objects.filter(
+                is_deleted=False, 
+                member = obj,
+                created_at__year = year,
+                created_at__month = month,
+            )
             for appointment in app:
                 create = str(appointment.created_at)
                 match = int(create.split(" ")[0].split("-")[1])
                 if int(month) == match:
                     total += int(appointment.price)
                     
-            for ord  in service_orders:
-                create = str(ord.created_at)
-                match = int(create.split(" ")[0].split("-")[1])
-                if int(month) == match:
-                    total += int(ord.total_price)
+            for ord in service_orders:
+                # create = str(ord.created_at)
+                # match = int(create.split(" ")[0].split("-")[1])
+                # if int(month) == match:
+                #     total += int(ord.total_price)
+                price = 0
+                if ord.discount_price:
+                    price = ord.discount_price
+                else:
+                    price = ord.total_price
+                
+                total += float(price) * float(ord.quantity)
                                 
-            return f'{total}'         
+            return f'{total}'
             
         except Exception as err:
             return str(err)
@@ -215,7 +232,8 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
         total_product_price = 0
 
         for commission in employee_commissions:
-            full_commission = commission.full_commission
+            full_commission = commission.single_item_commission
+            # full_commission = commission.full_commission
             commission_total += full_commission
 
             # Mannaging Product Commission
@@ -599,15 +617,22 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
             total = 0
 
             service_orders = ProductOrder.objects.filter(
-                is_deleted=False, 
-                location=obj,
-                created_at__icontains=year
+                is_deleted = False, 
+                location = obj,
+                created_at__year = year,
+                created_at__month = month,
             )
             for ord in service_orders:
-                create = str(ord.created_at)
-                match = int(create.split(" ")[0].split("-")[1])
-                if int(month) == match:
-                    total += int(ord.checkout.total_product_price) if ord.checkout.total_product_price is not None else 0
+                # create = str(ord.created_at)
+                # match = int(create.split(" ")[0].split("-")[1])
+                # if int(month) == match:
+                #     total += int(ord.checkout.total_product_price) if ord.checkout.total_product_price is not None else 0
+                price = 0
+                if ord.discount_price:
+                    price = ord.discount_price
+                else:
+                    price = ord.total_price
+                total += (float(ord.quantity) * float(price))
 
             return total
 
@@ -654,7 +679,12 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
                 # match = int(create.split(" ")[0].split("-")[1])
                 # if int(month) == match:
                     # total += int(ord.checkout.total_voucher_price) if ord.checkout.total_voucher_price is not None else 0
-                total += (ord.quantity * ord.total_price)
+                price = 0
+                if ord.discount_price:
+                    price = ord.discount_price
+                else:
+                    price = ord.total_price
+                total += (float(ord.quantity) * float(price))
 
             return total
 
@@ -877,18 +907,18 @@ class ServiceGroupReport(serializers.ModelSerializer):
     # service_sale_price = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
     service_target = serializers.SerializerMethodField(read_only=True)
-    services_sales = serializers.SerializerMethodField(read_only=True)
-    appointment_sales = serializers.SerializerMethodField(read_only=True)
-    total_service_sales = serializers.SerializerMethodField(read_only=True)
+    # services_sales = serializers.SerializerMethodField(read_only=True)
+    # appointment_sales = serializers.SerializerMethodField(read_only=True)
+    # total_service_sales = serializers.SerializerMethodField(read_only=True)
 
-    def get_appointment_sales(self, obj):
-        return obj.appointment_sales
+    # def get_appointment_sales(self, obj):
+    #     return obj.appointment_sales
     
-    def get_total_service_sales(self, obj):
-        return obj.appointment_sales + obj.services_sales
+    # def get_total_service_sales(self, obj):
+    #     return obj.appointment_sales + obj.services_sales
     
-    def get_services_sales(self, obj):
-        return obj.services_sales
+    # def get_services_sales(self, obj):
+    #     return obj.services_sales
     
     def get_service(self, obj):
         ser = obj.services.all()
@@ -919,7 +949,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
             return str(err)        
     class Meta:
         model = ServiceGroup
-        fields = ['id','name','service','service_target', 'services_sales', 'appointment_sales', 'total_service_sales']
+        fields = ['id','name','service','service_target']
         
 class ReportBrandSerializer(serializers.ModelSerializer): 
     product_sale_price = serializers.SerializerMethodField(read_only=True)
@@ -976,7 +1006,13 @@ class ReportBrandSerializer(serializers.ModelSerializer):
                 # create = str(ord.created_at)
                 # match = int(create.split(" ")[0].split("-")[1])
                 # if int(month) == match:
-                total += (ord.total_price * ord.quantity)
+                price = 0
+                if ord.discount_price:
+                    price = ord.discount_price
+                else:
+                    price = ord.total_price
+
+                total += (float(price) * float(ord.quantity))
 
                 # if ord.checkout and ord.checkout.total_product_price:
                 #     total += int(ord.checkout.total_product_price)
@@ -1022,8 +1058,8 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
         return 'Service'
 
     def get_commission(self, commission_instance):
-        # return commission_instance.commission_amount
-        return commission_instance.full_commission
+        return commission_instance.commission_amount
+        # return commission_instance.full_commission
 
     def get_commission_rate(self, commission_instance):
         return f'{commission_instance.commission_rate} {commission_instance.symbol}'
