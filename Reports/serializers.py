@@ -614,7 +614,7 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
                     price = ord.discount_price
                 else:
                     price = ord.total_price
-                total += (ord.quantity * price)
+                total += (float(ord.quantity) * float(price))
 
             return total
 
