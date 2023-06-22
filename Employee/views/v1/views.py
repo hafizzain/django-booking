@@ -3606,8 +3606,7 @@ def create_absence(request):
         note = note,
         holiday_type = 'Absence'
     )
-    
-    to_date = datetime.strptime(to_date, "%Y-%m-%d") + timedelta(days=1)
+    to_date = to_date + timedelta(days=1)
     if days > 0 :
         for i, value in enumerate(range(days)):
             if i == 0:
