@@ -878,6 +878,14 @@ class ServiceGroupReport(serializers.ModelSerializer):
     service = serializers.SerializerMethodField(read_only=True)
     service_target = serializers.SerializerMethodField(read_only=True)
     services_sales = serializers.SerializerMethodField(read_only=True)
+    appointment_sales = serializers.SerializerMethodField(read_only=True)
+    total_service_sales = serializers.SerializerMethodField(read_only=True)
+
+    def get_appointment_sales(self, obj):
+        return obj.appointment_sales
+    
+    def get_total_service_sales(self, obj):
+        return obj.total_service_sales
     
     def get_services_sales(self, obj):
         return obj.services_sales
@@ -911,7 +919,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
             return str(err)        
     class Meta:
         model = ServiceGroup
-        fields = ['id','name','service','service_target', 'services_sales']
+        fields = ['id','name','service','service_target', 'services_sales', 'appointment_sales', 'total_service_sales']
         
 class ReportBrandSerializer(serializers.ModelSerializer): 
     product_sale_price = serializers.SerializerMethodField(read_only=True)
