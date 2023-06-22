@@ -2385,6 +2385,7 @@ def create_commission(request):
                     commission_percentage = commission_per,
                     symbol = symbol,
                     category_comission = 'Retail',
+                    comission_choice = 'percentage' if '%' in symbol else 'currency'
                 )
             except Exception as err:
                 ExceptionRecord.objects.create(
@@ -2419,6 +2420,7 @@ def create_commission(request):
                     commission_percentage = commission_per,
                     symbol = symbol,
                     category_comission = 'Voucher',
+                    comission_choice = 'percentage' if '%' in symbol else 'currency'
                 )           
             except Exception as err:
                 ExceptionRecord.objects.create(
@@ -2745,6 +2747,7 @@ def update_commision(request):
                     commision_ser.to_value = to_value
                     commision_ser.commission_percentage = commission_per
                     commision_ser.symbol = symbol
+                    commision_ser.comission_choice = 'percentage' if '%' in symbol else 'currency'
                     commision_ser.save()           
                     
                 except Exception as err:
@@ -2757,6 +2760,7 @@ def update_commision(request):
                     commission_percentage = commission_per,
                     symbol = symbol,
                     category_comission = 'Retail',
+                    comission_choice = 'percentage' if '%' in symbol else 'currency'
                 )
                 
     if voucher_comission is not None:
@@ -2785,6 +2789,7 @@ def update_commision(request):
                     commision_ser.to_value = to_value
                     commision_ser.commission_percentage = commission_per
                     commision_ser.symbol = symbol
+                    commision_ser.comission_choice = 'percentage' if '%' in symbol else 'currency'
                     commision_ser.save()           
                     
                 except Exception as err:
@@ -2797,6 +2802,7 @@ def update_commision(request):
                     commission_percentage = commission_per,
                     symbol = symbol,
                     category_comission = 'Voucher',
+                    comission_choice = 'percentage' if '%' in symbol else 'currency'
                 )    
     try:
         employee_id=Employee.objects.get(id=employee)
