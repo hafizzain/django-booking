@@ -2396,6 +2396,16 @@ def update_vouchers(request):
 
 
     if currency_voucher:  
+        if check == True:
+            vch = VoucherCurrencyPrice.objects.filter(voucher = vouchers)
+            check = False
+            for i in vch:
+                try:
+                    v = VoucherCurrencyPrice.objects.get(id = i.id)
+                    v.delete()
+                except:
+                    pass
+
         if type(currency_voucher) == str:
             currency_voucher = currency_voucher.replace("'" , '"')
             currency_voucher = json.loads(currency_voucher)
@@ -2421,30 +2431,21 @@ def update_vouchers(request):
                 expt.save()
                 pass
             
-            if id is not None:
-                try:
-                    currency_price = VoucherCurrencyPrice.objects.get(id=id)
-                except Exception as err:
-                    pass
+            # if id is not None:
+            #     try:
+            #         currency_price = VoucherCurrencyPrice.objects.get(id=id)
+            #     except Exception as err:
+            #         pass
                 
-                currency_price.price = price
-                currency_price.save()
+            #     currency_price.price = price
+            #     currency_price.save()
             
-            elif currency_id is not None: 
+            if currency_id is not None: 
                 try:
                     currency_price = VoucherCurrencyPrice.objects.get(currency=currency_id, voucher = voucher_id)
                     currency_price.price = price
                     currency_price.save()
                 except Exception as err:
-                    if check == True:
-                        vch = VoucherCurrencyPrice.objects.filter(voucher = vouchers)
-                        check = False
-                        for i in vch:
-                            try:
-                                v = VoucherCurrencyPrice.objects.get(id = i.id)
-                                v.delete()
-                            except:
-                                pass
                     services_obj = VoucherCurrencyPrice.objects.create(
                         voucher = vouchers,
                         currency = currency_id,
