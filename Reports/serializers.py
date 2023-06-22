@@ -983,7 +983,13 @@ class ReportBrandSerializer(serializers.ModelSerializer):
                 # create = str(ord.created_at)
                 # match = int(create.split(" ")[0].split("-")[1])
                 # if int(month) == match:
-                total += (ord.total_price * ord.quantity)
+                price = 0
+                if ord.discount_price:
+                    price = ord.discount_price
+                else:
+                    price = ord.total_price
+
+                total += (float(price) * float(ord.quantity))
 
                 # if ord.checkout and ord.checkout.total_product_price:
                 #     total += int(ord.checkout.total_product_price)
