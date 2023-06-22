@@ -412,7 +412,7 @@ class LoyaltyPoints(models.Model):
     name = models.CharField(max_length=100, default='')
     loyaltytype = models.CharField(choices=LOYALTY_CHOICE, default='Service' , verbose_name='Loyalty Type', max_length=50)
     amount_spend = models.FloatField(default=0, null=True, blank=True)
-    number_points = models.PositiveIntegerField(default=0, null=True, blank=True)
+    number_points = models.FloatField(default=0, null=True, blank=True)
     earn_points = models.FloatField(default=0, null=True, blank=True)
     total_earn_from_points = models.FloatField(default=0, null=True, blank=True)
     
