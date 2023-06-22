@@ -877,18 +877,18 @@ class ServiceGroupReport(serializers.ModelSerializer):
     # service_sale_price = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
     service_target = serializers.SerializerMethodField(read_only=True)
-    services_sales = serializers.SerializerMethodField(read_only=True)
-    appointment_sales = serializers.SerializerMethodField(read_only=True)
-    total_service_sales = serializers.SerializerMethodField(read_only=True)
+    # services_sales = serializers.SerializerMethodField(read_only=True)
+    # appointment_sales = serializers.SerializerMethodField(read_only=True)
+    # total_service_sales = serializers.SerializerMethodField(read_only=True)
 
-    def get_appointment_sales(self, obj):
-        return obj.appointment_sales
+    # def get_appointment_sales(self, obj):
+    #     return obj.appointment_sales
     
-    def get_total_service_sales(self, obj):
-        return obj.appointment_sales + obj.services_sales
+    # def get_total_service_sales(self, obj):
+    #     return obj.appointment_sales + obj.services_sales
     
-    def get_services_sales(self, obj):
-        return obj.services_sales
+    # def get_services_sales(self, obj):
+    #     return obj.services_sales
     
     def get_service(self, obj):
         ser = obj.services.all()
@@ -919,7 +919,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
             return str(err)        
     class Meta:
         model = ServiceGroup
-        fields = ['id','name','service','service_target', 'services_sales', 'appointment_sales', 'total_service_sales']
+        fields = ['id','name','service','service_target']
         
 class ReportBrandSerializer(serializers.ModelSerializer): 
     product_sale_price = serializers.SerializerMethodField(read_only=True)
