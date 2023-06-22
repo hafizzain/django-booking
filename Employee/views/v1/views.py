@@ -3598,10 +3598,7 @@ def create_absence(request):
     # to_date ='2023-01-06'
     
     from_date = datetime.strptime(from_date, "%Y-%m-%d")
-    if to_date is None:
-        to_date = datetime.strptime(from_date, "%Y-%m-%d")
-    else:
-        to_date = datetime.strptime(to_date, "%Y-%m-%d")
+    to_date = datetime.strptime(to_date, "%Y-%m-%d")
     diff = to_date - from_date 
     # print(diff.days)
     working_sch = None
