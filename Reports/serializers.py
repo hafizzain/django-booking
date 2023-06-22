@@ -908,7 +908,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
             return str(err)        
     class Meta:
         model = ServiceGroup
-        fields = ['id','name','service','service_target']
+        fields = ['id','name','service','service_target', 'services_sales']
         
 class ReportBrandSerializer(serializers.ModelSerializer): 
     product_sale_price = serializers.SerializerMethodField(read_only=True)
