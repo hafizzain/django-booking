@@ -215,7 +215,8 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
         total_product_price = 0
 
         for commission in employee_commissions:
-            full_commission = commission.full_commission
+            full_commission = commission.single_item_commission
+            # full_commission = commission.full_commission
             commission_total += full_commission
 
             # Mannaging Product Commission
