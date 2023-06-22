@@ -179,7 +179,7 @@ def get_service_target_report(request):
     address = ServiceGroup.objects.filter(
         is_deleted = False,
     ).annotate(
-        services_sales = Sum(F('services__service_orders__quantity') * F('services__service_orders__total_price'), output_field=FloatField()),
+        services_sales = Sum((F('services__service_orders__quantity') * F('services__service_orders__total_price')), output_field=FloatField()),
         appointment_sales = Sum(F('services__serivce_appointments__price'), filter=Q(services__serivce_appointments__appointment_status = 'Done'), output_field=FloatField()),
         # total_service_sales = Sum(F('services_sales'), F('appointment_sales'))
     ).order_by('-created_at')
