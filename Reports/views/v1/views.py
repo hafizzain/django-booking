@@ -181,7 +181,7 @@ def get_service_target_report(request):
     ).annotate(
         services_sales = Sum(F('services__service_orders__quantity') * F('services__service_orders__total_price')),
         appointment_sales = Sum(F('services__serivce_appointments__appointment_service_checkout__total_price')),
-        total_service_sales = Sum(F('services_sales'), F('appointment_sales'))
+        # total_service_sales = Sum(F('services_sales'), F('appointment_sales'))
     ).order_by('-created_at')
     serialized = ServiceGroupReport(address, many=True, context={'request' : request, 
                     'month': month,

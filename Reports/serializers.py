@@ -885,7 +885,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
         return obj.appointment_sales
     
     def get_total_service_sales(self, obj):
-        return obj.total_service_sales
+        return obj.appointment_sales + obj.services_sales
     
     def get_services_sales(self, obj):
         return obj.services_sales
