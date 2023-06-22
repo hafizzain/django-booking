@@ -950,18 +950,19 @@ class ReportBrandSerializer(serializers.ModelSerializer):
             total = 0
 
             service_orders = ProductOrder.objects.filter(
-                is_deleted=False, 
-                product__brand=obj,
-                created_at__icontains=year,
-                location__id=location,
+                is_deleted = False, 
+                product__brand = obj,
+                created_at__year = year,
+                created_at__month = month,
+                location__id = location,
             )
             
             for ord in service_orders:
-                create = str(ord.created_at)
-                match = int(create.split(" ")[0].split("-")[1])
-                if int(month) == match:
-                    if ord.checkout and ord.checkout.total_product_price:
-                        total += int(ord.checkout.total_product_price)
+                # create = str(ord.created_at)
+                # match = int(create.split(" ")[0].split("-")[1])
+                # if int(month) == match:
+                if ord.checkout and ord.checkout.total_product_price:
+                    total += int(ord.checkout.total_product_price)
             
             return total
 
