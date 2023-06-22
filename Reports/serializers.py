@@ -599,15 +599,22 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
             total = 0
 
             service_orders = ProductOrder.objects.filter(
-                is_deleted=False, 
-                location=obj,
-                created_at__icontains=year
+                is_deleted = False, 
+                location = obj,
+                created_at__year = year,
+                created_at__month = month,
             )
             for ord in service_orders:
-                create = str(ord.created_at)
-                match = int(create.split(" ")[0].split("-")[1])
-                if int(month) == match:
-                    total += int(ord.checkout.total_product_price) if ord.checkout.total_product_price is not None else 0
+                # create = str(ord.created_at)
+                # match = int(create.split(" ")[0].split("-")[1])
+                # if int(month) == match:
+                #     total += int(ord.checkout.total_product_price) if ord.checkout.total_product_price is not None else 0
+                price = 0
+                if ord.discount_price:
+                    price = ord.discount_price
+                else:
+                    price = ord.total_price
+                total += (ord.quantity * price)
 
             return total
 
