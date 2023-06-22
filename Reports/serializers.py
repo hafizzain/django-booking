@@ -877,7 +877,10 @@ class ServiceGroupReport(serializers.ModelSerializer):
     # service_sale_price = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
     service_target = serializers.SerializerMethodField(read_only=True)
+    services_sales = serializers.SerializerMethodField(read_only=True)
     
+    def get_services_sales(self, obj):
+        return obj.services_sales
     
     def get_service(self, obj):
         ser = obj.services.all()
