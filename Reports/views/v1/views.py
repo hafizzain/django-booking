@@ -179,8 +179,7 @@ def get_service_target_report(request):
     address = ServiceGroup.objects.filter(
         is_deleted = False,
     ).annotate(
-        sold_services_prices = F('services__service_orders__quantity') * F('services__service_orders__total_price'),
-        services_sales = Sum(F('sold_services_prices'))
+        services_sales = Sum(F('services__service_orders__quantity') * F('services__service_orders__total_price'))
     ).order_by('-created_at')
     serialized = ServiceGroupReport(address, many=True, context={'request' : request, 
                     'month': month,
