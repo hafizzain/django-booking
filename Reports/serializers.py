@@ -89,13 +89,21 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
             service_orders = ProductOrder.objects.filter(
                 is_deleted=False, 
                 member = obj, 
-                created_at__icontains = year
+                created_at__year = year,
+                created_at__month = month,
                 )
             for ord  in service_orders:
-                create = str(ord.created_at)
-                match = int(create.split(" ")[0].split("-")[1])
-                if int(month) == match:
-                    total += int(ord.total_price)
+                # create = str(ord.created_at)
+                # match = int(create.split(" ")[0].split("-")[1])
+                # if int(month) == match:
+                #     total += int(ord.total_price)
+                price = 0
+                if ord.discount_price:
+                    price = ord.discount_price
+                else:
+                    price = ord.total_price
+                
+                total += float(price) * float(ord.quantity)
             
             return f'{total}'
                 
