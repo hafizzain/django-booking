@@ -25,7 +25,7 @@ from Business.models import BusinessAddress
 from Service.models import PriceService, Service, ServiceGroup
 
 from Product.models import Brand, Product, ProductOrderStockReport, ProductStock
-from django.db.models import Avg, Count, Min, Sum, F
+from django.db.models import Avg, Count, Min, Sum, F, FloatField
 
 
 from Sale.serializers import AppointmentCheckout_ReportsSerializer, PromotionNDiscount_AppointmentCheckoutSerializer, PromotionNDiscount_CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer, CheckoutCommissionSerializer
@@ -179,8 +179,8 @@ def get_service_target_report(request):
     address = ServiceGroup.objects.filter(
         is_deleted = False,
     ).annotate(
-        services_sales = Sum(F('services__service_orders__quantity') * F('services__service_orders__total_price')),
-        appointment_sales = Sum(F('services__serivce_appointments__price')),
+        services_sales = Sum(F('services__service_orders__quantity') * F('services__service_orders__total_price'), output_field=FloatField()),
+        appointment_sales = Sum(F('services__serivce_appointments__price'), output_field=FloatField()),
         # total_service_sales = Sum(F('services_sales'), F('appointment_sales'))
     ).order_by('-created_at')
     serialized = ServiceGroupReport(address, many=True, context={'request' : request, 
