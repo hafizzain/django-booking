@@ -556,10 +556,16 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
                     total += int(ord.price) if ord.price is not None else 0
 
             for ord in service_orders:
-                create = str(ord.created_at)
-                match = int(create.split(" ")[0].split("-")[1])
-                if int(month) == match:
-                    total += int(ord.checkout.total_service_price) if ord.checkout.total_service_price is not None else 0
+                # create = str(ord.created_at)
+                # match = int(create.split(" ")[0].split("-")[1])
+                # if int(month) == match:
+                #     total += int(ord.checkout.total_service_price) if ord.checkout.total_service_price is not None else 0
+                price = 0
+                if ord.discount_price:
+                    price = ord.discount_price
+                else:
+                    price = ord.total_price
+                total += (float(ord.quantity) * float(price))
 
             return total
 
@@ -708,7 +714,12 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
                 # match = int(create.split(" ")[0].split("-")[1])
                 # if int(month) == match:
                 #     total += int(ord.checkout.total_membership_price)
-                total += (ord.quantity * ord.total_price)
+                price = 0
+                if ord.discount_price:
+                    price = ord.discount_price
+                else:
+                    price = ord.total_price
+                total += (float(ord.quantity) * float(price))
             
             return total
                 
