@@ -29,10 +29,10 @@ def total_sale_employee(employee_id):
             price = order.discount_price
         elif order.total_price:
             price = order.total_price
-        total_price += price * order.quantity
+        total_price += float(price) * float(order.quantity)
     
     for price in apps_checkouts_total:
         if price.total_price is not None:
-            total_price += int(price.total_price)
+            total_price += float(price.total_price)
         
     return total_price
