@@ -1833,8 +1833,15 @@ def create_checkout(request):
                 invoice = invoice,
                 checkout = checkout
             )
-    
 
+    LogDetails.objects.create(
+        log = appointment_logs,
+        appointment_service = service_appointment,
+        start_time = service_appointment.appointment_time,
+        duration = service_appointment.duration,
+        member = service_appointment.member
+        )
+    
     
             
     serialized = CheckoutSerializer(checkout)
