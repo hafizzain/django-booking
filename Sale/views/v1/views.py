@@ -2375,7 +2375,7 @@ def new_create_sale_order(request):
                 client_points.total_amount = earned_amount
 
             else:
-                client_points.total_earn = int(client_points.total_earn) + int(earned_points)
+                client_points.total_earn = float(client_points.total_earn) + float(earned_points)
                 client_points.total_amount = client_points.total_amount + float(earned_amount)
 
                 
