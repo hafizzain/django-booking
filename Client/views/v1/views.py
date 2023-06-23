@@ -3101,9 +3101,12 @@ def get_customer_detailed_loyalty_points(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+    
+    
+    queries = {}
     clients_list = []
     if client_id is not None:
-        clients_list.append(client_id)
+        queries['client_id'] = client_id
 
     customers_points = LoyaltyPointLogs.objects.select_related(
         'location',
@@ -3114,7 +3117,8 @@ def get_customer_detailed_loyalty_points(request):
         location__id = location_id,
         created_at__date__range = (start_date, end_date),
         is_active = True,
-        is_deleted = False
+        is_deleted = False,
+        **queries
     ).order_by('-created_at')
 
     all_loyality_logs_count= customers_points.count()
