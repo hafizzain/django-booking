@@ -1835,11 +1835,11 @@ def create_checkout(request):
             )
 
     LogDetails.objects.create(
-            log = appointment_logs,
-            appointment_service = appointment_service,
-            start_time = appointment_service.appointment_time,
-            duration = appointment_service.duration,
-            member = appointment_service.member
+        log = appointment_logs,
+        appointment_service = service_appointment,
+        start_time = service_appointment.appointment_time,
+        duration = service_appointment.duration,
+        member = service_appointment.member
         )
     
     
