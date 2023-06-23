@@ -2347,10 +2347,13 @@ def new_create_sale_order(request):
         # these_orders = list(these_orders)
         total_price = 0
         for sale_order in these_orders:
+            sale_order_price = 0
             if sale_order.discount_price:
-                total_price += sale_order.discount_price
+                sale_order_price = sale_order.discount_price
             else:
-                total_price += sale_order.total_price
+                sale_order_price = sale_order.total_price
+            
+            total_price += (sale_order_price * sale_order.quantity)
 
         allowed_points = LoyaltyPoints.objects.filter(
             Q(loyaltytype = 'Service') |
