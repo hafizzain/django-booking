@@ -557,8 +557,8 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
         return f'{product_instance.created_at.strftime("%Y-%m-%d")}'
 
     def get_current_stock(self, product_instance):
-        stock = ProductStock.objects.get(product=product_instance, is_deleted=False)#[0]
-        return stock.avaiable_quantity
+        stock = ProductStock.objects.filter(product=product_instance, is_deleted=False)#[0]
+        return ProductInventoryStockSerializer(stock, many = True).data
     
     def get_brand(self, obj):
         try:
@@ -615,3 +615,13 @@ class ProductInsightSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'top_sold_orders']
+
+class ProductInventoryStockSerializer(serializers.ModelSerializer):
+    current_stock = serializers.SerializerMethodField()
+
+    def get_current_stock(self, obj):
+        return obj.available_quantity
+
+    class Meta:
+        model = ProductStock
+        fields = ['current_stock']
