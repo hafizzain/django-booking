@@ -972,6 +972,7 @@ def update_product(request):
     is_active = request.data.get('is_active', None)
     
     currency_retail_price = request.data.get('currency_retail_price', None)
+    check = True
     
     error = []
 
@@ -1076,6 +1077,15 @@ def update_product(request):
     #     stk.delete()
     
     if currency_retail_price is not None:
+        if check == True:
+            vch = CurrencyRetailPrice.objects.filter(product = product_id)
+            check = False
+            for i in vch:
+                try:
+                    voucher = CurrencyRetailPrice.objects.get(id = i.id)
+                    voucher.delete()
+                except:
+                    pass
         if type(currency_retail_price) == str:
             currency_retail_price = currency_retail_price.replace("'" , '"')
             currency_retail_price = json.loads(currency_retail_price)
@@ -1088,31 +1098,31 @@ def update_product(request):
             id = retail.get('id', None)
             price = retail['retail_price']
             
-            if id is not None:
-                try:
-                    currency_retail = CurrencyRetailPrice.objects.get(id=retail['id'])
-                    is_deleted = retail.get('is_deleted', None)
-                    if bool(is_deleted) == True:
-                        currency_retail.delete()
-                        continue
-                    currency_id= Currency.objects.get(id=retail['currency'])
-                    currency_retail.currency = currency_id
-                    currency_retail.retail_price = retail['retail_price']
-                    currency_retail.save()
-                except Exception as err:
-                    error.append(str(err))
-                    print(err)
-            else:
-                currency_id= Currency.objects.get(id=retail['currency'])
-                
-                CurrencyRetailPrice.objects.create(
-                user = user,
-                business = product.business,
-                product = product,
-                currency = currency_id,
-                retail_price =  retail['retail_price'] ,
-                )
+            # if id is not None:
+            #     try:
+            #         currency_retail = CurrencyRetailPrice.objects.get(id=retail['id'])
+            #         is_deleted = retail.get('is_deleted', None)
+            #         if bool(is_deleted) == True:
+            #             currency_retail.delete()
+            #             continue
+            #         currency_id= Currency.objects.get(id=retail['currency'])
+            #         currency_retail.currency = currency_id
+            #         currency_retail.retail_price = retail['retail_price']
+            #         currency_retail.save()
+            #     except Exception as err:
+            #         error.append(str(err))
+            #         print(err)
+            # else:
+            currency_id= Currency.objects.get(id=retail['currency'])
             
+            CurrencyRetailPrice.objects.create(
+            user = user,
+            business = product.business,
+            product = product,
+            currency = currency_id,
+            retail_price =  retail['retail_price'] ,
+            )
+        
                 
 
     location_quantities = request.data.get('location_quantities', None)
