@@ -2341,10 +2341,16 @@ def new_create_sale_order(request):
     if checkout.client :
         these_orders = Order.objects.filter(
             checkout = checkout
-        ).values_list('total_price', flat=True)
+        )
+        # .values_list('total_price', flat=True)
 
-        these_orders = list(these_orders)
-        total_price = sum(these_orders)
+        # these_orders = list(these_orders)
+        total_price = 0
+        for sale_order in these_orders:
+            if sale_order.discount_price:
+                total_price += sale_order.discount_price
+            else:
+                total_price += sale_order.total_price
 
         allowed_points = LoyaltyPoints.objects.filter(
             Q(loyaltytype = 'Service') |
