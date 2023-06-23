@@ -557,7 +557,8 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
         return f'{product_instance.created_at.strftime("%Y-%m-%d")}'
 
     def get_current_stock(self, product_instance):
-        return 0
+        stock = ProductStock.objects.filter(product=product_instance, is_deleted=False)#[0]
+        return ProductStockSerializer(stock, many = True).data
     
     def get_brand(self, obj):
         try:
