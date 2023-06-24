@@ -1846,6 +1846,10 @@ def new_create_sale_order(request):
     
     # start_date = request.data.get('start_date', None)
     # end_date = request.data.get('end_date', None)
+
+    is_loyalty_points_redeemed = request.data.get('is_redeemed', None)
+    loyalty_points_redeemed_id = request.data.get('redeemed_id', None)
+    loyalty_points_redeemed = request.data.get('redeemed_points', None)
      
     tip = request.data.get('tip', [])
     total_price = request.data.get('total_price', None)
@@ -2354,6 +2358,26 @@ def new_create_sale_order(request):
                 sale_order_price = sale_order.total_price
             
             total_price += (sale_order_price * sale_order.quantity)
+        
+        logs_points_redeemed = 0
+        logs_total_redeened_value = 0
+        if all([is_loyalty_points_redeemed, loyalty_points_redeemed_id, loyalty_points_redeemed]):
+            ExceptionRecord.objects.create(text=f'LOYALTY : is_loyalty_points_redeemed : {is_loyalty_points_redeemed} redeemed_id {loyalty_points_redeemed_id} redeemed_points {loyalty_points_redeemed}')
+            try:
+                client_points = ClientLoyaltyPoint.objects.get(id = loyalty_points_redeemed_id)
+            except Exception as err:
+                ExceptionRecord.objects.create(text=f'LOYALTY : {err}')
+                pass
+            else:
+                client_points.points_redeemed = client_points.points_redeemed + float(loyalty_points_redeemed)
+                client_points.save()
+
+
+                single_point_value = client_points.customer_will_get_amount / client_points.for_every_points
+                total_redeened_value = float(single_point_value) * float(loyalty_points_redeemed)
+
+                logs_points_redeemed = loyalty_points_redeemed
+                logs_total_redeened_value = total_redeened_value
 
         allowed_points = LoyaltyPoints.objects.filter(
             Q(loyaltytype = 'Service') |
@@ -2399,9 +2423,9 @@ def new_create_sale_order(request):
                 client_points = client_points,
                 loyalty = point,
                 points_earned = earned_points,
-                points_redeemed = 0,
-                balance = (float(client_points.total_earn) - float(client_points.points_redeemed)),
-                actual_sale_value_redeemed = 0,
+                points_redeemed = logs_points_redeemed,
+                balance = (float(client_points.total_earn) - float(logs_points_redeemed)),
+                actual_sale_value_redeemed = logs_total_redeened_value,
                 invoice = invoice,
                 checkout = checkout
             )
