@@ -2362,7 +2362,6 @@ def new_create_sale_order(request):
         logs_points_redeemed = 0
         logs_total_redeened_value = 0
         if all([is_loyalty_points_redeemed, loyalty_points_redeemed_id, loyalty_points_redeemed]):
-            ExceptionRecord.objects.create(text=f'LOYALTY : is_loyalty_points_redeemed : {is_loyalty_points_redeemed} redeemed_id {loyalty_points_redeemed_id} redeemed_points {loyalty_points_redeemed}')
             try:
                 client_points = ClientLoyaltyPoint.objects.get(id = loyalty_points_redeemed_id)
             except Exception as err:
@@ -2424,7 +2423,7 @@ def new_create_sale_order(request):
                 loyalty = point,
                 points_earned = earned_points,
                 points_redeemed = logs_points_redeemed,
-                balance = (float(client_points.total_earn) - float(logs_points_redeemed)),
+                balance = client_points.total_available_points,
                 actual_sale_value_redeemed = logs_total_redeened_value,
                 invoice = invoice,
                 checkout = checkout
