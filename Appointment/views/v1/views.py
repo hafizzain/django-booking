@@ -1754,7 +1754,6 @@ def create_checkout(request):
         logs_points_redeemed = 0
         logs_total_redeened_value = 0
         if all([is_redeemed, redeemed_id, redeemed_points]):
-            ExceptionRecord.objects.create(text=f'LOYALTY : is_redeemed : {is_redeemed} redeemed_id {redeemed_id} redeemed_points {redeemed_points}')
             try:
                 client_points = ClientLoyaltyPoint.objects.get(id = redeemed_id)
             except Exception as err:
