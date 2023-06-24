@@ -550,13 +550,13 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
     brand = serializers.SerializerMethodField()
     reports = serializers.SerializerMethodField()
 
-    current_stock = serializers.SerializerMethodField()
+    stock = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
 
     def get_created_at(self, product_instance):
         return f'{product_instance.created_at.strftime("%Y-%m-%d")}'
 
-    def get_current_stock(self, product_instance):
+    def get_stock(self, product_instance):
         stock = ProductStock.objects.filter(product=product_instance, is_deleted=False)#[0]
         return ProductInventoryStockSerializer(stock, many = True).data
     
@@ -607,7 +607,7 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
             
     class Meta:
         model = Product
-        fields = ['id', 'name', 'retail_price', 'brand', 'reports', 'current_stock', 'cost_price', 'created_at']
+        fields = ['id', 'name', 'retail_price', 'brand', 'reports', 'stock', 'cost_price', 'created_at']
         #  'avaiable',
 
 
