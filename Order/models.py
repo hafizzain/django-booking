@@ -203,7 +203,7 @@ class ProductOrder(Order):
                         currency = currency
                     )
                     if len(retail_prices) > 0:
-                        retail_price = retail_prices[0]
+                        retail_price = retail_prices[0].retail_price
                         original_price = retail_price
 
                         self.discount_price = self.total_price
@@ -253,8 +253,8 @@ class ServiceOrder(Order):
                         duration = self.duration
                     )
                     if len(prices) > 0:
-                        retail_price = prices[0]
-                        original_price = retail_price
+                        price = prices[0].price
+                        original_price = price
 
                         self.discount_price = self.total_price
                         self.total_price = original_price
