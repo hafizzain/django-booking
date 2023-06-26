@@ -4,9 +4,10 @@ from django.db import models
 from Authentication.models import User
 from Business.models import BusinessAddress
 from Client.models import Client, Membership, Promotion, Rewards, Vouchers
+from Promotions.models import PurchaseDiscount, SpendSomeAmount, FixedPriceService, MentionedNumberService, BundleFixed, RetailAndGetService
 from django.utils.timezone import now
 from Employee.models import Employee
-from Product.models import Product
+from Product.models import Product, CurrencyRetailPrice
 from Service.models import Service
 
 # Create your models here.
@@ -170,6 +171,47 @@ class Order(models.Model):
 
 class ProductOrder(Order):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_orders')
+
+    def save(self, *args, **kwargs):
+        if self.checkout and self.checkout.selected_promotion_type:
+            promotions_types = {
+                'purchase' : PurchaseDiscount,
+                'spendSomeAmount' : SpendSomeAmount,
+                'fixedPrice' : FixedPriceService,
+                'get_free_item_for_other_purchase' : MentionedNumberService,
+                'bundleDiscount' : BundleFixed,
+                'retailPromotion' : RetailAndGetService,
+
+                # 'directFlat' : None,
+                # 'specificCategoryGroup' : None,
+                # 'specificBrandServiceGroup' : None,
+                # 'userRestricted' : None,
+                # 'complimentaryVoucher' : None,
+                # 'packages' : None,
+            }
+
+            promotion_type = promotions_types.get(self.checkout.selected_promotion_type, None)
+            if promotion_type is not None:
+                try:
+                    selected_location = self.location
+                    currency = selected_location.currency
+                except:
+                    pass
+                else:
+                    retail_prices = CurrencyRetailPrice.objects.filter(
+                        product = self,
+                        currency = currency
+                    )
+                    if len(retail_prices) > 0:
+                        retail_price = retail_prices[0]
+                        original_price = retail_price
+
+                        self.discount_price = self.total_price
+                        self.total_price = original_price
+                        self.price = self.total_price
+                        self.discount_percentage = (self.discount_price / self.total_price) * 100
+
+        super(ProductOrder, self).save(*args, **kwargs)
     
     def __str__(self):
         return str(self.id)
