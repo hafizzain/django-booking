@@ -8,7 +8,7 @@ from Promotions.models import PurchaseDiscount, SpendSomeAmount, FixedPriceServi
 from django.utils.timezone import now
 from Employee.models import Employee
 from Product.models import Product, CurrencyRetailPrice
-from Service.models import Service
+from Service.models import Service, PriceService
 
 # Create your models here.
 class Checkout(models.Model):
@@ -219,6 +219,48 @@ class ProductOrder(Order):
 
 class ServiceOrder(Order):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='service_orders')
+
+    def save(self, *args, **kwargs):
+        if self.checkout and self.checkout.selected_promotion_type:
+            promotions_types = {
+                'purchase' : PurchaseDiscount,
+                'spendSomeAmount' : SpendSomeAmount,
+                'fixedPrice' : FixedPriceService,
+                'get_free_item_for_other_purchase' : MentionedNumberService,
+                'bundleDiscount' : BundleFixed,
+                'retailPromotion' : RetailAndGetService,
+
+                # 'directFlat' : None,
+                # 'specificCategoryGroup' : None,
+                # 'specificBrandServiceGroup' : None,
+                # 'userRestricted' : None,
+                # 'complimentaryVoucher' : None,
+                # 'packages' : None,
+            }
+
+            promotion_type = promotions_types.get(self.checkout.selected_promotion_type, None)
+            if promotion_type is not None:
+                try:
+                    selected_location = self.location
+                    currency = selected_location.currency
+                except:
+                    pass
+                else:
+                    prices = PriceService.objects.filter(
+                        service = self,
+                        currency = currency,
+                        duration = self.duration
+                    )
+                    if len(prices) > 0:
+                        retail_price = prices[0]
+                        original_price = retail_price
+
+                        self.discount_price = self.total_price
+                        self.total_price = original_price
+                        self.price = self.total_price
+                        self.discount_percentage = (self.discount_price / self.total_price) * 100
+
+        super(ServiceOrder, self).save(*args, **kwargs)
     
     def __str__(self):
         return str(self.id)
