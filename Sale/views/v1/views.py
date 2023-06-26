@@ -2318,6 +2318,7 @@ def new_create_sale_order(request):
                     tip = 0
                 )
                 employee_commission.sale_id = checkout.id
+                employee_commission.save()
             
 
     

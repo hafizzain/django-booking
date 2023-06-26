@@ -1681,6 +1681,8 @@ def create_checkout(request):
                     quantity = 1,
                     tip = 0
                 )
+                employee_commission.sale_id = checkout.id
+                employee_commission.save()
             
     # if gst is None:
     #     gst = 0
@@ -1720,8 +1722,7 @@ def create_checkout(request):
         service_commission = float(service_commission),
         service_commission_type = service_commission_type,        
     )
-    employee_commission.sale_id = checkout.id
-    employee_commission.save()
+    
     invoice = SaleInvoice.objects.create(
         appointment = appointments,
         appointment_service = service_appointment,
