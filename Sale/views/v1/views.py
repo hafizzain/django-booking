@@ -2299,7 +2299,7 @@ def new_create_sale_order(request):
                 commission = sale_commissions[0]
 
                 calculated_commission = commission.calculated_commission(total_from_value)
-                EmployeeCommission.objects.create(
+                employee_commission = EmployeeCommission.objects.create(
                     user = request.user,
                     business = business_address.business,
                     location = business_address,
@@ -2317,6 +2317,7 @@ def new_create_sale_order(request):
                     quantity = quantity,
                     tip = 0
                 )
+                employee_commission.sale_id = checkout.id
             
 
     

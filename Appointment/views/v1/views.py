@@ -1720,6 +1720,8 @@ def create_checkout(request):
         service_commission = float(service_commission),
         service_commission_type = service_commission_type,        
     )
+    employee_commission.sale_id = checkout.id
+    employee_commission.save()
     invoice = SaleInvoice.objects.create(
         appointment = appointments,
         appointment_service = service_appointment,

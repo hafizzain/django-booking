@@ -1093,5 +1093,5 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EmployeeCommission
-        fields = ['id', 'location', 'employee', 'order_type', 'commission_rate', 'commission', 'created_at', 'sale']
+        fields = ['id', 'location', 'employee', 'order_type', 'commission_rate', 'commission', 'created_at', 'sale', 'sale_id']
         #  'location', 'commission_rate',
