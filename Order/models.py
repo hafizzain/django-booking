@@ -199,7 +199,7 @@ class ProductOrder(Order):
                     pass
                 else:
                     retail_prices = CurrencyRetailPrice.objects.filter(
-                        product = self,
+                        product = self.product,
                         currency = currency
                     )
                     if len(retail_prices) > 0:
@@ -248,7 +248,7 @@ class ServiceOrder(Order):
                     pass
                 else:
                     prices = PriceService.objects.filter(
-                        service = self,
+                        service = self.service,
                         currency = currency,
                         duration = self.duration
                     )
