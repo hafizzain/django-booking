@@ -239,27 +239,27 @@ class ServiceOrder(Order):
                 # 'packages' : None,
             }
 
-            promotion_type = promotions_types.get(self.checkout.selected_promotion_type, None)
-            if promotion_type is not None:
-                try:
-                    selected_location = self.location
-                    currency = selected_location.currency
-                except:
-                    pass
-                else:
-                    prices = PriceService.objects.filter(
-                        service = self.service,
-                        currency = currency,
-                        duration = self.duration
-                    )
-                    if len(prices) > 0:
-                        price = prices[0].price
-                        original_price = price
+            # promotion_type = promotions_types.get(self.checkout.selected_promotion_type, None)
+            # if promotion_type is not None:
+            #     try:
+            #         selected_location = self.location
+            #         currency = selected_location.currency
+            #     except:
+            #         pass
+            #     else:
+            #         prices = PriceService.objects.filter(
+            #             service = self.service,
+            #             currency = currency,
+            #             duration = self.duration
+            #         )
+            #         if len(prices) > 0:
+            #             price = prices[0].price
+            #             original_price = price
 
-                        self.discount_price = self.total_price
-                        self.total_price = original_price
-                        self.price = self.total_price
-                        self.discount_percentage = (self.discount_price / self.total_price) * 100
+            #             self.discount_price = self.total_price
+            #             self.total_price = original_price
+            #             self.price = self.total_price
+            #             self.discount_percentage = (self.discount_price / self.total_price) * 100
 
         super(ServiceOrder, self).save(*args, **kwargs)
     
