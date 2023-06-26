@@ -175,12 +175,12 @@ class ProductOrder(Order):
     def save(self, *args, **kwargs):
         if self.checkout and self.checkout.selected_promotion_type:
             promotions_types = {
-                'purchase' : PurchaseDiscount,
-                'spendSomeAmount' : SpendSomeAmount,
-                'fixedPrice' : FixedPriceService,
-                'get_free_item_for_other_purchase' : MentionedNumberService,
-                'bundleDiscount' : BundleFixed,
-                'retailPromotion' : RetailAndGetService,
+                'Purchase Discount' : PurchaseDiscount,
+                'Spend_Some_Amount' : SpendSomeAmount,
+                'Fixed_Price_Service' : FixedPriceService,
+                'Mentioned_Number_Service' : MentionedNumberService,
+                'Bundle_Fixed_Service' : BundleFixed,
+                'Retail_and_Get_Service' : RetailAndGetService,
 
                 # 'directFlat' : None,
                 # 'specificCategoryGroup' : None,
@@ -223,12 +223,13 @@ class ServiceOrder(Order):
     def save(self, *args, **kwargs):
         if self.checkout and self.checkout.selected_promotion_type:
             promotions_types = {
-                'purchase' : PurchaseDiscount,
-                'spendSomeAmount' : SpendSomeAmount,
-                'fixedPrice' : FixedPriceService,
-                'get_free_item_for_other_purchase' : MentionedNumberService,
-                'bundleDiscount' : BundleFixed,
-                'retailPromotion' : RetailAndGetService,
+                'Purchase Discount' : PurchaseDiscount,
+                'Spend_Some_Amount' : SpendSomeAmount,
+                'Fixed_Price_Service' : FixedPriceService,
+                'Mentioned_Number_Service' : MentionedNumberService,
+                'Bundle_Fixed_Service' : BundleFixed,
+                'Retail_and_Get_Service' : RetailAndGetService,
+
 
                 # 'directFlat' : None,
                 # 'specificCategoryGroup' : None,
