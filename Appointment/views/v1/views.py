@@ -1625,6 +1625,8 @@ def create_checkout(request):
 
     elif type(appointment_service_obj) == list:
         pass
+
+    empl_commissions_instances = []
     for app in appointment_service_obj:
         active_user_staff = None
         try:
@@ -1681,8 +1683,7 @@ def create_checkout(request):
                     quantity = 1,
                     tip = 0
                 )
-                employee_commission.sale_id = checkout.id
-                employee_commission.save()
+                empl_commissions_instances.append(employee_commission)
             
     # if gst is None:
     #     gst = 0
@@ -1722,6 +1723,12 @@ def create_checkout(request):
         service_commission = float(service_commission),
         service_commission_type = service_commission_type,        
     )
+
+    for i_employee_commission in empl_commissions_instances:
+        i_employee_commission.sale_id = checkout.id
+        i_employee_commission.save()
+
+
     
     invoice = SaleInvoice.objects.create(
         appointment = appointments,
