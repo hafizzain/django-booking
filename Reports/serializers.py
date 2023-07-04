@@ -975,7 +975,17 @@ class ServiceGroupReport(serializers.ModelSerializer):
                 created_at__month = month,
                 location__id = location
             )
-            return len(services_orders)
+
+            for order in services_orders:
+
+                price = 0
+                if order.discount_price:
+                    price = order.discount_price
+                else:
+                    price = order.total_price
+                ser_target += float(price) * float(order.quantity)
+
+            return ser_target
         except Exception as err:
             return str(err)
     class Meta:
