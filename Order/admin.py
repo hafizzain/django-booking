@@ -5,15 +5,20 @@ from Order.models import Order, ProductOrder, ServiceOrder , MemberShipOrder ,Vo
 admin.site.register(ProductOrder)
 @admin.register(ServiceOrder)
 class ServiceOrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 
-                    'location',
-                    'quantity',
-                    'total_price',
-                    'sold_quantity',
-                    'discount_price',
-                    'price',
-                    'updated_at',
-                    ]
+    list_filter = [
+        'location',
+        'created_at',
+    ]
+    list_display = [
+        'id', 
+        'location',
+        'quantity',
+        'total_price',
+        'sold_quantity',
+        'discount_price',
+        'price',
+        'created_at',
+    ]
 
 admin.site.register(MemberShipOrder)
 
