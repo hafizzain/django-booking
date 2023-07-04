@@ -59,7 +59,11 @@ class ServiceReportSerializer(serializers.ModelSerializer):
             data.extend(serialized.data)
             
             
-            appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')
+            appointment_checkout = AppointmentCheckout.objects.filter(
+                # appointment_service__appointment_status = 'Done',
+                appointment__appointment_services__appointment_status = 'Done',
+                appointment__appointment_services__service = obj,
+            )
             serialized = AppointmentCheckoutReportSerializer(appointment_checkout, many = True)
             data.extend(serialized.data)
             
