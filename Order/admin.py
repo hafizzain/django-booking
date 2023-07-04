@@ -1,5 +1,6 @@
 from django.contrib import admin 
 from Order.models import Order, ProductOrder, ServiceOrder , MemberShipOrder ,VoucherOrder, Checkout , CheckoutPayment
+from Service.models import ServiceGroup
 
 # Register your models here.
 admin.site.register(ProductOrder)
@@ -13,7 +14,7 @@ class ServiceOrderAdmin(admin.ModelAdmin):
     list_display = [
         'id', 
         'location',
-        'service',
+        'service_group_name',
         'quantity',
         'total_price',
         'sold_quantity',
@@ -21,6 +22,15 @@ class ServiceOrderAdmin(admin.ModelAdmin):
         'price',
         'created_at',
     ]
+
+    def service_group_name(self, service):
+        groups = ServiceGroup.objects.filter(
+            services = service.service
+        )
+
+        if len(groups) > 0:
+            return groups[0].name
+
 
 admin.site.register(MemberShipOrder)
 
