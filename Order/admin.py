@@ -7,11 +7,13 @@ admin.site.register(ProductOrder)
 class ServiceOrderAdmin(admin.ModelAdmin):
     list_filter = [
         'location__address_name',
+        'service__name',
         'created_at',
     ]
     list_display = [
         'id', 
         'location',
+        'service',
         'quantity',
         'total_price',
         'sold_quantity',
