@@ -3,7 +3,18 @@ from Order.models import Order, ProductOrder, ServiceOrder , MemberShipOrder ,Vo
 
 # Register your models here.
 admin.site.register(ProductOrder)
-admin.site.register(ServiceOrder)
+@admin.register(ServiceOrder)
+class ServiceOrderAdmin(admin.ModelAdmin):
+    list_display = ['id', 
+                    'location',
+                    'quantity',
+                    'total_price',
+                    'sold_quantity',
+                    'discount_price',
+                    'price',
+                    'updated_at',
+                    ]
+
 admin.site.register(MemberShipOrder)
 
 
