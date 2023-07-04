@@ -6,7 +6,7 @@ admin.site.register(ProductOrder)
 @admin.register(ServiceOrder)
 class ServiceOrderAdmin(admin.ModelAdmin):
     list_filter = [
-        'location',
+        'location__address_name',
         'created_at',
     ]
     list_display = [
