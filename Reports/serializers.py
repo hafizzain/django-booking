@@ -7,7 +7,7 @@ from Appointment.serializers import LocationSerializer
 from Business.models import BusinessAddress
 from Employee.models import Employee, EmployeeCommission
 from Product.Constants.index import tenant_media_base_url
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.db.models.functions import Coalesce
 
 from Order.models import MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
@@ -988,6 +988,22 @@ class ServiceGroupReport(serializers.ModelSerializer):
                 else:
                     price = order.total_price
                 ser_target += float(price) * float(order.quantity)
+            
+            appointment_services = AppointmentService.objects.filter(
+                # appointment_service__appointment_status = 'Done',
+                Q(appointment_services__appointment_status = 'Done') |
+                Q(appointment_services__appointment_status = 'Paid'),
+                appointment_services__service__id__in = services_ids,
+            )
+
+            for app_order in appointment_services:
+                price = 0
+                if app_order.discount_price:
+                    price = app_order.discount_price
+                else:
+                    price = app_order.total_price
+                ser_target += float(price)
+
 
             return ser_target
         except Exception as err:
