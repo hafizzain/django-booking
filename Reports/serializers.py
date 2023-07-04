@@ -918,6 +918,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
     # service_sale_price = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
     service_target = serializers.SerializerMethodField(read_only=True)
+    total_service_target = serializers.SerializerMethodField(read_only=True)
     # services_sales = serializers.SerializerMethodField(read_only=True)
     # appointment_sales = serializers.SerializerMethodField(read_only=True)
     # total_service_sales = serializers.SerializerMethodField(read_only=True)
@@ -958,9 +959,30 @@ class ServiceGroupReport(serializers.ModelSerializer):
             
         except Exception as err:
             return str(err)        
+
+    def get_total_service_target(self, obj):
+        try:
+            month = self.context["month"]
+            year = self.context["year"]
+            location = self.context["location"]
+            ser_target = 0
+                        
+            service_target = ServiceTarget.objects.filter(
+                service_group = obj,
+                created_at__year = year,
+                created_at__month = month,
+                location__id =  location,
+            )
+            for ord  in service_target:
+                ser_target += float(ord.service_target)            
+
+            return ser_target
+            
+        except Exception as err:
+            return str(err)        
     class Meta:
         model = ServiceGroup
-        fields = ['id','name','service','service_target']
+        fields = ['id','name','service','service_target', 'total_service_target']
         
 class ReportBrandSerializer(serializers.ModelSerializer): 
     product_sale_price = serializers.SerializerMethodField(read_only=True)
