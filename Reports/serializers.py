@@ -991,9 +991,9 @@ class ServiceGroupReport(serializers.ModelSerializer):
             
             appointment_services = AppointmentService.objects.filter(
                 # appointment_service__appointment_status = 'Done',
-                Q(appointment_services__appointment_status = 'Done') |
-                Q(appointment_services__appointment_status = 'Paid'),
-                appointment_services__service__id__in = services_ids,
+                Q(appointment_status = 'Done') |
+                Q(appointment_status = 'Paid'),
+                service__id__in = services_ids,
             )
 
             for app_order in appointment_services:
