@@ -26,7 +26,7 @@ class ServiceOrderSerializer(serializers.ModelSerializer):
         return LocationSerializer(loc ).data
     class Meta:
         model = ServiceOrder
-        fields = ('total_price', 'sold_quantity','current_price', 'location','created_at')
+        fields = ('total_price', 'sold_quantity','current_price', 'location','created_at', 'discount_price', 'quantity')
         
 class AppointmentCheckoutReportSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
