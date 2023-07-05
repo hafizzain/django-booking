@@ -2468,6 +2468,7 @@ def new_create_sale_order(request):
             client = checkout.client,
             location = checkout.location,
         )
+        DiscountPromotionSalesReport.save()
 
     serialized = CheckoutSerializer(checkout, context = {'request' : request, })
     
