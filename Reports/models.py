@@ -9,6 +9,7 @@ from Sale.Constants.Promotion import get_promotions
 from Order.models import Checkout, Order, ServiceOrder, ProductOrder
 from Appointment.models import AppointmentCheckout
 from Service.models import PriceService
+from Product.models import CurrencyRetailPrice
 # Create your models here.
 
 
@@ -86,13 +87,22 @@ class DiscountPromotionSalesReport(models.Model):
                             item = ProductOrder.objects.get(id = order.id)
                         except:
                             pass
+                        else:
+                            retail_prices = CurrencyRetailPrice.objects.filter(
+                                product = item.product,
+                                currency = self.location.currency
+                            ).order_by('created_at')
+                            if len(retail_prices) > 0:
+                                retail_price = retail_prices[0].retail_price
+                                discounted_prices += float(retail_price) * float(order.quantity)
+                                original_prices += float(retail_price) * float(order.quantity)
+
                     else:
                         service_prices = PriceService.objects.filter(service = item.service, duration = item.duration, currency = self.location.currency)
                         if len(service_prices) > 0:
                             service_price = service_prices[0].price
                             discounted_prices += float(service_price) * float(order.quantity)
                             original_prices += float(service_price) * float(order.quantity)
-                            
             discounted_prices = original_prices - discounted_prices
                 
 
