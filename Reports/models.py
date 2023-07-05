@@ -13,6 +13,50 @@ from Product.models import CurrencyRetailPrice
 # Create your models here.
 
 
+
+def get_ItemPrice(this_instance, orders):
+    o1 = 0
+    d1 = 0
+    d2 = 0
+    f1 = 0
+
+    for order in orders:
+        price = order.discount_price or order.total_price
+        
+        if price > 0:
+            if order.discount_price:
+                d1 += float(order.discount_price) * float(order.quantity)
+                d2 += float(order.total_price) * float(order.quantity)
+
+            o1 += float(order.total_price) * float(order.quantity)
+        else:
+            try:
+                item = ServiceOrder.objects.get(id = order.id)
+            except:
+                try:
+                    item = ProductOrder.objects.get(id = order.id)
+                except:
+                    pass
+                else:
+                    retail_prices = CurrencyRetailPrice.objects.filter(
+                        product = item.product,
+                        currency = this_instance.location.currency
+                    ).order_by('created_at')
+                    if len(retail_prices) > 0:
+                        retail_price = retail_prices[0].retail_price
+                        f1 += float(retail_price) * float(order.quantity)
+                        o1 += float(retail_price) * float(order.quantity)
+
+            else:
+                service_prices = PriceService.objects.filter(service = item.service, duration = item.duration, currency = this_instance.location.currency)
+                if len(service_prices) > 0:
+                    service_price = service_prices[0].price
+                    f1 += float(service_price) * float(order.quantity)
+                    o1 += float(service_price) * float(order.quantity)
+
+    discounted_prices = d1 + (o1 - d2 - f1)
+    return [o1, discounted_prices]
+
 class DiscountPromotionSalesReport(models.Model):
 
     CHECKOUT_TYPES = (
@@ -68,41 +112,10 @@ class DiscountPromotionSalesReport(models.Model):
 
             
         if self.promotion_type == 'Purchase Discount':
-            for order in orders:
-                pass
+            original_prices, discounted_prices = get_ItemPrice(self, orders)
+
         elif self.promotion_type == 'Spend_Some_Amount':
-            for order in orders:
-                price = order.discount_price or order.total_price
-                
-                if price > 0:
-                    if order.discount_price:
-                        discounted_prices += float(order.discount_price) * float(order.quantity)
-
-                    original_prices += float(order.total_price) * float(order.quantity)
-                else:
-                    try:
-                        item = ServiceOrder.objects.get(id = order.id)
-                    except:
-                        try:
-                            item = ProductOrder.objects.get(id = order.id)
-                        except:
-                            pass
-                        else:
-                            retail_prices = CurrencyRetailPrice.objects.filter(
-                                product = item.product,
-                                currency = self.location.currency
-                            ).order_by('created_at')
-                            if len(retail_prices) > 0:
-                                retail_price = retail_prices[0].retail_price
-                                discounted_prices += float(retail_price) * float(order.quantity)
-                                original_prices += float(retail_price) * float(order.quantity)
-
-                    else:
-                        service_prices = PriceService.objects.filter(service = item.service, duration = item.duration, currency = self.location.currency)
-                        if len(service_prices) > 0:
-                            service_price = service_prices[0].price
-                            discounted_prices += float(service_price) * float(order.quantity)
-                            original_prices += float(service_price) * float(order.quantity)
+            original_prices, discounted_prices = get_ItemPrice(self, orders)
             discounted_prices = original_prices - discounted_prices
                 
 
