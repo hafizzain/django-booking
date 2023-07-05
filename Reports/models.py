@@ -6,9 +6,9 @@ from Client.models import Client
 from Business.models import BusinessAddress
 from Invoices.models import SaleInvoice
 from Sale.Constants.Promotion import get_promotions
-from Order.models import Checkout, Order
+from Order.models import Checkout, Order, ServiceOrder, ProductOrder
 from Appointment.models import AppointmentCheckout
-
+from Service.models import PriceService
 # Create your models here.
 
 
@@ -65,18 +65,57 @@ class DiscountPromotionSalesReport(models.Model):
             checkout__id = self.checkout_id
         )
 
-        for order in orders:
-            if order.discount_price:
-                discounted_prices += float(order.discount_price) * float(order.quantity)
+            
+        if self.promotion_type == 'Purchase Discount':
+            for order in orders:
+                pass
+        elif self.promotion_type == 'Spend_Some_Amount':
+            for order in orders:
+                price = order.discount_price or order.total_price
+                
+                if price > 0:
+                    if order.discount_price:
+                        discounted_prices += float(order.discount_price) * float(order.quantity)
 
-            original_prices += float(order.total_price) * float(order.quantity)
+                    original_prices += float(order.total_price) * float(order.quantity)
+                else:
+                    try:
+                        item = ServiceOrder.objects.get(id = order.id)
+                    except:
+                        try:
+                            item = ProductOrder.objects.get(id = order.id)
+                        except:
+                            pass
+                    else:
+                        service_prices = PriceService.objects.filter(service = item, duration = '30_Min', currency = self.location.currency)
+                        if len(service_prices) > 0:
+                            service_price = service_prices[0].price
+                            discounted_prices += float(service_price) * float(order.quantity)
+                
+
+                    
+
+
+        elif self.promotion_type == 'Fixed_Price_Service':
+            pass
+        elif self.promotion_type == 'Mentioned_Number_Service':
+            pass
+        elif self.promotion_type == 'Bundle_Fixed_Service':
+            pass
+        elif self.promotion_type == 'Retail_and_Get_Service':
+            pass
+        else:
+            for order in orders:
+                if order.discount_price:
+                    discounted_prices += float(order.discount_price) * float(order.quantity)
+                original_prices += float(order.total_price) * float(order.quantity)
 
         return {
             'original_prices' : original_prices,
             'discounted_prices' : discounted_prices,
         }
     
-    def assign_gst_price(self):
+    def set_gst_price(self):
         if self.checkout_type == 'Sale':
             checkout = Checkout.objects.get(id = self.checkout_id)
             self.gst = checkout.tax_amount
@@ -96,7 +135,7 @@ class DiscountPromotionSalesReport(models.Model):
                 self.promotion_name = promotion['promotion_name']
 
         if not self.gst:
-            self.assign_gst_price()
+            self.set_gst_price()
 
         if not self.original_price:
             if self.checkout_type == 'Sale':
