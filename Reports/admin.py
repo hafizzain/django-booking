@@ -5,6 +5,9 @@ from .models import DiscountPromotionSalesReport
 
 @admin.register(DiscountPromotionSalesReport)
 class DiscountPromotionSalesReportAdmin(admin.ModelAdmin):
+    list_filter = [
+        'location__address_name'
+    ]
     list_display = [
         'id',
         'checkout_type',
@@ -16,4 +19,6 @@ class DiscountPromotionSalesReportAdmin(admin.ModelAdmin):
         'gst',
         'original_price',
         'discount_price',
+        'is_deleted',
+        'is_active'
     ]
