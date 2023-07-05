@@ -2458,7 +2458,7 @@ def new_create_sale_order(request):
         # membership_service
 
     if checkout.is_promotion:
-        DiscountPromotionSalesReport(
+        disc_sale = DiscountPromotionSalesReport(
             checkout_id = checkout.id,
             checkout_type = 'Sale',
             invoice = invoice,
@@ -2468,7 +2468,7 @@ def new_create_sale_order(request):
             client = checkout.client,
             location = checkout.location,
         )
-        DiscountPromotionSalesReport.save()
+        disc_sale.save()
 
     serialized = CheckoutSerializer(checkout, context = {'request' : request, })
     
