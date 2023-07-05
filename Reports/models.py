@@ -103,11 +103,13 @@ class DiscountPromotionSalesReport(models.Model):
                 prices = self.get_sale_prices()
             elif self.checkout_type == 'Appointment':
                 prices = self.get_appointment_prices()
-                
+
             else:
                 prices = {'original_prices' : 0, 'discounted_prices' : 0}
             
             self.original_price = prices.get('original_prices', 0)
             self.discount_price = prices.get('discounted_prices', 0)
+        
+        self.is_active = True
 
         super(DiscountPromotionSalesReport, self).save(*args, **kwargs)
