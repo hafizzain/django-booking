@@ -91,6 +91,9 @@ class DiscountPromotionSalesReport(models.Model):
                         if len(service_prices) > 0:
                             service_price = service_prices[0].price
                             discounted_prices += float(service_price) * float(order.quantity)
+                            original_prices += float(service_price) * float(order.quantity)
+                            
+            discounted_prices = original_prices - discounted_prices
                 
 
                     
