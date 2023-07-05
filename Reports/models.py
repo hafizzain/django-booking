@@ -116,19 +116,19 @@ class DiscountPromotionSalesReport(models.Model):
 
         elif self.promotion_type == 'Spend_Some_Amount':
             original_prices, discounted_prices = get_ItemPrice(self, orders)
-                
-
-                    
-
 
         elif self.promotion_type == 'Fixed_Price_Service':
-            pass
+            original_prices, discounted_prices = get_ItemPrice(self, orders)
+
         elif self.promotion_type == 'Mentioned_Number_Service':
             original_prices, discounted_prices = get_ItemPrice(self, orders)
+
         elif self.promotion_type == 'Bundle_Fixed_Service':
-            pass
+            original_prices, discounted_prices = get_ItemPrice(self, orders)
+
         elif self.promotion_type == 'Retail_and_Get_Service':
             pass
+
         else:
             for order in orders:
                 if order.discount_price:
