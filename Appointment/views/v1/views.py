@@ -1763,7 +1763,7 @@ def create_checkout(request):
     except:
         pass
 
-    if checkout.appointment.is_promotion
+    if checkout.appointment.is_promotion:
         disc_sale = DiscountPromotionSalesReport(
             checkout_id = checkout.id,
             checkout_type = 'Appointment',
