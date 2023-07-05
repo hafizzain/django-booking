@@ -45,6 +45,7 @@ from django_tenants.utils import tenant_context
 from Utility.models import ExceptionRecord
 from django.db.models import Prefetch
 from Invoices.models import SaleInvoice
+from Reports.models import DiscountPromotionSalesReport
 
 
 @api_view(['GET'])
@@ -1758,6 +1759,19 @@ def create_checkout(request):
         invoice.selected_promotion_type = request.data.get('selected_promotion_type', '')
         invoice.checkout = checkout
         invoice.save()
+
+        if checkout.is_promotion:
+            disc_sale = DiscountPromotionSalesReport(
+                checkout_id = checkout.id,
+                checkout_type = 'Appointment',
+                invoice = invoice,
+                promotion_id = checkout.selected_promotion_id,
+                promotion_type = checkout.selected_promotion_type,
+                user = checkout.appointment.user,
+                client = checkout.appointment.client,
+                location = checkout.business_address,
+            )
+            disc_sale.save()
 
 
     if appointments.client:
