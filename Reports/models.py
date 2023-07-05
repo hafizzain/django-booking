@@ -73,7 +73,7 @@ def get_Appointment_ItemPrice(this_instance, orders):
 
             o1 += float(order.total_price)
         else:
-            service_prices = PriceService.objects.filter(service = order.service, duration = order.duration, currency = this_instance.business_address.currency)
+            service_prices = PriceService.objects.filter(service = order.service, duration = order.duration, currency = this_instance.location.currency)
             if len(service_prices) > 0:
                 service_price = service_prices[0].price
                 f1 += float(service_price)
@@ -123,7 +123,7 @@ def get_Appointment_fixed_prices(this_instance, orders):
         
         discounted_prices += float(order.total_price)
        
-        service_prices = PriceService.objects.filter(service = order.service, duration = order.duration, currency = this_instance.business_address.currency)
+        service_prices = PriceService.objects.filter(service = order.service, duration = order.duration, currency = this_instance.location.currency)
         if len(service_prices) > 0:
             service_price = service_prices[0].price
             original_price += float(service_price)
