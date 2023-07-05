@@ -16,7 +16,7 @@ class DiscountPromotionSalesReport(models.Model):
         ('Appointment', 'Appointment')
     )
 
-    id = models.UUIDField(default=uuid4, unique=True, editable=False)
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
 
     checkout_id = models.CharField(max_length=900, default='')
     checkout_type = models.CharField(max_length=20, default='Sale', choices=CHECKOUT_TYPES)
