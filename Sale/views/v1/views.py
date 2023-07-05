@@ -35,6 +35,7 @@ from rest_framework.pagination import PageNumberPagination
 from django.core.paginator import Paginator
 from Invoices.models import SaleInvoice
 from datetime import datetime as dt
+from Reports.models import DiscountPromotionSalesReport
 
 # @api_view(['GET'])
 # @permission_classes([IsAuthenticated])
@@ -2455,6 +2456,18 @@ def new_create_sale_order(request):
         # redeemed_membership_id
         # membership_product
         # membership_service
+
+    if checkout.is_promotion:
+        DiscountPromotionSalesReport(
+            checkout_id = checkout.id,
+            checkout_type = 'Sale',
+            invoice = invoice,
+            promotion_id = checkout.selected_promotion_id,
+            promotion_type = checkout.selected_promotion_type,
+            user = checkout.user,
+            client = checkout.client,
+            location = checkout.location,
+        )
 
     serialized = CheckoutSerializer(checkout, context = {'request' : request, })
     
