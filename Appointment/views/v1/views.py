@@ -1749,29 +1749,28 @@ def create_checkout(request):
     # checkout.business_address = service_appointment.business_address
     # checkout.save()
 
-    if is_promotion_availed:
+    if checkout.appointment.is_promotion:
         checkout.is_promotion = True
-        checkout.selected_promotion_id = request.data.get('selected_promotion_id', '')
-        checkout.selected_promotion_type = request.data.get('selected_promotion_type', '')
+        checkout.selected_promotion_id = checkout.appointment.selected_promotion_id
+        checkout.selected_promotion_type = checkout.appointment.selected_promotion_type
         checkout.save()
         invoice.is_promotion = True
-        invoice.selected_promotion_id = request.data.get('selected_promotion_id', '')
-        invoice.selected_promotion_type = request.data.get('selected_promotion_type', '')
+        invoice.selected_promotion_id = checkout.appointment.selected_promotion_id
+        invoice.selected_promotion_type = checkout.appointment.selected_promotion_type
         invoice.checkout = checkout
         invoice.save()
 
-        if checkout.is_promotion:
-            disc_sale = DiscountPromotionSalesReport(
-                checkout_id = checkout.id,
-                checkout_type = 'Appointment',
-                invoice = invoice,
-                promotion_id = checkout.selected_promotion_id,
-                promotion_type = checkout.selected_promotion_type,
-                user = checkout.appointment.user,
-                client = checkout.appointment.client,
-                location = checkout.business_address,
-            )
-            disc_sale.save()
+        disc_sale = DiscountPromotionSalesReport(
+            checkout_id = checkout.id,
+            checkout_type = 'Appointment',
+            invoice = invoice,
+            promotion_id = checkout.appointment.selected_promotion_id,
+            promotion_type = checkout.appointment.selected_promotion_type,
+            user = checkout.appointment.user,
+            client = checkout.appointment.client,
+            location = checkout.business_address,
+        )
+        disc_sale.save()
 
 
     if appointments.client:
