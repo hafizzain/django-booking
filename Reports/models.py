@@ -46,6 +46,6 @@ class DiscountPromotionSalesReport(models.Model):
 
     
     def save(self, *args, **kwargs):
-        if not original_price:
+        if not self.original_price:
             pass
         super(DiscountPromotionSalesReport, self).save(*args, **kwargs)
