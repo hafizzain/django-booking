@@ -1749,17 +1749,21 @@ def create_checkout(request):
     # checkout.business_address = service_appointment.business_address
     # checkout.save()
 
-    if checkout.appointment.is_promotion:
-        checkout.is_promotion = True
-        checkout.selected_promotion_id = checkout.appointment.selected_promotion_id
-        checkout.selected_promotion_type = checkout.appointment.selected_promotion_type
-        checkout.save()
-        invoice.is_promotion = True
-        invoice.selected_promotion_id = checkout.appointment.selected_promotion_id
-        invoice.selected_promotion_type = checkout.appointment.selected_promotion_type
-        invoice.checkout = checkout
-        invoice.save()
+    try:
+        if checkout.appointment.is_promotion:
+            checkout.is_promotion = True
+            checkout.selected_promotion_id = checkout.appointment.selected_promotion_id
+            checkout.selected_promotion_type = checkout.appointment.selected_promotion_type
+            checkout.save()
+            invoice.is_promotion = True
+            invoice.selected_promotion_id = checkout.appointment.selected_promotion_id
+            invoice.selected_promotion_type = checkout.appointment.selected_promotion_type
+            invoice.checkout = checkout
+            invoice.save()
+    except:
+        pass
 
+    if checkout.appointment.is_promotion
         disc_sale = DiscountPromotionSalesReport(
             checkout_id = checkout.id,
             checkout_type = 'Appointment',
