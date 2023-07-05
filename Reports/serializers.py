@@ -1100,6 +1100,7 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
     order_type  = serializers.SerializerMethodField(read_only=True)
     commission  = serializers.SerializerMethodField(read_only=True)
     commission_rate  = serializers.SerializerMethodField(read_only=True)
+    tip  = serializers.SerializerMethodField(read_only=True)
 
 
     def get_employee(self, commission_instance):
@@ -1144,6 +1145,12 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
             "tip": commission_instance.tip,
             "client": ""
         }
+    
+    def get_tip(self, commission_instance):
+        # tips = AppointmentEmployeeTip.objects.filter(checkout=obj)
+        # serialized_tips = CheckoutTipsSerializer(tips, many=True).data
+        # return serialized_tips
+        return 'none'
 
 
     class Meta:
