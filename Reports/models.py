@@ -116,7 +116,6 @@ class DiscountPromotionSalesReport(models.Model):
 
         elif self.promotion_type == 'Spend_Some_Amount':
             original_prices, discounted_prices = get_ItemPrice(self, orders)
-            discounted_prices = original_prices - discounted_prices
                 
 
                     
