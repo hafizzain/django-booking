@@ -2,7 +2,7 @@ from datetime import date, datetime
 from Product.models import Brand
 from Utility.models import ExceptionRecord
 from rest_framework import serializers
-from Appointment.models import AppointmentCheckout, AppointmentService
+from Appointment.models import AppointmentCheckout, AppointmentService, AppointmentEmployeeTip
 from Appointment.serializers import LocationSerializer
 from Business.models import BusinessAddress
 from Employee.models import Employee, EmployeeCommission
@@ -11,11 +11,13 @@ from django.db.models import Sum, Q
 from django.db.models.functions import Coalesce
 
 from Order.models import MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
-from Sale.serializers import ProductOrderSerializer
+from Sale.serializers import ProductOrderSerializer, SaleOrder_ProductSerializer, SaleOrder_ServiceSerializer, CheckoutTipsSerializer, SaleOrder_MemberShipSerializer, SaleOrder_VoucherSerializer, ClientSerializer
 from Service.models import Service, ServiceGroup
 from TragetControl.models import RetailTarget, ServiceTarget, StaffTarget, StoreTarget, TierStoreTarget
 from TragetControl.serializers import RetailTargetSerializers, StaffTargetSerializers, StoreTargetSerializers, TierStoreTargetSerializers
 from Utility.Constants.Data.months import MONTH_DICT
+from .models import DiscountPromotionSalesReport
+from Invoices.models import SaleInvoice
 
 
 class ServiceOrderSerializer(serializers.ModelSerializer):
@@ -1148,3 +1150,153 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
         model = EmployeeCommission
         fields = ['id', 'location', 'employee', 'order_type', 'commission_rate', 'commission', 'created_at', 'sale', 'sale_id']
         #  'location', 'commission_rate',
+
+
+class DiscountPromotion_SaleInvoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SaleInvoice
+        fields = '__all__'
+
+class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
+    promotion = serializers.SerializerMethodField(read_only=True)
+    invoice = serializers.SerializerMethodField(read_only=True)
+    discounted_price = serializers.SerializerMethodField(read_only=True)
+    location = LocationSerializer(read_only=True)
+
+    product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
+    service  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
+    membership  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
+    voucher  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
+    
+    client = ClientSerializer()
+
+    ids = serializers.SerializerMethodField(read_only=True)
+    membership_product = serializers.SerializerMethodField(read_only=True)
+    membership_service = serializers.SerializerMethodField(read_only=True)
+    
+    tip = serializers.SerializerMethodField(read_only=True)
+        
+    def get_membership(self, obj):
+        
+        check = MemberShipOrder.objects.only(
+            'id',
+            'membership',
+            'current_price',
+            'quantity',
+        ).select_related(
+            'membership',
+        ).filter(
+            checkout__id = obj.checkout_id
+        )
+        return SaleOrder_MemberShipSerializer(check, many = True ).data
+
+
+    def get_voucher(self, obj):
+        
+        check = VoucherOrder.objects.only(
+            'id',
+            'voucher',
+            'current_price',
+            'quantity',
+        ).select_related(
+            'voucher',
+        ).filter(
+            checkout__id = obj.checkout_id
+        )
+        # return VoucherOrderSerializer(check, many = True , context=self.context ).data
+        return SaleOrder_VoucherSerializer(check, many = True ).data
+
+
+    def get_product(self, obj):
+        check = ProductOrder.objects.only(
+                'current_price', 
+                'id',
+                'quantity',
+                'product',
+            ).select_related(
+                'product',
+            ).filter(
+            checkout__id = obj.checkout_id
+        )
+        # data =  ProductOrderSerializer(check, many = True , context=self.context ).data
+        data =  SaleOrder_ProductSerializer(check, many = True ).data
+        self.product = data
+        return self.product
+            
+    def get_membership_product(self, obj):
+        return self.product
+
+    def get_service(self, obj):
+        service = ServiceOrder.objects.only(
+            'id',
+            'quantity',
+            'current_price',
+            'service',
+        ).select_related(
+            'service',
+        ).filter(
+            checkout__id = obj.checkout_id
+        )
+        # data = ServiceOrderSerializer(service, many = True , context=self.context ).data
+        data = SaleOrder_ServiceSerializer(service, many = True ).data
+        self.service = data
+        return self.service
+    
+    def get_membership_service(self, obj):
+        return self.service
+    
+    def get_ids(self, obj):
+        
+        ids_data = []
+        ids_data.extend(self.product)
+        ids_data.extend(self.service)
+
+        return ids_data
+    
+    def get_tip(self, obj):
+        tips = AppointmentEmployeeTip.objects.filter(checkout__id=obj.checkout_id)
+        serialized_tips = CheckoutTipsSerializer(tips, many=True).data
+        return serialized_tips
+        
+    
+    def get_invoice(self, obj):
+        try:
+            invoice = SaleInvoice.objects.get(checkout__icontains = obj.checkout_id)
+            serializer = DiscountPromotion_SaleInvoiceSerializer(invoice)
+            return serializer.data
+        except Exception as e:
+            return str(e)
+
+    def get_promotion(self, obj):
+        return {
+            'promotion_name' : obj.promotion_name,
+        }
+        
+
+    def get_discounted_price(self, obj):
+        
+        return obj.discount_price
+        
+    class Meta:
+        model = DiscountPromotionSalesReport
+        fields = [
+            'id', 
+            'promotion', 
+            'invoice', 
+            'created_at', 
+            'original_price', 
+            'discounted_price', 
+            'location', 
+            'product', 
+            'service', 
+            'membership', 
+            'voucher', 
+            'client', 
+            'ids', 
+            'membership_product', 
+            'membership_service', 
+            'tip'
+            
+        ]
+
+        
