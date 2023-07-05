@@ -369,7 +369,7 @@ def get_promotions_and_discounts_sales(request):
         location__id = location_id,
         **queries
     ).order_by('-created_at')
-    data = DiscountPromotionSalesReport_serializer(sales, many=True).datta
+    data = DiscountPromotionSalesReport_serializer(sales, many=True).data
     
     # checkout_order = Checkout.objects.filter(
     #     is_deleted=False,
