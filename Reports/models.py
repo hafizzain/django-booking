@@ -100,9 +100,10 @@ class DiscountPromotionSalesReport(models.Model):
 
         if not self.original_price:
             if self.checkout_type == 'Sale':
-                prices = self.get_appointment_prices()
-            elif self.checkout_type == 'Appointment':
                 prices = self.get_sale_prices()
+            elif self.checkout_type == 'Appointment':
+                prices = self.get_appointment_prices()
+                
             else:
                 prices = {'original_prices' : 0, 'discounted_prices' : 0}
             
