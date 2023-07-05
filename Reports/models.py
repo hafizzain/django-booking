@@ -87,7 +87,7 @@ class DiscountPromotionSalesReport(models.Model):
                         except:
                             pass
                     else:
-                        service_prices = PriceService.objects.filter(service = item, duration = '30_Min', currency = self.location.currency)
+                        service_prices = PriceService.objects.filter(service = item.service, duration = '30_Min', currency = self.location.currency)
                         if len(service_prices) > 0:
                             service_price = service_prices[0].price
                             discounted_prices += float(service_price) * float(order.quantity)
