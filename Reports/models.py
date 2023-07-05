@@ -57,6 +57,36 @@ def get_ItemPrice(this_instance, orders):
     discounted_prices = d1 + (o1 - d2 - f1)
     return [o1, discounted_prices]
 
+def get_fixed_prices(this_instance, orders):
+    original_price = 0
+    discounted_prices = 0
+
+    for order in orders:
+        
+        discounted_prices += float(order.total_price) * float(order.quantity)
+        try:
+            item = ServiceOrder.objects.get(id = order.id)
+        except:
+            try:
+                item = ProductOrder.objects.get(id = order.id)
+            except:
+                pass
+            else:
+                retail_prices = CurrencyRetailPrice.objects.filter(
+                    product = item.product,
+                    currency = this_instance.location.currency
+                ).order_by('created_at')
+                if len(retail_prices) > 0:
+                    retail_price = retail_prices[0].retail_price
+                    original_price += float(retail_price) * float(order.quantity)
+
+        else:
+            service_prices = PriceService.objects.filter(service = item.service, duration = item.duration, currency = this_instance.location.currency)
+            if len(service_prices) > 0:
+                service_price = service_prices[0].price
+                original_price += float(service_price) * float(order.quantity)
+
+    return [original_price, discounted_prices]
 class DiscountPromotionSalesReport(models.Model):
 
     CHECKOUT_TYPES = (
@@ -117,14 +147,14 @@ class DiscountPromotionSalesReport(models.Model):
         elif self.promotion_type == 'Spend_Some_Amount':
             original_prices, discounted_prices = get_ItemPrice(self, orders)
 
-        elif self.promotion_type == 'Fixed_Price_Service':
-            original_prices, discounted_prices = get_ItemPrice(self, orders)
-
         elif self.promotion_type == 'Mentioned_Number_Service':
             original_prices, discounted_prices = get_ItemPrice(self, orders)
 
+        elif self.promotion_type == 'Fixed_Price_Service':
+            original_prices, discounted_prices = get_fixed_prices(self, orders)
+
         elif self.promotion_type == 'Bundle_Fixed_Service':
-            original_prices, discounted_prices = get_ItemPrice(self, orders)
+            original_prices, discounted_prices = get_fixed_prices(self, orders)
 
         elif self.promotion_type == 'Retail_and_Get_Service':
             pass
