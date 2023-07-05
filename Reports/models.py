@@ -5,6 +5,9 @@ from Authentication.models import User
 from Client.models import Client
 from Business.models import BusinessAddress
 from Invoices.models import SaleInvoice
+from Sale.Constants.Promotion import get_promotions
+from Order.models import Checkout, Order
+from Appointment.models import AppointmentCheckout
 
 # Create your models here.
 
@@ -43,9 +46,67 @@ class DiscountPromotionSalesReport(models.Model):
 
     def __str__(self):
         return str(self.id)
-
     
+    def get_appointment_prices(self):
+        original_prices = 0
+        discounted_prices = 0
+
+        return {
+            'original_prices' : original_prices,
+            'discounted_prices' : discounted_prices,
+        }
+
+
+    def get_sale_prices(self):
+        original_prices = 0
+        discounted_prices = 0
+
+        orders = Order.objects.filter(
+            checkout__id = self.checkout_id
+        )
+
+        for order in orders:
+            if order.discount_price:
+                discounted_prices += float(order.discount_price) * float(order.quantity)
+
+            original_prices += float(order.total_price) * float(order.quantity)
+
+        return {
+            'original_prices' : original_prices,
+            'discounted_prices' : discounted_prices,
+        }
+    
+    def assign_gst_price(self):
+        if self.checkout_type == 'Sale':
+            checkout = Checkout.objects.get(id = self.checkout_id)
+            self.gst = checkout.tax_amount
+
+        elif self.checkout_type == 'Appointment':
+            checkout = AppointmentCheckout.objects.get(id = self.checkout_id)
+            self.gst = checkout.gst_price
+        
     def save(self, *args, **kwargs):
+        if not self.promotion_name:
+            promotion = get_promotions(
+                promotion_type = self.promotion_type,
+                promotion_id = self.promotion_id
+            )
+            
+            if promotion:
+                self.promotion_name = promotion['promotion_name']
+
+        if not self.gst:
+            self.assign_gst_price()
+
         if not self.original_price:
-            pass
+            if self.checkout_type == 'Sale':
+                prices = self.get_appointment_prices()
+            elif self.checkout_type == 'Appointment':
+                prices = self.get_sale_prices()
+            else:
+                prices = {'original_prices' : 0, 'discounted_prices' : 0}
+            
+            self.original_price = prices.get('original_prices', 0)
+            self.discount_price = prices.get('discounted_prices', 0)
+
         super(DiscountPromotionSalesReport, self).save(*args, **kwargs)
