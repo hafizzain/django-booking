@@ -10,5 +10,22 @@ class ServiceAdmin(admin.ModelAdmin):
         'is_active',
         'is_default'
     ]
-admin.site.register(PriceService)
+@admin.register(PriceService)
+class PriceServiceAdmin(admin.ModelAdmin):
+    list_filter = [
+        'service__name',
+        'currency__code'
+    ]
+    list_display = [
+        'id',
+        'service_name',
+        'currency',
+        'duration',
+        'price',
+    ]
+
+    def service_name(self, instance):
+        return instance.service.name
+
+
 admin.site.register(ServiceGroup)
