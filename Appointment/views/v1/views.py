@@ -1674,7 +1674,7 @@ def create_checkout(request):
                     category_commission = commission,
                     commission_category = 'Service',
                     commission_type = commission.comission_choice,
-                    sale_value = service_appointment.total_price,
+                    sale_value = service_appointment.discount_price if service_appointment.discount_price else service_appointment.total_price,
                     commission_rate = commission.commission_percentage,
                     commission_amount = calculated_commission,
                     symbol = commission.symbol,

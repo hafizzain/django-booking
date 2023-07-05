@@ -27,7 +27,8 @@ from Service.models import PriceService, Service, ServiceGroup
 from Product.models import Brand, Product, ProductOrderStockReport, ProductStock
 from django.db.models import Avg, Count, Min, Sum, F, FloatField, Q
 
-
+from Reports.models import DiscountPromotionSalesReport
+from Reports.serializers import DiscountPromotionSalesReport_serializer
 from Sale.serializers import AppointmentCheckout_ReportsSerializer, PromotionNDiscount_AppointmentCheckoutSerializer, PromotionNDiscount_CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer, CheckoutCommissionSerializer
 from datetime import datetime as dt
 
@@ -362,25 +363,32 @@ def get_promotions_and_discounts_sales(request):
     if start_date and end_date:
         queries['created_at__range'] = (start_date, end_date)
 
+    sales = DiscountPromotionSalesReport.objects.filter(
+        is_deleted = False,
+        is_active = True,
+        location__id = location_id,
+        **queries
+    ).order_by('-created_at')
+    data = DiscountPromotionSalesReport_serializer(sales, many=True).data
     
-    checkout_order = Checkout.objects.filter(
-        is_deleted=False,
-        location__id=location_id,
-        is_promotion = True,
-        **queries,
-    )
-    appointment_checkout = AppointmentCheckout.objects.filter(
-        appointment_service__appointment_status='Done',
-        business_address__id=location_id,
-        is_promotion = True,
-        **queries,
-    )
+    # checkout_order = Checkout.objects.filter(
+    #     is_deleted=False,
+    #     location__id=location_id,
+    #     is_promotion = True,
+    #     **queries,
+    # )
+    # appointment_checkout = AppointmentCheckout.objects.filter(
+    #     appointment_service__appointment_status='Done',
+    #     business_address__id=location_id,
+    #     is_promotion = True,
+    #     **queries,
+    # )
 
-    data_total = list(PromotionNDiscount_CheckoutSerializer(checkout_order, many=True, context={'request': request}).data) + \
-                 list(PromotionNDiscount_AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
+    # data_total = list(PromotionNDiscount_CheckoutSerializer(checkout_order, many=True, context={'request': request}).data) + \
+    #              list(PromotionNDiscount_AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
                  
-    sorted_data = sorted(data_total, key=lambda x: x['created_at'], reverse=True)
+    # sorted_data = sorted(data_total, key=lambda x: x['created_at'], reverse=True)
 
-    paginated_data = paginator.paginate_queryset(sorted_data, request)
+    paginated_data = paginator.paginate_queryset(data, request)
 
     return paginator.get_paginated_response(paginated_data, 'sales')

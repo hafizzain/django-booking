@@ -1,9 +1,37 @@
 from django.contrib import admin 
 from Order.models import Order, ProductOrder, ServiceOrder , MemberShipOrder ,VoucherOrder, Checkout , CheckoutPayment
+from Service.models import ServiceGroup
 
 # Register your models here.
 admin.site.register(ProductOrder)
-admin.site.register(ServiceOrder)
+@admin.register(ServiceOrder)
+class ServiceOrderAdmin(admin.ModelAdmin):
+    list_filter = [
+        'location__address_name',
+        'service__name',
+        'created_at',
+    ]
+    list_display = [
+        'id', 
+        'location',
+        'service_group_name',
+        'quantity',
+        'total_price',
+        'sold_quantity',
+        'discount_price',
+        'price',
+        'created_at',
+    ]
+
+    def service_group_name(self, service):
+        groups = ServiceGroup.objects.filter(
+            services = service.service
+        )
+
+        if len(groups) > 0:
+            return groups[0].name
+
+
 admin.site.register(MemberShipOrder)
 
 

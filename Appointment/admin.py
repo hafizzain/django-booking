@@ -1,5 +1,6 @@
 from django.contrib import admin
 from Appointment.models import Appointment, AppointmentService, AppointmentNotes, AppointmentCheckout, AppointmentLogs, LogDetails
+from Service.models import ServiceGroup
 
 
 @admin.register(AppointmentLogs)
@@ -33,9 +34,14 @@ class AppointmentAdmin(admin.ModelAdmin):
 @admin.register(AppointmentService)
 class AppointmentServiceAdmin(admin.ModelAdmin):
     ordering = ['-created_at']
+    list_filter = [
+        'business_address__address_name',
+        'created_at'
+    ]
     list_display = [
         'id',
         'member_name',
+        'service_group_name',
         'appointment_status',
         'appointment_date',
         'appointment_time',
@@ -49,3 +55,10 @@ class AppointmentServiceAdmin(admin.ModelAdmin):
         'discount_price',
         'discount_percentage',
     ]
+
+    def service_group_name(self, appointment):
+        groups = ServiceGroup.objects.filter(
+            services = appointment.service
+        )
+        if len(groups) > 0:
+            return groups[0].name
