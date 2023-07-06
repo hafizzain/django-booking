@@ -49,8 +49,14 @@ def get_ItemPrice(this_instance, orders):
 
             else:
                 service_prices = PriceService.objects.filter(service = item.service, duration = item.duration, currency = this_instance.location.currency)
+                service_price = 0
                 if len(service_prices) > 0:
                     service_price = service_prices[0].price
+                else:
+                    service_prices = PriceService.objects.filter(service = item.service, currency = this_instance.location.currency)
+                    if len(service_prices) > 0:
+                        service_price = service_prices[0].price
+                if service_price:
                     f1 += float(service_price) * float(order.quantity)
                     o1 += float(service_price) * float(order.quantity)
 
