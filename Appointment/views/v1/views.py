@@ -1653,7 +1653,7 @@ def create_checkout(request):
         except Exception as err:
             pass
         else:
-            service_total_price = service_appointment.total_price * 1
+            service_total_price = (service_appointment.total_price or service_appointment.price) * 1
 
             sale_commissions = CategoryCommission.objects.filter(
                 commission__employee = service_appointment.member,
@@ -1665,7 +1665,7 @@ def create_checkout(request):
             if len(sale_commissions) > 0:
                 commission = sale_commissions[0]
 
-                calculated_commission = commission.calculated_commission(service_appointment.total_price)
+                calculated_commission = commission.calculated_commission(service_appointment.total_price or service_appointment.price)
                 employee_commission = EmployeeCommission.objects.create(
                     user = request.user,
                     business = business_address.business,
@@ -1675,7 +1675,7 @@ def create_checkout(request):
                     category_commission = commission,
                     commission_category = 'Service',
                     commission_type = commission.comission_choice,
-                    sale_value = service_appointment.discount_price if service_appointment.discount_price else service_appointment.total_price,
+                    sale_value = service_appointment.discount_price if service_appointment.discount_price else (service_appointment.total_price or service_appointment.price),
                     commission_rate = commission.commission_percentage,
                     commission_amount = calculated_commission,
                     symbol = commission.symbol,

@@ -199,6 +199,12 @@ class AppointmentService(models.Model):
             return str(err)
     
 
+    def save(self, *args, **kwargs):
+        if not self.total_price:
+            self.total_price = self.price
+        super(AppointmentService, self).save(*args, **kwargs)
+    
+
     def __str__(self):
         return str(self.id)
 
