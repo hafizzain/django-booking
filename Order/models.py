@@ -171,47 +171,6 @@ class Order(models.Model):
 
 class ProductOrder(Order):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_orders')
-
-    # def save(self, *args, **kwargs):
-    #     if self.checkout and self.checkout.selected_promotion_type:
-    #         promotions_types = {
-    #             'Purchase Discount' : PurchaseDiscount,
-    #             'Spend_Some_Amount' : SpendSomeAmount,
-    #             'Fixed_Price_Service' : FixedPriceService,
-    #             'Mentioned_Number_Service' : MentionedNumberService,
-    #             'Bundle_Fixed_Service' : BundleFixed,
-    #             'Retail_and_Get_Service' : RetailAndGetService,
-
-    #             # 'directFlat' : None,
-    #             # 'specificCategoryGroup' : None,
-    #             # 'specificBrandServiceGroup' : None,
-    #             # 'userRestricted' : None,
-    #             # 'complimentaryVoucher' : None,
-    #             # 'packages' : None,
-    #         }
-
-    #         promotion_type = promotions_types.get(self.checkout.selected_promotion_type, None)
-    #         if promotion_type is not None:
-    #             try:
-    #                 selected_location = self.location
-    #                 currency = selected_location.currency
-    #             except:
-    #                 pass
-    #             else:
-    #                 retail_prices = CurrencyRetailPrice.objects.filter(
-    #                     product = self.product,
-    #                     currency = currency
-    #                 )
-    #                 if len(retail_prices) > 0:
-    #                     retail_price = retail_prices[0].retail_price
-    #                     original_price = retail_price
-
-    #                     self.discount_price = self.total_price
-    #                     self.total_price = original_price
-    #                     self.price = self.total_price
-    #                     self.discount_percentage = (self.discount_price / self.total_price) * 100
-
-    #     super(ProductOrder, self).save(*args, **kwargs)
     
     def __str__(self):
         return str(self.id)
@@ -220,68 +179,6 @@ class ProductOrder(Order):
 class ServiceOrder(Order):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='service_orders')
 
-    def save(self, *args, **kwargs):
-        if self.checkout and self.checkout.selected_promotion_type:
-            promotions_types = {
-                'Purchase Discount' : PurchaseDiscount,
-                'Spend_Some_Amount' : SpendSomeAmount,
-                'Fixed_Price_Service' : FixedPriceService,
-                'Mentioned_Number_Service' : MentionedNumberService,
-                'Bundle_Fixed_Service' : BundleFixed,
-                'Retail_and_Get_Service' : RetailAndGetService,
-
-
-                # 'directFlat' : None,
-                # 'specificCategoryGroup' : None,
-                # 'specificBrandServiceGroup' : None,
-                # 'userRestricted' : None,
-                # 'complimentaryVoucher' : None,
-                # 'packages' : None,
-            }
-
-            if self.checkout.selected_promotion_type == 'Purchase Discount':
-                pass
-            elif self.checkout.selected_promotion_type == 'Spend_Some_Amount':
-                pass
-            elif self.checkout.selected_promotion_type == 'Fixed_Price_Service':
-                pass
-            elif self.checkout.selected_promotion_type == 'Mentioned_Number_Service':
-                pass
-            elif self.checkout.selected_promotion_type == 'Bundle_Fixed_Service':
-                pass
-            elif self.checkout.selected_promotion_type == 'Retail_and_Get_Service':
-                pass
-
-
-            # promotion_type = promotions_types.get(self.checkout.selected_promotion_type, None)
-            # if promotion_type is not None:
-            #     try:
-            #         selected_location = self.location
-            #         currency = selected_location.currency
-            #     except:
-            #         pass
-            #     else:
-            #         prices = PriceService.objects.filter(
-            #             service = self.service,
-            #             currency = currency,
-            #             duration = self.duration
-            #         )
-            #         if len(prices) > 0:
-            #             price = prices[0].price
-            #             original_price = price
-
-            #             if not self.total_price or self.total_price == 0:
-            #                 self.discount_price = self.original_price
-            #                 self.price = self.total_price
-            #                 self.discount_percentage = 100
-            #             else:
-            #                 self.discount_price = self.total_price
-            #                 self.total_price = original_price
-            #                 self.price = self.total_price
-            #                 self.discount_percentage = (self.discount_price / self.total_price) * 100
-
-        super(ServiceOrder, self).save(*args, **kwargs)
-    
     def __str__(self):
         return str(self.id)
 
