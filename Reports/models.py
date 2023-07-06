@@ -236,7 +236,7 @@ class DiscountPromotionSalesReport(models.Model):
             original_prices, discounted_prices = get_fixed_prices(self, orders)
 
         elif self.promotion_type == 'Retail_and_Get_Service':
-            original_prices, discounted_prices = get_ItemPrice(self, orders)
+            original_prices, discounted_prices = get_fixed_prices(self, orders)
 
         else:
             for order in orders:
