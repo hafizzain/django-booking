@@ -1147,15 +1147,25 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
         }
     
     def get_tip(self, commission_instance):
-        # tips = AppointmentEmployeeTip.objects.filter(checkout=obj)
-        # serialized_tips = CheckoutTipsSerializer(tips, many=True).data
-        # return serialized_tips
-        return 'none'
+        try:
+            if commission_instance.sale_id is not None:
+                try:
+                    tips = AppointmentEmployeeTip.objects.filter(checkout=commission_instance.sale_id)
+                    serialized_tips = CheckoutTipsSerializer(tips, many=True).data
+                    return serialized_tips
+                except:
+                    tips = AppointmentEmployeeTip.objects.filter(checkout=commission_instance.sale_id)
+                    serialized_tips = CheckoutTipsSerializer(tips, many=True).data
+                    return serialized_tips
+            else:
+                return 'Id is Null'
+        except Exception as e:
+            return "None " + e
 
 
     class Meta:
         model = EmployeeCommission
-        fields = ['id', 'location', 'employee', 'order_type', 'commission_rate', 'commission', 'created_at', 'sale', 'sale_id']
+        fields = ['id', 'location', 'employee', 'order_type', 'commission_rate', 'commission', 'created_at', 'sale', 'sale_id', 'tip']
         #  'location', 'commission_rate',
 
 
