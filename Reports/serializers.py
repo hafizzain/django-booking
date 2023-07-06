@@ -1002,11 +1002,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
             )
 
             for app_order in appointment_services:
-                price = 0
-                if app_order.discount_price:
-                    price = app_order.discount_price
-                else:
-                    price = app_order.total_price
+                price = app_order.discount_price or app_order.total_price or app_order.price
                 ser_target += float(price)
 
 
