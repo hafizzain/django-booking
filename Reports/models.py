@@ -58,10 +58,12 @@ def get_ItemPrice(this_instance, orders):
     return [o1, discounted_prices]
 
 def get_Appointment_ItemPrice(this_instance, orders):
-    o1 = 0
-    d1 = 0
-    d2 = 0
+    o1 = 0 # 50 + 340
+    d1 = 0 # 272
+    d2 = 0 # 340
     f1 = 0
+
+    # 272 + (390 - 340 - 0)
 
     for order in orders:
         price = order.discount_price or order.price
@@ -69,11 +71,12 @@ def get_Appointment_ItemPrice(this_instance, orders):
         if price > 0:
             if order.discount_price:
                 d1 += float(order.discount_price)
-                d2 += float(order.price)
+                
                 service_prices = PriceService.objects.filter(service = order.service, duration = order.duration, currency = this_instance.location.currency)
                 if len(service_prices) > 0:
                     service_price = service_prices[0].price
                     o1 += float(service_price)
+                    d2 += float(service_price)
             else:
                 o1 += float(order.price)
         else:
