@@ -234,10 +234,15 @@ class DiscountPromotionSalesReport(models.Model):
 
         else:
             for order in orders:
+                oop = order.total_price or order.price # Order Original Price
+                oop = float(oop)
+
                 if order.discount_price:
                     discounted_prices += float(order.discount_price)
+                else:
+                    discounted_prices += oop
 
-                original_prices += float(order.total_price)
+                original_prices += oop
 
         return {
             'original_prices' : original_prices,
