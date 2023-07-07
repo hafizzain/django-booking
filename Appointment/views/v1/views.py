@@ -1733,7 +1733,7 @@ def create_checkout(request):
     
     invoice = SaleInvoice.objects.create(
         appointment = appointments,
-        appointment_service = service_appointment,
+        appointment_service = f'{service_appointment.id}',
         payment_type = payment_method,
         service = services,
         member = members,
@@ -1759,7 +1759,6 @@ def create_checkout(request):
             invoice.is_promotion = True
             invoice.selected_promotion_id = checkout.appointment.selected_promotion_id
             invoice.selected_promotion_type = checkout.appointment.selected_promotion_type
-            invoice.checkout = checkout
             invoice.save()
     except Exception as err:
         Errors.append(str(err))
