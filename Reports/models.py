@@ -281,6 +281,9 @@ class DiscountPromotionSalesReport(models.Model):
             for order in orders:
                 if order.discount_price:
                     discounted_prices += float(order.discount_price) * float(order.quantity)
+                else:
+                    discounted_prices += float(order.total_price) * float(order.quantity)
+
                 original_prices += float(order.total_price) * float(order.quantity)
 
         return {
