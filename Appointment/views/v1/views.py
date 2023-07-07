@@ -1760,7 +1760,8 @@ def create_checkout(request):
             invoice.selected_promotion_type = checkout.appointment.selected_promotion_type
             invoice.checkout = checkout
             invoice.save()
-    except:
+    except Exception as err:
+        Errors.append(str(err))
         pass
 
     if checkout.appointment.is_promotion:
