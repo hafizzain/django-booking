@@ -1342,7 +1342,6 @@ class AppointmentService_DiscountReportSerializer(serializers.ModelSerializer):
     def get_selection_type(self, obj):
         return 'SERVICE'
     
-
     def get_service(self, obj):
         if obj.service:
             return {'name' : obj.service.name}
@@ -1355,12 +1354,8 @@ class AppointmentService_DiscountReportSerializer(serializers.ModelSerializer):
         return None
     
     def get_price(self, obj):
-        if obj.is_redeemed == True:
-            return obj.redeemed_price
-        elif obj.discount_price:
-            return obj.discount_price
-        else:
-            return obj.current_price
+        app_price = obj.discount_price or obj.total_price or obj.price
+        return app_price
 
     class Meta:
         model = AppointmentService
