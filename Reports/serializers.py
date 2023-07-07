@@ -1240,19 +1240,36 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
         return self.product
 
     def get_service(self, obj):
-        service = ServiceOrder.objects.only(
-            'id',
-            'quantity',
-            'current_price',
-            'service',
-        ).select_related(
-            'service',
-        ).filter(
-            checkout__id = obj.checkout_id
-        )
-        # data = ServiceOrderSerializer(service, many = True , context=self.context ).data
-        data = SaleOrder_ServiceSerializer(service, many = True ).data
-        self.service = data
+        if obj.checkout_type == 'Sale':
+            service = ServiceOrder.objects.only(
+                'id',
+                'quantity',
+                'current_price',
+                'service',
+            ).select_related(
+                'service',
+            ).filter(
+                checkout__id = obj.checkout_id
+            )
+            # data = ServiceOrderSerializer(service, many = True , context=self.context ).data
+            data = SaleOrder_ServiceSerializer(service, many = True ).data
+            self.service = data
+        elif obj.checkout_type == 'Appointment':
+            try:
+                app_checkout = AppointmentCheckout.objects.get(
+                    id = obj.checkout_id
+                )
+            except:
+                self.service = []
+            else:
+                app_services = AppointmentService.objects.filter(
+                    appointment = app_checkout.appointment
+                )
+                data = AppointmentService_DiscountReportSerializer(app_services, many=True).data
+                self.service = data
+        else:
+            self.service = []
+
         return self.service
     
     def get_membership_service(self, obj):
@@ -1294,6 +1311,7 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
         model = DiscountPromotionSalesReport
         fields = [
             'id', 
+            'checkout_type', 
             'promotion', 
             'invoice', 
             'created_at', 
@@ -1313,3 +1331,40 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
         ]
 
         
+
+class AppointmentService_DiscountReportSerializer(serializers.ModelSerializer):
+
+    service = serializers.SerializerMethodField()
+    price = serializers.SerializerMethodField()
+    selection_type  = serializers.SerializerMethodField(read_only=True)
+    service_original_price  = serializers.SerializerMethodField(read_only=True)
+
+    def get_selection_type(self, obj):
+        return 'SERVICE'
+    
+
+    def get_service(self, obj):
+        if obj.service:
+            return {'name' : obj.service.name}
+        return None
+    
+    def get_service_original_price(self, obj):
+        if obj.service:
+            return obj.service.price
+        
+        return None
+    
+    def get_price(self, obj):
+        if obj.is_redeemed == True:
+            return obj.redeemed_price
+        elif obj.discount_price:
+            return obj.discount_price
+        else:
+            return obj.current_price
+
+    class Meta:
+        model = AppointmentService
+        fields = ['id', 'price', 'service_original_price', 'quantity', 'service', 'selection_type' ]
+            # 'client','created_at' ,'user',
+            #       'duration', 'location', 'member', 'total_price',
+            #       'payment_type','tip','gst', 'order_type','created_at'
