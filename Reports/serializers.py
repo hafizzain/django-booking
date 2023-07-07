@@ -1335,12 +1335,16 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
 class AppointmentService_DiscountReportSerializer(serializers.ModelSerializer):
 
     service = serializers.SerializerMethodField()
+    quantity = serializers.SerializerMethodField()
     price = serializers.SerializerMethodField()
     selection_type  = serializers.SerializerMethodField(read_only=True)
     service_original_price  = serializers.SerializerMethodField(read_only=True)
 
     def get_selection_type(self, obj):
         return 'SERVICE'
+    
+    def get_quantity(self, obj):
+        return 1
     
     def get_service(self, obj):
         if obj.service:
