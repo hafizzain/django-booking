@@ -2119,7 +2119,14 @@ def new_create_sale_order(request):
             try:
                 service = Service.objects.get(id = service_id)
                 item_name = service.name
-                service_price = PriceService.objects.filter(service = service_id).first()
+                service_price = PriceService.objects.filter(
+                    service = service_id,
+                    currency = business_address.currency
+                )
+                if len(service_price) > 0:
+                    service_price = service_price[0]
+                else:
+                    service_price = PriceService.objects.filter(service = service_id).first()
                 dur = service_price.duration
                 
                 service_order = ServiceOrder.objects.create(

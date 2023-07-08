@@ -135,6 +135,7 @@ class PriceService(models.Model):
 
     duration = models.CharField(max_length=50, null=True, blank=True, choices=DURATION_CHOICES )
     price = models.FloatField(default=0)
+    created_at = models.DateTimeField(default=now)
 
     def __str__(self):
         return str(self.id)
