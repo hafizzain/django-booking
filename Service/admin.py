@@ -16,13 +16,18 @@ class PriceServiceAdmin(admin.ModelAdmin):
         'service__name',
         'currency__code'
     ]
+
     list_display = [
         'id',
         'service_name',
         'currency',
         'duration',
+        'duration_added',
         'price',
     ]
+
+    def duration_added(self, instance):
+        return instance.duration
 
     def service_name(self, instance):
         return instance.service.name
