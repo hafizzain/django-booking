@@ -3756,24 +3756,22 @@ def create_workingschedule(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
             
-    working_schedule = EmployeDailySchedule.objects.create(
+    working_schedule, created = EmployeDailySchedule.objects.get_or_create(
         user = user,
         business = business ,
         employee = employee_id,
-        day = day,
-        
-        start_time = start_time,
-        end_time = end_time,
-        start_time_shift = start_time_shift,
-        end_time_shift = end_time_shift,
-        
-        from_date =from_date,
-        to_date = to_date,
-        note = note,
-        
         date = date,
+    )
+
+    working_schedule.day = day
+    working_schedule.start_time = start_time
+    working_schedule.end_time = end_time
+    working_schedule.start_time_shift = start_time_shift
+    working_schedule.end_time_shift = end_time_shift
+    working_schedule.from_date = from_date
+    working_schedule.to_date = to_date
+    working_schedule.note = note
         
-    )    
     if is_vacation is not None:
         working_schedule.is_vacation = True
     else:
