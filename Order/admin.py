@@ -6,6 +6,7 @@ from Service.models import ServiceGroup
 admin.site.register(ProductOrder)
 @admin.register(ServiceOrder)
 class ServiceOrderAdmin(admin.ModelAdmin):
+    ordering = ['-created_at']
     list_filter = [
         'location__address_name',
         'service__name',
