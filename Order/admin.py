@@ -16,12 +16,16 @@ class ServiceOrderAdmin(admin.ModelAdmin):
         'location',
         'service_group_name',
         'quantity',
+        'duration_text',
         'total_price',
         'sold_quantity',
         'discount_price',
         'price',
         'created_at',
     ]
+
+    def duration_text(self, order):
+        return f'{order.duration}'
 
     def service_group_name(self, service):
         groups = ServiceGroup.objects.filter(
