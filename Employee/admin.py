@@ -144,7 +144,7 @@ class EmployeeCommissionAdmin(admin.ModelAdmin):
 @admin.register(EmployeDailySchedule)
 class EmployeDailyScheduleAdmin(admin.ModelAdmin):
     ordering = ['-date']
-    list_filter = ['employee']
+    list_filter = ['employee__full_name']
     list_display = [
         'id',
         'employee_name',
