@@ -234,8 +234,14 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
         try:
             employee_working_schedule = EmployeDailySchedule.objects.get(
                 employee = employee_instance,
-                date = selected_date
+                date = selected_date,
             )
+            if employee_working_schedule.is_leave :
+                raise Exception('Employee on Leave')
+            
+            if employee_working_schedule.is_vacation :
+                raise Exception('Employee on Vacation')
+            
         except Exception as err:
             errors.append(str(err))
             exluded_times.append({
