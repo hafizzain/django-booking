@@ -473,7 +473,7 @@ def update_service(request):
     
     if priceservice is not None:
         if check == True:
-            vch = PriceService.objects.filter(service = service_id)
+            vch = PriceService.objects.filter(service = service_id).order_by('-created_at')
             check = False
             for i in vch:
                 try:
@@ -1632,7 +1632,7 @@ def create_sale_order(request):
         elif sale_type == 'SERVICE':
             try:
                 service = Service.objects.get(id = service_id)
-                service_price = PriceService.objects.filter(service = service_id).first()
+                service_price = PriceService.objects.filter(service = service_id).order_by('-created_at').first()
                 dur = service_price.duration
                 # ExceptionRecord.objects.create(
                 #     text = f'price {price} discount_price {discount_price}'
@@ -2122,11 +2122,11 @@ def new_create_sale_order(request):
                 service_price = PriceService.objects.filter(
                     service = service_id,
                     currency = business_address.currency
-                )
+                ).order_by('-created_at')
                 if len(service_price) > 0:
                     service_price = service_price[0]
                 else:
-                    service_price = PriceService.objects.filter(service = service_id).first()
+                    service_price = PriceService.objects.filter(service = service_id).order_by('-created_at').first()
                 dur = service_price.duration
                 
                 service_order = ServiceOrder.objects.create(

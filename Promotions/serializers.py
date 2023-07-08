@@ -76,7 +76,7 @@ class AvailOfferService_Serializer(serializers.ModelSerializer):
             else:
                 queries['currency'] = location.currency
 
-        prices = PriceService.objects.filter(service = service, **queries)
+        prices = PriceService.objects.filter(service = service, **queries).order_by('-created_at')
 
         return AvailOffer_PriceService_Serializers(prices, many = True).data
 
@@ -103,7 +103,7 @@ class AvailOfferProduct_Serializer(serializers.ModelSerializer):
             else:
                 queries['currency'] = location.currency
 
-        prices = PriceService.objects.filter(service = service, **queries)
+        prices = PriceService.objects.filter(service = service, **queries).order_by('-created_at')
 
         return AvailOffer_PriceService_Serializers(prices, many = True).data
 
@@ -321,7 +321,7 @@ class FreeServiceSerializers(serializers.ModelSerializer):
     
     def get_priceservice(self, obj):
         try:
-            ser = PriceService.objects.filter(service = obj.service)
+            ser = PriceService.objects.filter(service = obj.service).order_by('-created_at')
             return PriceServiceSerializers(ser, many = True).data
         except Exception as err:
             return str(err)
@@ -1858,7 +1858,7 @@ class AvailFreeServiceSerializers(serializers.ModelSerializer):
     
     def get_priceservice(self, obj):
         try:
-            ser = PriceService.objects.filter(service = obj.service)
+            ser = PriceService.objects.filter(service = obj.service).order_by('-created_at')
             return PriceServiceSerializers(ser, many = True).data
         except Exception as err:
             return str(err)
@@ -1880,7 +1880,7 @@ class AvailServiceSerializers(serializers.ModelSerializer):
     
     def get_priceservice(self, obj):
         try:
-            ser = PriceService.objects.filter(service = obj.service)
+            ser = PriceService.objects.filter(service = obj.service).order_by('-created_at')
             return AvailPriceServiceSerializers(ser, many = True).data
         except Exception as err:
             return str(err)

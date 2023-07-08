@@ -36,7 +36,7 @@ class ServiceSaleSerializer(serializers.ModelSerializer):
     price_service = serializers.SerializerMethodField(read_only=True)
     
     def get_price_service(self, obj):
-        price = PriceService.objects.filter(service = str(obj))
+        price = PriceService.objects.filter(service = str(obj)).order_by('-created_at')
         return PriceServiceSaleSerializer(price, many = True).data
     class Meta:
         model = Service
