@@ -471,26 +471,24 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
         return c_points.balance
 
     def get_checkout_data(self, c_points):
-        # from Sale.serializers import SaleOrders_CheckoutSerializer, SaleOrders_AppointmentCheckoutSerializer
+        from Sale.serializers import SaleOrders_CheckoutSerializer, SaleOrders_AppointmentCheckoutSerializer
 
-        # is_checkout = False
-        # try:
-        #     data = Checkout.objects.filter(id = c_points.checkout)
-        #     serializer = SaleOrders_CheckoutSerializer(data, many=True)
+        is_checkout = False
+        try:
+            data = Checkout.objects.filter(id = c_points.checkout)
+            serializer = SaleOrders_CheckoutSerializer(data, many=True)
 
-        #     if len(data) == 0:                
-        #         data = AppointmentCheckout.objects.filter(id = c_points.checkout)
-        #         # serializer = AppointmentCheckoutSerializer(data, many=True)
-        #         serializer = SaleOrders_AppointmentCheckoutSerializer(data, many=True)
+            if len(data) == 0:                
+                data = AppointmentCheckout.objects.filter(id = c_points.checkout)
+                # serializer = AppointmentCheckoutSerializer(data, many=True)
+                serializer = SaleOrders_AppointmentCheckoutSerializer(data, many=True)
 
-        # except Exception as e:
-        #     return str(e)
+        except Exception as e:
+            return str(e)
 
-        # return serializer.data
-
-        invoice = SaleInvoice.objects.filter(id__icontains = c_points.invoice)
-        serializer = SaleInvoiceSerializer(invoice, many=True)
         return serializer.data
+        
+
 
 
     class Meta:
