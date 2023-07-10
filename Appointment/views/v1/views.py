@@ -2558,7 +2558,8 @@ def get_employee_check_time(request):
         )
         try:
             av_staff_ids = AppointmentService.objects.filter(
-                Q(appointment_time__range = (start_time, tested)),
+                Q(end_time__range = (start_time, tested)),
+                # Q(appointment_time__range = (start_time, tested)),
                 #  | Q(end_time__range = (start_time, tested))
                 member__id = employee.id,
                 appointment_date = date,
