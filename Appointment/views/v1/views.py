@@ -2574,7 +2574,7 @@ def get_employee_check_time(request):
                         'status_code_text' : '200',
                         'response' : {
                             'message' : f'{employee.full_name} isn’t available between {st_time} and {ed_time}, but your team member can still book appointments for them.',
-                            'error_message' : None,
+                            'error_message' : f'Appointments Found ({len(av_staff_ids)})',
                             'employee':data,
                         }
                     },
