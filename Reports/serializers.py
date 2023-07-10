@@ -2,7 +2,7 @@ from datetime import date, datetime
 from Product.models import Brand
 from Utility.models import ExceptionRecord
 from rest_framework import serializers
-from Appointment.models import AppointmentCheckout, AppointmentService, AppointmentEmployeeTip
+from Appointment.models import AppointmentCheckout, AppointmentService, AppointmentEmployeeTip, Checkout
 from Appointment.serializers import LocationSerializer
 from Business.models import BusinessAddress
 from Employee.models import Employee, EmployeeCommission
@@ -18,7 +18,7 @@ from TragetControl.serializers import RetailTargetSerializers, StaffTargetSerial
 from Utility.Constants.Data.months import MONTH_DICT
 from .models import DiscountPromotionSalesReport
 from Invoices.models import SaleInvoice
-
+from Sale.serializers import SaleInvoiceSerializer
 
 class ServiceOrderSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
@@ -1097,6 +1097,7 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
     commission  = serializers.SerializerMethodField(read_only=True)
     commission_rate  = serializers.SerializerMethodField(read_only=True)
     tip  = serializers.SerializerMethodField(read_only=True)
+    invoice  = serializers.SerializerMethodField()
 
 
     def get_employee(self, commission_instance):
@@ -1142,6 +1143,24 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
             "client": ""
         }
     
+    
+    def get_invoice(self, obj):
+        # try:
+        #     checkoutt = Checkout.objects.get(id__icontains=obj.sale_id)
+        # except:
+        #     checkoutt = AppointmentCheckout.objects.get(id=obj.sale_id)
+        
+        # if checkoutt:
+        try:
+            invoice = SaleInvoice.objects.get(checkout__icontains = obj.sale_id)
+            serializer = SaleInvoiceSerializer(invoice)
+            return serializer.data
+        except Exception as e:
+            return str(e)
+        # else:
+        #     return 'invoice not found'
+
+    
     def get_tip(self, commission_instance):
         try:
             if commission_instance.sale_id is not None:
@@ -1161,7 +1180,7 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EmployeeCommission
-        fields = ['id', 'location', 'employee', 'order_type', 'commission_rate', 'commission', 'created_at', 'sale', 'sale_id', 'tip']
+        fields = ['id', 'location', 'employee', 'order_type', 'commission_rate', 'commission', 'created_at', 'sale', 'sale_id', 'tip', 'invoice']
         #  'location', 'commission_rate',
 
 
