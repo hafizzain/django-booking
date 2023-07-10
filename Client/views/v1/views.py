@@ -2066,20 +2066,11 @@ def update_memberships(request):
         for curr in currency_membership:
             currency = curr.get('currency', None)
             id = curr.get('id', None)
-            #membership = curr.get('membership', None)
             price = curr.get('price', None)
             try:
                 currency_id = Currency.objects.get(id=currency)
             except Exception as err:
                 pass
-            # if id is not None:
-            #     try:
-            #         currency_price = CurrencyPriceMembership.objects.get(id=id)
-            #     except Exception as err:
-            #         pass
-            #     else:                
-            #         currency_price.price = price
-            #         currency_price.save()
             
             if currency_id is not None: 
                 try:

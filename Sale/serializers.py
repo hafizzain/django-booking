@@ -1756,6 +1756,8 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
     promotion_name  = serializers.SerializerMethodField(read_only=True)
     
     tip = serializers.SerializerMethodField(read_only=True)
+    invoice = serializers.SerializerMethodField(read_only=True)
+    
 
     def get_promotion_name(self, obj):
         return 'promotion name'
@@ -1801,11 +1803,19 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
         serialized_tips = AppointmentTipsSerializer(tips, many=True).data
         return serialized_tips
     
+    def get_invoice(self, obj):
+        try:
+            invoice = SaleInvoice.objects.get(checkout__icontains = obj)
+            serializer = SaleInvoiceSerializer(invoice)
+            return serializer.data
+        except Exception as e:
+            return str(e)
+    
     class Meta:
         model = AppointmentCheckout
         fields = ['id', 'appointment', 'appointment_service', 'payment_method', 'service',
                  'business_address', 'voucher', 'promotion', 
                  'membership', 'rewards', 'tip', 'gst', 'gst_price', 'service_price',
                  'total_price', 'service_commission', 'service_commission_type', 'voucher_discount_percentage',
-                 'created_at', 'order_type', 'client', 'location', 'price', 'promotion_name']
+                 'created_at', 'order_type', 'client', 'location', 'price', 'promotion_name', 'invoice']
         
