@@ -1048,7 +1048,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     def get_schedule(self, obj):
         schedule =  EmployeDailySchedule.objects.filter(
             employee = obj
-        ).order_by('-created_at')
+        ).order_by('-date')
         # ).order_by('employee__employee_employedailyschedule__date')            
         context = self.context
         try:
