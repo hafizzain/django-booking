@@ -2555,14 +2555,14 @@ def get_employee_check_time(request):
                 }
             },
             status=status.HTTP_200_OK
-        )                               
+        )
         try:
             av_staff_ids = AppointmentService.objects.filter(
+                Q(appointment_time__range = (start_time, tested)) |
+                Q(end_time__range = (start_time, tested)),
                 member__id = employee.id,
                 appointment_date = date,
                 #is_blocked = False,
-                appointment_time__range = (start_time, tested),
-                end_time__range = (start_time, tested),
             ).exclude(appointment_status = 'Cancel')
             if len(av_staff_ids) > 0:
                 st_time = convert_24_to_12(str(start_time))
