@@ -2567,6 +2567,7 @@ def get_employee_check_time(request):
             if len(av_staff_ids) > 0:
                 st_time = convert_24_to_12(str(start_time))
                 ed_time = convert_24_to_12(str(tested))
+                data.append(AppointmentServiceSerializer(av_staff_ids, many=True).data)
                 return Response(
                     {
                         'status' : True,
