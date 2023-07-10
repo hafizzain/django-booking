@@ -854,10 +854,6 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
         income_type = self.context.get('income_type', None)
         
         try:
-            if obj.start_time is None or obj.end_time is None:
-                return '0'  # Return '0' if any of the time values is None
-
-            
             if income_type == 'Hourly_Rate':
                 if obj.is_vacation:
                     return '8'
@@ -865,6 +861,9 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
                     return '0'
                 else:
                     pass
+                
+            if obj.start_time is None or obj.end_time is None:
+                return '0'  # Return '0' if any of the time values is None
 
             shift1_start = datetime.strptime(obj.start_time.strftime("%H:%M:%S"), "%H:%M:%S")
             shift1_end = datetime.strptime(obj.end_time.strftime("%H:%M:%S"), "%H:%M:%S")
