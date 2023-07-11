@@ -253,8 +253,8 @@ def update_user_default_data(request):
         except Exception as err:
             errors.append(str(err))
         else:
-            location.location_name = name
-            location.address_name = address_name
+            location.address_name = name
+            location.address = address_name
             try:
                 currency = Currency.objects.get(id = currency)
             except Exception as err:
