@@ -22,6 +22,7 @@ from Employee.models import EmployeDailySchedule, Employee
 from NStyle.Constants import StatusCodes
 
 from Appointment.models import AppointmentService
+from Appointment.serializers import PriceServiceSaleSerializer
 from Authentication.models import User
 from Business.models import Business, BusinessSocial, BusinessAddress, BusinessOpeningHour, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BookingSetting, BusinessPaymentMethod, BusinessTax, BusinessVendor
 from Product.models import Product, ProductStock
@@ -35,7 +36,7 @@ import json
 from django.db.models import Q, F
 
 from django_tenants.utils import tenant_context
-
+from Service.models import PriceService
 from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, EmployeeBusinessSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
 
 
@@ -87,7 +88,8 @@ def get_user_default_data(request):
         data['service'].append({
             'id' : f'{service_instance.id}',
             'name' : f'{service_instance.name}',
-            'type' : 'service'
+            'type' : 'service',
+            'priceservice' : PriceServiceSaleSerializer(PriceService.objects.filter(service = service_instance), many=True).data
         })
     
     clients = Client.objects.filter(
