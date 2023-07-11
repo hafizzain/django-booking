@@ -73,7 +73,10 @@ def get_user_default_data(request):
         data['location'] = {
             'name' : f'{location_instance.address_name}',
             'id' : f'{location_instance.id}',
-            'type' : 'location'
+            'business_address' : f'{location_instance.address}',
+            'currency' : f'{location_instance.currency.id}',
+            'email' : f'{location_instance.email}',
+            'type' : 'location',
         }
     
     services = Service.objects.filter(
