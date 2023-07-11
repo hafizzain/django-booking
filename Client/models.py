@@ -439,6 +439,7 @@ class ClientLoyaltyPoint(models.Model):
 
     for_every_points = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name='For every (this) points')
     customer_will_get_amount = models.FloatField(default=0, null=True, blank=True, verbose_name='a customer will get (this) amount')
+    invoice = models.CharField(max_length=128, null=True, blank=True)
 
 
     created_at = models.DateTimeField(auto_now_add=now, null=True)

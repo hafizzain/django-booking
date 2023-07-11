@@ -1824,7 +1824,8 @@ def create_checkout(request):
             client_points, created = ClientLoyaltyPoint.objects.get_or_create(
                 location = business_address,
                 client = appointments.client,
-                loyalty_points = point
+                loyalty_points = point,
+                invoice = invoice.id
             )
 
 
