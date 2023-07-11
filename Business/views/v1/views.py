@@ -138,7 +138,7 @@ def get_user_default_data(request):
             'income_type' : f'{info.income_type}' if info else '',
             'salary' : f'{info.salary}' if info else '',
             'assigned_services' : [
-                {'id' : serv.id, 'name' : serv.name} for serv in emp_services
+                {'id' : serv.service.id, 'name' : serv.service.name} for serv in emp_services
             ],
         }
     
