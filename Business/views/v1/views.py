@@ -84,7 +84,8 @@ def get_user_default_data(request):
         is_default = True
     )
 
-    for service_instance in services:
+    if len(services) > 0:
+        service_instance = services[0]
         data['service'].append({
             'id' : f'{service_instance.id}',
             'name' : f'{service_instance.name}',
