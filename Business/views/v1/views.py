@@ -17,7 +17,7 @@ from Authentication.serializers import UserTenantLoginSerializer
 from Business.models import BusinessAddressMedia, BusinessType
 from Business.serializers.v1_serializers import BusinessAddress_CustomerSerializer, EmployeAppointmentServiceSerializer, EmployeTenatSerializer, OpeningHoursSerializer,AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer
 from Client.models import Client
-from Employee.models import EmployeDailySchedule, Employee
+from Employee.models import EmployeDailySchedule, Employee, EmployeeProfessionalInfo, EmployeeSelectedService
 
 from NStyle.Constants import StatusCodes
 
@@ -121,10 +121,25 @@ def get_user_default_data(request):
 
     if len(employees) > 0:
         employee_instance = employees[0]
+        try:
+            info = EmployeeProfessionalInfo.objects.get(employee = employee_instance)
+        except:
+            info = None
+        
+        emp_services = EmployeeSelectedService.objects.filter(employee = employee_instance)
+        
         data['employee'] = {
             'id' : f'{employee_instance.id}',
             'name' : f'{employee_instance.full_name}',
-            'type' : 'employee'
+            'type' : 'employee',
+            'email' : f'{employee_instance.email}',
+            'address' : f'{employee_instance.address}',
+            'designation' : f'{info.designation}' if info else '',
+            'income_type' : f'{info.income_type}' if info else '',
+            'salary' : f'{info.salary}' if info else '',
+            'assigned_services' : [
+                {'id' : serv.id, 'name' : serv.name} for serv in emp_services
+            ],
         }
     
     return Response(
