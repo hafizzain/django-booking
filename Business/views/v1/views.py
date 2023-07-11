@@ -28,7 +28,7 @@ from Business.models import Business, BusinessSocial, BusinessAddress, BusinessO
 from Product.models import Product, ProductStock
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
-from Service.models import Service, ServiceGroup
+from Service.models import Service, ServiceGroup, PriceService
 from Tenants.models import Domain, Tenant
 from Utility.models import Country, Currency, ExceptionRecord, Language, NstyleFile, Software, State, City
 from Utility.serializers import LanguageSerializer
@@ -36,7 +36,6 @@ import json
 from django.db.models import Q, F
 
 from django_tenants.utils import tenant_context
-from Service.models import PriceService
 from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, EmployeeBusinessSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
 
 
@@ -86,11 +85,22 @@ def get_user_default_data(request):
 
     if len(services) > 0:
         service_instance = services[0]
+        service_group = ServiceGroup.objects.filter(
+            services =service_instance
+        )
+        if len(service_group) > 0:
+            service_group_id = service_group[0].id
+            service_group_name = service_group[0].name
+        else:
+            service_group_id = None
+            service_group_name = None
         data['service'] = {
             'id' : f'{service_instance.id}',
             'name' : f'{service_instance.name}',
             'type' : 'service',
-            'priceservice' : PriceServiceSaleSerializer(PriceService.objects.filter(service = service_instance), many=True).data
+            'priceservice' : PriceServiceSaleSerializer(PriceService.objects.filter(service = service_instance), many=True).data,
+            'service_group_id' : service_group_id,
+            'service_group_name' : service_group_name,
         }
     
     clients = Client.objects.filter(
