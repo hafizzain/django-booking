@@ -155,7 +155,58 @@ def get_user_default_data(request):
         }
     )
 
-
+{
+    "service": {
+        "id": "02bb064a-f78d-4f84-9bcd-8671d719830a",
+        "name": "Hair color",
+        "type": "service",
+        "priceservice": [
+            {
+                "id": "83017f5c-9938-481f-88e3-47e2e07205f9",
+                "service": "02bb064a-f78d-4f84-9bcd-8671d719830a",
+                "duration": "30Min",
+                "price": 500
+            }
+        ],
+        "service_group_id": "e44ccae3-40d7-44e1-87e1-80b7a48f044d",
+        "service_group_name": "Hair Care"
+    },
+    "location": {
+        "name": "Dubai",
+        "id": "841ba0cb-de64-4e9f-b29a-fbba24141df2",
+        "business_address": "Dubai - United Arab Emirates",
+        "currency": "bf71d666-5b0f-4185-a857-cae2a0c5d86c",
+        "email": "muhammadtayyabahmed14@gmail.com",
+        "type": "location"
+    },
+    "client": {
+        "id": "c42cadea-3cab-461a-a7c1-4f6362fd72dc",
+        "name": "Muhammad Tayyab",
+        "email": "",
+        "phone_number": "+92-3176742642",
+        "type": "client"
+    },
+    "employee": {
+        "id": "b63d060c-0548-45bc-b394-ca35a133fef5",
+        "name": "Muhammad Tayyab Ahmed",
+        "type": "employee",
+        "email": "muhammadtayyabahmed14@gmail.com",
+        "address": "Dubai Marina",
+        "designation": "Store Manager",
+        "income_type": "Hourly_Rate",
+        "salary": "20",
+        "assigned_services": [
+            {
+                "id": "02bb064a-f78d-4f84-9bcd-8671d719830a",
+                "name": "Hair color"
+            },
+            {
+                "id": "0e2d70fd-3a9e-4b17-a17f-a01f6f91c3fa",
+                "name": "Hair cut"
+            }
+        ]
+    }
+}
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -187,50 +238,158 @@ def update_user_default_data(request):
     
     errors = []
 
-    locations = BusinessAddress.objects.filter(
-        is_default = True
-    )
-
-    if len(locations) > 0:
-        location_instance = locations[0]
-        location_instance.address_name = location
-        location_instance.save()
-
-    if type(service) == str:
-        service = json.loads(service)
-    
-    if type(service) == list:
-        for service_obj in service:
+    if location is not None:
+        location = json.loads(location)
+        name = location.get('name', '')
+        id = location.get('id', None)
+        address_name = location.get('business_address', '')
+        currency = location.get('currency', '')
+        email = location.get('email', '')
+        
+        try:
+            location = BusinessAddress.objects.get(
+                id = id
+            )
+        except Exception as err:
+            errors.append(str(err))
+        else:
+            location.name = name
+            location.address_name = address_name
             try:
-                service_instance = Service.objects.get(
-                    id = service_obj['id']
+                currency = Currency.objects.get(id = currency)
+            except Exception as err:
+                errors.append(str(err))
+            else:
+                location.currency = currency
+            location.email = email
+            location.save()
+
+    if service is not None:
+        service = json.loads(service)
+        
+        id = service.get('id', None)
+        name = service.get('name', None)
+        priceservice = service.get('priceservice', None)
+        service_group_id = service.get('service_group_id', None)
+        service_group_name = service.get('service_group_name', None)
+
+        try:
+            service_instance = Service.objects.get(
+                id = id
+            )
+        except Exception as err:
+            errors.append(str(err))
+        else:
+            service_instance.name = name
+            service_instance.save()
+            try:
+                serv_grp = ServiceGroup.objects.get(
+                    id = service_group_id
                 )
             except Exception as err:
                 errors.append(str(err))
-
             else:
-                service_instance.name = service_obj['name']
-                service_instance.save()
-    else:
-        errors.append('Failed Condition :::: type(service) == list')
-    
-    clients = Client.objects.filter(
-        is_default = True
-    )
+                serv_grp.name = service_group_name
+                serv_grp.save()
 
-    if len(clients) > 0:
-        client_instance = clients[0]
-        client_instance.full_name = client
-        client_instance.save()
-    
-    employees = Employee.objects.filter(
-        is_default = True
-    )
+            price_services_ids = []
+            for price in priceservice:
+                price_id = price.get('id', None)
+                price_services_ids.append(price_id)
+            deleted_items = PriceService.objects.filter(service = service_instance).exclude(id__in = price_services_ids)
+            deleted_items.delete()
 
-    if len(employees) > 0:
-        employee_instance = employees[0]
-        employee_instance.full_name = employee
-        employee_instance.save()
+            for price in priceservice:
+                price_id = price.get('id', None)
+                price_price = price.get('price', 0)
+                price_duration = price.get('duration', '')
+                try:
+                    service_price = PriceService.objects.get(
+                        id = price_id
+                    )
+                except:
+                    PriceService.objects.create(
+                        price = price.get('price', 0),
+                        duration = price.get('price', 0),
+                    )
+                else:
+                    service_price.price = price_price
+                    service_price.duration = price_duration
+                    service_price.save()
+    
+    
+
+    if client:
+        client = json.loads(client)
+        id = client.get('id', None)
+        name = client.get('name', None)
+        email = client.get('email', None)
+        phone_number = client.get('phone_number', None)
+        try:
+            client_instance = Client.objects.get(
+                id = id
+            )
+        except:
+            pass
+        else:
+            client_instance.full_name = name
+            client_instance.email = email
+            client_instance.phone_number = phone_number
+            client_instance.save()
+
+    if employee:
+        employee = json.loads(employee)
+        id = employee.get('id', None)
+        name = employee.get('name', None)
+        email = employee.get('email', None)
+        address = employee.get('address', None)
+        designation = employee.get('designation', None)
+        income_type = employee.get('income_type', None)
+        salary = employee.get('salary', None)
+        assigned_services = employee.get('assigned_services', None)
+        try:
+            employee_instance = Employee.objects.get(
+                id = id
+            )
+        except :
+            pass
+        else:
+            employee_instance.full_name = name
+            employee_instance.email = email
+            employee_instance.address = address
+            employee_instance.save()
+
+            try:
+                info = EmployeeProfessionalInfo.objects.get(
+                    employee = employee_instance
+                )
+            except:
+                pass
+            else:
+                info.designation = designation
+                info.income_type = income_type
+                info.salary = salary
+                info.save()
+            
+            empl_servs_ids = []
+            
+            for empl_serv in assigned_services:
+                emp_serv_id = empl_serv.get('id', None)
+                empl_servs_ids.append(emp_serv_id)
+            
+            EmployeeSelectedService.objects.filter(
+                employee = employee_instance
+            ).exclude(service__id__in = empl_servs_ids).delete()
+                
+            for empl_serv in assigned_services:
+                emp_serv_id = empl_serv.get('id', None)
+                EmployeeSelectedService.objects.get_or_create(
+                    service__id = emp_serv_id
+                )
+
+
+            
+
     
     return Response(
         {
