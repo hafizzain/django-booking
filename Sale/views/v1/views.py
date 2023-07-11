@@ -2367,7 +2367,7 @@ def new_create_sale_order(request):
             else:
                 sale_order_price = sale_order.total_price
             
-            total_price += (sale_order_price * sale_order.quantity)
+            total_price += float(sale_order_price * sale_order.quantity)
         
         logs_points_redeemed = 0
         logs_total_redeened_value = 0
