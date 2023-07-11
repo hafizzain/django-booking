@@ -421,7 +421,7 @@ class CustomerLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClientLoyaltyPoint
-        fields = ['customer', 'loyalty', 'points_earned', 'points_redeemed', 'balance']
+        fields = ['customer', 'loyalty', 'points_earned', 'points_redeemed', 'balance', 'invoice']
 
 class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
 
