@@ -1950,7 +1950,7 @@ def new_create_sale_order(request):
 
         for item in ids:
             price = item["price"]
-            minus_price +=(price)
+            minus_price += float(price)
     
     for id in ids:  
     
