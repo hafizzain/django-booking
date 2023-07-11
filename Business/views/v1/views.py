@@ -112,6 +112,8 @@ def get_user_default_data(request):
         data['client'] = {
             'id' : f'{client_instance.id}',
             'name' : f'{client_instance.full_name}',
+            'email' : f'{client_instance.email}',
+            'phone_number' : f'{client_instance.mobile_number}',
             'type' : 'client'
         }
     
