@@ -14,6 +14,8 @@ from django.utils.timezone import now
 from Product.models import Product
 from Service.models import Service
 import uuid
+from googletrans import Translator
+
 
 class Client(models.Model):
     GENDER_CHOICES = [
@@ -337,6 +339,8 @@ class Membership(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_memberships')
     
     name =  models.CharField(max_length=100, default='')
+    arabic_name = models.CharField(max_length=999, default='')
+
     description =  models.CharField(max_length=300, null=True, blank=True)
     #membership = models.CharField(default='Product', choices=MEMBERSHIP_CHOICES, max_length=30, verbose_name = 'Membership_type')
     
@@ -363,6 +367,13 @@ class Membership(models.Model):
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        translator = Translator()
+        arabic_text = translator.translate(self.name, src='en', dest='ar')
+        self.arabic_name = arabic_text.text
+
+        super(Product, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.id)
