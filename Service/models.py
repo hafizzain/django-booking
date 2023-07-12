@@ -63,6 +63,7 @@ class Service(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_services_or_packages', null=True, blank=True)
 
     name = models.CharField(max_length=100, default='')
+    urdu_name = models.CharField(max_length=999, default='')
 
     #service_type = models.CharField(choices=TREATMENT_TYPES, max_length=50, null=True, blank=True)
     service_availible = models.CharField(choices=SERVICE_CHOICE, max_length=50, default ='Everyone'  ,null=True, blank=True)
