@@ -94,7 +94,7 @@ class Product(models.Model):
 
         if not self.arabic_id:
             arabic_id_ = translator.translate(self.id, dest='ar')
-            self.arabic_id = arabic_id_
+            self.arabic_id = arabic_id_.text
 
         super(Product, self).save(*args, **kwargs)
 

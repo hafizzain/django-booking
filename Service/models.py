@@ -110,7 +110,7 @@ class Service(models.Model):
 
         if not self.arabic_id:
             arabic_id_ = translator.translate(self.id, dest='ar')
-            self.arabic_id = arabic_id_
+            self.arabic_id = arabic_id_.text
         super(Service, self).save(*args, **kwargs)
 
 
