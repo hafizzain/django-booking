@@ -1506,7 +1506,7 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
 
     def get_service(self, obj):
         if obj.service:
-            return {'name' : obj.service.name}
+            return {'name' : obj.service.name, 'arabic_name' : obj.service.arabic_name}
         return None
     
     def get_service_original_price(self, obj):
