@@ -1540,16 +1540,20 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
 class SaleOrder_VoucherSerializer(serializers.ModelSerializer):
     voucher_price = serializers.SerializerMethodField()
     voucher = serializers.SerializerMethodField()
+    voucher_arabic_name = serializers.SerializerMethodField()
 
     def get_voucher_price(self, obj):
         return obj.current_price
 
     def get_voucher(self, obj):
             return obj.voucher.name
+
+    def get_voucher_arabic_name(self, obj):
+            return obj.voucher.arabic_name
             
     class Meta:
         model = VoucherOrder
-        fields =[ 'id', 'voucher', 'quantity', 'voucher_price' ]
+        fields =[ 'id', 'voucher', 'voucher_arabic_name', 'quantity', 'voucher_price' ]
             # 'client', 'location' , 
             #      'member' ,'start_date', 'end_date','status',
             #      'total_price', 'payment_type' , 'order_type','price', 'name','created_at','discount_percentage'
@@ -1574,7 +1578,7 @@ class SaleOrder_MemberShipSerializer(serializers.ModelSerializer):
     def get_membership(self, obj):
         return obj.membership.name
     
-    def get_membership(self, obj):
+    def get_membership_arabic_name(self, obj):
         return obj.membership.arabic_name
         
     class Meta:
