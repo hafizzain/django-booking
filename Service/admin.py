@@ -7,6 +7,7 @@ class ServiceAdmin(admin.ModelAdmin):
     list_display = [
         'id',
         'name',
+        'arabic_name',
         'is_active',
         'is_default'
     ]
