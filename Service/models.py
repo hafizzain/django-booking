@@ -61,7 +61,7 @@ class Service(models.Model):
         
     ]
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
-    arabic_id = models.CharField(default='', max_length=999, unique=True, editable=False)
+    arabic_id = models.CharField(default='', max_length=999, editable=False)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_services_or_packages')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_services_or_packages', null=True, blank=True)
