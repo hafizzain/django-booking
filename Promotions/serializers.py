@@ -109,7 +109,7 @@ class AvailOfferProduct_Serializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id','name', 'slot_availible_for_online', 'prices', 'client_can_book']
+        fields = ['id','name', 'arabic_name', 'slot_availible_for_online', 'prices', 'client_can_book']
 
 
 
@@ -374,7 +374,7 @@ class AvailProduct_Serializers(serializers.ModelSerializer):
     #     return AvailOffer_PriceService_Serializers(prices, many = True).data
     class Meta:
         model = Product
-        fields = ['id','cost_price']
+        fields = ['id','cost_price', 'arabic_name']
 
 
 class DiscountOnFreeServiceSerializers(serializers.ModelSerializer):

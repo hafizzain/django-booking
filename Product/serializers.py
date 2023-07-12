@@ -214,6 +214,7 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
         fields = [
             'id', 
             'name', 
+            'arabic_name', 
             'cost_price',
             'category', 
             'brand', 
@@ -336,6 +337,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'id', 
             'short_id', 
             'name', 
+            'arabic_name', 
             'currency_retail_price',
             'size',
             'product_type',
@@ -608,14 +610,14 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
             
     class Meta:
         model = Product
-        fields = ['id', 'name', 'retail_price', 'brand', 'reports', 'current_stock', 'cost_price', 'created_at']
+        fields = ['id', 'name', 'arabic_name', 'retail_price', 'brand', 'reports', 'current_stock', 'cost_price', 'created_at']
         #  'avaiable',
 
 
 class ProductInsightSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['id', 'top_sold_orders']
+        fields = ['id', 'top_sold_orders', 'arabic_name']
 
 class ProductInventoryStockSerializer(serializers.ModelSerializer):
     current_stock = serializers.SerializerMethodField()

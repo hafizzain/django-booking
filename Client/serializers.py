@@ -22,7 +22,7 @@ class LocationSerializerLoyalty(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'arabic_name')
         # exclude = ['is_deleted', 'created_at', 'slug', 'published'
         #            , 'user', 'business' , 'vendor', 'category' ,'brand' , 'product_type' ,'cost_price' , 'full_price'
         #            , 'sell_price', 'tax_rate', 'short_description' , 'description' , 'barcode_id', ''

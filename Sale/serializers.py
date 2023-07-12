@@ -1313,7 +1313,7 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
 class ProductSerializer_CheckoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['id', 'name', 'cost_price']
+        fields = ['id', 'name', 'cost_price', 'arabic_name']
 
 class ServiceSerializer_CheckoutSerializer(serializers.ModelSerializer):
     price_service = serializers.SerializerMethodField(read_only=True)
@@ -1447,6 +1447,7 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
 
 class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     product_name  = serializers.SerializerMethodField(read_only=True)
+    product_arabic_name  = serializers.SerializerMethodField(read_only=True)
     product_price  = serializers.SerializerMethodField(read_only=True)
     price  = serializers.SerializerMethodField(read_only=True)
     selection_type  = serializers.SerializerMethodField(read_only=True)
@@ -1473,6 +1474,12 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
             return obj.product.name
         
         return None
+    
+    def get_product_arabic_name(self, obj):
+        if obj.product:
+            return obj.product.arabic_name
+        
+        return None
 
     # def get_product_original_price(self, obj):
     #     if obj.product:
@@ -1488,7 +1495,7 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductOrder
         fields = [
-            'id', 'product_name', 'product_original_price', 'quantity', 'product_price', 'price', 'selection_type']
+            'id', 'product_name', 'product_arabic_name', 'product_original_price', 'quantity', 'product_price', 'price', 'selection_type']
             # 'client','status', 'created_at',
             #       'location', 'member', 'tip', 'total_price' , 'payment_type','price','name',
             #       'gst', 'order_type', 'sold_quantity','product_details','total_product'
