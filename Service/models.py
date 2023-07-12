@@ -104,7 +104,7 @@ class Service(models.Model):
     def save(self, *args, **kwargs):
         translator = Translator()
 
-        arabic_text = translator.translate(f'{self.name}'.capitalize(), dest='ar')
+        arabic_text = translator.translate(f'{self.name}'.title(), dest='ar')
         text = arabic_text.text
         self.arabic_name = text
 
