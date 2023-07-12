@@ -268,7 +268,7 @@ class Vouchers(models.Model):
 
     def save(self, *args, **kwargs):
         translator = Translator()
-        arabic_text = translator.translate(self.name, src='en', dest='ar')
+        arabic_text = translator.translate(f'{self.name}'.capitalize(), src='en', dest='ar')
         self.arabic_name = arabic_text.text
 
         super(Vouchers, self).save(*args, **kwargs)
@@ -379,7 +379,7 @@ class Membership(models.Model):
 
     def save(self, *args, **kwargs):
         translator = Translator()
-        arabic_text = translator.translate(self.name, src='en', dest='ar')
+        arabic_text = translator.translate(f'{self.name}'.capitalize(), src='en', dest='ar')
         self.arabic_name = arabic_text.text
 
         super(Membership, self).save(*args, **kwargs)

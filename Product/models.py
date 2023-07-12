@@ -89,7 +89,7 @@ class Product(models.Model):
 
     def save(self, *args, **kwargs):
         translator = Translator()
-        arabic_text = translator.translate(self.name, src='en', dest='ar')
+        arabic_text = translator.translate(f'{self.name}'.capitalize(), src='en', dest='ar')
         self.arabic_name = arabic_text.text
 
         if not self.arabic_id:
