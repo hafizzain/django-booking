@@ -82,7 +82,7 @@ class AvailOfferService_Serializer(serializers.ModelSerializer):
 
     class Meta:
         model = Service
-        fields = ['id','name', 'slot_availible_for_online', 'prices', 'client_can_book']
+        fields = ['id','name', 'arabic_name', 'slot_availible_for_online', 'prices', 'client_can_book']
 
 class AvailOfferProduct_Serializer(serializers.ModelSerializer):
     prices = serializers.SerializerMethodField(read_only=True)

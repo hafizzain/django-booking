@@ -31,7 +31,7 @@ class ProductSerializer(serializers.ModelSerializer):
 class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'arabic_name')
         #exclude = ['is_deleted', 'created_at', 'updated_at']
 
 class CountrySerializer(serializers.ModelSerializer):

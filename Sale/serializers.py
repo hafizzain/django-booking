@@ -71,7 +71,7 @@ class ServiceSearchSerializer(serializers.ModelSerializer):
             pass
     class Meta:
         model = Service
-        fields = ['id','name', 'location', 'client_can_book', 'employees','priceservice', 'slot_availible_for_online']
+        fields = ['id','name', 'arabic_name', 'location', 'client_can_book', 'employees','priceservice', 'slot_availible_for_online']
         
 class ServiceGroupSerializer(serializers.ModelSerializer):
     
@@ -341,6 +341,7 @@ class ServiceSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'name' , 
+            'arabic_name' , 
             'service_availible',
             'employees', 
             'parrent_service' , 
@@ -1322,7 +1323,7 @@ class ServiceSerializer_CheckoutSerializer(serializers.ModelSerializer):
         return PriceServiceSaleSerializer(price, many = True).data
     class Meta:
         model = Service
-        fields = ['id', 'name', 'price_service']
+        fields = ['id', 'name', 'arabic_name', 'price_service']
 
 class PriceServiceSaleSerializer(serializers.ModelSerializer):
     

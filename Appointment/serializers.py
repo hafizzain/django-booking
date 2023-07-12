@@ -40,7 +40,7 @@ class ServiceSaleSerializer(serializers.ModelSerializer):
         return PriceServiceSaleSerializer(price, many = True).data
     class Meta:
         model = Service
-        fields = ['id', 'name', 'price_service']
+        fields = ['id', 'name', 'price_service', 'arabic_name']
 
 class UpdateAppointmentSerializer(serializers.ModelSerializer):
     service_name  = serializers.SerializerMethodField(read_only=True)
@@ -65,7 +65,7 @@ class LocationSerializer(serializers.ModelSerializer):
 class ServiceAppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
-        fields = ('id', 'name', 'price')
+        fields = ('id', 'name', 'price', 'arabic_name')
 
 class EmployeAppoinmentSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()

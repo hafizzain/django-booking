@@ -75,7 +75,7 @@ class ServiceReportSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Service
-        fields = ['id','name', 'sale']
+        fields = ['id','name', 'sale', 'arabic_name']
 
 class ReportsEmployeSerializer(serializers.ModelSerializer):    
     image = serializers.SerializerMethodField()
