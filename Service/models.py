@@ -61,6 +61,8 @@ class Service(models.Model):
         
     ]
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    arabic_id = models.UUIDField(default='', unique=True, editable=False)
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_services_or_packages')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_services_or_packages', null=True, blank=True)
 
@@ -105,6 +107,10 @@ class Service(models.Model):
         arabic_text = translator.translate(self.name, dest='ar')
         text = arabic_text.text
         self.arabic_name = text
+
+        if not self.arabic_id:
+            arabic_id_ = translator.translate(self.id, dest='ar')
+            self.arabic_id = arabic_id_
         super(Service, self).save(*args, **kwargs)
 
 

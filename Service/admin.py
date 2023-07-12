@@ -6,6 +6,7 @@ from .models import Service , PriceService , ServiceGroup
 class ServiceAdmin(admin.ModelAdmin):
     list_display = [
         'id',
+        'arabic_id',
         'name',
         'arabic_name',
         'is_active',
