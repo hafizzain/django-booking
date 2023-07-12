@@ -1559,6 +1559,7 @@ class SaleOrder_MemberShipSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField()
     membership_price = serializers.SerializerMethodField()
     membership = serializers.SerializerMethodField()
+    membership_arabic_name = serializers.SerializerMethodField()
     selection_type  = serializers.SerializerMethodField(read_only=True)
 
     def get_selection_type(self, obj):
@@ -1572,10 +1573,13 @@ class SaleOrder_MemberShipSerializer(serializers.ModelSerializer):
 
     def get_membership(self, obj):
         return obj.membership.name
+    
+    def get_membership(self, obj):
+        return obj.membership.arabic_name
         
     class Meta:
         model = MemberShipOrder
-        fields =['id', 'membership', 'quantity', 'price', 'membership_price', 'selection_type' ]
+        fields =['id', 'membership', 'membership_arabic_name', 'quantity', 'price', 'membership_price', 'selection_type' ]
             # 'order_type' ,'client','member', 'location' ,'start_date', 'end_date','status', 'total_price', 'name',
             #      'payment_type','created_at'
 
