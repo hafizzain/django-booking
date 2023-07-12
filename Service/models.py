@@ -8,6 +8,8 @@ from Authentication.models import User
 from Business.models import Business, BusinessAddress
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 from Utility.models import Currency
+from googletrans import Translator
+
 
 class Service(models.Model):
     SERVICE_CHOICE = [
@@ -63,7 +65,7 @@ class Service(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_services_or_packages', null=True, blank=True)
 
     name = models.CharField(max_length=100, default='')
-    urdu_name = models.CharField(max_length=999, default='')
+    arabic_name = models.CharField(max_length=999, default='')
 
     #service_type = models.CharField(choices=TREATMENT_TYPES, max_length=50, null=True, blank=True)
     service_availible = models.CharField(choices=SERVICE_CHOICE, max_length=50, default ='Everyone'  ,null=True, blank=True)
@@ -96,6 +98,14 @@ class Service(models.Model):
     updated_at = models.DateTimeField(null=True, blank=True)
     
     is_package = models.BooleanField(default=False, )
+
+    def save(self, *args, **kwargs):
+        translator = Translator()
+
+        arabic_text = translator.translate(self.name, dest='ar')
+        text = arabic_text.text
+        self.arabic_name = text
+        super(Service, self).save(*args, **kwargs)
 
 
     def __str__(self):
