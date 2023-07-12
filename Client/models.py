@@ -242,6 +242,8 @@ class Vouchers(models.Model):
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_voucher')
     
     name = models.CharField(max_length=100, default='')
+    arabic_name = models.CharField(max_length=999, default='')
+
     #value = models.PositiveIntegerField(default=0)
     
     voucher_type = models.CharField(choices= VOUCHER_CHOICES,default= 'Product', verbose_name = 'Voucher Type', max_length=20)
@@ -263,6 +265,13 @@ class Vouchers(models.Model):
     is_deleted = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
+
+    def save(self, *args, **kwargs):
+        translator = Translator()
+        arabic_text = translator.translate(self.name, src='en', dest='ar')
+        self.arabic_name = arabic_text.text
+
+        super(Vouchers, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.id)
@@ -373,7 +382,7 @@ class Membership(models.Model):
         arabic_text = translator.translate(self.name, src='en', dest='ar')
         self.arabic_name = arabic_text.text
 
-        super(Product, self).save(*args, **kwargs)
+        super(Membership, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.id)
