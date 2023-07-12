@@ -42,7 +42,7 @@ class Product(models.Model):
         ('Both', 'Both'),
     ]
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
-    arabic_id = models.UUIDField(default='', unique=True, editable=False)
+    arabic_id = models.CharField(default='', max_length=999, unique=True, editable=False)
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_products')
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_products')
