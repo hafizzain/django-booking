@@ -93,14 +93,14 @@ def get_user_default_data(request):
         else:
             service_group_id = None
             service_group_name = None
-        data['service'] = {
+        data['service'].append({
             'id' : f'{service_instance.id}',
             'name' : f'{service_instance.name}',
             'type' : 'service',
             'priceservice' : PriceServiceSaleSerializer(PriceService.objects.filter(service = service_instance), many=True).data,
             'service_group_id' : service_group_id,
             'service_group_name' : service_group_name,
-        }
+        })
     
     clients = Client.objects.filter(
         is_default = True
