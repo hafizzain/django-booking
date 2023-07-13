@@ -94,6 +94,7 @@ def get_user_default_data(request):
         data['service'].append({
             'id' : f'{service_instance.id}',
             'name' : f'{service_instance.name}',
+            'description' : f'{service_instance.description}',
             'type' : 'service',
             'priceservice' : PriceServiceSaleSerializer(PriceService.objects.filter(service = service_instance), many=True).data,
         })
