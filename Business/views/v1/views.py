@@ -83,23 +83,19 @@ def get_user_default_data(request):
         is_default = True
     )
 
+    service_group = ServiceGroup.objects.all()
+    if len(service_group) > 0:
+        data['service_group'] = {
+            'id' : service_group[0].id,
+            'name' : service_group[0].name
+        }
+
     for service_instance in services:
-        service_group = ServiceGroup.objects.filter(
-            services =service_instance
-        )
-        if len(service_group) > 0:
-            service_group_id = service_group[0].id
-            service_group_name = service_group[0].name
-        else:
-            service_group_id = None
-            service_group_name = None
         data['service'].append({
             'id' : f'{service_instance.id}',
             'name' : f'{service_instance.name}',
             'type' : 'service',
             'priceservice' : PriceServiceSaleSerializer(PriceService.objects.filter(service = service_instance), many=True).data,
-            'service_group_id' : service_group_id,
-            'service_group_name' : service_group_name,
         })
     
     clients = Client.objects.filter(
