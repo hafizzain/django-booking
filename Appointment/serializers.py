@@ -16,6 +16,7 @@ from Service.models import PriceService, Service
 from datetime import datetime, timedelta
 from Product.Constants.index import tenant_media_base_url
 from django.db.models import Q, F
+from Business.serializers.v1_serializers import CurrencySerializer
 
 
 
@@ -23,10 +24,11 @@ from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 from Utility.models import ExceptionRecord
 
 class PriceServiceSaleSerializer(serializers.ModelSerializer):
+    currency = CurrencySerializer()
     
     class Meta:
         model = PriceService
-        fields = ['id','service', 'duration', 'price']
+        fields = ['id','service', 'duration', 'price', 'currency']
 
 class MemberSaleSerializer(serializers.ModelSerializer):
     class Meta:
