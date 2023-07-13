@@ -83,8 +83,7 @@ def get_user_default_data(request):
         is_default = True
     )
 
-    if len(services) > 0:
-        service_instance = services[0]
+    for service_instance in services:
         service_group = ServiceGroup.objects.filter(
             services =service_instance
         )
