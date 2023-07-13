@@ -263,6 +263,7 @@ def update_user_default_data(request):
     for service in services:
         id = service.get('id', None)
         name = service.get('name', None)
+        description = service.get('description', '')
         priceservice = service.get('priceservice', None)
         service_group_id = service.get('service_group_id', None)
         service_group_name = service.get('service_group_name', None)
@@ -275,6 +276,7 @@ def update_user_default_data(request):
             errors.append(str(err))
         else:
             service_instance.name = name
+            service_instance.description = description
             service_instance.save()
             try:
                 serv_grp = ServiceGroup.objects.get(
