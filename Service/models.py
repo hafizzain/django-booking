@@ -8,6 +8,8 @@ from Authentication.models import User
 from Business.models import Business, BusinessAddress
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 from Utility.models import Currency
+from googletrans import Translator
+
 
 class Service(models.Model):
     SERVICE_CHOICE = [
@@ -59,10 +61,13 @@ class Service(models.Model):
         
     ]
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
+    arabic_id = models.CharField(default='', max_length=999, editable=False)
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_services_or_packages')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_services_or_packages', null=True, blank=True)
 
     name = models.CharField(max_length=100, default='')
+    arabic_name = models.CharField(max_length=999, default='')
 
     #service_type = models.CharField(choices=TREATMENT_TYPES, max_length=50, null=True, blank=True)
     service_availible = models.CharField(choices=SERVICE_CHOICE, max_length=50, default ='Everyone'  ,null=True, blank=True)
@@ -95,6 +100,18 @@ class Service(models.Model):
     updated_at = models.DateTimeField(null=True, blank=True)
     
     is_package = models.BooleanField(default=False, )
+
+    def save(self, *args, **kwargs):
+        translator = Translator()
+
+        arabic_text = translator.translate(f'{self.name}'.title(), dest='ar')
+        text = arabic_text.text
+        self.arabic_name = text
+
+        if not self.arabic_id:
+            arabic_id_ = translator.translate(self.id, dest='ar')
+            self.arabic_id = arabic_id_.text
+        super(Service, self).save(*args, **kwargs)
 
 
     def __str__(self):
@@ -135,6 +152,7 @@ class PriceService(models.Model):
 
     duration = models.CharField(max_length=50, null=True, blank=True, choices=DURATION_CHOICES )
     price = models.FloatField(default=0)
+    created_at = models.DateTimeField(default=now)
 
     def __str__(self):
         return str(self.id)

@@ -98,6 +98,7 @@ class MembershipAdmin(admin.ModelAdmin):
         'id', 
         'user', 
         'name', 
+        'arabic_name', 
         ] 
 @admin.register(Vouchers)
 class VouchersAdmin(admin.ModelAdmin):
@@ -105,6 +106,7 @@ class VouchersAdmin(admin.ModelAdmin):
         'id', 
         'user', 
         'name', 
+        'arabic_name', 
         'validity',
         'price',
         'is_active'

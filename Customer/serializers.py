@@ -48,7 +48,7 @@ class EmployeAppoinmentSerializer(serializers.ModelSerializer):
 class ServiceAppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
-        fields = ('id', 'name', 'price')
+        fields = ('id', 'name', 'price', 'arabic_name')
         
 class AppointmentServiceClientSerializer(serializers.ModelSerializer):
     business_address = serializers.SerializerMethodField()

@@ -65,13 +65,13 @@ class ServiceSearchSerializer(serializers.ModelSerializer):
     
     def get_priceservice(self, obj):
         try:
-            ser = PriceService.objects.filter(service = obj)
+            ser = PriceService.objects.filter(service = obj).order_by('-created_at')
             return PriceServiceSerializers(ser, many = True).data
         except Exception as err:
             pass
     class Meta:
         model = Service
-        fields = ['id','name', 'location', 'client_can_book', 'employees','priceservice', 'slot_availible_for_online']
+        fields = ['id','name', 'arabic_name', 'location', 'client_can_book', 'employees','priceservice', 'slot_availible_for_online']
         
 class ServiceGroupSerializer(serializers.ModelSerializer):
     
@@ -301,7 +301,7 @@ class ServiceSerializer(serializers.ModelSerializer):
     
     def get_price(self, obj):
         try:
-            ser = PriceService.objects.filter(service = obj).first()
+            ser = PriceService.objects.filter(service = obj).order_by('-created_at').first()
             return ser.price
         except Exception as err:
             pass
@@ -309,7 +309,7 @@ class ServiceSerializer(serializers.ModelSerializer):
     
     def get_priceservice(self, obj):
         try:
-            ser = PriceService.objects.filter(service = obj)
+            ser = PriceService.objects.filter(service = obj).order_by('-created_at')
             return PriceServiceSerializers(ser, many = True).data
         except Exception as err:
             pass
@@ -341,6 +341,7 @@ class ServiceSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'name' , 
+            'arabic_name' , 
             'service_availible',
             'employees', 
             'parrent_service' , 
@@ -1312,17 +1313,17 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
 class ProductSerializer_CheckoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['id', 'name', 'cost_price']
+        fields = ['id', 'name', 'cost_price', 'arabic_name']
 
 class ServiceSerializer_CheckoutSerializer(serializers.ModelSerializer):
     price_service = serializers.SerializerMethodField(read_only=True)
     
     def get_price_service(self, obj):
-        price = PriceService.objects.filter(service = str(obj))
+        price = PriceService.objects.filter(service = str(obj)).order_by('-created_at')
         return PriceServiceSaleSerializer(price, many = True).data
     class Meta:
         model = Service
-        fields = ['id', 'name', 'price_service']
+        fields = ['id', 'name', 'arabic_name', 'price_service']
 
 class PriceServiceSaleSerializer(serializers.ModelSerializer):
     
@@ -1446,6 +1447,7 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
 
 class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     product_name  = serializers.SerializerMethodField(read_only=True)
+    product_arabic_name  = serializers.SerializerMethodField(read_only=True)
     product_price  = serializers.SerializerMethodField(read_only=True)
     price  = serializers.SerializerMethodField(read_only=True)
     selection_type  = serializers.SerializerMethodField(read_only=True)
@@ -1472,6 +1474,12 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
             return obj.product.name
         
         return None
+    
+    def get_product_arabic_name(self, obj):
+        if obj.product:
+            return obj.product.arabic_name
+        
+        return None
 
     # def get_product_original_price(self, obj):
     #     if obj.product:
@@ -1480,14 +1488,14 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     #     return None
     
     def get_product_original_price(self, obj):
-        price = PriceService.objects.filter(service = str(obj))
+        price = PriceService.objects.filter(service = str(obj)).order_by('-created_at')
         return PriceServiceSaleSerializer(price, many = True).data
 
 
     class Meta:
         model = ProductOrder
         fields = [
-            'id', 'product_name', 'product_original_price', 'quantity', 'product_price', 'price', 'selection_type']
+            'id', 'product_name', 'product_arabic_name', 'product_original_price', 'quantity', 'product_price', 'price', 'selection_type']
             # 'client','status', 'created_at',
             #       'location', 'member', 'tip', 'total_price' , 'payment_type','price','name',
             #       'gst', 'order_type', 'sold_quantity','product_details','total_product'
@@ -1505,7 +1513,7 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
 
     def get_service(self, obj):
         if obj.service:
-            return {'name' : obj.service.name}
+            return {'name' : obj.service.name, 'arabic_name' : obj.service.arabic_name}
         return None
     
     def get_service_original_price(self, obj):
@@ -1532,16 +1540,20 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
 class SaleOrder_VoucherSerializer(serializers.ModelSerializer):
     voucher_price = serializers.SerializerMethodField()
     voucher = serializers.SerializerMethodField()
+    voucher_arabic_name = serializers.SerializerMethodField()
 
     def get_voucher_price(self, obj):
         return obj.current_price
 
     def get_voucher(self, obj):
             return obj.voucher.name
+
+    def get_voucher_arabic_name(self, obj):
+            return obj.voucher.arabic_name
             
     class Meta:
         model = VoucherOrder
-        fields =[ 'id', 'voucher', 'quantity', 'voucher_price' ]
+        fields =[ 'id', 'voucher', 'voucher_arabic_name', 'quantity', 'voucher_price' ]
             # 'client', 'location' , 
             #      'member' ,'start_date', 'end_date','status',
             #      'total_price', 'payment_type' , 'order_type','price', 'name','created_at','discount_percentage'
@@ -1551,6 +1563,7 @@ class SaleOrder_MemberShipSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField()
     membership_price = serializers.SerializerMethodField()
     membership = serializers.SerializerMethodField()
+    membership_arabic_name = serializers.SerializerMethodField()
     selection_type  = serializers.SerializerMethodField(read_only=True)
 
     def get_selection_type(self, obj):
@@ -1564,10 +1577,13 @@ class SaleOrder_MemberShipSerializer(serializers.ModelSerializer):
 
     def get_membership(self, obj):
         return obj.membership.name
+    
+    def get_membership_arabic_name(self, obj):
+        return obj.membership.arabic_name
         
     class Meta:
         model = MemberShipOrder
-        fields =['id', 'membership', 'quantity', 'price', 'membership_price', 'selection_type' ]
+        fields =['id', 'membership', 'membership_arabic_name', 'quantity', 'price', 'membership_price', 'selection_type' ]
             # 'order_type' ,'client','member', 'location' ,'start_date', 'end_date','status', 'total_price', 'name',
             #      'payment_type','created_at'
 
@@ -1756,6 +1772,8 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
     promotion_name  = serializers.SerializerMethodField(read_only=True)
     
     tip = serializers.SerializerMethodField(read_only=True)
+    invoice = serializers.SerializerMethodField(read_only=True)
+    
 
     def get_promotion_name(self, obj):
         return 'promotion name'
@@ -1801,11 +1819,19 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
         serialized_tips = AppointmentTipsSerializer(tips, many=True).data
         return serialized_tips
     
+    def get_invoice(self, obj):
+        try:
+            invoice = SaleInvoice.objects.get(checkout__icontains = obj)
+            serializer = SaleInvoiceSerializer(invoice)
+            return serializer.data
+        except Exception as e:
+            return str(e)
+    
     class Meta:
         model = AppointmentCheckout
         fields = ['id', 'appointment', 'appointment_service', 'payment_method', 'service',
                  'business_address', 'voucher', 'promotion', 
                  'membership', 'rewards', 'tip', 'gst', 'gst_price', 'service_price',
                  'total_price', 'service_commission', 'service_commission_type', 'voucher_discount_percentage',
-                 'created_at', 'order_type', 'client', 'location', 'price', 'promotion_name']
+                 'created_at', 'order_type', 'client', 'location', 'price', 'promotion_name', 'invoice']
         

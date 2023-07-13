@@ -48,12 +48,12 @@ def get_ItemPrice(this_instance, orders):
                         o1 += float(retail_price) * float(order.quantity)
 
             else:
-                service_prices = PriceService.objects.filter(service = item.service, duration = item.duration, currency = this_instance.location.currency)
+                service_prices = PriceService.objects.filter(service = item.service, duration = item.duration, currency = this_instance.location.currency).order_by('-created_at')
                 service_price = 0
                 if len(service_prices) > 0:
                     service_price = service_prices[0].price
                 else:
-                    service_prices = PriceService.objects.filter(service = item.service, currency = this_instance.location.currency)
+                    service_prices = PriceService.objects.filter(service = item.service, currency = this_instance.location.currency).order_by('-created_at')
                     if len(service_prices) > 0:
                         service_price = service_prices[0].price
                 if service_price:
@@ -78,7 +78,7 @@ def get_Appointment_ItemPrice(this_instance, orders):
             if order.discount_price:
                 d1 += float(order.discount_price)
                 
-                service_prices = PriceService.objects.filter(service = order.service, duration = order.duration, currency = this_instance.location.currency)
+                service_prices = PriceService.objects.filter(service = order.service, duration = order.duration, currency = this_instance.location.currency).order_by('-created_at')
                 if len(service_prices) > 0:
                     service_price = service_prices[0].price
                     o1 += float(service_price)
@@ -86,12 +86,12 @@ def get_Appointment_ItemPrice(this_instance, orders):
             else:
                 o1 += float(order.price)
         else:
-            service_prices = PriceService.objects.filter(service = order.service, duration = order.duration, currency = this_instance.location.currency)
+            service_prices = PriceService.objects.filter(service = order.service, duration = order.duration, currency = this_instance.location.currency).order_by('-created_at')
             service_price = 0
             if len(service_prices) > 0:
                 service_price = service_prices[0].price
             else:
-                service_prices = PriceService.objects.filter(service = order.service, currency = this_instance.location.currency)
+                service_prices = PriceService.objects.filter(service = order.service, currency = this_instance.location.currency).order_by('-created_at')
                 if len(service_prices) > 0:
                     service_price = service_prices[0].price
 
@@ -127,12 +127,12 @@ def get_fixed_prices(this_instance, orders):
                     original_price += float(retail_price) * float(order.quantity)
 
         else:
-            service_prices = PriceService.objects.filter(service = item.service, duration = item.duration, currency = this_instance.location.currency)
+            service_prices = PriceService.objects.filter(service = item.service, duration = item.duration, currency = this_instance.location.currency).order_by('-created_at')
             service_price = 0
             if len(service_prices) > 0:
                 service_price = service_prices[0].price
             else:
-                service_prices = PriceService.objects.filter(service = item.service, currency = this_instance.location.currency)
+                service_prices = PriceService.objects.filter(service = item.service, currency = this_instance.location.currency).order_by('-created_at')
                 if len(service_prices) > 0:
                     service_price = service_prices[0].price
 
@@ -150,12 +150,12 @@ def get_Appointment_fixed_prices(this_instance, orders):
         
         discounted_prices += float(order.price)
        
-        service_prices = PriceService.objects.filter(service = order.service, duration = order.duration, currency = this_instance.location.currency)
+        service_prices = PriceService.objects.filter(service = order.service, duration = order.duration, currency = this_instance.location.currency).order_by('-created_at')
         service_price = 0
         if len(service_prices) > 0:
             service_price = service_prices[0].price
         else:
-            service_prices = PriceService.objects.filter(service = order.service, currency = this_instance.location.currency)
+            service_prices = PriceService.objects.filter(service = order.service, currency = this_instance.location.currency).order_by('-created_at')
             if len(service_prices) > 0:
                 service_price = service_prices[0].price
 

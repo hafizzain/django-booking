@@ -28,7 +28,7 @@ from django_tenants.utils import tenant_context
 class ServicesEmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
-        fields=['id', 'name', 'location']
+        fields=['id', 'name', 'location', 'arabic_name']
 
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
@@ -850,8 +850,18 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
         
         # except Exception as err:
         #     return '0'
+
+        income_type = self.context.get('income_type', None)
         
         try:
+            if income_type == 'Hourly_Rate':
+                if obj.is_vacation:
+                    return '8'
+                elif obj.is_leave:
+                    return '0'
+                else:
+                    pass
+                
             if obj.start_time is None or obj.end_time is None:
                 return '0'  # Return '0' if any of the time values is None
 
@@ -1037,9 +1047,14 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     def get_schedule(self, obj):
         schedule =  EmployeDailySchedule.objects.filter(
             employee = obj
-        ).order_by('-created_at')
+        ).order_by('-date')
         # ).order_by('employee__employee_employedailyschedule__date')            
-        return WorkingSchedulePayrollSerializer(schedule, many = True,context=self.context).data
+        context = self.context
+        try:
+            context['income_type'] = EmployeeProfessionalInfo.objects.get(employee=obj).income_type
+        except:
+            context['income_type'] = None
+        return WorkingSchedulePayrollSerializer(schedule, many = True,context=context).data
     
     def get_sallaryslip(self, obj):
         sallary =  SallarySlipPayrol.objects.filter(employee= obj )            

@@ -473,7 +473,7 @@ def update_service(request):
     
     if priceservice is not None:
         if check == True:
-            vch = PriceService.objects.filter(service = service_id)
+            vch = PriceService.objects.filter(service = service_id).order_by('-created_at')
             check = False
             for i in vch:
                 try:
@@ -1632,7 +1632,7 @@ def create_sale_order(request):
         elif sale_type == 'SERVICE':
             try:
                 service = Service.objects.get(id = service_id)
-                service_price = PriceService.objects.filter(service = service_id).first()
+                service_price = PriceService.objects.filter(service = service_id).order_by('-created_at').first()
                 dur = service_price.duration
                 # ExceptionRecord.objects.create(
                 #     text = f'price {price} discount_price {discount_price}'
@@ -1950,7 +1950,7 @@ def new_create_sale_order(request):
 
         for item in ids:
             price = item["price"]
-            minus_price +=(price)
+            minus_price += float(price)
     
     for id in ids:  
     
@@ -2119,7 +2119,14 @@ def new_create_sale_order(request):
             try:
                 service = Service.objects.get(id = service_id)
                 item_name = service.name
-                service_price = PriceService.objects.filter(service = service_id).first()
+                service_price = PriceService.objects.filter(
+                    service = service_id,
+                    currency = business_address.currency
+                ).order_by('-created_at')
+                if len(service_price) > 0:
+                    service_price = service_price[0]
+                else:
+                    service_price = PriceService.objects.filter(service = service_id).order_by('-created_at').first()
                 dur = service_price.duration
                 
                 service_order = ServiceOrder.objects.create(
@@ -2360,7 +2367,7 @@ def new_create_sale_order(request):
             else:
                 sale_order_price = sale_order.total_price
             
-            total_price += (sale_order_price * sale_order.quantity)
+            total_price += float(sale_order_price * sale_order.quantity)
         
         logs_points_redeemed = 0
         logs_total_redeened_value = 0
@@ -2394,7 +2401,8 @@ def new_create_sale_order(request):
             client_points, created = ClientLoyaltyPoint.objects.get_or_create(
                 location = business_address,
                 client = checkout.client,
-                loyalty_points = point
+                loyalty_points = point,
+                invoice = invoice.id
             )
             
             loyalty_spend_amount = point.amount_spend

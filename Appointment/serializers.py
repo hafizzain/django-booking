@@ -16,6 +16,7 @@ from Service.models import PriceService, Service
 from datetime import datetime, timedelta
 from Product.Constants.index import tenant_media_base_url
 from django.db.models import Q, F
+from Business.serializers.v1_serializers import CurrencySerializer
 
 
 
@@ -23,10 +24,11 @@ from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 from Utility.models import ExceptionRecord
 
 class PriceServiceSaleSerializer(serializers.ModelSerializer):
+    currency = CurrencySerializer()
     
     class Meta:
         model = PriceService
-        fields = ['id','service', 'duration', 'price']
+        fields = ['id','service', 'duration', 'price', 'currency']
 
 class MemberSaleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -36,14 +38,15 @@ class ServiceSaleSerializer(serializers.ModelSerializer):
     price_service = serializers.SerializerMethodField(read_only=True)
     
     def get_price_service(self, obj):
-        price = PriceService.objects.filter(service = str(obj))
+        price = PriceService.objects.filter(service = str(obj)).order_by('-created_at')
         return PriceServiceSaleSerializer(price, many = True).data
     class Meta:
         model = Service
-        fields = ['id', 'name', 'price_service']
+        fields = ['id', 'name', 'price_service', 'arabic_name']
 
 class UpdateAppointmentSerializer(serializers.ModelSerializer):
     service_name  = serializers.SerializerMethodField(read_only=True)
+    service_arabic_name  = serializers.SerializerMethodField(read_only=True)
     
     def get_service_name(self, obj):
         try:
@@ -52,6 +55,15 @@ class UpdateAppointmentSerializer(serializers.ModelSerializer):
 
         except Exception as err:
             print(err)
+
+    def get_service_arabic_name(self, obj):
+        try:
+            cli = f"{obj.service.arabic_name}"
+            return cli
+
+        except Exception as err:
+            print(err)
+
     class Meta:
         model = AppointmentService
         fields = '__all__'
@@ -65,7 +77,7 @@ class LocationSerializer(serializers.ModelSerializer):
 class ServiceAppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
-        fields = ('id', 'name', 'price')
+        fields = ('id', 'name', 'price', 'arabic_name')
 
 class EmployeAppoinmentSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
@@ -234,8 +246,14 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
         try:
             employee_working_schedule = EmployeDailySchedule.objects.get(
                 employee = employee_instance,
-                date = selected_date
+                date = selected_date,
             )
+            if employee_working_schedule.is_leave :
+                raise Exception('Employee on Leave')
+            
+            if employee_working_schedule.is_vacation :
+                raise Exception('Employee on Vacation')
+            
         except Exception as err:
             errors.append(str(err))
             exluded_times.append({

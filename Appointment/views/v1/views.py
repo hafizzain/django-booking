@@ -1824,7 +1824,8 @@ def create_checkout(request):
             client_points, created = ClientLoyaltyPoint.objects.get_or_create(
                 location = business_address,
                 client = appointments.client,
-                loyalty_points = point
+                loyalty_points = point,
+                invoice = invoice.id
             )
 
 
@@ -2555,18 +2556,18 @@ def get_employee_check_time(request):
                 }
             },
             status=status.HTTP_200_OK
-        )                               
+        )
         try:
             av_staff_ids = AppointmentService.objects.filter(
+                Q(appointment_time__range = (start_time, tested)) | Q(end_time__range = (start_time, tested)),
                 member__id = employee.id,
                 appointment_date = date,
                 #is_blocked = False,
-                appointment_time__range = (start_time, tested),
-                end_time__range = (start_time, tested),
             ).exclude(appointment_status = 'Cancel')
             if len(av_staff_ids) > 0:
                 st_time = convert_24_to_12(str(start_time))
                 ed_time = convert_24_to_12(str(tested))
+                data.append(AppointmentServiceSerializer(av_staff_ids, many=True).data)
                 return Response(
                     {
                         'status' : True,
@@ -2574,8 +2575,12 @@ def get_employee_check_time(request):
                         'status_code_text' : '200',
                         'response' : {
                             'message' : f'{employee.full_name} isn’t available between {st_time} and {ed_time}, but your team member can still book appointments for them.',
-                            'error_message' : None,
+                            'error_message' : f'Appointments Found ({len(av_staff_ids)})',
                             'employee':data,
+                            'extra_data' : {
+                                'start_time' : start_time,
+                                'end_time' : tested,
+                            }
                         }
                     },
                     status=status.HTTP_200_OK

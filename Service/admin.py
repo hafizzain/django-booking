@@ -6,7 +6,9 @@ from .models import Service , PriceService , ServiceGroup
 class ServiceAdmin(admin.ModelAdmin):
     list_display = [
         'id',
+        'arabic_id',
         'name',
+        'arabic_name',
         'is_active',
         'is_default'
     ]
@@ -16,13 +18,18 @@ class PriceServiceAdmin(admin.ModelAdmin):
         'service__name',
         'currency__code'
     ]
+
     list_display = [
         'id',
         'service_name',
         'currency',
         'duration',
+        'duration_added',
         'price',
     ]
+
+    def duration_added(self, instance):
+        return instance.duration
 
     def service_name(self, instance):
         return instance.service.name

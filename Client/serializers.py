@@ -22,7 +22,7 @@ class LocationSerializerLoyalty(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'arabic_name')
         # exclude = ['is_deleted', 'created_at', 'slug', 'published'
         #            , 'user', 'business' , 'vendor', 'category' ,'brand' , 'product_type' ,'cost_price' , 'full_price'
         #            , 'sell_price', 'tax_rate', 'short_description' , 'description' , 'barcode_id', ''
@@ -31,7 +31,7 @@ class ProductSerializer(serializers.ModelSerializer):
 class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'arabic_name')
         #exclude = ['is_deleted', 'created_at', 'updated_at']
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -190,7 +190,7 @@ class MembershipSerializer(serializers.ModelSerializer):
             
     class Meta:
         model = Membership
-        fields = ['id', 'name','valid_for','discount','description', 'term_condition','products', 'services', 'currency_membership']
+        fields = ['id', 'name', 'arabic_name', 'valid_for','discount','description', 'term_condition','products', 'services', 'currency_membership']
 
 class VoucherSerializer(serializers.ModelSerializer):
     # currency_voucher_prices = serializers.SerializerMethodField(read_only=True)
@@ -210,7 +210,7 @@ class VoucherSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Vouchers
-        fields = ['id', 'name','user','business','voucher_type',
+        fields = ['id', 'name', 'arabic_name', 'user','business','voucher_type',
                 'validity','sales','is_deleted','is_active','created_at','currency_voucher','discount_percentage', 'voucher_count']
 
 
@@ -421,7 +421,7 @@ class CustomerLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClientLoyaltyPoint
-        fields = ['customer', 'loyalty', 'points_earned', 'points_redeemed', 'balance']
+        fields = ['customer', 'loyalty', 'points_earned', 'points_redeemed', 'balance', 'invoice']
 
 class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
 

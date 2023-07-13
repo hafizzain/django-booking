@@ -14,6 +14,8 @@ from django.utils.timezone import now
 from Product.models import Product
 from Service.models import Service
 import uuid
+from googletrans import Translator
+
 
 class Client(models.Model):
     GENDER_CHOICES = [
@@ -240,6 +242,8 @@ class Vouchers(models.Model):
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_voucher')
     
     name = models.CharField(max_length=100, default='')
+    arabic_name = models.CharField(max_length=999, default='')
+
     #value = models.PositiveIntegerField(default=0)
     
     voucher_type = models.CharField(choices= VOUCHER_CHOICES,default= 'Product', verbose_name = 'Voucher Type', max_length=20)
@@ -261,6 +265,13 @@ class Vouchers(models.Model):
     is_deleted = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
+
+    def save(self, *args, **kwargs):
+        translator = Translator()
+        arabic_text = translator.translate(f'{self.name}'.title(), src='en', dest='ar')
+        self.arabic_name = arabic_text.text
+
+        super(Vouchers, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.id)
@@ -337,6 +348,8 @@ class Membership(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_memberships')
     
     name =  models.CharField(max_length=100, default='')
+    arabic_name = models.CharField(max_length=999, default='')
+
     description =  models.CharField(max_length=300, null=True, blank=True)
     #membership = models.CharField(default='Product', choices=MEMBERSHIP_CHOICES, max_length=30, verbose_name = 'Membership_type')
     
@@ -363,6 +376,13 @@ class Membership(models.Model):
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        translator = Translator()
+        arabic_text = translator.translate(f'{self.name}'.title(), src='en', dest='ar')
+        self.arabic_name = arabic_text.text
+
+        super(Membership, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.id)
@@ -439,6 +459,7 @@ class ClientLoyaltyPoint(models.Model):
 
     for_every_points = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name='For every (this) points')
     customer_will_get_amount = models.FloatField(default=0, null=True, blank=True, verbose_name='a customer will get (this) amount')
+    invoice = models.CharField(max_length=128, null=True, blank=True)
 
 
     created_at = models.DateTimeField(auto_now_add=now, null=True)

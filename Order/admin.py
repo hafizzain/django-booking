@@ -6,6 +6,7 @@ from Service.models import ServiceGroup
 admin.site.register(ProductOrder)
 @admin.register(ServiceOrder)
 class ServiceOrderAdmin(admin.ModelAdmin):
+    ordering = ['-created_at']
     list_filter = [
         'location__address_name',
         'service__name',
@@ -13,15 +14,28 @@ class ServiceOrderAdmin(admin.ModelAdmin):
     ]
     list_display = [
         'id', 
-        'location',
+        'location_name',
+        'service_name',
         'service_group_name',
         'quantity',
+        'duration_text',
         'total_price',
         'sold_quantity',
         'discount_price',
         'price',
         'created_at',
     ]
+
+    def location_name(self, order):
+        if order.location:
+            return order.location.address_name
+    
+    def service_name(self, order):
+        if order.service:
+            return order.service.name
+
+    def duration_text(self, order):
+        return f'{order.duration}'
 
     def service_group_name(self, service):
         groups = ServiceGroup.objects.filter(
