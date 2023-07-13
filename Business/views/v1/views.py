@@ -212,10 +212,10 @@ def get_user_default_data(request):
 def update_user_default_data(request):
     location = request.data.get('location', None)
     client = request.data.get('client', None)
-    service = request.data.get('service', None)
+    services = request.data.get('service', None)
     employee = request.data.get('employee', None)
 
-    if not all([location, client, service, employee]):
+    if not all([location, client, services, employee]):
         return Response(
             {
                 'status' : False,
@@ -263,9 +263,8 @@ def update_user_default_data(request):
             location.email = email
             location.save()
 
-    if service is not None:
-        service = json.loads(service)
-        
+    services = json.loads(services)
+    for service in services:
         id = service.get('id', None)
         name = service.get('name', None)
         priceservice = service.get('priceservice', None)
