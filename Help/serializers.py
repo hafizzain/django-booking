@@ -3,9 +3,9 @@ from .models import HelpContent
 from Product.Constants.index import tenant_media_base_url
 
 class HelpContentSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
+    imagee = serializers.SerializerMethodField()
     
-    def get_image(self, obj):
+    def get_imagee(self, obj):
         if obj.image:
             try:
                 request = self.context["request"]
@@ -13,8 +13,8 @@ class HelpContentSerializer(serializers.ModelSerializer):
                 return f'{url}{obj.image}'
             except:
                 return obj.image
-        return None
+        return ''
     
     class Meta:
         model = HelpContent
-        fields = ['id', 'content', 'parent_comment', 'is_parent', 'image']
+        fields = ['id', 'content', 'parent_comment', 'is_parent', 'imagee']
