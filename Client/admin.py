@@ -10,6 +10,7 @@ class DiscountMembershipAdmin(admin.ModelAdmin):
     list_display = [
         'id',
         'service',
+        'product',
         'membership',
         'duration',
     ]
