@@ -1306,6 +1306,32 @@ def create_blockTime(request):
         end_time = datetime_duration
     except Exception as err:
         ExceptionRecord.objects.create(text=f'Errors happer in end linr 1180 {str(err)}')
+    # start_time
+    # tested
+
+    block_time_start = start_time
+    block_time_end = tested
+    current_appointments = AppointmentService.objects.filter(
+        Q(appointment_time__range = (block_time_start, block_time_end)),
+        Q(end_time__range = (block_time_start, block_time_end)),
+        business = business,
+        appointment_date = date,
+    ).exclude(
+        appointment_status__in = ['Done', 'Paid', 'Cancel']
+    )
+
+    if len(current_appointments) > 0:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'response' : {
+                    'message' : 'You already have appointment in this time.',
+                    'error_message' : None,
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        ) 
     
     block_time = AppointmentService.objects.create(
             user = user,
