@@ -1245,8 +1245,6 @@ def get_products(request):
                                             'location': location,
                                             })
     data = serialized.data
-    sorted_data = sorted(data, key=lambda x: x['stocks'], reverse=True)
-
     end_time = datetime.datetime.now()
 
     return Response(
@@ -1264,7 +1262,7 @@ def get_products(request):
                 'pages':page_count,
                 'per_page_result':20,
                 'error_message' : None,
-                'products' : sorted_data
+                'products' : data
             }
         },
         status=status.HTTP_200_OK
