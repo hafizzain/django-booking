@@ -333,7 +333,7 @@ def get_Employees(request):
 
         serialized = singleEmployeeSerializer(all_employe,  many=True, context={'request' : request} )
         data = serialized.data
-        sorted_data = sorted(data, key=lambda x: x['totoal_sale'], reverse=True)
+        # sorted_data = sorted(data, key=lambda x: x['totoal_sale'], reverse=True)
         return Response(
             {
                 'status' : 200,
@@ -344,7 +344,7 @@ def get_Employees(request):
                     'pages':page_count,
                     'per_page_result':20,
                     'error_message' : None,
-                    'employees' : sorted_data
+                    'employees' : data
                 }
             },
             status=status.HTTP_200_OK
@@ -352,7 +352,7 @@ def get_Employees(request):
     else:
         serialized = singleEmployeeSerializer(all_employe,  many=True, context={'request' : request} )
         data = serialized.data
-        sorted_data = sorted(data, key=lambda x: x['total_sale'], reverse=True)
+        # sorted_data = sorted(data, key=lambda x: x['total_sale'], reverse=True)
         return Response(
             {
                 'status' : 200,
@@ -363,7 +363,7 @@ def get_Employees(request):
                     'pages':page_count,
                     'per_page_result':20,
                     'error_message' : None,
-                    'employees' :sorted_data
+                    'employees' : data
                 }
             },
             status=status.HTTP_200_OK
