@@ -724,6 +724,7 @@ class CategoryCommissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = CategoryCommission
         fields = '__all__'
+        ordering = ['total_sale']
      
 class CommissionSerializer(serializers.ModelSerializer):
     category_comission = serializers.SerializerMethodField()
