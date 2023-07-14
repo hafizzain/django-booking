@@ -2504,6 +2504,9 @@ def get_employee_check_time(request):
     duration = request.data.get('duration', None)
     start_time = request.data.get('app_time', None)
     date = request.data.get('date', None)
+
+    if duration and duration is not None:
+        duration = duration.strip()
     
     if start_time is not None:
         dtime = datetime.strptime(start_time, "%H:%M:%S")
