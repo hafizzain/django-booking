@@ -1317,6 +1317,7 @@ def create_blockTime(request):
         business = business,
         member = member,
         appointment_date = date,
+        is_deleted = False
     ).exclude(
         appointment_status__in = ['Done', 'Paid', 'Cancel']
     )
