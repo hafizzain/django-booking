@@ -1975,6 +1975,7 @@ def update_memberships(request):
     service = request.data.get('service', None)
     services = request.data.get('services', None)
     product = request.data.get('product',None)
+    products = request.data.get('products',None)
     membership_type = request.data.get('membership_type',None)
     currency_membership = request.data.get('currency_membership',None)
     check = True
@@ -2068,7 +2069,26 @@ def update_memberships(request):
                 if created:
                     membership_service.duration = duration
                     membership_service.save()
-
+    
+    for product_dict in products:
+        product_id = product_dict['product']
+        percentage = product_dict['percentage']
+        try:
+            product_instance = Product.objects.get(id=product_id)
+        except Exception as err:
+            errors.append(str(err))
+        else:
+            try:
+                membership_product, created = DiscountMembership.objects.get_or_create(
+                    product = product_instance,
+                    membership = membership
+                )
+            except Exception as err:
+                errors.append(str(err))
+            else:
+                membership_product.percentage = percentage
+                membership_product.save()
+    
      
     if currency_membership:  
         if check == True:
