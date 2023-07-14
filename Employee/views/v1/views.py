@@ -318,7 +318,7 @@ def get_Employees(request):
     all_employe= Employee.objects.filter(
         is_deleted=False, 
         is_blocked=False
-    )
+    ).order_by('-created')
     all_employee_count = all_employe.count()
     
     page_count = all_employee_count / 20
