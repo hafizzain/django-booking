@@ -2053,13 +2053,13 @@ def update_memberships(request):
         service_id = serv['service']
         duration = serv['duration']
         try:
-            service_id=Service.objects.get(id=service)
+            service_instance = Service.objects.get(id=service_id)
         except Exception as err:
             errors.append(str(err))
         else:
             try:
                 membership_service, created = DiscountMembership.objects.get_or_create(
-                    service = service_id,
+                    service = service_instance,
                     membership = membership
                 )
             except Exception as err:
