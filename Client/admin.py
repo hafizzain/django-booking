@@ -13,6 +13,7 @@ class DiscountMembershipAdmin(admin.ModelAdmin):
         'product',
         'membership',
         'duration',
+        'percentage',
     ]
 
 @admin.register(VoucherCurrencyPrice)
