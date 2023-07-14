@@ -2114,9 +2114,10 @@ def update_memberships(request):
             #membership = curr.get('membership', None)
             price = curr.get('price', None)
             try:
-                currency_id = Currency.objects.get(id=currency)
+                currency_instance = Currency.objects.get(id=currency)
             except Exception as err:
                 pass
+            else:
             # if id is not None:
             #     try:
             #         currency_price = CurrencyPriceMembership.objects.get(id=id)
@@ -2126,18 +2127,18 @@ def update_memberships(request):
             #         currency_price.price = price
             #         currency_price.save()
             
-            if currency_id is not None: 
-                try:
-                    currency_price = CurrencyPriceMembership.objects.get(currency=currency_id)
-                    currency_price.price = price
-                    currency_price.save()
-                except Exception as err:
+                currency_price, created = CurrencyPriceMembership.objects.get_or_create(
+                    currency = currency_instance,
+                    membership = membership,
+                )
+                currency_price.price = price
+                currency_price.save()
                     
-                    services_obj = CurrencyPriceMembership.objects.create(
-                        membership = membership,
-                        currency = currency_id,
-                        price = price,
-                    )                
+                    # services_obj = CurrencyPriceMembership.objects.create(
+                    #     membership = membership,
+                    #     currency = currency_instance,
+                    #     price = price,
+                    # )                
                 
                 
     serializer = MembershipSerializer(membership, data=request.data, partial=True)
