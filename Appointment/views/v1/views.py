@@ -1312,9 +1312,10 @@ def create_blockTime(request):
     block_time_start = start_time
     block_time_end = tested
     current_appointments = AppointmentService.objects.filter(
-        Q(appointment_time__range = (block_time_start, block_time_end)),
+        Q(appointment_time__range = (block_time_start, block_time_end)) |
         Q(end_time__range = (block_time_start, block_time_end)),
         business = business,
+        member = member,
         appointment_date = date,
     ).exclude(
         appointment_status__in = ['Done', 'Paid', 'Cancel']
