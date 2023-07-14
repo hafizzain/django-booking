@@ -34,7 +34,7 @@ from Authentication.models import AccountType, User, VerificationOTP
 from NStyle.Constants import StatusCodes
 import json
 from Utility.models import NstyleFile
-from django.db.models import Q, F, Sum, When, Case, IntegerField
+from django.db.models import Q, F, Sum, When, Case, IntegerField, FloatField
 import csv
 from Utility.models import GlobalPermissionChoices
 from Permissions.models import EmployePermission
@@ -325,7 +325,7 @@ def get_Employees(request):
                 # When(member_appointments__appointment_status = 'Done', then=F('member_appointments__total_price')),
                 When(member_orders__discount_price__gt = 0, then=F('member_orders__discount_price') * F('member_orders__quantity') ),
                 When(member_orders__total_price__gt = 0, then=F('member_orders__total_price') * F('member_orders__quantity') ),
-                output_field = IntegerField()
+                output_field = FloatField()
             )
         )
     ).order_by('-employee_total_sale')
