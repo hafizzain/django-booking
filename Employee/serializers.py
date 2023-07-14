@@ -718,7 +718,6 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'total_sale',
             'is_active',  
             ]   
-        ordering = ['total_sale']
 
 class CategoryCommissionSerializer(serializers.ModelSerializer):
     
