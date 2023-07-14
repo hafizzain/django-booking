@@ -1376,7 +1376,7 @@ def search_product(request):
 def get_stocks(request):
     all_stocks = Product.objects.filter(is_active=True, is_deleted=False, product_stock__gt=0 ).order_by('-created_at').distinct()
     serialized = ProductWithStockSerializer(all_stocks, many=True, context={'request' : request}).data
-    serialized_data = sorted(serialized, key=lambda x:x ['stock']['sold_quantity'], reverse=True)
+    serialized_data = sorted(serialized, key=lambda x:x ['stock'][1]['sold_quantity'], reverse=True)
     return Response(
         {
             'status' : True,
