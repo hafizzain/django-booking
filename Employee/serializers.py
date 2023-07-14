@@ -697,6 +697,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
         model =Employee
         fields = [
             'id',
+            'employee_total_sale',
             'image',
             'salary',
             'email',

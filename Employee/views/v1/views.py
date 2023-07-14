@@ -34,7 +34,7 @@ from Authentication.models import AccountType, User, VerificationOTP
 from NStyle.Constants import StatusCodes
 import json
 from Utility.models import NstyleFile
-from django.db.models import Q
+from django.db.models import Q, F, Sum, When
 import csv
 from Utility.models import GlobalPermissionChoices
 from Permissions.models import EmployePermission
@@ -314,7 +314,13 @@ def search_employee(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_Employees(request):
-    all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
+    # total_sale = ?
+    all_employe= Employee.objects.filter(
+        is_deleted=False, 
+        is_blocked=False
+    ).annotate(
+        employee_total_sale = Sum(F('member_appointments__price'))
+    ).order_by('-employee_total_sale')
     all_employee_count = all_employe.count()
     
     page_count = all_employee_count / 20
