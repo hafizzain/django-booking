@@ -2050,16 +2050,21 @@ def update_memberships(request):
         service_id = serv['service']
         duration = serv['duration']
         try:
-            membership_service, created = DiscountMembership.objects.get_or_create(
-                service__id = service_id,
-                membership = membership
-            )
+            service_id=Service.objects.get(id=service)
         except Exception as err:
             pass
         else:
-            if created:
-                membership_service.duration = duration
-                membership_service.save()
+            try:
+                membership_service, created = DiscountMembership.objects.get_or_create(
+                    service = service_id,
+                    membership = membership
+                )
+            except Exception as err:
+                pass
+            else:
+                if created:
+                    membership_service.duration = duration
+                    membership_service.save()
 
      
     if currency_membership:  
