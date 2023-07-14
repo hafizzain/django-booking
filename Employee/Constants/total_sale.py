@@ -7,11 +7,11 @@ def total_sale_employee(employee_id):
     total_price = 0
     employee_id = str(employee_id)
     
-    # appointment_checkout = AppointmentService.objects.filter(
-    #     appointment_status = 'Done',
-    #     member = employee_id,
-    #     ).values_list('total_price', flat=True)
-    # total_price += sum(appointment_checkout)
+    appointment_checkout = AppointmentService.objects.filter(
+        appointment_status = 'Done',
+        member = employee_id,
+        ).values_list('total_price', flat=True)
+    total_price += sum(appointment_checkout)
     
     orders = Order.objects.filter(
         checkout__is_deleted = False, 
