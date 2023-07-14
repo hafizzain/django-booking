@@ -604,6 +604,13 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
         
     location = serializers.SerializerMethodField()
     total_sale = serializers.SerializerMethodField()
+    employee_total_sale = serializers.SerializerMethodField()
+
+    def get_employee_total_sale(self, obj):
+        try:
+            return obj.employee_total_sale
+        except Exception as err:
+            return str(err)
     
     def get_total_sale(self,obj):
         try:
