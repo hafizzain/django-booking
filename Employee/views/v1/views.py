@@ -333,7 +333,7 @@ def get_Employees(request):
 
         serialized = singleEmployeeSerializer(all_employe,  many=True, context={'request' : request} )
         data = serialized.data
-        sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
+        sorted_data = sorted(data, key=lambda x: x['totoal_sale'], reverse=True)
         return Response(
             {
                 'status' : 200,
@@ -352,7 +352,7 @@ def get_Employees(request):
     else:
         serialized = singleEmployeeSerializer(all_employe,  many=True, context={'request' : request} )
         data = serialized.data
-        sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
+        sorted_data = sorted(data, key=lambda x: x['total_sale'], reverse=True)
         return Response(
             {
                 'status' : 200,
