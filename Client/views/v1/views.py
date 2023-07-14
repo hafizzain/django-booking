@@ -2050,7 +2050,8 @@ def update_memberships(request):
         service_id = serv['service']
         duration = serv['duration']
         membership_service, created = DiscountMembership.objects.get_or_create(
-            service__id = service_id
+            service__id = service_id,
+            membership = membership
         )
 
         if created:
