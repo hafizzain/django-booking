@@ -23,16 +23,16 @@ def total_sale_employee(employee_id):
         member__id=employee_id,
     )
     
-    for order in orders:
-        price = 0
-        if order.discount_price:
-            price = order.discount_price
-        elif order.total_price:
-            price = order.total_price
-        total_price += float(price) * float(order.quantity)
+    # for order in orders:
+    #     price = 0
+    #     if order.discount_price:
+    #         price = order.discount_price
+    #     elif order.total_price:
+    #         price = order.total_price
+    #     total_price += float(price) * float(order.quantity)
     
-    for price in apps_checkouts_total:
-        if price.total_price is not None:
-            total_price += float(price.total_price)
+    # for price in apps_checkouts_total:
+    #     if price.total_price is not None:
+    #         total_price += float(price.total_price)
         
     return total_price
