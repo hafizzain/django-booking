@@ -604,21 +604,6 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
         
     location = serializers.SerializerMethodField()
     total_sale = serializers.SerializerMethodField()
-    employee_total_sale = serializers.SerializerMethodField()
-    appointment_sales = serializers.SerializerMethodField()
-    other_sales = serializers.SerializerMethodField()
-
-    def get_employee_total_sale(self, obj):
-        try:
-            return obj.employee_total_sale
-        except Exception as err:
-            return str(err)
-        
-    def get_appointment_sales(self, obj):
-        return obj.appointment_sales
-        
-    def get_other_sales(self, obj):
-        return obj.other_sales
     
     def get_total_sale(self,obj):
         try:
@@ -712,9 +697,6 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
         model =Employee
         fields = [
             'id',
-            'employee_total_sale',
-            'appointment_sales',
-            'other_sales',
             'image',
             'salary',
             'email',

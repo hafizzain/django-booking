@@ -318,22 +318,7 @@ def get_Employees(request):
     all_employe= Employee.objects.filter(
         is_deleted=False, 
         is_blocked=False
-    ).annotate(
-        # employee_total_sale = Sum(F('member_appointments__price'))
-        appointment_sales = Case(
-                When(member_appointments__appointment_status = 'Done', then=Sum(F('member_appointments__total_price'))),
-                output_field = FloatField()
-            ),
-        other_sales = Sum(
-            Case(
-                When(member_orders__discount_price__gt = 0, then=F('member_orders__discount_price') * F('member_orders__quantity') ),
-                When(member_orders__total_price__gt = 0, then=F('member_orders__total_price') * F('member_orders__quantity') ),
-                output_field = FloatField()
-            )
-        ),
-    ).annotate(
-        employee_total_sale = F('appointment_sales') + F('other_sales')
-    ).order_by('-employee_total_sale')
+    )
     all_employee_count = all_employe.count()
     
     page_count = all_employee_count / 20
@@ -347,6 +332,8 @@ def get_Employees(request):
         all_employe = paginator.get_page(page_number)
 
         serialized = singleEmployeeSerializer(all_employe,  many=True, context={'request' : request} )
+        data = serialized.data
+        sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
         return Response(
             {
                 'status' : 200,
@@ -357,13 +344,15 @@ def get_Employees(request):
                     'pages':page_count,
                     'per_page_result':20,
                     'error_message' : None,
-                    'employees' : serialized.data
+                    'employees' : sorted_data
                 }
             },
             status=status.HTTP_200_OK
         )
     else:
         serialized = singleEmployeeSerializer(all_employe,  many=True, context={'request' : request} )
+        data = serialized.data
+        sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
         return Response(
             {
                 'status' : 200,
@@ -374,7 +363,7 @@ def get_Employees(request):
                     'pages':page_count,
                     'per_page_result':20,
                     'error_message' : None,
-                    'employees' : serialized.data
+                    'employees' :sorted_data
                 }
             },
             status=status.HTTP_200_OK
