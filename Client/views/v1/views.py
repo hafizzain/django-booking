@@ -1973,6 +1973,7 @@ def delete_memberships(request):
 def update_memberships(request):
     id = request.data.get('id', None)
     service = request.data.get('service', None)
+    services = request.data.get('services', None)
     product = request.data.get('product',None)
     membership_type = request.data.get('membership_type',None)
     currency_membership = request.data.get('currency_membership',None)
@@ -2044,6 +2045,18 @@ def update_memberships(request):
         membership.service= service_id
         membership.product = None
         membership.save()
+
+    for serv in services:
+        service_id = serv['service']
+        duration = serv['duration']
+        membership_service, created = DiscountMembership.objects.get_or_create(
+            service__id = service_id
+        )
+
+        if created:
+            membership_service.duration = duration
+            membership_service.save()
+
      
     if currency_membership:  
         if check == True:
