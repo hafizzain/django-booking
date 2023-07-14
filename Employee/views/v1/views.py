@@ -322,9 +322,9 @@ def get_Employees(request):
         # employee_total_sale = Sum(F('member_appointments__price'))
         employee_total_sale = Sum(
             Case(
-                When(member_appointments__appointment_status = 'Done', then=F('member_appointments__total_price')),
-                # When(member_orders__discount_price__gt = 0, then=F('member_orders__discount_price') * F('member_orders__quantity') ),
-                # When(member_orders__total_price__gt = 0, then=F('member_orders__total_price') * F('member_orders__quantity') ),
+                # When(member_appointments__appointment_status = 'Done', then=F('member_appointments__total_price')),
+                When(member_orders__discount_price__gt = 0, then=F('member_orders__discount_price') * F('member_orders__quantity') ),
+                When(member_orders__total_price__gt = 0, then=F('member_orders__total_price') * F('member_orders__quantity') ),
                 output_field = IntegerField()
             )
         )
