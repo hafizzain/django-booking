@@ -34,7 +34,7 @@ from Authentication.models import AccountType, User, VerificationOTP
 from NStyle.Constants import StatusCodes
 import json
 from Utility.models import NstyleFile
-from django.db.models import Q, F, Sum, When
+from django.db.models import Q, F, Sum, When, Case
 import csv
 from Utility.models import GlobalPermissionChoices
 from Permissions.models import EmployePermission
@@ -319,7 +319,13 @@ def get_Employees(request):
         is_deleted=False, 
         is_blocked=False
     ).annotate(
-        employee_total_sale = Sum(F('member_appointments__price'))
+        # employee_total_sale = Sum(F('member_appointments__price'))
+        employee_total_sale = Sum(Case(
+            When(
+                member_appointments__appointment_status = 'Done',
+                then=F('member_appointments__price')
+            )
+        ))
     ).order_by('-employee_total_sale')
     all_employee_count = all_employe.count()
     
