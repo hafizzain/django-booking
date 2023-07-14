@@ -1978,6 +1978,8 @@ def update_memberships(request):
     membership_type = request.data.get('membership_type',None)
     currency_membership = request.data.get('currency_membership',None)
     check = True
+
+    errors= []
     
     if id is None: 
         return Response(
@@ -2046,13 +2048,14 @@ def update_memberships(request):
         membership.product = None
         membership.save()
 
+    errors.append(services)
     for serv in services:
         service_id = serv['service']
         duration = serv['duration']
         try:
             service_id=Service.objects.get(id=service)
         except Exception as err:
-            pass
+            errors.append(str(err))
         else:
             try:
                 membership_service, created = DiscountMembership.objects.get_or_create(
@@ -2060,7 +2063,7 @@ def update_memberships(request):
                     membership = membership
                 )
             except Exception as err:
-                pass
+                errors.append(str(err))
             else:
                 if created:
                     membership_service.duration = duration
@@ -2138,7 +2141,8 @@ def update_memberships(request):
             'response' : {
                 'message' : 'Update Membership Successfully',
                 'error_message' : None,
-                'membership' : serializer.data
+                'membership' : serializer.data,
+                'errors' : errors
             }
         },
         status=status.HTTP_200_OK
