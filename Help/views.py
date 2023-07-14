@@ -96,7 +96,7 @@ def get_comment(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    comments = HelpContentSerializer(all_comments, many=True)
+    comments = HelpContentSerializer(all_comments, many=True, context={'request' : request})
 
     return Response(
     {
