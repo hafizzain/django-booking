@@ -191,6 +191,7 @@ class MembershipSerializer(serializers.ModelSerializer):
     class Meta:
         model = Membership
         fields = ['id', 'name', 'arabic_name', 'valid_for','discount','description', 'term_condition','products', 'services', 'currency_membership']
+        read_only_fields = ['arabic_name']
 
 class VoucherSerializer(serializers.ModelSerializer):
     # currency_voucher_prices = serializers.SerializerMethodField(read_only=True)
