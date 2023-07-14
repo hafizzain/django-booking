@@ -320,14 +320,21 @@ def get_Employees(request):
         is_blocked=False
     ).annotate(
         # employee_total_sale = Sum(F('member_appointments__price'))
-        employee_total_sale = Sum(
+        appointment_sales = Sum(
             Case(
                 When(member_appointments__appointment_status = 'Done', then=F('member_appointments__total_price')),
+                output_field = FloatField()
+            )
+        ),
+        other_sales = Sum(
+            Case(
                 When(member_orders__discount_price__gt = 0, then=F('member_orders__discount_price') * F('member_orders__quantity') ),
                 When(member_orders__total_price__gt = 0, then=F('member_orders__total_price') * F('member_orders__quantity') ),
                 output_field = FloatField()
             )
-        )
+        ),
+    ).annotate(
+        employee_total_sale = F('appointment_sales') + F('other_sales')
     ).order_by('-employee_total_sale')
     all_employee_count = all_employe.count()
     
