@@ -28,7 +28,7 @@ from django_tenants.utils import tenant_context
 class ServicesEmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
-        fields=['id', 'name', 'location', 'arabic_name']
+        fields=['id', 'name', 'location']
 
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:

@@ -31,8 +31,8 @@ def total_sale_employee(employee_id):
             price = order.total_price
         total_price += float(price) * float(order.quantity)
     
-    for price in apps_checkouts_total:
-        if price.total_price is not None:
-            total_price += float(price.total_price)
+    # for price in apps_checkouts_total:
+    #     if price.total_price is not None:
+    #         total_price += float(price.total_price)
         
     return total_price
