@@ -18,3 +18,8 @@ class HelpContentSerializer(serializers.ModelSerializer):
     class Meta:
         model = HelpContent
         fields = ['id', 'content', 'parent_comment', 'is_parent', 'image']
+
+class HelpContentDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HelpContent
+        fields = ['id', 'content', 'parent_comment', 'is_parent', 'description']
