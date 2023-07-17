@@ -2137,7 +2137,7 @@ def get_payrol_working(request):
         is_deleted = False, 
         is_blocked = False,
         **queries
-    ).distinct().order_by('employee_employedailyschedule__date')
+    ).distinct('id').order_by('employee_employedailyschedule__date')
     all_employe_count= all_employe.count()
 
     page_count = all_employe_count / 10
