@@ -140,7 +140,7 @@ def get_comment_details(request):
 
     
     leng = len(all)
-    serializer = HelpContentSerializer(all, many=True)
+    serializer = HelpContentDetailSerializer(all, many=True)
     print(serializer)
     if leng == 0:
         message = 'No Child Data'
