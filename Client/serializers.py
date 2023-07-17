@@ -213,6 +213,7 @@ class VoucherSerializer(serializers.ModelSerializer):
         model = Vouchers
         fields = ['id', 'name', 'arabic_name', 'user','business','voucher_type',
                 'validity','sales','is_deleted','is_active','created_at','currency_voucher','discount_percentage', 'voucher_count']
+        read_only_fields = ['arabic_name']
 
 
 class ClientAppointmentSerializer(serializers.ModelSerializer):
