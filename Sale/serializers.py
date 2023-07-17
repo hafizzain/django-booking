@@ -184,10 +184,13 @@ class EmployeeSelectedServiceSerializer(serializers.ModelSerializer):
     
     def get_image(self, obj):
         try:
-            request = self.context["request"]
-            url = tenant_media_base_url(request)
             img = Employee.objects.get(id = obj.employee.id)
-            return f'{url}{img.image}'
+            if img.image:
+                request = self.context["request"]
+                url = tenant_media_base_url(request)
+                return f'{url}{img.image}'
+            else:
+                return None
         except Exception as err:
             print(str(err))
     
