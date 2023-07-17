@@ -24,7 +24,7 @@ from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Business.models import Business , BusinessAddress, ClientNotificationSetting, StaffNotificationSetting
 from datetime import datetime
 from Order.models import Checkout, MemberShipOrder, ProductOrder, VoucherOrder, ServiceOrder
-from Sale.serializers import MemberShipOrderSerializer, ProductOrderSerializer, VoucherOrderSerializer
+from Sale.serializers import MemberShipOrderSerializer, ProductOrderSerializer, VoucherOrderSerializer, ServiceOrderSerializer
 
 #from Service.models import Service
 from Service.models import Service
@@ -2194,6 +2194,9 @@ def get_client_sale(request):
     product_order = ProductOrder.objects.filter(checkout__client = client).order_by('-created_at')
     product = ProductOrderSerializer(product_order,  many=True,  context={'request' : request, })
     
+    service_orders = ServiceOrder.objects.filter(checkout__client = client).order_by('-created_at')
+    services_data = ServiceOrderSerializer(service_orders,  many=True,  context={'request' : request, })
+    
     voucher_order = VoucherOrder.objects.filter(checkout__client = client).order_by('-created_at')
     voucher = VoucherOrderSerializer(voucher_order,  many=True,  context={'request' : request, })
     data.extend(voucher.data)
@@ -2219,6 +2222,7 @@ def get_client_sale(request):
                     'message' : 'Client Order Sales!',
                     'error_message' : None,
                     'product' : product.data,
+                    'service' : services_data.data,
                     'voucher' : data,
                     'appointment' : serialized.data
                 }
