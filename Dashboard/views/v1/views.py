@@ -14,7 +14,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from Appointment.models import Appointment, AppointmentCheckout, AppointmentService
+from Appointment.models import Appointment, AppointmentCheckout, AppointmentService, AppointmentEmployeeTip
 from Client.models import Client
 from NStyle.Constants import StatusCodes
 from Business.models import Business, BusinessAddress
@@ -509,35 +509,49 @@ def get_total_tips(request):
     if range_start:
         range_start = datetime.strptime(range_start, "%Y-%m-%d")
         range_end = datetime.strptime(range_end, "%Y-%m-%d")
+        emplooyee_tips = AppointmentEmployeeTip.objects.filter(
+            member__id = employee_id,
+            is_active = True,
+            is_deleted = False,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+        ).values_list('tip', flat=True)
+        total_tips += sum(emplooyee_tips)
     
-        checkout_order = Checkout.objects.filter(
-            is_deleted=False,
-            member__id = employee_id,
-            created_at__gte =  range_start ,
-            created_at__lte = range_end
-            ).values_list('tip', flat=True)
-        total_tips += sum(checkout_order)
+        # checkout_order = Checkout.objects.filter(
+        #     is_deleted=False,
+        #     member__id = employee_id,
+        #     created_at__gte =  range_start ,
+        #     created_at__lte = range_end
+        #     ).values_list('tip', flat=True)
+        # total_tips += sum(checkout_order)
         
-        appointment_checkout = AppointmentCheckout.objects.filter(
-            appointment_service__appointment_status = 'Done',
-            member__id = employee_id,
-            created_at__gte =  range_start ,
-            created_at__lte = range_end
-            ).values_list('tip', flat=True)
-        total_tips += sum(appointment_checkout)
+        # appointment_checkout = AppointmentCheckout.objects.filter(
+        #     appointment_service__appointment_status = 'Done',
+        #     member__id = employee_id,
+        #     created_at__gte =  range_start ,
+        #     created_at__lte = range_end
+        #     ).values_list('tip', flat=True)
+        # total_tips += sum(appointment_checkout)
         
     else:
-        checkout_order = Checkout.objects.filter(
-            is_deleted=False,
-            member__id = employee_id,
-            ).values_list('tip', flat=True)
-        total_tips += sum(checkout_order)
+        # checkout_order = Checkout.objects.filter(
+        #     is_deleted=False,
+        #     member__id = employee_id,
+        #     ).values_list('tip', flat=True)
+        # total_tips += sum(checkout_order)
 
-        appointment_checkout = AppointmentCheckout.objects.filter(
-            appointment_service__appointment_status = 'Done',
+        # appointment_checkout = AppointmentCheckout.objects.filter(
+        #     appointment_service__appointment_status = 'Done',
+        #     member__id = employee_id,
+        #     ).values_list('tip', flat=True)
+        # total_tips += sum(appointment_checkout)
+        emplooyee_tips = AppointmentEmployeeTip.objects.filter(
             member__id = employee_id,
-            ).values_list('tip', flat=True)
-        total_tips += sum(appointment_checkout)
+            is_active = True,
+            is_deleted = False,
+        ).values_list('tip', flat=True)
+        total_tips += sum(emplooyee_tips)
     
     return Response(
         {
