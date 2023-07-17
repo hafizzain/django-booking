@@ -2005,7 +2005,7 @@ def create_checkout_device(request):
     )
     invoice = SaleInvoice.objects.create(
         appointment = appointments,
-        appointment_service = service_appointment,
+        # appointment_service = service_appointment,
         payment_type = payment_method,
         service = services,
         member = members,
@@ -2015,7 +2015,6 @@ def create_checkout_device(request):
         service_price = service_price,
         total_price = total_price,
     )
-    invoice.save()
     # checkout.business_address = service_appointment.business_address
     # checkout.save()
     
