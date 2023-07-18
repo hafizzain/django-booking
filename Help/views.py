@@ -219,7 +219,7 @@ def update_comment(request):
         return Response(
             {
                 'success':False,
-                'message':'Not Found',
+                'message':'Data Not Found',
                 'status_code':400,
                 'status_code_text' : '400',
                 'response':
