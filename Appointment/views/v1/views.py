@@ -255,39 +255,34 @@ def get_today_appointments(request):
 @permission_classes([AllowAny])
 def get_all_appointments(request):
     location_id = request.GET.get('location', None)
+    appointment_status = request.GET.get('appointment_status', None)
+
     paginator = CustomPagination()
     paginator.page_size = 10
-    
+# Upcomming
+# Completed
+# Cancelled
+    queries = {}
+
+    if appointment_status is not None:
+        if appointment_status == 'Upcomming':
+            queries['appointment_status__in'] = ['Appointment_Booked', 'Arrived', 'In Progress']
+        elif appointment_status == 'Completed':
+            queries['appointment_status__in'] = ['Done', 'Paid']
+        elif appointment_status == 'Cancelled':
+            queries['appointment_status__in'] = ['Cancel']
+        
     if location_id is not None:
-        test = AppointmentService.objects.filter(
-            is_blocked=False,
-            business_address__id = location_id,
-        ).order_by('-created_at')
-        paginated_checkout_order = paginator.paginate_queryset(test, request)
-    else:
-        test = AppointmentService.objects.filter(
-            is_blocked=False,
-        #business_address__id = location_id,
-        ).order_by('-created_at')
-        paginated_checkout_order = paginator.paginate_queryset(test, request)
+        queries['business_address__id'] = location_id
+
+    test = AppointmentService.objects.filter(
+        is_blocked=False,
+        **queries
+    ).order_by('-created_at')
+    paginated_checkout_order = paginator.paginate_queryset(test, request)
     serialize = AllAppoinmentSerializer(paginated_checkout_order, many=True)
     
     return paginator.get_paginated_response(serialize.data, 'appointments' )
-    
-    
-    # return Response(
-    #     {
-    #         'status' : 200,
-    #         'status_code' : '200',
-    #         'response' : {
-    #             'message' : 'All Appointment',
-    #             'error_message' : None,
-    #             'appointments' : serialize.data
-    #             #'appointments' : sale_data
-    #         }
-    #     },
-    #     status=status.HTTP_200_OK
-    # )
 
     
 @api_view(['GET'])
