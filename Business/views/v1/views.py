@@ -239,6 +239,7 @@ def update_user_default_data(request):
     
     errors = []
 
+    location_currency = None
     if location is not None:
         location = json.loads(location)
         name = location.get('name', '')
@@ -261,6 +262,7 @@ def update_user_default_data(request):
             except Exception as err:
                 errors.append(str(err))
             else:
+                location_currency = currency
                 location.currency = currency
             location.email = email
             location.save()
@@ -329,8 +331,11 @@ def update_user_default_data(request):
                     PriceService.objects.create(
                         price = price.get('price', 0),
                         duration = price.get('price', 0),
+                        currency = location_currency
                     )
                 else:
+                    if location_currency is not None:
+                        service_price.currency = location_currency
                     service_price.price = price_price
                     service_price.duration = price_duration
                     service_price.save()
