@@ -266,7 +266,7 @@ def get_all_appointments(request):
 
     if appointment_status is not None:
         if appointment_status == 'Upcomming':
-            queries['appointment_status__in'] = ['Appointment_Booked', 'Arrived', 'In Progress']
+            queries['appointment_status__in'] = ['Appointment_Booked', 'Appointment Booked', 'Arrived', 'In Progress']
         elif appointment_status == 'Completed':
             queries['appointment_status__in'] = ['Done', 'Paid']
         elif appointment_status == 'Cancelled':
