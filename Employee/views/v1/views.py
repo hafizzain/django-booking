@@ -5038,7 +5038,7 @@ def set_password(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def check_employee_existance(request):
-    email = request.data.get('email', None) 
+    email = request.GET.get('email', None) 
 
     employees = Employee.objects.filter(email = email)
     if len(employees) > 0:
