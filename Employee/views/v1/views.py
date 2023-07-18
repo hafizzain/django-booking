@@ -5034,3 +5034,34 @@ def set_password(request):
         status=status.HTTP_200_OK
     )
             
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def check_employee_existance(request):
+    email = request.data.get('email', None) 
+
+    employees = Employee.objects.filter(email = email)
+    if len(employees) > 0:
+        return Response(
+            {
+                'status' : 200,
+                'status_code' : '200',
+                'response' : {
+                    'message' : 'Employee Exist!',
+                    'error_message' : None,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    return Response(
+        {
+            'status' : 404,
+            'status_code' : '404',
+            'response' : {
+                'message' : 'Employee does not exists!',
+                'error_message' : None,
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
+    )
+            
