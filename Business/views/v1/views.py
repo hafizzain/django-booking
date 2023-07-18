@@ -357,7 +357,7 @@ def update_user_default_data(request):
         else:
             client_instance.full_name = name
             client_instance.email = email
-            client_instance.phone_number = phone_number
+            client_instance.mobile_number = phone_number
             client_instance.save()
 
     if employee:
