@@ -2402,9 +2402,8 @@ def new_create_sale_order(request):
                 location = business_address,
                 client = checkout.client,
                 loyalty_points = point,
-                invoice = invoice.id
             )
-            
+
             loyalty_spend_amount = point.amount_spend
             loyalty_earned_points = point.number_points # total earned points if user spend amount point.amount_spend
 

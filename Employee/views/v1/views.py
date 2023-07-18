@@ -34,7 +34,7 @@ from Authentication.models import AccountType, User, VerificationOTP
 from NStyle.Constants import StatusCodes
 import json
 from Utility.models import NstyleFile
-from django.db.models import Q
+from django.db.models import Q, F, Sum, When, Case, IntegerField, FloatField
 import csv
 from Utility.models import GlobalPermissionChoices
 from Permissions.models import EmployePermission
@@ -314,7 +314,11 @@ def search_employee(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_Employees(request):
-    all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
+    # total_sale = ?
+    all_employe= Employee.objects.filter(
+        is_deleted=False, 
+        is_blocked=False
+    ).order_by('-created_at')
     all_employee_count = all_employe.count()
     
     page_count = all_employee_count / 20
@@ -328,6 +332,8 @@ def get_Employees(request):
         all_employe = paginator.get_page(page_number)
 
         serialized = singleEmployeeSerializer(all_employe,  many=True, context={'request' : request} )
+        data = serialized.data
+        # sorted_data = sorted(data, key=lambda x: x['totoal_sale'], reverse=True)
         return Response(
             {
                 'status' : 200,
@@ -338,13 +344,15 @@ def get_Employees(request):
                     'pages':page_count,
                     'per_page_result':20,
                     'error_message' : None,
-                    'employees' : serialized.data
+                    'employees' : data
                 }
             },
             status=status.HTTP_200_OK
         )
     else:
         serialized = singleEmployeeSerializer(all_employe,  many=True, context={'request' : request} )
+        data = serialized.data
+        # sorted_data = sorted(data, key=lambda x: x['total_sale'], reverse=True)
         return Response(
             {
                 'status' : 200,
@@ -355,7 +363,7 @@ def get_Employees(request):
                     'pages':page_count,
                     'per_page_result':20,
                     'error_message' : None,
-                    'employees' : serialized.data
+                    'employees' : data
                 }
             },
             status=status.HTTP_200_OK
@@ -2129,7 +2137,8 @@ def get_payrol_working(request):
         is_deleted = False, 
         is_blocked = False,
         **queries
-    ).order_by('employee_employedailyschedule__date')
+    )
+    # .order_by('employee_employedailyschedule__date')
     all_employe_count= all_employe.count()
 
     page_count = all_employe_count / 10

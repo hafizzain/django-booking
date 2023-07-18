@@ -24,7 +24,7 @@ from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Business.models import Business , BusinessAddress, ClientNotificationSetting, StaffNotificationSetting
 from datetime import datetime
 from Order.models import Checkout, MemberShipOrder, ProductOrder, VoucherOrder, ServiceOrder
-from Sale.serializers import MemberShipOrderSerializer, ProductOrderSerializer, VoucherOrderSerializer
+from Sale.serializers import MemberShipOrderSerializer, ProductOrderSerializer, VoucherOrderSerializer, ServiceOrderSerializer
 
 #from Service.models import Service
 from Service.models import Service
@@ -255,39 +255,34 @@ def get_today_appointments(request):
 @permission_classes([AllowAny])
 def get_all_appointments(request):
     location_id = request.GET.get('location', None)
+    appointment_status = request.GET.get('appointment_status', None)
+
     paginator = CustomPagination()
     paginator.page_size = 10
-    
+# Upcomming
+# Completed
+# Cancelled
+    queries = {}
+
+    if appointment_status is not None:
+        if appointment_status == 'Upcomming':
+            queries['appointment_status__in'] = ['Appointment_Booked', 'Appointment Booked', 'Arrived', 'In Progress']
+        elif appointment_status == 'Completed':
+            queries['appointment_status__in'] = ['Done', 'Paid']
+        elif appointment_status == 'Cancelled':
+            queries['appointment_status__in'] = ['Cancel']
+        
     if location_id is not None:
-        test = AppointmentService.objects.filter(
-            is_blocked=False,
-            business_address__id = location_id,
-        ).order_by('-created_at')
-        paginated_checkout_order = paginator.paginate_queryset(test, request)
-    else:
-        test = AppointmentService.objects.filter(
-            is_blocked=False,
-        #business_address__id = location_id,
-        ).order_by('-created_at')
-        paginated_checkout_order = paginator.paginate_queryset(test, request)
+        queries['business_address__id'] = location_id
+
+    test = AppointmentService.objects.filter(
+        is_blocked=False,
+        **queries
+    ).order_by('-created_at')
+    paginated_checkout_order = paginator.paginate_queryset(test, request)
     serialize = AllAppoinmentSerializer(paginated_checkout_order, many=True)
     
     return paginator.get_paginated_response(serialize.data, 'appointments' )
-    
-    
-    # return Response(
-    #     {
-    #         'status' : 200,
-    #         'status_code' : '200',
-    #         'response' : {
-    #             'message' : 'All Appointment',
-    #             'error_message' : None,
-    #             'appointments' : serialize.data
-    #             #'appointments' : sale_data
-    #         }
-    #     },
-    #     status=status.HTTP_200_OK
-    # )
 
     
 @api_view(['GET'])
@@ -1306,6 +1301,34 @@ def create_blockTime(request):
         end_time = datetime_duration
     except Exception as err:
         ExceptionRecord.objects.create(text=f'Errors happer in end linr 1180 {str(err)}')
+    # start_time
+    # tested
+
+    block_time_start = start_time
+    block_time_end = tested
+    current_appointments = AppointmentService.objects.filter(
+        Q(appointment_time__range = (block_time_start, block_time_end)) |
+        Q(end_time__range = (block_time_start, block_time_end)),
+        business = business,
+        member = member,
+        appointment_date = date,
+        is_deleted = False
+    ).exclude(
+        appointment_status__in = ['Done', 'Paid', 'Cancel']
+    )
+
+    if len(current_appointments) > 0:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'response' : {
+                    'message' : 'You already have appointment in this time.',
+                    'error_message' : None,
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        ) 
     
     block_time = AppointmentService.objects.create(
             user = user,
@@ -1825,9 +1848,8 @@ def create_checkout(request):
                 location = business_address,
                 client = appointments.client,
                 loyalty_points = point,
-                invoice = invoice.id
             )
-
+            # invoice = invoice.id
 
             loyalty_spend_amount = point.amount_spend
             loyalty_earned_points = point.number_points # total earned points if user spend amount point.amount_spend
@@ -1978,7 +2000,7 @@ def create_checkout_device(request):
     )
     invoice = SaleInvoice.objects.create(
         appointment = appointments,
-        appointment_service = service_appointment,
+        # appointment_service = service_appointment,
         payment_type = payment_method,
         service = services,
         member = members,
@@ -1988,7 +2010,6 @@ def create_checkout_device(request):
         service_price = service_price,
         total_price = total_price,
     )
-    invoice.save()
     # checkout.business_address = service_appointment.business_address
     # checkout.save()
     
@@ -2167,6 +2188,9 @@ def get_client_sale(request):
     product_order = ProductOrder.objects.filter(checkout__client = client).order_by('-created_at')
     product = ProductOrderSerializer(product_order,  many=True,  context={'request' : request, })
     
+    service_orders = ServiceOrder.objects.filter(checkout__client = client).order_by('-created_at')
+    services_data = ServiceOrderSerializer(service_orders,  many=True,  context={'request' : request, })
+    
     voucher_order = VoucherOrder.objects.filter(checkout__client = client).order_by('-created_at')
     voucher = VoucherOrderSerializer(voucher_order,  many=True,  context={'request' : request, })
     data.extend(voucher.data)
@@ -2192,6 +2216,7 @@ def get_client_sale(request):
                     'message' : 'Client Order Sales!',
                     'error_message' : None,
                     'product' : product.data,
+                    'service' : services_data.data,
                     'voucher' : data,
                     'appointment' : serialized.data
                 }
@@ -2477,6 +2502,9 @@ def get_employee_check_time(request):
     duration = request.data.get('duration', None)
     start_time = request.data.get('app_time', None)
     date = request.data.get('date', None)
+
+    if duration and duration is not None:
+        duration = duration.strip()
     
     if start_time is not None:
         dtime = datetime.strptime(start_time, "%H:%M:%S")

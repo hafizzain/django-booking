@@ -1375,7 +1375,8 @@ def search_product(request):
 @permission_classes([AllowAny])
 def get_stocks(request):
     all_stocks = Product.objects.filter(is_active=True, is_deleted=False, product_stock__gt=0 ).order_by('-created_at').distinct()
-    serialized = ProductWithStockSerializer(all_stocks, many=True, context={'request' : request})
+    serialized = ProductWithStockSerializer(all_stocks, many=True, context={'request' : request}).data
+    # serialized_data = sorted(serialized, key=lambda x:x ['stock'][0]['sold_quantity'], reverse=True)
     return Response(
         {
             'status' : True,
@@ -1383,7 +1384,7 @@ def get_stocks(request):
             'response' : {
                 'message' : 'All stocks!',
                 'error_message' : None,
-                'stocks' : serialized.data
+                'stocks' : serialized
             }
         },
         status=status.HTTP_200_OK

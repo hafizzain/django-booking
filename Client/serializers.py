@@ -191,6 +191,7 @@ class MembershipSerializer(serializers.ModelSerializer):
     class Meta:
         model = Membership
         fields = ['id', 'name', 'arabic_name', 'valid_for','discount','description', 'term_condition','products', 'services', 'currency_membership']
+        read_only_fields = ['arabic_name']
 
 class VoucherSerializer(serializers.ModelSerializer):
     # currency_voucher_prices = serializers.SerializerMethodField(read_only=True)
@@ -212,6 +213,7 @@ class VoucherSerializer(serializers.ModelSerializer):
         model = Vouchers
         fields = ['id', 'name', 'arabic_name', 'user','business','voucher_type',
                 'validity','sales','is_deleted','is_active','created_at','currency_voucher','discount_percentage', 'voucher_count']
+        read_only_fields = ['arabic_name']
 
 
 class ClientAppointmentSerializer(serializers.ModelSerializer):

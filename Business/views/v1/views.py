@@ -43,6 +43,7 @@ from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSeria
 @permission_classes([AllowAny])
 def get_user_default_data(request):
     business_id = request.GET.get('business_id', None)
+    
 
     if not all([business_id]):
         return Response(
@@ -60,8 +61,11 @@ def get_user_default_data(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    admin_user = User.objects.filter(is_admin = True, is_active = True, is_staff = True, is_superuser = True)
     data = {
-        'service' : []
+        'service' : [],
+        'admin_email' : admin_user[0].email,
+        'admin_phone_number' : admin_user[0].mobile_number,
     }
 
     locations = BusinessAddress.objects.filter(

@@ -8,13 +8,13 @@ from Sale.serializers import AppointmentCheckoutSerializer, CheckoutSerializer, 
 from Utility.Constants.Data.months import  FIXED_MONTHS, MONTH_DICT, MONTHS, MONTHS_DEVICE
 
 from Dashboard.serializers import EmployeeDashboradSerializer
-from Employee.models import Employee,CategoryCommission,CommissionSchemeSetting
+from Employee.models import Employee,CategoryCommission,CommissionSchemeSetting, EmployeeCommission
 from TragetControl.models import StaffTarget
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from Appointment.models import Appointment, AppointmentCheckout, AppointmentService
+from Appointment.models import Appointment, AppointmentCheckout, AppointmentService, AppointmentEmployeeTip
 from Client.models import Client
 from NStyle.Constants import StatusCodes
 from Business.models import Business, BusinessAddress
@@ -509,35 +509,49 @@ def get_total_tips(request):
     if range_start:
         range_start = datetime.strptime(range_start, "%Y-%m-%d")
         range_end = datetime.strptime(range_end, "%Y-%m-%d")
+        emplooyee_tips = AppointmentEmployeeTip.objects.filter(
+            member__id = employee_id,
+            is_active = True,
+            is_deleted = False,
+            created_at__gte =  range_start ,
+            created_at__lte = range_end
+        ).values_list('tip', flat=True)
+        total_tips += sum(emplooyee_tips)
     
-        checkout_order = Checkout.objects.filter(
-            is_deleted=False,
-            member__id = employee_id,
-            created_at__gte =  range_start ,
-            created_at__lte = range_end
-            ).values_list('tip', flat=True)
-        total_tips += sum(checkout_order)
+        # checkout_order = Checkout.objects.filter(
+        #     is_deleted=False,
+        #     member__id = employee_id,
+        #     created_at__gte =  range_start ,
+        #     created_at__lte = range_end
+        #     ).values_list('tip', flat=True)
+        # total_tips += sum(checkout_order)
         
-        appointment_checkout = AppointmentCheckout.objects.filter(
-            appointment_service__appointment_status = 'Done',
-            member__id = employee_id,
-            created_at__gte =  range_start ,
-            created_at__lte = range_end
-            ).values_list('tip', flat=True)
-        total_tips += sum(appointment_checkout)
+        # appointment_checkout = AppointmentCheckout.objects.filter(
+        #     appointment_service__appointment_status = 'Done',
+        #     member__id = employee_id,
+        #     created_at__gte =  range_start ,
+        #     created_at__lte = range_end
+        #     ).values_list('tip', flat=True)
+        # total_tips += sum(appointment_checkout)
         
     else:
-        checkout_order = Checkout.objects.filter(
-            is_deleted=False,
-            member__id = employee_id,
-            ).values_list('tip', flat=True)
-        total_tips += sum(checkout_order)
+        # checkout_order = Checkout.objects.filter(
+        #     is_deleted=False,
+        #     member__id = employee_id,
+        #     ).values_list('tip', flat=True)
+        # total_tips += sum(checkout_order)
 
-        appointment_checkout = AppointmentCheckout.objects.filter(
-            appointment_service__appointment_status = 'Done',
+        # appointment_checkout = AppointmentCheckout.objects.filter(
+        #     appointment_service__appointment_status = 'Done',
+        #     member__id = employee_id,
+        #     ).values_list('tip', flat=True)
+        # total_tips += sum(appointment_checkout)
+        emplooyee_tips = AppointmentEmployeeTip.objects.filter(
             member__id = employee_id,
-            ).values_list('tip', flat=True)
-        total_tips += sum(appointment_checkout)
+            is_active = True,
+            is_deleted = False,
+        ).values_list('tip', flat=True)
+        total_tips += sum(emplooyee_tips)
     
     return Response(
         {
@@ -558,6 +572,7 @@ def get_total_comission(request):
     employee_id = request.GET.get('employee_id', None)
     range_start =  request.GET.get('range_start', None)
     range_end = request.GET.get('range_end', None)
+
     sum_total_commision = 0
     total_service_comission = 0
     total_product_comission = 0
@@ -568,55 +583,76 @@ def get_total_comission(request):
         range_start = datetime.strptime(range_start, "%Y-%m-%d")#.date()
         range_end = datetime.strptime(range_end, "%Y-%m-%d")#
 
-        service_commission = Checkout.objects.filter(
-            is_deleted=False,
-            member__id = employee_id,
-            created_at__gte =  range_start ,
-            created_at__lte = range_end
-            ).values_list('service_commission', flat=True)
-        service_commission = [i for i in service_commission if i]
-        total_service_comission += sum(service_commission)
 
-        product_commission = Checkout.objects.filter(
-            is_deleted=False,
-            member__id = employee_id,
+        employee_commissions = EmployeeCommission.objects.filter(
+            employee__id = employee_id,
+            is_active = True,
             created_at__gte =  range_start ,
             created_at__lte = range_end
-            ).values_list('product_commission', flat=True)
-        product_commission = [i for i in product_commission if i]
-        total_product_comission += sum(product_commission)
+        )
+        # service_commission = Checkout.objects.filter(
+        #     is_deleted=False,
+        #     member__id = employee_id,
+        #     created_at__gte =  range_start ,
+        #     created_at__lte = range_end
+        #     ).values_list('service_commission', flat=True)
+        # service_commission = [i for i in service_commission if i]
+        # total_service_comission += sum(service_commission)
 
-        voucher_commission = Checkout.objects.filter(
-            is_deleted=False,
-            member__id = employee_id,
-            created_at__gte =  range_start ,
-            created_at__lte = range_end
-            ).values_list('voucher_commission', flat=True)
-        voucher_commission = [i for i in voucher_commission if i]
-        total_voucher_comission += sum(voucher_commission)
+        # product_commission = Checkout.objects.filter(
+        #     is_deleted=False,
+        #     member__id = employee_id,
+        #     created_at__gte =  range_start ,
+        #     created_at__lte = range_end
+        #     ).values_list('product_commission', flat=True)
+        # product_commission = [i for i in product_commission if i]
+        # total_product_comission += sum(product_commission)
+
+        # voucher_commission = Checkout.objects.filter(
+        #     is_deleted=False,
+        #     member__id = employee_id,
+        #     created_at__gte =  range_start ,
+        #     created_at__lte = range_end
+        #     ).values_list('voucher_commission', flat=True)
+        # voucher_commission = [i for i in voucher_commission if i]
+        # total_voucher_comission += sum(voucher_commission)
         # sum_total_commision = sum([total_service_comission,total_product_comission,total_voucher_comission])
         
     else:
-        service_commission = Checkout.objects.filter(
-            is_deleted=False,
-            member__id = employee_id,
-            ).values_list('service_commission', flat=True)
-        service_commission = [i for i in service_commission if i]
-        total_service_comission += sum(service_commission)
+        # service_commission = Checkout.objects.filter(
+        #     is_deleted=False,
+        #     member__id = employee_id,
+        #     ).values_list('service_commission', flat=True)
+        # service_commission = [i for i in service_commission if i]
+        # total_service_comission += sum(service_commission)
 
-        product_commission = Checkout.objects.filter(
-            is_deleted=False,
-            member__id = employee_id,
-            ).values_list('product_commission', flat=True)
-        product_commission = [i for i in product_commission if i]
-        total_product_comission += sum(product_commission)
+        # product_commission = Checkout.objects.filter(
+        #     is_deleted=False,
+        #     member__id = employee_id,
+        #     ).values_list('product_commission', flat=True)
+        # product_commission = [i for i in product_commission if i]
+        # total_product_comission += sum(product_commission)
 
-        voucher_commission = Checkout.objects.filter(
-            is_deleted=False,
-            member__id = employee_id,
-            ).values_list('voucher_commission', flat=True)
-        voucher_commission = [i for i in voucher_commission if i]
-        total_voucher_comission += sum(voucher_commission)
+        # voucher_commission = Checkout.objects.filter(
+        #     is_deleted=False,
+        #     member__id = employee_id,
+        #     ).values_list('voucher_commission', flat=True)
+        # voucher_commission = [i for i in voucher_commission if i]
+        # total_voucher_comission += sum(voucher_commission)
+        employee_commissions = EmployeeCommission.objects.filter(
+            employee__id = employee_id,
+            is_active = True,
+        )
+    
+    for commission in employee_commissions:
+        full_commission = commission.full_commission
+        if commission.commission_category == 'Service':
+            total_service_comission += full_commission
+        elif commission.commission_category == 'Retail':
+            total_product_comission += full_commission
+        elif commission.commission_category == 'Voucher':
+            total_voucher_comission += full_commission
+
     sum_total_commision = sum([total_service_comission,total_product_comission,total_voucher_comission])
     
     return Response(

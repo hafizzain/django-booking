@@ -1973,10 +1973,14 @@ def delete_memberships(request):
 def update_memberships(request):
     id = request.data.get('id', None)
     service = request.data.get('service', None)
+    services = request.data.get('services', None)
     product = request.data.get('product',None)
+    products = request.data.get('products',None)
     membership_type = request.data.get('membership_type',None)
     currency_membership = request.data.get('currency_membership',None)
     check = True
+
+    errors= []
     
     if id is None: 
         return Response(
@@ -2044,6 +2048,47 @@ def update_memberships(request):
         membership.service= service_id
         membership.product = None
         membership.save()
+
+    errors.append(services)
+    for serv in services:
+        service_id = serv['service']
+        duration = serv['duration']
+        try:
+            service_instance = Service.objects.get(id=service_id)
+        except Exception as err:
+            errors.append(str(err))
+        else:
+            try:
+                membership_service, created = DiscountMembership.objects.get_or_create(
+                    service = service_instance,
+                    membership = membership
+                )
+            except Exception as err:
+                errors.append(str(err))
+            else:
+                if created:
+                    membership_service.duration = duration
+                    membership_service.save()
+    
+    for product_dict in products:
+        product_id = product_dict['product']
+        percentage = product_dict['percentage']
+        try:
+            product_instance = Product.objects.get(id=product_id)
+        except Exception as err:
+            errors.append(str(err))
+        else:
+            try:
+                membership_product, created = DiscountMembership.objects.get_or_create(
+                    product = product_instance,
+                    membership = membership
+                )
+            except Exception as err:
+                errors.append(str(err))
+            else:
+                membership_product.percentage = percentage
+                membership_product.save()
+    
      
     if currency_membership:  
         if check == True:
@@ -2069,9 +2114,10 @@ def update_memberships(request):
             #membership = curr.get('membership', None)
             price = curr.get('price', None)
             try:
-                currency_id = Currency.objects.get(id=currency)
+                currency_instance = Currency.objects.get(id=currency)
             except Exception as err:
                 pass
+            else:
             # if id is not None:
             #     try:
             #         currency_price = CurrencyPriceMembership.objects.get(id=id)
@@ -2081,18 +2127,18 @@ def update_memberships(request):
             #         currency_price.price = price
             #         currency_price.save()
             
-            if currency_id is not None: 
-                try:
-                    currency_price = CurrencyPriceMembership.objects.get(currency=currency_id)
-                    currency_price.price = price
-                    currency_price.save()
-                except Exception as err:
+                currency_price, created = CurrencyPriceMembership.objects.get_or_create(
+                    currency = currency_instance,
+                    membership = membership,
+                )
+                currency_price.price = price
+                currency_price.save()
                     
-                    services_obj = CurrencyPriceMembership.objects.create(
-                        membership = membership,
-                        currency = currency_id,
-                        price = price,
-                    )                
+                    # services_obj = CurrencyPriceMembership.objects.create(
+                    #     membership = membership,
+                    #     currency = currency_instance,
+                    #     price = price,
+                    # )                
                 
                 
     serializer = MembershipSerializer(membership, data=request.data, partial=True)
@@ -2116,7 +2162,8 @@ def update_memberships(request):
             'response' : {
                 'message' : 'Update Membership Successfully',
                 'error_message' : None,
-                'membership' : serializer.data
+                'membership' : serializer.data,
+                'errors' : errors
             }
         },
         status=status.HTTP_200_OK

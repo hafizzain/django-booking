@@ -96,7 +96,7 @@ def get_comment(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    comments = HelpContentSerializer(all_comments, many=True)
+    comments = HelpContentSerializer(all_comments, many=True, context={'request' : request})
 
     return Response(
     {
@@ -140,7 +140,7 @@ def get_comment_details(request):
 
     
     leng = len(all)
-    serializer = HelpContentSerializer(all, many=True)
+    serializer = HelpContentDetailSerializer(all, many=True)
     print(serializer)
     if leng == 0:
         message = 'No Child Data'
@@ -219,7 +219,7 @@ def update_comment(request):
         return Response(
             {
                 'success':False,
-                'message':'Not Found',
+                'message':'Data Not Found',
                 'status_code':400,
                 'status_code_text' : '400',
                 'response':
