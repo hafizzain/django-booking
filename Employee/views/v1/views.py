@@ -5040,7 +5040,7 @@ def set_password(request):
 def check_employee_existance(request):
     email = request.GET.get('email', None) 
 
-    employees = Employee.objects.filter(email = email)
+    employees = User.objects.filter(email = email)
     if len(employees) > 0:
         return Response(
             {
@@ -5051,7 +5051,7 @@ def check_employee_existance(request):
                     'error_message' : None,
                 }
             },
-            status=status.HTTP_200_OK
+            status=status.HTTP_200_OK 
         )
     return Response(
         {
