@@ -861,6 +861,7 @@ def get_all_sale_orders_pagination(request):
     location_id = request.GET.get('location', None)
     range_start =  request.GET.get('range_start', None)
     range_end = request.GET.get('range_end', None)
+    no_pagination = request.GET.get('no_pagination', None)
 
     if range_end is not None:
         range_end = dt.strptime(range_end, '%Y-%m-%d').date()
@@ -909,7 +910,7 @@ def get_all_sale_orders_pagination(request):
 
 
     paginator = CustomPagination()
-    paginator.page_size = 10
+    paginator.page_size = 100000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(sorted_data, request)
 
     response = paginator.get_paginated_response(paginated_data, 'sales')
