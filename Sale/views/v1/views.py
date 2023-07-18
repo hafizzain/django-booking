@@ -69,6 +69,17 @@ def get_service(request):
     query = {}
     if location:
         query['location__id'] = location
+    elif request.user.is_authenticated :
+        try:
+            employee = Employee.objects.get(
+                user = request.user
+            )
+        except:
+            pass
+        else:
+            if len(employee.location.all()) > 0:
+                first_location = employee.location.all()[0]
+                query['location__id'] = first_location.id
     
     service= Service.objects.filter(
         name__icontains = title,
