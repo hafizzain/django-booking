@@ -4351,7 +4351,8 @@ class getUserBusinessProfileCompletionProgress(APIView):
         completed_modules = 0
 
         services = Service.objects.filter(
-            business = self.business
+            business = self.business,
+            is_deleted = False
         )
 
         if len(services) > 0 :
