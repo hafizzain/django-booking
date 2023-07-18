@@ -77,7 +77,7 @@ def get_service(request):
     elif request.user.is_authenticated :
         try:
             employee = Employee.objects.get(
-                user = request.user
+                email = request.user.email
             )
         except Exception as err:
             errors.append(str(err))
