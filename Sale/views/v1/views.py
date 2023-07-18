@@ -863,14 +863,32 @@ def get_all_sale_orders_pagination(request):
     range_end = request.GET.get('range_end', None)
     no_pagination = request.GET.get('no_pagination', None)
 
+
+    search_text = request.GET.get('search_text', None)
+    client_id = request.GET.get('client', None)
+    service_id = request.GET.get('service', None)
+
     if range_end is not None:
         range_end = dt.strptime(range_end, '%Y-%m-%d').date()
         range_end = range_end + timedelta(days=1)
         range_end = str(range_end)
 
     queries = {}
+    app_queries = {}
+    sale_queries = {}
     if range_start:
         queries['created_at__range'] = (range_start, range_end)
+    
+    if client_id:
+        sale_queries['client__id'] = client_id
+        app_queries['appointment__client__id'] = client_id
+    
+    if service_id:
+        sale_queries['checkout_orders__service__id'] = service_id
+        app_queries['appointment__appointment_services__service__id'] = service_id
+
+    
+
 
     checkout_order = Checkout.objects.select_related(
         'location',
@@ -887,8 +905,9 @@ def get_all_sale_orders_pagination(request):
     ).filter(
         is_deleted=False,
         location__id=location_id,
-        **queries
-    )
+        **queries,
+        **sale_queries
+    ).distinct()
     appointment_checkout = AppointmentCheckout.objects.select_related(
             'appointment_service', 
             'business_address',
@@ -898,8 +917,9 @@ def get_all_sale_orders_pagination(request):
         ).filter(
             appointment_service__appointment_status = 'Done',
             business_address__id = location_id,
-            **queries
-        )
+            **queries,
+            **app_queries
+        ).distinct()
 
     checkout_data = list(SaleOrders_CheckoutSerializer(checkout_order, many=True, context={'request': request}).data)
     appointment_data = list(SaleOrders_AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
