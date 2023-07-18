@@ -906,7 +906,11 @@ def get_all_sale_orders_pagination(request):
         app_queries['appointment__client__id'] = client_id
     
     if service_id:
-        sale_queries['checkout_orders__service__id'] = service_id
+        service_orders = ServiceOrder.objects.filter(
+            service__id = service_id
+        ).values_list('checkout' , flat=True)
+
+        sale_queries['id__in'] = list(service_orders)
         app_queries['appointment__appointment_services__service__id'] = service_id
 
     if search_text:
