@@ -60,6 +60,7 @@ from Reports.models import DiscountPromotionSalesReport
 def get_service(request):
     title = request.GET.get('title', '')
     location = request.GET.get('location_id', None)
+    is_mobile = request.GET.get('is_mobile', None)
     # SORTED_OPTIONS = {
     #     'default' : '-created_at',
     #     'title': title
@@ -67,6 +68,7 @@ def get_service(request):
     # sorted_value = SORTED_OPTIONS.get(title, '-created_at')
 
     query = {}
+    location_instance = None
     if location:
         query['location__id'] = location
     elif request.user.is_authenticated :
@@ -79,6 +81,7 @@ def get_service(request):
         else:
             if len(employee.location.all()) > 0:
                 first_location = employee.location.all()[0]
+                location_instance = first_location
                 query['location__id'] = first_location.id
     
     service= Service.objects.filter(
@@ -97,7 +100,7 @@ def get_service(request):
     page_number = request.GET.get("page") 
     services = paginator.get_page(page_number)
 
-    serialized = ServiceSerializer(services,  many=True, context={'request' : request} )
+    serialized = ServiceSerializer(services,  many=True, context={'request' : request, 'location_instance' : location_instance, 'is_mobile' : is_mobile} )
     return Response(
         {
             'status' : 200,

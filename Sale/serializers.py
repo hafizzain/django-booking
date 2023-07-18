@@ -311,8 +311,20 @@ class ServiceSerializer(serializers.ModelSerializer):
             #print(err)
     
     def get_priceservice(self, obj):
+        context = self.context
+        is_mobile = context.get('is_mobile', None)
+        queries = {}
+
+        if is_mobile is not None :
+            location = context.get('location_instance', None)
+            if location is not None :
+                queries['currency'] = location.currency
+
         try:
-            ser = PriceService.objects.filter(service = obj).order_by('-created_at')
+            ser = PriceService.objects.filter(
+                service = obj,
+                **queries
+            ).order_by('-created_at')
             return PriceServiceSerializers(ser, many = True).data
         except Exception as err:
             pass
