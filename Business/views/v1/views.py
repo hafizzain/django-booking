@@ -215,6 +215,7 @@ def update_user_default_data(request):
     client = request.data.get('client', None)
     services = request.data.get('service', None)
     employee = request.data.get('employee', None)
+    service_group = request.data.get('service_group', None)
 
     if not all([location, client, services, employee]):
         return Response(
@@ -263,6 +264,22 @@ def update_user_default_data(request):
                 location.currency = currency
             location.email = email
             location.save()
+
+    if service_group is not None:
+        service_group = json.loads(service_group)
+
+        service_group_name = service_group.get('name', '')
+        service_group_id = service_group.get('id', None)
+        
+        try:
+            service_group = ServiceGroup.objects.get(
+                id = service_group_id
+            )
+        except Exception as err:
+            errors.append(str(err))
+        else:
+            service_group.name = service_group_name
+            service_group.save()
 
     services = json.loads(services)
     for service in services:

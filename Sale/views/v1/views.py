@@ -352,7 +352,8 @@ def delete_service(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-    service.delete()
+    service.is_deleted = True
+    service.save()
     return Response(
         {
             'status' : True,
