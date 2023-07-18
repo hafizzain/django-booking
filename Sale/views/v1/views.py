@@ -69,6 +69,9 @@ def get_service(request):
 
     query = {}
     location_instance = None
+    currency_code = None
+    errors = []
+
     if location:
         query['location__id'] = location
     elif request.user.is_authenticated :
@@ -76,13 +79,17 @@ def get_service(request):
             employee = Employee.objects.get(
                 user = request.user
             )
-        except:
-            pass
+        except Exception as err:
+            errors.append(str(err))
         else:
             if len(employee.location.all()) > 0:
                 first_location = employee.location.all()[0]
                 location_instance = first_location
+                currency_code = location_instance.currency.code
                 query['location__id'] = first_location.id
+            else:
+                errors.append('Employee Location 0')
+
     
     service= Service.objects.filter(
         name__icontains = title,
@@ -100,7 +107,7 @@ def get_service(request):
     page_number = request.GET.get("page") 
     services = paginator.get_page(page_number)
 
-    serialized = ServiceSerializer(services,  many=True, context={'request' : request, 'location_instance' : location_instance, 'is_mobile' : is_mobile} )
+    serialized = ServiceSerializer(services,  many=True, context={'request' : request, 'location_instance' : location_instance, 'is_mobile' : is_mobile, 'currency_code' : currency_code} )
     return Response(
         {
             'status' : 200,
@@ -111,7 +118,8 @@ def get_service(request):
                 'pages':page_count,
                 'per_page_result':20,
                 'error_message' : None,
-                'service' : serialized.data
+                'service' : serialized.data,
+                'errors' : errors,
             }
         },
         status=status.HTTP_200_OK

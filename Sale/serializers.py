@@ -313,12 +313,13 @@ class ServiceSerializer(serializers.ModelSerializer):
     def get_priceservice(self, obj):
         context = self.context
         is_mobile = context.get('is_mobile', None)
+
         queries = {}
 
         if is_mobile is not None :
-            location = context.get('location_instance', None)
-            if location is not None :
-                queries['currency'] = location.currency
+            currency_code = context.get('currency_code', None)
+            if currency_code is not None :
+                queries['currency__code'] = currency_code
 
         try:
             ser = PriceService.objects.filter(
