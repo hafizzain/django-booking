@@ -887,7 +887,9 @@ def get_all_sale_orders_pagination(request):
         sale_queries['checkout_orders__service__id'] = service_id
         app_queries['appointment__appointment_services__service__id'] = service_id
 
-    
+    if search_text:
+        sale_queries['client__full_name__icontains'] = search_text
+        app_queries['appointment__client__full_name__icontains'] = search_text
 
 
     checkout_order = Checkout.objects.select_related(
