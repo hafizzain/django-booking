@@ -1063,6 +1063,13 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
                 total_earning += (currentMonthSchedule.count() * per_day_salary)
 
             elif income_type == 'Daily_Income':
+                month_start_date = f'{now_date.year}-{now_date.month}-01'
+                month_end_date = now_date.strftime('%Y-%m-%d')
+                currentMonthSchedule = employee_schedules.filter(
+                    is_leave = False,
+                    date__range = (month_start_date, month_end_date)
+                )
+                total_earning += (currentMonthSchedule.count() * salary)
                 pass
             elif income_type == 'Hourly_Rate':
                 pass
