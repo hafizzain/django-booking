@@ -578,71 +578,18 @@ def get_total_comission(request):
     total_product_comission = 0
     total_voucher_comission = 0
     
+    queries = {}
 
     if range_start:
         range_start = datetime.strptime(range_start, "%Y-%m-%d")#.date()
         range_end = datetime.strptime(range_end, "%Y-%m-%d")#
+        queries['created_at__range'] = (range_start, range_end)
 
-
-        employee_commissions = EmployeeCommission.objects.filter(
-            employee__id = employee_id,
-            is_active = True,
-            created_at__gte =  range_start ,
-            created_at__lte = range_end
-        )
-        # service_commission = Checkout.objects.filter(
-        #     is_deleted=False,
-        #     member__id = employee_id,
-        #     created_at__gte =  range_start ,
-        #     created_at__lte = range_end
-        #     ).values_list('service_commission', flat=True)
-        # service_commission = [i for i in service_commission if i]
-        # total_service_comission += sum(service_commission)
-
-        # product_commission = Checkout.objects.filter(
-        #     is_deleted=False,
-        #     member__id = employee_id,
-        #     created_at__gte =  range_start ,
-        #     created_at__lte = range_end
-        #     ).values_list('product_commission', flat=True)
-        # product_commission = [i for i in product_commission if i]
-        # total_product_comission += sum(product_commission)
-
-        # voucher_commission = Checkout.objects.filter(
-        #     is_deleted=False,
-        #     member__id = employee_id,
-        #     created_at__gte =  range_start ,
-        #     created_at__lte = range_end
-        #     ).values_list('voucher_commission', flat=True)
-        # voucher_commission = [i for i in voucher_commission if i]
-        # total_voucher_comission += sum(voucher_commission)
-        # sum_total_commision = sum([total_service_comission,total_product_comission,total_voucher_comission])
-        
-    else:
-        # service_commission = Checkout.objects.filter(
-        #     is_deleted=False,
-        #     member__id = employee_id,
-        #     ).values_list('service_commission', flat=True)
-        # service_commission = [i for i in service_commission if i]
-        # total_service_comission += sum(service_commission)
-
-        # product_commission = Checkout.objects.filter(
-        #     is_deleted=False,
-        #     member__id = employee_id,
-        #     ).values_list('product_commission', flat=True)
-        # product_commission = [i for i in product_commission if i]
-        # total_product_comission += sum(product_commission)
-
-        # voucher_commission = Checkout.objects.filter(
-        #     is_deleted=False,
-        #     member__id = employee_id,
-        #     ).values_list('voucher_commission', flat=True)
-        # voucher_commission = [i for i in voucher_commission if i]
-        # total_voucher_comission += sum(voucher_commission)
-        employee_commissions = EmployeeCommission.objects.filter(
-            employee__id = employee_id,
-            is_active = True,
-        )
+    employee_commissions = EmployeeCommission.objects.filter(
+        employee__id = employee_id,
+        is_active = True,
+        **queries
+    )
     
     for commission in employee_commissions:
         full_commission = commission.full_commission
