@@ -397,9 +397,9 @@ class EmployeDailySchedule(models.Model):
         
         if income_type == 'Hourly_Rate':
             if self.is_vacation:
-                return '8'
+                return 8
             elif self.is_leave:
-                return '0'
+                return 0
             else:
                 pass
             
