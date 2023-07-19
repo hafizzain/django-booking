@@ -12,6 +12,7 @@ from Service.models import Service
 from Permissions.models import EmployePermission
 # from datetime import datetime, timedelta
 from datetime import datetime, timedelta
+import calendar
 
 from rest_framework import serializers
 from .models import( EmployeDailySchedule, Employee, EmployeeProfessionalInfo ,
@@ -1021,6 +1022,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     income_type = serializers.SerializerMethodField(read_only=True)
     salary = serializers.SerializerMethodField(read_only=True)
+    total_earning = serializers.SerializerMethodField(read_only=True)
     #employe_id = serializers.SerializerMethodField(read_only=True)
     
     location = serializers.SerializerMethodField(read_only=True)
@@ -1029,7 +1031,51 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     def get_location(self, obj):
         loc = obj.location.all()
         return LocationSerializer(loc, many =True ).data
-    
+
+
+    def get_total_earning(self, obj):
+        now_date = datetime.now()
+        total_days = calendar.monthrange(now_date.year, now_date.month)[1]
+        date = now_date.date
+
+        employee_schedules =  EmployeDailySchedule.objects.filter(
+            employee = obj
+        ).order_by('-date')
+
+        try:
+            income_type_info = EmployeeProfessionalInfo.objects.get(employee=obj)
+        except:
+            income_type = None
+        else:
+            total_earning = 0
+            salary = income_type_info.salary # 300
+            income_type = income_type_info.income_type
+
+            if income_type == 'Monthly_Salary':
+                per_day_salary = salary / total_days # 10
+                month_start_date = f'{now_date.year}-{now_date.month}-01'
+                month_end_date = now_date.strftime('%Y-%m-%d')
+
+                currentMonthSchedule = employee_schedules.filter(
+                    is_leave = False,
+                    date__range = (month_start_date, month_end_date)
+                )
+                total_earning += (currentMonthSchedule.count() * per_day_salary)
+
+            elif income_type == 'Daily_Income':
+                pass
+            elif income_type == 'Hourly_Rate':
+                pass
+
+            return total_earning
+            # Hourly_Rate
+            # Daily_Income
+            # Monthly_Salary
+
+            # is_leave
+            # is_off
+            # is_vacation
+
     def get_salary(self, obj):        
         try:
             income_info = EmployeeProfessionalInfo.objects.get(employee=obj)
@@ -1074,7 +1120,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ['id', 'employee_id','is_active','full_name','image','location','sallaryslip',
-                  'schedule','created_at', 'income_type', 'salary']
+                  'schedule','created_at', 'income_type', 'salary', 'total_earning']
 class Payroll_Working_device_attendence_ScheduleSerializer(serializers.ModelSerializer):    
     schedule =  serializers.SerializerMethodField(read_only=True)    
     
