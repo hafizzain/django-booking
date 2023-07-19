@@ -384,6 +384,18 @@ class EmployeDailySchedule(models.Model):
     
     def __str__(self):
         return str(self.id)
+
+
+    @property
+    def total_hours(self):
+        hours = 0
+        if self.start_time and self.end_time:
+            hours += self.end_time - self.start_time
+        
+        if self.start_time_shift and self.end_time_shift:
+            hours += self.end_time_shift - self.start_time_shift
+        return hours
+
     
 # class EmployeDailyShift(models.Model):
 #     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)

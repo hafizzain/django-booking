@@ -829,28 +829,6 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
                     
     
     def get_total_hours(self, obj):
-        # try:
-        #     if obj.start_time_shift != None:
-        #         time1 = datetime.strptime(str(obj.start_time), "%H:%M:%S")
-        #         time2 = datetime.strptime(str(obj.end_time_shift), "%H:%M:%S")
-
-        #         time_diff = time2 - time1
-        #         total_hours = time_diff - timedelta(hours=1)  # subtracting 1 hour for break
-        #         total_hours = datetime.strptime(str(total_hours), '%H:%M:%S')
-        #         total_hours = total_hours.strftime('%H')
-        #         return f'{total_hours}'
-            
-        #     time1 = datetime.strptime(str(obj.start_time), "%H:%M:%S")
-        #     time2 = datetime.strptime(str(obj.end_time), "%H:%M:%S")
-
-        #     time_diff = time2 - time1
-        #     total_hours = time_diff - timedelta(hours=1)  # subtracting 1 hour for break
-        #     total_hours = datetime.strptime(str(total_hours), '%H:%M:%S')
-        #     total_hours = total_hours.strftime('%H')
-        #     return f'{total_hours}'
-        
-        # except Exception as err:
-        #     return '0'
 
         income_type = self.context.get('income_type', None)
         
@@ -866,6 +844,7 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
             if obj.start_time is None or obj.end_time is None:
                 return '0'  # Return '0' if any of the time values is None
 
+            return obj.total_hours
             shift1_start = datetime.strptime(obj.start_time.strftime("%H:%M:%S"), "%H:%M:%S")
             shift1_end = datetime.strptime(obj.end_time.strftime("%H:%M:%S"), "%H:%M:%S")
 
@@ -1038,8 +1017,13 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         total_days = calendar.monthrange(now_date.year, now_date.month)[1]
         date = now_date.date
 
+        month_start_date = f'{now_date.year}-{now_date.month}-01'
+        month_end_date = now_date.strftime('%Y-%m-%d')
+
         employee_schedules =  EmployeDailySchedule.objects.filter(
-            employee = obj
+            employee = obj,
+            is_leave = False,
+            date__range = (month_start_date, month_end_date)
         ).order_by('-date')
 
         try:
@@ -1053,26 +1037,15 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
 
             if income_type == 'Monthly_Salary':
                 per_day_salary = salary / total_days # 10
-                month_start_date = f'{now_date.year}-{now_date.month}-01'
-                month_end_date = now_date.strftime('%Y-%m-%d')
-
-                currentMonthSchedule = employee_schedules.filter(
-                    is_leave = False,
-                    date__range = (month_start_date, month_end_date)
-                )
-                total_earning += (currentMonthSchedule.count() * per_day_salary)
+                total_earning += (employee_schedules.count() * per_day_salary)
 
             elif income_type == 'Daily_Income':
-                month_start_date = f'{now_date.year}-{now_date.month}-01'
-                month_end_date = now_date.strftime('%Y-%m-%d')
-                currentMonthSchedule = employee_schedules.filter(
-                    is_leave = False,
-                    date__range = (month_start_date, month_end_date)
-                )
-                total_earning += (currentMonthSchedule.count() * salary)
+                total_earning += (employee_schedules.count() * salary)
                 pass
             elif income_type == 'Hourly_Rate':
-                pass
+                total_hours = 0
+                for schedule in employee_schedules:
+                    pass
 
             return total_earning
             # Hourly_Rate

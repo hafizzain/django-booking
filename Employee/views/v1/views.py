@@ -2128,10 +2128,14 @@ def create_sallaryslip(request):
 @permission_classes([AllowAny])
 def get_payrol_working(request):
     location_id = request.GET.get('location', None)
+    employee_id = request.GET.get('employee_id', None)
     queries = {}
 
     if location_id:
         queries['location'] = location_id
+    
+    if employee_id:
+        queries['id__in'] = [employee_id]
 
     all_employe= Employee.objects.filter(
         is_deleted = False, 
