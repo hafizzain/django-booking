@@ -391,7 +391,7 @@ class EmployeDailySchedule(models.Model):
         from datetime import datetime , timedelta
 
         try:
-            income_type = EmployeeProfessionalInfo.objects.get(employee=self).income_type
+            income_type = EmployeeProfessionalInfo.objects.get(employee=self.employee).income_type
         except:
             return 0
         
