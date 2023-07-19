@@ -844,7 +844,6 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
             if obj.start_time is None or obj.end_time is None:
                 return '0'  # Return '0' if any of the time values is None
 
-            return obj.total_hours
             shift1_start = datetime.strptime(obj.start_time.strftime("%H:%M:%S"), "%H:%M:%S")
             shift1_end = datetime.strptime(obj.end_time.strftime("%H:%M:%S"), "%H:%M:%S")
 
