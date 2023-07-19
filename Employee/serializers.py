@@ -1009,10 +1009,28 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     
     location = serializers.SerializerMethodField(read_only=True)
     sallaryslip = serializers.SerializerMethodField(read_only=True)
+    total_hours = serializers.SerializerMethodField(read_only=True)
     
     def get_location(self, obj):
         loc = obj.location.all()
         return LocationSerializer(loc, many =True ).data
+    
+
+    def get_total_hours(self, obj):
+        now_date = datetime.now()
+        month_start_date = f'{now_date.year}-{now_date.month}-01'
+        month_end_date = now_date.strftime('%Y-%m-%d')
+
+        employee_schedules =  EmployeDailySchedule.objects.filter(
+            employee = obj,
+            is_leave = False,
+            date__range = (month_start_date, month_end_date)
+        ).order_by('-date')
+        total_hours = 0
+        for schedule in employee_schedules:
+            total_hours += schedule.total_hours
+        
+        return total_hours
 
 
     def get_total_earning(self, obj):
@@ -1105,7 +1123,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ['id', 'employee_id','is_active','full_name','image','location','sallaryslip',
-                  'schedule','created_at', 'income_type', 'salary', 'total_earning']
+                  'schedule','created_at', 'income_type', 'salary', 'total_earning', 'total_hours']
 class Payroll_Working_device_attendence_ScheduleSerializer(serializers.ModelSerializer):    
     schedule =  serializers.SerializerMethodField(read_only=True)    
     
