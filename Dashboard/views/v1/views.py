@@ -692,46 +692,39 @@ def get_total_sales_device(request):
         "December",
     ]
 
-    checkout_orders = Checkout.objects.filter(
-        is_deleted=False, 
-        member__id=employee_id,
-    ).values_list('created_at__month', flat=True)
-
-
-    apps_checkouts = AppointmentCheckout.objects.filter(
-        is_deleted=False, 
-        member__id=employee_id,
-    ).values_list('created_at__month', flat=True)
-    checkout_orders = list(checkout_orders)
-    apps_checkouts = list(apps_checkouts)
-    
     checkout_orders_total = Checkout.objects.filter(
         is_deleted=False, 
         member__id=employee_id,
     )   
+    checkout_orders_months = checkout_orders_total.values_list('created_at__month', flat=True)
     
+    appointment_services = AppointmentService.objects.filter(
+        member__id = employee_id,
+        appointment_status__in = ['Done', 'Paid']
+
+    )
     apps_checkouts_total = AppointmentCheckout.objects.filter(
         is_deleted=False, 
         member__id=employee_id,
     )
+    apps_checkouts_months = apps_checkouts_total.values_list('created_at__month', flat=True)
     
-    for price in checkout_orders_total:
-        total_price += int(price.total_service_price or 0)
-        total_price += int(price.total_product_price or 0)
-        total_price += int(price.total_voucher_price or 0)
-        total_price += int(price.total_membership_price or 0)
-    
-    for price in apps_checkouts_total:
-        total_price += int(price.total_price or 0)
 
+    for price in checkout_orders_total:
+        total_price += float(price.total_service_price or 0)
+        total_price += float(price.total_product_price or 0)
+        total_price += float(price.total_voucher_price or 0)
+        total_price += float(price.total_membership_price or 0)
+    
+    for price in appointment_services:
+        total_price += float(price.discount_price or price.total_price or 0)
+        
     dashboard_data = []
     for index, month in enumerate(months):
         i = index + 1
-        count = checkout_orders.count(i)
-        count_app = apps_checkouts.count(i)
+        count = checkout_orders_months.count(i)
+        count_app = apps_checkouts_months.count(i)
         
-        #total_sales += count + count_app
-
         dashboard_data.append({
             'month' : month,
             'count' : count + count_app
