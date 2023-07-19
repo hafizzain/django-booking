@@ -1,17 +1,17 @@
 {% extends 'SuperAdminPanel/main.html' %} {% block body %}
 <div class="flex items-center gap-5 lg:w-fit w-full lg:px-0 lg:pb-[2rem] lg:py-0 p-3 pb-8">
-{{request.tenant_name}}usman
-<h2 class="font-semibold text-2xl">Help Center</h2>
+    <h2 class="font-semibold text-2xl">Help Center</h2>
   </div>
 <div class="flex items-center  gap-3">
     {% for cont in content %}
 
     <a href="/api/v1/help/view_topic_content/?id={{cont.id}}" class="hover:bg-slate-100 relative transition-all cursor-pointer shadow-login-card px-[1.25rem] py-[1rem] rounded-xl flex flex-col gap-2">
-        <img src="/media/public/{{cont.image}}" width="60">
+        <img src="/media/{{tenant_schema_name}}/{{cont.image}}" width="60">
          <h2 class="font-semibold text-xl">{{cont.content}}</h2>
        </a>
     {% endfor %}
 </div>
+
 
 
 
