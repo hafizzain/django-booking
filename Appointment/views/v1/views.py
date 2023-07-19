@@ -2042,7 +2042,6 @@ def create_checkout_device(request):
         member = members,
         business_address = business_address,
         business = appointments.business,
-        checkout = checkout,
         tip = tip,
         total_price = total_price
     )
