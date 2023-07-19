@@ -578,71 +578,18 @@ def get_total_comission(request):
     total_product_comission = 0
     total_voucher_comission = 0
     
+    queries = {}
 
     if range_start:
         range_start = datetime.strptime(range_start, "%Y-%m-%d")#.date()
         range_end = datetime.strptime(range_end, "%Y-%m-%d")#
+        queries['created_at__range'] = (range_start, range_end)
 
-
-        employee_commissions = EmployeeCommission.objects.filter(
-            employee__id = employee_id,
-            is_active = True,
-            created_at__gte =  range_start ,
-            created_at__lte = range_end
-        )
-        # service_commission = Checkout.objects.filter(
-        #     is_deleted=False,
-        #     member__id = employee_id,
-        #     created_at__gte =  range_start ,
-        #     created_at__lte = range_end
-        #     ).values_list('service_commission', flat=True)
-        # service_commission = [i for i in service_commission if i]
-        # total_service_comission += sum(service_commission)
-
-        # product_commission = Checkout.objects.filter(
-        #     is_deleted=False,
-        #     member__id = employee_id,
-        #     created_at__gte =  range_start ,
-        #     created_at__lte = range_end
-        #     ).values_list('product_commission', flat=True)
-        # product_commission = [i for i in product_commission if i]
-        # total_product_comission += sum(product_commission)
-
-        # voucher_commission = Checkout.objects.filter(
-        #     is_deleted=False,
-        #     member__id = employee_id,
-        #     created_at__gte =  range_start ,
-        #     created_at__lte = range_end
-        #     ).values_list('voucher_commission', flat=True)
-        # voucher_commission = [i for i in voucher_commission if i]
-        # total_voucher_comission += sum(voucher_commission)
-        # sum_total_commision = sum([total_service_comission,total_product_comission,total_voucher_comission])
-        
-    else:
-        # service_commission = Checkout.objects.filter(
-        #     is_deleted=False,
-        #     member__id = employee_id,
-        #     ).values_list('service_commission', flat=True)
-        # service_commission = [i for i in service_commission if i]
-        # total_service_comission += sum(service_commission)
-
-        # product_commission = Checkout.objects.filter(
-        #     is_deleted=False,
-        #     member__id = employee_id,
-        #     ).values_list('product_commission', flat=True)
-        # product_commission = [i for i in product_commission if i]
-        # total_product_comission += sum(product_commission)
-
-        # voucher_commission = Checkout.objects.filter(
-        #     is_deleted=False,
-        #     member__id = employee_id,
-        #     ).values_list('voucher_commission', flat=True)
-        # voucher_commission = [i for i in voucher_commission if i]
-        # total_voucher_comission += sum(voucher_commission)
-        employee_commissions = EmployeeCommission.objects.filter(
-            employee__id = employee_id,
-            is_active = True,
-        )
+    employee_commissions = EmployeeCommission.objects.filter(
+        employee__id = employee_id,
+        is_active = True,
+        **queries
+    )
     
     for commission in employee_commissions:
         full_commission = commission.full_commission
@@ -692,46 +639,39 @@ def get_total_sales_device(request):
         "December",
     ]
 
-    checkout_orders = Checkout.objects.filter(
-        is_deleted=False, 
-        member__id=employee_id,
-    ).values_list('created_at__month', flat=True)
-
-
-    apps_checkouts = AppointmentCheckout.objects.filter(
-        is_deleted=False, 
-        member__id=employee_id,
-    ).values_list('created_at__month', flat=True)
-    checkout_orders = list(checkout_orders)
-    apps_checkouts = list(apps_checkouts)
-    
     checkout_orders_total = Checkout.objects.filter(
         is_deleted=False, 
         member__id=employee_id,
     )   
+    checkout_orders_months = list(checkout_orders_total.values_list('created_at__month', flat=True))
     
+    appointment_services = AppointmentService.objects.filter(
+        member__id = employee_id,
+        appointment_status__in = ['Done', 'Paid']
+
+    )
     apps_checkouts_total = AppointmentCheckout.objects.filter(
         is_deleted=False, 
         member__id=employee_id,
     )
+    apps_checkouts_months = list(apps_checkouts_total.values_list('created_at__month', flat=True))
     
+
     for price in checkout_orders_total:
-        total_price += int(price.total_service_price or 0)
-        total_price += int(price.total_product_price or 0)
-        total_price += int(price.total_voucher_price or 0)
-        total_price += int(price.total_membership_price or 0)
+        total_price += float(price.total_service_price or 0)
+        total_price += float(price.total_product_price or 0)
+        total_price += float(price.total_voucher_price or 0)
+        total_price += float(price.total_membership_price or 0)
     
-    for price in apps_checkouts_total:
-        total_price += int(price.total_price or 0)
+    for price in appointment_services:
+        total_price += float(price.discount_price or price.total_price or 0)
 
     dashboard_data = []
     for index, month in enumerate(months):
         i = index + 1
-        count = checkout_orders.count(i)
-        count_app = apps_checkouts.count(i)
+        count = checkout_orders_months.count(i)
+        count_app = apps_checkouts_months.count(i)
         
-        #total_sales += count + count_app
-
         dashboard_data.append({
             'month' : month,
             'count' : count + count_app

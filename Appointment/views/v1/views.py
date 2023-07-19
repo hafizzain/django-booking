@@ -1983,13 +1983,47 @@ def create_checkout_device(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    
+    try:
+        business_address=BusinessAddress.objects.get(id = str(business_address))
+    except Exception as err:
+        business_address = None
     
     try:
         service_appointment = AppointmentService.objects.filter(appointment = str(appointments))
         for ser in service_appointment:
             ser.appointment_status = 'Done'
             ser.save()
+
+            service_total_price = (ser.total_price or ser.price) * 1
+
+            sale_commissions = CategoryCommission.objects.filter(
+                commission__employee = members,
+                from_value__lte = service_total_price,
+                category_comission__iexact = 'Service'
+            ).order_by('-from_value')
+
+            if len(sale_commissions) > 0:
+                commission = sale_commissions[0]
+
+                calculated_commission = commission.calculated_commission(ser.total_price or ser.price)
+                employee_commission = EmployeeCommission.objects.create(
+                    user = request.user,
+                    business = business_address.business,
+                    location = business_address,
+                    employee = ser.member,
+                    commission = commission.commission,
+                    category_commission = commission,
+                    commission_category = 'Service',
+                    commission_type = commission.comission_choice,
+                    sale_value = ser.discount_price if ser.discount_price else (ser.total_price or ser.price),
+                    commission_rate = commission.commission_percentage,
+                    commission_amount = calculated_commission,
+                    symbol = commission.symbol,
+                    item_name = ser.service.name,
+                    item_id = f'{ser.service.id}',
+                    quantity = 1,
+                    tip = 0
+                )
             
     except Exception as err:
         return Response(
@@ -2005,10 +2039,7 @@ def create_checkout_device(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-    try:
-        business_address=BusinessAddress.objects.get(id = str(business_address))
-    except Exception as err:
-        business_address = None
+
     
     checkout =AppointmentCheckout.objects.create(
         appointment = appointments,
@@ -2045,6 +2076,8 @@ def create_checkout_device(request):
         tip = tip,
         total_price = total_price
     )
+
+    
     
     serialized = CheckoutSerializer(checkout)
     return Response(
