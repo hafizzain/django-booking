@@ -1,0 +1,61 @@
+{% extends 'SuperAdminPanel/main.html' %} {% block body %}
+<div class="flex items-center gap-5 lg:w-fit w-full lg:px-0 lg:pb-[2rem] lg:py-0 p-3 pb-8">
+    <h2 class="font-semibold text-2xl">Help Center</h2>
+  </div>
+  
+  <div class="flex items-center  gap-3">
+    {% for cont in content %}
+
+    <a href="/api/v1/help/view_topic_content/?id={{cont.id}}" class="hover:bg-slate-100 relative transition-all cursor-pointer shadow-login-card px-[1.25rem] py-[1rem] rounded-xl flex flex-col gap-2">
+        <img src="/media/{{request.tenant_schema_name}}/{{cont.image}}" width="60">
+         <h2 class="font-semibold text-xl">{{cont.content}}</h2>
+       </a>
+    {% endfor %}
+</div>
+
+
+
+
+
+
+<div class="flex items-center gap-5 lg:w-fit w-full lg:px-0 lg:pb-[2rem] lg:py-0 p-3 pb-8">
+    <h2 class="font-semibold text-2xl">Help Center</h2>
+  </div>
+  <form method="post" action="/api/v1/help/add_content/" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="grid md:grid-cols-2 gap-3">
+    
+        <div>
+            <div class="input-wrapper">
+            <div class="input-label">Topic</div>
+            <input type="text" name="topic"  class="input" required="">
+            </div>
+        </div>
+        <div>
+            <div class="input-wrapper">
+            <div class="input-label">Description</div>
+            <input type="text" name="desc"  class="input" required="" >
+            </div>
+        </div>
+        <div>
+            <div class="input-wrapper">
+            <div class="input-label">Image</div>
+            <input type="file" name="image" class="input" required="">
+            </div>
+        </div>
+
+        <div>
+            <div class="input-wrapper">
+            <div class="input-label">Is Recent</div>
+            <input type="checkbox" name="is_recent" class="input">
+            </div>
+        </div>        
+    </div>
+    <button style=" margin-left:3rem;" type='submit'>Add</button>
+</form>
+
+
+
+
+
+{% endblock body %}

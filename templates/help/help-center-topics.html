@@ -1,0 +1,46 @@
+{% extends 'SuperAdminPanel/main.html' %} {% block body %}
+<div class="flex items-center gap-5 lg:w-fit w-full lg:px-0 lg:pb-[2rem] lg:py-0 p-3 pb-8">
+    <h2 class="font-semibold text-2xl">Help Center Content Detail</h2>
+  </div>
+<div class="flex items-center  gap-3">
+    {% for cont in content %}
+        <a href="" class="hover:bg-slate-100 relative transition-all cursor-pointer shadow-login-card px-[1.25rem] py-[1rem] rounded-xl flex flex-col gap-2">
+            <h2 class="font-semibold text-xl">{{cont.content|truncatechars:12}}</h2>
+            <p class="">{{cont.description|truncatechars:20}}</p>
+        </a>
+    {% endfor %}
+</div>
+
+
+
+<div class="flex items-center gap-5 lg:w-fit w-full lg:px-0 lg:pb-[2rem] lg:py-0 p-3 pb-8">
+    <h2 class="font-semibold text-2xl">Add Content Below</h2>
+  </div>
+  <form method="post" action="/api/v1/help/add_topic_content/">
+    {% csrf_token %}
+    <div class="grid md:grid-cols-2 gap-3">
+    
+        <div>
+            <div class="input-wrapper">
+            <div class="input-label">Topic</div>
+            <input type="text" name="topic"  class="input" required="">
+            </div>
+        </div>
+        <div>
+            <div class="input-wrapper">
+            <div class="input-label">Description</div>
+            <input type="text" name="desc"  class="input" required="" >
+            </div>
+        </div>
+        <div>
+            <input type="text" name="parent" value='{{parent}}' hidden>
+        </div>
+    </div>
+    <button style=" margin-left:3rem;" type='submit'>Add</button>
+</form>
+
+
+
+
+
+{% endblock body %}
