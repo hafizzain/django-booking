@@ -489,7 +489,7 @@ def single_employee_schedule(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def working_schedule(request):
-    all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
+    all_employe= Employee.objects.filter(is_active=True, is_deleted=False, is_blocked=False).order_by('-created_at')
     serialized = WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request,} )
    
     return Response(
