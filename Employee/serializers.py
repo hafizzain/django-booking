@@ -862,8 +862,8 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
                 shift2_hours = (shift2_end - shift2_start).total_seconds() / 3600  # calculate the time difference in hours
                 total_hours += shift2_hours
 
-            total_hours = int(total_hours)  # convert to integer
-            return str(total_hours)
+            total_hours = float(total_hours)  # convert to integer
+            return float(total_hours)
 
         except Exception as err:
             return str(err)
