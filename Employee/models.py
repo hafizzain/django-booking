@@ -390,10 +390,10 @@ class EmployeDailySchedule(models.Model):
     def total_hours(self):
         hours = 0
         if self.start_time and self.end_time:
-            hours += self.end_time - self.start_time
+            hours += float((self.end_time - self.start_time).strftime('%H'))
         
         if self.start_time_shift and self.end_time_shift:
-            hours += self.end_time_shift - self.start_time_shift
+            hours += float((self.end_time_shift - self.start_time_shift).strftime('%H'))
         return hours
 
     
