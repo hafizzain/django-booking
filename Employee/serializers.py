@@ -1048,7 +1048,9 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
             elif income_type == 'Hourly_Rate':
                 total_hours = 0
                 for schedule in employee_schedules:
-                    pass
+                    total_hours += schedule.total_hours
+                
+                total_earning += (total_hours * salary)
 
             return total_earning
             # Hourly_Rate
