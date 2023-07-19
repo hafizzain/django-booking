@@ -1026,11 +1026,11 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
             is_leave = False,
             date__range = (month_start_date, month_end_date)
         ).order_by('-date')
-        total_hours = 0
+        hours = 0
         for schedule in employee_schedules:
-            total_hours += schedule.total_hours
+            hours += schedule.total_hours
         
-        return total_hours
+        return hours
 
 
     def get_total_earning(self, obj):

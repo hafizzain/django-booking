@@ -404,7 +404,7 @@ class EmployeDailySchedule(models.Model):
                 pass
             
         if self.start_time is None or self.end_time is None:
-            return '0'  # Return '0' if any of the time values is None
+            return 0  # Return '0' if any of the time values is None
 
         shift1_start = datetime.strptime(self.start_time.strftime("%H:%M:%S"), "%H:%M:%S")
         shift1_end = datetime.strptime(self.end_time.strftime("%H:%M:%S"), "%H:%M:%S")
