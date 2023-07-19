@@ -2,7 +2,8 @@
 <div class="flex items-center gap-5 lg:w-fit w-full lg:px-0 lg:pb-[2rem] lg:py-0 p-3 pb-8">
     <h2 class="font-semibold text-2xl">Help Center</h2>
   </div>
-<div class="flex items-center  gap-3">
+  {{tenant_schema_name}} uuu
+  <div class="flex items-center  gap-3">
     {% for cont in content %}
 
     <a href="/api/v1/help/view_topic_content/?id={{cont.id}}" class="hover:bg-slate-100 relative transition-all cursor-pointer shadow-login-card px-[1.25rem] py-[1rem] rounded-xl flex flex-col gap-2">
