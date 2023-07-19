@@ -696,7 +696,7 @@ def get_total_sales_device(request):
         is_deleted=False, 
         member__id=employee_id,
     )   
-    checkout_orders_months = checkout_orders_total.values_list('created_at__month', flat=True)
+    checkout_orders_months = list(checkout_orders_total.values_list('created_at__month', flat=True))
     
     appointment_services = AppointmentService.objects.filter(
         member__id = employee_id,
@@ -707,7 +707,7 @@ def get_total_sales_device(request):
         is_deleted=False, 
         member__id=employee_id,
     )
-    apps_checkouts_months = apps_checkouts_total.values_list('created_at__month', flat=True)
+    apps_checkouts_months = list(apps_checkouts_total.values_list('created_at__month', flat=True))
     
 
     for price in checkout_orders_total:
@@ -718,7 +718,7 @@ def get_total_sales_device(request):
     
     for price in appointment_services:
         total_price += float(price.discount_price or price.total_price or 0)
-        
+
     dashboard_data = []
     for index, month in enumerate(months):
         i = index + 1
