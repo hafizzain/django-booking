@@ -818,6 +818,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
 class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
     total_hours = serializers.SerializerMethodField(read_only=True)
     end_time = serializers.SerializerMethodField(read_only=True)
+    total_hours_dummy = serializers.SerializerMethodField(read_only=True)
     
     def get_end_time(self, obj):
         try:
@@ -826,6 +827,9 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
             return str(obj.end_time)
         except:
             pass
+                    
+    def get_total_hours_dummy(self, obj):
+        return obj.total_hours
                     
     
     def get_total_hours(self, obj):
@@ -872,7 +876,7 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
         model = EmployeDailySchedule
         fields = ['id','user','business','employee','day','vacation','start_time','end_time',
                   'start_time_shift','end_time_shift','from_date','to_date','total_hours','note',
-                  'date','is_leave','is_off','is_vacation','is_active','created_at','updated_at']
+                  'date','is_leave','is_off','is_vacation','is_active','created_at','updated_at', 'total_hours_dummy']
 
 class WorkingScheduleSerializer(serializers.ModelSerializer):
     start_time = serializers.SerializerMethodField(read_only=True)

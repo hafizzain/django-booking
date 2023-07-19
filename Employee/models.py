@@ -388,13 +388,44 @@ class EmployeDailySchedule(models.Model):
 
     @property
     def total_hours(self):
-        hours = 0
-        if self.start_time and self.end_time:
-            hours += float((self.end_time - self.start_time).strftime('%H'))
+        from datetime import datetime , timedelta
+
+        try:
+            income_type = EmployeeProfessionalInfo.objects.get(employee=self).income_type
+        except:
+            return 0
         
+        if income_type == 'Hourly_Rate':
+            if self.is_vacation:
+                return '8'
+            elif self.is_leave:
+                return '0'
+            else:
+                pass
+            
+        if self.start_time is None or self.end_time is None:
+            return '0'  # Return '0' if any of the time values is None
+
+        shift1_start = datetime.strptime(self.start_time.strftime("%H:%M:%S"), "%H:%M:%S")
+        shift1_end = datetime.strptime(self.end_time.strftime("%H:%M:%S"), "%H:%M:%S")
+
+        if shift1_end < shift1_start:
+            shift1_end += timedelta(days=1)  # Add 1 day if the shift ends on the next day
+
+        total_hours = (shift1_end - shift1_start).total_seconds() / 3600  # calculate the time difference in hours
+
         if self.start_time_shift and self.end_time_shift:
-            hours += float((self.end_time_shift - self.start_time_shift).strftime('%H'))
-        return hours
+            shift2_start = datetime.strptime(self.start_time_shift.strftime("%H:%M:%S"), "%H:%M:%S")
+            shift2_end = datetime.strptime(self.end_time_shift.strftime("%H:%M:%S"), "%H:%M:%S")
+
+            if shift2_end < shift2_start:
+                shift2_end += timedelta(days=1)  # Add 1 day if the shift ends on the next day
+
+            shift2_hours = (shift2_end - shift2_start).total_seconds() / 3600  # calculate the time difference in hours
+            total_hours += shift2_hours
+
+        total_hours = float(total_hours)  # convert to integer
+        return float(total_hours)
 
     
 # class EmployeDailyShift(models.Model):
