@@ -2037,6 +2037,15 @@ def create_checkout_device(request):
     )
     # checkout.business_address = service_appointment.business_address
     # checkout.save()
+    employee_tip = AppointmentEmployeeTip.objects.create(
+        appointment = appointments,
+        member = members,
+        business_address = business_address,
+        business = appointments.business,
+        checkout = checkout,
+        tip = tip,
+        total_price = total_price
+    )
     
     serialized = CheckoutSerializer(checkout)
     return Response(
