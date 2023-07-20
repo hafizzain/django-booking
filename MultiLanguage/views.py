@@ -212,6 +212,45 @@ def add_invoiceTranslation(request):
         )
     
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_invoiceTranslation(request):
+    allInvoicTrans = InvoiceTranslation.objects.filter(status='active')
+    
+    if allInvoicTrans:
+        translation_data = InvoiceTransSerializer(allInvoicTrans, many=True).data
+
+        return Response(
+                {
+                    'success':True,
+                    'status_code':200,
+                    'status_code_text' : '200',
+                    'response':
+                    {
+                        'message':'Data REturend Successfully',
+                        'data':translation_data
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+    
+    else:
+        return Response(
+                {
+                    'success':True,
+                    'status_code':204,
+                    'status_code_text' : '204',
+                    'response':
+                    {
+                        'message':'No Data Found',
+                        'data':[]
+                    }
+                },
+                status=status.HTTP_204_NO_CONTENT
+            )
+    
+
+    
 
 
 

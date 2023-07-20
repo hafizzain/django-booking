@@ -7,5 +7,6 @@ urlpatterns = [
    path('add_labels/', views.add_labels),
    path('get_data/', views.get_data),
    path('add_invocieTranslation/', views.add_invoiceTranslation),
+   path('get_invoiceTranslation/', views.get_invoiceTranslation),
 ]
 
