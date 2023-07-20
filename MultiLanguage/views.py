@@ -134,69 +134,83 @@ def get_data(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def add_invoiceTranslation(request):
-    # if request.method == 'POST':
-    location = request.POST.get('location')
-    language = request.POST.get('language')
-    invoice = request.POST.get('invoice')
-    items = request.POST.get('items')
-    amount = request.POST.get('amount')
-    subtotal = request.POST.get('subtotal')
-    tips = request.POST.get('tips')
-    taxes = request.POST.get('taxes')
-    total = request.POST.get('total')
-    payment_method = request.POST.get('payment_method')
+    if request.method == 'POST':
+        location = request.POST.get('location')
+        language = request.POST.get('language')
+        invoice = request.POST.get('invoice')
+        items = request.POST.get('items')
+        amount = request.POST.get('amount')
+        subtotal = request.POST.get('subtotal')
+        tips = request.POST.get('tips')
+        taxes = request.POST.get('taxes')
+        total = request.POST.get('total')
+        payment_method = request.POST.get('payment_method')
 
 
-    loc = location
+        loc = location
 
-    invoiceTranslation = InvoiceTranslation(
-        invoice = invoice,
-        items = items,
-        amount = amount,
-        subtotal = subtotal,
-        tips = tips,
-        taxes = taxes,
-        total = total,
-        payment_method = payment_method
-    )
-    try:
-        location = BusinessAddress.objects.get(id__icontains = str(location))
-        invoiceTranslation.location = location
-    except Exception as e:
-        return Response(
-        {
-            'success':False,
-            'status_code':204,
-            'status_code_text' : '204',
-            'response':
+        invoiceTranslation = InvoiceTranslation(
+            invoice = invoice,
+            items = items,
+            amount = amount,
+            subtotal = subtotal,
+            tips = tips,
+            taxes = taxes,
+            total = total,
+            payment_method = payment_method
+        )
+        try:
+            location = BusinessAddress.objects.get(id__icontains = str(location))
+            invoiceTranslation.location = location
+        except Exception as e:
+            return Response(
             {
-                'message':'Location Not Founf',
-                'data': str(e),
-                'location':loc,
-                'tips':tips
-            }
-        },
-        status=status.HTTP_201_CREATED
+                'success':False,
+                'status_code':204,
+                'status_code_text' : '204',
+                'response':
+                {
+                    'message':'Location Not Founf',
+                    'data': str(e),
+                    'location':loc,
+                    'tips':tips
+                }
+            },
+            status=status.HTTP_201_CREATED
+            )
+
+
+        language = AllLanguages.objects.get(id__icontains = str(language))        
+        invoiceTranslation.language = language
+
+        invoiceTranslation.save()
+
+        return Response(
+            {
+                'success':True,
+                'status_code':201,
+                'status_code_text' : '201',
+                'response':
+                {
+                    'message':'Invoice Translation Added Successfully',
+                }
+            },
+            status=status.HTTP_201_CREATED
         )
 
-
-    language = AllLanguages.objects.get(id__icontains = str(language))        
-    invoiceTranslation.language = language
-
-    invoiceTranslation.save()
-
     return Response(
-        {
-            'success':True,
-            'status_code':201,
-            'status_code_text' : '201',
-            'response':
             {
-                'message':'Invoice Translation Added Successfully',
-            }
-        },
-        status=status.HTTP_201_CREATED
-    )
+                'success':True,
+                'status_code':204,
+                'status_code_text' : '204',
+                'response':
+                {
+                    'message':'Invalid Input',
+                }
+            },
+            status=status.HTTP_204_NO_CONTENT
+        )
+    
 
 
 
