@@ -3233,7 +3233,7 @@ def check_client_existance(request):
             'status_code' : 200,
             'status_code_text' : '200',
             'response' : {
-                'message' : 'Loyalty Points Logs',
+                'message' : 'Existing fields for Client',
                 'fields' : set(fields)
             }
         },
