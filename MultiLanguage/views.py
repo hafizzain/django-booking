@@ -131,45 +131,63 @@ def get_data(request):
     )
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def add_invoiceTranslation(request):
-    location = request.POST.get('location')
-    language = request.POST.get('language')
-    invoice = request.POST.get('invoice')
-    items = request.POST.get('items')
-    amount = request.POST.get('amount')
-    subtotal = request.POST.get('subtotal')
-    tips = request.POST.get('tips')
-    taxes = request.POST.get('taxes')
-    total = request.POST.get('total')
-    payment_method = request.POST.get('payment_method')
+    if request.method == 'POST':
+        location = request.POST.get('location')
+        language = request.POST.get('language')
+        invoice = request.POST.get('invoice')
+        items = request.POST.get('items')
+        amount = request.POST.get('amount')
+        subtotal = request.POST.get('subtotal')
+        tips = request.POST.get('tips')
+        taxes = request.POST.get('taxes')
+        total = request.POST.get('total')
+        payment_method = request.POST.get('payment_method')
 
-    invoiceTranslation = InvoiceTranslation.objects.create(
-        invocie = invoice,
-        items = items,
-        amount = amount,
-        subtotal = subtotal,
-        tips = tips,
-        taxes = taxes,
-        total = total,
-        payment_method = payment_method
-    )
+        invoiceTranslation = InvoiceTranslation(
+            invoice = invoice,
+            items = items,
+            amount = amount,
+            subtotal = subtotal,
+            tips = tips,
+            taxes = taxes,
+            total = total,
+            payment_method = payment_method
+        )
+        location = BusinessAddress.objects.get(id = location)
+        invoiceTranslation.location = location
+
+        language = AllLanguages.objects.get(id=language)
+        invoiceTranslation.language = language
+
+        return Response(
+            {
+                'success':True,
+                'status_code':201,
+                'status_code_text' : '201',
+                'response':
+                {
+                    'message':'Invoice Translation Added Successfully',
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
 
     return Response(
-        {
-            'success':True,
-            'status_code':200,
-            'status_code_text' : '200',
-            'response':
             {
-                'message':'Invoice Translation Added Successfully',
-            }
-        },
-        status=status.HTTP_200_OK
-    )
-
-
+                'success':True,
+                'status_code':204,
+                'status_code_text' : '204',
+                'response':
+                {
+                    'message':'Invalid Input',
+                }
+            },
+            status=status.HTTP_204_NO_CONTENT
+        )
+    
 
 
 
