@@ -75,6 +75,7 @@ def view_topic_content(request):
 
 
 
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_comment(request):
