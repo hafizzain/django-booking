@@ -1986,7 +1986,18 @@ def create_checkout_device(request):
     try:
         business_address=BusinessAddress.objects.get(id = str(business_address))
     except Exception as err:
-        business_address = None
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Business address Not Found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
     
     try:
         service_appointment = AppointmentService.objects.filter(appointment = str(appointments))
