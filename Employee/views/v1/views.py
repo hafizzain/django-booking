@@ -3914,7 +3914,7 @@ def get_vacations(request):
         holiday_type = 'Vacation',
         is_active = True,  
         **queries
-    )
+    ).order_by('-created_at')
     
     allvacations_count = allvacations.count()
 
