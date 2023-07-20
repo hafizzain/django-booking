@@ -3852,7 +3852,7 @@ def create_workingschedule(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_vacations(request):
-    # employee_id = request.data.get('employee', None)
+    employee_id = request.data.get('employee', None)
     location = request.GET.get('location', None)
 
     if not all([location]):
@@ -3905,12 +3905,15 @@ def get_vacations(request):
     
     # employee= Employee.objects.get(id = employee_id.id, is_deleted=False, is_blocked=False)
 
+    queries = {}
+    if employee_id:
+        queries['employee__id'] = employee_id
     allvacations = Vacation.objects.filter(
         # employee = employee, 
         employee__location = location,
         holiday_type = 'Vacation',
         is_active = True,  
-        
+        **queries
     )
     
     allvacations_count = allvacations.count()
