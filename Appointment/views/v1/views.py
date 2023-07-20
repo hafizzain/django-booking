@@ -2067,7 +2067,7 @@ def create_checkout_device(request):
     )
     invoice = SaleInvoice.objects.create(
         appointment = appointments,
-        # appointment_service = service_appointment,
+        appointment_service = service_appointment[0].id,
         payment_type = payment_method,
         service = services,
         member = members,
