@@ -4,3 +4,4 @@ from .models import *
 admin.site.register(Language)
 admin.site.register(Section)
 admin.site.register(Labels)
+admin.site.register(InvoiceTranslation)
