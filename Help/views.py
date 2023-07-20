@@ -78,22 +78,42 @@ def view_topic_content(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_comment(request):
-    try:
-        all_comments = HelpContent.objects.filter(is_parent = True, parent_comment__isnull = True)
-    except Exception as e:
-        return Response(
-            {
-                'success':False,
-                'message':'Data Not Found',
-                'status_code':400,
-                'status_code_text' : '400',
-                'response':
+    search = request.GET.get('search', None)
+
+    if search:
+            try:
+                all_comments = HelpContent.objects.filter(is_parent = True, parent_comment__isnull = True, content__icontains = search)
+            except Exception as e:
+                return Response(
+                    {
+                        'success':False,
+                        'message':'Data Not Found For this Search',
+                        'status_code':400,
+                        'status_code_text' : '400',
+                        'response':
+                        {
+                            'message':str(e),
+                        }
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+    else: 
+        try:
+            all_comments = HelpContent.objects.filter(is_parent = True, parent_comment__isnull = True)
+        except Exception as e:
+            return Response(
                 {
-                    'message':str(e),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
+                    'success':False,
+                    'message':'Data Not Found',
+                    'status_code':400,
+                    'status_code_text' : '400',
+                    'response':
+                    {
+                        'message':str(e),
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
 
     comments = HelpContentSerializer(all_comments, many=True, context={'request' : request})
 
@@ -110,7 +130,7 @@ def get_comment(request):
         }
     },
     status=status.HTTP_200_OK
-)
+    )
 
 
 
