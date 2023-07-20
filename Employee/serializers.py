@@ -1017,9 +1017,12 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     
 
     def get_total_hours(self, obj):
+        start_date = self.context.get('start_date', None)
+        end_date = self.context.get('end_date', None)
         now_date = datetime.now()
-        month_start_date = f'{now_date.year}-{now_date.month}-01'
-        month_end_date = now_date.strftime('%Y-%m-%d')
+
+        month_start_date = start_date or f'{now_date.year}-{now_date.month}-01'
+        month_end_date = end_date or now_date.strftime('%Y-%m-%d')
 
         employee_schedules =  EmployeDailySchedule.objects.filter(
             employee = obj,
@@ -1038,8 +1041,11 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         total_days = calendar.monthrange(now_date.year, now_date.month)[1]
         date = now_date.date
 
-        month_start_date = f'{now_date.year}-{now_date.month}-01'
-        month_end_date = now_date.strftime('%Y-%m-%d')
+        start_date = self.context.get('start_date', None)
+        end_date = self.context.get('end_date', None)
+
+        month_start_date = start_date or f'{now_date.year}-{now_date.month}-01'
+        month_end_date = end_date or now_date.strftime('%Y-%m-%d')
 
         employee_schedules =  EmployeDailySchedule.objects.filter(
             employee = obj,
@@ -1094,8 +1100,15 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
             return None
 
     def get_schedule(self, obj):
+        now_date = datetime.now()
+        start_date = self.context.get('start_date', None)
+        end_date = self.context.get('end_date', None)
+
+        month_start_date = start_date or f'{now_date.year}-{now_date.month}-01'
+        month_end_date = end_date or now_date.strftime('%Y-%m-%d')
         schedule =  EmployeDailySchedule.objects.filter(
-            employee = obj
+            employee = obj,
+            date__range = (month_start_date, month_end_date)
         ).order_by('-date')
         # ).order_by('employee__employee_employedailyschedule__date')            
         context = self.context

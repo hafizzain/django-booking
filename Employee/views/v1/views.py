@@ -1683,9 +1683,17 @@ def update_staff_group(request):
 def get_attendence(request):
     # all_attendence= Attendance.objects.all()
     # serialized = AttendanceSerializers(all_attendence, many=True, context={'request' : request})
+
+    location = request.GET.get('location', None)
+    start_date = request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
     
     
-    all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
+    all_employe= Employee.objects.filter(
+        is_deleted=False, 
+        is_blocked=False,
+        location__id = location
+    ).order_by('-created_at')
     all_employe_count= all_employe.count()
 
     page_count = all_employe_count / 10
@@ -1697,7 +1705,7 @@ def get_attendence(request):
     all_employe = paginator.get_page(page_number)
 
 
-    serialized = Payroll_WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request,} )
+    serialized = Payroll_WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request, 'start_date' : start_date, 'end_date' : end_date } )
     
     return Response(
         {
@@ -2129,6 +2137,9 @@ def create_sallaryslip(request):
 def get_payrol_working(request):
     location_id = request.GET.get('location', None)
     employee_id = request.GET.get('employee_id', None)
+    start_date = request.GET.get('start_date', None) # '2023-07-01'
+    end_date = request.GET.get('end_date', None)
+
     queries = {}
 
     if location_id:
@@ -2154,7 +2165,7 @@ def get_payrol_working(request):
     all_employe = paginator.get_page(page_number)
 
 
-    serialized = Payroll_WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request,} )
+    serialized = Payroll_WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request, 'start_date' : start_date, 'end_date' : end_date} )
    
     return Response(
         {
