@@ -316,56 +316,57 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
                   'name','created_at','discount_percentage', 'voucher_price' ]
 
 class ClientMembershipsSerializer(serializers.ModelSerializer):
-    # location = serializers.SerializerMethodField(read_only=True)
-    # order_type  = serializers.SerializerMethodField(read_only=True)
+    # membership = serializers.SerializerMethodField(read_only=True)
+    location = serializers.SerializerMethodField(read_only=True)
+    order_type  = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)
     name  = serializers.SerializerMethodField(read_only=True)
-    # membership_price  = serializers.SerializerMethodField(read_only=True)
-    # discount_type = serializers.SerializerMethodField(read_only=True)
-    # products = serializers.SerializerMethodField()
-    # services = serializers.SerializerMethodField()
-    # employee = serializers.SerializerMethodField()
+    membership_price  = serializers.SerializerMethodField(read_only=True)
+    discount_type = serializers.SerializerMethodField(read_only=True)
+    products = serializers.SerializerMethodField()
+    services = serializers.SerializerMethodField()
+    employee = serializers.SerializerMethodField()
 
-    # def get_products(self, obj):
-    #     try:
-    #         pro = DiscountMembership.objects.filter(membership=obj.membership, service__isnull=True)
-    #         return DiscountMembershipSerializers(pro, many=True).data
-    #     except Exception as err:
-    #         return str(err)
+    def get_products(self, obj):
+        try:
+            pro = DiscountMembership.objects.filter(membership=obj.membership, service__isnull=True)
+            return DiscountMembershipSerializers(pro, many=True).data
+        except Exception as err:
+            return str(err)
             
-    # def get_services(self, obj):
-    #     try:
-    #         pro = DiscountMembership.objects.filter(membership=obj.membership, product__isnull=True)
-    #         return DiscountMembershipSerializers(pro, many=True).data
-    #     except Exception as err:
-    #         return str(err)
+    def get_services(self, obj):
+        try:
+            pro = DiscountMembership.objects.filter(membership=obj.membership, product__isnull=True)
+            return DiscountMembershipSerializers(pro, many=True).data
+        except Exception as err:
+            return str(err)
     
 
-    # def get_order_type(self, obj):
-    #     return 'Membership'
+    def get_order_type(self, obj):
+        return 'Membership'
     
-    # def get_membership_price(self, obj):
-    #     return (obj.current_price)
+    def get_membership_price(self, obj):
+        return (obj.current_price)
     
 
-    # def get_employee(self, membership_order):
-    #     if membership_order.member:
-    #         return {
-    #             'full_name' : str(membership_order.member.full_name),
-    #         }
-    #     return ''
+    def get_employee(self, membership_order):
+        if membership_order.member:
+            return {
+                'full_name' : str(membership_order.member.full_name),
+            }
+        return ''
 
-    # def get_location(self, obj):
-    #     try:
-    #         loc = BusinessAddress.objects.get(id = obj.location.id)
-    #         return LocationSerializerLoyalty(loc).data
-    #     except Exception as err:
-    #         print(err)
+    def get_location(self, obj):
+        try:
+            loc = BusinessAddress.objects.get(id = obj.location.id)
+            return LocationSerializerLoyalty(loc).data
+        except Exception as err:
+            print(err)
 
     def get_client(self, obj):
         try:
-            serializers = ClientSerializer(obj.client).data
-            return serializers
+            serializered_data = ClientSerializer(obj.client).data
+            return serializered_data
         except Exception as err:
             return None
     
@@ -376,11 +377,11 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
         except Exception as err:
             return None
 
-    # def get_discount_type(self, obj):
-    #     try:
-    #         return obj.membership.discount
-    #     except Exception as err:
-    #         return None
+    def get_discount_type(self, obj):
+        try:
+            return obj.membership.discount
+        except Exception as err:
+            return None
         
     
     class Meta:
@@ -389,23 +390,23 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
             'id',
             'name', 
             'client', 
-            # 'location',
-            # 'status',
-            # 'quantity',
-            # 'products', 
-            # 'services',
-            # 'checkout',
-            # 'employee',
-            # 'start_date', 
-            # 'end_date',
-            # 'total_price', 
-            # 'payment_type', 
-            # 'order_type',
-            # 'price',
-            # 'created_at',
-            # 'discount_percentage', 
-            # 'membership_price', 
-            # 'discount_type' 
+            'location',
+            'status',
+            'quantity',
+            'products', 
+            'services',
+            'checkout',
+            'employee',
+            'start_date', 
+            'end_date',
+            'total_price', 
+            'payment_type', 
+            'order_type',
+            'price',
+            'created_at',
+            'discount_percentage', 
+            'membership_price', 
+            'discount_type' 
         ]
 
 
