@@ -185,6 +185,8 @@ def add_invoiceTranslation(request):
 
         invoiceTranslation.save()
 
+        invoiceTranslation_data = InvoiceTransSerializer(invoiceTranslation).data
+
         return Response(
             {
                 'success':True,
@@ -193,6 +195,7 @@ def add_invoiceTranslation(request):
                 'response':
                 {
                     'message':'Invoice Translation Added Successfully',
+                    'data': invoiceTranslation_data
                 }
             },
             status=status.HTTP_201_CREATED
