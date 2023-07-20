@@ -16,7 +16,7 @@ class Section(models.Model):
         return self.title 
     
 class Labels(models.Model):
-    section = models.ForeignKey(Section, on_delete=models.PROTECT, related_name='language_sections', null=True)
+    section = models.ForeignKey(Section, on_delete=models.PROTECT, related_name='language_sections', null=True, blank=True)
     label = models.TextField(null=True, blank=True)
     value = models.TextField(null=True, blank=True)
 
