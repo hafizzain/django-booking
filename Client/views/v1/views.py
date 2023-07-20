@@ -3206,11 +3206,11 @@ def get_customer_detailed_loyalty_points(request):
         status=status.HTTP_200_OK
     )
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def check_client_existance(request):
-    email = request.GET.get('email', None)
-    phone_number = request.GET.get('phone_number', None)
+    email = request.data.get('email', None)
+    phone_number = request.data.get('phone_number', None)
     
     fields = []
 
