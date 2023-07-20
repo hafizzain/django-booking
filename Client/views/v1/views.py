@@ -2754,28 +2754,11 @@ def get_client_all_memberships(request):
     location_id = request.GET.get('location_id', None)
     client_id = request.GET.get('client_id', None)
 
-    try:
-        client_membership = MemberShipOrder.objects.filter(
-            location__id = location_id,
-            client__id = client_id,
-        )
-    except Exception as error:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : 404,
-                'response' : {
-                    'message' : 'No Membership is found on this location against this Client',
-                    'error_message' : str(error),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
-    
-    try:
-        data = ClientMembershipsSerializer(client_membership, many=True).data
-    except:
-        data = []
+    client_membership = MemberShipOrder.objects.filter(
+        location__id = location_id,
+        client__id = client_id,
+    )
+    data = ClientMembershipsSerializer(client_membership, many=True).data
        
     return Response(
         {
@@ -2784,6 +2767,7 @@ def get_client_all_memberships(request):
             'response' : {
                 'message' : 'Client Available Memberships',
                 'error_message' : None,
+                'client_memberships' : str(data)
             }
         },
         status=status.HTTP_200_OK
