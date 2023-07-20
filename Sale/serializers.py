@@ -23,7 +23,16 @@ from Service.models import Service
 
 class PriceServiceSerializers(serializers.ModelSerializer):
     currency_name = serializers.SerializerMethodField(read_only=True)
+    location_id = serializers.SerializerMethodField(read_only=True)
     
+    def get_location_id(self, obj):
+        try:
+            return BusinessAddress.objects.get(
+                currency = obj.currency
+            ).id
+        except:
+            return None
+
     def get_currency_name(self, obj):
         try:
             currency = Currency.objects.get(id  = obj.currency.id)
