@@ -943,7 +943,7 @@ def get_all_sale_orders_pagination(request):
             'appointment__client',
             'service',
         ).filter(
-            appointment_service__appointment_status = 'Done',
+            # appointment_service__appointment_status = 'Done',
             business_address__id = location_id,
             **queries,
             **app_queries

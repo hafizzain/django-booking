@@ -1986,7 +1986,18 @@ def create_checkout_device(request):
     try:
         business_address=BusinessAddress.objects.get(id = str(business_address))
     except Exception as err:
-        business_address = None
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Business address Not Found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
     
     try:
         service_appointment = AppointmentService.objects.filter(appointment = str(appointments))
@@ -2043,7 +2054,7 @@ def create_checkout_device(request):
     
     checkout =AppointmentCheckout.objects.create(
         appointment = appointments,
-       # appointment_service = service_appointment,
+        appointment_service = service_appointment[0],
         payment_method =payment_method,
         service= services,
         member=members,
@@ -2056,7 +2067,7 @@ def create_checkout_device(request):
     )
     invoice = SaleInvoice.objects.create(
         appointment = appointments,
-        # appointment_service = service_appointment,
+        appointment_service = service_appointment[0].id,
         payment_type = payment_method,
         service = services,
         member = members,
