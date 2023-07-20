@@ -159,8 +159,10 @@ def add_invoiceTranslation(request):
         location = BusinessAddress.objects.get(id__icontains = str(location))
         invoiceTranslation.location = location
 
-        language = AllLanguages.objects.get(id__icontains = str(language))
+        language = AllLanguages.objects.get(id__icontains = str(language))        
         invoiceTranslation.language = language
+
+        invoiceTranslation.save()
 
         return Response(
             {
