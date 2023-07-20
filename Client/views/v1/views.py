@@ -2767,7 +2767,7 @@ def get_client_all_memberships(request):
             'response' : {
                 'message' : 'Client Available Memberships',
                 'error_message' : None,
-                'client_memberships' : str(data)
+                'client_memberships' : list(data)
             }
         },
         status=status.HTTP_200_OK
