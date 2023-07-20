@@ -131,6 +131,43 @@ def get_data(request):
     )
 
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def add_invoiceTranslation(request):
+    location = request.POST.get('location')
+    language = request.POST.get('language')
+    invoice = request.POST.get('invoice')
+    items = request.POST.get('items')
+    amount = request.POST.get('amount')
+    subtotal = request.POST.get('subtotal')
+    tips = request.POST.get('tips')
+    taxes = request.POST.get('taxes')
+    total = request.POST.get('total')
+    payment_method = request.POST.get('payment_method')
+
+    invoiceTranslation = InvoiceTranslation.objects.create(
+        invocie = invoice,
+        items = items,
+        amount = amount,
+        subtotal = subtotal,
+        tips = tips,
+        taxes = taxes,
+        total = total,
+        payment_method = payment_method
+    )
+
+    return Response(
+        {
+            'success':True,
+            'status_code':200,
+            'status_code_text' : '200',
+            'response':
+            {
+                'message':'Invoice Translation Added Successfully',
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
 
 
