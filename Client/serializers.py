@@ -57,7 +57,7 @@ class ClientSerializer(serializers.ModelSerializer):
                 url = tenant_media_base_url(request)
                 return f'{url}{obj.image}'
             except:
-                return obj.image
+                return f'{obj.image}'
         return None
     class Meta:
         model = Client
