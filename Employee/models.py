@@ -385,14 +385,14 @@ class EmployeDailySchedule(models.Model):
     def __str__(self):
         return str(self.id)
     
-    def save(self, *args, **kwargs):
-        if self.is_leave:
-            self.start_time = None
-            self.end_time = None
-            self.start_time_shift = None
-            self.end_time_shift = None
+    # def save(self, *args, **kwargs):
+    #     if self.is_leave:
+    #         self.start_time = None
+    #         self.end_time = None
+    #         self.start_time_shift = None
+    #         self.end_time_shift = None
         
-        super(EmployeDailySchedule, self).save(*args, **kwargs)
+    #     super(EmployeDailySchedule, self).save(*args, **kwargs)
 
 
 
