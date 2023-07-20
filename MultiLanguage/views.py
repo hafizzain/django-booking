@@ -156,10 +156,10 @@ def add_invoiceTranslation(request):
             total = total,
             payment_method = payment_method
         )
-        location = BusinessAddress.objects.get(id = location)
+        location = BusinessAddress.objects.get(id__icontains = str(location))
         invoiceTranslation.location = location
 
-        language = AllLanguages.objects.get(id=language)
+        language = AllLanguages.objects.get(id__icontains = str(language))
         invoiceTranslation.language = language
 
         return Response(
