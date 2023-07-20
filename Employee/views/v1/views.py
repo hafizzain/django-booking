@@ -3460,7 +3460,7 @@ def create_vacation_emp(request):
     working_sch = None
     days = int(diff.days)
 
-    empl_vacation = Vacation(
+    empl_vacation = Vacation.objects.create(
         business = business,
         employee = employee_id,
         from_date = from_date,
