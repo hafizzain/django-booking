@@ -824,7 +824,8 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
         try:
             if obj.start_time_shift != None:
                 return str(obj.end_time_shift)
-            return str(obj.end_time)
+            if obj.end_time:
+                return str(obj.end_time)
         except:
             pass
                     
