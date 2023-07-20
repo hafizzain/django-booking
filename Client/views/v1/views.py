@@ -3214,10 +3214,22 @@ def check_client_existance(request):
     
     fields = []
 
-    clients = Client.objects.filter(
-        Q(email__icontains = email) |
-        Q(mobile_number__icontains = phone_number)
-    )
+   
+    if all[email, phone_number]:
+        clients = Client.objects.filter(
+            Q(email__icontains = email) |
+            Q(mobile_number__icontains = phone_number)
+        )
+    else:
+        query = {}
+        if email:
+            query['email__icontains'] = email
+        else :
+            query['mobile_number__icontains'] = phone_number
+
+        clients = Client.objects.filter(
+            **query
+        )
 
     for client in clients:
         if client.email == email:
