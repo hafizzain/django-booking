@@ -2054,7 +2054,7 @@ def create_checkout_device(request):
     
     checkout =AppointmentCheckout.objects.create(
         appointment = appointments,
-       # appointment_service = service_appointment,
+        appointment_service = service_appointment[0],
         payment_method =payment_method,
         service= services,
         member=members,
