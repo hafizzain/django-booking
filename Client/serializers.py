@@ -346,7 +346,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
         return 'Membership'
     
     def get_membership_price(self, obj):
-        return obj.current_price
+        return (obj.current_price)
     
 
     def get_employee(self, membership_order):

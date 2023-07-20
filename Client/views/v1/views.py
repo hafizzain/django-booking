@@ -2772,7 +2772,10 @@ def get_client_all_memberships(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-    serialized = ClientMembershipsSerializer(client_membership, many=True)
+    try:
+        data = ClientMembershipsSerializer(client_membership, many=True).data
+    except:
+        data = []
        
     return Response(
         {
@@ -2781,7 +2784,7 @@ def get_client_all_memberships(request):
             'response' : {
                 'message' : 'Client Available Memberships',
                 'error_message' : None,
-                'client_memberships' : serialized.data
+                'client_memberships' : data
             }
         },
         status=status.HTTP_200_OK
