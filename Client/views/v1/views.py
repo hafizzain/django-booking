@@ -3215,8 +3215,8 @@ def check_client_existance(request):
     fields = []
 
     clients = Client.objects.filter(
-        Q(email = email) |
-        Q(mobile_number = phone_number)
+        Q(email__icontains = email) |
+        Q(mobile_number__icontains = phone_number)
     )
 
     for client in clients:
@@ -3234,7 +3234,9 @@ def check_client_existance(request):
             'status_code_text' : '200',
             'response' : {
                 'message' : 'Existing fields for Client',
-                'fields' : set(fields)
+                'fields' : set(fields),
+                'email' : email,
+                'phone_number' : phone_number,
             }
         },
         status=status.HTTP_200_OK
