@@ -346,7 +346,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
         return 'Membership'
     
     def get_membership_price(self, obj):
-        return obj.current_price
+        return (obj.current_price)
     
 
     def get_employee(self, membership_order):
@@ -386,10 +386,28 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = MemberShipOrder
-        fields = ['id','name', 'client' , 'location' , 
-                  'status','quantity','products', 'services', 'checkout','employee','start_date', 'end_date',
-                  'total_price', 'payment_type' , 'order_type','price',
-                  'name','created_at','discount_percentage', 'membership_price', 'discount_type' ]
+        fields = [
+            'id',
+            'name', 
+            'client', 
+            'location',
+            'status',
+            'quantity',
+            'products', 
+            'services',
+            'checkout',
+            'employee',
+            'start_date', 
+            'end_date',
+            'total_price', 
+            'payment_type', 
+            'order_type',
+            'price',
+            'created_at',
+            'discount_percentage', 
+            'membership_price', 
+            'discount_type' 
+        ]
 
 
 class CustomerLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
