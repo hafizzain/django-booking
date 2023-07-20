@@ -319,7 +319,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
     # location = serializers.SerializerMethodField(read_only=True)
     # order_type  = serializers.SerializerMethodField(read_only=True)
     # client = serializers.SerializerMethodField(read_only=True)
-    # name  = serializers.SerializerMethodField(read_only=True)
+    name  = serializers.SerializerMethodField(read_only=True)
     # membership_price  = serializers.SerializerMethodField(read_only=True)
     # discount_type = serializers.SerializerMethodField(read_only=True)
     # products = serializers.SerializerMethodField()
@@ -370,11 +370,11 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
     #         return None
     
     
-    # def get_name(self, obj):
-    #     try:
-    #         return obj.membership.name
-    #     except Exception as err:
-    #         return None
+    def get_name(self, obj):
+        try:
+            return obj.membership.name
+        except Exception as err:
+            return None
 
     # def get_discount_type(self, obj):
     #     try:
@@ -387,7 +387,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
         model = MemberShipOrder
         fields = [
             'id',
-            # 'name', 
+            'name', 
             # 'client', 
             # 'location',
             # 'status',
