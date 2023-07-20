@@ -57,7 +57,7 @@ class ClientSerializer(serializers.ModelSerializer):
                 url = tenant_media_base_url(request)
                 return f'{url}{obj.image}'
             except:
-                return obj.image
+                return f'{obj.image}'
         return None
     class Meta:
         model = Client
@@ -365,8 +365,8 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
 
     def get_client(self, obj):
         try:
-            serializers = ClientSerializer(obj.client).data
-            return serializers
+            serializered_data = ClientSerializer(obj.client).data
+            return serializered_data
         except Exception as err:
             return None
     
