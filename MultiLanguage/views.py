@@ -190,15 +190,15 @@ def add_invoiceTranslation(request):
         return Response(
             {
                 'success':True,
-                'status_code':201,
-                'status_code_text' : '201',
+                'status_code':200,
+                'status_code_text' : 'success',
                 'response':
                 {
                     'message':'Invoice Translation Added Successfully',
                     'data': invoiceTranslation_data
                 }
             },
-            status=status.HTTP_201_CREATED
+            status=status.HTTP_200_OK
         )
 
     return Response(
