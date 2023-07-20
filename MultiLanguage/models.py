@@ -29,16 +29,18 @@ class Labels(models.Model):
 
 
 class InvoiceTranslation(models.Model):
+    status_type=(('active', 'active'),('inactive', 'inactive'))
     location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True)
     language = models.ForeignKey(AllLanguages, on_delete=models.PROTECT, null=True, blank=True)
-    invoice = models.CharField(max_length=500)
-    items = models.CharField(max_length=500)
-    amount = models.CharField(max_length=500)
-    subtotal = models.CharField(max_length=500)
-    tips = models.CharField(max_length=500)
-    taxes = models.CharField(max_length=500)
-    total = models.CharField(max_length=500)
-    payment_method = models.CharField(max_length=500)
+    invoice = models.CharField(max_length=500, null=True, blank=True)
+    items = models.CharField(max_length=500, null=True, blank=True)
+    amount = models.CharField(max_length=500, null=True, blank=True)
+    subtotal = models.CharField(max_length=500, null=True, blank=True)
+    tips = models.CharField(max_length=500, null=True, blank=True)
+    taxes = models.CharField(max_length=500, null=True, blank=True)
+    total = models.CharField(max_length=500, null=True, blank=True)
+    payment_method = models.CharField(max_length=500, null=True, blank=True)
+    status = models.CharField(max_length=10, choices=status_type, default='active')
     
     def __str__(self):
         return f'{self.invoice} -- {self.items}'
