@@ -3234,7 +3234,9 @@ def check_client_existance(request):
             'status_code_text' : '200',
             'response' : {
                 'message' : 'Existing fields for Client',
-                'fields' : set(fields)
+                'fields' : set(fields),
+                'email' : email,
+                'phone_number' : phone_number,
             }
         },
         status=status.HTTP_200_OK
