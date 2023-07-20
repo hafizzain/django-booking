@@ -146,6 +146,9 @@ def add_invoiceTranslation(request):
         total = request.POST.get('total')
         payment_method = request.POST.get('payment_method')
 
+
+        loc = location
+
         invoiceTranslation = InvoiceTranslation(
             invoice = invoice,
             items = items,
@@ -156,8 +159,25 @@ def add_invoiceTranslation(request):
             total = total,
             payment_method = payment_method
         )
-        location = BusinessAddress.objects.get(id__icontains = str(location))
-        invoiceTranslation.location = location
+        try:
+            location = BusinessAddress.objects.get(id__icontains = str(location))
+            invoiceTranslation.location = location
+        except Exception as e:
+            return Response(
+            {
+                'success':False,
+                'status_code':204,
+                'status_code_text' : '204',
+                'response':
+                {
+                    'message':'Location Not Founf',
+                    'data': str(e),
+                    'location':loc
+                }
+            },
+            status=status.HTTP_201_CREATED
+            )
+
 
         language = AllLanguages.objects.get(id__icontains = str(language))        
         invoiceTranslation.language = language
