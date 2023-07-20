@@ -172,7 +172,8 @@ def add_invoiceTranslation(request):
                 {
                     'message':'Location Not Founf',
                     'data': str(e),
-                    'location':loc
+                    'location':loc,
+                    'tips':tips
                 }
             },
             status=status.HTTP_201_CREATED
