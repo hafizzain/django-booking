@@ -2052,7 +2052,7 @@ def create_checkout_device(request):
     
 
     
-    checkout =AppointmentCheckout.objects.create(
+    checkout = AppointmentCheckout.objects.create(
         appointment = appointments,
         appointment_service = service_appointment[0],
         payment_method =payment_method,
@@ -2067,15 +2067,15 @@ def create_checkout_device(request):
     )
     invoice = SaleInvoice.objects.create(
         appointment = appointments,
-        appointment_service = service_appointment[0].id,
+        appointment_service = f'{service_appointment[0].id}',
         payment_type = payment_method,
-        service = services,
-        member = members,
-        business_address=business_address,
-        # tip = tip,
+        service = f'{services.id}' if services else '',
+        member = f'{members.id}' if members else '',
+        business_address = f'{business_address.id}',
         gst = gst,
         service_price = service_price,
         total_price = total_price,
+        checkout = f'{checkout.id}',
     )
     # checkout.business_address = service_appointment.business_address
     # checkout.save()
