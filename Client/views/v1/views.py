@@ -3206,5 +3206,39 @@ def get_customer_detailed_loyalty_points(request):
         status=status.HTTP_200_OK
     )
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def check_client_existance(request):
+    email = request.GET.get('email', None)
+    phone_number = request.GET.get('phone_number', None)
+    
+    fields = []
+
+    clients = Client.objects.filter(
+        Q(email = email) |
+        Q(mobile_number = phone_number)
+    )
+
+    for client in clients:
+        if client.email == email:
+            fields.append('EMAIL')
+        
+        if client.mobile_number == phone_number:
+            fields.append('PHONE_NUMBER')
+
+
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Loyalty Points Logs',
+                'fields' : set(fields)
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
 # Select Related  => Single Object => (Inside FK + OTO Relaion)
 # prefetch related => Many to Many => (MTM + Outside FK)
