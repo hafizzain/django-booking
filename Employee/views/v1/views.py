@@ -3968,6 +3968,7 @@ def get_vacations(request):
 @permission_classes([AllowAny])
 def get_absence(request):
     location = request.GET.get('location', None)
+    employee_id = request.GET.get('employee', None)
 
     if not all([location]):
         return Response(
@@ -4019,13 +4020,17 @@ def get_absence(request):
     
     # employee= Employee.objects.get(id = employee_id.id, is_deleted=False, is_blocked=False)
 
+    queries = {}
+    if employee_id:
+        queries['employee__id'] = employee_id
+
     allvacations = Vacation.objects.filter(
         # employee = employee, 
         employee__location = location,
         holiday_type ='Absence',
         is_active = True, 
-        
-    )
+        **queries
+    ).order_by('-created_at')
     
     allvacations_count = allvacations.count()
 
