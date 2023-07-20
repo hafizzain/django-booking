@@ -560,7 +560,6 @@ def delete_client(request):
             
     #client.is_deleted = True
     client.delete()
-    client.save()
     return Response(
         {
             'status' : True,
