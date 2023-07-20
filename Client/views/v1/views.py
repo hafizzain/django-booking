@@ -3215,8 +3215,8 @@ def check_client_existance(request):
     fields = []
 
     clients = Client.objects.filter(
-        Q(email = email) |
-        Q(mobile_number = phone_number)
+        Q(email__icontains = email) |
+        Q(mobile_number__icontains = phone_number)
     )
 
     for client in clients:
