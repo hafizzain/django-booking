@@ -145,6 +145,7 @@ def add_invoiceTranslation(request):
         taxes = request.POST.get('taxes')
         total = request.POST.get('total')
         payment_method = request.POST.get('payment_method')
+        statuss = request.POST.get('status')
 
 
         loc = location
@@ -157,7 +158,8 @@ def add_invoiceTranslation(request):
             tips = tips,
             taxes = taxes,
             total = total,
-            payment_method = payment_method
+            payment_method = payment_method,
+            status = statuss
         )
         try:
             location = BusinessAddress.objects.get(id__icontains = str(location))
