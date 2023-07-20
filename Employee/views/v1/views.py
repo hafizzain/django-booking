@@ -3852,7 +3852,7 @@ def create_workingschedule(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_vacations(request):
-    employee_id = request.data.get('employee', None)
+    employee_id = request.GET.get('employee', None)
     location = request.GET.get('location', None)
 
     if not all([location]):
