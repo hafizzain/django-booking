@@ -331,7 +331,8 @@ def update_user_default_data(request):
                     PriceService.objects.create(
                         price = price.get('price', 0),
                         duration = price.get('price', 0),
-                        currency = location_currency
+                        currency = location_currency,
+                        service = service_instance
                     )
                 else:
                     if location_currency is not None:
