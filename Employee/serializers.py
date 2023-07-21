@@ -1154,7 +1154,7 @@ class Payroll_Working_device_attendence_ScheduleSerializer(serializers.ModelSeri
             month = current_date.month
             year = current_date.year
 
-            current_month_days = calendar.monthcalendar(year, month)[1]
+            current_month_days = calendar.monthrange(year, month)[1]
 
             range_start = f'{year}-{month}-01'
             range_end = f'{year}-{month}-{current_month_days}'
