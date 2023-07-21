@@ -1149,17 +1149,21 @@ class Payroll_Working_device_attendence_ScheduleSerializer(serializers.ModelSeri
             range_start = datetime.strptime(range_start, "%Y-%m-%d")#.date()
             range_end = datetime.strptime(range_end, "%Y-%m-%d")#.date()
         else:
-            range_end = datetime.now()#.date()
-            month = range_end.month
-            year = range_end.year
+            import calendar
+            current_date = datetime.now()#.date()
+            month = current_date.month
+            year = current_date.year
+
+            current_month_days = calendar.monthcalendar(year, month)[1]
+
             range_start = f'{year}-{month}-01'
-            range_start = datetime.strptime(range_start, "%Y-%m-%d")#.date()
+            range_end = f'{year}-{month}-{current_month_days}'
         
         #return f'range_start{range_start} range_end{range_end}' 
         schedule =  EmployeDailySchedule.objects.filter(
-            employee= obj, 
-            date__gte =  range_start ,
-            date__lte = range_end,
+            employee = obj, 
+            date__range =  (range_start, range_end) ,
+            is_vacation = False
             # created_at__gte =  range_start ,
             # created_at__lte = range_end
             ) 

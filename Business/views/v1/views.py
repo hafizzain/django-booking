@@ -302,15 +302,6 @@ def update_user_default_data(request):
             service_instance.name = name
             service_instance.description = description
             service_instance.save()
-            try:
-                serv_grp = ServiceGroup.objects.get(
-                    id = service_group_id
-                )
-            except Exception as err:
-                errors.append(str(err))
-            else:
-                serv_grp.name = service_group_name
-                serv_grp.save()
 
             price_services_ids = []
             for price in priceservice:
