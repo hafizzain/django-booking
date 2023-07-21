@@ -1046,7 +1046,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         end_date = self.context.get('end_date', None)
 
         month_start_date = start_date or f'{now_date.year}-{now_date.month}-01'
-        month_end_date = end_date or now_date.strftime('%Y-%m-%d')
+        month_end_date = end_date or f'{now_date.year}-{now_date.month}-{total_days}'
 
         employee_schedules =  EmployeDailySchedule.objects.filter(
             employee = obj,
@@ -1105,8 +1105,11 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         start_date = self.context.get('start_date', None)
         end_date = self.context.get('end_date', None)
 
+        total_days = calendar.monthrange(now_date.year, now_date.month)[1]
+
         month_start_date = start_date or f'{now_date.year}-{now_date.month}-01'
-        month_end_date = end_date or now_date.strftime('%Y-%m-%d')
+        month_end_date = end_date or f'{now_date.year}-{now_date.month}-{total_days}'
+
         schedule =  EmployeDailySchedule.objects.filter(
             employee = obj,
             date__range = (month_start_date, month_end_date)
