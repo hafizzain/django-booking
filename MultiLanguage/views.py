@@ -253,7 +253,113 @@ def get_invoiceTranslation(request):
                 },
                 status=status.HTTP_204_NO_CONTENT
             )
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def update_invoiceTranslation(request):
+    id = request.POST.get('id', None)
+    location = request.POST.get('location')
+    language = request.POST.get('language')
+    invoice = request.POST.get('invoice')
+    items = request.POST.get('items')
+    amount = request.POST.get('amount')
+    subtotal = request.POST.get('subtotal')
+    tips = request.POST.get('tips')
+    taxes = request.POST.get('taxes')
+    total = request.POST.get('total')
+    payment_method = request.POST.get('payment_method')
+    statuss = request.POST.get('status')
+
+
+    if id:
+        invoice_data = InvoiceTranslation.objects.get(id = id)
+        invoice_data.invoice = invoice
+        invoice_data.items = items
+        invoice_data.amount = amount
+        invoice_data.subtotal = subtotal
+        invoice_data.tips = tips
+        invoice_data.taxes = taxes
+        invoice_data.total = total
+        invoice_data.payment_method = payment_method
+        invoice_data.status = statuss
+
+        location = BusinessAddress.objects.get(id__icontains = str(location))
+        invoice_data.location = location
+
+        language = AllLanguages.objects.get(id__icontains = str(language))        
+        invoice_data.language = language
+
+        invoice_data.save()
+
+        return Response(
+                {
+                    'success':True,
+                    'status_code':200,
+                    'status_code_text' : '200',
+                    'response':
+                    {
+                        'message':'Invoice Translation Updated Successfully',
+                        'data':[]
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
     
+    else:
+        return Response(
+                {
+                    'success':False,
+                    'status_code':204,
+                    'status_code_text' : '204',
+                    'response':
+                    {
+                        'message':'No Data Found',
+                        'data':[]
+                    }
+                },
+                status=status.HTTP_204_NO_CONTENT
+            )
+    
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def delete_invoiceTranslation(request):
+    id = request.GET.get('id', None)
+
+    if id:
+        invoice = InvoiceTranslation.objects.get(id = id)
+        invoice.delete()
+        return Response(
+                {
+                    'success':True,
+                    'status_code':200,
+                    'status_code_text' : '200',
+                    'response':
+                    {
+                        'message':'Data Deleted Successfully',
+                        'data':[]
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+    
+    else:
+        return Response(
+                {
+                    'success':False,
+                    'status_code':204,
+                    'status_code_text' : '204',
+                    'response':
+                    {
+                        'message':'No Data Found',
+                        'data':[]
+                    }
+                },
+                status=status.HTTP_204_NO_CONTENT
+            )
+    
+
 
     
 

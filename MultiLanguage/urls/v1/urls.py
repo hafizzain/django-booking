@@ -8,5 +8,7 @@ urlpatterns = [
    path('get_data/', views.get_data),
    path('add_invoiceTranslation/', views.add_invoiceTranslation),
    path('get_invoiceTranslation/', views.get_invoiceTranslation),
+   path('update_invoiceTranslation/', views.update_invoiceTranslation),
+   path('delete_invoiceTranslation/', views.delete_invoiceTranslation),
 ]
 
