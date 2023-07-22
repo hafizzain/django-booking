@@ -2716,7 +2716,7 @@ def get_client_all_vouchers(request):
 
     try:
         client_vouchers = VoucherOrder.objects.filter(
-            location__id = location_id,
+            # location__id = location_id,
             client__id = client_id,
         )
     except Exception as error:
@@ -2755,7 +2755,7 @@ def get_client_all_memberships(request):
     client_id = request.GET.get('client_id', None)
 
     client_membership = MemberShipOrder.objects.filter(
-        location__id = location_id,
+        # location__id = location_id,
         client__id = client_id,
     )
     data = ClientMembershipsSerializer(client_membership, many=True).data
