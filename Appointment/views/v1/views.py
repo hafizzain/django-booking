@@ -2279,7 +2279,10 @@ def get_client_sale(request):
     # appointment_checkout = AppointmentCheckout.objects.filter(appointment__client = client)
     # serialized = CheckoutSerializer(appointment_checkout, many = True)
     
-    appointment_checkout = AppointmentService.objects.filter(appointment__client = client).order_by('-created_at')
+    appointment_checkout = AppointmentService.objects.filter(
+        appointment__client = client,
+        appointment_status__in = ['Done', 'Paid']
+    ).order_by('-created_at')
     serialized = ServiceClientSaleSerializer(appointment_checkout, many = True)
     
     #test = checkout.count()
