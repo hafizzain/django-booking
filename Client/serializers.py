@@ -9,7 +9,7 @@ from Utility.models import Country, State, City
 
 from Client.models import Client, ClientGroup, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription, Promotion , Rewards , Membership, Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs , VoucherCurrencyPrice 
 from Invoices.models import SaleInvoice
-from Appointment.models import AppointmentCheckout, AppointmentEmployeeTip
+from Appointment.models import AppointmentCheckout, AppointmentEmployeeTip, AppointmentService
 from Order.models import Checkout
 
 
@@ -42,7 +42,13 @@ class CountrySerializer(serializers.ModelSerializer):
 class ClientSerializer(serializers.ModelSerializer):
     country_obj = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
-    
+    total_done_appointments = serializers.SerializerMethodField(read_only=True)
+
+    def get_total_done_appointments(self, obj):
+        return AppointmentService.objects.filter(
+            appointment_status__in = ['Done', 'Paid'],
+            appointment__client = obj
+        ).count()
     
     def get_country_obj(self, obj):
         try:
@@ -64,7 +70,7 @@ class ClientSerializer(serializers.ModelSerializer):
         fields =['id','full_name','image','client_id','email','mobile_number','dob','postal_code','address','gender','card_number',
                  'country','city','state', 'is_active',
                  'language', 'about_us', 'marketing','country_obj','customer_note',
-                 'created_at']
+                 'created_at', 'total_done_appointments']
         
 class Client_TenantSerializer(serializers.ModelSerializer):
     country_obj = serializers.SerializerMethodField(read_only=True)
