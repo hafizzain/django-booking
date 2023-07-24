@@ -630,7 +630,7 @@ def get_total_sales_device(request):
     
 
     total_orders = Order.objects.filter(
-        checkout__id__in = list(checkout_orders_total.values_list('id', flat=True))
+        member__id = employee_id,
     )
 
     for order in total_orders:
