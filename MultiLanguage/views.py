@@ -272,7 +272,23 @@ def update_invoiceTranslation(request):
 
 
     if id:
-        invoice_data = InvoiceTranslation.objects.get(id = id)
+        try:
+            invoice_data = InvoiceTranslation.objects.get(id = id)
+        except:
+            return Response(
+                {
+                    'success':False,
+                    'status_code':204,
+                    'status_code_text' : '204',
+                    'response':
+                    {
+                        'message':'Invalid Id',
+                        'data':[]
+                    }
+                },
+                status=status.HTTP_204_NO_CONTENT
+            )
+
         invoice_data.invoice = invoice
         invoice_data.items = items
         invoice_data.amount = amount
@@ -313,7 +329,7 @@ def update_invoiceTranslation(request):
                     'status_code_text' : '204',
                     'response':
                     {
-                        'message':'No Data Found',
+                        'message':'Id cannot be empty',
                         'data':[]
                     }
                 },
