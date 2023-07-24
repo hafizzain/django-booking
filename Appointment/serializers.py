@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 from Product.Constants.index import tenant_media_base_url
 from django.db.models import Q, F
 from Business.serializers.v1_serializers import CurrencySerializer
-
+from Client.serializers import ClientSerializer
 
 
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
@@ -803,6 +803,7 @@ class NoteSerializer(serializers.ModelSerializer):
 class SingleNoteSerializer(serializers.ModelSerializer):
     
     notes = serializers.SerializerMethodField(read_only=True)
+    client = ClientSerializer()
     customer_note = serializers.SerializerMethodField(read_only=True)
     appointmnet_service = serializers.SerializerMethodField(read_only=True)
     appointment_tips = serializers.SerializerMethodField(read_only=True)
