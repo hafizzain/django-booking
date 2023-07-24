@@ -9,6 +9,7 @@ class HelpContent(models.Model):
     image = models.ImageField(upload_to='helpcenter/images/', null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     is_recent = models.BooleanField(default=False)
+    order = models.IntegerField(null=True, blank=True)
 
 
 
