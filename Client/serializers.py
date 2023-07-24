@@ -10,7 +10,7 @@ from Utility.models import Country, State, City
 from Client.models import Client, ClientGroup, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription, Promotion , Rewards , Membership, Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs , VoucherCurrencyPrice 
 from Invoices.models import SaleInvoice
 from Appointment.models import AppointmentCheckout, AppointmentEmployeeTip, AppointmentService
-from Order.models import Checkout
+from Order.models import Checkout, Order
 
 
 class LocationSerializerLoyalty(serializers.ModelSerializer):
@@ -43,12 +43,36 @@ class ClientSerializer(serializers.ModelSerializer):
     country_obj = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
     total_done_appointments = serializers.SerializerMethodField(read_only=True)
+    total_sales = serializers.SerializerMethodField(read_only=True)
 
     def get_total_done_appointments(self, obj):
         return AppointmentService.objects.filter(
             appointment_status__in = ['Done', 'Paid'],
             appointment__client = obj
         ).count()
+    
+    def get_total_sales(self, obj):
+        total_price = 0
+        appointments = AppointmentService.objects.filter(
+            appointment_status__in = ['Done', 'Paid'],
+            appointment__client = obj
+        )
+        for price in appointments:
+            total_price += float(price.discount_price or price.total_price or 0)
+
+        checkout_orders_total = Checkout.objects.filter(
+            is_deleted = False, 
+            client = obj,
+        )   
+        total_orders = Order.objects.filter(
+            checkout__id__in = list(checkout_orders_total.values_list('id', flat=True))
+        )
+
+        for order in total_orders:
+            realPrice = order.discount_price or order.total_price
+            total_price += float(order.quantity) * float(realPrice)
+    
+        return total_price
     
     def get_country_obj(self, obj):
         try:
@@ -70,7 +94,7 @@ class ClientSerializer(serializers.ModelSerializer):
         fields =['id','full_name','image','client_id','email','mobile_number','dob','postal_code','address','gender','card_number',
                  'country','city','state', 'is_active',
                  'language', 'about_us', 'marketing','country_obj','customer_note',
-                 'created_at', 'total_done_appointments']
+                 'created_at', 'total_done_appointments', 'total_sales']
         
 class Client_TenantSerializer(serializers.ModelSerializer):
     country_obj = serializers.SerializerMethodField(read_only=True)
