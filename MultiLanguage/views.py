@@ -132,7 +132,7 @@ def get_data(request):
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def add_invoiceTranslation(request):
     if request.method == 'POST':
         location = request.POST.get('location')
@@ -146,6 +146,8 @@ def add_invoiceTranslation(request):
         total = request.POST.get('total')
         payment_method = request.POST.get('payment_method')
         statuss = request.POST.get('status')
+
+        user = request.user
 
 
         loc = location
@@ -161,6 +163,8 @@ def add_invoiceTranslation(request):
             payment_method = payment_method,
             status = statuss
         )
+        invoiceTranslation.user = user
+        invoiceTranslation.save()
         try:
             location = BusinessAddress.objects.get(id__icontains = str(location))
             invoiceTranslation.location = location
@@ -218,7 +222,7 @@ def add_invoiceTranslation(request):
     
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def get_invoiceTranslation(request):
     allInvoicTrans = InvoiceTranslation.objects.filter(status='active')
     
@@ -255,7 +259,7 @@ def get_invoiceTranslation(request):
             )
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def update_invoiceTranslation(request):
     id = request.POST.get('id', None)
     location = request.POST.get('location')
@@ -270,6 +274,7 @@ def update_invoiceTranslation(request):
     payment_method = request.POST.get('payment_method')
     statuss = request.POST.get('status')
 
+    user = request.user
 
     if id:
         try:
@@ -305,6 +310,9 @@ def update_invoiceTranslation(request):
         language = AllLanguages.objects.get(id__icontains = str(language))        
         invoice_data.language = language
 
+        invoice_data.user = user
+
+
         invoice_data.save()
 
         return Response(
@@ -339,13 +347,46 @@ def update_invoiceTranslation(request):
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def delete_invoiceTranslation(request):
     id = request.GET.get('id', None)
+    user = request.user    
 
     if id:
-        invoice = InvoiceTranslation.objects.get(id = id)
-        invoice.delete()
+        try:
+            invoice = InvoiceTranslation.objects.get(id = id)
+        except Exception as e:
+            return Response(
+                {
+                    'success':True,
+                    'status_code':200,
+                    'status_code_text' : '200',
+                    'response':
+                    {
+                        'message':'Invalid ID',
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+    
+ 
+        if invoice.user == user:
+            invoice.delete()
+        else:
+            return Response(
+                {
+                    'success':True,
+                    'status_code':200,
+                    'status_code_text' : '200',
+                    'response':
+                    {
+                        'message':'You are not allowed to delete it',
+                        'data':[]
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+    
         return Response(
                 {
                     'success':True,
