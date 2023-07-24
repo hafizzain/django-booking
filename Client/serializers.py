@@ -58,7 +58,7 @@ class ClientSerializer(serializers.ModelSerializer):
             appointment__client = obj
         )
         for price in appointments:
-            total_price += float(price.discount_price or price.total_price or 0)
+            total_price += float(price.price or price.total_price or 0)
 
         checkout_orders_total = Checkout.objects.filter(
             is_deleted = False, 
