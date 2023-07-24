@@ -629,11 +629,17 @@ def get_total_sales_device(request):
     apps_checkouts_months = list(apps_checkouts_total.values_list('created_at__month', flat=True))
     
 
-    for price in checkout_orders_total:
-        total_price += float(price.total_service_price or 0)
-        total_price += float(price.total_product_price or 0)
-        total_price += float(price.total_voucher_price or 0)
-        total_price += float(price.total_membership_price or 0)
+    total_orders = Order.objects.filter(
+        checkout__id__in = list(checkout_orders_total.values_list('id', flat=True))
+    )
+
+    for order in total_orders:
+        # total_price += float(price.total_service_price or 0)
+        # total_price += float(price.total_product_price or 0)
+        # total_price += float(price.total_voucher_price or 0)
+        # total_price += float(price.total_membership_price or 0)
+        realPrice = order.discount_price or order.total_price
+        total_price += float(order.quantity) * float(realPrice)
     
     for price in appointment_services:
         total_price += float(price.discount_price or price.total_price or 0)
