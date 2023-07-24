@@ -69,7 +69,7 @@ class ClientSerializer(serializers.ModelSerializer):
         )
 
         for order in total_orders:
-            realPrice = order.discount_price or order.total_price
+            realPrice = order.price or order.total_price
             total_price += float(order.quantity) * float(realPrice)
     
         return total_price
