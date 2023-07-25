@@ -1000,6 +1000,8 @@ def update_product(request):
     is_active = request.data.get('is_active', None)
     
     currency_retail_price = request.data.get('currency_retail_price', None)
+    invoices = request.data.get('invoices', None)
+
     check = True
     
     error = []
@@ -1150,6 +1152,34 @@ def update_product(request):
             currency = currency_id,
             retail_price =  retail['retail_price'] ,
             )
+
+    if invoices is not None:
+        if type(invoices) == str:
+            invoices = invoices.replace("'" , '"')
+            invoices = json.loads(invoices)
+        else:
+            pass
+        
+        
+        old_data = ProductTranslations.objects.filter(product = product)
+        for old in old_data:
+            old = ProductTranslations.objects.get(id = old.id)
+            old.delete()
+
+        for invoice in invoices:
+            try:
+                language = invoice['invoiceLanguage']
+                product_name = invoice['product_name']
+            except:
+                pass
+            else:
+                productTranslation = ProductTranslations(
+                    product = product,
+                    product_name = product_name
+                    )
+                language = Language.objects.get(id__icontains = str(language))
+                productTranslation.language = language
+                productTranslation.save()
         
                 
 
@@ -1210,6 +1240,7 @@ def update_product(request):
     # if serialized.is_valid():
     #     serialized.save()
     #     data.update(serialized.data)
+
         
     
     serialized = ProductSerializer(product, data=request.data, partial=True, context={'request':request, 'location': None})
