@@ -257,6 +257,8 @@ class ProductSerializer(serializers.ModelSerializer):
     size = serializers.SerializerMethodField(read_only=True)
 
     short_id = serializers.SerializerMethodField(read_only=True)
+    # invoices = serializers.SerializerMethodField(read_only=True)
+
     
     def get_short_id(self,obj):
         return obj.short_id
@@ -329,6 +331,13 @@ class ProductSerializer(serializers.ModelSerializer):
         else:
             all_stocks = ProductStock.objects.filter(product=obj, location__is_deleted=False,).order_by('-created_at')
             return ProductStockSerializer(all_stocks, many=True).data
+        
+    # def get_invoices(self, obj):
+    #     try:
+    #         invoice = ProductTranslations.objects.filter(service = obj) 
+    #         return ProductTranslationsSerializer(invoice, many=True).data
+    #     except:
+    #         return []
 
 
     class Meta:

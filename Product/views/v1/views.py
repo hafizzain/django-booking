@@ -25,6 +25,9 @@ from Product.serializers import (CategorySerializer, BrandSerializer, ProductOrd
                                  ,OrderSerializer , OrderProductSerializer, ProductConsumptionSerializer, ProductStockTransferSerializer, ProductOrderSerializer, ProductStockReportSerializer
                                  )
 from django.core.paginator import Paginator
+from Product.models import ProductTranslations
+from Utility.models import Language
+
 
 
 @api_view(['GET'])
@@ -714,6 +717,8 @@ def add_product(request):
     #turnover = request.data.get('turnover', None)
    
     alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', None)
+    invoices = request.data.get('invoices', None)
+
     
     product_error = []
 
@@ -943,6 +948,29 @@ def add_product(request):
 
     else:
         ExceptionRecord.objects.create(text='No Location Quantities Find')
+    
+    if invoices is not None:
+        if type(invoices) == str:
+            invoices = invoices.replace("'" , '"')
+            invoices = json.loads(invoices)
+        else:
+            pass
+        for invoice in invoices:
+            try:
+                language = invoice['invoiceLanguage']
+                product_name = invoice['product_name']
+            except:
+                pass
+            else:
+                ProductTranslations = ProductTranslations(
+                    product = product,
+                    product_name = product_name
+                    )
+                language = Language.objects.get(id__icontains = str(language))
+                ProductTranslations.language = language
+                ProductTranslations.save()
+
+
     
 
     serialized = ProductSerializer(product, context={'request' : request, 'location': None})
