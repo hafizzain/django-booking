@@ -2940,6 +2940,7 @@ def get_business_vendors(request):
 def check_vendor_existance(request):
     email = request.data.get('email', None)
     mobile_number = request.data.get('mobile_number', None)
+    instanceId = request.data.get('instance_id', None)
 
 
     if email and mobile_number:
@@ -2961,6 +2962,9 @@ def check_vendor_existance(request):
             is_closed = False,
             **queries
         )
+    
+    if instanceId:
+        all_vendors = all_vendors.exclude(id = instanceId)
 
     fields = []
     for vendor in all_vendors:
