@@ -336,8 +336,8 @@ class ProductSerializer(serializers.ModelSerializer):
         
     def get_invoices(self, obj):
         try:
-            invoice = ProductTranslations.objects.filter(service = obj) 
-            return ProductTranslationsSerializer(invoice, many=True).data
+            invoice = ProductTranslations.objects.filter(product = obj) 
+            return ProductTranlationsSerializer(invoice, many=True).data
         except:
             return []
 
