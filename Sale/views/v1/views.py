@@ -427,7 +427,7 @@ def update_service(request):
     service=request.data.get('service', None)
     location=request.data.get('location', None)
     check = True
-    invocies = request.data.get('invoices', None)
+    invoices = request.data.get('invoices', None)
 
     
     
