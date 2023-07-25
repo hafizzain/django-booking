@@ -4350,8 +4350,11 @@ class getUserBusinessProfileCompletionProgress(APIView):
         if len(services) > 0 :
             completed_modules += 1
 
-            service_groups = services.filter(
-                parrent_service__isnull = False
+
+            service_groups = ServiceGroup.objects.filter(
+                is_deleted = False,
+                is_active = True,
+                is_blocked = False
             )
 
             if len(service_groups) > 0:
