@@ -9,6 +9,8 @@ from Business.models import Business, BusinessAddress
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 from Utility.models import Currency
 from googletrans import Translator
+from Utility.models import Language
+
 
 
 class Service(models.Model):
@@ -157,5 +159,14 @@ class PriceService(models.Model):
     def __str__(self):
         return str(self.id)
     
+
+class ServiceTranlations(models.Model):
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True)
+    language = models.ForeignKey(Language, on_delete=models.CASCADE, null=True, blank=True)
+    service_name = models.CharField(max_length=500, null=True, blank=True)
+
+    def __str__(self):
+        return self.service_name
+
     
     
