@@ -556,7 +556,7 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
             )
 
             for ord in app:
-                create = str(ord.created_at)
+                create = str(ord.appointment_date)
                 match = int(create.split(" ")[0].split("-")[1])
                 if int(month) == match:
                     total += int(ord.price) if ord.price is not None else 0
