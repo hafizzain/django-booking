@@ -996,8 +996,8 @@ class ServiceGroupReport(serializers.ModelSerializer):
                 Q(appointment_status = 'Done') |
                 Q(appointment_status = 'Paid'),
                 service__id__in = services_ids,
-                created_at__year = year,
-                created_at__month = month,
+                appointment_date__year = year,
+                appointment_date__month = month,
                 business_address__id = location
             )
 
