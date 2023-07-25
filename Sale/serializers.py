@@ -342,7 +342,7 @@ class ServiceSerializer(serializers.ModelSerializer):
     
     def get_service_group(self, obj):
         try:
-            group = ServiceGroup.objects.filter(services = obj)
+            group = ServiceGroup.objects.filter(services = obj, is_deleted = False)
             return ServiceGroupSerializer(group, many = True ).data
         except Exception as err:
             print(str(err))

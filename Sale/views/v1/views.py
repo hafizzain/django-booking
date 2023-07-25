@@ -508,7 +508,7 @@ def update_service(request):
                 error.append(str(err))
     try:
         print(staffgroup_id)
-        all_prev_ser_grops = ServiceGroup.objects.filter(services=service_id)
+        all_prev_ser_grops = ServiceGroup.objects.filter(services=service_id, is_deleted = False)
         for i in all_prev_ser_grops:
             i.services.remove(service_id)
             i.save()
@@ -738,7 +738,7 @@ def delete_servicegroup(request):
         )
        
     try:
-        service = ServiceGroup.objects.get(id=service_id)
+        service_group = ServiceGroup.objects.get(id=service_id)
     except Exception as err:
         return Response(
             {
@@ -746,14 +746,15 @@ def delete_servicegroup(request):
                 'status_code' : 404,
                 'status_code_text' : '404',
                 'response' : {
-                    'message' : 'Invalid Service ID!',
+                    'message' : 'Invalid Service Group ID!',
                     'error_message' : str(err),
                 }
             },
             status=status.HTTP_404_NOT_FOUND
         )
     
-    service.delete()
+    service_group.is_deleted = True
+    service_group.save()
     return Response(
         {
             'status' : True,

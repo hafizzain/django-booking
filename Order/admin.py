@@ -39,7 +39,8 @@ class ServiceOrderAdmin(admin.ModelAdmin):
 
     def service_group_name(self, service):
         groups = ServiceGroup.objects.filter(
-            services = service.service
+            services = service.service,
+            is_deleted = False
         )
 
         if len(groups) > 0:
