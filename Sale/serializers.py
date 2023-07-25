@@ -370,8 +370,8 @@ class ServiceSerializer(serializers.ModelSerializer):
 
     def get_invoices(self, obj):
         try:
-            invoice = ServiceTranlations.objects.get(service = obj) 
-            return ServiceTranlationsSerializer(invoice).data
+            invoice = ServiceTranlations.objects.filter(service = obj) 
+            return ServiceTranlationsSerializer(invoice, many=True).data
         except:
             return []
         
