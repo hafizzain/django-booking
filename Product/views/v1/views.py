@@ -962,13 +962,13 @@ def add_product(request):
             except:
                 pass
             else:
-                ProductTranslations = ProductTranslations(
+                productTranslation = ProductTranslations(
                     product = product,
                     product_name = product_name
                     )
                 language = Language.objects.get(id__icontains = str(language))
-                ProductTranslations.language = language
-                ProductTranslations.save()
+                productTranslation.language = language
+                productTranslation.save()
 
 
     
