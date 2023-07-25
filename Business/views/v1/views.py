@@ -2936,6 +2936,54 @@ def get_business_vendors(request):
         )
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
+def check_vendor_existance(request):
+    email = request.data.get('email', None)
+    mobile_number = request.data.get('mobile_number', None)
+
+
+    if email and mobile_number:
+        all_vendors = BusinessVendor.objects.filter(
+            Q(email = email) |
+            Q(mobile_number = mobile_number),
+            is_deleted = False, 
+            is_closed = False,
+        )
+    else:
+        queries = {}
+        if email:
+            queries['email'] = email
+        if mobile_number:
+            queries['mobile_number'] = mobile_number
+
+        all_vendors = BusinessVendor.objects.filter(
+            is_deleted = False, 
+            is_closed = False,
+            **queries
+        )
+
+    fields = []
+    for vendor in all_vendors:
+        if vendor.email == email:
+            fields.append('EMAIL')
+        if vendor.mobile_number == mobile_number:
+            fields.append('MOBILE_NUMBER')
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'All available business vendors!',
+                    'error_message' : None,
+                    'fields' : fields,
+                    'count' : all_vendors.count(),
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_business_vendor(request):
     user = request.user
