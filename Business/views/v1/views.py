@@ -87,7 +87,7 @@ def get_user_default_data(request):
         is_default = True
     )
 
-    service_group = ServiceGroup.objects.all()
+    service_group = ServiceGroup.objects.filter(is_deleted = False)
     if len(service_group) > 0:
         data['service_group'] = {
             'id' : service_group[0].id,

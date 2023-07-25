@@ -58,7 +58,8 @@ class AppointmentServiceAdmin(admin.ModelAdmin):
 
     def service_group_name(self, appointment):
         groups = ServiceGroup.objects.filter(
-            services = appointment.service
+            services = appointment.service,
+            is_deleted = False
         )
         if len(groups) > 0:
             return groups[0].name
