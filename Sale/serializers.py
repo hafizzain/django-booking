@@ -20,6 +20,8 @@ from Invoices.models import SaleInvoice
 from django.db.models import Sum, F
 from Product.models import Product
 from Service.models import Service, ServiceTranlations
+from Utility.models import Language
+
 
 
 
@@ -399,6 +401,12 @@ class ServiceSerializer(serializers.ModelSerializer):
                
 
 class ServiceTranlationsSerializer(serializers.ModelSerializer):
+    language = serializers.SerializerMethodField(read_only=True)
+    def get_language(self, obj):
+        language = Language.objects.get(id__icontains = obj.language)
+        return language.name
+        
+    
     class Meta:
         model = ServiceTranlations
         fields = [
