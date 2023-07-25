@@ -367,8 +367,11 @@ class ServiceSerializer(serializers.ModelSerializer):
     #employee = EmployeeServiceSerializer(read_only=True, many = True)
 
     def get_invoices(self, obj):
-        invoice = ServiceTranlations.objects.get(service = obj) 
-        return ServiceTranlationsSerializer(invoice).data
+        try:
+            invoice = ServiceTranlations.objects.get(service = obj) 
+            return ServiceTranlationsSerializer(invoice).data
+        except:
+            return []
         
     class Meta:
         model = Service
