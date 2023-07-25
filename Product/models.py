@@ -7,6 +7,7 @@ from Authentication.models import User
 from Business.models import Business, BusinessAddress, BusinessVendor
 from Utility.models import Currency
 from googletrans import Translator
+from Utility.models import Language
 
 
 class Category(models.Model):
@@ -302,3 +303,13 @@ class ProductOrderStockReport(models.Model):
     
     def __str__(self):
         return str(self.id)
+    
+
+
+class ProductTranslations(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True)
+    language = models.ForeignKey(Language, on_delete=models.CASCADE, null=True, blank=True)
+    product_name = models.CharField(max_length=500, null=True, blank=True)
+
+    def __str__(self):
+        return self.product_name
