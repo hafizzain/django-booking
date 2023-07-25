@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Category, Brand, CurrencyRetailPrice, Product, ProductMedia, ProductOrderStockReport, ProductStock, OrderStock, OrderStockProduct, ProductConsumption
+from .models import Category, Brand, CurrencyRetailPrice, Product, ProductMedia, ProductOrderStockReport, ProductStock, OrderStock, OrderStockProduct, ProductConsumption, ProductTranslations
 
 admin.site.register(Category)
 admin.site.register(Brand)
@@ -50,3 +50,5 @@ class ProductOrderStockReportAdmin(admin.ModelAdmin):
                 'to_location',
                 'report_choice',
             ]
+    
+admin.site.register(ProductTranslations)
