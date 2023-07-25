@@ -10,6 +10,8 @@ from Business.serializers.v1_serializers import BusiessAddressAppointmentSeriali
 
 from Utility.models import  ExceptionRecord
 from django.db.models import Avg, Count, Min, Sum, Q
+from Utility.models import Language
+from Product.models import ProductTranslations
 
 
 
@@ -257,7 +259,7 @@ class ProductSerializer(serializers.ModelSerializer):
     size = serializers.SerializerMethodField(read_only=True)
 
     short_id = serializers.SerializerMethodField(read_only=True)
-    # invoices = serializers.SerializerMethodField(read_only=True)
+    invoices = serializers.SerializerMethodField(read_only=True)
 
     
     def get_short_id(self,obj):
@@ -332,12 +334,12 @@ class ProductSerializer(serializers.ModelSerializer):
             all_stocks = ProductStock.objects.filter(product=obj, location__is_deleted=False,).order_by('-created_at')
             return ProductStockSerializer(all_stocks, many=True).data
         
-    # def get_invoices(self, obj):
-    #     try:
-    #         invoice = ProductTranslations.objects.filter(service = obj) 
-    #         return ProductTranslationsSerializer(invoice, many=True).data
-    #     except:
-    #         return []
+    def get_invoices(self, obj):
+        try:
+            invoice = ProductTranslations.objects.filter(service = obj) 
+            return ProductTranslationsSerializer(invoice, many=True).data
+        except:
+            return []
 
 
     class Meta:
@@ -371,9 +373,27 @@ class ProductSerializer(serializers.ModelSerializer):
             'consumed',
             'stocktransfer',
             'location',
-            'is_active'
+            'is_active',
+            'invoices'
         ]
         read_only_fields = ['slug', 'id']
+
+class ProductTranlationsSerializer(serializers.ModelSerializer):
+    invoiceLanguage = serializers.SerializerMethodField(read_only=True)
+    def get_invoiceLanguage(self, obj):
+        language = Language.objects.get(id__icontains = obj.language)
+        return language.id
+        
+    
+    class Meta:
+        model = ProductTranslations
+        fields = [
+            'id', 
+            'product', 
+            'product_name',
+            'invoiceLanguage'
+            ]
+
 class ProductOrderSerializer(serializers.ModelSerializer):
     avaiable = serializers.SerializerMethodField()
     retail_price = serializers.SerializerMethodField()
