@@ -19,7 +19,9 @@ from Service.models import PriceService, Service, ServiceGroup
 from Invoices.models import SaleInvoice
 from django.db.models import Sum, F
 from Product.models import Product
-from Service.models import Service
+from Service.models import Service, ServiceTranlations
+
+
 
 class PriceServiceSerializers(serializers.ModelSerializer):
     currency_name = serializers.SerializerMethodField(read_only=True)
@@ -310,6 +312,9 @@ class ServiceSerializer(serializers.ModelSerializer):
     
     priceservice = serializers.SerializerMethodField(read_only=True)
     price = serializers.SerializerMethodField(read_only=True)
+
+    invoices = serializers.SerializerMethodField(read_only=True)
+ 
     
     def get_price(self, obj):
         try:
@@ -360,7 +365,11 @@ class ServiceSerializer(serializers.ModelSerializer):
         return LocationServiceSerializer(locations, many = True, ).data
     
     #employee = EmployeeServiceSerializer(read_only=True, many = True)
-    
+
+    def get_invoices(self, obj):
+        invoice = ServiceTranlations.objects.get(service = obj) 
+        return ServiceTranlationsSerializer(invoice).data
+        
     class Meta:
         model = Service
         fields = [
@@ -382,8 +391,21 @@ class ServiceSerializer(serializers.ModelSerializer):
             'priceservice',
             'enable_team_comissions',
             'enable_vouchers',
+            'invoices'
             ]
                
+
+class ServiceTranlationsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ServiceTranlations
+        fields = [
+            'id', 
+            'service', 
+            'language', 
+            'service_name'
+            ]
+
+
 class ProductOrderSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
     member  = serializers.SerializerMethodField(read_only=True)
