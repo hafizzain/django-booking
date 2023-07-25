@@ -590,7 +590,7 @@ def update_service(request):
             pass
         
         
-        old_data = ServiceTranlations.objects.filter(service__id = service_id)
+        old_data = ServiceTranlations.objects.filter(service = service_id)
         for old in old_data:
             old = ServiceTranlations.objects.get(id = old.id)
             old.delete()
