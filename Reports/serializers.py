@@ -124,7 +124,7 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
             app = AppointmentService.objects.filter(
                 member = obj,
                 appointment_status = 'Done',
-                created_at__icontains = year
+                appointment_date__icontains = year
             )
         
             service_orders = ServiceOrder.objects.filter(
@@ -134,7 +134,7 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
                 created_at__month = month,
             )
             for appointment in app:
-                create = str(appointment.created_at)
+                create = str(appointment.appointment_date)
                 match = int(create.split(" ")[0].split("-")[1])
                 if int(month) == match:
                     total += int(appointment.price)
