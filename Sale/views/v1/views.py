@@ -427,6 +427,9 @@ def update_service(request):
     service=request.data.get('service', None)
     location=request.data.get('location', None)
     check = True
+    invocies = request.data.get('invoices', None)
+
+    
     
     if id is None: 
         return Response(
@@ -578,6 +581,34 @@ def update_service(request):
                 price=price,
                 currency = currency_id
             )
+
+    if invoices is not None:
+        if type(invoices) == str:
+            invoices = invoices.replace("'" , '"')
+            invoices = json.loads(invoices)
+        else:
+            pass
+        
+        
+        old_data = ServiceTranlations.objects.filter(service__id = service_id)
+        for old in old_data:
+            old = ServiceTranlations.objects.get(id = old.id)
+            old.delete()
+
+        for invoice in invoices:
+            try:
+                language = invoice['invoiceLanguage']
+                service_name = invoice['service_name']
+            except:
+                pass
+            else:
+                serviceTranslation = ServiceTranlations(
+                    service = service_id,
+                    service_name = service_name
+                    )
+                language = Language.objects.get(id__icontains = str(language))
+                serviceTranslation.language = language
+                serviceTranslation.save()
 
     serializer= ServiceSerializer(service_id, context={'request' : request} , data=request.data, partial=True)
     if serializer.is_valid():
