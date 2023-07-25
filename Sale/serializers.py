@@ -404,7 +404,7 @@ class ServiceTranlationsSerializer(serializers.ModelSerializer):
     invoiceLanguage = serializers.SerializerMethodField(read_only=True)
     def get_invoiceLanguage(self, obj):
         language = Language.objects.get(id__icontains = obj.language)
-        return language.name
+        return language.id
         
     
     class Meta:
