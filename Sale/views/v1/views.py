@@ -36,6 +36,9 @@ from django.core.paginator import Paginator
 from Invoices.models import SaleInvoice
 from datetime import datetime as dt
 from Reports.models import DiscountPromotionSalesReport
+from Service.models import ServiceTranlations
+from Utility.models import Language
+
 
 # @api_view(['GET'])
 # @permission_classes([IsAuthenticated])
@@ -152,6 +155,8 @@ def create_service(request):
     enable_team_comissions = request.data.get('enable_team_comissions', None)
     enable_vouchers = request.data.get('enable_vouchers', None)
     is_package = request.data.get('is_package', None)
+
+    invoices = request.data.get('invoices', None)
     
     if not all([business, name, description ]):
         return Response(
@@ -319,6 +324,28 @@ def create_service(request):
             except Exception as err:
                 employees_error.append(str(err))
         
+    if invoices is not None:
+        if type(invoices) == str:
+            invoices = invoices.replace("'" , '"')
+            invoices = json.loads(invoices)
+        else:
+            pass
+        for invoice in invoices:
+            try:
+                language = invoice['invoiceLanguage']
+                service_name = invoice['service_name']
+            except:
+                pass
+            else:
+                serviceTranslation = ServiceTranlations(
+                    service = service_obj,
+                    service_name = service_name
+                    )
+                language = Language.objects.get(id__icontains = str(language))
+                serviceTranslation.language = language
+                serviceTranslation.save()
+
+
     
     service_serializers= ServiceSerializer(service_obj, context={'request' : request})
     

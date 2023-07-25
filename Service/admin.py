@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Service , PriceService , ServiceGroup
+from .models import Service , PriceService , ServiceGroup, ServiceTranlations
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
@@ -36,3 +36,4 @@ class PriceServiceAdmin(admin.ModelAdmin):
 
 
 admin.site.register(ServiceGroup)
+admin.site.register(ServiceTranlations)
