@@ -2941,18 +2941,26 @@ def check_vendor_existance(request):
     email = request.data.get('email', None)
     mobile_number = request.data.get('mobile_number', None)
 
-    queries = {}
 
-    if email:
-        queries['email'] = email
-    if mobile_number:
-        queries['mobile_number'] = mobile_number
+    if email and mobile_number:
+        all_vendors = BusinessVendor.objects.filter(
+            Q(email = email) |
+            Q(mobile_number = mobile_number),
+            is_deleted = False, 
+            is_closed = False,
+        )
+    else:
+        queries = {}
+        if email:
+            queries['email'] = email
+        if mobile_number:
+            queries['mobile_number'] = mobile_number
 
-    all_vendors = BusinessVendor.objects.filter(
-        is_deleted = False, 
-        is_closed = False,
-        **queries
-    )
+        all_vendors = BusinessVendor.objects.filter(
+            is_deleted = False, 
+            is_closed = False,
+            **queries
+        )
 
     fields = []
     for vendor in all_vendors:
@@ -2968,7 +2976,8 @@ def check_vendor_existance(request):
                 'response' : {
                     'message' : 'All available business vendors!',
                     'error_message' : None,
-                    'fields' : fields
+                    'fields' : fields,
+                    'count' : all_vendors.count(),
                 }
             },
             status=status.HTTP_200_OK
