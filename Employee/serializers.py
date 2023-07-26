@@ -1029,7 +1029,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
             employee = obj,
             is_leave = False,
             date__range = (month_start_date, month_end_date)
-        ).order_by('-date')
+        ).exclude(is_off=True).order_by('-date')
         hours = 0
         for schedule in employee_schedules:
             hours += schedule.total_hours
