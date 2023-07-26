@@ -35,18 +35,6 @@ from Utility.models import Language
 def get_test_api(request):
     product_id = request.data.get('product_id', None)
     from_location_id = request.data.get('from_location_id', None)
-    # service_id = "ed9b3e32-4f1f-469a-a065-ea9805ee0edc"
-    # location = "fef70b9b-c42d-4b3e-bf54-f4d1b5513f6b"
-    # product = Product.objects.get(id = service_id)
-    # product_stock = product.product_stock.all()#.first()
-    # available = 0
-    # for i in product_stock:
-    #     print(location, i.location)
-    #     if location == str(i.location):
-    #         print(i.available_quantity)
-    # #data = product_stock.available_quantity
-    # data = 1
-    # print(data)
     data = []
     location_ids = ['c7dfffd8-f399-48bf-9165-3fe26f565992','340b2c1f-ff66-4327-9cfe-692dff48ca40','8f8b22c9-8410-46b8-b0c7-f520a1480357']
     product = Product.objects.get(id = 'c7dfffd8-f399-48bf-9165-3fe26f565992')#filter(is_deleted = False).exclude(id__in = location_ids)
@@ -62,23 +50,6 @@ def get_test_api(request):
             text=str(err)
         )
     
-        #data =  ProductStockTransfer.objects.filter(product = i).aggregate(Sum('quantity'))
-    #print(data)
-    
-    # product = Product.objects.filter(is_deleted = False).exclude(id__in = data)
-    # for i in product:
-    #     print('test')
-    
-    # try:
-    #     added = ProductStock.objects.get(product__id=product_id, location = str(from_location_id) )
-    #     print(added)
-    #     # sold = added.available_quantity - 3
-    #     # added.available_quantity = sold
-    #     # added.save()
-    #     # print(sold)
-    #     # print(added.available_quantity)
-    # except Exception as err:
-    #     print(err)
     data = 'test'
     return Response(
         {
@@ -1365,10 +1336,10 @@ def delete_product(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    #product.is_deleted = True
+    product.is_deleted = True
     #product_stock.is_deleted = True
-    #product.save()
-    product.delete()
+    product.save()
+    # product.delete()
     return Response(
         {
             'status' : True,
@@ -1799,26 +1770,7 @@ def update_orderstock(request):
                     product = pro,
                     quantity = quantity
                 )
-    
-    # if type(products) == str:
-    #     products = products.replace("'" , '"')
-    #     print(products)
-    #     products = json.loads(products)
-    # else:
-    #     pass
-    # for product in products :
-       
-    #     if product['edit'] == 'yes':
-    #         try:
-    #             print(product['id'])
-    #             id_dt = OrderStockProduct.objects.get(id=product['id'])
-    #             pro = Product.objects.get(id=product['product_id'])
-    #         except Product.DoesNotExist:
-    #             None
-            
-    #         product_serializer = OrderProductSerializer(id_dt, data=request.data , partial=True)
-       
-              
+ 
     serializer = OrderSerializer(order_stock, data=request.data, partial=True, context={'request' : request})
     if serializer.is_valid():
            serializer.save()

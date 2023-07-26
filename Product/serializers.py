@@ -450,7 +450,7 @@ class OrderSerializer(serializers.ModelSerializer):
     
     
     def get_products(self, obj):
-        data = OrderStockProduct.objects.filter(order=obj)
+        data = OrderStockProduct.objects.filter(order=obj, is_deleted = True)
         return OrderProductSerializer(data, many=True).data
     
     class Meta:
