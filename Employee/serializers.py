@@ -982,7 +982,7 @@ class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ['id', 'image','location','full_name', 'email', 
-                  'mobile_number','country','state','city', 'address', 'postal_code', 'employee_permission']
+                  'mobile_number','country','state','city', 'address', 'postal_code', 'employee_permission', 'is_active']
 class EmployeeInformationSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     
