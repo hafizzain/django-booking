@@ -675,8 +675,9 @@ def get_total_sales_device(request):
 def get_dashboard_target_overview_update(request):
     employee_id = request.GET.get('employee_id', None)
     
-    range_start =  request.GET.get('range_start', '1990-01-01')
-    range_end = request.GET.get('range_end', '2050-12-20')
+    nowDate = datetime.now()
+    month = request.GET.get('month', nowDate.month)
+    year = request.GET.get('year', nowDate.year)
     
     service_target = 0
     retail_target = 0
@@ -715,16 +716,17 @@ def get_dashboard_target_overview_update(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-    if range_start:
-        range_start = datetime.strptime(range_start, "%Y-%m-%d")
-        range_end = datetime.strptime(range_end, "%Y-%m-%d")
+    if month and year:
+        import calendar
+        range_start = f'{year}-{month}-01'
+        range_end = f'{year}-{month}-{calendar.monthrange(year, month)[1]}'
         
         targets = StaffTarget.objects.filter(
             # is_deleted=False,
             employee = employee,
-            created_at__gte =  range_start ,
-            created_at__lte = range_end
-            )
+            month = month,
+            year__date__year = year,
+        )
         for tar in targets:
             service_target += int(tar.service_target)
             retail_target += int(tar.retail_target)
