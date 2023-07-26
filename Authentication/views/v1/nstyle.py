@@ -22,6 +22,7 @@ from django.contrib.auth import authenticate
 from Authentication.serializers import UserLoginSerializer, UserSerializer, UserTenantSerializer
 from django_tenants.utils import tenant_context
 from Authentication.Constants.Email import send_welcome_email
+from Employee.models import Employee
 
 from Utility.models import ExceptionRecord
 # Create your views here.
@@ -665,6 +666,24 @@ def login(request):
                 is_deleted=False,
                 user_account_type__account_type = 'Employee'
             )
+            try:
+                emp = Employee.objects.get(email = str(user.email))
+            except:
+                pass
+            else:
+                if not emp.is_active:
+                    return Response(
+                        {
+                            'status' : False,
+                            'status_code' : 403,
+                            'status_code_text' : 'EMPLOYEE_INACTIVE',
+                            'response' : {
+                                'message' : 'Your employee is inactive',
+                                'error_message' : 'User Employee is not active, Please enable is_active flag'
+                            }
+                        },
+                        status=status.HTTP_403_FORBIDDEN
+                    )
             try:
                 token = Token.objects.get(user=user)
             except Token.DoesNotExist:
