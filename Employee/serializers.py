@@ -1029,7 +1029,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
             employee = obj,
             is_leave = False,
             date__range = (month_start_date, month_end_date)
-        ).exclude(is_off=True).order_by('-date')
+        ).order_by('-date')
         hours = 0
         for schedule in employee_schedules:
             hours += schedule.total_hours
@@ -1113,7 +1113,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         schedule =  EmployeDailySchedule.objects.filter(
             employee = obj,
             date__range = (month_start_date, month_end_date)
-        ).order_by('-date')
+        ).exclude(is_off=True).order_by('-date')
         # ).order_by('employee__employee_employedailyschedule__date')            
         context = self.context
         try:
