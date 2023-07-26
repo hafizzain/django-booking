@@ -756,7 +756,10 @@ def get_dashboard_target_overview_update(request):
             created_at__lte = range_end
         )#.values_list('retail_targets', flat=True)
         for pro in retail_order_sale:
-            retail_sale += int(pro.checkout.total_product_price or 0)
+            thisPrice = pro.discount_price or pro.total_price
+            pro.quantity
+            retail_sale += float(thisPrice) * float(pro.quantity)
+            # retail_sale += int(pro.checkout.total_product_price or 0)
     else:
         targets = StaffTarget.objects.filter(
             # is_deleted=False,
