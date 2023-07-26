@@ -674,11 +674,25 @@ def get_total_sales_device(request):
 @permission_classes([AllowAny])
 def get_dashboard_target_overview_update(request):
     employee_id = request.GET.get('employee_id', None)
+
+    MONTHS_ALL = {
+        'January' : 1,
+        'February' : 2,
+        'March' : 3,
+        'April' : 4,
+        'May' : 5,
+        'June' : 6,
+        'July' : 7,
+        'August' : 8,
+        'September' : 9,
+        'October' : 10,
+        'November' : 11,
+        'December' : 12,
+    }
     
     nowDate = datetime.now()
-    stringMonth = nowDate.strftime('%B')
-    intMonth = nowDate.month
-    month = request.GET.get('month', stringMonth)
+    month = request.GET.get('month', nowDate.strftime('%B'))
+    intMonth = MONTHS_ALL.get(month, None) or nowDate.month
     year = request.GET.get('year', nowDate.year)
     
     service_target = 0
