@@ -1113,7 +1113,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         schedule =  EmployeDailySchedule.objects.filter(
             employee = obj,
             date__range = (month_start_date, month_end_date)
-        ).exclude(is_off=True).order_by('-date')
+        ).exclude(is_leave = True).order_by('-date')
         # ).order_by('employee__employee_employedailyschedule__date')            
         context = self.context
         try:
