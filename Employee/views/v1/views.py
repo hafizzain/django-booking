@@ -4570,6 +4570,26 @@ def employee_login(request):
             token = Token.objects.get(user=user)
         except Token.DoesNotExist:
            token = Token.objects.create(user=user)
+        
+        try:
+            employee = Employee.objects.get(
+                email__icontains = user.email,
+            )
+        except:
+            pass
+        else:
+            if not employee.is_active:
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : 403,
+                        'status_code_text' : 'EMPLOYEEE_IS_INACTIVE',
+                        'response' : {
+                            'message' : 'Employee is inactive',
+                        }
+                    },
+                    status=status.HTTP_403_FORBIDDEN
+                )
             
         serialized = UserEmployeeSerializer(user, context = {'tenant': employee_tenant.tenant, 'token': token.key })
     
