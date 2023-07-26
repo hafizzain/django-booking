@@ -1341,28 +1341,12 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
         checkout_orders = list(checkout_orders)
         checkout_orders = sum(checkout_orders)
         return checkout_orders
-    
-    # def get_all_products(self, obj):
-    #     products = Product.objects.all()
-    #     return ProductSerializer_CheckoutSerializer(products, many=True).data
-
-    # def get_all_services(self, obj):
-    #     services = Service.objects.all()
-    #     return ServiceSerializer_CheckoutSerializer(services, many=True).data
-
-    
 
     def get_discounted_price(self, obj):
         chk_orders = Order.objects.filter(
             checkout = obj
         ).values_list('discount_price', flat=True)
         return sum(list(chk_orders))
-        # d_price = 0
-        # for ordr in chk_orders:
-        #     if ordr.discount_percentage and ordr.total_price:
-        #         d_price += ((ordr.discount_percentage * ordr.total_price) / 100)
-
-        # return d_price
         
     class Meta:
         model = Checkout

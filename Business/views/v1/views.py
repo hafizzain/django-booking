@@ -1182,12 +1182,14 @@ def add_business_location(request):
     #     serialized.save()
     #     data.update(serialized.data)
     try:
-        all_product = Product.objects.all()
+        all_product = Product.objects.filter(
+            is_deleted = False
+        )
         
         for pro in all_product:
             product = Product.objects.get(
-            id=pro.id,
-            is_deleted = False,
+                id=pro.id,
+                is_deleted = False,
             )
             stock  = ProductStock.objects.create(
                     user = user,
