@@ -721,7 +721,7 @@ def get_dashboard_target_overview_update(request):
     if month and year:
         import calendar
         range_start = f'{year}-{intMonth}-01'
-        range_end = f'{year}-{intMonth}-{calendar.monthrange(year, intMonth)[1]}'
+        range_end = f'{year}-{intMonth}-{calendar.monthrange(int(year), intMonth)[1]}'
         
         targets = StaffTarget.objects.filter(
             # is_deleted=False,
