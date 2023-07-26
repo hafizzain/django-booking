@@ -676,7 +676,9 @@ def get_dashboard_target_overview_update(request):
     employee_id = request.GET.get('employee_id', None)
     
     nowDate = datetime.now()
-    month = request.GET.get('month', nowDate.month)
+    stringMonth = nowDate.strftime('%B')
+    intMonth = nowDate.month
+    month = request.GET.get('month', stringMonth)
     year = request.GET.get('year', nowDate.year)
     
     service_target = 0
@@ -718,8 +720,8 @@ def get_dashboard_target_overview_update(request):
             )
     if month and year:
         import calendar
-        range_start = f'{year}-{month}-01'
-        range_end = f'{year}-{month}-{calendar.monthrange(year, month)[1]}'
+        range_start = f'{year}-{intMonth}-01'
+        range_end = f'{year}-{intMonth}-{calendar.monthrange(year, intMonth)[1]}'
         
         targets = StaffTarget.objects.filter(
             # is_deleted=False,
