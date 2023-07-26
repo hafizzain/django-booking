@@ -4,96 +4,65 @@
 </script>
 
 <div class="flex flex-col gap-6">
-  <h2 class="font-semibold text-2xl flex items-center gap-3">
-    <a href="{% url 'LanguageSectionPage' %}">
-      <svg
-        width="2rem"
-        height="1.25rem"
-        viewBox="0 0 17 10"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M4.75527 0.908165L0.936728 4.72671C0.702404 4.96103 0.702404 5.34095 0.936728 5.57527L4.75527 9.39382C4.9896 9.62814 5.36951 9.62814 5.60384 9.39382C5.83816 9.15949 5.83816 8.77958 5.60384 8.54525L2.8096 5.75102L16.7217 5.75102V4.55096L2.8096 4.55096L5.60384 1.75673C5.83816 1.52241 5.83816 1.14249 5.60384 0.908165C5.36951 0.673841 4.9896 0.673841 4.75527 0.908165Z"
-          fill="#101928"
-        ></path>
-      </svg>
-    </a>
-    <p>Language Detail</p>
+    <p>Language Detail Data</p>
   </h2>
 
-  {% for label in labels %}
-    <div class="grid xl:grid-cols-3 md:grid-cols-2 gap-4">
-      <form style="display:flex;" action="/api/v1/multilanguage/add_labels/" method="POST">
-        {% csrf_token %}
-        <input name="lang" value={{lang}} hidden>
-        <input name="section" value={{section}} hidden>
-        <div>
-          <div class="input-wrapper">
-            <div class="input-label">Label</div>
-            <input
-              type="text"
-              name="label"
-              value="{{label.label}}"
-              class="input"
-              required readonly
-            />
-          </div>
-        </div>
-        <div style=" margin-left:3rem;">
-          <div class="input-wrapper">
-            <div class="input-label">Value</div>
-            <input
-              type="text"
-              name="value"
-              value={{label.value}}
-              class="input"
-              required
-            />
-          </div>
-        </div>
-        <button style=" margin-left:3rem;" type='submit'>Edit</button>
-      </form>
-    </div>
-  {% endfor %}
 
 
-
-
-  <div class="grid xl:grid-cols-3 md:grid-cols-2 gap-4">
-    <form style="display:flex;" action="/api/v1/multilanguage/add_labels/" method="POST">
+  <h1>Add New Below</h1>
+  <form method="post" action='/api/v1/multilanguage/addviewforms/'>
       {% csrf_token %}
-      <input name="lang" value={{lang}} hidden>
-      <input name="section" value={{section}} hidden>
-      <div>
-        <div class="input-wrapper">
-          <div class="input-label">Label</div>
-          <input
-            type="text"
-            name="label"
-            placeholder="Enter your business name"
-            class="input"
-            required
-          />
-        </div>
+      <div class="grid lg:grid-cols-4 gap-4 !mx-0">
+        <input value="{{language}}" required hidden name="language">
+          <div class="flex flex-col gap-2">
+              <input min="" type="text"
+                  class="disable_prev_dates inputs Start_Date border rounded-md date-sm outline-none lg:px-4 px-2 lg:py-3 py-2.5 placeholder:text-A1A1A1 text-101928 focus:border-205a42 ease-in transition-all focus:border-l-8 "
+                  name="english_name" required>
+          </div>                    
+          <div class="flex flex-col gap-2">
+              <input min="" type="text"
+                  class="disable_prev_dates End_Date inputs border rounded-md date-sm outline-none lg:px-4 px-2 lg:py-3 py-2.5 placeholder:text-A1A1A1 text-101928 focus:border-205a42 ease-in transition-all focus:border-l-8 "
+                  name="value" required>
+          </div>
+          <button class="submit_btn___ px-4 py-2 text-sm text-black font-semibold bg-primary rounded-md w-fit ml-auto" type="submit">Add</button>
+  
+  
       </div>
-      <div style=" margin-left:3rem;">
-        <div class="input-wrapper">
-          <div class="input-label">Value</div>
-          <input
-            type="text"
-            name="value"
-            placeholder="Enter your business name"
-            class="input"
-            required
-          />
-        </div>
+  </form>
+      
+      <div class="grid lg:grid-cols-4 gap-4 !mx-0">
+          <p>English: <span class='text-red-600'>*</span></p>
+          <p>Arabic: <span class='text-red-600'>*</span></p>
       </div>
-      <button style=" margin-left:3rem;" type='submit'>Add</button>
+      <br>
+
+
+
+
+{% for i in trans%}
+    <form method="post" action='/api/v1/multilanguage/editviewforms/'>
+        {% csrf_token %}
+        <div class="grid lg:grid-cols-4 gap-4 !mx-0">
+          <input value="{{i.language}}" required hidden name="language">
+
+            <div class="flex flex-col gap-2">
+                <input min="" type="text"
+                    class="disable_prev_dates inputs Start_Date border rounded-md date-sm outline-none lg:px-4 px-2 lg:py-3 py-2.5 placeholder:text-A1A1A1 text-101928 focus:border-205a42 ease-in transition-all focus:border-l-8 "
+                    value="{{i.order}} - {{i.english_name}}" name="english_name" required readonly>
+            </div>                    
+            <div class="flex flex-col gap-2">
+                <input min="" type="text"
+                    class="disable_prev_dates End_Date inputs border rounded-md date-sm outline-none lg:px-4 px-2 lg:py-3 py-2.5 placeholder:text-A1A1A1 text-101928 focus:border-205a42 ease-in transition-all focus:border-l-8 "
+                    value="{{i.value}}" name="value" required>
+            </div>
+            <input name="id" required value='{{i.id}}' hidden>
+
+            <button class="submit_btn___ px-4 py-2 text-sm text-black font-semibold bg-primary rounded-md w-fit ml-auto" type="submit">Edit</button>
+    
+        </div>
     </form>
-  </div>
-</div>
+    {% endfor %}
+
+
 
 {% endblock body %}

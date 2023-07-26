@@ -25,7 +25,7 @@
  >
   {% for lang in languages %}
   <a
-    href='{% url "LanguageSectionPage" %}?language={{lang.title}}'
+    href='/api/v1/multilanguage/get_data/?language={{lang}}'
     class="hover:bg-slate-100 relative transition-all cursor-pointer shadow-login-card px-[1.25rem] py-[1rem] rounded-xl flex flex-col gap-2"
    >
    {{lang.icon|safe}}
@@ -38,7 +38,7 @@
   <form action="/api/v1/multilanguage/add_language/" method="POST">
     {% csrf_token %}
     <label>Enter Language</label>
-    <input type="text" name="language" required placeholder="Language">
+    <input type="text" name="lang" required placeholder="Language">
 
     <label>Enter Icon</label>
     <input type="text" name="icon" required placeholder="Icon">

@@ -6,16 +6,31 @@ from .models import *
 from rest_framework import status
 from .serializers import *
 import json
+from .models import Language as Lang
 
 
 
 
 def add_language(request):
-    language = request.POST.get('language')
-    icon = request.POST.get('icon')
+    lang = request.POST.get('lang', None)
+    icon = request.POST.get('icon', None)
 
-    lang = Language.objects.create(title=language, icon=icon)
-    lang.save()
+    language = Lang(title=lang, icon=icon)
+    language.save()
+
+    new_language = Lang.objects.get(title__icontains = lang)
+
+    first_language = Lang.objects.get(title__icontains = 'arabic')
+    
+    labels = TranslationLabels.objects.filter(language = first_language)
+
+    for label in labels:
+        label_instance = TranslationLabels(english_name=label.english_name, value=label.english_name, key=label.english_name, order=label.order )
+        
+        language = Lang.objects.get(id = new_language.id)
+        label_instance.language = language
+        
+        label_instance.save()
 
     return redirect('/super-admin/language/')
 
@@ -37,37 +52,29 @@ def add_section(request):
 
 
 def add_labels(request):
-
-    lang = request.POST.get('lang')
-    section = request.POST.get('section')
-    label = request.POST.get('label')
-    value = request.POST.get('value')
-    print(lang, section, label, value)
-    try:
-        section = Section.objects.get(language__title=lang, title=section)
-    except:
-        pass
-
-    try:
-        old_label = Labels.objects.get(label=label, section__title=section, section__language__title = lang)
-        old_label.value= value
-        old_label.save()
-    except:        
-        labels = Labels.objects.create(label=label, value=value)
-        labels.section = section
-        labels.save()
+    if request.method == "POST":
+        english_name = request.POST.get('english_name')
+        value = request.POST.get('value')
+        last_instance = Labels.objects.all()[0]
+        order = int(last_instance.order) +1
+        lang = request.POST.get('lang')
 
 
-    detail= f'/super-admin/language/section-detail/?language={lang}&section={ section }'
+    label = TranslationLabels(english_name=english_name, value=value, key=english_name, order=order )
+
+    lang = Language.objects.get(id = lang.id)
+    label.language = lang
+
+    label.save()
+
+
+    detail= f'/super-admin/language'
     return redirect(detail)
 
 
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
 def get_data(request):
     language = request.GET.get('language', None)
-    section = request.GET.get('section', None)
     
     if language is None:
         return Response(
@@ -83,23 +90,8 @@ def get_data(request):
         status=status.HTTP_200_OK
     )
 
-    if section is None:
-        return Response(
-        {
-            'success':False,
-            'status_code':200,
-            'status_code_text' : '200',
-            'response':
-            {
-                'message':'Section Cannot be empty',
-            }
-        },
-        status=status.HTTP_200_OK
-    )
-
-
     try:
-        data = Labels.objects.filter(section__language__title=language, section__title = section)
+        trans = TranslationLabels.objects.filter(language__title=language)
     except Exception as e:
             return Response(
                 {
@@ -113,22 +105,44 @@ def get_data(request):
                 },
                 status=status.HTTP_200_OK
             )
+    return render(request, 'SuperAdminPanel/pages/language/language-section-detail.html', {'trans':trans, 'language':language})
 
-    serializer = LabelSerializer(data, many=True)
 
-    return Response(
-        {
-            'success':True,
-            'status_code':200,
-            'status_code_text' : '200',
-            'response':
-            {
-                'message':'Returned Successfully',
-                'data':serializer.data,
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+
+def edit_translation_forms(request):
+    if request.method == 'POST':
+        language = request.POST.get('language', None)
+        id = request.POST.get('id')
+        translation = request.POST.get('value')
+        trans = TranslationLabels.objects.get(id = id)
+        trans.value = translation
+        trans.save()
+        return redirect(f'/api/v1/multilanguage/get_data/?language={language}')
+    return redirect(f'/api/v1/multilanguage/get_data/?language={language}')
+
+def add_translation_forms(request):
+    if request.method == 'POST':
+        language = request.POST.get('language', None)
+        english_name = request.POST.get('english_name')
+        value = request.POST.get('value')
+        try:
+            last_instance = TranslationLabels.objects.all()[0]
+            order = int(last_instance.order) +1
+
+        except:
+            last_instance = 0
+            order = last_instance + 1
+
+
+        label = TranslationLabels(english_name=english_name, value=value, key=english_name, order=order )
+        lang = Lang.objects.get(title = language)
+        label.language = lang
+        label.save()
+        
+        return redirect(f'/api/v1/multilanguage/get_data/?language={language}')
+    return redirect(f'/api/v1/multilanguage/get_data/?language={language}')
+
+
 
 
 @api_view(['POST'])
