@@ -164,7 +164,7 @@ class SaleInvoice(models.Model):
         return tips
     
     def save(self, *args, **kwargs):
-        if not self.file:
+        if not self.file and self.checkout:
             order_items, order_tips = self.get_invoice_order_items()
             sub_total = sum([order['price'] for order in order_items])
             tips_total = sum([t.tip for t in order_tips])
