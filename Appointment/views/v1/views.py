@@ -1918,7 +1918,7 @@ def create_checkout(request):
         )
     
     
-            
+    invoice.save() # Do not remove this
     serialized = CheckoutSerializer(checkout)
     return Response(
             {
@@ -2089,7 +2089,7 @@ def create_checkout_device(request):
     )
 
     
-    
+    invoice.save() # Do not remove this
     serialized = CheckoutSerializer(checkout)
     return Response(
             {
