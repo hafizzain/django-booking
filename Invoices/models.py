@@ -11,6 +11,8 @@ from django.conf import settings
 from django.template.loader import get_template
 import os
 from django.db import connection
+from Order.models import Order, Checkout, ProductOrder, ServiceOrder, VoucherOrder, MemberShipOrder
+from Appointment.models import Appointment, AppointmentCheckout, AppointmentService
 
 
 class SaleInvoice(models.Model):
@@ -86,9 +88,48 @@ class SaleInvoice(models.Model):
         uuid = uuid.split('-')[0]
         return uuid
     
+    def get_appointment_services(self, checkout):
+        return []
+
+    def get_order_items(self, checkout):
+        orders = []
+
+        orders.extend(ProductOrder.objects.filter(checkout = checkout).values('name', 'arabic_name'))
+
+        ordersData = []
+        for order in orders:
+            data = {
+                'name' : ''
+            }
+            ordersData.append(data)
+            
+        return ordersData
+
+    def get_invoice_order_items(self):
+        try:
+            checkout = Checkout.objects.get(
+                id = self.checkout
+            )
+            return self.get_order_items(checkout)
+        except:
+            try:
+                checkout = AppointmentCheckout.objects.get(
+                    id = self.checkout
+                )
+                return self.get_appointment_services(checkout)
+            except:
+                pass
+        
+
+            
+        return []
+    
     def save(self, *args, **kwargs):
         if not self.file:
-            context = {}
+            context = {
+                'invoice_id' : self.short_id,
+                'order_items' : self.get_invoice_order_items()
+            }
             schema_name = connection.schema_name
             output_dir = f'{settings.BASE_DIR}/media/{schema_name}/invoicesFiles'
             is_exist = os.path.isdir(output_dir)
