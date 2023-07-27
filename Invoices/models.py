@@ -90,8 +90,14 @@ class SaleInvoice(models.Model):
         if not self.file:
             context = {}
             schema_name = connection.schema_name
-            no_media_path = f'{schema_name}/invoicesFiles/invoice-{self.short_id}.pdf'
-            output_path = f'{settings.BASE_DIR}/media/{no_media_path}'
+            output_dir = f'{settings.BASE_DIR}/media/{schema_name}/invoicesFiles'
+            is_exist = os.path.isdir(output_dir)
+            if not is_exist:
+                os.mkdir(output_dir)
+
+            file_name = f'invoice-{self.short_id}.pdf'
+            output_path = f'{output_dir}/{file_name}'
+            no_media_path = f'{schema_name}/invoicesFiles/{file_name}'
             template = get_template(f'{settings.BASE_DIR}/templates/Sales/invoice.html')
             html_string = template.render(context)
             pdfkit.from_string(html_string, os.path.join(output_path))
