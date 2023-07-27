@@ -31,13 +31,12 @@ from Profile.serializers import UserLanguageSerializer
 from Service.models import Service, ServiceGroup, PriceService
 from Tenants.models import Domain, Tenant
 from Utility.models import Country, Currency, ExceptionRecord, Language, NstyleFile, Software, State, City
-from Utility.serializers import LanguageSerializer, NewLanguageSerializer
+from Utility.serializers import LanguageSerializer
 import json
 from django.db.models import Q, F
 
 from django_tenants.utils import tenant_context
 from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, EmployeeBusinessSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
-from MultiLanguage.models import Language as Lang
 
 
 @api_view(['GET'])
@@ -1884,10 +1883,9 @@ def delete_languages(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_all_languages(request):
-    # all_languages = Language.objects.filter(is_active=True, is_deleted=False)
-    all_languages = Lang.objects.all()
+    all_languages = Language.objects.filter(is_active=True, is_deleted=False)
 
-    serialized = NewLanguageSerializer(all_languages, many=True)
+    serialized = LanguageSerializer(all_languages, many=True)
     return Response(
         {
             'status' : True,
