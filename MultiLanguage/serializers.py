@@ -33,3 +33,8 @@ class InvoiceTransSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+
+class TranslationLabelsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TranslationLabels
+        fields = '__all__'

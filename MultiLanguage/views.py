@@ -432,10 +432,62 @@ def delete_invoiceTranslation(request):
     
 
 
-    
 
 
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_LanguageTranslation(request):
+    language = request.GET.get('language')
+
+    if language is None:
+        return Response(
+        {
+            'success':False,
+            'status_code':200,
+            'status_code_text' : '200',
+            'response':
+            {
+                'message':'InValid Language',
+                'data':[]
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
+    labels = TranslationLabels.objects.filter(language__title = language).order_by('-order')
+
+    serializer = TranslationLabelsSerializer(labels,many=True).data
+
+    if len(labels) == 0:
+        return Response(
+        {
+            'success':False,
+            'status_code':200,
+            'status_code_text' : '200',
+            'response':
+            {
+                'message':'No Data Found',
+                'data':[]
+            }
+        },
+        status=status.HTTP_200_OK
+    )    
+
+    return Response(
+        {
+            'success':True,
+            'status_code':200,
+            'status_code_text' : '200',
+            'response':
+            {
+                'message':'Data Found',
+                'data':serializer
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
 
 
