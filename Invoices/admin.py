@@ -4,7 +4,9 @@ from .models import *
 
 @admin.register(SaleInvoice)
 class SaleInvoiceAdmin(admin.ModelAdmin):
+    ordering = ['-created_at']
     list_display = [
         'id',
-        'file'
+        'file',
+        'created_at'
     ]

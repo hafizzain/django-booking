@@ -1544,8 +1544,6 @@ def create_sale_order(request):
         service_commission_type = service_commission_type,
         product_commission_type = product_commission_type,
         voucher_commission_type = voucher_commission_type,  
-        
-        # tip = tip,
     )
 
     invoice = SaleInvoice.objects.create(
@@ -1563,12 +1561,10 @@ def create_sale_order(request):
         
         service_commission_type = service_commission_type,
         product_commission_type = product_commission_type,
-        voucher_commission_type = voucher_commission_type,  
-
+        voucher_commission_type = voucher_commission_type,
+        checkout = f'{checkout.id}'
     )
-    checkout.save()
-    invoice.checkout = checkout.id
-
+    
 
     if bool(is_promotion) == True:
         checkout.is_promotion = True

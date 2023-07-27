@@ -14,6 +14,7 @@ from django.db import connection
 from django.db.models import F, Q
 from Order.models import Order, Checkout, ProductOrder, ServiceOrder, VoucherOrder, MemberShipOrder
 from Appointment.models import Appointment, AppointmentCheckout, AppointmentService, AppointmentEmployeeTip
+from Utility.models import ExceptionRecord
 
 
 class SaleInvoice(models.Model):
@@ -134,14 +135,19 @@ class SaleInvoice(models.Model):
                 id = self.checkout
             )
             return [self.get_order_items(checkout), self.get_tips(checkout_type='Checkout', id=self.checkout)]
-        except:
+        except Exception as err:
+            ExceptionRecord.objects.create(
+                text = f'Sale INVOICE ERROR not found {str(err)} -- {self.checkout}'
+            )
             try:
                 checkout = AppointmentCheckout.objects.get(
                     id = self.checkout
                 )
                 return [self.get_appointment_services(checkout), self.get_tips(checkout_type='Appointment', id=f'{checkout.appointment.id}')]
-            except:
-                pass
+            except Exception as err:
+                ExceptionRecord.objects.create(
+                    text = f'Sale INVOICE ERROR not found {str(err)} -- {self.checkout}'
+                )
         return [[], []]
 
     def get_tips(self, checkout_type = None, id=None):
@@ -158,7 +164,7 @@ class SaleInvoice(models.Model):
         return tips
     
     def save(self, *args, **kwargs):
-        if not self.file:
+        if not self.file and self.checkout:
             order_items, order_tips = self.get_invoice_order_items()
             sub_total = sum([order['price'] for order in order_items])
             tips_total = sum([t.tip for t in order_tips])
@@ -171,7 +177,7 @@ class SaleInvoice(models.Model):
                 'tips' : order_tips,
                 'total_tax' : 0,
                 'total' : float(tips_total) + float(sub_total),
-                'created_at' : self.created_at.strftime('%Y-%m-%d'),
+                'created_at' : self.created_at.strftime('%Y-%m-%d') if self.created_at else '',
             }
             schema_name = connection.schema_name
             output_dir = f'{settings.BASE_DIR}/media/{schema_name}/invoicesFiles'
