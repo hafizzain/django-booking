@@ -14,6 +14,7 @@ from django.db import connection
 from django.db.models import F, Q
 from Order.models import Order, Checkout, ProductOrder, ServiceOrder, VoucherOrder, MemberShipOrder
 from Appointment.models import Appointment, AppointmentCheckout, AppointmentService, AppointmentEmployeeTip
+from Utility.models import ExceptionRecord
 
 
 class SaleInvoice(models.Model):
@@ -134,14 +135,19 @@ class SaleInvoice(models.Model):
                 id = self.checkout
             )
             return [self.get_order_items(checkout), self.get_tips(checkout_type='Checkout', id=self.checkout)]
-        except:
+        except Exception as err:
+            ExceptionRecord.objects.create(
+                text = f'Sale INVOICE ERROR not found {str(err)} -- {self.checkout}'
+            )
             try:
                 checkout = AppointmentCheckout.objects.get(
                     id = self.checkout
                 )
                 return [self.get_appointment_services(checkout), self.get_tips(checkout_type='Appointment', id=f'{checkout.appointment.id}')]
-            except:
-                pass
+            except Exception as err:
+                ExceptionRecord.objects.create(
+                    text = f'Sale INVOICE ERROR not found {str(err)} -- {self.checkout}'
+                )
         return [[], []]
 
     def get_tips(self, checkout_type = None, id=None):
