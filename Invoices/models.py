@@ -192,5 +192,9 @@ class SaleInvoice(models.Model):
             html_string = template.render(context)
             pdfkit.from_string(html_string, os.path.join(output_path))
             self.file = no_media_path
+        else:
+            ExceptionRecord.objects.create(
+                text = f'Sale INVOICE ERROR not found {self.checkout}'
+            )
 
         super(SaleInvoice, self).save(*args, **kwargs)
