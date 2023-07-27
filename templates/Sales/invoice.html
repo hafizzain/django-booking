@@ -681,7 +681,7 @@
                     <div
                         class="max-w-[80%] w-fit bg-[#F9F9F9] text-[#7B7B7B] border rounded-md mx-auto p-2 px-4 flex items-center gap-2 text-sm text-center">
                         <div>
-                            <p>2023-07-24</p>
+                            <p>{{created_at}}</p>
                         </div>
                         <div class="h-[1.5rem] w-[1px] border-l"></div>
                         <div>
@@ -695,13 +695,15 @@
                                     <p class="text-left">Item <span class="arabic">غرض</span></p>
                                     <p>Amount <span class="arabic">كمية</span></p>
                                 </div>
-                                <div class="flex items-center justify-between text-primary text-sm font-semibold">
-                                    <div>
-                                        <p class="text-left">Usman</p>
-                                        <p class="arabic">عثمان</p>
+                                {% for order in order_items %}
+                                    <div class="flex items-center justify-between text-primary text-sm font-semibold">
+                                        <div>
+                                            <p class="text-left">{{order.name}}</p>
+                                            <p class="arabic">{{order.arabic_name}}</p>
+                                        </div>
+                                        <p><span class="text-[#7B7B7B]">{{order.quantity}} x</span>{{order.quantity.price}} {{currency_code}}</p>
                                     </div>
-                                    <p><span class="text-[#7B7B7B]">21 x</span>20.00USD</p>
-                                </div>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
@@ -711,77 +713,23 @@
                                 <p>Subtotal</p>
                                 <p class="arabic">المجموع الفرعي</p>
                             </div>
-                            <p>4032 USD</p>
+                            <p>{{sub_total}} {{currency_code}}</p>
                         </div>
-                        <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
-                            <div>
-                                <p> Tip for Fokok</p>
-                                <p>Fokok <span class="arabic">نصيحة ل</span></p>
+                        {% for tip in tips %}
+                            <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
+                                <div>
+                                    <p>Tip for {{tip.employee_name}}</p>
+                                    <p>{{tip.employee_name}} <span class="arabic">نصيحة ل</span></p>
+                                </div>
+                                <p>{{tip.tip}} {{currency_code}}</p>
                             </div>
-                            <p>12.00 USD</p>
-                        </div>
-                        <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
-                            <div>
-                                <p> Tip for Muhammad Usman Nazir</p>
-                                <p>Muhammad Usman Nazir <span class="arabic">نصيحة ل</span></p>
-                            </div>
-                            <p>12.00 USD</p>
-                        </div>
-                        <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
-                            <div>
-                                <p> Tip for ocman briet</p>
-                                <p>ocman briet <span class="arabic">نصيحة ل</span></p>
-                            </div>
-                            <p>12.00 USD</p>
-                        </div>
-                        <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
-                            <div>
-                                <p> Tip for test</p>
-                                <p>test <span class="arabic">نصيحة ل</span></p>
-                            </div>
-                            <p>12.00 USD</p>
-                        </div>
-                        <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
-                            <div>
-                                <p> Tip for Samasa</p>
-                                <p>Samasa <span class="arabic">نصيحة ل</span></p>
-                            </div>
-                            <p>12.00 USD</p>
-                        </div>
-                        <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
-                            <div>
-                                <p> Tip for Jennie</p>
-                                <p>Jennie <span class="arabic">نصيحة ل</span></p>
-                            </div>
-                            <p>12.00 USD</p>
-                        </div>
-                        <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
-                            <div>
-                                <p> Tip for Jack</p>
-                                <p>Jack <span class="arabic">نصيحة ل</span></p>
-                            </div>
-                            <p>12.00 USD</p>
-                        </div>
-                        <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
-                            <div>
-                                <p> Tip for Hira</p>
-                                <p>Hira <span class="arabic">نصيحة ل</span></p>
-                            </div>
-                            <p>12.00 USD</p>
-                        </div>
-                        <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
-                            <div>
-                                <p> Tip for Yasmeen</p>
-                                <p>Yasmeen <span class="arabic">نصيحة ل</span></p>
-                            </div>
-                            <p>12.00 USD</p>
-                        </div>
+                        {% endfor %}
                         <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
                             <div>
                                 <p> Taxes (10%) </p>
                                 <p class="arabic">الضرائب</p>
                             </div>
-                            <p>403.20 USD</p>
+                            <p>{{total_tax}} {{currency_code}}</p>
                         </div>
                     </div>
                     <div class="flex items-center justify-between text-primary text-sm font-bold">
@@ -789,7 +737,7 @@
                             <p class="text-left">Total</p>
                             <p class="arabic">المجموع</p>
                         </p>
-                        <p class="text-sm ">4543.20 USD</p>
+                        <p class="text-sm ">{{total}} {{currency_code}}</p>
                     </div>
                     <hr>
                     <div class="text-left flex flex-col gap-1">
