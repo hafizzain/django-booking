@@ -2023,7 +2023,6 @@ def new_create_sale_order(request):
 
     invoice = SaleInvoice.objects.create(
         user = user,
-        
         client = client, 
         location = business_address,
         client_type = client_type,
@@ -2036,15 +2035,9 @@ def new_create_sale_order(request):
         service_commission_type = service_commission_type,
         product_commission_type = product_commission_type,
         voucher_commission_type = voucher_commission_type,  
-
+        checkout = f'{checkout.id}'
     )
-    invoice.checkout = checkout.id
-    invoice.save()
-
-    # if is_promotion:
-    #     checkout.save()
-        
-        
+    
     test = True
     
     if is_promotion_availed :
@@ -2524,7 +2517,6 @@ def new_create_sale_order(request):
             else:
                 client_points.total_earn = float(client_points.total_earn) + float(earned_points)
                 client_points.total_amount = client_points.total_amount + float(earned_amount)
-
                 
             client_points.for_every_points = point.earn_points
             client_points.customer_will_get_amount = point.total_earn_from_points
@@ -2543,32 +2535,6 @@ def new_create_sale_order(request):
                 invoice = invoice,
                 checkout = checkout
             )
-
-    # payment_type_sales = Order.objects.values('payment_type').annotate(total_sales=Count('id')).order_by('payment_type')
-    try:
-        payment_type_sales = Order.objects.filter(
-            payment_type = payment_type,
-            total_sales = Count('id')
-        ).order_by('payment_type')
-
-        for payment_type_sale in payment_type_sales:
-            payment_type = payment_type_sale['payment_type']
-            total_sales = payment_type_sale['total_sales']
-            print(f"Payment Type: {payment_type}, Total Sales: {total_sales}")
-    except Exception as err:
-                ExceptionRecord.objects.create(
-                            text = f' error in payment method sale{str(err)}'
-                        )    
-    
-    # if is_membership_redeemed:
-    #     """
-    #         Handle Membership Redeemed Here...
-    #     """
-
-        # redeemed_membership_id
-        # membership_product
-        # membership_service
-
     if checkout.is_promotion:
         disc_sale = DiscountPromotionSalesReport(
             checkout_id = checkout.id,
