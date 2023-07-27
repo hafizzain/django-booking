@@ -1,5 +1,3 @@
-# error_logging_middleware.py
-
 from Utility.models import ExceptionRecord
 import logging
 

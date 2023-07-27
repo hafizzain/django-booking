@@ -458,7 +458,7 @@ def get_LanguageTranslation(request):
     )
 
 
-    labels = TranslationLabels.objects.filter(language__title__icontains = language).order_by('-order')
+    labels = TranslationLabels.objects.filter(language__title__icontains = language).order_by('order')
 
     serializer = TranslationLabelsSerializer(labels,many=True).data
 

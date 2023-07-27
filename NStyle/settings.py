@@ -117,6 +117,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     'MultiLanguage.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Help.error_logging_middleware.ServerErrorLoggingMiddleware',
 
 ]
 
