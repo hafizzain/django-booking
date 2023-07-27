@@ -1,16 +1,25 @@
 from django.shortcuts import render
 from MultiLanguage.models import *
-# Create your views here.
-
+from Utility.models import ExceptionRecord
 
 def DashboardPage(request):
     return render(request, 'SuperAdminPanel/pages/dashboard/dashboard.html')
 
 def ExceptionPage(request):
-    return render(request, 'SuperAdminPanel/pages/exception/exception.html')
+    exceptions = ExceptionRecord.objects.all()
+    context={}
+    context['exceptions'] = exceptions
+    return render(request, 'SuperAdminPanel/pages/exception/exception.html', context)
 
 def ExceptionDetailPage(request):
-    return render(request, 'SuperAdminPanel/pages/exception/exception-detail.html')
+    if request.method == 'GET':
+        id = request.GET.get('id')
+    
+    exception = ExceptionRecord.objects.get(id = id)
+    
+    context={}
+    context['exception'] = exception
+    return render(request, 'SuperAdminPanel/pages/exception/exception-detail.html', context)
 
 def LanguagePage(request):
     languages = Language.objects.all()

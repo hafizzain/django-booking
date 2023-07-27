@@ -137,6 +137,11 @@ class ExceptionRecord(models.Model):
     is_resolved = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
 
+    def save(self, *args, **kwargs):
+        if self.text:
+            text = f'{self.text}'.replace('\\n', '<br/>')
+            self.text = text
+        super(ExceptionRecord, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.id)

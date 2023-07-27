@@ -1,4 +1,7 @@
-{% extends 'SuperAdminPanel/main.html' %} {% block body %}
+{% extends 'SuperAdminPanel/main.html' %} 
+{% load static %}
+{% block body %}
+
 <script>
   SideBarActive("exception");
 </script>
@@ -49,6 +52,15 @@
         
       </code></pre>
     </div>
+
+    <div>
+      <iframe style='width:100%;min-height:100vh' srcdoc="{{exception.text|linebreaksbr}}">
+        <p>Browser does not support iframes.</p>
+     </iframe>
+      
+    </div>
+
+
   </div>
 </div>
 
