@@ -2,6 +2,8 @@
 
 from .models import Software, Country, State, City, Language, Currency
 from rest_framework import serializers
+from MultiLanguage.models import Language as Lang
+
 
 class SoftwareSerializer(serializers.ModelSerializer):
     class Meta:
@@ -32,3 +34,8 @@ class LanguageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Language
         fields = ['id', 'name', 'code']
+    
+class NewLanguageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Lang
+        fields = ['id', 'name']

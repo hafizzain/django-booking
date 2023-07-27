@@ -23,14 +23,16 @@ def add_language(request):
     first_language = Lang.objects.get(title__icontains = 'arabic')
     
     labels = TranslationLabels.objects.filter(language = first_language)
-
-    for label in labels:
-        label_instance = TranslationLabels(english_name=label.english_name, value=label.english_name, key=label.english_name, order=label.order )
-        
-        language = Lang.objects.get(id = new_language.id)
-        label_instance.language = language
-        
-        label_instance.save()
+    if len(labels) == 0:
+        pass
+    else:
+        for label in labels:
+            label_instance = TranslationLabels(english_name=label.english_name, value=label.english_name, key=label.english_name, order=label.order )
+            
+            language = Lang.objects.get(id = new_language.id)
+            label_instance.language = language
+            
+            label_instance.save()
 
     return redirect('/super-admin/language/')
 
