@@ -177,7 +177,7 @@ class SaleInvoice(models.Model):
                 'tips' : order_tips,
                 'total_tax' : 0,
                 'total' : float(tips_total) + float(sub_total),
-                'created_at' : self.created_at.strftime('%Y-%m-%d'),
+                'created_at' : self.created_at.strftime('%Y-%m-%d') if self.created_at else '',
             }
             schema_name = connection.schema_name
             output_dir = f'{settings.BASE_DIR}/media/{schema_name}/invoicesFiles'
