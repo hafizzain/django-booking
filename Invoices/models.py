@@ -6,6 +6,11 @@ from Employee.models import Employee
 from Business.models import BusinessAddress
 from uuid import uuid4
 from Appointment.models import Appointment
+import pdfkit
+from django.conf import settings
+from django.template.loader import get_template
+import os
+
 
 class SaleInvoice(models.Model):
     status_choice=[
@@ -74,9 +79,21 @@ class SaleInvoice(models.Model):
     def __str__(self):
         return str(self.id)
     
-
+    @property
+    def short_id(self):
+        uuid = f'{self.id}'
+        uuid = uuid.split('-')[0]
+        return uuid
+    
     def save(self, *args, **kwargs):
         if not self.file:
-            pass
+            context = {}
+
+            no_media_path = f'invoicesFiles/invoice-{self.short_id}.pdf'
+            output_path = f'{settings.BASE_DIR}/media/{no_media_path}'
+            template = get_template(f'{settings.BASE_DIR}/templates/Sales/invoice.html')
+            html_string = template.render(context)
+            pdfkit.from_string(html_string, os.path.join(output_path))
+            self.file = no_media_path
 
         super(SaleInvoice, self).save(*args, **kwargs)
