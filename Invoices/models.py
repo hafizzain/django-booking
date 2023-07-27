@@ -166,35 +166,32 @@ class SaleInvoice(models.Model):
     def save(self, *args, **kwargs):
         if not self.file and self.checkout:
             order_items, order_tips = self.get_invoice_order_items()
-            sub_total = sum([order['price'] for order in order_items])
-            tips_total = sum([t.tip for t in order_tips])
- 
-            context = {
-                'invoice_id' : self.short_id,
-                'order_items' : order_items,
-                'currency_code' : 'AED',
-                'sub_total' : sub_total,
-                'tips' : order_tips,
-                'total_tax' : 0,
-                'total' : float(tips_total) + float(sub_total),
-                'created_at' : self.created_at.strftime('%Y-%m-%d') if self.created_at else '',
-            }
-            schema_name = connection.schema_name
-            output_dir = f'{settings.BASE_DIR}/media/{schema_name}/invoicesFiles'
-            is_exist = os.path.isdir(output_dir)
-            if not is_exist:
-                os.mkdir(output_dir)
+            if len(order_items) > 0:
+                sub_total = sum([order['price'] for order in order_items])
+                tips_total = sum([t.tip for t in order_tips])
+    
+                context = {
+                    'invoice_id' : self.short_id,
+                    'order_items' : order_items,
+                    'currency_code' : 'AED',
+                    'sub_total' : sub_total,
+                    'tips' : order_tips,
+                    'total_tax' : 0,
+                    'total' : float(tips_total) + float(sub_total),
+                    'created_at' : self.created_at.strftime('%Y-%m-%d') if self.created_at else '',
+                }
+                schema_name = connection.schema_name
+                output_dir = f'{settings.BASE_DIR}/media/{schema_name}/invoicesFiles'
+                is_exist = os.path.isdir(output_dir)
+                if not is_exist:
+                    os.mkdir(output_dir)
 
-            file_name = f'invoice-{self.short_id}.pdf'
-            output_path = f'{output_dir}/{file_name}'
-            no_media_path = f'invoicesFiles/{file_name}'
-            template = get_template(f'{settings.BASE_DIR}/templates/Sales/invoice.html')
-            html_string = template.render(context)
-            pdfkit.from_string(html_string, os.path.join(output_path))
-            self.file = no_media_path
-        else:
-            ExceptionRecord.objects.create(
-                text = f'Sale INVOICE ERROR not found {self.checkout}'
-            )
+                file_name = f'invoice-{self.short_id}.pdf'
+                output_path = f'{output_dir}/{file_name}'
+                no_media_path = f'invoicesFiles/{file_name}'
+                template = get_template(f'{settings.BASE_DIR}/templates/Sales/invoice.html')
+                html_string = template.render(context)
+                pdfkit.from_string(html_string, os.path.join(output_path))
+                self.file = no_media_path
 
         super(SaleInvoice, self).save(*args, **kwargs)

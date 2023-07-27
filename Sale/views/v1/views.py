@@ -1895,6 +1895,7 @@ def create_sale_order(request):
         ExceptionRecord.objects.create(
                 text = f' error in email sale{str(err)}'
             )
+    invoice.save()
     serialized = CheckoutSerializer(checkout, context = {'request' : request, })
     
     return Response(
@@ -2037,7 +2038,7 @@ def new_create_sale_order(request):
         voucher_commission_type = voucher_commission_type,  
         checkout = f'{checkout.id}'
     )
-    
+
     test = True
     
     if is_promotion_availed :
@@ -2548,6 +2549,7 @@ def new_create_sale_order(request):
         )
         disc_sale.save()
 
+    invoice.save()
     serialized = CheckoutSerializer(checkout, context = {'request' : request, })
     
     return Response(
