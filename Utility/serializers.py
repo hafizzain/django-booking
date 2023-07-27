@@ -38,4 +38,4 @@ class LanguageSerializer(serializers.ModelSerializer):
 class NewLanguageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lang
-        fields = ['id', 'name']
+        fields = ['id', 'title']
