@@ -116,6 +116,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "debug_toolbar.middleware.DebugToolbarMiddleware",
+    'MultiLanguage.error_logging_middleware.ServerErrorLoggingMiddleware',
+
 ]
 
 CORS_ALLOWED_ORIGINS = [
