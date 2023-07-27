@@ -161,6 +161,7 @@ class SaleInvoice(models.Model):
             query['checkout__id'] = id
         
         tips = AppointmentEmployeeTip.objects.filter(**query)
+        tips = [{'tip' : tip.tip, 'employee_name' : tip.member.full_name} for tip in tips]
         return tips
     
     def save(self, *args, **kwargs):
@@ -168,7 +169,7 @@ class SaleInvoice(models.Model):
             order_items, order_tips = self.get_invoice_order_items()
             if len(order_items) > 0:
                 sub_total = sum([order['price'] for order in order_items])
-                tips_total = sum([t.tip for t in order_tips])
+                tips_total = sum([t['tip'] for t in order_tips])
     
                 context = {
                     'invoice_id' : self.short_id,

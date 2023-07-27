@@ -1895,7 +1895,7 @@ def create_sale_order(request):
         ExceptionRecord.objects.create(
                 text = f' error in email sale{str(err)}'
             )
-    invoice.save()
+    invoice.save() # Do not remove this
     serialized = CheckoutSerializer(checkout, context = {'request' : request, })
     
     return Response(
@@ -2549,7 +2549,7 @@ def new_create_sale_order(request):
         )
         disc_sale.save()
 
-    invoice.save()
+    invoice.save() # Do not remove this
     serialized = CheckoutSerializer(checkout, context = {'request' : request, })
     
     return Response(
