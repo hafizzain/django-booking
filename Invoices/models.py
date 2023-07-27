@@ -65,10 +65,18 @@ class SaleInvoice(models.Model):
     service_price = models.FloatField(default=0, null=True, blank=True)
     total_price = models.FloatField(default=0, null=True, blank=True)
     checkout = models.CharField(max_length=128, null=True, blank=True)
-    
+
+    file = models.FileField(upload_to='invoicesFiles/', null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(null=True, blank=True)
     
     def __str__(self):
         return str(self.id)
+    
+
+    def save(self, *args, **kwargs):
+        if not self.file:
+            pass
+
+        super(SaleInvoice, self).save(*args, **kwargs)
