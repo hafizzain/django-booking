@@ -10,6 +10,7 @@ import pdfkit
 from django.conf import settings
 from django.template.loader import get_template
 import os
+from django.db import connection
 
 
 class SaleInvoice(models.Model):
@@ -88,8 +89,8 @@ class SaleInvoice(models.Model):
     def save(self, *args, **kwargs):
         if not self.file:
             context = {}
-
-            no_media_path = f'invoicesFiles/invoice-{self.short_id}.pdf'
+            schema_name = connection.schema_name
+            no_media_path = f'{schema_name}/invoicesFiles/invoice-{self.short_id}.pdf'
             output_path = f'{settings.BASE_DIR}/media/{no_media_path}'
             template = get_template(f'{settings.BASE_DIR}/templates/Sales/invoice.html')
             html_string = template.render(context)
