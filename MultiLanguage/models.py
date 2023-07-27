@@ -26,6 +26,8 @@ class Labels(models.Model):
 
     def __str__(self):
         return f"{self.label} - {self.value}"
+    
+
 
 
 
@@ -46,3 +48,21 @@ class InvoiceTranslation(models.Model):
     
     def __str__(self):
         return f'{self.id} -- {self.invoice} -- {self.items}'
+    
+
+
+class TranslationLabels(models.Model):
+
+    language = models.ForeignKey(Language, on_delete=models.PROTECT, null=True)
+
+    key=models.TextField(null=True, blank=True)
+    value=models.TextField(null=True, blank=True)
+    english_name = models.TextField(null=True, blank=True)
+
+    order = models.IntegerField(null=True, blank=True)
+
+    
+    class Meta:
+        ordering = ['-order']
+    def __str__(self):
+        return f"{self.order} -- {self.english_name}"

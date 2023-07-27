@@ -10,5 +10,8 @@ urlpatterns = [
    path('get_invoiceTranslation/', views.get_invoiceTranslation),
    path('update_invoiceTranslation/', views.update_invoiceTranslation),
    path('delete_invoiceTranslation/', views.delete_invoiceTranslation),
+   path('editviewforms/', views.edit_translation_forms),
+   path('addviewforms/', views.add_translation_forms),
+   path('get_language_translation/', views.get_LanguageTranslation),
 ]
 
