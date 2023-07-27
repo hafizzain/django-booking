@@ -97,7 +97,7 @@ class SaleInvoice(models.Model):
 
             file_name = f'invoice-{self.short_id}.pdf'
             output_path = f'{output_dir}/{file_name}'
-            no_media_path = f'{schema_name}/invoicesFiles/{file_name}'
+            no_media_path = f'invoicesFiles/{file_name}'
             template = get_template(f'{settings.BASE_DIR}/templates/Sales/invoice.html')
             html_string = template.render(context)
             pdfkit.from_string(html_string, os.path.join(output_path))
