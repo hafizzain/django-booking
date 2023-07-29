@@ -19,7 +19,7 @@ def ExceptionDetailPage(request):
     
     context={}
     context['exception'] = exception
-    return render(request, 'SuperAdminPanel/pages/exception/exception-detail.html', context)
+    return render(request, 'SuperAdminPanel/pages/Exception/exception-detail.html', context)
 
 def LanguagePage(request):
     languages = Language.objects.all()
