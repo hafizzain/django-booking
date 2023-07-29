@@ -6,7 +6,7 @@ def DashboardPage(request):
     return render(request, 'SuperAdminPanel/pages/dashboard/dashboard.html')
 
 def ExceptionPage(request):
-    exceptions = ExceptionRecord.objects.all()
+    exceptions = ExceptionRecord.objects.all().order_by('-id')
     context={}
     context['exceptions'] = exceptions
     return render(request, 'SuperAdminPanel/pages/Exception/exception.html', context)
