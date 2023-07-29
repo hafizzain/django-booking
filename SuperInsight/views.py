@@ -9,7 +9,7 @@ def ExceptionPage(request):
     exceptions = ExceptionRecord.objects.all()
     context={}
     context['exceptions'] = exceptions
-    return render(request, 'SuperAdminPanel/pages/exception/exception.html', context)
+    return render(request, 'SuperAdminPanel/pages/Exception/exception.html', context)
 
 def ExceptionDetailPage(request):
     if request.method == 'GET':
