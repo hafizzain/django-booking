@@ -326,14 +326,19 @@ def copy_stafftarget(request):
                     },
                     status=status.HTTP_400_BAD_REQUEST
                 )
-        staff_target = StaffTarget.objects.create(
+        staff_target, created = StaffTarget.objects.get_or_create(
                 user = staff.user,
                 business = business_id,
                 employee = employee_id,
                 month = to_month,
-                service_target = staff.service_target,
-                retail_target = staff.retail_target,
         )
+        if created:
+            staff_target.service_target = staff.service_target
+            staff_target.retail_target = staff.retail_target
+        else:
+            staff_target.service_target = staff_target.service_target + staff.service_target
+            staff_target.retail_target = staff_target.retail_target + staff.retail_target
+
         date_string =  f'{to_year} {to_month} 01'
         c_year = datetime.strptime(date_string, '%Y %B %d')
         staff_target.year = c_year
@@ -1043,15 +1048,17 @@ def copy_servicetarget(request):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-        servicetarget = ServiceTarget.objects.create(
+        servicetarget, created = ServiceTarget.objects.get_or_create(
             user = user,
             business = business_id,
             location = location_id,
             service_group = service_group_id,
             month = to_month,
-            service_target = service.service_target,
-            
         )
+        if created:
+            servicetarget.service_target = service.service_target
+        else:
+            servicetarget.service_target = servicetarget.service_target + service.service_target
     
         date_string =  f'{to_year} {to_month} 01'
         c_year = datetime.strptime(date_string, '%Y %B %d')
@@ -1412,19 +1419,22 @@ def copy_retailtarget(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-        retail = RetailTarget.objects.create(
+        retail_target, created = RetailTarget.objects.get_or_create(
             user = user,
             business = business_id,
             location = location_id,
             brand = brand_id,
             month =to_month,
-            brand_target = retail.brand_target,
         )
-    
+        if created:
+            retail_target.brand_target = retail.brand_target
+        else:
+            retail_target.brand_target = retail_target.brand_target + retail.brand_target
+
         date_string =  f'{to_year} {to_month} 01'
         c_year = datetime.strptime(date_string, '%Y %B %d')
-        retail.year = c_year
-        retail.save()
+        retail_target.year = c_year
+        retail_target.save()
         
     retail_target = RetailTarget.objects.all().order_by('-created_at').distinct()
     serializer = RetailTargetSerializers(retail_target, many = True,context={'request' : request})
