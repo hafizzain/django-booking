@@ -326,14 +326,19 @@ def copy_stafftarget(request):
                     },
                     status=status.HTTP_400_BAD_REQUEST
                 )
-        staff_target = StaffTarget.objects.create(
+        staff_target, created = StaffTarget.objects.get_or_create(
                 user = staff.user,
                 business = business_id,
                 employee = employee_id,
                 month = to_month,
-                service_target = staff.service_target,
-                retail_target = staff.retail_target,
         )
+        if created:
+            staff_target.service_target = staff.service_target
+            staff_target.retail_target = staff.retail_target
+        else:
+            staff_target.service_target = staff_target.service_target + staff.service_target
+            staff_target.retail_target = staff_target.retail_target + staff.retail_target
+
         date_string =  f'{to_year} {to_month} 01'
         c_year = datetime.strptime(date_string, '%Y %B %d')
         staff_target.year = c_year
