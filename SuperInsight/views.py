@@ -1,16 +1,24 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from MultiLanguage.models import *
 from Utility.models import ExceptionRecord
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 
+
+
+@login_required(login_url='/admin')
 def DashboardPage(request):
     return render(request, 'SuperAdminPanel/pages/dashboard/dashboard.html')
 
+@login_required(login_url='/admin')
 def ExceptionPage(request):
     exceptions = ExceptionRecord.objects.all().order_by('-created_at')
     context={}
     context['exceptions'] = exceptions
     return render(request, 'SuperAdminPanel/pages/Exception/exception.html', context)
 
+
+@login_required(login_url='/admin')
 def ExceptionDetailPage(request):
     if request.method == 'GET':
         id = request.GET.get('id')
@@ -21,18 +29,24 @@ def ExceptionDetailPage(request):
     context['exception'] = exception
     return render(request, 'SuperAdminPanel/pages/Exception/exception-detail.html', context)
 
+
+@login_required(login_url='/admin')
 def LanguagePage(request):
     languages = Language.objects.all()
     context = {}
     context['languages'] = languages
     return render(request, 'SuperAdminPanel/pages/language/language.html', context)
 
+
+@login_required(login_url='/admin')
 def LanguageSectionPage(request):
     lang = request.GET.get('language')
     sections = Section.objects.filter(language__title=lang)
     
     return render(request, 'SuperAdminPanel/pages/language/language-section.html', {'sections':sections, 'language':lang})
 
+
+@login_required(login_url='/admin')
 def LanguageSectionDetailPage(request):
     lang = request.GET.get('language')
     section = request.GET.get('section')
@@ -47,3 +61,6 @@ def LanguageSectionDetailPage(request):
 
 
 
+def Logout(request):
+    logout(request)
+    return redirect('/admin')
