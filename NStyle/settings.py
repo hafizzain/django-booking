@@ -116,9 +116,32 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "debug_toolbar.middleware.DebugToolbarMiddleware",
+    'Api.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Appointment.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Authentication.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Business.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Client.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'CRM.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Customer.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Dashboard.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Employee.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Invoices.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Notification.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Order.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Permissions.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Product.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Profile.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Promotions.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Reports.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Sale.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Service.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'SuperInsight.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Tenants.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'TargetControl.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Utility.error_logging_middleware.ServerErrorLoggingMiddleware',
     'MultiLanguage.error_logging_middleware.ServerErrorLoggingMiddleware',
     'Help.error_logging_middleware.ServerErrorLoggingMiddleware',
-
+    
 ]
 
 CORS_ALLOWED_ORIGINS = [
