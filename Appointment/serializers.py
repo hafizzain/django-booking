@@ -664,7 +664,14 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
             return None
             
     def get_booked_by(self, obj):
-        return f'{obj.user.first_name} {obj.user.last_name}'
+        name = ''
+        if obj.user:
+            if obj.user.first_name:
+                name += f'{obj.user.first_name}'
+            if obj.user.last_name:
+                name += f' {obj.user.last_name}'
+    
+        return name
     
     def get_booking_id(self, obj):
         id = str(obj.id).split('-')[0:2]
