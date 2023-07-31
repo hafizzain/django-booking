@@ -18,12 +18,14 @@ from Business.models import BusinessAddressMedia, BusinessType
 from Business.serializers.v1_serializers import BusinessAddress_CustomerSerializer, EmployeAppointmentServiceSerializer, EmployeTenatSerializer, OpeningHoursSerializer,AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer
 from Client.models import Client
 from Employee.models import EmployeDailySchedule, Employee, EmployeeProfessionalInfo, EmployeeSelectedService
+from Employee.Constants.Add_Employe import add_employee
+from Client.Constants.Add_Employe import add_client
 
 from NStyle.Constants import StatusCodes
 
 from Appointment.models import AppointmentService
 from Appointment.serializers import PriceServiceSaleSerializer
-from Authentication.models import User
+from Authentication.models import User, AccountType
 from Business.models import Business, BusinessSocial, BusinessAddress, BusinessOpeningHour, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BookingSetting, BusinessPaymentMethod, BusinessTax, BusinessVendor
 from Product.models import Product, ProductStock
 from Profile.models import UserLanguage
@@ -34,7 +36,7 @@ from Utility.models import Country, Currency, ExceptionRecord, Language, NstyleF
 from Utility.serializers import LanguageSerializer
 import json
 from django.db.models import Q, F
-
+from threading import Thread
 from django_tenants.utils import tenant_context
 from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, EmployeeBusinessSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
 
@@ -351,6 +353,13 @@ def update_user_default_data(request):
             client_instance.email = email
             client_instance.mobile_number = phone_number
             client_instance.save()
+        
+        if email is not None:
+            try:
+                thrd = Thread(target=add_client, args=[name, email , request.tenant_name, client_instance.business.business_name,])
+                thrd.start()
+            except Exception as err:
+                errors.append(str(err))
 
     if employee:
         employee = json.loads(employee)
@@ -403,9 +412,42 @@ def update_user_default_data(request):
                 )
 
 
-            
+            if email is not None:
+                try:
+                    try:
+                        username = email.split('@')[0]
+                        try:
+                            user_check = User.objects.get(username = username)
+                        except Exception as err:
+                            #data.append(f'username user is client errors {str(err)}')
+                            pass
+                        else:
+                            username = f'{username} {len(User.objects.all())}'
 
-    
+                    except Exception as err:
+                        pass
+
+                    user = User.objects.create(
+                        first_name = name,
+                        username = username,
+                        email = email ,
+                        is_email_verified = True,
+                        is_active = True,
+                        mobile_number = phone_number,
+                    )
+                    account_type = AccountType.objects.create(
+                            user = user,
+                            account_type = 'Employee'
+                        )
+                except Exception as err:
+                    pass        
+            # stop_thread = False
+            try:
+                thrd = Thread(target=add_employee, args=[name, email , phone_number, request.tenant_name, employee_instance.business.business_name, request.tenant.id, request.tenant_name, user])
+                thrd.start()
+            except Exception as err:
+                errors.append(str(err))
+
     return Response(
         {
             'status' : True,
