@@ -755,24 +755,23 @@ def get_dashboard_target_overview_update(request):
     appointment_checkout = AppointmentService.objects.filter(
         appointment_status = 'Done',
         member = employee,
-        created_at__range = (range_start, range_end),
+        # created_at__range = (range_start, range_end),
         ).values_list('price', flat=True)
     service_sale += sum(list(appointment_checkout))
     
     service_order_sale = ServiceOrder.objects.filter(
         member = employee,
-        created_at__range = (range_start, range_end),
-    )#.values_list('service_target', flat=True)
+        # created_at__range = (range_start, range_end),
+    )
 
     for ser in service_order_sale:
         thisPrice = ser.discount_price or ser.total_price
         service_sale += float(thisPrice) * float(ser.quantity)
-        # service_sale += int(ser.checkout.total_service_price or 0)
 
     retail_order_sale = ProductOrder.objects.filter(
         member = employee,
-        created_at__range =  (range_start, range_end),
-    )#.values_list('retail_targets', flat=True)
+        # created_at__range =  (range_start, range_end),
+    )
     for pro in retail_order_sale:
         thisPrice = pro.discount_price or pro.total_price
         retail_sale += float(thisPrice) * float(pro.quantity)
