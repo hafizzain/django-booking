@@ -766,7 +766,7 @@ def get_dashboard_target_overview_update(request):
 
     for ser in service_order_sale:
         thisPrice = ser.discount_price or ser.total_price
-        retail_sale += float(thisPrice) * float(ser.quantity)
+        service_sale += float(thisPrice) * float(ser.quantity)
         # service_sale += int(ser.checkout.total_service_price or 0)
 
     retail_order_sale = ProductOrder.objects.filter(
