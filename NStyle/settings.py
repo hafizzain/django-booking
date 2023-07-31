@@ -137,7 +137,6 @@ MIDDLEWARE = [
     'Service.error_logging_middleware.ServerErrorLoggingMiddleware',
     'SuperInsight.error_logging_middleware.ServerErrorLoggingMiddleware',
     'Tenants.error_logging_middleware.ServerErrorLoggingMiddleware',
-    'TargetControl.error_logging_middleware.ServerErrorLoggingMiddleware',
     'Utility.error_logging_middleware.ServerErrorLoggingMiddleware',
     'MultiLanguage.error_logging_middleware.ServerErrorLoggingMiddleware',
     'Help.error_logging_middleware.ServerErrorLoggingMiddleware',
