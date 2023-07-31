@@ -755,13 +755,13 @@ def get_dashboard_target_overview_update(request):
     appointment_checkout = AppointmentService.objects.filter(
         appointment_status = 'Done',
         member = employee,
-        created_at__range =  (range_start, range_end),
-        ).values_list('total_price', flat=True)
-    service_sale += sum(appointment_checkout)
+        created_at__range = (range_start, range_end),
+        ).values_list('price', flat=True)
+    service_sale += sum(list(appointment_checkout))
     
     service_order_sale = ServiceOrder.objects.filter(
         member = employee,
-        created_at__range =  (range_start, range_end),
+        created_at__range = (range_start, range_end),
     )#.values_list('service_target', flat=True)
 
     for ser in service_order_sale:
