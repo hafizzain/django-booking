@@ -156,7 +156,7 @@ def create_service(request):
     enable_vouchers = request.data.get('enable_vouchers', None)
     is_package = request.data.get('is_package', None)
 
-    # invoices = request.data.get('invoices', None)
+    invoices = request.data.get('invoices', None)
     
     if not all([business, name, description ]):
         return Response(
@@ -324,26 +324,26 @@ def create_service(request):
             except Exception as err:
                 employees_error.append(str(err))
         
-    # if invoices is not None:
-    #     if type(invoices) == str:
-    #         invoices = invoices.replace("'" , '"')
-    #         invoices = json.loads(invoices)
-    #     else:
-    #         pass
-    #     for invoice in invoices:
-    #         try:
-    #             language = invoice['invoiceLanguage']
-    #             service_name = invoice['service_name']
-    #         except:
-    #             pass
-    #         else:
-    #             serviceTranslation = ServiceTranlations(
-    #                 service = service_obj,
-    #                 service_name = service_name
-    #                 )
-    #             language = Language.objects.get(id__icontains = str(language))
-    #             serviceTranslation.language = language
-    #             serviceTranslation.save()
+    if invoices is not None:
+        if type(invoices) == str:
+            invoices = invoices.replace("'" , '"')
+            invoices = json.loads(invoices)
+        else:
+            pass
+        for invoice in invoices:
+            try:
+                language = invoice['invoiceLanguage']
+                service_name = invoice['service_name']
+            except:
+                pass
+            else:
+                serviceTranslation = ServiceTranlations(
+                    service = service_obj,
+                    service_name = service_name
+                    )
+                language = Language.objects.get(id__icontains = str(language))
+                serviceTranslation.language = language
+                serviceTranslation.save()
 
 
     
