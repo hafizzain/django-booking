@@ -265,15 +265,15 @@ def get_invoiceTranslation(request):
         return Response(
                 {
                     'success':True,
-                    'status_code':204,
-                    'status_code_text' : '204',
+                    'status_code':200,
+                    'status_code_text' : '200',
                     'response':
                     {
                         'message':'No Data Found',
                         'data':[]
                     }
                 },
-                status=status.HTTP_204_NO_CONTENT
+                status=status.HTTP_200_OK
             )
 
 @api_view(['POST'])
