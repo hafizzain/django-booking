@@ -322,8 +322,8 @@ def update_user_default_data(request):
                     )
                 except:
                     PriceService.objects.create(
-                        price = price.get('price', 0),
-                        duration = price.get('duration', 0),
+                        price = price_price,
+                        duration = price_duration,
                         currency = location_currency,
                         service = service_instance
                     )
