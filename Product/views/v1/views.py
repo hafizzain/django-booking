@@ -688,7 +688,7 @@ def add_product(request):
     #turnover = request.data.get('turnover', None)
    
     alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', None)
-    invoices = request.data.get('invoices', None)
+    # invoices = request.data.get('invoices', None)
 
     
     product_error = []
@@ -920,26 +920,26 @@ def add_product(request):
     else:
         ExceptionRecord.objects.create(text='No Location Quantities Find')
     
-    if invoices is not None:
-        if type(invoices) == str:
-            invoices = invoices.replace("'" , '"')
-            invoices = json.loads(invoices)
-        else:
-            pass
-        for invoice in invoices:
-            try:
-                language = invoice['invoiceLanguage']
-                product_name = invoice['product_name']
-            except:
-                pass
-            else:
-                productTranslation = ProductTranslations(
-                    product = product,
-                    product_name = product_name
-                    )
-                language = Language.objects.get(id__icontains = str(language))
-                productTranslation.language = language
-                productTranslation.save()
+    # if invoices is not None:
+    #     if type(invoices) == str:
+    #         invoices = invoices.replace("'" , '"')
+    #         invoices = json.loads(invoices)
+    #     else:
+    #         pass
+    #     for invoice in invoices:
+    #         try:
+    #             language = invoice['invoiceLanguage']
+    #             product_name = invoice['product_name']
+    #         except:
+    #             pass
+    #         else:
+    #             productTranslation = ProductTranslations(
+    #                 product = product,
+    #                 product_name = product_name
+    #                 )
+    #             language = Language.objects.get(id__icontains = str(language))
+    #             productTranslation.language = language
+    #             productTranslation.save()
 
 
     
