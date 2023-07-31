@@ -515,8 +515,7 @@ def get_total_tips(request):
             member__id = employee_id,
             is_active = True,
             is_deleted = False,
-            created_at__gte =  range_start ,
-            created_at__lte = range_end
+            created_at__date__range =  (range_start, range_end) ,
         ).values_list('tip', flat=True)
         total_tips += sum(emplooyee_tips)
     else:
