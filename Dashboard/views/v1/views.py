@@ -21,6 +21,8 @@ from Business.models import Business, BusinessAddress
 from Product.models import ProductStock
 from datetime import datetime,timedelta
 from django.db.models import Q
+import calendar
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -736,77 +738,47 @@ def get_dashboard_target_overview_update(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-    if month and year:
-        import calendar
-        range_start = f'{year}-{intMonth}-01'
-        range_end = f'{year}-{intMonth}-{calendar.monthrange(int(year), intMonth)[1]}'
+    
+    range_start = f'{year}-{intMonth}-01'
+    range_end = f'{year}-{intMonth}-{calendar.monthrange(int(year), intMonth)[1]}'
+    
+    targets = StaffTarget.objects.filter(
+        # is_deleted=False,
+        employee = employee,
+        month = month,
+        year__date__year = year,
+    )
+    for tar in targets:
+        service_target += int(tar.service_target)
+        retail_target += int(tar.retail_target)
+    
+    appointment_checkout = AppointmentService.objects.filter(
+        appointment_status = 'Done',
+        member = employee,
+        created_at__gte =  range_start ,
+        created_at__lte = range_end
+        ).values_list('total_price', flat=True)
+    service_sale += sum(appointment_checkout)
+    
+    service_order_sale = ServiceOrder.objects.filter(
+        member = employee,
+        created_at__gte =  range_start ,
+        created_at__lte = range_end
+    )#.values_list('service_target', flat=True)
+    for ser in service_order_sale:
         
-        targets = StaffTarget.objects.filter(
-            # is_deleted=False,
-            employee = employee,
-            month = month,
-            year__date__year = year,
-        )
-        for tar in targets:
-            service_target += int(tar.service_target)
-            retail_target += int(tar.retail_target)
-        
-        appointment_checkout = AppointmentService.objects.filter(
-            appointment_status = 'Done',
-            member = employee,
-            created_at__gte =  range_start ,
-            created_at__lte = range_end
-            ).values_list('total_price', flat=True)
-        service_sale += sum(appointment_checkout)
-        
-        service_order_sale = ServiceOrder.objects.filter(
-            member = employee,
-            created_at__gte =  range_start ,
-            created_at__lte = range_end
-        )#.values_list('service_target', flat=True)
-        for ser in service_order_sale:
-            
-            service_sale += int(ser.checkout.total_service_price or 0)
+        service_sale += int(ser.checkout.total_service_price or 0)
 
-        retail_order_sale = ProductOrder.objects.filter(
-            member = employee,
-            created_at__gte =  range_start ,
-            created_at__lte = range_end
-        )#.values_list('retail_targets', flat=True)
-        for pro in retail_order_sale:
-            thisPrice = pro.discount_price or pro.total_price
-            pro.quantity
-            retail_sale += float(thisPrice) * float(pro.quantity)
-            # retail_sale += int(pro.checkout.total_product_price or 0)
-    else:
-        targets = StaffTarget.objects.filter(
-            # is_deleted=False,
-            employee = employee,
-            )
-        for tar in targets:
-            service_target += int(tar.service_target)
-            retail_target += int(tar.retail_target)
-        
-        appointment_checkout = AppointmentService.objects.filter(
-            appointment_status = 'Done',
-            member = employee,
-            ).values_list('total_price', flat=True)
-        service_sale += sum(appointment_checkout)
-        
-        service_order_sale = ServiceOrder.objects.filter(
-            member = employee,
-        )
-        for ser in service_order_sale:
-            service_sale += int(ser.checkout.total_service_price or 0)
-
-        retail_order_sale = ProductOrder.objects.filter(
-            member = employee,
-        )
-        for pro in retail_order_sale:
-            thisPrice = pro.discount_price or pro.total_price
-            pro.quantity
-            retail_sale += float(thisPrice) * float(pro.quantity)
-            # retail_sale += int(pro.checkout.total_product_price or 0)
+    retail_order_sale = ProductOrder.objects.filter(
+        member = employee,
+        created_at__gte =  range_start ,
+        created_at__lte = range_end
+    )#.values_list('retail_targets', flat=True)
+    for pro in retail_order_sale:
+        thisPrice = pro.discount_price or pro.total_price
+        pro.quantity
+        retail_sale += float(thisPrice) * float(pro.quantity)
+        # retail_sale += int(pro.checkout.total_product_price or 0)
         
     total_targets = service_target + retail_target
     total_sale = service_sale + retail_sale
@@ -819,7 +791,10 @@ def get_dashboard_target_overview_update(request):
                     'message' : 'Employee Id recieved',
                     'error_message' : None,
                     'employee_id' : employee_id,
-
+                    'month': month,
+                    'year': year,
+                    'range_start': range_start,
+                    'range_end': range_end,
                     'set' : {
                         'service' : service_target,
                         'retail' : retail_target,
