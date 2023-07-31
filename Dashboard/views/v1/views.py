@@ -613,8 +613,8 @@ def get_total_sales_device(request):
 
     checkout_orders_total = Checkout.objects.filter(
         is_deleted=False, 
-        member__id=employee_id,
-    )   
+        checkout_orders__member__id = employee_id,
+    ).distinct()
     checkout_orders_months = list(checkout_orders_total.values_list('created_at__month', flat=True))
     
     appointment_services = AppointmentService.objects.filter(
