@@ -116,8 +116,10 @@ def edit_translation_forms(request):
         language = request.POST.get('language', None)
         id = request.POST.get('id')
         translation = request.POST.get('value')
+        english_name = request.POST.get('english_name')
         trans = TranslationLabels.objects.get(id = id)
         trans.value = translation
+        trans.english_name = english_name
         trans.save()
         return redirect(f'/api/v1/multilanguage/get_data/?language={language}')
     return redirect(f'/api/v1/multilanguage/get_data/?language={language}')
