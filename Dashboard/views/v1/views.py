@@ -21,6 +21,8 @@ from Business.models import Business, BusinessAddress
 from Product.models import ProductStock
 from datetime import datetime,timedelta
 from django.db.models import Q
+import calendar
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -613,8 +615,8 @@ def get_total_sales_device(request):
 
     checkout_orders_total = Checkout.objects.filter(
         is_deleted=False, 
-        member__id=employee_id,
-    )   
+        checkout_orders__member__id = employee_id,
+    ).distinct()
     checkout_orders_months = list(checkout_orders_total.values_list('created_at__month', flat=True))
     
     appointment_services = AppointmentService.objects.filter(
@@ -652,7 +654,9 @@ def get_total_sales_device(request):
         
         dashboard_data.append({
             'month' : month,
-            'count' : count + count_app
+            'count' : count + count_app,
+            'index' : index,
+
         })
 
     return Response(
@@ -663,7 +667,9 @@ def get_total_sales_device(request):
                 'message': 'Graph for mobile',
                 'error_message': None,
                 'dashboard': dashboard_data,
-                'total_sales': total_price
+                'total_sales': total_price,
+                'total_checkout_orders' : len(checkout_orders_total),
+                'total_app_orders' : len(apps_checkouts_total),
             }
         },
         status=status.HTTP_200_OK
@@ -732,77 +738,43 @@ def get_dashboard_target_overview_update(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-    if month and year:
-        import calendar
-        range_start = f'{year}-{intMonth}-01'
-        range_end = f'{year}-{intMonth}-{calendar.monthrange(int(year), intMonth)[1]}'
-        
-        targets = StaffTarget.objects.filter(
-            # is_deleted=False,
-            employee = employee,
-            month = month,
-            year__date__year = year,
-        )
-        for tar in targets:
-            service_target += int(tar.service_target)
-            retail_target += int(tar.retail_target)
-        
-        appointment_checkout = AppointmentService.objects.filter(
-            appointment_status = 'Done',
-            member = employee,
-            created_at__gte =  range_start ,
-            created_at__lte = range_end
-            ).values_list('total_price', flat=True)
-        service_sale += sum(appointment_checkout)
-        
-        service_order_sale = ServiceOrder.objects.filter(
-            member = employee,
-            created_at__gte =  range_start ,
-            created_at__lte = range_end
-        )#.values_list('service_target', flat=True)
-        for ser in service_order_sale:
-            
-            service_sale += int(ser.checkout.total_service_price or 0)
+    
+    range_start = f'{year}-{str(intMonth).zfill(2)}-01'
+    range_end = f'{year}-{str(intMonth).zfill(2)}-{calendar.monthrange(int(year), intMonth)[1]}'
+    
+    targets = StaffTarget.objects.filter(
+        # is_deleted=False,
+        employee = employee,
+        month = month,
+        year__date__year = year,
+    )
+    for tar in targets:
+        service_target += int(tar.service_target)
+        retail_target += int(tar.retail_target)
+    
+    appointment_checkout = AppointmentService.objects.filter(
+        appointment_status__in = ['Done'],
+        member = employee,
+        created_at__range = (range_start, range_end),
+        ).values_list('price', flat=True)
+    service_sale += sum(list(appointment_checkout))
+    
+    service_order_sale = ServiceOrder.objects.filter(
+        member = employee,
+        # created_at__range = (range_start, range_end),
+    )
 
-        retail_order_sale = ProductOrder.objects.filter(
-            member = employee,
-            created_at__gte =  range_start ,
-            created_at__lte = range_end
-        )#.values_list('retail_targets', flat=True)
-        for pro in retail_order_sale:
-            thisPrice = pro.discount_price or pro.total_price
-            pro.quantity
-            retail_sale += float(thisPrice) * float(pro.quantity)
-            # retail_sale += int(pro.checkout.total_product_price or 0)
-    else:
-        targets = StaffTarget.objects.filter(
-            # is_deleted=False,
-            employee = employee,
-            )
-        for tar in targets:
-            service_target += int(tar.service_target)
-            retail_target += int(tar.retail_target)
-        
-        appointment_checkout = AppointmentService.objects.filter(
-            appointment_status = 'Done',
-            member = employee,
-            ).values_list('total_price', flat=True)
-        service_sale += sum(appointment_checkout)
-        
-        service_order_sale = ServiceOrder.objects.filter(
-            member = employee,
-        )
-        for ser in service_order_sale:
-            service_sale += int(ser.checkout.total_service_price or 0)
+    for ser in service_order_sale:
+        thisPrice = ser.discount_price or ser.total_price
+        service_sale += float(thisPrice) * float(ser.quantity)
 
-        retail_order_sale = ProductOrder.objects.filter(
-            member = employee,
-        )
-        for pro in retail_order_sale:
-            thisPrice = pro.discount_price or pro.total_price
-            pro.quantity
-            retail_sale += float(thisPrice) * float(pro.quantity)
-            # retail_sale += int(pro.checkout.total_product_price or 0)
+    retail_order_sale = ProductOrder.objects.filter(
+        member = employee,
+        created_at__range =  (range_start, range_end),
+    )
+    for pro in retail_order_sale:
+        thisPrice = pro.discount_price or pro.total_price
+        retail_sale += float(thisPrice) * float(pro.quantity)
         
     total_targets = service_target + retail_target
     total_sale = service_sale + retail_sale
@@ -815,7 +787,10 @@ def get_dashboard_target_overview_update(request):
                     'message' : 'Employee Id recieved',
                     'error_message' : None,
                     'employee_id' : employee_id,
-
+                    'month': month,
+                    'year': year,
+                    'range_start': range_start,
+                    'range_end': range_end,
                     'set' : {
                         'service' : service_target,
                         'retail' : retail_target,

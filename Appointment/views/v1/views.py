@@ -480,6 +480,7 @@ def create_appointment(request):
         pass
     
     appointment_logs = AppointmentLogs.objects.create( 
+        user = request.user,
         location = business_address,
         appointment = appointment,
         log_type = 'Create',
@@ -841,6 +842,7 @@ def update_appointment(request):
     except:
         active_user_staff = None
     appointment_logs = AppointmentLogs.objects.create( 
+        user = request.user,
         location = service_appointment.business_address,
         appointment = service_appointment.appointment,
         log_type = 'Reschedule',
@@ -1112,6 +1114,7 @@ def update_appointment_service(request):
         pass
     
     appointment_logs = AppointmentLogs.objects.create( 
+        user = request.user,
         location = appointment.business_address,
         appointment = appointment,
         log_type = 'Edit' if action_type == 'edit' else 'Reschedule',
@@ -1693,6 +1696,7 @@ def create_checkout(request):
             service_appointment.appointment_status= 'Done'
             service_appointment.save()
             appointment_logs = AppointmentLogs.objects.create( 
+                user = request.user,
                 location = service_appointment.business_address,
                 appointment = service_appointment.appointment,
                 log_type = 'Done',
