@@ -1215,17 +1215,17 @@ def update_employee(request):
         serializer.save()
         data.update(serializer.data)
     else: 
-            return Response(
-        {
-            'status' : False,
-            'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
-            'response' : {
-                'message' : 'Invialid Data',
-                'error_message' : str(serializer.errors),
-            }
-        },
-        status=status.HTTP_404_NOT_FOUND
-    )
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                'response' : {
+                    'message' : 'Invialid Data',
+                    'error_message' : str(serializer.errors),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
     return Response(
         {
             'status' : True,
@@ -1236,8 +1236,7 @@ def update_employee(request):
                 'Employee' : data
             }
         },
-        status=status.HTTP_200_OK
-        )
+        status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -4574,9 +4573,20 @@ def employee_login(request):
         try:
             employee = Employee.objects.get(
                 email__icontains = user.email,
+                is_deleted = False
             )
         except:
-            pass
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 404,
+                    'status_code_text' : 'EMPLOYEEE_IS_DELETED',
+                    'response' : {
+                        'message' : 'User Does not exist',
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
         else:
             if not employee.is_active:
                 return Response(
