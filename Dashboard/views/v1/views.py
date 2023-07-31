@@ -739,8 +739,8 @@ def get_dashboard_target_overview_update(request):
                 status=status.HTTP_404_NOT_FOUND
             )
     
-    range_start = f'{year}-{intMonth}-01'
-    range_end = f'{year}-{intMonth}-{calendar.monthrange(int(year), intMonth)[1]}'
+    range_start = f'{year}-{str(intMonth).zfill(2)}-01'
+    range_end = f'{year}-{str(intMonth).zfill(2)}-{calendar.monthrange(int(year), intMonth)[1]}'
     
     targets = StaffTarget.objects.filter(
         # is_deleted=False,
@@ -755,13 +755,13 @@ def get_dashboard_target_overview_update(request):
     appointment_checkout = AppointmentService.objects.filter(
         appointment_status = 'Done',
         member = employee,
-        # created_at__range = (range_start, range_end),
+        created_at__range = (range_start, range_end),
         ).values_list('price', flat=True)
     service_sale += sum(list(appointment_checkout))
     
     service_order_sale = ServiceOrder.objects.filter(
         member = employee,
-        # created_at__range = (range_start, range_end),
+        created_at__range = (range_start, range_end),
     )
 
     for ser in service_order_sale:
@@ -770,7 +770,7 @@ def get_dashboard_target_overview_update(request):
 
     retail_order_sale = ProductOrder.objects.filter(
         member = employee,
-        # created_at__range =  (range_start, range_end),
+        created_at__range =  (range_start, range_end),
     )
     for pro in retail_order_sale:
         thisPrice = pro.discount_price or pro.total_price
