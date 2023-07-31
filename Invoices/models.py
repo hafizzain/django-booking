@@ -6,6 +6,16 @@ from Employee.models import Employee
 from Business.models import BusinessAddress
 from uuid import uuid4
 from Appointment.models import Appointment
+import pdfkit
+from django.conf import settings
+from django.template.loader import get_template
+import os
+from django.db import connection
+from django.db.models import F, Q
+from Order.models import Order, Checkout, ProductOrder, ServiceOrder, VoucherOrder, MemberShipOrder
+from Appointment.models import Appointment, AppointmentCheckout, AppointmentService, AppointmentEmployeeTip
+from Utility.models import ExceptionRecord
+
 
 class SaleInvoice(models.Model):
     status_choice=[
@@ -65,10 +75,124 @@ class SaleInvoice(models.Model):
     service_price = models.FloatField(default=0, null=True, blank=True)
     total_price = models.FloatField(default=0, null=True, blank=True)
     checkout = models.CharField(max_length=128, null=True, blank=True)
-    
+
+    file = models.FileField(upload_to='invoicesFiles/', null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(null=True, blank=True)
     
     def __str__(self):
         return str(self.id)
+    
+    @property
+    def short_id(self):
+        uuid = f'{self.id}'
+        uuid = uuid.split('-')[0]
+        return uuid
+    
+    def get_appointment_services(self, app_checkout):
+        services = AppointmentService.objects.filter(
+            appointment = app_checkout.appointment
+        )
+        ordersData = []
+        for order in services:
+            price = order.discount_price or order.total_price
+            data = {
+                'name' : f'{order.service.name}',
+                'arabic_name' : f'{order.service.arabic_name}',
+                'price' : price,
+                'quantity' : 1
+            }
+            ordersData.append(data)
+        return ordersData
+
+    def get_order_items(self, checkout):
+        orders = []
+
+        orders.extend(ProductOrder.objects.filter(checkout = checkout).annotate(name = F('product__name'), arabic_name=F('product__arabic_name')))
+        orders.extend(ServiceOrder.objects.filter(checkout = checkout).annotate(name = F('service__name'), arabic_name=F('service__arabic_name')))
+        orders.extend(VoucherOrder.objects.filter(checkout = checkout).annotate(name = F('voucher__name'), arabic_name=F('voucher__arabic_name')))
+        orders.extend(MemberShipOrder.objects.filter(checkout = checkout).annotate(name = F('membership__name'), arabic_name=F('membership__arabic_name')))
+
+        # .values('name', 'arabic_name', 'quantity', 'current_price', 'total_price', 'discount_price', 'price')
+        ordersData = []
+        for order in orders:
+            price = order.discount_price or order.total_price
+            total_price = float(price) * float(order.quantity)
+            data = {
+                'name' : f'{order.name}',
+                'arabic_name' : f'{order.arabic_name}',
+                'price' : total_price,
+                'quantity' : order.quantity
+            }
+            ordersData.append(data)
+
+        return ordersData
+
+    def get_invoice_order_items(self):
+        try:
+            checkout = Checkout.objects.get(
+                id = self.checkout
+            )
+            return [self.get_order_items(checkout), self.get_tips(checkout_type='Checkout', id=self.checkout)]
+        except Exception as err:
+            ExceptionRecord.objects.create(
+                text = f'Sale INVOICE ERROR not found {str(err)} -- {self.checkout}'
+            )
+            try:
+                checkout = AppointmentCheckout.objects.get(
+                    id = self.checkout
+                )
+                return [self.get_appointment_services(checkout), self.get_tips(checkout_type='Appointment', id=f'{checkout.appointment.id}')]
+            except Exception as err:
+                ExceptionRecord.objects.create(
+                    text = f'Sale INVOICE ERROR not found {str(err)} -- {self.checkout}'
+                )
+        return [[], []]
+
+    def get_tips(self, checkout_type = None, id=None):
+        if not checkout_type or not id:
+            return []
+        query = {}
+
+        if checkout_type == 'Appointment':
+            query['appointment__id'] = id
+        else:
+            query['checkout__id'] = id
+        
+        tips = AppointmentEmployeeTip.objects.filter(**query)
+        tips = [{'tip' : tip.tip, 'employee_name' : tip.member.full_name} for tip in tips]
+        return tips
+    
+    def save(self, *args, **kwargs):
+        if not self.file and self.checkout:
+            order_items, order_tips = self.get_invoice_order_items()
+            if len(order_items) > 0:
+                sub_total = sum([order['price'] for order in order_items])
+                tips_total = sum([t['tip'] for t in order_tips])
+    
+                context = {
+                    'invoice_id' : self.short_id,
+                    'order_items' : order_items,
+                    'currency_code' : 'AED',
+                    'sub_total' : sub_total,
+                    'tips' : order_tips,
+                    'total_tax' : 0,
+                    'total' : float(tips_total) + float(sub_total),
+                    'created_at' : self.created_at.strftime('%Y-%m-%d') if self.created_at else '',
+                }
+                schema_name = connection.schema_name
+                output_dir = f'{settings.BASE_DIR}/media/{schema_name}/invoicesFiles'
+                is_exist = os.path.isdir(output_dir)
+                if not is_exist:
+                    os.mkdir(output_dir)
+
+                file_name = f'invoice-{self.short_id}.pdf'
+                output_path = f'{output_dir}/{file_name}'
+                no_media_path = f'invoicesFiles/{file_name}'
+                template = get_template(f'{settings.BASE_DIR}/templates/Sales/invoice.html')
+                html_string = template.render(context)
+                pdfkit.from_string(html_string, os.path.join(output_path))
+                self.file = no_media_path
+
+        super(SaleInvoice, self).save(*args, **kwargs)

@@ -66,7 +66,7 @@ NSTYLE_APPS = [
     'Reports.apps.ReportsConfig',
     'Invoices.apps.InvoicesConfig',
     'Help.apps.HelpConfig',
-    'Translations.apps.TranslationsConfig',
+    'MultiLanguage.apps.MultilanguageConfig',
     'SuperInsight.apps.SuperinsightConfig',
 ]
 
@@ -116,6 +116,31 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "debug_toolbar.middleware.DebugToolbarMiddleware",
+    'Api.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Appointment.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Authentication.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Business.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Client.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'CRM.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Customer.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Dashboard.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Employee.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Invoices.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Notification.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Order.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Permissions.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Product.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Profile.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Promotions.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Reports.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Sale.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Service.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'SuperInsight.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Tenants.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Utility.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'MultiLanguage.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Help.error_logging_middleware.ServerErrorLoggingMiddleware',
+    
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -175,6 +200,7 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -230,10 +256,10 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'static'),
+# ]
 
 BACKEND_DOMAIN_NAME=env('BACKEND_DOMAIN_NAME')
 BACKEND_HOST=env('BACKEND_HOST')

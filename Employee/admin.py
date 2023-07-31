@@ -129,6 +129,7 @@ class EmployeeCommissionAdmin(admin.ModelAdmin):
         'total_sale_value',
         'single_item_commission',
         'full_commission',
+        'created_at',
     ]
 
     def total_sale_value(self, instance):
@@ -143,7 +144,7 @@ class EmployeeCommissionAdmin(admin.ModelAdmin):
 @admin.register(EmployeDailySchedule)
 class EmployeDailyScheduleAdmin(admin.ModelAdmin):
     ordering = ['-date']
-    list_filter = ['employee']
+    list_filter = ['employee__full_name']
     list_display = [
         'id',
         'employee_name',
@@ -178,4 +179,13 @@ class EmployeDailyScheduleAdmin(admin.ModelAdmin):
 admin.site.register(Asset)
 admin.site.register(AssetDocument)
 admin.site.register(EmployeeSelectedService)
-admin.site.register(CategoryCommission)
+@admin.register(CategoryCommission)
+class CategoryCommissionAdmin(admin.ModelAdmin):
+    ordering = ['commission__employee', 'category_comission', 'from_value']
+    list_display = ['id', 'employee', 'category_comission', 'from_value', 'to_value','commission_percentage','comission_choice','symbol']
+
+    def employee(self, obj):
+        if obj.commission and obj.commission.employee:
+            return f'{obj.commission.employee.full_name}'
+        
+        return '-------'

@@ -94,4 +94,5 @@ urlpatterns = [
     
     #Set_passeord
     path('set_password/', views.set_password),
+    path('check_employee_existance/', views.check_employee_existance),
 ]

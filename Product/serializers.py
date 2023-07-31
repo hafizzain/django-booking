@@ -9,7 +9,9 @@ from django.conf import settings
 from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer
 
 from Utility.models import  ExceptionRecord
-from django.db.models import Avg, Count, Min, Sum
+from django.db.models import Avg, Count, Min, Sum, Q
+from Utility.models import Language
+from Product.models import ProductTranslations
 
 
 
@@ -214,6 +216,7 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
         fields = [
             'id', 
             'name', 
+            'arabic_name', 
             'cost_price',
             'category', 
             'brand', 
@@ -256,6 +259,8 @@ class ProductSerializer(serializers.ModelSerializer):
     size = serializers.SerializerMethodField(read_only=True)
 
     short_id = serializers.SerializerMethodField(read_only=True)
+    invoices = serializers.SerializerMethodField(read_only=True)
+
     
     def get_short_id(self,obj):
         return obj.short_id
@@ -328,6 +333,13 @@ class ProductSerializer(serializers.ModelSerializer):
         else:
             all_stocks = ProductStock.objects.filter(product=obj, location__is_deleted=False,).order_by('-created_at')
             return ProductStockSerializer(all_stocks, many=True).data
+        
+    def get_invoices(self, obj):
+        try:
+            invoice = ProductTranslations.objects.filter(product = obj) 
+            return ProductTranlationsSerializer(invoice, many=True).data
+        except:
+            return []
 
 
     class Meta:
@@ -336,6 +348,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'id', 
             'short_id', 
             'name', 
+            'arabic_name', 
             'currency_retail_price',
             'size',
             'product_type',
@@ -360,9 +373,27 @@ class ProductSerializer(serializers.ModelSerializer):
             'consumed',
             'stocktransfer',
             'location',
-            'is_active'
+            'is_active',
+            'invoices'
         ]
         read_only_fields = ['slug', 'id']
+
+class ProductTranlationsSerializer(serializers.ModelSerializer):
+    invoiceLanguage = serializers.SerializerMethodField(read_only=True)
+    def get_invoiceLanguage(self, obj):
+        language = Language.objects.get(id__icontains = obj.language)
+        return language.id
+        
+    
+    class Meta:
+        model = ProductTranslations
+        fields = [
+            'id', 
+            'product', 
+            'product_name',
+            'invoiceLanguage'
+            ]
+
 class ProductOrderSerializer(serializers.ModelSerializer):
     avaiable = serializers.SerializerMethodField()
     retail_price = serializers.SerializerMethodField()
@@ -557,7 +588,9 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
         return f'{product_instance.created_at.strftime("%Y-%m-%d")}'
 
     def get_current_stock(self, product_instance):
-        return 0
+        location_id = self.context.get('location_id')
+        stock = ProductStock.objects.get(product=product_instance, location = location_id, is_deleted=False)#[0]
+        return stock.available_quantity
     
     def get_brand(self, obj):
         try:
@@ -588,24 +621,39 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
     def get_reports(self, product_instance):
         filter_query = {}
         report_type = self.context.get('report_type', None)
+        location_id = self.context.get('location_id', None)
+
         if report_type:
             filter_query['report_choice'] = report_type
 
         product_reports = ProductOrderStockReport.objects.filter(
+            Q(report_choice = 'Transfer_from', from_location__id = location_id) |
+            Q(report_choice = 'Transfer_to', to_location__id = location_id) |
+            Q(report_choice__in = ['Purchase', 'Consumed', 'Sold']),
             product = product_instance,
             **filter_query
-        )
+        ).order_by('-created_at')
         
         serialized_data = ProductStockReport_OrderStockReportsSerializer(product_reports, many=True)
         return serialized_data.data
             
     class Meta:
         model = Product
-        fields = ['id', 'name', 'retail_price', 'brand', 'reports', 'current_stock', 'cost_price', 'created_at']
+        fields = ['id', 'name', 'arabic_name', 'retail_price', 'brand', 'reports', 'current_stock', 'cost_price', 'created_at']
         #  'avaiable',
 
 
 class ProductInsightSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['id', 'top_sold_orders']
+        fields = ['id', 'top_sold_orders', 'arabic_name']
+
+class ProductInventoryStockSerializer(serializers.ModelSerializer):
+    current_stock = serializers.SerializerMethodField()
+
+    def get_current_stock(self, obj):
+        return obj.available_quantity
+
+    class Meta:
+        model = ProductStock
+        fields = ['current_stock']

@@ -7,7 +7,7 @@ from Client.models import Client
 #from Sale.serializers import LocationServiceSerializer
 from rest_framework import serializers
 from Appointment.Constants.durationchoice import DURATION_CHOICES
-from Appointment.models import Appointment, AppointmentCheckout, AppointmentNotes, AppointmentService, AppointmentLogs, LogDetails
+from Appointment.models import Appointment, AppointmentCheckout, AppointmentNotes, AppointmentService, AppointmentLogs, LogDetails, AppointmentEmployeeTip
 from Business.models import BusinessAddress
 from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer
 from Client.serializers import ClientAppointmentSerializer
@@ -16,17 +16,19 @@ from Service.models import PriceService, Service
 from datetime import datetime, timedelta
 from Product.Constants.index import tenant_media_base_url
 from django.db.models import Q, F
-
+from Business.serializers.v1_serializers import CurrencySerializer
+from Client.serializers import ClientSerializer
 
 
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 from Utility.models import ExceptionRecord
 
 class PriceServiceSaleSerializer(serializers.ModelSerializer):
+    currency = CurrencySerializer()
     
     class Meta:
         model = PriceService
-        fields = ['id','service', 'duration', 'price']
+        fields = ['id','service', 'duration', 'price', 'currency']
 
 class MemberSaleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -36,14 +38,15 @@ class ServiceSaleSerializer(serializers.ModelSerializer):
     price_service = serializers.SerializerMethodField(read_only=True)
     
     def get_price_service(self, obj):
-        price = PriceService.objects.filter(service = str(obj))
+        price = PriceService.objects.filter(service = str(obj)).order_by('-created_at')
         return PriceServiceSaleSerializer(price, many = True).data
     class Meta:
         model = Service
-        fields = ['id', 'name', 'price_service']
+        fields = ['id', 'name', 'price_service', 'arabic_name']
 
 class UpdateAppointmentSerializer(serializers.ModelSerializer):
     service_name  = serializers.SerializerMethodField(read_only=True)
+    service_arabic_name  = serializers.SerializerMethodField(read_only=True)
     
     def get_service_name(self, obj):
         try:
@@ -52,6 +55,15 @@ class UpdateAppointmentSerializer(serializers.ModelSerializer):
 
         except Exception as err:
             print(err)
+
+    def get_service_arabic_name(self, obj):
+        try:
+            cli = f"{obj.service.arabic_name}"
+            return cli
+
+        except Exception as err:
+            print(err)
+
     class Meta:
         model = AppointmentService
         fields = '__all__'
@@ -65,7 +77,7 @@ class LocationSerializer(serializers.ModelSerializer):
 class ServiceAppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
-        fields = ('id', 'name', 'price')
+        fields = ('id', 'name', 'price', 'arabic_name')
 
 class EmployeAppoinmentSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
@@ -123,7 +135,7 @@ class TodayAppoinmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentService
         fields = ('id', 'appointment_time', 'appointment_date','duration',
-                  'member' , 'service', 'end_time', 'location' )
+                  'member' , 'service', 'end_time', 'location', 'appointment' )
         
 class AppointmentServiceSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
@@ -222,6 +234,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
         return self.retreive_unavailable_time(employee_instance)
 
     def retreive_unavailable_time(self, employee_instance):
+        errors = []
         selected_date = self.context.get('selected_date', None)
         if not selected_date:
             return []
@@ -233,9 +246,16 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
         try:
             employee_working_schedule = EmployeDailySchedule.objects.get(
                 employee = employee_instance,
-                date = selected_date
+                date = selected_date,
             )
-        except:
+            if employee_working_schedule.is_leave :
+                raise Exception('Employee on Leave')
+            
+            if employee_working_schedule.is_vacation :
+                raise Exception('Employee on Vacation')
+            
+        except Exception as err:
+            errors.append(str(err))
             exluded_times.append({
                 'start_time' : "00:00:00",
                 'end_time' : "00:00:00",
@@ -313,6 +333,10 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                             })
                 else:
                     end_time = "00:00:00"
+                    exluded_times.append({
+                        'start_time' : start_time,
+                        'end_time' : end_time,
+                    })
                     
         for exl_time in exluded_times:
             start_time = exl_time['start_time']
@@ -324,6 +348,21 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                 difference = end_time_f - start_time_f
                 seconds = difference.seconds
                 minutes = seconds // 60
+                hours = minutes // 60
+                remaining_minutes = minutes % 60
+                
+                remaining_time = remaining_minutes // 5
+                remaining_time = remaining_time * 5
+
+                # remianing_time_less_than_five = remaining_minutes % 5
+                # if remianing_time_less_than_five > 2:
+                #     remianing_time = remianing_time + 5
+
+                
+
+
+
+                
 
                 data.append([
                     {
@@ -333,10 +372,12 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                         "end_time": end_time,
                         # 'difference' : f'{difference}min',
                         # "duration": "35min",
-                        "duration": f'{minutes}min',
+                        "duration": f'{hours}h {remaining_time}min',
                         "created_at": "2023-05-29T06:45:38.035196Z",
                         "is_blocked": True,
                         "is_unavailable": True,
+                        'errors' : errors,
+                        'exluded_times' : exluded_times
                     }
                 ])
         return data
@@ -387,124 +428,7 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             #is_blocked = False
             appointment_date = selected_date
         ).exclude(appointment_status__in=excluded_list).distinct()
-        #selected_data = []
         
-        
-        # try:
-        #     for appoint in appoint_services:
-                
-        #         app_id = appoint.id
-        #         appointment_time = appoint.appointment_time
-        #         app_duration = appoint.duration
-        #         app_date = appoint.appointment_date
-                
-        #         app_date_time = f'2000-01-01 {appointment_time}'
-
-        #         #duration = DURATION_CHOICES_DATA[app_duration]
-        #         duration = DURATION_CHOICES[app_duration]
-        #         app_date_time = datetime.fromisoformat(app_date_time)
-        #         datetime_duration = app_date_time + timedelta(minutes=duration)
-        #         datetime_duration = datetime_duration.strftime('%H:%M:%S')
-        #         #second_end = datetime_duration.strftime('%H:%M:%S')
-        #         end_time = datetime_duration # Calculated End Time
-
-        #         #print(appointment_time.microsecond)
-        #         #print(appointment_time)
-
-        #         find_values = []
-        #         new_start_time = None
-        #         new_end_time = None
-
-        #         for dt in selected_data:
-        #             if ((dt['range_start'] >= appointment_time and dt['range_end'] <= end_time)) and dt['date'] == app_date:
-                        
-        #                 ExceptionRecord.objects.create(
-        #                     text = f"tested successfully{dt['range_end']}"
-        #                 )
-        #                 find_values.append(dt)
-        #             elif (dt['range_end'] == appointment_time and dt['date'] == app_date ):
-        #                 find_values.append(dt)
-                        
-        #             else :
-        #                 new_start_time = appointment_time
-                    
-        #             if ((dt['range_start'] <= appointment_time and dt['range_end'] >= end_time) and dt['date'] == app_date):
-        #                 find_values.append(dt)
-        #             else:
-        #                 new_end_time = end_time
-        #                 pass
-                    
-
-        #             # if str(dt['range_end']) == str(appointment_time) and dt['date'] == app_date:
-        #             #     find_values.append(dt)
-        #             #     new_end_time = end_time
-                    
-        #                ##OLD
-                        
-        #             # if ((dt['range_start'] == appointment_time or str(dt['range_start']) == str(end_time)) and dt['date'] == app_date):
-        #             #     find_values.append(dt)
-        #             # else:
-        #             #     new_start_time = appointment_time
-                    
-        #             # if str(dt['range_end']) == str(end_time) and dt['date'] == app_date:
-        #             #     find_values.append(dt)
-        #             # else:
-        #             #     # new_end_time = end_time
-        #             #     pass
-
-        #             # if str(dt['range_end']) == str(appointment_time) and dt['date'] == app_date:
-        #             #     find_values.append(dt)
-        #             #     new_end_time = end_time
-
-
-        #         if len(find_values) > 0:
-        #             current_obj = find_values[0]
-        #             if new_start_time is not None:
-        #                 current_obj['range_start'] = new_start_time
-        #                 ExceptionRecord.objects.create(
-        #                     text = f"tested abcs{current_obj}"
-        #                 )
-        #             if new_end_time is not None:
-        #                 current_obj['range_end'] = new_end_time
-        #                 ExceptionRecord.objects.create(
-        #                     text = f"tested 123{current_obj}"
-        #                 )
-
-        #             current_obj['ids'].append(app_id)
-        #         else:
-        #             selected_data.append({
-        #                 'date' : app_date,
-        #                 'range_start' : appointment_time,
-        #                 'range_end' : end_time,
-        #                 'ids' : [app_id]
-        #             })
-            
-        #     returned_list = []
-        #     for data in selected_data:
-        #         loop_return =[]
-        #         for id in data['ids']:
-        #             app_service = AppointmentService.objects.get(id=id)
-        #             serialized_service = AppointmentServiceSerializer(app_service)
-        #             loop_return.append(serialized_service.data)
-        #         returned_list.append(loop_return)
-                
-
-        #     # for selected_time in selected_ids.values():
-        #     #     loop_return = []
-        #     #     for id_ in selected_time:
-        #     #         app_service = AppointmentService.objects.get(id=id_)
-        #     #         serialized_service = AppointmentServiceSerializer(app_service)
-        #     #         loop_return.append(serialized_service.data)
-                
-        #     #     returned_list.append(loop_return)
-                
-        #     # serialized = AppointmentServiceSerializer(appoint_services, many=True)
-        #     # returned_list.append(serialized.data)
-        #     return returned_list
-        # except Exception as err:
-        #     ExceptionRecord.objects.create(
-        #         text = f'errors happen on appointment {str(err)}'
-        #     )
         
         try:
             # sort the appointments by start time
@@ -674,7 +598,29 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
     employee_list = serializers.SerializerMethodField(read_only=True)
     designation = serializers.SerializerMethodField(read_only=True)
     status = serializers.SerializerMethodField(read_only=True)
+    appointment_service_member = serializers.SerializerMethodField(read_only=True)
+
     
+    def get_appointment_service_member(self, obj):   
+        if obj.member:
+
+            try:
+                employee_service = EmployeeSelectedService.objects.get(
+                    service = obj.service,
+                    employee = obj.member
+                )
+            except:
+                level = 'Average'
+            else:
+                level = employee_service.level
+
+            return {
+                'id' : f'{obj.member.id}',
+                'full_name' : f'{obj.member.full_name}',
+                'level' : f'{level}',
+            }
+        return {}
+
     def get_designation(self, obj):        
         try:
             designation = EmployeeProfessionalInfo.objects.get(employee=obj.member.id)
@@ -718,7 +664,14 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
             return None
             
     def get_booked_by(self, obj):
-        return f'{obj.user.first_name} {obj.user.last_name}'
+        name = ''
+        if obj.user:
+            if obj.user.first_name:
+                name += f'{obj.user.first_name}'
+            if obj.user.last_name:
+                name += f' {obj.user.last_name}'
+    
+        return name
     
     def get_booking_id(self, obj):
         id = str(obj.id).split('-')[0:2]
@@ -766,7 +719,7 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
         fields= ('id', 'service', 'member', 'price', 'client', 'designation',
                  'appointment_date', 'appointment_time', 'duration','srv_name','status',
                  'booked_by' , 'booking_id', 'appointment_type','client_can_book','slot_availible_for_online',
-                 'appointment_status', 'location','employee_list', 'created_at', 'is_deleted')
+                 'appointment_status', 'location','employee_list', 'created_at', 'is_deleted', 'appointment_service_member')
         
       
 class SingleAppointmentSerializer(serializers.ModelSerializer):
@@ -857,8 +810,18 @@ class NoteSerializer(serializers.ModelSerializer):
 class SingleNoteSerializer(serializers.ModelSerializer):
     
     notes = serializers.SerializerMethodField(read_only=True)
+    client = ClientSerializer()
     customer_note = serializers.SerializerMethodField(read_only=True)
     appointmnet_service = serializers.SerializerMethodField(read_only=True)
+    appointment_tips = serializers.SerializerMethodField(read_only=True)
+
+    def get_appointment_tips(self, obj):
+        tips = AppointmentEmployeeTip.objects.filter(
+            appointment = obj
+        ).annotate(
+            member_name = F('member__full_name')
+        ).values('member_name', 'tip')
+        return list(tips)
     
     def get_customer_note(self, obj):
         try:
@@ -882,7 +845,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
             #return serializers
     class Meta:
         model = Appointment
-        fields = ['id', 'client', 'notes', 'business_address','client_type','appointmnet_service', 'customer_note']
+        fields = ['id', 'client', 'appointment_tips', 'notes', 'business_address','client_type','appointmnet_service', 'customer_note']
   
 class AppointmentServiceSeriailzer(serializers.ModelSerializer):
     class Meta:

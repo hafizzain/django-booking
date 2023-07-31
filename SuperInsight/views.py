@@ -1,22 +1,66 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from MultiLanguage.models import *
+from Utility.models import ExceptionRecord
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 
-# Create your views here.
 
 
+@login_required(login_url='/admin')
 def DashboardPage(request):
     return render(request, 'SuperAdminPanel/pages/dashboard/dashboard.html')
 
+@login_required(login_url='/admin')
 def ExceptionPage(request):
-    return render(request, 'SuperAdminPanel/pages/exception/exception.html')
+    exceptions = ExceptionRecord.objects.all().order_by('-created_at')
+    context={}
+    context['exceptions'] = exceptions
+    return render(request, 'SuperAdminPanel/pages/Exception/exception.html', context)
 
+
+@login_required(login_url='/admin')
 def ExceptionDetailPage(request):
-    return render(request, 'SuperAdminPanel/pages/exception/exception-detail.html')
+    if request.method == 'GET':
+        id = request.GET.get('id')
+    
+    exception = ExceptionRecord.objects.get(id = id)
+    
+    context={}
+    context['exception'] = exception
+    return render(request, 'SuperAdminPanel/pages/Exception/exception-detail.html', context)
 
+
+@login_required(login_url='/admin')
 def LanguagePage(request):
-    return render(request, 'SuperAdminPanel/pages/language/language.html')
+    languages = Language.objects.all()
+    context = {}
+    context['languages'] = languages
+    return render(request, 'SuperAdminPanel/pages/language/language.html', context)
 
+
+@login_required(login_url='/admin')
 def LanguageSectionPage(request):
-    return render(request, 'SuperAdminPanel/pages/language/language-section.html')
+    lang = request.GET.get('language')
+    sections = Section.objects.filter(language__title=lang)
+    
+    return render(request, 'SuperAdminPanel/pages/language/language-section.html', {'sections':sections, 'language':lang})
 
+
+@login_required(login_url='/admin')
 def LanguageSectionDetailPage(request):
-    return render(request, 'SuperAdminPanel/pages/language/language-section-detail.html')
+    lang = request.GET.get('language')
+    section = request.GET.get('section')
+
+    labels = Labels.objects.filter(section__title=section, section__language__title = lang)
+    context = {}
+    context['lang'] = lang
+    context['section'] = section
+    context['labels'] = labels
+
+    return render(request, 'SuperAdminPanel/pages/language/language-section-detail.html', context)
+
+
+
+def Logout(request):
+    logout(request)
+    return redirect('/admin')

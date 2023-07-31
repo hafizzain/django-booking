@@ -69,4 +69,7 @@ urlpatterns = [
    #client promotion
    path('get_complimentary/', views.get_complimentary),
    path('get_client_package/', views.get_client_package),
+
+
+   path('check_client_existance/', views.check_client_existance),
 ]

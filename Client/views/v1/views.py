@@ -350,7 +350,7 @@ def create_client(request):
                             'status_code' : 404,
                             'status_code_text' : '404',
                             'response' : {
-                                'message' : f'Client Already exist with this {email}!',
+                                'message' : f'Client already exist with this email.',
                                 'error_message' : None,
                             }
                         },
@@ -369,7 +369,7 @@ def create_client(request):
                             'status_code' : 404,
                             'status_code_text' : '404',
                             'response' : {
-                                'message' : f'Client Already exist with this {mobile_number}!',
+                                'message' : f'Client already exist with this phone number',
                                 'error_message' : None, 
                             }
                         },
@@ -560,7 +560,6 @@ def delete_client(request):
             
     #client.is_deleted = True
     client.delete()
-    client.save()
     return Response(
         {
             'status' : True,
@@ -912,46 +911,6 @@ def create_subscription(request):
         is_active= is_active,
 
     )
-    # if subscription_type == 'Product':
-    #     try:
-    #         product=Product.objects.get(id=product)
-    #     except Exception as err:
-    #         return Response(
-    #             {
-    #                 'status' : False,
-    #                 'status_code' : StatusCodes.PRODUCT_NOT_FOUND_4037,
-    #                 'response' : {
-    #                 'message' : 'Product not found',
-    #                 'error_message' : str(err),
-    #                 }
-    #             },
-    #             status=status.HTTP_400_BAD_REQUEST
-    #         ) 
-    #     client_subscription.product = product
-    #     client_subscription.products_count = products_count
-
-    # else:
-    #     try:
-    #         service=Service.objects.get(id=service_id)
-    #     except Exception as err:
-    #         return Response(
-    #             {
-    #                 'status' : False,
-    #                 'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
-    #                 'response' : {
-    #                 'message' : 'Service not found',
-    #                 'error_message' : str(err),
-    #                 }
-    #             },
-    #             status=status.HTTP_400_BAD_REQUEST
-    #         )
-            
-    #     client_subscription.service = service
-    #     client_subscription.services_count = services_count
-
-    
-    # client_subscription.save()
-        
     
     serialized = SubscriptionSerializer(client_subscription, context={'request' : request})
        
@@ -1973,9 +1932,14 @@ def delete_memberships(request):
 def update_memberships(request):
     id = request.data.get('id', None)
     service = request.data.get('service', None)
+    services = request.data.get('services', None)
     product = request.data.get('product',None)
+    products = request.data.get('products',None)
     membership_type = request.data.get('membership_type',None)
     currency_membership = request.data.get('currency_membership',None)
+    check = True
+
+    errors= []
     
     if id is None: 
         return Response(
@@ -2043,8 +2007,59 @@ def update_memberships(request):
         membership.service= service_id
         membership.product = None
         membership.save()
+
+    errors.append(services)
+    for serv in services:
+        service_id = serv['service']
+        duration = serv['duration']
+        try:
+            service_instance = Service.objects.get(id=service_id)
+        except Exception as err:
+            errors.append(str(err))
+        else:
+            try:
+                membership_service, created = DiscountMembership.objects.get_or_create(
+                    service = service_instance,
+                    membership = membership
+                )
+            except Exception as err:
+                errors.append(str(err))
+            else:
+                if created:
+                    membership_service.duration = duration
+                    membership_service.save()
+    
+    for product_dict in products:
+        product_id = product_dict['product']
+        percentage = product_dict['percentage']
+        try:
+            product_instance = Product.objects.get(id=product_id)
+        except Exception as err:
+            errors.append(str(err))
+        else:
+            try:
+                membership_product, created = DiscountMembership.objects.get_or_create(
+                    product = product_instance,
+                    membership = membership
+                )
+            except Exception as err:
+                errors.append(str(err))
+            else:
+                membership_product.percentage = percentage
+                membership_product.save()
+    
      
     if currency_membership:  
+        if check == True:
+            vch = CurrencyPriceMembership.objects.filter(membership = membership)
+            check = False
+            for i in vch:
+                try:
+                    v = CurrencyPriceMembership.objects.get(id = i.id)
+                    v.delete()
+                except:
+                    pass
+
         if type(currency_membership) == str:
             currency_membership = currency_membership.replace("'" , '"')
             currency_membership = json.loads(currency_membership)
@@ -2058,30 +2073,31 @@ def update_memberships(request):
             #membership = curr.get('membership', None)
             price = curr.get('price', None)
             try:
-                currency_id = Currency.objects.get(id=currency)
+                currency_instance = Currency.objects.get(id=currency)
             except Exception as err:
                 pass
-            if id is not None:
-                try:
-                    currency_price = CurrencyPriceMembership.objects.get(id=id)
-                except Exception as err:
-                    pass
-                
+            else:
+            # if id is not None:
+            #     try:
+            #         currency_price = CurrencyPriceMembership.objects.get(id=id)
+            #     except Exception as err:
+            #         pass
+            #     else:                
+            #         currency_price.price = price
+            #         currency_price.save()
+            
+                currency_price, created = CurrencyPriceMembership.objects.get_or_create(
+                    currency = currency_instance,
+                    membership = membership,
+                )
                 currency_price.price = price
                 currency_price.save()
-            
-            elif currency_id is not None: 
-                try:
-                    currency_price = CurrencyPriceMembership.objects.get(currency=currency_id)
-                    currency_price.price = price
-                    currency_price.save()
-                except Exception as err:
-                    #pass
-                    services_obj = CurrencyPriceMembership.objects.create(
-                        membership = membership,
-                        currency = currency_id,
-                        price = price,
-                    )                
+                    
+                    # services_obj = CurrencyPriceMembership.objects.create(
+                    #     membership = membership,
+                    #     currency = currency_instance,
+                    #     price = price,
+                    # )                
                 
                 
     serializer = MembershipSerializer(membership, data=request.data, partial=True)
@@ -2105,7 +2121,8 @@ def update_memberships(request):
             'response' : {
                 'message' : 'Update Membership Successfully',
                 'error_message' : None,
-                'membership' : serializer.data
+                'membership' : serializer.data,
+                'errors' : errors
             }
         },
         status=status.HTTP_200_OK
@@ -2347,6 +2364,9 @@ def delete_vouchers(request):
 def update_vouchers(request):
     id = request.data.get('id', None)
     currency_voucher = request.data.get('currency_voucher',None)
+    check = True
+
+
 
     if id is None: 
         return Response(
@@ -2379,7 +2399,19 @@ def update_vouchers(request):
                 status=status.HTTP_404_NOT_FOUND
         )
 
+
+
     if currency_voucher:  
+        if check == True:
+            vch = VoucherCurrencyPrice.objects.filter(voucher = vouchers)
+            check = False
+            for i in vch:
+                try:
+                    v = VoucherCurrencyPrice.objects.get(id = i.id)
+                    v.delete()
+                except:
+                    pass
+
         if type(currency_voucher) == str:
             currency_voucher = currency_voucher.replace("'" , '"')
             currency_voucher = json.loads(currency_voucher)
@@ -2391,31 +2423,49 @@ def update_vouchers(request):
             currency = curr.get('currency', None)
             id = curr.get('id', None)
             price = curr.get('price', None)
+            voucher = curr.get('voucher', None)
+
+            
+
+
             try:
                 currency_id = Currency.objects.get(id=currency)
             except Exception as err:
                 pass
-            if id is not None:
-                try:
-                    currency_price = VoucherCurrencyPrice.objects.get(id=id)
-                except Exception as err:
-                    pass
-                
-                currency_price.price = price
-                currency_price.save()
             
-            elif currency_id is not None: 
-                try:
-                    currency_price = VoucherCurrencyPrice.objects.get(currency=currency_id)
-                    currency_price.price = price
-                    currency_price.save()
-                except Exception as err:
-                    #pass
-                    services_obj = VoucherCurrencyPrice.objects.create(
+            services_obj = VoucherCurrencyPrice.objects.create(
                         voucher = vouchers,
                         currency = currency_id,
                         price = price,
                     )
+
+            # try:
+            #     voucher_id = Vouchers.objects.get(id=voucher)
+            # except Exception as err:
+            #     expt = ExceptionRecord.objects.create(text= 'voucher found ' + str(err))
+            #     expt.save()
+            #     pass
+            
+            # # if id is not None:
+            # #     try:
+            # #         currency_price = VoucherCurrencyPrice.objects.get(id=id)
+            # #     except Exception as err:
+            # #         pass
+                
+            # #     currency_price.price = price
+            # #     currency_price.save()
+            
+            # if currency_id is not None: 
+            #     if id is not None:
+            #         currency_price = VoucherCurrencyPrice.objects.get(currency=currency_id, voucher = voucher_id)
+            #         currency_price.price = price
+            #         currency_price.save()
+            #     else:
+            #         services_obj = VoucherCurrencyPrice.objects.create(
+            #             voucher = vouchers,
+            #             currency = currency_id,
+            #             price = price,
+            #         )
     serializer = VoucherSerializer(vouchers, data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(
@@ -2434,8 +2484,9 @@ def update_vouchers(request):
         {
             'status' : True,
             'status_code' : 200,
+            'message':'',
             'response' : {
-                'message' : 'Update Voucher Successfully',
+                'message' : 'You have updated the Voucher',
                 'error_message' : None,
                 'voucher' : serializer.data
             }
@@ -2625,7 +2676,7 @@ def get_client_all_vouchers(request):
 
     try:
         client_vouchers = VoucherOrder.objects.filter(
-            location__id = location_id,
+            # location__id = location_id,
             client__id = client_id,
         )
     except Exception as error:
@@ -2663,25 +2714,11 @@ def get_client_all_memberships(request):
     location_id = request.GET.get('location_id', None)
     client_id = request.GET.get('client_id', None)
 
-    try:
-        client_membership = MemberShipOrder.objects.filter(
-            location__id = location_id,
-            client__id = client_id,
-        )
-    except Exception as error:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : 404,
-                'response' : {
-                    'message' : 'No Membership is found on this location against this Client',
-                    'error_message' : str(error),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
-    
-    serialized = ClientMembershipsSerializer(client_membership, many=True)
+    client_membership = MemberShipOrder.objects.filter(
+        # location__id = location_id,
+        client__id = client_id,
+    )
+    data = ClientMembershipsSerializer(client_membership, many=True).data
        
     return Response(
         {
@@ -2690,7 +2727,7 @@ def get_client_all_memberships(request):
             'response' : {
                 'message' : 'Client Available Memberships',
                 'error_message' : None,
-                'client_memberships' : serialized.data
+                'client_memberships' : list(data)
             }
         },
         status=status.HTTP_200_OK
@@ -3065,9 +3102,12 @@ def get_customer_detailed_loyalty_points(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+    
+    
+    queries = {}
     clients_list = []
     if client_id is not None:
-        clients_list.append(client_id)
+        queries['client_id'] = client_id
 
     customers_points = LoyaltyPointLogs.objects.select_related(
         'location',
@@ -3078,7 +3118,8 @@ def get_customer_detailed_loyalty_points(request):
         location__id = location_id,
         created_at__date__range = (start_date, end_date),
         is_active = True,
-        is_deleted = False
+        is_deleted = False,
+        **queries
     ).order_by('-created_at')
 
     all_loyality_logs_count= customers_points.count()
@@ -3105,6 +3146,54 @@ def get_customer_detailed_loyalty_points(request):
                 'per_page_result':20,
                 'error_message' : None,
                 'data' : data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def check_client_existance(request):
+    email = request.data.get('email', None)
+    phone_number = request.data.get('phone_number', None)
+    
+    fields = []
+
+   
+    if all([email, phone_number]):
+        clients = Client.objects.filter(
+            Q(email__icontains = email) |
+            Q(mobile_number__icontains = phone_number)
+        )
+    else:
+        query = {}
+        if email:
+            query['email__icontains'] = email
+        else :
+            query['mobile_number__icontains'] = phone_number
+
+        clients = Client.objects.filter(
+            **query
+        )
+
+    for client in clients:
+        if client.email == email:
+            fields.append('EMAIL')
+        
+        if client.mobile_number == phone_number:
+            fields.append('PHONE_NUMBER')
+
+
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Existing fields for Client',
+                'fields' : set(fields),
+                'email' : email,
+                'phone_number' : phone_number,
             }
         },
         status=status.HTTP_200_OK

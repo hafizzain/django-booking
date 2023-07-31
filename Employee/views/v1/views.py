@@ -34,7 +34,7 @@ from Authentication.models import AccountType, User, VerificationOTP
 from NStyle.Constants import StatusCodes
 import json
 from Utility.models import NstyleFile
-from django.db.models import Q
+from django.db.models import Q, F, Sum, When, Case, IntegerField, FloatField
 import csv
 from Utility.models import GlobalPermissionChoices
 from Permissions.models import EmployePermission
@@ -314,7 +314,11 @@ def search_employee(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_Employees(request):
-    all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
+    # total_sale = ?
+    all_employe= Employee.objects.filter(
+        is_deleted=False, 
+        is_blocked=False
+    ).order_by('-created_at')
     all_employee_count = all_employe.count()
     
     page_count = all_employee_count / 20
@@ -328,6 +332,8 @@ def get_Employees(request):
         all_employe = paginator.get_page(page_number)
 
         serialized = singleEmployeeSerializer(all_employe,  many=True, context={'request' : request} )
+        data = serialized.data
+        # sorted_data = sorted(data, key=lambda x: x['totoal_sale'], reverse=True)
         return Response(
             {
                 'status' : 200,
@@ -338,13 +344,15 @@ def get_Employees(request):
                     'pages':page_count,
                     'per_page_result':20,
                     'error_message' : None,
-                    'employees' : serialized.data
+                    'employees' : data
                 }
             },
             status=status.HTTP_200_OK
         )
     else:
         serialized = singleEmployeeSerializer(all_employe,  many=True, context={'request' : request} )
+        data = serialized.data
+        # sorted_data = sorted(data, key=lambda x: x['total_sale'], reverse=True)
         return Response(
             {
                 'status' : 200,
@@ -355,7 +363,7 @@ def get_Employees(request):
                     'pages':page_count,
                     'per_page_result':20,
                     'error_message' : None,
-                    'employees' : serialized.data
+                    'employees' : data
                 }
             },
             status=status.HTTP_200_OK
@@ -481,7 +489,7 @@ def single_employee_schedule(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def working_schedule(request):
-    all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
+    all_employe= Employee.objects.filter(is_active=True, is_deleted=False, is_blocked=False).order_by('-created_at')
     serialized = WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request,} )
    
     return Response(
@@ -1207,17 +1215,17 @@ def update_employee(request):
         serializer.save()
         data.update(serializer.data)
     else: 
-            return Response(
-        {
-            'status' : False,
-            'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
-            'response' : {
-                'message' : 'Invialid Data',
-                'error_message' : str(serializer.errors),
-            }
-        },
-        status=status.HTTP_404_NOT_FOUND
-    )
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                'response' : {
+                    'message' : 'Invialid Data',
+                    'error_message' : str(serializer.errors),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
     return Response(
         {
             'status' : True,
@@ -1228,8 +1236,7 @@ def update_employee(request):
                 'Employee' : data
             }
         },
-        status=status.HTTP_200_OK
-        )
+        status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -1675,21 +1682,29 @@ def update_staff_group(request):
 def get_attendence(request):
     # all_attendence= Attendance.objects.all()
     # serialized = AttendanceSerializers(all_attendence, many=True, context={'request' : request})
+
+    location = request.GET.get('location', None)
+    start_date = request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
     
     
-    all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
+    all_employe= Employee.objects.filter(
+        is_deleted=False, 
+        is_blocked=False,
+        location__id = location
+    ).order_by('-created_at')
     all_employe_count= all_employe.count()
 
-    page_count = all_employe_count / 20
+    page_count = all_employe_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_employe, 20)
+    paginator = Paginator(all_employe, 10)
     page_number = request.GET.get("page") 
     all_employe = paginator.get_page(page_number)
 
 
-    serialized = Payroll_WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request,} )
+    serialized = Payroll_WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request, 'start_date' : start_date, 'end_date' : end_date } )
     
     return Response(
         {
@@ -1699,7 +1714,7 @@ def get_attendence(request):
                 'message' : 'All Attendance',
                 'count':all_employe_count,
                 'pages':page_count,
-                'per_page_result':20,
+                'per_page_result':10,
                 'error_message' : None,
                 'attendance' : serialized.data
             }
@@ -2119,19 +2134,37 @@ def create_sallaryslip(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_payrol_working(request):
-    all_employe= Employee.objects.filter(is_deleted=False, is_blocked=False).order_by('employee_employedailyschedule__date')
+    location_id = request.GET.get('location', None)
+    employee_id = request.GET.get('employee_id', None)
+    start_date = request.GET.get('start_date', None) # '2023-07-01'
+    end_date = request.GET.get('end_date', None)
+
+    queries = {}
+
+    if location_id:
+        queries['location'] = location_id
+    
+    if employee_id:
+        queries['id__in'] = [employee_id]
+
+    all_employe= Employee.objects.filter(
+        is_deleted = False, 
+        is_blocked = False,
+        **queries
+    )
+    # .order_by('employee_employedailyschedule__date')
     all_employe_count= all_employe.count()
 
-    page_count = all_employe_count / 20
+    page_count = all_employe_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_employe, 20)
+    paginator = Paginator(all_employe, 10)
     page_number = request.GET.get("page") 
     all_employe = paginator.get_page(page_number)
 
 
-    serialized = Payroll_WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request,} )
+    serialized = Payroll_WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request, 'start_date' : start_date, 'end_date' : end_date} )
    
     return Response(
         {
@@ -2141,7 +2174,7 @@ def get_payrol_working(request):
                 'message' : 'All Employee',
                 'count':all_employe_count,
                 'pages':page_count,
-                'per_page_result':20,
+                'per_page_result':10,
                 'error_message' : None,
                 'employees' : serialized.data
             }
@@ -2351,6 +2384,7 @@ def create_commission(request):
                     commission_percentage = commission_per,
                     symbol = symbol,
                     category_comission = 'Service',
+                    comission_choice = 'percentage' if '%' in symbol else 'currency'
                 )
             except Exception as err:
                 ExceptionRecord.objects.create(
@@ -2384,6 +2418,7 @@ def create_commission(request):
                     commission_percentage = commission_per,
                     symbol = symbol,
                     category_comission = 'Retail',
+                    comission_choice = 'percentage' if '%' in symbol else 'currency'
                 )
             except Exception as err:
                 ExceptionRecord.objects.create(
@@ -2418,6 +2453,7 @@ def create_commission(request):
                     commission_percentage = commission_per,
                     symbol = symbol,
                     category_comission = 'Voucher',
+                    comission_choice = 'percentage' if '%' in symbol else 'currency'
                 )           
             except Exception as err:
                 ExceptionRecord.objects.create(
@@ -2702,6 +2738,7 @@ def update_commision(request):
                     commision_ser.to_value = to_value
                     commision_ser.commission_percentage = commission_per
                     commision_ser.symbol = symbol
+                    commision_ser.comission_choice = 'percentage' if '%' in symbol else 'currency'
                     commision_ser.save()           
                     
                 except Exception as err:
@@ -2714,6 +2751,7 @@ def update_commision(request):
                     commission_percentage = commission_per,
                     symbol = symbol,
                     category_comission = 'Service',
+                    comission_choice = 'percentage' if '%' in symbol else 'currency'
                 )
                 
     if product_comission is not None:
@@ -2742,6 +2780,7 @@ def update_commision(request):
                     commision_ser.to_value = to_value
                     commision_ser.commission_percentage = commission_per
                     commision_ser.symbol = symbol
+                    commision_ser.comission_choice = 'percentage' if '%' in symbol else 'currency'
                     commision_ser.save()           
                     
                 except Exception as err:
@@ -2754,6 +2793,7 @@ def update_commision(request):
                     commission_percentage = commission_per,
                     symbol = symbol,
                     category_comission = 'Retail',
+                    comission_choice = 'percentage' if '%' in symbol else 'currency'
                 )
                 
     if voucher_comission is not None:
@@ -2782,6 +2822,7 @@ def update_commision(request):
                     commision_ser.to_value = to_value
                     commision_ser.commission_percentage = commission_per
                     commision_ser.symbol = symbol
+                    commision_ser.comission_choice = 'percentage' if '%' in symbol else 'currency'
                     commision_ser.save()           
                     
                 except Exception as err:
@@ -2794,6 +2835,7 @@ def update_commision(request):
                     commission_percentage = commission_per,
                     symbol = symbol,
                     category_comission = 'Voucher',
+                    comission_choice = 'percentage' if '%' in symbol else 'currency'
                 )    
     try:
         employee_id=Employee.objects.get(id=employee)
@@ -3417,72 +3459,71 @@ def create_vacation_emp(request):
     working_sch = None
     days = int(diff.days)
 
-    empl_vacation = Vacation(
+    empl_vacation = Vacation.objects.create(
         business = business,
         employee = employee_id,
         from_date = from_date,
         to_date = to_date,
         note = note
     )
-    if days > 0 :
-        for i, value in enumerate(range(days+1)):
-            if i == 0:
-                from_date = from_date 
-            else:
-                from_date = from_date + timedelta(days=1)
-            try:
-                working_sch = EmployeDailySchedule.objects.get(
-                    employee = employee_id,   
-                    date = from_date
-                )
-            except Exception as err:
-                pass
+    for i, value in enumerate(range(days+1)):
+        if i == 0:
+            from_date = from_date 
+        else:
+            from_date = from_date + timedelta(days=1)
+        try:
+            working_sch = EmployeDailySchedule.objects.get(
+                employee = employee_id,   
+                date = from_date
+            )
+        except Exception as err:
+            pass
+        
+        if working_sch is not None:
+            #date_obj = datetime.fromisoformat(from_date)
             
-            if working_sch is not None:
-                #date_obj = datetime.fromisoformat(from_date)
+            working_sch.is_vacation = True
+            empl_vacation.save()
+            working_sch.vacation = empl_vacation
+            working_sch.from_date = from_date
+            working_sch.save()
+            working_sch = None
+            
+        else:   
+            working_schedule = EmployeDailySchedule.objects.create(
+                user = user,
+                business = business ,
+                employee = employee_id,
+                day = day,
+                start_time = start_time,
+                end_time = end_time,
+                start_time_shift = start_time_shift,
+                end_time_shift = end_time_shift,
                 
-                working_sch.is_vacation = True
+                date = from_date,
+                from_date =from_date,
+                to_date = to_date,
+                note = note,
+                
+            )    
+            if is_vacation is not None:
+                working_schedule.is_vacation = True
                 empl_vacation.save()
-                working_sch.vacation = empl_vacation
-                working_sch.from_date = from_date
-                working_sch.save()
-                working_sch = None
+                working_schedule.vacation = empl_vacation
+            else:
+                working_schedule.is_vacation = False
                 
-            else:   
-                working_schedule = EmployeDailySchedule.objects.create(
-                    user = user,
-                    business = business ,
-                    employee = employee_id,
-                    day = day,
-                    start_time = start_time,
-                    end_time = end_time,
-                    start_time_shift = start_time_shift,
-                    end_time_shift = end_time_shift,
-                    
-                    date = from_date,
-                    from_date =from_date,
-                    to_date = to_date,
-                    note = note,
-                    
-                )    
-                if is_vacation is not None:
-                    working_schedule.is_vacation = True
-                    empl_vacation.save()
-                    working_schedule.vacation = empl_vacation
-                else:
-                    working_schedule.is_vacation = False
-                    
-                if is_leave is not None:
-                    working_schedule.is_leave = True
-                else:
-                    working_schedule.is_leave = False
-                if is_off is not None:
-                    working_schedule.is_off = True
-                else:
-                    working_schedule.is_off = False
-                
-                working_schedule.save()
+            if is_leave is not None:
+                working_schedule.is_leave = True
+            else:
+                working_schedule.is_leave = False
+            if is_off is not None:
+                working_schedule.is_off = True
+            else:
+                working_schedule.is_off = False
             
+            working_schedule.save()
+        
     all_employe= EmployeDailySchedule.objects.all().order_by('created_at')
     serialized = ScheduleSerializer(all_employe, many=True, context={'request' : request})
     return Response(
@@ -3587,6 +3628,8 @@ def create_absence(request):
     
     # from_date ='2023-01-04'
     # to_date ='2023-01-06'
+    if not to_date:
+        to_date = from_date
     
     from_date = datetime.strptime(from_date, "%Y-%m-%d")
     to_date = datetime.strptime(to_date, "%Y-%m-%d")
@@ -3594,6 +3637,7 @@ def create_absence(request):
     # print(diff.days)
     working_sch = None
     days = int(diff.days)
+    days = days + 1
     print(days)
     empl_absence = Vacation(
         business = business,
@@ -3734,24 +3778,22 @@ def create_workingschedule(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
             
-    working_schedule = EmployeDailySchedule.objects.create(
+    working_schedule, created = EmployeDailySchedule.objects.get_or_create(
         user = user,
         business = business ,
         employee = employee_id,
-        day = day,
-        
-        start_time = start_time,
-        end_time = end_time,
-        start_time_shift = start_time_shift,
-        end_time_shift = end_time_shift,
-        
-        from_date =from_date,
-        to_date = to_date,
-        note = note,
-        
         date = date,
+    )
+
+    working_schedule.day = day
+    working_schedule.start_time = start_time
+    working_schedule.end_time = end_time
+    working_schedule.start_time_shift = start_time_shift
+    working_schedule.end_time_shift = end_time_shift
+    working_schedule.from_date = from_date
+    working_schedule.to_date = to_date
+    working_schedule.note = note
         
-    )    
     if is_vacation is not None:
         working_schedule.is_vacation = True
     else:
@@ -3809,7 +3851,7 @@ def create_workingschedule(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_vacations(request):
-    # employee_id = request.data.get('employee', None)
+    employee_id = request.GET.get('employee', None)
     location = request.GET.get('location', None)
 
     if not all([location]):
@@ -3862,21 +3904,24 @@ def get_vacations(request):
     
     # employee= Employee.objects.get(id = employee_id.id, is_deleted=False, is_blocked=False)
 
+    queries = {}
+    if employee_id:
+        queries['employee__id'] = employee_id
     allvacations = Vacation.objects.filter(
         # employee = employee, 
         employee__location = location,
         holiday_type = 'Vacation',
         is_active = True,  
-        
-    )
+        **queries
+    ).order_by('-created_at')
     
     allvacations_count = allvacations.count()
 
-    page_count = allvacations_count / 20
+    page_count = allvacations_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(allvacations, 20)
+    paginator = Paginator(allvacations, 10)
     page_number = request.GET.get("page", None)
     if page_number is not None: 
         allvacations = paginator.get_page(page_number)
@@ -3891,7 +3936,7 @@ def get_vacations(request):
                     'message' : f'Page {page_number} Schedule',
                     'count':allvacations_count,
                     'pages':page_count,
-                    'per_page_result':20,
+                    'per_page_result':10,
                     'error_message' : None,
                     'vacations' : serialized.data
                 }
@@ -3905,8 +3950,10 @@ def get_vacations(request):
                 'status' : 200,
                 'status_code' : '200',
                 'response' : {
-                    'message' : 'All Schedule',
+                    'message' : f'Page {page_number} Schedule',
                     'count':allvacations_count,
+                    'pages':page_count,
+                    'per_page_result':10,
                     'error_message' : None,
                     'vacations' : serialized.data
                 }
@@ -3920,6 +3967,7 @@ def get_vacations(request):
 @permission_classes([AllowAny])
 def get_absence(request):
     location = request.GET.get('location', None)
+    employee_id = request.GET.get('employee', None)
 
     if not all([location]):
         return Response(
@@ -3971,13 +4019,17 @@ def get_absence(request):
     
     # employee= Employee.objects.get(id = employee_id.id, is_deleted=False, is_blocked=False)
 
+    queries = {}
+    if employee_id:
+        queries['employee__id'] = employee_id
+
     allvacations = Vacation.objects.filter(
         # employee = employee, 
         employee__location = location,
         holiday_type ='Absence',
         is_active = True, 
-        
-    )
+        **queries
+    ).order_by('-created_at')
     
     allvacations_count = allvacations.count()
 
@@ -4498,8 +4550,7 @@ def employee_login(request):
             is_deleted=False,
             #user_account_type__account_type = 'Employee'
         )
-        user = authenticate(username=user_id.username, password=password)
-        if user is None:
+        if not user_id.check_password(password):
             return Response(
                 {
                     'status' : False,
@@ -4512,10 +4563,43 @@ def employee_login(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
+        else:
+            user = user_id
         try:
             token = Token.objects.get(user=user)
         except Token.DoesNotExist:
            token = Token.objects.create(user=user)
+        
+        try:
+            employee = Employee.objects.get(
+                email__icontains = user.email,
+                is_deleted = False
+            )
+        except:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 404,
+                    'status_code_text' : 'EMPLOYEEE_IS_DELETED',
+                    'response' : {
+                        'message' : 'User Does not exist',
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        else:
+            if not employee.is_active:
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : 403,
+                        'status_code_text' : 'EMPLOYEEE_IS_INACTIVE',
+                        'response' : {
+                            'message' : 'Employee is inactive',
+                        }
+                    },
+                    status=status.HTTP_403_FORBIDDEN
+                )
             
         serialized = UserEmployeeSerializer(user, context = {'tenant': employee_tenant.tenant, 'token': token.key })
     
@@ -5000,5 +5084,36 @@ def set_password(request):
             }
         },
         status=status.HTTP_200_OK
+    )
+            
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def check_employee_existance(request):
+    email = request.GET.get('email', None) 
+
+    employees = User.objects.filter(email = email)
+    if len(employees) > 0:
+        return Response(
+            {
+                'status' : 200,
+                'status_code' : '200',
+                'response' : {
+                    'message' : 'Employee Exist!',
+                    'error_message' : None,
+                }
+            },
+            status=status.HTTP_200_OK 
+        )
+    return Response(
+        {
+            'status' : 404,
+            'status_code' : '404',
+            'response' : {
+                'message' : 'Employee does not exists!',
+                'error_message' : None,
+            }
+        },
+        status=status.HTTP_404_NOT_FOUND
     )
             
