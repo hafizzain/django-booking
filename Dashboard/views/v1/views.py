@@ -652,7 +652,9 @@ def get_total_sales_device(request):
         
         dashboard_data.append({
             'month' : month,
-            'count' : count + count_app
+            'count' : count + count_app,
+            'index' : index,
+
         })
 
     return Response(
@@ -663,7 +665,9 @@ def get_total_sales_device(request):
                 'message': 'Graph for mobile',
                 'error_message': None,
                 'dashboard': dashboard_data,
-                'total_sales': total_price
+                'total_sales': total_price,
+                'total_checkout_orders' : len(checkout_orders_total),
+                'total_app_orders' : len(apps_checkouts_total),
             }
         },
         status=status.HTTP_200_OK
