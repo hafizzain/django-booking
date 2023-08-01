@@ -66,7 +66,7 @@ NSTYLE_APPS = [
     'Reports.apps.ReportsConfig',
     'Invoices.apps.InvoicesConfig',
     'Help.apps.HelpConfig',
-    'Translations.apps.TranslationsConfig',
+    # 'Translations.apps.TranslationsConfig',
     'SuperInsight.apps.SuperinsightConfig',
 ]
 
