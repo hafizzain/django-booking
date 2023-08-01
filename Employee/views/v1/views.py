@@ -1237,6 +1237,100 @@ def update_employee(request):
             }
         },
         status=status.HTTP_200_OK)
+    
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_employee_device(request): 
+    # sourcery skip: avoid-builtin-shadow
+    id = request.data.get('id', None)
+    full_name = request.data.get('full_name', None)
+    
+    country = request.data.get('country', None) 
+    city = request.data.get('city', None) 
+    state = request.data.get('state', None) 
+    phone_number=request.data.get('mobile_number',None)
+    image=request.data.get('image',None)
+    postal_code=request.data.get('postal_code',None)
+    address=request.data.get('address',None)
+    
+    Errors = []
+    
+    if id is None:
+        return Response(
+        {
+            'status' : False,
+            'status_code' : StatusCodes.MISSING_FIELDS_4001,
+            'status_code_text' : 'MISSING_FIELDS_4001',
+            'response' : {
+                'message' : 'Invalid Data!',
+                'error_message' : 'User id is required',
+                'fields' : [
+                    'id',
+                ]
+            }
+        },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        employee = Employee.objects.get(id=id)
+    except Exception as err:
+            return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
+                'status_code_text' : 'INVALID_NOT_FOUND_EMPLOYEE_ID_4022',
+                        'response' : {
+                    'message' : 'Employee Not Found',
+                    'error_message' : str(err),
+                }
+            },
+                status=status.HTTP_404_NOT_FOUND
+            )
+    
+        
+    employee.full_name = full_name
+    employee.mobile_number = phone_number
+    employee.postal_code = postal_code
+    employee.address = address
+
+
+    if image is not None:
+        employee.image=image
+       
+    if country is not None:
+        try:
+            country= Country.objects.get(id=country)
+            employee.country = country
+        except:
+            country = None
+            
+    if state is not None:
+        try:
+            state= State.objects.get(id=state)
+            employee.state = state
+        except:
+            state = None
+            
+    if city is not None:
+        try:
+            city= City.objects.get(id=city)
+            employee.city = city
+        except:
+            city = None
+
+    employee.save()
+    serializer = EmployeSerializer(employee, context={'request' : request,})
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : ' Employee updated successfully',
+                'error_message' : Errors,
+                'Employee' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
