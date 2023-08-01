@@ -820,7 +820,7 @@ def update_appointment(request):
         service_appointment.appointment_time = start_time
 
         duration = DURATION_CHOICES[service_appointment.duration]
-        app_date_time = datetime.fromisoformat(start_time)
+        app_date_time = datetime.fromisoformat(f'{service_appointment.appointment_date} {start_time}')
         datetime_duration = app_date_time + timedelta(minutes=duration)
         datetime_duration = datetime_duration.strftime('%H:%M:%S')
 
