@@ -226,7 +226,7 @@ def get_appointments_device(request):
 @permission_classes([AllowAny])
 def get_today_appointments(request):
     today = date.today()
-    today_appointment = AppointmentService.objects.filter(appointment_date__icontains = today, is_blocked=False )
+    today_appointment = AppointmentService.objects.filter(appointment_date__icontains = today, is_blocked=False ).exclude(appointment_status='Cancel')
     serialize = TodayAppoinmentSerializer(today_appointment, many=True)
     return Response(
         {
