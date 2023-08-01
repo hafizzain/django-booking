@@ -1413,7 +1413,7 @@ def update_location(request):
     if is_publish is not None:
         business_address.is_publish = True
     else:
-        business_address.is_publish = False
+        business_address.is_publish = business_address.is_publish
         
     
     if images is not None:
