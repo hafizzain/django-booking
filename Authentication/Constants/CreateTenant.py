@@ -21,7 +21,6 @@ from django.conf import  settings
 from django_tenants.utils import tenant_context
 from Authentication.models import AccountType, User, NewsLetterDetail
 from Authentication.Constants import AuthTokenConstants
-from Authentication.Constants.UserConstants import create_user_account_type
 from threading import Thread
 from Service.models import PriceService, Service, ServiceGroup
 from datetime import date, timedelta

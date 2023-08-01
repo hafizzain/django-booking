@@ -1,0 +1,68 @@
+{% extends 'SuperAdminPanel/main.html' %} {% block body %}
+<script>
+  SideBarActive("language");
+</script>
+
+<div class="flex flex-col gap-6">
+    <p>Language Detail Data</p>
+  </h2>
+
+
+
+  <h1>Add New Below</h1>
+  <form method="post" action='/api/v1/multilanguage/addviewforms/'>
+      {% csrf_token %}
+      <div class="grid lg:grid-cols-4 gap-4 !mx-0">
+        <input value="{{language}}" required hidden name="language">
+          <div class="flex flex-col gap-2">
+              <input min="" type="text"
+                  class="disable_prev_dates inputs Start_Date border rounded-md date-sm outline-none lg:px-4 px-2 lg:py-3 py-2.5 placeholder:text-A1A1A1 text-101928 focus:border-205a42 ease-in transition-all focus:border-l-8 "
+                  name="english_name" required>
+          </div>                    
+          <div class="flex flex-col gap-2">
+              <input min="" type="text"
+                  class="disable_prev_dates End_Date inputs border rounded-md date-sm outline-none lg:px-4 px-2 lg:py-3 py-2.5 placeholder:text-A1A1A1 text-101928 focus:border-205a42 ease-in transition-all focus:border-l-8 "
+                  name="value" required>
+          </div>
+          <button class="submit_btn___ px-4 py-2 text-sm text-black font-semibold bg-primary rounded-md w-fit ml-auto" type="submit">Add</button>
+  
+  
+      </div>
+  </form>
+      
+      <div class="grid lg:grid-cols-4 gap-4 !mx-0">
+          <p>English: <span class='text-red-600'>*</span></p>
+          <p>Arabic: <span class='text-red-600'>*</span></p>
+      </div>
+      <br>
+
+
+
+
+{% for i in trans%}
+    <form method="post" action='/api/v1/multilanguage/editviewforms/'>
+        {% csrf_token %}
+        <div class="grid lg:grid-cols-4 gap-4 !mx-0">
+          <input value="{{i.language}}" required hidden name="language">
+
+            <div class="flex flex-col gap-2">
+                <input min="" type="text"
+                    class="disable_prev_dates inputs Start_Date border rounded-md date-sm outline-none lg:px-4 px-2 lg:py-3 py-2.5 placeholder:text-A1A1A1 text-101928 focus:border-205a42 ease-in transition-all focus:border-l-8 "
+                    value="{{i.order}} - {{i.english_name}}" name="english_name" required>
+            </div>                    
+            <div class="flex flex-col gap-2">
+                <input min="" type="text"
+                    class="disable_prev_dates End_Date inputs border rounded-md date-sm outline-none lg:px-4 px-2 lg:py-3 py-2.5 placeholder:text-A1A1A1 text-101928 focus:border-205a42 ease-in transition-all focus:border-l-8 "
+                    value="{{i.value}}" name="value" required>
+            </div>
+            <input name="id" required value='{{i.id}}' hidden>
+
+            <button class="submit_btn___ px-4 py-2 text-sm text-black font-semibold bg-primary rounded-md w-fit ml-auto" type="submit">Edit</button>
+    
+        </div>
+    </form>
+    {% endfor %}
+
+
+
+{% endblock body %}

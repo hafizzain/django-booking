@@ -23,8 +23,8 @@ from rest_framework import status
 from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Business.models import Business , BusinessAddress, ClientNotificationSetting, StaffNotificationSetting
 from datetime import datetime
-from Order.models import Checkout, MemberShipOrder, ProductOrder, VoucherOrder
-from Sale.serializers import MemberShipOrderSerializer, ProductOrderSerializer, VoucherOrderSerializer
+from Order.models import Checkout, MemberShipOrder, ProductOrder, VoucherOrder, ServiceOrder
+from Sale.serializers import MemberShipOrderSerializer, ProductOrderSerializer, VoucherOrderSerializer, ServiceOrderSerializer
 
 #from Service.models import Service
 from Service.models import Service
@@ -45,6 +45,7 @@ from django_tenants.utils import tenant_context
 from Utility.models import ExceptionRecord
 from django.db.models import Prefetch
 from Invoices.models import SaleInvoice
+from Reports.models import DiscountPromotionSalesReport
 
 
 @api_view(['GET'])
@@ -191,15 +192,6 @@ def get_appointments_device(request):
     
     try:
         appointment = Appointment.objects.filter(appointment_services__member = employee ).order_by('-created_at').distinct()
-#appointment = Appointment.objects.filter(member = employee )
-        # .prefetch_related(
-        #     Prefetch('appointment_services', queryset=AppointmentService.objects.filter(member=employee))#[0]
-        # )
-        
-    #     #prefetch_related('appointment_services')
-    # except Appointment.MultipleObjectsReturned:
-    #     appointment = Appointment.objects.filter(appointment_services__member = employee )
-        
     except Exception as err:
         return Response(
                 {
@@ -254,39 +246,68 @@ def get_today_appointments(request):
 @permission_classes([AllowAny])
 def get_all_appointments(request):
     location_id = request.GET.get('location', None)
+    appointment_status = request.GET.get('appointment_status', None)
+
     paginator = CustomPagination()
     paginator.page_size = 10
-    
+# Upcomming
+# Completed
+# Cancelled
+    queries = {}
+
+    if appointment_status is not None:
+        if appointment_status == 'Upcomming':
+            queries['appointment_status__in'] = ['Appointment_Booked', 'Appointment Booked', 'Arrived', 'In Progress']
+        elif appointment_status == 'Completed':
+            queries['appointment_status__in'] = ['Done', 'Paid']
+        elif appointment_status == 'Cancelled':
+            queries['appointment_status__in'] = ['Cancel']
+        
     if location_id is not None:
-        test = AppointmentService.objects.filter(
-            is_blocked=False,
-            business_address__id = location_id,
-        ).order_by('-created_at')
-        paginated_checkout_order = paginator.paginate_queryset(test, request)
-    else:
-        test = AppointmentService.objects.filter(
-            is_blocked=False,
-        #business_address__id = location_id,
-        ).order_by('-created_at')
-        paginated_checkout_order = paginator.paginate_queryset(test, request)
+        queries['business_address__id'] = location_id
+
+    test = AppointmentService.objects.filter(
+        is_blocked=False,
+        **queries
+    ).order_by('-created_at')
+    paginated_checkout_order = paginator.paginate_queryset(test, request)
     serialize = AllAppoinmentSerializer(paginated_checkout_order, many=True)
     
     return paginator.get_paginated_response(serialize.data, 'appointments' )
+
     
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_all_appointments_no_pagination(request):
+    location_id = request.GET.get('location', None)
+    appointment_status = request.GET.get('appointment_status', None)
+
+    paginator = CustomPagination()
+    paginator.page_size = 1000000
+# Upcomming
+# Completed
+# Cancelled
+    queries = {}
+
+    if appointment_status is not None:
+        if appointment_status == 'Upcomming':
+            queries['appointment_status__in'] = ['Appointment_Booked', 'Appointment Booked', 'Arrived', 'In Progress']
+        elif appointment_status == 'Completed':
+            queries['appointment_status__in'] = ['Done', 'Paid']
+        elif appointment_status == 'Cancelled':
+            queries['appointment_status__in'] = ['Cancel']
+        
+    if location_id is not None:
+        queries['business_address__id'] = location_id
+
+    test = AppointmentService.objects.filter(
+        is_blocked=False,
+        **queries
+    ).order_by('-created_at')
+    paginated_checkout_order = paginator.paginate_queryset(test, request)
+    serialize = AllAppoinmentSerializer(paginated_checkout_order, many=True)
     
-    # return Response(
-    #     {
-    #         'status' : 200,
-    #         'status_code' : '200',
-    #         'response' : {
-    #             'message' : 'All Appointment',
-    #             'error_message' : None,
-    #             'appointments' : serialize.data
-    #             #'appointments' : sale_data
-    #         }
-    #     },
-    #     status=status.HTTP_200_OK
-    # )
+    return paginator.get_paginated_response(serialize.data, 'appointments' )
 
     
 @api_view(['GET'])
@@ -1305,6 +1326,34 @@ def create_blockTime(request):
         end_time = datetime_duration
     except Exception as err:
         ExceptionRecord.objects.create(text=f'Errors happer in end linr 1180 {str(err)}')
+    # start_time
+    # tested
+
+    block_time_start = start_time
+    block_time_end = tested
+    current_appointments = AppointmentService.objects.filter(
+        Q(appointment_time__range = (block_time_start, block_time_end)) |
+        Q(end_time__range = (block_time_start, block_time_end)),
+        business = business,
+        member = member,
+        appointment_date = date,
+        is_deleted = False
+    ).exclude(
+        appointment_status__in = ['Done', 'Paid', 'Cancel']
+    )
+
+    if len(current_appointments) > 0:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'response' : {
+                    'message' : 'You already have appointment in this time.',
+                    'error_message' : None,
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        ) 
     
     block_time = AppointmentService.objects.create(
             user = user,
@@ -1590,7 +1639,11 @@ def create_checkout(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-
+    try:
+        business_address = BusinessAddress.objects.get(id = str(business_address))
+    except Exception as err:
+        business_address = None
+        
     if type(tip) == str:
         tip = json.loads(tip)
     if type(tip) == list:
@@ -1615,36 +1668,52 @@ def create_checkout(request):
                 pass
         
         
-    try:
-        business_address = BusinessAddress.objects.get(id = str(business_address))
-    except Exception as err:
-        business_address = None
+    
     if type(appointment_service_obj) == str:
             appointment_service_obj = json.loads(appointment_service_obj)
 
     elif type(appointment_service_obj) == list:
         pass
+
+    empl_commissions_instances = []
     for app in appointment_service_obj:
+        active_user_staff = None
+        try:
+            active_user_staff = Employee.objects.get(
+                email = request.user.email,
+                is_deleted = False,
+                is_active = True,
+                is_blocked = False
+            )
+        except:
+            pass
         id = app.get('id', None)
         try:
             service_appointment = AppointmentService.objects.get(id=id)
             service_appointment.appointment_status= 'Done'
             service_appointment.save()
+            appointment_logs = AppointmentLogs.objects.create( 
+                location = service_appointment.business_address,
+                appointment = service_appointment.appointment,
+                log_type = 'Done',
+                member = active_user_staff
+            )
         except Exception as err:
             pass
         else:
-            total_price = service_appointment.total_price * 1
+            service_total_price = (service_appointment.total_price or service_appointment.price) * 1
 
             sale_commissions = CategoryCommission.objects.filter(
                 commission__employee = service_appointment.member,
-                from_value__lte = total_price,
+                # from_value__lte = total_price,
+                from_value__lte = service_total_price,
                 category_comission__iexact = 'Service'
             ).order_by('-from_value')
 
             if len(sale_commissions) > 0:
                 commission = sale_commissions[0]
 
-                calculated_commission = commission.calculated_commission(service_appointment.total_price)
+                calculated_commission = commission.calculated_commission(service_appointment.total_price or service_appointment.price)
                 employee_commission = EmployeeCommission.objects.create(
                     user = request.user,
                     business = business_address.business,
@@ -1654,7 +1723,7 @@ def create_checkout(request):
                     category_commission = commission,
                     commission_category = 'Service',
                     commission_type = commission.comission_choice,
-                    sale_value = service_appointment.total_price,
+                    sale_value = service_appointment.discount_price if service_appointment.discount_price else (service_appointment.total_price or service_appointment.price),
                     commission_rate = commission.commission_percentage,
                     commission_amount = calculated_commission,
                     symbol = commission.symbol,
@@ -1663,6 +1732,7 @@ def create_checkout(request):
                     quantity = 1,
                     tip = 0
                 )
+                empl_commissions_instances.append(employee_commission)
             
     # if gst is None:
     #     gst = 0
@@ -1702,40 +1772,64 @@ def create_checkout(request):
         service_commission = float(service_commission),
         service_commission_type = service_commission_type,        
     )
+
+    for i_employee_commission in empl_commissions_instances:
+        i_employee_commission.sale_id = checkout.id
+        i_employee_commission.save()
+
+
+    
     invoice = SaleInvoice.objects.create(
         appointment = appointments,
-        appointment_service = service_appointment,
+        appointment_service = f'{service_appointment.id}',
         payment_type = payment_method,
-        service = services,
-        member = members,
-        business_address=business_address,
+        service = f'{services.id}' if services else '',
+        member = f'{members.id}' if members else '',
+        business_address = f'{business_address.id}',
         # tip = tip,
         gst = gst,
         gst_price = gst_price,
         service_price = service_price,
         total_price = total_price,
         service_commission = float(service_commission),
-        service_commission_type = service_commission_type,        
+        service_commission_type = service_commission_type,      
+        checkout = f'{checkout.id}'
     )
     # checkout.business_address = service_appointment.business_address
     # checkout.save()
 
-    if is_promotion_availed:
-        checkout.is_promotion = True
-        checkout.selected_promotion_id = request.data.get('selected_promotion_id', '')
-        checkout.selected_promotion_type = request.data.get('selected_promotion_type', '')
-        checkout.save()
-        invoice.is_promotion = True
-        invoice.selected_promotion_id = request.data.get('selected_promotion_id', '')
-        invoice.selected_promotion_type = request.data.get('selected_promotion_type', '')
-        invoice.save()
+    try:
+        if checkout.appointment.is_promotion:
+            checkout.is_promotion = True
+            checkout.selected_promotion_id = checkout.appointment.selected_promotion_id
+            checkout.selected_promotion_type = checkout.appointment.selected_promotion_type
+            checkout.save()
+            invoice.is_promotion = True
+            invoice.selected_promotion_id = checkout.appointment.selected_promotion_id
+            invoice.selected_promotion_type = checkout.appointment.selected_promotion_type
+            invoice.save()
+    except Exception as err:
+        Errors.append(str(err))
+        pass
+
+    if checkout.appointment.is_promotion:
+        disc_sale = DiscountPromotionSalesReport(
+            checkout_id = checkout.id,
+            checkout_type = 'Appointment',
+            invoice = invoice,
+            promotion_id = checkout.appointment.selected_promotion_id,
+            promotion_type = checkout.appointment.selected_promotion_type,
+            user = checkout.appointment.user,
+            client = checkout.appointment.client,
+            location = checkout.business_address,
+        )
+        disc_sale.save()
 
 
     if appointments.client:
         logs_points_redeemed = 0
         logs_total_redeened_value = 0
         if all([is_redeemed, redeemed_id, redeemed_points]):
-            ExceptionRecord.objects.create(text=f'LOYALTY : is_redeemed : {is_redeemed} redeemed_id {redeemed_id} redeemed_points {redeemed_points}')
             try:
                 client_points = ClientLoyaltyPoint.objects.get(id = redeemed_id)
             except Exception as err:
@@ -1778,9 +1872,9 @@ def create_checkout(request):
             client_points, created = ClientLoyaltyPoint.objects.get_or_create(
                 location = business_address,
                 client = appointments.client,
-                loyalty_points = point
+                loyalty_points = point,
             )
-
+            # invoice = invoice.id
 
             loyalty_spend_amount = point.amount_spend
             loyalty_earned_points = point.number_points # total earned points if user spend amount point.amount_spend
@@ -1810,12 +1904,21 @@ def create_checkout(request):
                 points_earned = float(earned_points),
                 points_redeemed = logs_points_redeemed,
                 balance = (float(client_points.total_earn) - float(logs_points_redeemed)),
-                actual_sale_value_redeemed = logs_total_redeened_value
+                actual_sale_value_redeemed = logs_total_redeened_value,
+                invoice = invoice,
+                checkout = checkout
             )
-    
 
+    LogDetails.objects.create(
+        log = appointment_logs,
+        appointment_service = service_appointment,
+        start_time = service_appointment.appointment_time,
+        duration = service_appointment.duration,
+        member = service_appointment.member
+        )
     
-            
+    
+    invoice.save() # Do not remove this
     serialized = CheckoutSerializer(checkout)
     return Response(
             {
@@ -1880,13 +1983,58 @@ def create_checkout_device(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    
+    try:
+        business_address=BusinessAddress.objects.get(id = str(business_address))
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Business address Not Found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
     
     try:
         service_appointment = AppointmentService.objects.filter(appointment = str(appointments))
         for ser in service_appointment:
             ser.appointment_status = 'Done'
             ser.save()
+
+            service_total_price = (ser.total_price or ser.price) * 1
+
+            sale_commissions = CategoryCommission.objects.filter(
+                commission__employee = members,
+                from_value__lte = service_total_price,
+                category_comission__iexact = 'Service'
+            ).order_by('-from_value')
+
+            if len(sale_commissions) > 0:
+                commission = sale_commissions[0]
+
+                calculated_commission = commission.calculated_commission(ser.total_price or ser.price)
+                employee_commission = EmployeeCommission.objects.create(
+                    user = request.user,
+                    business = business_address.business,
+                    location = business_address,
+                    employee = ser.member,
+                    commission = commission.commission,
+                    category_commission = commission,
+                    commission_category = 'Service',
+                    commission_type = commission.comission_choice,
+                    sale_value = ser.discount_price if ser.discount_price else (ser.total_price or ser.price),
+                    commission_rate = commission.commission_percentage,
+                    commission_amount = calculated_commission,
+                    symbol = commission.symbol,
+                    item_name = ser.service.name,
+                    item_id = f'{ser.service.id}',
+                    quantity = 1,
+                    tip = 0
+                )
             
     except Exception as err:
         return Response(
@@ -1902,14 +2050,11 @@ def create_checkout_device(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-    try:
-        business_address=BusinessAddress.objects.get(id = str(business_address))
-    except Exception as err:
-        business_address = None
+
     
-    checkout =AppointmentCheckout.objects.create(
+    checkout = AppointmentCheckout.objects.create(
         appointment = appointments,
-       # appointment_service = service_appointment,
+        appointment_service = service_appointment[0],
         payment_method =payment_method,
         service= services,
         member=members,
@@ -1922,20 +2067,29 @@ def create_checkout_device(request):
     )
     invoice = SaleInvoice.objects.create(
         appointment = appointments,
-        appointment_service = service_appointment,
+        appointment_service = f'{service_appointment[0].id}',
         payment_type = payment_method,
-        service = services,
-        member = members,
-        business_address=business_address,
-        # tip = tip,
+        service = f'{services.id}' if services else '',
+        member = f'{members.id}' if members else '',
+        business_address = f'{business_address.id}',
         gst = gst,
         service_price = service_price,
         total_price = total_price,
+        checkout = f'{checkout.id}',
     )
-    invoice.save()
     # checkout.business_address = service_appointment.business_address
     # checkout.save()
+    employee_tip = AppointmentEmployeeTip.objects.create(
+        appointment = appointments,
+        member = members,
+        business_address = business_address,
+        business = appointments.business,
+        tip = tip,
+        total_price = total_price
+    )
+
     
+    invoice.save() # Do not remove this
     serialized = CheckoutSerializer(checkout)
     return Response(
             {
@@ -1965,13 +2119,23 @@ def service_appointment_count(request):
     services = Service.objects.all()
     return_data =[]
     for ser in services:
+        count = 0
         if duration is not None:
             today = datetime.today()
             day = today - timedelta(days=int(duration))
+
             app_service = AppointmentService.objects.filter(service = ser, business_address =adds , created_at__gte = day )
+            sale_services = ServiceOrder.objects.filter(service = ser, created_at__gte = day)
         else:
             app_service = AppointmentService.objects.filter(service = ser, business_address =adds )
-        count = app_service.count()
+            sale_services = ServiceOrder.objects.filter(service = ser)
+
+
+        count += app_service.count()
+
+        for service_order in sale_services:
+            count += service_order.quantity
+
         data = {
             # 'id' : str(ser.id),
             'name' : str(ser.name),
@@ -2101,6 +2265,9 @@ def get_client_sale(request):
     product_order = ProductOrder.objects.filter(checkout__client = client).order_by('-created_at')
     product = ProductOrderSerializer(product_order,  many=True,  context={'request' : request, })
     
+    service_orders = ServiceOrder.objects.filter(checkout__client = client).order_by('-created_at')
+    services_data = ServiceOrderSerializer(service_orders,  many=True,  context={'request' : request, })
+    
     voucher_order = VoucherOrder.objects.filter(checkout__client = client).order_by('-created_at')
     voucher = VoucherOrderSerializer(voucher_order,  many=True,  context={'request' : request, })
     data.extend(voucher.data)
@@ -2112,7 +2279,10 @@ def get_client_sale(request):
     # appointment_checkout = AppointmentCheckout.objects.filter(appointment__client = client)
     # serialized = CheckoutSerializer(appointment_checkout, many = True)
     
-    appointment_checkout = AppointmentService.objects.filter(appointment__client = client).order_by('-created_at')
+    appointment_checkout = AppointmentService.objects.filter(
+        appointment__client = client,
+        appointment_status__in = ['Done', 'Paid']
+    ).order_by('-created_at')
     serialized = ServiceClientSaleSerializer(appointment_checkout, many = True)
     
     #test = checkout.count()
@@ -2126,6 +2296,7 @@ def get_client_sale(request):
                     'message' : 'Client Order Sales!',
                     'error_message' : None,
                     'product' : product.data,
+                    'service' : services_data.data,
                     'voucher' : data,
                     'appointment' : serialized.data
                 }
@@ -2134,7 +2305,7 @@ def get_client_sale(request):
         )
     
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def create_appointment_client(request):
     #user = request.user
     tenant_id = request.data.get('hash', None)
@@ -2145,6 +2316,7 @@ def create_appointment_client(request):
 
     client = request.data.get('client', None)
     client_type = request.data.get('client_type', None)
+    client_email = request.data.get('client_email', None)
     
     payment_method = request.data.get('payment_method', None)
     discount_type = request.data.get('discount_type', None)
@@ -2188,19 +2360,23 @@ def create_appointment_client(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    
-    try:
-        tenant_client = ClientTenantAppDetail.objects.create(
-            # user = user 
-            tenant = tenant,
-            client_id = client,
-            is_appointment = True
-        )
-    except Exception as err:
-        errors.append(str(err))
-        pass    
+
+    tenant_client, tennant_client_created = ClientTenantAppDetail.objects.get_or_create(
+        user = request.user,
+        tenant = tenant,
+        is_appointment = True
+    )
+
+    if tennant_client_created:
+        user_details = {
+            'email' : f'{request.user.email}',
+            'full_name' : f'{request.user.username}',
+            'mobile_number' : f'{request.user.mobile_number}',
+        }
+        client_id = None
     else:
-        errors.append('Tenant client app detail found')
+        client_id = tenant_client.client_id
+
     with tenant_context(tenant):
         try:
             business=Business.objects.get(id=business_id)
@@ -2233,21 +2409,27 @@ def create_appointment_client(request):
                     }
                 }
             )
-        try:
-            client = Client.objects.get(id=client)
-        except Exception as err:
-            errors.append('Client is none')
-            client = None
-            # return Response(
-            #     {
-            #             'status' : False,
-            #             'status_code' : StatusCodes.INVALID_CLIENT_4032,
-            #             'response' : {
-            #             'message' : 'Client not found',
-            #             'error_message' : str(err),
-            #         }
-            #     }
-            # )
+        
+        if client_id:
+            client = Client.objects.get(id = client_id)
+        else:
+            client, created = Client.objects.get_or_create(
+                email = user_details['email'],
+                business = business,
+            )
+
+            if created:
+                client.full_name = user_details['full_name']
+                client.mobile_number = user_details['mobile_number']
+                client.is_email_verified = True
+                client.is_mobile_verified = True
+
+                client.is_active = True
+                client.save()
+        
+        client_id = f'{client.id}'
+        tenant_client.client_id = client_id
+        tenant_client.save()
         
                 
         appointment = Appointment.objects.create(
@@ -2341,6 +2523,7 @@ def create_appointment_client(request):
                 service = service,
                 member = member,
                 price = price,
+                total_price = price,
                 
                 
                 # voucher = voucher,
@@ -2385,6 +2568,7 @@ def create_appointment_client(request):
                         'message' : 'Appointment Create!',
                         'error_message' : None,
                         'appointments' : serialized.data,
+                        'client_id' : client_id,
                         'errors' : errors
                     }
                 },
@@ -2398,12 +2582,17 @@ def get_employee_check_time(request):
     duration = request.data.get('duration', None)
     start_time = request.data.get('app_time', None)
     date = request.data.get('date', None)
+
+    if duration and duration is not None:
+        duration = duration.strip()
     
-    dtime = datetime.strptime(start_time, "%H:%M:%S")
-    start_time = dtime.time()
+    if start_time is not None:
+        dtime = datetime.strptime(start_time, "%H:%M:%S")
+        start_time = dtime.time()
     
-    dt = datetime.strptime(date, "%Y-%m-%d")
-    date = dt.date()
+    if date is not None:
+        dt = datetime.strptime(date, "%Y-%m-%d")
+        date = dt.date()
     
     app_date_time = f'2000-01-01 {start_time}'
 
@@ -2455,7 +2644,7 @@ def get_employee_check_time(request):
                     'status' : True,
                     'status_code' : 200,
                     'response' : {
-                        'message' : f'{employee.full_name} isn’t available on the selected date {st_time} and {ed_time}, but your team member can still book appointments for them.',
+                        'message' : f'{employee.full_name} isn’t available on the selected time {st_time} and {ed_time}, but your team member can still book appointments for them.',
                         'error_message' : f'This Employee day off, {employee.full_name} date {date}',
                         'Availability': False
                     }
@@ -2475,13 +2664,35 @@ def get_employee_check_time(request):
                 }
             },
             status=status.HTTP_200_OK
-        )                               
+        )
         try:
             av_staff_ids = AppointmentService.objects.filter(
+                Q(appointment_time__range = (start_time, tested)) | Q(end_time__range = (start_time, tested)),
                 member__id = employee.id,
                 appointment_date = date,
                 #is_blocked = False,
-            )
+            ).exclude(appointment_status = 'Cancel')
+            if len(av_staff_ids) > 0:
+                st_time = convert_24_to_12(str(start_time))
+                ed_time = convert_24_to_12(str(tested))
+                data.append(AppointmentServiceSerializer(av_staff_ids, many=True).data)
+                return Response(
+                    {
+                        'status' : True,
+                        'status_code' : 200,
+                        'status_code_text' : '200',
+                        'response' : {
+                            'message' : f'{employee.full_name} isn’t available between {st_time} and {ed_time}, but your team member can still book appointments for them.',
+                            'error_message' : f'Appointments Found ({len(av_staff_ids)})',
+                            'employee':data,
+                            'extra_data' : {
+                                'start_time' : start_time,
+                                'end_time' : tested,
+                            }
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
             
             for ser in av_staff_ids:
                 if tested <= ser.appointment_time:
@@ -2520,7 +2731,9 @@ def get_employee_check_time(request):
                         #data.append(f'{employee.full_name} isn’t available between {st_time} and {ed_time}, but your team member can still book appointments for them.')
                                                                 
                 else:
-                    data.append(f'The selected staff is not available at this time  {employee.full_name}')
+                    data.append(f'The selected staff is not available at this time {employee.full_name}')
+                    data.append(f'{tested}')
+                    data.append(f'{ser.appointment_time}')
                     return Response(
                             {
                                 'status' : True,

@@ -244,7 +244,7 @@ def create_client_business(request):
             'status_code' : 200,
             'status_code_text' : '200',
             'response' : {
-                'message' : 'End OTP to User email Please verify!',
+                'message' : 'We have sent the OTP on your email!',
                 'error_message' : None,
                 'client': data,
             }
@@ -401,6 +401,8 @@ def customer_login(request):
     email = request.data.get('email', None)
     social_account = request.data.get('social_account', False)
     password = request.data.get('password', None)
+    
+    tenant_id = request.GET.get('tenant_id', None)
 
     if social_account:
         social_platform = request.data.get('social_platform', None)
@@ -478,8 +480,7 @@ def customer_login(request):
         )
 
     if not social_account:
-        user = authenticate(username=user.username, password=password)
-        if user is None:
+        if not user.check_password(password):
             return Response(
                 {
                     'status' : False,
@@ -533,7 +534,7 @@ def customer_login(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    serialized = UserSerializerByClient(user)
+    serialized = UserSerializerByClient(user, context={'tenant_id' : tenant_id})
     
     return Response(
             {
@@ -878,8 +879,14 @@ def generate_id(request):
 def get_client_detail(request):
     hash = request.GET.get('hash', None)
     client_id = request.GET.get('client_id', None)
+    client_email = request.GET.get('client_email', None)
+
+
+    data = []
+    errors = []
+
+    client = None
     
-    data = []    
     if hash is None: 
        return Response(
             {
@@ -900,34 +907,58 @@ def get_client_detail(request):
     try:
         tenant = Tenant.objects.get(id = hash)
     except Exception as err:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : 400,
-                'status_code_text' : 'Invalid Data',
-                'response' : {
-                    'message' : 'Invalid Tenant Id',
-                    'error_message' : str(err),
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )    
-    
-    with tenant_context(tenant):
+        client = None
+    else:
+        with tenant_context(tenant):
+            try:
+                all_client=Client.objects.get(id = client_id)
+                serialized = Client_TenantSerializer(all_client, context={'request' : request,'tenant' : tenant.schema_name })
+                data.append(serialized.data)
+            except Exception as first_err:
+                client = None
+                errors.append(str(first_err))
+
+    if client is None:
         try:
-            all_client=Client.objects.get(id = client_id)
-            serialized = Client_TenantSerializer(all_client, context={'request' : request,'tenant' : tenant.schema_name })
-            data.append(serialized.data)
+            user = User.objects.get(
+                email = client_email,
+                user_account_type__account_type = 'Everyone'
+            )
         except Exception as err:
-            pass
-            
+            errors.append(str(err))
+        else:
+            user_data = {
+                'id' : f'{user.id}',
+                'full_name' : f'{user.first_name} {user.last_name if user.last_name else ""}',
+                'image' : '',
+                'client_id' : '',
+                'email' : '',
+                'mobile_number' : '',
+                'dob' : '',
+                'postal_code' : '',
+                'address' : '',
+                'gender' : '',
+                'card_number' : '',
+                'country' : '',
+                'city' : '',
+                'state' : '',
+                'is_active' : '',
+                'language' : '',
+                'about_us' : '',
+                'marketing' : '',
+                'country_obj' : '',
+                'customer_note' : '',
+                'created_at' : '',
+            }
+            data.append(user_data)
+
     return Response(
         {
             'status' : 200,
             'status_code' : '200',
             'response' : {
                 'message' : 'All Client',
-                'error_message' : None,
+                'error_message' : errors,
                 'client' : data
             }
         },

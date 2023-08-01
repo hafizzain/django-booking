@@ -6,7 +6,8 @@ import uuid
 from Authentication.models import User
 from Business.models import Business, BusinessAddress, BusinessVendor
 from Utility.models import Currency
-
+from googletrans import Translator
+from Utility.models import Language
 
 
 class Category(models.Model):
@@ -42,6 +43,7 @@ class Product(models.Model):
         ('Both', 'Both'),
     ]
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    arabic_id = models.CharField(default='', max_length=999, editable=False)
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_products')
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_products')
@@ -54,6 +56,7 @@ class Product(models.Model):
     product_type = models.CharField(default='Sellable', choices=PRODUCT_TYPE_CHOICES, max_length=20)
 
     name = models.CharField(max_length=1000, default='')
+    arabic_name = models.CharField(max_length=999, default='')
 
     cost_price = models.PositiveIntegerField(default=0, null = True, blank= True)
     #full_price = models.PositiveIntegerField(default=0, null = True, blank= True)
@@ -84,6 +87,17 @@ class Product(models.Model):
         instance_id = instance_id.split('-')
         instance_id = instance_id[0]
         return f'{instance_id}'
+
+    def save(self, *args, **kwargs):
+        translator = Translator()
+        arabic_text = translator.translate(f'{self.name}'.title(), src='en', dest='ar')
+        self.arabic_name = arabic_text.text
+
+        if not self.arabic_id:
+            arabic_id_ = translator.translate(self.id, dest='ar')
+            self.arabic_id = arabic_id_.text
+
+        super(Product, self).save(*args, **kwargs)
 
 
     def __str__(self):
@@ -223,6 +237,7 @@ class ProductConsumption(models.Model):
 
     location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='consumption_locations')
     quantity = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now=now)
 
     def __str__(self):
         return str(self.id)
@@ -288,3 +303,13 @@ class ProductOrderStockReport(models.Model):
     
     def __str__(self):
         return str(self.id)
+    
+
+
+class ProductTranslations(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True)
+    language = models.ForeignKey(Language, on_delete=models.CASCADE, null=True, blank=True)
+    product_name = models.CharField(max_length=500, null=True, blank=True)
+
+    def __str__(self):
+        return self.product_name

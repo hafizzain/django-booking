@@ -8,6 +8,10 @@ from Service.models import Service
 from Utility.models import Country, State, City
 
 from Client.models import Client, ClientGroup, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription, Promotion , Rewards , Membership, Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs , VoucherCurrencyPrice 
+from Invoices.models import SaleInvoice
+from Appointment.models import AppointmentCheckout, AppointmentEmployeeTip, AppointmentService
+from Order.models import Checkout, Order
+
 
 class LocationSerializerLoyalty(serializers.ModelSerializer):
     
@@ -18,7 +22,7 @@ class LocationSerializerLoyalty(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'arabic_name')
         # exclude = ['is_deleted', 'created_at', 'slug', 'published'
         #            , 'user', 'business' , 'vendor', 'category' ,'brand' , 'product_type' ,'cost_price' , 'full_price'
         #            , 'sell_price', 'tax_rate', 'short_description' , 'description' , 'barcode_id', ''
@@ -27,7 +31,7 @@ class ProductSerializer(serializers.ModelSerializer):
 class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'arabic_name')
         #exclude = ['is_deleted', 'created_at', 'updated_at']
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -38,7 +42,37 @@ class CountrySerializer(serializers.ModelSerializer):
 class ClientSerializer(serializers.ModelSerializer):
     country_obj = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
+    total_done_appointments = serializers.SerializerMethodField(read_only=True)
+    total_sales = serializers.SerializerMethodField(read_only=True)
+
+    def get_total_done_appointments(self, obj):
+        return AppointmentService.objects.filter(
+            appointment_status__in = ['Done', 'Paid'],
+            appointment__client = obj
+        ).count()
     
+    def get_total_sales(self, obj):
+        total_price = 0
+        appointments = AppointmentService.objects.filter(
+            appointment_status__in = ['Done', 'Paid'],
+            appointment__client = obj
+        )
+        for price in appointments:
+            total_price += float(price.price or price.total_price or 0)
+
+        checkout_orders_total = Checkout.objects.filter(
+            is_deleted = False, 
+            client = obj,
+        )   
+        total_orders = Order.objects.filter(
+            checkout__id__in = list(checkout_orders_total.values_list('id', flat=True))
+        )
+
+        for order in total_orders:
+            realPrice = order.price or order.total_price
+            total_price += float(order.quantity) * float(realPrice)
+    
+        return total_price
     
     def get_country_obj(self, obj):
         try:
@@ -53,14 +87,14 @@ class ClientSerializer(serializers.ModelSerializer):
                 url = tenant_media_base_url(request)
                 return f'{url}{obj.image}'
             except:
-                return obj.image
+                return f'{obj.image}'
         return None
     class Meta:
         model = Client
         fields =['id','full_name','image','client_id','email','mobile_number','dob','postal_code','address','gender','card_number',
                  'country','city','state', 'is_active',
                  'language', 'about_us', 'marketing','country_obj','customer_note',
-                 'created_at']
+                 'created_at', 'total_done_appointments', 'total_sales']
         
 class Client_TenantSerializer(serializers.ModelSerializer):
     country_obj = serializers.SerializerMethodField(read_only=True)
@@ -186,7 +220,8 @@ class MembershipSerializer(serializers.ModelSerializer):
             
     class Meta:
         model = Membership
-        fields = ['id', 'name','valid_for','discount','description', 'term_condition','products', 'services', 'currency_membership']
+        fields = ['id', 'name', 'arabic_name', 'valid_for','discount','description', 'term_condition','products', 'services', 'currency_membership']
+        read_only_fields = ['arabic_name']
 
 class VoucherSerializer(serializers.ModelSerializer):
     # currency_voucher_prices = serializers.SerializerMethodField(read_only=True)
@@ -206,8 +241,9 @@ class VoucherSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Vouchers
-        fields = ['id', 'name','user','business','voucher_type',
+        fields = ['id', 'name', 'arabic_name', 'user','business','voucher_type',
                 'validity','sales','is_deleted','is_active','created_at','currency_voucher','discount_percentage', 'voucher_count']
+        read_only_fields = ['arabic_name']
 
 
 class ClientAppointmentSerializer(serializers.ModelSerializer):
@@ -340,7 +376,7 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
         return 'Membership'
     
     def get_membership_price(self, obj):
-        return obj.current_price
+        return (obj.current_price)
     
 
     def get_employee(self, membership_order):
@@ -359,8 +395,8 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
 
     def get_client(self, obj):
         try:
-            serializers = ClientSerializer(obj.client).data
-            return serializers
+            serializered_data = ClientSerializer(obj.client).data
+            return serializered_data
         except Exception as err:
             return None
     
@@ -380,10 +416,28 @@ class ClientMembershipsSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = MemberShipOrder
-        fields = ['id','name', 'client' , 'location' , 
-                  'status','quantity','products', 'services', 'checkout','employee','start_date', 'end_date',
-                  'total_price', 'payment_type' , 'order_type','price',
-                  'name','created_at','discount_percentage', 'membership_price', 'discount_type' ]
+        fields = [
+            'id',
+            'name', 
+            'client', 
+            'location',
+            'status',
+            'quantity',
+            'products', 
+            'services',
+            'checkout',
+            'employee',
+            'start_date', 
+            'end_date',
+            'total_price', 
+            'payment_type', 
+            'order_type',
+            'price',
+            'created_at',
+            'discount_percentage', 
+            'membership_price', 
+            'discount_type' 
+        ]
 
 
 class CustomerLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
@@ -417,18 +471,19 @@ class CustomerLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClientLoyaltyPoint
-        fields = ['customer', 'loyalty', 'points_earned', 'points_redeemed', 'balance']
-    
+        fields = ['customer', 'loyalty', 'points_earned', 'points_redeemed', 'balance', 'invoice']
+
 class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
 
     date = serializers.SerializerMethodField()
     actual_sale_value_redeemed = serializers.SerializerMethodField()
-    invoice = serializers.SerializerMethodField()
+    invoice_data = serializers.SerializerMethodField()
     customer = serializers.SerializerMethodField()
     loyalty = serializers.SerializerMethodField()
     points_earned = serializers.SerializerMethodField()
     points_redeemed = serializers.SerializerMethodField()
     balance = serializers.SerializerMethodField()
+    checkout_data = serializers.SerializerMethodField()
 
     def get_date(self, c_points):
         return c_points.created_at.strftime('%Y-%m-%d')
@@ -436,10 +491,13 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
     def get_actual_sale_value_redeemed(self, c_points):
         return c_points.actual_sale_value_redeemed
 
-    def get_invoice(self, c_points):
-        return {
-            'id' : f'{c_points.short_id}'
-        }
+    def get_invoice_data(self, c_points):
+        try:
+            invoice = SaleInvoice.objects.get(id__icontains = c_points.invoice)
+            serializer = SaleInvoiceSerializer(invoice)
+            return serializer.data
+        except Exception as e:
+            return str(e)
 
     def get_customer(self, c_points):
         return {
@@ -462,7 +520,55 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
     def get_balance(self, c_points):
         return c_points.balance
 
+    def get_checkout_data(self, c_points):
+        from Sale.serializers import SaleOrders_CheckoutSerializer, SaleOrders_AppointmentCheckoutSerializer
+
+        is_checkout = False
+        try:
+            data = Checkout.objects.filter(id = c_points.checkout)
+            serializer = SaleOrders_CheckoutSerializer(data, many=True)
+
+            if len(data) == 0:                
+                data = AppointmentCheckout.objects.filter(id = c_points.checkout)
+                # serializer = AppointmentCheckoutSerializer(data, many=True)
+                serializer = SaleOrders_AppointmentCheckoutSerializer(data, many=True)
+
+        except Exception as e:
+            return str(e)
+
+        return serializer.data
+        
+
+
 
     class Meta:
         model = LoyaltyPointLogs
-        fields = ['customer', 'loyalty', 'points_earned', 'points_redeemed', 'balance', 'invoice', 'actual_sale_value_redeemed', 'date']
+        fields = ['customer', 'loyalty', 'points_earned', 'points_redeemed','balance', 'checkout', 'checkout_data', 'invoice', 'invoice_data', 'actual_sale_value_redeemed', 'date']
+
+
+
+class SaleInvoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SaleInvoice
+        fields = '__all__'
+
+
+class CheckoutSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Checkout
+        fields = '__all__'
+
+class AppointmentCheckoutSerializer(serializers.ModelSerializer):
+    tip = serializers.SerializerMethodField(read_only = True)
+
+
+    def get_tip(self, appointment_checkout):
+        tips = AppointmentEmployeeTip.objects.filter(
+            appointment = appointment_checkout.appointment
+        ).values('member', 'tip', 'id')
+        tips = list(tips)
+        return tips
+
+    class Meta:
+        model = AppointmentCheckout
+        fields = '__all__'

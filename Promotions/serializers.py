@@ -76,13 +76,13 @@ class AvailOfferService_Serializer(serializers.ModelSerializer):
             else:
                 queries['currency'] = location.currency
 
-        prices = PriceService.objects.filter(service = service, **queries)
+        prices = PriceService.objects.filter(service = service, **queries).order_by('-created_at')
 
         return AvailOffer_PriceService_Serializers(prices, many = True).data
 
     class Meta:
         model = Service
-        fields = ['id','name', 'slot_availible_for_online', 'prices', 'client_can_book']
+        fields = ['id','name', 'arabic_name', 'slot_availible_for_online', 'prices', 'client_can_book']
 
 class AvailOfferProduct_Serializer(serializers.ModelSerializer):
     prices = serializers.SerializerMethodField(read_only=True)
@@ -103,13 +103,13 @@ class AvailOfferProduct_Serializer(serializers.ModelSerializer):
             else:
                 queries['currency'] = location.currency
 
-        prices = PriceService.objects.filter(service = service, **queries)
+        prices = PriceService.objects.filter(service = service, **queries).order_by('-created_at')
 
         return AvailOffer_PriceService_Serializers(prices, many = True).data
 
     class Meta:
         model = Product
-        fields = ['id','name', 'slot_availible_for_online', 'prices', 'client_can_book']
+        fields = ['id','name', 'arabic_name', 'slot_availible_for_online', 'prices', 'client_can_book']
 
 
 
@@ -321,7 +321,7 @@ class FreeServiceSerializers(serializers.ModelSerializer):
     
     def get_priceservice(self, obj):
         try:
-            ser = PriceService.objects.filter(service = obj.service)
+            ser = PriceService.objects.filter(service = obj.service).order_by('-created_at')
             return PriceServiceSerializers(ser, many = True).data
         except Exception as err:
             return str(err)
@@ -374,7 +374,7 @@ class AvailProduct_Serializers(serializers.ModelSerializer):
     #     return AvailOffer_PriceService_Serializers(prices, many = True).data
     class Meta:
         model = Product
-        fields = ['id','cost_price']
+        fields = ['id','cost_price', 'arabic_name']
 
 
 class DiscountOnFreeServiceSerializers(serializers.ModelSerializer):
@@ -1858,7 +1858,7 @@ class AvailFreeServiceSerializers(serializers.ModelSerializer):
     
     def get_priceservice(self, obj):
         try:
-            ser = PriceService.objects.filter(service = obj.service)
+            ser = PriceService.objects.filter(service = obj.service).order_by('-created_at')
             return PriceServiceSerializers(ser, many = True).data
         except Exception as err:
             return str(err)
@@ -1880,7 +1880,7 @@ class AvailServiceSerializers(serializers.ModelSerializer):
     
     def get_priceservice(self, obj):
         try:
-            ser = PriceService.objects.filter(service = obj.service)
+            ser = PriceService.objects.filter(service = obj.service).order_by('-created_at')
             return AvailPriceServiceSerializers(ser, many = True).data
         except Exception as err:
             return str(err)

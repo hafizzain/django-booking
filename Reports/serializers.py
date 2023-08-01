@@ -2,21 +2,23 @@ from datetime import date, datetime
 from Product.models import Brand
 from Utility.models import ExceptionRecord
 from rest_framework import serializers
-from Appointment.models import AppointmentCheckout, AppointmentService
+from Appointment.models import AppointmentCheckout, AppointmentService, AppointmentEmployeeTip, Checkout
 from Appointment.serializers import LocationSerializer
 from Business.models import BusinessAddress
 from Employee.models import Employee, EmployeeCommission
 from Product.Constants.index import tenant_media_base_url
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.db.models.functions import Coalesce
 
 from Order.models import MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
-from Sale.serializers import ProductOrderSerializer
+from Sale.serializers import ProductOrderSerializer, SaleOrder_ProductSerializer, SaleOrder_ServiceSerializer, CheckoutTipsSerializer, SaleOrder_MemberShipSerializer, SaleOrder_VoucherSerializer, ClientSerializer
 from Service.models import Service, ServiceGroup
 from TragetControl.models import RetailTarget, ServiceTarget, StaffTarget, StoreTarget, TierStoreTarget
 from TragetControl.serializers import RetailTargetSerializers, StaffTargetSerializers, StoreTargetSerializers, TierStoreTargetSerializers
 from Utility.Constants.Data.months import MONTH_DICT
-
+from .models import DiscountPromotionSalesReport
+from Invoices.models import SaleInvoice
+from Sale.serializers import SaleInvoiceSerializer
 
 class ServiceOrderSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
@@ -26,7 +28,7 @@ class ServiceOrderSerializer(serializers.ModelSerializer):
         return LocationSerializer(loc ).data
     class Meta:
         model = ServiceOrder
-        fields = ('total_price', 'sold_quantity','current_price', 'location','created_at')
+        fields = ('total_price', 'sold_quantity','current_price', 'location','created_at', 'discount_price', 'quantity')
         
 class AppointmentCheckoutReportSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
@@ -59,7 +61,11 @@ class ServiceReportSerializer(serializers.ModelSerializer):
             data.extend(serialized.data)
             
             
-            appointment_checkout = AppointmentCheckout.objects.filter(appointment_service__appointment_status = 'Done')
+            appointment_checkout = AppointmentCheckout.objects.filter(
+                # appointment_service__appointment_status = 'Done',
+                appointment__appointment_services__appointment_status = 'Done',
+                appointment__appointment_services__service = obj,
+            )
             serialized = AppointmentCheckoutReportSerializer(appointment_checkout, many = True)
             data.extend(serialized.data)
             
@@ -69,7 +75,7 @@ class ServiceReportSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Service
-        fields = ['id','name', 'sale']
+        fields = ['id','name', 'sale', 'arabic_name']
 
 class ReportsEmployeSerializer(serializers.ModelSerializer):    
     image = serializers.SerializerMethodField()
@@ -89,13 +95,21 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
             service_orders = ProductOrder.objects.filter(
                 is_deleted=False, 
                 member = obj, 
-                created_at__icontains = year
+                created_at__year = year,
+                created_at__month = month,
                 )
             for ord  in service_orders:
-                create = str(ord.created_at)
-                match = int(create.split(" ")[0].split("-")[1])
-                if int(month) == match:
-                    total += int(ord.total_price)
+                # create = str(ord.created_at)
+                # match = int(create.split(" ")[0].split("-")[1])
+                # if int(month) == match:
+                #     total += int(ord.total_price)
+                price = 0
+                if ord.discount_price:
+                    price = ord.discount_price
+                else:
+                    price = ord.total_price
+                
+                total += float(price) * float(ord.quantity)
             
             return f'{total}'
                 
@@ -107,29 +121,38 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
             month = self.context["month"]
             year = self.context["year"]
             total = 0
-            app   = AppointmentService.objects.filter(
+            app = AppointmentService.objects.filter(
                 member = obj,
                 appointment_status = 'Done',
-                created_at__icontains = year
+                appointment_date__icontains = year
             )
         
-            service_orders = ServiceOrder.objects.filter(is_deleted=False, 
-                        member = obj,
-                        created_at__icontains = year
-                        )
+            service_orders = ServiceOrder.objects.filter(
+                is_deleted=False, 
+                member = obj,
+                created_at__year = year,
+                created_at__month = month,
+            )
             for appointment in app:
-                create = str(appointment.created_at)
+                create = str(appointment.appointment_date)
                 match = int(create.split(" ")[0].split("-")[1])
                 if int(month) == match:
                     total += int(appointment.price)
                     
-            for ord  in service_orders:
-                create = str(ord.created_at)
-                match = int(create.split(" ")[0].split("-")[1])
-                if int(month) == match:
-                    total += int(ord.total_price)
+            for ord in service_orders:
+                # create = str(ord.created_at)
+                # match = int(create.split(" ")[0].split("-")[1])
+                # if int(month) == match:
+                #     total += int(ord.total_price)
+                price = 0
+                if ord.discount_price:
+                    price = ord.discount_price
+                else:
+                    price = ord.total_price
+                
+                total += float(price) * float(ord.quantity)
                                 
-            return f'{total}'         
+            return f'{total}'
             
         except Exception as err:
             return str(err)
@@ -215,8 +238,9 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
         total_product_price = 0
 
         for commission in employee_commissions:
-            full_commission = commission.full_commission
-            commission_total += commission.full_commission
+            full_commission = commission.single_item_commission
+            # full_commission = commission.full_commission
+            commission_total += full_commission
 
             # Mannaging Product Commission
             if commission.commission_category == 'Retail':
@@ -532,16 +556,22 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
             )
 
             for ord in app:
-                create = str(ord.created_at)
+                create = str(ord.appointment_date)
                 match = int(create.split(" ")[0].split("-")[1])
                 if int(month) == match:
                     total += int(ord.price) if ord.price is not None else 0
 
             for ord in service_orders:
-                create = str(ord.created_at)
-                match = int(create.split(" ")[0].split("-")[1])
-                if int(month) == match:
-                    total += int(ord.checkout.total_service_price) if ord.checkout.total_service_price is not None else 0
+                # create = str(ord.created_at)
+                # match = int(create.split(" ")[0].split("-")[1])
+                # if int(month) == match:
+                #     total += int(ord.checkout.total_service_price) if ord.checkout.total_service_price is not None else 0
+                price = 0
+                if ord.discount_price:
+                    price = ord.discount_price
+                else:
+                    price = ord.total_price
+                total += (float(ord.quantity) * float(price))
 
             return total
 
@@ -599,15 +629,22 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
             total = 0
 
             service_orders = ProductOrder.objects.filter(
-                is_deleted=False, 
-                location=obj,
-                created_at__icontains=year
+                is_deleted = False, 
+                location = obj,
+                created_at__year = year,
+                created_at__month = month,
             )
             for ord in service_orders:
-                create = str(ord.created_at)
-                match = int(create.split(" ")[0].split("-")[1])
-                if int(month) == match:
-                    total += int(ord.checkout.total_product_price) if ord.checkout.total_product_price is not None else 0
+                # create = str(ord.created_at)
+                # match = int(create.split(" ")[0].split("-")[1])
+                # if int(month) == match:
+                #     total += int(ord.checkout.total_product_price) if ord.checkout.total_product_price is not None else 0
+                price = 0
+                if ord.discount_price:
+                    price = ord.discount_price
+                else:
+                    price = ord.total_price
+                total += (float(ord.quantity) * float(price))
 
             return total
 
@@ -644,15 +681,22 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
             total = 0
 
             service_orders = VoucherOrder.objects.filter(
-                is_deleted=False,
-                location=obj,
-                created_at__icontains=year,
+                is_deleted = False,
+                location = obj,
+                created_at__year = year,
+                created_at__month = month,
             )
             for ord in service_orders:
-                create = str(ord.created_at)
-                match = int(create.split(" ")[0].split("-")[1])
-                if int(month) == match:
-                    total += int(ord.checkout.total_voucher_price) if ord.checkout.total_voucher_price is not None else 0
+                # create = str(ord.created_at)
+                # match = int(create.split(" ")[0].split("-")[1])
+                # if int(month) == match:
+                    # total += int(ord.checkout.total_voucher_price) if ord.checkout.total_voucher_price is not None else 0
+                price = 0
+                if ord.discount_price:
+                    price = ord.discount_price
+                else:
+                    price = ord.total_price
+                total += (float(ord.quantity) * float(price))
 
             return total
 
@@ -668,13 +712,20 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
             service_orders = MemberShipOrder.objects.filter(
                 is_deleted=False, 
                 location = obj,
-                created_at__icontains = year,
-                )
+                created_at__year = year,
+                created_at__month = month,
+            )
             for ord  in service_orders:
-                create = str(ord.created_at)
-                match = int(create.split(" ")[0].split("-")[1])
-                if int(month) == match:
-                    total += int(ord.checkout.total_membership_price)
+                # create = str(ord.created_at)
+                # match = int(create.split(" ")[0].split("-")[1])
+                # if int(month) == match:
+                #     total += int(ord.checkout.total_membership_price)
+                price = 0
+                if ord.discount_price:
+                    price = ord.discount_price
+                else:
+                    price = ord.total_price
+                total += (float(ord.quantity) * float(price))
             
             return total
                 
@@ -873,7 +924,19 @@ class ServiceGroupReport(serializers.ModelSerializer):
     # service_sale_price = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
     service_target = serializers.SerializerMethodField(read_only=True)
+    total_service_sales = serializers.SerializerMethodField(read_only=True)
+    # services_sales = serializers.SerializerMethodField(read_only=True)
+    # appointment_sales = serializers.SerializerMethodField(read_only=True)
+    # total_service_sales = serializers.SerializerMethodField(read_only=True)
+
+    # def get_appointment_sales(self, obj):
+    #     return obj.appointment_sales
     
+    # def get_total_service_sales(self, obj):
+    #     return obj.appointment_sales + obj.services_sales
+    
+    # def get_services_sales(self, obj):
+    #     return obj.services_sales
     
     def get_service(self, obj):
         ser = obj.services.all()
@@ -902,9 +965,53 @@ class ServiceGroupReport(serializers.ModelSerializer):
             
         except Exception as err:
             return str(err)        
+
+    def get_total_service_sales(self, obj):
+        try:
+            year = self.context["year"]
+            month = self.context["month"]
+            location = self.context["location"]
+            ser_target = 0
+                        
+            services_ids = obj.services.all().values_list('id', flat=True)
+
+            services_orders = ServiceOrder.objects.filter(
+                service__id__in = services_ids,
+                created_at__year = year,
+                created_at__month = month,
+                location__id = location
+            )
+
+            for order in services_orders:
+
+                price = 0
+                if order.discount_price:
+                    price = order.discount_price
+                else:
+                    price = order.total_price
+                ser_target += float(price) * float(order.quantity)
+            
+            appointment_services = AppointmentService.objects.filter(
+                # appointment_service__appointment_status = 'Done',
+                Q(appointment_status = 'Done') |
+                Q(appointment_status = 'Paid'),
+                service__id__in = services_ids,
+                appointment_date__year = year,
+                appointment_date__month = month,
+                business_address__id = location
+            )
+
+            for app_order in appointment_services:
+                price = app_order.discount_price or app_order.total_price or app_order.price
+                ser_target += float(price)
+
+
+            return ser_target
+        except Exception as err:
+            return str(err)
     class Meta:
         model = ServiceGroup
-        fields = ['id','name','service','service_target']
+        fields = ['id','name','service','service_target', 'total_service_sales']
         
 class ReportBrandSerializer(serializers.ModelSerializer): 
     product_sale_price = serializers.SerializerMethodField(read_only=True)
@@ -950,18 +1057,27 @@ class ReportBrandSerializer(serializers.ModelSerializer):
             total = 0
 
             service_orders = ProductOrder.objects.filter(
-                is_deleted=False, 
-                product__brand=obj,
-                created_at__icontains=year,
-                location__id=location,
+                is_deleted = False, 
+                product__brand = obj,
+                created_at__year = year,
+                created_at__month = month,
+                location__id = location,
             )
             
             for ord in service_orders:
-                create = str(ord.created_at)
-                match = int(create.split(" ")[0].split("-")[1])
-                if int(month) == match:
-                    if ord.checkout and ord.checkout.total_product_price:
-                        total += int(ord.checkout.total_product_price)
+                # create = str(ord.created_at)
+                # match = int(create.split(" ")[0].split("-")[1])
+                # if int(month) == match:
+                price = 0
+                if ord.discount_price:
+                    price = ord.discount_price
+                else:
+                    price = ord.total_price
+
+                total += (float(price) * float(ord.quantity))
+
+                # if ord.checkout and ord.checkout.total_product_price:
+                #     total += int(ord.checkout.total_product_price)
             
             return total
 
@@ -980,6 +1096,8 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
     order_type  = serializers.SerializerMethodField(read_only=True)
     commission  = serializers.SerializerMethodField(read_only=True)
     commission_rate  = serializers.SerializerMethodField(read_only=True)
+    tip  = serializers.SerializerMethodField(read_only=True)
+    invoice  = serializers.SerializerMethodField()
 
 
     def get_employee(self, commission_instance):
@@ -1004,8 +1122,8 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
         return 'Service'
 
     def get_commission(self, commission_instance):
-        # return commission_instance.commission_amount
-        return commission_instance.full_commission
+        return commission_instance.commission_amount
+        # return commission_instance.full_commission
 
     def get_commission_rate(self, commission_instance):
         return f'{commission_instance.commission_rate} {commission_instance.symbol}'
@@ -1017,16 +1135,254 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
             "id": f'{commission_instance.id}',
             "quantity": commission_instance.quantity,
             "name": commission_instance.item_name,
-            "price": commission_instance.total_price,
-            # "price": commission_instance.sale_value,
+            # "price": commission_instance.total_price,
+            "price": commission_instance.sale_value,
             "order_type": commission_instance.commission_category,
             "payment_type": "Cash",
             "tip": commission_instance.tip,
             "client": ""
         }
+    
+    
+    def get_invoice(self, obj):
+        # try:
+        #     checkoutt = Checkout.objects.get(id__icontains=obj.sale_id)
+        # except:
+        #     checkoutt = AppointmentCheckout.objects.get(id=obj.sale_id)
+        
+        # if checkoutt:
+        try:
+            invoice = SaleInvoice.objects.get(checkout__icontains = obj.sale_id)
+            serializer = SaleInvoiceSerializer(invoice)
+            return serializer.data
+        except Exception as e:
+            return str(e)
+        # else:
+        #     return 'invoice not found'
+
+    
+    def get_tip(self, commission_instance):
+        try:
+            if commission_instance.sale_id is not None:
+                try:
+                    tips = AppointmentEmployeeTip.objects.filter(checkout=commission_instance.sale_id)
+                    serialized_tips = CheckoutTipsSerializer(tips, many=True).data
+                    return serialized_tips
+                except:
+                    tips = AppointmentEmployeeTip.objects.filter(checkout=commission_instance.sale_id)
+                    serialized_tips = CheckoutTipsSerializer(tips, many=True).data
+                    return serialized_tips
+            else:
+                return 'Id is Null'
+        except Exception as e:
+            return "None " + e
 
 
     class Meta:
         model = EmployeeCommission
-        fields = ['id', 'location', 'employee', 'order_type', 'commission_rate', 'commission', 'created_at', 'sale']
+        fields = ['id', 'location', 'employee', 'order_type', 'commission_rate', 'commission', 'created_at', 'sale', 'sale_id', 'tip', 'invoice']
         #  'location', 'commission_rate',
+
+
+class DiscountPromotion_SaleInvoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SaleInvoice
+        fields = '__all__'
+
+class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
+    promotion = serializers.SerializerMethodField(read_only=True)
+    invoice = serializers.SerializerMethodField(read_only=True)
+    discounted_price = serializers.SerializerMethodField(read_only=True)
+    location = LocationSerializer(read_only=True)
+
+    product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
+    service  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
+    membership  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
+    voucher  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
+    
+    client = ClientSerializer()
+
+    ids = serializers.SerializerMethodField(read_only=True)
+    membership_product = serializers.SerializerMethodField(read_only=True)
+    membership_service = serializers.SerializerMethodField(read_only=True)
+    
+    tip = serializers.SerializerMethodField(read_only=True)
+        
+    def get_membership(self, obj):
+        
+        check = MemberShipOrder.objects.only(
+            'id',
+            'membership',
+            'current_price',
+            'quantity',
+        ).select_related(
+            'membership',
+        ).filter(
+            checkout__id = obj.checkout_id
+        )
+        return SaleOrder_MemberShipSerializer(check, many = True ).data
+
+
+    def get_voucher(self, obj):
+        
+        check = VoucherOrder.objects.only(
+            'id',
+            'voucher',
+            'current_price',
+            'quantity',
+        ).select_related(
+            'voucher',
+        ).filter(
+            checkout__id = obj.checkout_id
+        )
+        # return VoucherOrderSerializer(check, many = True , context=self.context ).data
+        return SaleOrder_VoucherSerializer(check, many = True ).data
+
+
+    def get_product(self, obj):
+        check = ProductOrder.objects.only(
+                'current_price', 
+                'id',
+                'quantity',
+                'product',
+            ).select_related(
+                'product',
+            ).filter(
+            checkout__id = obj.checkout_id
+        )
+        # data =  ProductOrderSerializer(check, many = True , context=self.context ).data
+        data =  SaleOrder_ProductSerializer(check, many = True ).data
+        self.product = data
+        return self.product
+            
+    def get_membership_product(self, obj):
+        return self.product
+
+    def get_service(self, obj):
+        if obj.checkout_type == 'Sale':
+            service = ServiceOrder.objects.only(
+                'id',
+                'quantity',
+                'current_price',
+                'service',
+            ).select_related(
+                'service',
+            ).filter(
+                checkout__id = obj.checkout_id
+            )
+            # data = ServiceOrderSerializer(service, many = True , context=self.context ).data
+            data = SaleOrder_ServiceSerializer(service, many = True ).data
+            self.service = data
+        elif obj.checkout_type == 'Appointment':
+            try:
+                app_checkout = AppointmentCheckout.objects.get(
+                    id = obj.checkout_id
+                )
+            except:
+                self.service = []
+            else:
+                app_services = AppointmentService.objects.filter(
+                    appointment = app_checkout.appointment
+                )
+                data = AppointmentService_DiscountReportSerializer(app_services, many=True).data
+                self.service = data
+        else:
+            self.service = []
+
+        return self.service
+    
+    def get_membership_service(self, obj):
+        return self.service
+    
+    def get_ids(self, obj):
+        
+        ids_data = []
+        ids_data.extend(self.product)
+        ids_data.extend(self.service)
+
+        return ids_data
+    
+    def get_tip(self, obj):
+        tips = AppointmentEmployeeTip.objects.filter(checkout__id=obj.checkout_id)
+        serialized_tips = CheckoutTipsSerializer(tips, many=True).data
+        return serialized_tips
+        
+    
+    def get_invoice(self, obj):
+        try:
+            invoice = SaleInvoice.objects.get(checkout__icontains = obj.checkout_id)
+            serializer = DiscountPromotion_SaleInvoiceSerializer(invoice)
+            return serializer.data
+        except Exception as e:
+            return str(e)
+
+    def get_promotion(self, obj):
+        return {
+            'promotion_name' : obj.promotion_name,
+        }
+        
+
+    def get_discounted_price(self, obj):
+        
+        return obj.discount_price
+        
+    class Meta:
+        model = DiscountPromotionSalesReport
+        fields = [
+            'id', 
+            'checkout_type', 
+            'promotion', 
+            'invoice', 
+            'created_at', 
+            'original_price', 
+            'discounted_price', 
+            'location', 
+            'product', 
+            'service', 
+            'membership', 
+            'voucher', 
+            'client', 
+            'ids', 
+            'membership_product', 
+            'membership_service', 
+            'tip'
+            
+        ]
+
+        
+
+class AppointmentService_DiscountReportSerializer(serializers.ModelSerializer):
+
+    service = serializers.SerializerMethodField()
+    quantity = serializers.SerializerMethodField()
+    price = serializers.SerializerMethodField()
+    selection_type  = serializers.SerializerMethodField(read_only=True)
+    service_original_price  = serializers.SerializerMethodField(read_only=True)
+
+    def get_selection_type(self, obj):
+        return 'SERVICE'
+    
+    def get_quantity(self, obj):
+        return 1
+    
+    def get_service(self, obj):
+        if obj.service:
+            return {'name' : obj.service.name}
+        return None
+    
+    def get_service_original_price(self, obj):
+        if obj.service:
+            return obj.service.price
+        
+        return None
+    
+    def get_price(self, obj):
+        app_price = obj.discount_price or obj.total_price or obj.price
+        return app_price
+
+    class Meta:
+        model = AppointmentService
+        fields = ['id', 'price', 'service_original_price', 'quantity', 'service', 'selection_type' ]
+            # 'client','created_at' ,'user',
+            #       'duration', 'location', 'member', 'total_price',
+            #       'payment_type','tip','gst', 'order_type','created_at'

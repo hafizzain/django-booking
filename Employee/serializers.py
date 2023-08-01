@@ -12,6 +12,7 @@ from Service.models import Service
 from Permissions.models import EmployePermission
 # from datetime import datetime, timedelta
 from datetime import datetime, timedelta
+import calendar
 
 from rest_framework import serializers
 from .models import( EmployeDailySchedule, Employee, EmployeeProfessionalInfo ,
@@ -817,41 +818,34 @@ class ScheduleSerializer(serializers.ModelSerializer):
 class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
     total_hours = serializers.SerializerMethodField(read_only=True)
     end_time = serializers.SerializerMethodField(read_only=True)
+    total_hours_dummy = serializers.SerializerMethodField(read_only=True)
     
     def get_end_time(self, obj):
         try:
             if obj.start_time_shift != None:
                 return str(obj.end_time_shift)
-            return str(obj.end_time)
+            if obj.end_time:
+                return str(obj.end_time)
         except:
             pass
                     
+    def get_total_hours_dummy(self, obj):
+        return obj.total_hours
+                    
     
     def get_total_hours(self, obj):
-        # try:
-        #     if obj.start_time_shift != None:
-        #         time1 = datetime.strptime(str(obj.start_time), "%H:%M:%S")
-        #         time2 = datetime.strptime(str(obj.end_time_shift), "%H:%M:%S")
 
-        #         time_diff = time2 - time1
-        #         total_hours = time_diff - timedelta(hours=1)  # subtracting 1 hour for break
-        #         total_hours = datetime.strptime(str(total_hours), '%H:%M:%S')
-        #         total_hours = total_hours.strftime('%H')
-        #         return f'{total_hours}'
-            
-        #     time1 = datetime.strptime(str(obj.start_time), "%H:%M:%S")
-        #     time2 = datetime.strptime(str(obj.end_time), "%H:%M:%S")
-
-        #     time_diff = time2 - time1
-        #     total_hours = time_diff - timedelta(hours=1)  # subtracting 1 hour for break
-        #     total_hours = datetime.strptime(str(total_hours), '%H:%M:%S')
-        #     total_hours = total_hours.strftime('%H')
-        #     return f'{total_hours}'
-        
-        # except Exception as err:
-        #     return '0'
+        income_type = self.context.get('income_type', None)
         
         try:
+            if income_type == 'Hourly_Rate':
+                if obj.is_vacation:
+                    return '8'
+                elif obj.is_leave:
+                    return '0'
+                else:
+                    pass
+                
             if obj.start_time is None or obj.end_time is None:
                 return '0'  # Return '0' if any of the time values is None
 
@@ -873,8 +867,8 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
                 shift2_hours = (shift2_end - shift2_start).total_seconds() / 3600  # calculate the time difference in hours
                 total_hours += shift2_hours
 
-            total_hours = int(total_hours)  # convert to integer
-            return str(total_hours)
+            total_hours = float(total_hours)  # convert to integer
+            return float(total_hours)
 
         except Exception as err:
             return str(err)
@@ -883,7 +877,7 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
         model = EmployeDailySchedule
         fields = ['id','user','business','employee','day','vacation','start_time','end_time',
                   'start_time_shift','end_time_shift','from_date','to_date','total_hours','note',
-                  'date','is_leave','is_off','is_vacation','is_active','created_at','updated_at']
+                  'date','is_leave','is_off','is_vacation','is_active','created_at','updated_at', 'total_hours_dummy']
 
 class WorkingScheduleSerializer(serializers.ModelSerializer):
     start_time = serializers.SerializerMethodField(read_only=True)
@@ -988,7 +982,7 @@ class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ['id', 'image','location','full_name', 'email', 
-                  'mobile_number','country','state','city', 'address', 'postal_code', 'employee_permission']
+                  'mobile_number','country','state','city', 'address', 'postal_code', 'employee_permission', 'is_active']
 class EmployeeInformationSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     
@@ -1011,15 +1005,87 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     income_type = serializers.SerializerMethodField(read_only=True)
     salary = serializers.SerializerMethodField(read_only=True)
+    total_earning = serializers.SerializerMethodField(read_only=True)
     #employe_id = serializers.SerializerMethodField(read_only=True)
     
     location = serializers.SerializerMethodField(read_only=True)
     sallaryslip = serializers.SerializerMethodField(read_only=True)
+    total_hours = serializers.SerializerMethodField(read_only=True)
     
     def get_location(self, obj):
         loc = obj.location.all()
         return LocationSerializer(loc, many =True ).data
     
+
+    def get_total_hours(self, obj):
+        start_date = self.context.get('start_date', None)
+        end_date = self.context.get('end_date', None)
+        now_date = datetime.now()
+
+        month_start_date = start_date or f'{now_date.year}-{now_date.month}-01'
+        month_end_date = end_date or now_date.strftime('%Y-%m-%d')
+
+        employee_schedules =  EmployeDailySchedule.objects.filter(
+            employee = obj,
+            is_leave = False,
+            date__range = (month_start_date, month_end_date)
+        ).order_by('-date')
+        hours = 0
+        for schedule in employee_schedules:
+            hours += schedule.total_hours
+        
+        return hours
+
+
+    def get_total_earning(self, obj):
+        now_date = datetime.now()
+        total_days = calendar.monthrange(now_date.year, now_date.month)[1]
+        date = now_date.date
+
+        start_date = self.context.get('start_date', None)
+        end_date = self.context.get('end_date', None)
+
+        month_start_date = start_date or f'{now_date.year}-{now_date.month}-01'
+        month_end_date = end_date or f'{now_date.year}-{now_date.month}-{total_days}'
+
+        employee_schedules =  EmployeDailySchedule.objects.filter(
+            employee = obj,
+            is_leave = False,
+            date__range = (month_start_date, month_end_date)
+        ).order_by('-date')
+
+        try:
+            income_type_info = EmployeeProfessionalInfo.objects.get(employee=obj)
+        except:
+            income_type = None
+        else:
+            total_earning = 0
+            salary = income_type_info.salary # 300
+            income_type = income_type_info.income_type
+
+            if income_type == 'Monthly_Salary':
+                per_day_salary = salary / total_days # 10
+                total_earning += (employee_schedules.count() * per_day_salary)
+
+            elif income_type == 'Daily_Income':
+                total_earning += (employee_schedules.count() * salary)
+                pass
+            elif income_type == 'Hourly_Rate':
+                total_hours = 0
+                for schedule in employee_schedules:
+                    total_hours += schedule.total_hours
+                
+                total_earning += (total_hours * salary)
+
+            return total_earning
+            # Hourly_Rate
+            # Daily_Income
+            # Monthly_Salary
+
+            # is_leave
+            # is_off
+            # is_vacation
+
     def get_salary(self, obj):        
         try:
             income_info = EmployeeProfessionalInfo.objects.get(employee=obj)
@@ -1035,11 +1101,26 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
             return None
 
     def get_schedule(self, obj):
+        now_date = datetime.now()
+        start_date = self.context.get('start_date', None)
+        end_date = self.context.get('end_date', None)
+
+        total_days = calendar.monthrange(now_date.year, now_date.month)[1]
+
+        month_start_date = start_date or f'{now_date.year}-{now_date.month}-01'
+        month_end_date = end_date or f'{now_date.year}-{now_date.month}-{total_days}'
+
         schedule =  EmployeDailySchedule.objects.filter(
-            employee = obj
-        ).order_by('-created_at')
+            employee = obj,
+            date__range = (month_start_date, month_end_date)
+        ).exclude(is_leave = True).order_by('-date')
         # ).order_by('employee__employee_employedailyschedule__date')            
-        return WorkingSchedulePayrollSerializer(schedule, many = True,context=self.context).data
+        context = self.context
+        try:
+            context['income_type'] = EmployeeProfessionalInfo.objects.get(employee=obj).income_type
+        except:
+            context['income_type'] = None
+        return WorkingSchedulePayrollSerializer(schedule, many = True,context=context).data
     
     def get_sallaryslip(self, obj):
         sallary =  SallarySlipPayrol.objects.filter(employee= obj )            
@@ -1059,7 +1140,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ['id', 'employee_id','is_active','full_name','image','location','sallaryslip',
-                  'schedule','created_at', 'income_type', 'salary']
+                  'schedule','created_at', 'income_type', 'salary', 'total_earning', 'total_hours']
 class Payroll_Working_device_attendence_ScheduleSerializer(serializers.ModelSerializer):    
     schedule =  serializers.SerializerMethodField(read_only=True)    
     
@@ -1071,17 +1152,23 @@ class Payroll_Working_device_attendence_ScheduleSerializer(serializers.ModelSeri
             range_start = datetime.strptime(range_start, "%Y-%m-%d")#.date()
             range_end = datetime.strptime(range_end, "%Y-%m-%d")#.date()
         else:
-            range_end = datetime.now()#.date()
-            month = range_end.month
-            year = range_end.year
+            import calendar
+            current_date = datetime.now()#.date()
+            month = current_date.month
+            year = current_date.year
+
+            current_month_days = calendar.monthrange(year, month)[1]
+
             range_start = f'{year}-{month}-01'
-            range_start = datetime.strptime(range_start, "%Y-%m-%d")#.date()
+            range_end = f'{year}-{month}-{current_month_days}'
         
         #return f'range_start{range_start} range_end{range_end}' 
         schedule =  EmployeDailySchedule.objects.filter(
-            employee= obj, 
-            created_at__gte =  range_start ,
-            created_at__lte = range_end
+            employee = obj, 
+            date__range =  (range_start, range_end) ,
+            is_vacation = False
+            # created_at__gte =  range_start ,
+            # created_at__lte = range_end
             ) 
                    
         return WorkingSchedulePayrollSerializer(schedule, many = True,context=self.context).data

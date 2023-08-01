@@ -4,10 +4,11 @@ from django.db import models
 from Authentication.models import User
 from Business.models import BusinessAddress
 from Client.models import Client, Membership, Promotion, Rewards, Vouchers
+from Promotions.models import PurchaseDiscount, SpendSomeAmount, FixedPriceService, MentionedNumberService, BundleFixed, RetailAndGetService
 from django.utils.timezone import now
 from Employee.models import Employee
-from Product.models import Product
-from Service.models import Service
+from Product.models import Product, CurrencyRetailPrice
+from Service.models import Service, PriceService
 
 # Create your models here.
 class Checkout(models.Model):
@@ -40,6 +41,9 @@ class Checkout(models.Model):
     payment_type = models.CharField(choices = PAYMENT_TYPE, max_length=50 , default = '' )
     
     tip = models.PositiveBigIntegerField(default = 0)
+
+    tax_applied = models.FloatField(default=0, verbose_name='Tax Applied in Percentage')
+    tax_amount = models.FloatField(default=0, verbose_name='Tax total amount')
     
     total_service_price = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
     total_product_price = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
@@ -145,8 +149,8 @@ class Order(models.Model):
     total_price = models.DecimalField(default = 0 , max_digits=10, decimal_places=5)
     sold_quantity = models.PositiveBigIntegerField(default = 0)
     
-    discount_percentage = models.PositiveBigIntegerField(default= 0)
-    discount_price = models.PositiveBigIntegerField(default= 0)
+    discount_percentage = models.FloatField(default= 0)
+    discount_price = models.FloatField(default= 0)
     price = models.PositiveBigIntegerField(default= 0)
 
     is_redeemed = models.BooleanField(default=False)
@@ -174,7 +178,7 @@ class ProductOrder(Order):
 
 class ServiceOrder(Order):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='service_orders')
-    
+
     def __str__(self):
         return str(self.id)
 

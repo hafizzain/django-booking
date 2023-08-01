@@ -25,6 +25,9 @@ from Product.serializers import (CategorySerializer, BrandSerializer, ProductOrd
                                  ,OrderSerializer , OrderProductSerializer, ProductConsumptionSerializer, ProductStockTransferSerializer, ProductOrderSerializer, ProductStockReportSerializer
                                  )
 from django.core.paginator import Paginator
+from Product.models import ProductTranslations
+from Utility.models import Language
+
 
 
 @api_view(['GET'])
@@ -32,18 +35,6 @@ from django.core.paginator import Paginator
 def get_test_api(request):
     product_id = request.data.get('product_id', None)
     from_location_id = request.data.get('from_location_id', None)
-    # service_id = "ed9b3e32-4f1f-469a-a065-ea9805ee0edc"
-    # location = "fef70b9b-c42d-4b3e-bf54-f4d1b5513f6b"
-    # product = Product.objects.get(id = service_id)
-    # product_stock = product.product_stock.all()#.first()
-    # available = 0
-    # for i in product_stock:
-    #     print(location, i.location)
-    #     if location == str(i.location):
-    #         print(i.available_quantity)
-    # #data = product_stock.available_quantity
-    # data = 1
-    # print(data)
     data = []
     location_ids = ['c7dfffd8-f399-48bf-9165-3fe26f565992','340b2c1f-ff66-4327-9cfe-692dff48ca40','8f8b22c9-8410-46b8-b0c7-f520a1480357']
     product = Product.objects.get(id = 'c7dfffd8-f399-48bf-9165-3fe26f565992')#filter(is_deleted = False).exclude(id__in = location_ids)
@@ -59,23 +50,6 @@ def get_test_api(request):
             text=str(err)
         )
     
-        #data =  ProductStockTransfer.objects.filter(product = i).aggregate(Sum('quantity'))
-    #print(data)
-    
-    # product = Product.objects.filter(is_deleted = False).exclude(id__in = data)
-    # for i in product:
-    #     print('test')
-    
-    # try:
-    #     added = ProductStock.objects.get(product__id=product_id, location = str(from_location_id) )
-    #     print(added)
-    #     # sold = added.available_quantity - 3
-    #     # added.available_quantity = sold
-    #     # added.save()
-    #     # print(sold)
-    #     # print(added.available_quantity)
-    # except Exception as err:
-    #     print(err)
     data = 'test'
     return Response(
         {
@@ -714,6 +688,8 @@ def add_product(request):
     #turnover = request.data.get('turnover', None)
    
     alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', None)
+    # invoices = request.data.get('invoices', None)
+
     
     product_error = []
 
@@ -944,6 +920,29 @@ def add_product(request):
     else:
         ExceptionRecord.objects.create(text='No Location Quantities Find')
     
+    # if invoices is not None:
+    #     if type(invoices) == str:
+    #         invoices = invoices.replace("'" , '"')
+    #         invoices = json.loads(invoices)
+    #     else:
+    #         pass
+    #     for invoice in invoices:
+    #         try:
+    #             language = invoice['invoiceLanguage']
+    #             product_name = invoice['product_name']
+    #         except:
+    #             pass
+    #         else:
+    #             productTranslation = ProductTranslations(
+    #                 product = product,
+    #                 product_name = product_name
+    #                 )
+    #             language = Language.objects.get(id__icontains = str(language))
+    #             productTranslation.language = language
+    #             productTranslation.save()
+
+
+    
 
     serialized = ProductSerializer(product, context={'request' : request, 'location': None})
     return Response(
@@ -972,6 +971,9 @@ def update_product(request):
     is_active = request.data.get('is_active', None)
     
     currency_retail_price = request.data.get('currency_retail_price', None)
+    invoices = request.data.get('invoices', None)
+
+    check = True
     
     error = []
 
@@ -1076,6 +1078,15 @@ def update_product(request):
     #     stk.delete()
     
     if currency_retail_price is not None:
+        if check == True:
+            vch = CurrencyRetailPrice.objects.filter(product = product_id)
+            check = False
+            for i in vch:
+                try:
+                    voucher = CurrencyRetailPrice.objects.get(id = i.id)
+                    voucher.delete()
+                except:
+                    pass
         if type(currency_retail_price) == str:
             currency_retail_price = currency_retail_price.replace("'" , '"')
             currency_retail_price = json.loads(currency_retail_price)
@@ -1088,31 +1099,59 @@ def update_product(request):
             id = retail.get('id', None)
             price = retail['retail_price']
             
-            if id is not None:
-                try:
-                    currency_retail = CurrencyRetailPrice.objects.get(id=retail['id'])
-                    is_deleted = retail.get('is_deleted', None)
-                    if bool(is_deleted) == True:
-                        currency_retail.delete()
-                        continue
-                    currency_id= Currency.objects.get(id=retail['currency'])
-                    currency_retail.currency = currency_id
-                    currency_retail.retail_price = retail['retail_price']
-                    currency_retail.save()
-                except Exception as err:
-                    error.append(str(err))
-                    print(err)
-            else:
-                currency_id= Currency.objects.get(id=retail['currency'])
-                
-                CurrencyRetailPrice.objects.create(
-                user = user,
-                business = product.business,
-                product = product,
-                currency = currency_id,
-                retail_price =  retail['retail_price'] ,
-                )
+            # if id is not None:
+            #     try:
+            #         currency_retail = CurrencyRetailPrice.objects.get(id=retail['id'])
+            #         is_deleted = retail.get('is_deleted', None)
+            #         if bool(is_deleted) == True:
+            #             currency_retail.delete()
+            #             continue
+            #         currency_id= Currency.objects.get(id=retail['currency'])
+            #         currency_retail.currency = currency_id
+            #         currency_retail.retail_price = retail['retail_price']
+            #         currency_retail.save()
+            #     except Exception as err:
+            #         error.append(str(err))
+            #         print(err)
+            # else:
+            currency_id= Currency.objects.get(id=retail['currency'])
             
+            CurrencyRetailPrice.objects.create(
+            user = user,
+            business = product.business,
+            product = product,
+            currency = currency_id,
+            retail_price =  retail['retail_price'] ,
+            )
+
+    if invoices is not None:
+        if type(invoices) == str:
+            invoices = invoices.replace("'" , '"')
+            invoices = json.loads(invoices)
+        else:
+            pass
+        
+        
+        old_data = ProductTranslations.objects.filter(product = product)
+        for old in old_data:
+            old = ProductTranslations.objects.get(id = old.id)
+            old.delete()
+
+        for invoice in invoices:
+            try:
+                language = invoice['invoiceLanguage']
+                product_name = invoice['product_name']
+            except:
+                pass
+            else:
+                productTranslation = ProductTranslations(
+                    product = product,
+                    product_name = product_name
+                    )
+                language = Language.objects.get(id__icontains = str(language))
+                productTranslation.language = language
+                productTranslation.save()
+        
                 
 
     location_quantities = request.data.get('location_quantities', None)
@@ -1172,6 +1211,7 @@ def update_product(request):
     # if serialized.is_valid():
     #     serialized.save()
     #     data.update(serialized.data)
+
         
     
     serialized = ProductSerializer(product, data=request.data, partial=True, context={'request':request, 'location': None})
@@ -1296,10 +1336,10 @@ def delete_product(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    #product.is_deleted = True
+    product.is_deleted = True
     #product_stock.is_deleted = True
-    #product.save()
-    product.delete()
+    product.save()
+    # product.delete()
     return Response(
         {
             'status' : True,
@@ -1365,7 +1405,8 @@ def search_product(request):
 @permission_classes([AllowAny])
 def get_stocks(request):
     all_stocks = Product.objects.filter(is_active=True, is_deleted=False, product_stock__gt=0 ).order_by('-created_at').distinct()
-    serialized = ProductWithStockSerializer(all_stocks, many=True, context={'request' : request})
+    serialized = ProductWithStockSerializer(all_stocks, many=True, context={'request' : request}).data
+    # serialized_data = sorted(serialized, key=lambda x:x ['stock'][0]['sold_quantity'], reverse=True)
     return Response(
         {
             'status' : True,
@@ -1373,7 +1414,7 @@ def get_stocks(request):
             'response' : {
                 'message' : 'All stocks!',
                 'error_message' : None,
-                'stocks' : serialized.data
+                'stocks' : serialized
             }
         },
         status=status.HTTP_200_OK
@@ -1729,26 +1770,7 @@ def update_orderstock(request):
                     product = pro,
                     quantity = quantity
                 )
-    
-    # if type(products) == str:
-    #     products = products.replace("'" , '"')
-    #     print(products)
-    #     products = json.loads(products)
-    # else:
-    #     pass
-    # for product in products :
-       
-    #     if product['edit'] == 'yes':
-    #         try:
-    #             print(product['id'])
-    #             id_dt = OrderStockProduct.objects.get(id=product['id'])
-    #             pro = Product.objects.get(id=product['product_id'])
-    #         except Product.DoesNotExist:
-    #             None
-            
-    #         product_serializer = OrderProductSerializer(id_dt, data=request.data , partial=True)
-       
-              
+ 
     serializer = OrderSerializer(order_stock, data=request.data, partial=True, context={'request' : request})
     if serializer.is_valid():
            serializer.save()
@@ -1880,8 +1902,12 @@ def update_orderstockproduct(request):
         order_stock.note = note
         order_stock.save()
     if rec_quantity is not None:
+        rec_quantity = order_stock.rec_quantity + int(rec_quantity)
+
         order_stock.rec_quantity = rec_quantity
         order_stock.save()
+        exp = ExceptionRecord.objects.create(text= f'{order_stock.rec_quantity} ++ {rec_quantity}')
+        exp.save()
     if int(rec_quantity) >= order_stock.quantity:
         order_stock.is_finished = True
     else:
@@ -1964,7 +1990,12 @@ def update_orderstockproduct(request):
     
     serializer = OrderProductSerializer(order_stock, data=request.data, partial=True, context={'request' : request})
     if serializer.is_valid():
-           serializer.save()
+        created_obj = serializer.save()
+        created_obj.rec_quantity = 0
+        rec_quantity = order_stock.rec_quantity + int(rec_quantity)
+        created_obj.rec_quantity = rec_quantity
+        created_obj.save()
+           
     else: 
         return Response(
             {

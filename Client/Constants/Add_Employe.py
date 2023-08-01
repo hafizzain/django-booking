@@ -22,7 +22,7 @@ def add_client(emp_name, emp_email, template,busines_name ,tenant = None):
         text_content = strip_tags(html_file)
         
         email = EmailMultiAlternatives(
-            'Employee Created',
+            'Join NStyle',
             text_content,
             settings.EMAIL_HOST_USER,
             to = [emp_email],

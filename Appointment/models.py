@@ -18,6 +18,7 @@ class AppointmentLogs(models.Model):
         ('Edit', 'Edit'),
         ('Reschedule', 'Reschedule'),
         ('Cancel', 'Cancel'),
+        ('done', 'Done'),
     ]
 
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
@@ -161,13 +162,13 @@ class AppointmentService(models.Model):
     appointment_status = models.CharField(choices=BOOKED_CHOICES, max_length=100, default='Appointment Booked')
     tip = models.PositiveIntegerField(default=0, null=True, blank=True)
     
-    price = models.PositiveIntegerField(default=0, null=True, blank=True)
+    price = models.FloatField(default=0, null=True, blank=True)
     
     service_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
     service_commission_type = models.CharField( max_length=50 , default = '')
     
-    discount_price = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
-    discount_percentage = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
+    discount_price = models.FloatField(default = 0 , null=True, blank=True)    
+    discount_percentage = models.FloatField(default = 0 , null=True, blank=True)
         
     total_price = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
     
@@ -196,6 +197,12 @@ class AppointmentService(models.Model):
             return datetime_duration
         except Exception as err:
             return str(err)
+    
+
+    def save(self, *args, **kwargs):
+        if not self.total_price:
+            self.total_price = self.price
+        super(AppointmentService, self).save(*args, **kwargs)
     
 
     def __str__(self):

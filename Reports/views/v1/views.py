@@ -25,10 +25,12 @@ from Business.models import BusinessAddress
 from Service.models import PriceService, Service, ServiceGroup
 
 from Product.models import Brand, Product, ProductOrderStockReport, ProductStock
-from django.db.models import Avg, Count, Min, Sum
+from django.db.models import Avg, Count, Min, Sum, F, FloatField, Q
 
-
+from Reports.models import DiscountPromotionSalesReport
+from Reports.serializers import DiscountPromotionSalesReport_serializer
 from Sale.serializers import AppointmentCheckout_ReportsSerializer, PromotionNDiscount_AppointmentCheckoutSerializer, PromotionNDiscount_CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer, CheckoutCommissionSerializer
+from datetime import datetime as dt
 
 
 @api_view(['GET'])
@@ -175,12 +177,15 @@ def get_service_target_report(request):
     year = request.GET.get('year', None)
     location = request.GET.get('location', None)
     
-    address = ServiceGroup.objects.filter(is_deleted=False).order_by('-created_at')
+    address = ServiceGroup.objects.filter(
+        is_deleted = False,
+    ).order_by('-created_at')
     serialized = ServiceGroupReport(address, many=True, context={'request' : request, 
                     'month': month,
                     'location': location,
                     'year': year
                     })
+
     return Response(
         {
             'status' : 200,
@@ -193,7 +198,7 @@ def get_service_target_report(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_retail_target_report(request):
@@ -221,13 +226,19 @@ def get_retail_target_report(request):
         status=status.HTTP_200_OK
     )
 
-    
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_commission_reports_by_commission_details_updated(request):
     range_start = request.GET.get('range_start', None) # 2023-02-23
     year = request.GET.get('year', None) # non used
     range_end = request.GET.get('range_end', None) # 2023-02-25
+    if range_end is not None:
+        range_end = dt.strptime(range_end, '%Y-%m-%d').date()
+        range_end = range_end + timedelta(days=1)
+        range_end = str(range_end)
+
+    print( range_start, range_end)
     
     data = []
     
@@ -283,10 +294,13 @@ def get_commission_reports_by_commission_details_updated(request):
         'location',
     ).filter(
         is_active = True,
+        # created_at__gte = range_start,
+        # created_at__lte = range_end,
         **query
     ).order_by(
         '-created_at'
     )
+
 
     # 'location', 'order_type', 'employee', 'commission', 'commission_rate', 'sale', 'created_at'
 
@@ -349,25 +363,32 @@ def get_promotions_and_discounts_sales(request):
     if start_date and end_date:
         queries['created_at__range'] = (start_date, end_date)
 
+    sales = DiscountPromotionSalesReport.objects.filter(
+        is_deleted = False,
+        is_active = True,
+        location__id = location_id,
+        **queries
+    ).order_by('-created_at')
+    data = DiscountPromotionSalesReport_serializer(sales, many=True).data
     
-    checkout_order = Checkout.objects.filter(
-        is_deleted=False,
-        location__id=location_id,
-        is_promotion = True,
-        **queries,
-    )
-    appointment_checkout = AppointmentCheckout.objects.filter(
-        appointment_service__appointment_status='Done',
-        business_address__id=location_id,
-        is_promotion = True,
-        **queries,
-    )
+    # checkout_order = Checkout.objects.filter(
+    #     is_deleted=False,
+    #     location__id=location_id,
+    #     is_promotion = True,
+    #     **queries,
+    # )
+    # appointment_checkout = AppointmentCheckout.objects.filter(
+    #     appointment_service__appointment_status='Done',
+    #     business_address__id=location_id,
+    #     is_promotion = True,
+    #     **queries,
+    # )
 
-    data_total = list(PromotionNDiscount_CheckoutSerializer(checkout_order, many=True, context={'request': request}).data) + \
-                 list(PromotionNDiscount_AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
+    # data_total = list(PromotionNDiscount_CheckoutSerializer(checkout_order, many=True, context={'request': request}).data) + \
+    #              list(PromotionNDiscount_AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
                  
-    sorted_data = sorted(data_total, key=lambda x: x['created_at'], reverse=True)
+    # sorted_data = sorted(data_total, key=lambda x: x['created_at'], reverse=True)
 
-    paginated_data = paginator.paginate_queryset(sorted_data, request)
+    paginated_data = paginator.paginate_queryset(data, request)
 
     return paginator.get_paginated_response(paginated_data, 'sales')

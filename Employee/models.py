@@ -385,6 +385,59 @@ class EmployeDailySchedule(models.Model):
     def __str__(self):
         return str(self.id)
     
+    def save(self, *args, **kwargs):
+        if self.is_leave:
+            self.start_time = None
+            self.end_time = None
+            self.start_time_shift = None
+            self.end_time_shift = None
+        
+        super(EmployeDailySchedule, self).save(*args, **kwargs)
+
+
+
+    @property
+    def total_hours(self):
+        from datetime import datetime , timedelta
+
+        try:
+            income_type = EmployeeProfessionalInfo.objects.get(employee=self.employee).income_type
+        except:
+            return 0
+        
+        if income_type == 'Hourly_Rate':
+            if self.is_vacation:
+                return 8
+            elif self.is_leave:
+                return 0
+            else:
+                pass
+            
+        if self.start_time is None or self.end_time is None:
+            return 0  # Return '0' if any of the time values is None
+
+        shift1_start = datetime.strptime(self.start_time.strftime("%H:%M:%S"), "%H:%M:%S")
+        shift1_end = datetime.strptime(self.end_time.strftime("%H:%M:%S"), "%H:%M:%S")
+
+        if shift1_end < shift1_start:
+            shift1_end += timedelta(days=1)  # Add 1 day if the shift ends on the next day
+
+        total_hours = (shift1_end - shift1_start).total_seconds() / 3600  # calculate the time difference in hours
+
+        if self.start_time_shift and self.end_time_shift:
+            shift2_start = datetime.strptime(self.start_time_shift.strftime("%H:%M:%S"), "%H:%M:%S")
+            shift2_end = datetime.strptime(self.end_time_shift.strftime("%H:%M:%S"), "%H:%M:%S")
+
+            if shift2_end < shift2_start:
+                shift2_end += timedelta(days=1)  # Add 1 day if the shift ends on the next day
+
+            shift2_hours = (shift2_end - shift2_start).total_seconds() / 3600  # calculate the time difference in hours
+            total_hours += shift2_hours
+
+        total_hours = float(total_hours)  # convert to integer
+        return float(total_hours)
+
+    
 # class EmployeDailyShift(models.Model):
 #     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
 #     user = models.ForeignKey(User, on_delete=models.CASCADE, null = True, related_name='user_employedailyshift')
@@ -441,6 +494,8 @@ class EmployeeCommission(models.Model):
     quantity = models.PositiveIntegerField(default=0, verbose_name='Sold Items Quantity')
 
     tip = models.FloatField(default=0)
+
+    sale_id = models.CharField(max_length=128, null=True, blank=True)
 
     
     is_active = models.BooleanField(default=True)

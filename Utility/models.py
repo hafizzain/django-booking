@@ -129,10 +129,19 @@ class NstyleFile(models.Model):
 class ExceptionRecord(models.Model):
     id = models.UUIDField(default=uuid4, editable=False, unique=True, primary_key=True)
 
-    text = models.TextField()
+    status_code = models.TextField(null=True, blank=True)
+    text = models.TextField()    
+    path = models.TextField(null=True, blank=True)
+    method = models.TextField(null=True, blank=True)
+    
     is_resolved = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
 
+    def save(self, *args, **kwargs):
+        if self.text:
+            text = f'{self.text}'.replace('\\n', '<br/>')
+            self.text = text
+        super(ExceptionRecord, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.id)
