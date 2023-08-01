@@ -1093,13 +1093,13 @@ def update_employee(request):
 
     Employe_Informations= EmployeeProfessionalInfo.objects.get(employee=employee)
     
-    Employe_Informations.monday = True if 'monday' in request.data else Employe_Informations.monday
-    Employe_Informations.tuesday = True if 'tuesday' in request.data else Employe_Informations.tuesday
-    Employe_Informations.wednesday = True if 'wednesday' in request.data else Employe_Informations.wednesday
-    Employe_Informations.thursday = True if 'thursday' in request.data else Employe_Informations.thursday
-    Employe_Informations.friday = True if 'friday' in request.data else Employe_Informations.friday
-    Employe_Informations.saturday = True if 'saturday' in request.data else Employe_Informations.saturday
-    Employe_Informations.sunday = True if 'sunday' in request.data else Employe_Informations.sunday
+    Employe_Informations.monday = True if 'monday' in request.data else False
+    Employe_Informations.tuesday = True if 'tuesday' in request.data else False
+    Employe_Informations.wednesday = True if 'wednesday' in request.data else False
+    Employe_Informations.thursday = True if 'thursday' in request.data else False
+    Employe_Informations.friday = True if 'friday' in request.data else False
+    Employe_Informations.saturday = True if 'saturday' in request.data else False
+    Employe_Informations.sunday = True if 'sunday' in request.data else False
     
     
     if services_id is not None:
