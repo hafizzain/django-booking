@@ -124,14 +124,15 @@ class TodayAppoinmentSerializer(serializers.ModelSerializer):
         app_date_time = f'2000-01-01 {obj.appointment_time}'
 
         try:
-            duration = DURATION_CHOICES_DATA[obj.duration]
+            # duration = DURATION_CHOICES_DATA[obj.duration]
+            duration = DURATION_CHOICES[obj.duration]
             app_date_time = datetime.fromisoformat(app_date_time)
             datetime_duration = app_date_time + timedelta(minutes=duration)
             datetime_duration = datetime_duration.strftime('%H:%M:%S')
             return datetime_duration
         except Exception as err:
             print(err)
-            return None
+            return str(err)
     class Meta:
         model = AppointmentService
         fields = ('id', 'appointment_time', 'appointment_date','duration',
