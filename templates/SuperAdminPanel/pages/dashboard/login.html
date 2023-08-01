@@ -1,3 +1,4 @@
+{% load static %}
 {% include 'SuperAdminPanel/partials/header.html' %}
 {% block body %}
 
@@ -212,7 +213,7 @@
               <div
                 class="w-[20rem] h-[20rem] md:h-[25rem] md:w-[25rem] lg:h-[30rem] lg:w-[30rem] relative flex justify-center items-center"
               >
-                <img src="/images/login-slider-1.png" class="relative z-10" />
+                <img src='{% static "/images/login-slider-1.png" %}' class="relative z-10" />
               </div>
             </div>
           </div>
