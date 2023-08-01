@@ -156,7 +156,7 @@ def get_appointments_service(request):
 @permission_classes([AllowAny])
 def get_appointments_device(request):
     employee_id = request.GET.get('employee_id', None) 
-    status = request.GET.get('status', None) 
+    appointment_status = request.GET.get('status', None) 
     
     if not all([employee_id]):
         return Response(
@@ -194,7 +194,7 @@ def get_appointments_device(request):
     try:
         appointment = Appointment.objects.filter(
             appointment_services__member = employee,
-            appointment_services__appointment_status = status,
+            appointment_services__appointment_status = appointment_status,
             ).order_by('-created_at').distinct()
     except Exception as err:
         return Response(
