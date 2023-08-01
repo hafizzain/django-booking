@@ -23,7 +23,6 @@ def add_content(request):
         else:
             is_recent_check = False
 
-        print("*********************", image)
         help_content = HelpContent.objects.create(
             content=topic, 
             description = desc, 
@@ -42,6 +41,11 @@ def view_content(request):
     context={}
     context['content'] = content
     return render(request, 'help/help-center.html', context)
+
+
+def update_content(request):
+    # if request.method == 'POST':
+    pass
 
 
 def add_topic_content(request):
@@ -70,7 +74,6 @@ def view_topic_content(request):
     context['content'] = all
     context['parent'] = id
     return render(request, 'help/help-center-topics.html', context)
-
 
 
 
@@ -181,12 +184,15 @@ def get_comment_details(request):
 
 
 
+
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def search_topic(request):
     topic = request.data.get('topic')
 
     HelpContent.objects.filter()
+    
 
     
 
