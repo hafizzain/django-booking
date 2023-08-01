@@ -12,4 +12,5 @@ urlpatterns = [
     path('language/section/', insightViews.LanguageSectionPage, name='LanguageSectionPage'),
     path('language/section-detail/', insightViews.LanguageSectionDetailPage, name='LanguageSectionDetailPage'),
     path('logout/', insightViews.Logout, name='logout'),
+    path('super-login/', insightViews.SuperLogin, name='super-login'),
 ]

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponse
 from MultiLanguage.models import *
 from Utility.models import ExceptionRecord
 from django.contrib.auth.decorators import login_required
@@ -64,3 +64,6 @@ def LanguageSectionDetailPage(request):
 def Logout(request):
     logout(request)
     return redirect('/admin')
+
+def SuperLogin(request):
+    return render(request, 'SuperAdminPanel/pages/dashboard/login.html')
