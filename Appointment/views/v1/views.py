@@ -194,7 +194,7 @@ def get_appointments_device(request):
     try:
         appointment = Appointment.objects.filter(
             appointment_services__member = employee,
-            appointment_services__appointment_status = appointment_status,
+            # appointment_services__appointment_status = appointment_status,
             ).order_by('-created_at').distinct()
     except Exception as err:
         return Response(
