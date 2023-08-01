@@ -556,7 +556,7 @@ def get_total_comission(request):
     if range_start:
         range_start = datetime.strptime(range_start, "%Y-%m-%d")#.date()
         range_end = datetime.strptime(range_end, "%Y-%m-%d")#
-        queries['created_at__range'] = (range_start, range_end)
+        queries['created_at__date__range'] = (range_start, range_end)
 
     employee_commissions = EmployeeCommission.objects.filter(
         employee__id = employee_id,
