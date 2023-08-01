@@ -3,6 +3,8 @@ from MultiLanguage.models import *
 from Utility.models import ExceptionRecord
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 
 
 
@@ -66,4 +68,28 @@ def Logout(request):
     return redirect('/admin')
 
 def SuperLogin(request):
+    if request.method == "POST":
+        username = request.data.get('username', None)
+        password = request.data.get('password', None)
+    else:
+        pass
+
+    try:
+        user = User.objects.get(
+                username=username,
+                is_deleted=False,
+                is_admin=True,
+                user_account_type__account_type = 'Everyone'
+            )
+    except:
+        messages.error(request, 'Invalid Username')
+    
+    user = authenticate(request, username=username, password=password)
+
+    if user:    
+        login(request, user)
+        messages.success(request, 'Logged in Successfully')
+        return redirect('super-admin/admin')
+    else:
+        messages.error(request, 'Invalid Credentials')
     return render(request, 'SuperAdminPanel/pages/dashboard/login.html')
