@@ -5,14 +5,14 @@
 <div class="nstyle-container">
   <div class="min-h-[100vh] grid grid-cols-1 lg:grid-cols-2">
     <div class="flex flex-col lg:pt-[3rem] lg:px-[4rem] px-8 py-5">
-      <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
         <svg
           width="4rem"
           height="4rem"
           viewBox="0 0 68 73"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-        >
+         >
           <g clip-path="url(#clip0_51_4)">
             <path
               fill-rule="evenodd"
@@ -63,6 +63,9 @@
             </clipPath>
           </defs>
         </svg>
+        <h1 class="text-3xl font-light text-[#5779ff] lg:text-left text-center">
+          <span class="font-semibold">NStyle</span>
+        </h1>
       </div>
       <div
         class="flex flex-1 flex-col gap-5 justify-center md:py-[3rem] py-[1.75rem] md:w-[75%] lg:mx-0 mx-auto slide-in-bottom w-full lg:py-0"
@@ -75,14 +78,14 @@
           Welcome Back to Nstyle Backend Portal, Please Sign In your account.
         </p>
 
-        <form action="/super-admin/super-login/" method="POST">
+        <form action="/super-admin/super-login/" method="POST" class="flex flex-col gap-4">
           {% csrf_token %}
         <div class="undefined flex flex-col gap-2 relative">
           <div class="text-sm flex items-center gap-1">
             Email Address <span class=""> *</span>
           </div>
           <input
-            type="email"
+            type="email" required
             placeholder="Enter your email address"
             name="email"
             class="border disabled:cursor-not-allowed rounded-md text-sm outline-none lg:px-4 px-2 py-[0.8rem] placeholder:text-[#A1A1A1] text-primary focus:border-primary ease-in transition-all focus:border-l-[0.375rem]"
@@ -91,7 +94,7 @@
         <div class="flex flex-col gap-2 relative">
           <p class="text-sm">Password <span> *</span></p>
           <div class="flex flex-col gap-2 relative">
-            <input
+            <input required
               type="password"
               name="password"
               class="border rounded-md text-sm outline-none lg:px-4 px-2 py-[0.8rem] placeholder:text-[#A1A1A1] text-primary focus:border-primary ease-in transition-all focus:border-l-[7px]"
@@ -121,7 +124,7 @@
         </div>
         <div class="flex justify-start">
           <button type="submit"
-            class="shake-bottom shake-bottom !px-3 !py-3 font-medium text-xs leading-tight uppercase rounded-md shadow-md hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg active:text-white transition duration-150 ease-in-out flex items-center whitespace-nowrap w-fit disabled:cursor-not-allowed border border-primary text-white bg-primary"
+            class="btn bg-[#5679FF] text-sm px-4 !rounded-md"
           >
             Login &nbsp;<svg
               width="18"
