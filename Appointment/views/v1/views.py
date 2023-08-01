@@ -818,8 +818,13 @@ def update_appointment(request):
         
         service_appointment.member = employee
         service_appointment.appointment_time = start_time
-        service_appointment.save()
-        service_appointment.end_time = service_appointment.appointment_time + time_difference
+
+        duration = DURATION_CHOICES[service_appointment.duration]
+        app_date_time = datetime.fromisoformat(start_time)
+        datetime_duration = app_date_time + timedelta(minutes=duration)
+        datetime_duration = datetime_duration.strftime('%H:%M:%S')
+
+        service_appointment.end_time = datetime_duration
         service_appointment.save()
 
         
