@@ -297,12 +297,12 @@ class AppointmentEmployeeTip(models.Model):
 
     checkout = models.ForeignKey(Checkout, on_delete=models.CASCADE,related_name="checkout_tips", null=True, blank=True)
 
-    tip = models.PositiveIntegerField(default=0, null=True, blank=True)
-    gst = models.PositiveIntegerField(default=0, null=True, blank=True)
+    tip = models.FloatField(default=0, null=True, blank=True)
+    gst = models.FloatField(default=0, null=True, blank=True)
     gst_price = models.FloatField(default=0, null=True, blank=True)
     
-    service_price = models.PositiveIntegerField(default=0, null=True, blank=True)
-    total_price = models.PositiveIntegerField(default=0, null=True, blank=True)
+    service_price = models.FloatField(default=0, null=True, blank=True)
+    total_price = models.FloatField(default=0, null=True, blank=True)
     
     
     is_active = models.BooleanField(default=True)
