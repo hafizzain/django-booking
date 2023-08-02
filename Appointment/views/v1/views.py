@@ -889,7 +889,7 @@ def update_appointment(request):
                 appointment_service = appointment_service,
                 start_time = appointment_service.appointment_time,
                 duration = appointment_service.duration,
-                member = active_user_staff
+                member = appointment_service.member
             )
 
         try:
