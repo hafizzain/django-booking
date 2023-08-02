@@ -111,7 +111,7 @@ class CurrencyRetailPrice(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_currencyretailprice')
     
     currency = models.ForeignKey(Currency, on_delete=models.SET_NULL, null=True, blank=True)
-    retail_price = models.PositiveIntegerField(default=0)
+    retail_price = models.FloatField(default=0)
 
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
