@@ -13,6 +13,6 @@ urlpatterns = [
    path('add_topic_content/', views.add_topic_content),
    path('view_topic_content/', views.view_topic_content),
    
-   path('edit_topic/', views.edit_topic),
+   path('edit_topic/<str:id>', views.edit_topic),
    path('help-details/', views.help_details),
 ]

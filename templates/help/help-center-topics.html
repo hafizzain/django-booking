@@ -13,17 +13,6 @@
 <div
   class="bg-[#fff] lg:px-[2rem] lg:py-[2.5rem] py-[1.3rem] px-[1rem] md:w-[80%]"
 >
-  <div class="flex items-center gap-3">
-    {% for cont in content %}
-    <a
-      href=""
-      class="hover:bg-slate-100 relative transition-all cursor-pointer shadow-login-card px-[1.25rem] py-[1rem] rounded-xl flex flex-col gap-2"
-    >
-      <h2 class="font-semibold text-xl">{{cont.content|truncatechars:12}}</h2>
-      <p class="">{{cont.description|truncatechars:20}}</p>
-    </a>
-    {% endfor %}
-  </div>
 
   <div
     class="flex items-center gap-5 justify-between w-full lg:px-0 lg:pb-[2rem] lg:py-0 p-3 pb-8"
@@ -85,8 +74,9 @@
     </button>
   </form> {% endcomment %}
 
-
   <div class="grid lg:grid-cols-3 grid-cols-2 gap-5">
+  {% for cont in content %}
+
     <div
       class="border hover:shadow-sm relative transition-all hover:bg-gray-50 px-[1rem] py-[1.5rem] flex flex-col gap-2"
     >
@@ -101,10 +91,12 @@
                 </a>
         </div>
       
-        <h1 class="font-semibold text-lg">Actionable Products</h1>
+        <h1 class="font-semibold text-lg">{{cont.content}}</h1>
        </div>
-        <p class="text-[#101928] text-sm">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+        <p class="text-[#101928] text-sm">{{cont.description}}</p>
     </div>
+  {% endfor %}
+
   </div>
 </div>
 

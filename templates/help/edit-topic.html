@@ -4,7 +4,7 @@
 
 <form
   method="post"
-  action="/api/v1/help/add_content/"
+  action="/api/v1/help/edit_topic/{{content.id}}"
   enctype="multipart/form-data"
  >
   {% csrf_token %}
@@ -12,13 +12,14 @@
     <div>
       <div class="input-wrapper">
         <div class="input-label">Topic</div>
-        <input type="text" name="topic" class="input" required="" />
+        <input type="text" name="topic" class="input" required="" value="{{content.content}}"/>
       </div>
     </div>
     <div>
       <div class="input-wrapper">
+        <img src="/media/{{request.tenant_schema_name}}/{{content.image}}" width="50">
         <div class="input-label">Image</div>
-        <input type="file" name="image" class="input bg-white !text-xs" />
+        <input type="file" name="image" class="input bg-white !text-xs"/>
         
       </div>
     </div>
@@ -43,9 +44,13 @@
         id="is_recent"
         type="checkbox"
         name="is_recent"
+        {% if content.is_recent == True %}
+        checked
+        {% endif %}
+
         class="h-[1.2rem] w-[1.2rem] rounded-md accent-[#5679FF]"
       />
-      <labe for="#is_recent" class="input-label">Is Recent</labe>
+      <label for="#is_recent" class="input-label" value='1' >Is Recent</label>
     </div>
   </div>
   <button class="btn bg-[#5679FF] text-sm px-4 !rounded-md" type="submit">

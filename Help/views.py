@@ -76,8 +76,27 @@ def view_topic_content(request):
     return render(request, 'help/help-center-topics.html', context)
 
 # test
-def edit_topic(request):
-    return render(request, 'help/edit-topic.html')
+def edit_topic(request, id):
+    content = HelpContent.objects.get(id = str(id))
+    if request.method == 'POST':
+        topic = request.POST.get('topic', None)
+        image = request.FILES.get('image', None)
+        is_recent = request.POST.get('is_recent', False)
+        
+        if is_recent=='on':
+            is_recent_check = True
+        else:
+            is_recent_check = False
+
+
+        content.content = topic
+        if image is not None:
+            content.image = image
+        content.is_recent = is_recent_check
+        content.save()
+        return redirect('view_content')
+
+    return render(request, 'help/edit-topic.html', {'content':content})
 
 
 def help_details(request):
