@@ -985,7 +985,7 @@ class AppointmenttLogSerializer(serializers.ModelSerializer):
                 'service': log_detail.appointment_service.service.name,
                 'duration': log_detail.duration,
                 'appointment_time': log_detail.start_time,
-                'assigned_staff': log_detail.member.full_name,
+                'assigned_staff': log_detail.member.full_name if log_detail.member else '',
             }
             output.append(log)
 
