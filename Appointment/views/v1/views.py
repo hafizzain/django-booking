@@ -2053,7 +2053,6 @@ def create_checkout_device(request):
         service= services,
         member=members,
         business_address=business_address,
-        tip = tip,
         gst = gst,
         service_price =service_price,
         total_price =total_price,
