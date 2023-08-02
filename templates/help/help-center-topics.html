@@ -1,46 +1,103 @@
 {% extends 'SuperAdminPanel/main.html' %} {% block body %}
-<div class="flex items-center gap-5 lg:w-fit w-full lg:px-0 lg:pb-[2rem] lg:py-0 p-3 pb-8">
-    <h2 class="font-semibold text-2xl">Help Center Content Detail</h2>
+
+<div class="no_padding">
+  <div
+    class="bg-[#fff] lg:px-[2rem] lg:py-[2rem] py-[1.3rem] px-[1rem] border-b"
+  >
+    <div class="flex flex-col gap-6">
+      <h1 class="font-semibold text-3xl">Help Center Details</h1>
+    </div>
   </div>
-<div class="flex items-center  gap-3">
-    {% for cont in content %}
-        <a href="" class="hover:bg-slate-100 relative transition-all cursor-pointer shadow-login-card px-[1.25rem] py-[1rem] rounded-xl flex flex-col gap-2">
-            <h2 class="font-semibold text-xl">{{cont.content|truncatechars:12}}</h2>
-            <p class="">{{cont.description|truncatechars:20}}</p>
-        </a>
-    {% endfor %}
 </div>
 
+<div
+  class="bg-[#fff] lg:px-[2rem] lg:py-[2.5rem] py-[1.3rem] px-[1rem] md:w-[80%]"
+>
 
-
-<div class="flex items-center gap-5 lg:w-fit w-full lg:px-0 lg:pb-[2rem] lg:py-0 p-3 pb-8">
-    <h2 class="font-semibold text-2xl">Add Content Below</h2>
+  <div
+    class="flex items-center gap-5 justify-between w-full lg:px-0 lg:pb-[2rem] lg:py-0 p-3 pb-8"
+  >
+    <div class="flex items-center gap-3">
+      <svg
+        width="30"
+        height="30"
+        viewBox="0 0 30 30"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M5.3125 15.3429L24.0625 15.3429"
+          stroke="#130F26"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M12.875 22.8734L5.3125 15.3434L12.875 7.81213"
+          stroke="#130F26"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      <h2 class="font-semibold text-2xl">Dashboard</h2>
+    </div>
+    <div>
+      <a href='/api/v1/help/help-details/?id={{parent}}' class="btn bg-[#5679FF] text-sm px-4 !rounded-md" type="submit">
+        Add Topic
+      </a>
+    </div>
   </div>
-  <form method="post" action="/api/v1/help/add_topic_content/">
+
+
+  {% comment %} <form method="post" action="/api/v1/help/add_topic_content/">
     {% csrf_token %}
     <div class="grid md:grid-cols-2 gap-3">
-    
-        <div>
-            <div class="input-wrapper">
-            <div class="input-label">Topic</div>
-            <input type="text" name="topic"  class="input" required="">
-            </div>
+      <div>
+        <div class="input-wrapper">
+          <div class="input-label">Topic</div>
+          <input type="text" name="topic" class="input" required="" />
         </div>
-        <div>
-            <div class="input-wrapper">
-            <div class="input-label">Description</div>
-            <input type="text" name="desc"  class="input" required="" >
-            </div>
+      </div>
+      <div>
+        <div class="input-wrapper">
+          <div class="input-label">Description</div>
+          <input type="text" name="desc" class="input" required="" />
         </div>
-        <div>
-            <input type="text" name="parent" value='{{parent}}' hidden>
-        </div>
+      </div>
+      <div>
+        <input type="text" name="parent" value="{{parent}}" hidden />
+      </div>
     </div>
-    <button style=" margin-left:3rem;" type='submit'>Add</button>
-</form>
+    <button class="btn bg-[#5679FF] text-sm px-4 !rounded-md" type="submit">
+      Add
+    </button>
+  </form> {% endcomment %}
 
+  <div class="grid lg:grid-cols-3 grid-cols-2 gap-5">
+  {% for cont in content %}
 
+    <div
+      class="border hover:shadow-sm relative transition-all hover:bg-gray-50 px-[1rem] py-[1.5rem] flex flex-col gap-2"
+    >
+       <div>
+        <div class="flex items-center justify-end">
+                <a href="#" class="cursor-pointer ml-auto ">
+                    <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11.4766 17.0358H17.5338" stroke="#A9A6B6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M10.6719 3.16233C11.3197 2.38982 12.4843 2.27655 13.2745 2.90978C13.3182 2.94413 14.7221 4.03232 14.7221 4.03232C15.5903 4.55599 15.86 5.66925 15.3234 6.51882C15.2949 6.56432 7.35791 16.4704 7.35791 16.4704C7.09385 16.7991 6.69301 16.9931 6.26463 16.9978L3.2251 17.0358L2.54026 14.1436C2.44433 13.7369 2.54026 13.3098 2.80432 12.9811L10.6719 3.16233Z" stroke="#A9A6B6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M9.20703 5.00073L13.7606 8.49" stroke="#A9A6B6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>   
+                </a>
+        </div>
+      
+        <h1 class="font-semibold text-lg">{{cont.content}}</h1>
+       </div>
+        <p class="text-[#101928] text-sm">{{cont.description|safe}}</p>
+    </div>
+  {% endfor %}
 
-
+  </div>
+</div>
 
 {% endblock body %}

@@ -1,61 +1,178 @@
 {% extends 'SuperAdminPanel/main.html' %} {% block body %}
-<div class="flex items-center gap-5 lg:w-fit w-full lg:px-0 lg:pb-[2rem] lg:py-0 p-3 pb-8">
-    <h2 class="font-semibold text-2xl">Help Center</h2>
-  </div>
-  
-  <div class="flex items-center  gap-3">
-    {% for cont in content %}
+<script>
+  SideBarActive("help");
+</script>
 
-    <a href="/api/v1/help/view_topic_content/?id={{cont.id}}" class="hover:bg-slate-100 relative transition-all cursor-pointer shadow-login-card px-[1.25rem] py-[1rem] rounded-xl flex flex-col gap-2">
-        <img src="/media/{{request.tenant_schema_name}}/{{cont.image}}" width="60">
-         <h2 class="font-semibold text-xl">{{cont.content|truncatechars:10}}</h2>
-       </a>
-    {% endfor %}
+
+<div class="no_padding">
+  <div
+    class="bg-[#fff] lg:px-[2rem] lg:py-[2rem] py-[1.3rem] px-[1rem] border-b"
+  >
+    <div class="flex flex-col gap-6">
+      <h1 class="font-semibold text-3xl">Help Center</h1>
+    </div>
+  </div>
 </div>
 
+<div class="bg-[#fff] lg:px-[2rem] lg:py-[2.5rem] py-[1.3rem] px-[1rem] md:w-[80%]">
+    <div class="flex items-center justify-between gap-4">
+        <h2 class="font-semibold text-2xl mb-[2rem]">Topics</h2>
+        {% comment %} <button class="btn bg-[#5679FF] text-sm px-4 !rounded-md" type="submit">
+            Add Topic
+        </button> {% endcomment %}
+    </div>
 
 
 
+    <div class="flex items-center gap-3 flex-wrap">
+        {% for cont in content %}
+    
+        <div
+          class="min-w-[13rem] items-center text-center border hover:shadow-sm relative transition-all hover:bg-gray-50 px-[1rem] py-[1.5rem] flex flex-col gap-2"
+        >
+            <div class="w-full flex justify-end">
+                <a href='/api/v1/help/edit_topic/{{cont.id}}' class="cursor-pointer">
+                    <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11.4766 17.0358H17.5338" stroke="#A9A6B6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M10.6719 3.16233C11.3197 2.38982 12.4843 2.27655 13.2745 2.90978C13.3182 2.94413 14.7221 4.03232 14.7221 4.03232C15.5903 4.55599 15.86 5.66925 15.3234 6.51882C15.2949 6.56432 7.35791 16.4704 7.35791 16.4704C7.09385 16.7991 6.69301 16.9931 6.26463 16.9978L3.2251 17.0358L2.54026 14.1436C2.44433 13.7369 2.54026 13.3098 2.80432 12.9811L10.6719 3.16233Z" stroke="#A9A6B6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M9.20703 5.00073L13.7606 8.49" stroke="#A9A6B6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>   
+                </a>                 
+            </div>
+          <img
+            src="/media/{{request.tenant_schema_name}}/{{cont.image}}"
+            width="60"
+          />
+          <h2 class="font-semibold text-xl">{{cont.content|truncatechars:10}}</h2>
+          <a href="/api/v1/help/view_topic_content/?id={{cont.id}}" >
+              <p class="underline cursor-pointer text-[#5679FF] text-sm">Add Details</p>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
 
 
-<div class="flex items-center gap-5 lg:w-fit w-full lg:px-0 lg:pb-[2rem] lg:py-0 p-3 pb-8">
-    <h2 class="font-semibold text-2xl">Help Center</h2>
-  </div>
-  <form method="post" action="/api/v1/help/add_content/" enctype="multipart/form-data">
+    <h2 class="font-semibold text-2xl my-[2rem]">Add Topics</h2>
+
+
+  <form
+    method="post"
+    action="/api/v1/help/add_content/"
+    enctype="multipart/form-data"
+   >
     {% csrf_token %}
     <div class="grid md:grid-cols-2 gap-3">
-    
-        <div>
-            <div class="input-wrapper">
-            <div class="input-label">Topic</div>
-            <input type="text" name="topic"  class="input" required="">
-            </div>
+      <div>
+        <div class="input-wrapper">
+          <div class="input-label">Topic</div>
+          <input type="text" name="topic" class="input" required="" />
         </div>
-        <div>
-            <div class="input-wrapper">
-            <div class="input-label">Description</div>
-            <input type="text" name="desc"  class="input" required="" >
-            </div>
+      </div>
+      <div>
+        <div class="input-wrapper">
+          <div class="input-label">Image</div>
+          <input type="file" name="image" class="input bg-white !text-xs" />
+          
         </div>
-        <div>
-            <div class="input-wrapper">
-            <div class="input-label">Image</div>
-            <input type="file" name="image" class="input">
-            </div>
-        </div>
-
-        <div>
-            <div class="input-wrapper">
-            <div class="input-label">Is Recent</div>
-            <input type="checkbox" name="is_recent" class="input">
-            </div>
-        </div>        
+      </div>
     </div>
-    <button style=" margin-left:3rem;" type='submit'>Add</button>
-</form>
 
+    {% comment %} <div class="mt-4">
+      <div class="input-label mb-1">Description</div>
+      <div id="" class="bg-white editor" style="height: 15rem"></div>
+      <input
+        type="text"
+        name="desc"
+        class="input editorContentInput"
+        hidden
+        id=""
+        required=""
+      />
+    </div> {% endcomment %}
 
+    <div class="w-fit my-3">
+      <div class="flex items-center gap-2">
+        <input
+          id="is_recent"
+          type="checkbox"
+          name="is_recent"
+          class="h-[1.2rem] w-[1.2rem] rounded-md accent-[#5679FF]"
+        />
+        <labe for="#is_recent" class="input-label">Is Recent</labe>
+      </div>
+    </div>
+    <button class="btn bg-[#5679FF] text-sm px-4 !rounded-md" type="submit">
+      Submit
+    </button>
+  </form>
+  
+</div>
 
-
-
+{% comment %} POPUP {% endcomment %}
+<div class="popup hidden">
+  <div
+    class="fixed inset-0 h-[100vh] w-[100vw] z-[4444] flex justify-center items-center"
+  >
+    <div class="bg-[#101928]/30 absolute inset-0 z-[1]"></div>
+    <div
+      class="relative overflow-hidden bg-white shadow-2xl rounded-2xl lg:w-[36vw] w-[90vw] z-[2] slide-in-elliptic-top-fwd"
+    >
+      <div class="sticky top-0 bg-white z-[22]">
+        <div
+          class="absolute top-0 right-0 bg-primary px-[1.6rem] py-[1rem] rounded-bl-2xl cursor-pointer close_btn"
+        >
+          <svg
+            class="h-[1.125rem] w-[1.125rem]"
+            viewBox="0 0 25 25"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M1.36973 1.42735C1.79418 1.00302 2.36979 0.764648 2.96996 0.764648C3.57014 0.764648 4.14575 1.00302 4.5702 1.42735L12.5736 9.43078L20.5771 1.42735C21.004 1.01505 21.5757 0.786907 22.1692 0.792064C22.7626 0.797221 23.3303 1.03526 23.75 1.45492C24.1696 1.87457 24.4077 2.44227 24.4128 3.03573C24.418 3.62919 24.1898 4.20093 23.7775 4.62782L15.7741 12.6313L23.7775 20.6347C24.1898 21.0616 24.418 21.6333 24.4128 22.2268C24.4077 22.8202 24.1696 23.3879 23.75 23.8076C23.3303 24.2272 22.7626 24.4653 22.1692 24.4704C21.5757 24.4756 21.004 24.2475 20.5771 23.8352L12.5736 15.8317L4.5702 23.8352C4.14331 24.2475 3.57157 24.4756 2.97811 24.4704C2.38465 24.4653 1.81696 24.2272 1.3973 23.8076C0.977645 23.3879 0.739604 22.8202 0.734447 22.2268C0.72929 21.6333 0.957429 21.0616 1.36973 20.6347L9.37317 12.6313L1.36973 4.62782C0.945404 4.20336 0.707031 3.62776 0.707031 3.02758C0.707031 2.4274 0.945404 1.8518 1.36973 1.42735V1.42735Z"
+              fill="white"
+            ></path>
+          </svg>
+        </div>
+        <h1 class="p-[1.2rem] normal-case font-semibold text-xl text-left">
+          Edit Translate
+        </h1>
+        <hr />
+      </div>
+      <div
+        class="p-[1.2rem] overflow-y-auto overflow-x-hidden scroll-hidden lg:max-h-[75vh] max-h-[65vh]"
+      >
+        <div class="flex flex-col gap-3">
+          <div>
+            <div class="input-wrapper">
+              <div class="input-label">English</div>
+              <input
+                type="text"
+                name="topic"
+                class="input"
+                placeholder="Enter Label"
+              />
+            </div>
+          </div>
+          <div>
+            <div class="input-wrapper">
+              <div class="input-label">English</div>
+              <input
+                type="text"
+                name="topic"
+                class="input"
+                placeholder="Enter Label"
+              />
+            </div>
+          </div>
+          <div class="flex items-center justify-start">
+            <button class="btn bg-[#5679FF] text-sm px-4 !rounded-lg">
+              Update
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% comment %} POPUP {% endcomment %} 
 {% endblock body %}

@@ -1634,3 +1634,7 @@ div[class$="-Input"] {
 .no_padding_parent:has(.no_padding){
   padding: 0 !important;
 }
+
+.ql-toolbar.ql-snow{
+  background-color: white;
+}
