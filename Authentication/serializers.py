@@ -119,16 +119,6 @@ class UserTenantLoginSerializer(serializers.ModelSerializer):
     is_tenant = serializers.SerializerMethodField()
     access_token = serializers.SerializerMethodField()
     employee =  serializers.SerializerMethodField()
-    #employee_permission = serializers.SerializerMethodField()
-
-    # def get_employee_permission(self, obj):
-    #     try:
-            
-    #         emp = Employee.objects.get(email = str(obj.email))
-    #         return EmployeSerializer(emp, context=self.context).data#context={'request' : request, })
-            
-    #     except Exception as err:
-    #         return str(err)
     def get_employee(self, obj):
         try:
             employee = self.context['employee']

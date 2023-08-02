@@ -621,14 +621,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
         model = AppointmentService
         fields = '__all__'
 class ScheduleSerializer(serializers.ModelSerializer):
-    # employee = serializers.SerializerMethodField(read_only=True)
-    
-    # def get_employee(self, obj):
-    #     try:
-    #         data = Employee.objects.get(id = str(obj.employee))
-    #         return EmployeeNameSerializer(data, context=self.context).data
-    #     except Exception as err:
-    #         print(err)
+
          
     class Meta:
         model = EmployeDailySchedule

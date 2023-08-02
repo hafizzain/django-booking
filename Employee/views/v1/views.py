@@ -294,7 +294,8 @@ def search_employee(request):
         Q(mobile_number__icontains=text)|
         Q(gender__icontains=text)|
         Q(employee_professional_details__designation__icontains=text)|
-        Q(employee_professional_details__income_type__icontains=text) 
+        Q(employee_professional_details__income_type__icontains=text) ,
+        is_deleted = False
     )
     serialized = singleEmployeeSerializer(search_employee, many=True, context={'request':request})
     return Response(

@@ -62,7 +62,6 @@ def get_commission_reports_by_staff(request):
     year = request.GET.get('year', None)
     range_end = request.GET.get('range_end', None)
     
-    # employee = Employee.objects.filter(is_deleted=False).order_by('-created_at')
     employee = Employee.objects.prefetch_related(
         'location'
     ).filter(
@@ -108,67 +107,6 @@ def get_store_target_report(request):
         },
         status=status.HTTP_200_OK
     )
-    
-# @api_view(['GET'])
-# @permission_classes([AllowAny])
-# def get_commission_reports_by_commission_details(request):
-#     month = request.GET.get('month', None)
-#     range_start = request.GET.get('range_start', None)
-#     year = request.GET.get('year', None)
-#     range_end = request.GET.get('range_end', None)
-#     response_data = []
-#     Append_data = [] 
-#     newdata = {} 
-        
-#     employee = Employee.objects.filter(is_deleted=False).order_by('-created_at')
-#     serialized = StaffCommissionReport (employee,  many=True, context={
-#         'request' : request, 
-#         'range_start': range_start, 
-#         'range_end': range_end, 
-#         'year': year
-        
-#         })
-#     response_data = serialized.data
-    
-#     for da in response_data:
-#         location =  da['location']
-#         name = da['full_name']
-#         service_sale_price = da['service_sale_price']
-#         product_sale_price = da['product_sale_price']
-#         voucher_sale_price = da['voucher_sale_price']
-        
-#         newdata = {
-#             'employee': name,
-#             'location': location,
-#             'sale': service_sale_price,
-#             }
-#         Append_data.append(newdata)
-        
-#         newdata = {
-#             'employee': name,
-#             'location': location,
-#             'sale': product_sale_price,
-#             }
-#         Append_data.append(newdata)
-#         newdata = {
-#             'employee': name,
-#             'location': location,
-#             'sale': voucher_sale_price,
-#             }
-#         Append_data.append(newdata)
-    
-#     return Response(
-#         {
-#             'status' : 200,
-#             'status_code' : '200',
-#             'response' : {
-#                 'message' : 'All Employee Orders',
-#                 'error_message' : None,
-#                 'staff_report' : Append_data
-#             }
-#         },
-#         status=status.HTTP_200_OK
-#     )
     
 @api_view(['GET'])
 @permission_classes([AllowAny])

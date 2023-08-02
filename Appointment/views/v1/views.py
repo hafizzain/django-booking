@@ -885,44 +885,6 @@ def update_appointment(request):
             pass
     else:
         pass
-        # active_user_staff = None
-        # try:
-        #     active_user_staff = Employee.objects.get(
-        #         email = request.user.email,
-        #         is_deleted = False,
-        #         is_active = True,
-        #         is_blocked = False
-        #     )
-        # except:
-        #     pass
-        
-        
-        # cancel_service_appointment = AppointmentService.objects.filter(appointment=service_appointment.appointment)
-        # for appointment_service in cancel_service_appointment:
-            # LogDetails.objects.create(
-            #     log = appointment_logs,
-            #     appointment_service = appointment_service,
-            #     start_time = appointment_service.appointment_time,
-            #     duration = appointment_service.duration,
-            #     member = appointment_service.member
-            # )
-        
-
-    # if appointment_status == 'Cancel':
-    #     try:
-    #         thrd = Thread(target=cancel_appointment_n, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant} )
-    #         thrd.start()
-    #     except Exception as err:
-    #         print(err)
-    #         pass
-        
-    # else :
-        # try:
-        #     thrd = Thread(target=reschedule_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant})
-        #     thrd.start()
-        # except Exception as err:
-        #     print(err)
-        #     pass
 
         try:
             thrd = Thread(target=reschedule_appointment_n, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant})
