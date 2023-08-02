@@ -884,7 +884,16 @@ def update_appointment(request):
             print(err)
             pass
     else:
-        pass
+        res_service_appointment = AppointmentService.objects.filter(appointment=service_appointment.appointment)
+        for appointment_service in res_service_appointment:
+
+            LogDetails.objects.create(
+                log = appointment_logs,
+                appointment_service = appointment_service,
+                start_time = appointment_service.appointment_time,
+                duration = appointment_service.duration,
+                member = active_user_staff
+            )
 
         try:
             thrd = Thread(target=reschedule_appointment_n, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant})
