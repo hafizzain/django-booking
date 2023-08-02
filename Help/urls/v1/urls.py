@@ -15,4 +15,5 @@ urlpatterns = [
    
    path('edit_topic/<str:id>', views.edit_topic),
    path('help-details/', views.help_details),
+   path('edit_topic_content/', views.edit_topic_content)
 ]

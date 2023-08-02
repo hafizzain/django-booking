@@ -108,6 +108,21 @@ def help_details(request):
 
 
 
+def edit_topic_content(request):
+    print("********************************")
+    id = request.GET.get('id')
+
+    content = HelpContent.objects.get(id = id)
+    print(content.id)
+    context = {}
+    context['content'] = content
+    return render(request, 'help/edit-topic-content.html', context)
+
+
+
+
+
+
 
 
 # Frontend Side API
