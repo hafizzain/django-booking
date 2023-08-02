@@ -282,7 +282,7 @@ class VoucherCurrencyPrice(models.Model):
     
     voucher = models.ForeignKey(Vouchers, on_delete=models.CASCADE, related_name='voucher_vouchercurrencyprice')
     currency = models.ForeignKey(Currency, on_delete=models.SET_NULL, null=True, blank=True)
-    price = models.PositiveIntegerField(default=0)
+    price = models.FloatField(default=0)
 
     is_deleted = models.BooleanField(default=False)
     
@@ -410,7 +410,7 @@ class CurrencyPriceMembership(models.Model):
     
     membership = models.ForeignKey(Membership, on_delete=models.CASCADE, related_name='membership_currenypricemembership')
     currency = models.ForeignKey(Currency, on_delete=models.SET_NULL, null=True, blank=True)
-    price = models.PositiveIntegerField(default=0)
+    price = models.FloatField(default=0)
 
     def __str__(self):
         return str(self.id)
