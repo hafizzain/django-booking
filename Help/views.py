@@ -75,8 +75,13 @@ def view_topic_content(request):
     context['parent'] = id
     return render(request, 'help/help-center-topics.html', context)
 
+# test
+def edit_topic(request):
+    return render(request, 'help/edit-topic.html')
 
 
+def help_details(request):
+    return render(request, 'help/help-details.html')
 
 
 @api_view(['GET'])
