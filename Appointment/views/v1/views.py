@@ -814,9 +814,6 @@ def update_appointment(request):
                     },
                     status=status.HTTP_404_NOT_FOUND
                 )
-        time_delta = datetime.combine(datetime.today(), service_appointment.end_time) - datetime.combine(datetime.today(), service_appointment.appointment_time)
-        time_difference = (datetime.min + time_delta).time()
-
         
         service_appointment.member = employee
         service_appointment.appointment_time = start_time
