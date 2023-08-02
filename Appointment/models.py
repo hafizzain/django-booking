@@ -241,8 +241,8 @@ class AppointmentCheckout(models.Model):
     gst = models.FloatField(default=0, null=True, blank=True)
     gst_price = models.FloatField(default=0, null=True, blank=True)
     
-    service_price = models.PositiveIntegerField(default=0, null=True, blank=True)
-    total_price = models.PositiveIntegerField(default=0, null=True, blank=True)
+    service_price = models.FloatField(default=0, null=True, blank=True)
+    total_price = models.FloatField(default=0, null=True, blank=True)
     
     service_commission = models.DecimalField(default = 0 , null=True, blank=True, decimal_places=5, max_digits=8)    
     service_commission_type = models.CharField( max_length=50 , default = '')
