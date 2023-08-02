@@ -157,7 +157,15 @@ def get_appointments_service(request):
 def get_appointments_device(request):
     employee_id = request.GET.get('employee_id', None) 
     appointment_status = request.GET.get('status', None) 
-    
+
+    query = {}
+    if appointment_status == 'Appointment Booked':
+        query['appointment_services__appointment_status__in'] = ['Appointment_Booked', 'Appointment Booked', 'Arrived', 'In Progress']
+    elif appointment_status == 'Done':
+        query['appointment_services__appointment_status__in'] = ['Done', 'Paid']
+    elif appointment_status == 'Cancel':
+        query['appointment_services__appointment_status__in'] = ['Cancel']
+
     if not all([employee_id]):
         return Response(
             {
@@ -194,7 +202,8 @@ def get_appointments_device(request):
     try:
         appointment = Appointment.objects.filter(
             appointment_services__member = employee,
-            appointment_services__appointment_status = appointment_status,
+            # appointment_services__appointment_status = appointment_status,
+            **query
             ).order_by('-created_at').distinct()
     except Exception as err:
         return Response(
