@@ -43,7 +43,7 @@
       <h2 class="font-semibold text-2xl">Dashboard</h2>
     </div>
     <div>
-      <a href='/api/v1/help/help-details' class="btn bg-[#5679FF] text-sm px-4 !rounded-md" type="submit">
+      <a href='/api/v1/help/help-details/?id={{parent}}' class="btn bg-[#5679FF] text-sm px-4 !rounded-md" type="submit">
         Add Topic
       </a>
     </div>
@@ -93,7 +93,7 @@
       
         <h1 class="font-semibold text-lg">{{cont.content}}</h1>
        </div>
-        <p class="text-[#101928] text-sm">{{cont.description}}</p>
+        <p class="text-[#101928] text-sm">{{cont.description|safe}}</p>
     </div>
   {% endfor %}
 

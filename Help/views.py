@@ -43,9 +43,6 @@ def view_content(request):
     return render(request, 'help/help-center.html', context)
 
 
-def update_content(request):
-    # if request.method == 'POST':
-    pass
 
 
 def add_topic_content(request):
@@ -100,9 +97,20 @@ def edit_topic(request, id):
 
 
 def help_details(request):
-    return render(request, 'help/help-details.html')
+
+    id = request.GET.get('id')
+
+    all = HelpContent.objects.filter(parent_comment=id).order_by('content')
+    context={}
+    context['content'] = all
+    context['parent'] = id
+    return render(request, 'help/help-details.html', context)
 
 
+
+
+
+# Frontend Side API
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_comment(request):
