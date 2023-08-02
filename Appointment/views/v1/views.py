@@ -876,7 +876,7 @@ def update_appointment(request):
                 duration = appointment_service.duration,
                 member = active_user_staff
             )
-        
+        pass
         try:
             thrd = Thread(target=cancel_appointment, args=[] , kwargs={'appointment' : service_appointment, 'tenant' : request.tenant} )
             thrd.start()
