@@ -29,7 +29,10 @@ SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
+CSRF_TRUSTED_ORIGINS=[
+    # 'https://*.YOUR_DOMAIN.COM',
+    'https://hashedsystems.com'
+                      ]
 ALLOWED_HOSTS = ['*']
 INTERNAL_IPS = [
     # ...
