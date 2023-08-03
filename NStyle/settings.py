@@ -143,6 +143,9 @@ MIDDLEWARE = [
     
 ]
 
+BACKEND_DOMAIN_NAME=env('BACKEND_DOMAIN_NAME')
+BACKEND_HOST=env('BACKEND_HOST')
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
@@ -150,6 +153,7 @@ CORS_ALLOWED_ORIGINS = [
     'https://midtechdxb.com',
     'http://us-telecoms.com',
     'https://us-telecoms.com',
+    BACKEND_HOST,
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -261,8 +265,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 #     os.path.join(BASE_DIR, 'static'),
 # ]
 
-BACKEND_DOMAIN_NAME=env('BACKEND_DOMAIN_NAME')
-BACKEND_HOST=env('BACKEND_HOST')
 
 
 # Default primary key field type

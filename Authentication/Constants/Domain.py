@@ -4,12 +4,13 @@ import datetime
 import subprocess
 
 from Utility.models import ExceptionRecord
+from django.conf import settings
 
 
 def ssl_sub_domain(domain):
     time_start = datetime.datetime.now()
 
-    subprocess.call(f'sudo certbot --nginx -d {domain}.us-telecoms.com', shell=True)
+    subprocess.call(f'sudo certbot --nginx -d {domain}.{settings.BACKEND_DOMAIN_NAME}', shell=True)
 
     time_end = datetime.datetime.now()
     time_diff = time_end - time_start
