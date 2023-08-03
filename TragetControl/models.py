@@ -35,8 +35,8 @@ class StaffTarget(models.Model):
     year = models.DateTimeField( null = True, blank =True)
 
     
-    service_target = models.PositiveIntegerField(default=0)
-    retail_target = models.PositiveIntegerField(default=0)
+    service_target = models.FloatField(default=0)
+    retail_target = models.FloatField(default=0)
     
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=now) 
@@ -88,10 +88,10 @@ class TierStoreTarget(models.Model):
 
     month = models.CharField(choices=MONTH_CHOICE, max_length=100, default='January')
     
-    service_target = models.PositiveIntegerField(default=0)
-    retail_target = models.PositiveIntegerField(default=0)
-    voucher_target = models.PositiveIntegerField(default=0)
-    membership_target = models.PositiveIntegerField(default=0)
+    service_target = models.FloatField(default=0)
+    retail_target = models.FloatField(default=0)
+    voucher_target = models.FloatField(default=0)
+    membership_target = models.FloatField(default=0)
     year = models.DateTimeField( null = True, blank =True)
 
     is_primary = models.BooleanField(default=False)
@@ -125,7 +125,7 @@ class ServiceTarget(models.Model):
     month = models.CharField(choices=MONTH_CHOICE, max_length=100, default='January')
     year = models.DateTimeField( null = True, blank =True)
 
-    service_target = models.PositiveIntegerField(default=0)
+    service_target = models.FloatField(default=0)
     
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(null=True, auto_now_add=now) 
@@ -158,7 +158,7 @@ class RetailTarget(models.Model):
     month = models.CharField(choices=MONTH_CHOICE, max_length=100, default='January')
     year = models.DateTimeField( null = True, blank =True)
 
-    brand_target = models.PositiveIntegerField(default=0)
+    brand_target = models.FloatField(default=0)
     
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=now, null= True) 
