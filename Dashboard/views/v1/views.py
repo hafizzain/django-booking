@@ -632,7 +632,7 @@ def get_total_sales_device(request):
         "November",
         "December",
     ]
-    intMonth = months.index(month)
+    intMonth = months.index(month) + 1
     start_date = f'{year}-{str(intMonth).zfill(2)}-01'
     end_date = f'{year}-{str(intMonth).zfill(2)}-{calendar.monthrange(int(year), intMonth)[1]}'
 
