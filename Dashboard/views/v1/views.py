@@ -103,7 +103,7 @@ def get_busines_client_appointment(request):
     for order in orders_price:
         order_sale +=1
         if order.total_price is not  None:
-            total += order.total_price
+            total += float(order.total_price)
     #orders_price = Order.objects.aggregate(Total= Sum('total_price'))
     
     price = AppointmentCheckout.objects.filter(
@@ -116,7 +116,7 @@ def get_busines_client_appointment(request):
     for order in price:
         appointmemnt_sale +=1
         if order.total_price is not None:
-            total += order.total_price
+            total += float(order.total_price)
     # //////////////////////////
     
     # avg = footfalls / all_apps_clients if all_apps_clients > 0 else 0
