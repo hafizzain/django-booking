@@ -58,14 +58,12 @@ class Product(models.Model):
     name = models.CharField(max_length=1000, default='')
     arabic_name = models.CharField(max_length=999, default='')
 
-    cost_price = models.PositiveIntegerField(default=0, null = True, blank= True)
-    #full_price = models.PositiveIntegerField(default=0, null = True, blank= True)
-    #sell_price = models.PositiveIntegerField(default=0, null = True, blank= True)
-    product_size = models.PositiveIntegerField(default=0)
+    cost_price = models.FloatField(default=0, null = True, blank= True)
+    product_size = models.FloatField(default=0)
     #product_size = models.CharField(max_length=50, null=True, blank=True)
 
 
-    tax_rate = models.PositiveIntegerField(default=0, null=True, blank=True)
+    tax_rate = models.FloatField(default=0, null=True, blank=True)
 
     short_description = models.TextField(default='', null=True, blank=True)
     description = models.TextField(default='', null=True, blank=True)
@@ -153,7 +151,6 @@ class ProductStock(models.Model):
     consumable_quantity = models.IntegerField(validators=[MinValueValidator(0)],null=True, blank=True, default=0, verbose_name= 'Consumable Quantity')
     location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, related_name='location_product_stocks')
     
-    #quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0, verbose_name='Total Quantity')
     available_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
     sold_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
     consumed_quantity = models.PositiveIntegerField(validators=[MinValueValidator(0),], default=0)
@@ -196,7 +193,6 @@ class OrderStock(models.Model):
     to_location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='to_locations_order_stock')
     
     status= models.CharField(choices = STATUS_CHOICES, max_length =100, default='Placed')
-#    rec_quantity= models.PositiveIntegerField(default=0, verbose_name= 'Received Quantity', null=True, blank=True)
     
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
