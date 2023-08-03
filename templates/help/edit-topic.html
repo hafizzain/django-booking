@@ -1,0 +1,60 @@
+{% extends 'SuperAdminPanel/main.html' %} {% block body %}
+<h2 class="font-semibold text-2xl my-[2rem]">Edit Topics</h2>
+
+
+<form
+  method="post"
+  action="/api/v1/help/edit_topic/{{content.id}}"
+  enctype="multipart/form-data"
+ >
+  {% csrf_token %}
+  <div class="grid md:grid-cols-2 gap-3">
+    <div>
+      <div class="input-wrapper">
+        <div class="input-label">Topic</div>
+        <input type="text" name="topic" class="input" required="" value="{{content.content}}"/>
+      </div>
+    </div>
+    <div>
+      <div class="input-wrapper">
+        <img src="/media/{{request.tenant_schema_name}}/{{content.image}}" width="50">
+        <div class="input-label">Image</div>
+        <input type="file" name="image" class="input bg-white !text-xs"/>
+        
+      </div>
+    </div>
+  </div>
+
+  {% comment %} <div class="mt-4">
+    <div class="input-label mb-1">Description</div>
+    <div id="" class="bg-white editor" style="height: 15rem"></div>
+    <input
+      type="text"
+      name="desc"
+      class="input editorContentInput"
+      hidden
+      id=""
+      required=""
+    />
+  </div> {% endcomment %}
+
+  <div class="w-fit my-3">
+    <div class="flex items-center gap-2">
+      <input
+        id="is_recent"
+        type="checkbox"
+        name="is_recent"
+        {% if content.is_recent == True %}
+        checked
+        {% endif %}
+
+        class="h-[1.2rem] w-[1.2rem] rounded-md accent-[#5679FF]"
+      />
+      <label for="#is_recent" class="input-label" value='1' >Is Recent</label>
+    </div>
+  </div>
+  <button class="btn bg-[#5679FF] text-sm px-4 !rounded-md" type="submit">
+    Submit
+  </button>
+</form>
+{% endblock body %}

@@ -1,0 +1,34 @@
+{% extends 'SuperAdminPanel/main.html' %} {% block body %}
+<h2 class="font-semibold text-2xl my-[2rem]">Edit Topic</h2>
+<form action="/api/v1/help/add_topic_content/" method='post'>
+  {% csrf_token %}
+  <div class="flex flex-col gap-4">
+    <div>
+      <div class="input-wrapper">
+        <div class="input-label">Topic</div>
+        <input type="text" name="topic"  value="{{content.content}}" placeholder="{{content.content}}" required="" />
+        {% comment %} <input type="text" name="topic" class="input"  value="{{content.topic}}" placeholder="ksjdishisdho" required="" /> {% endcomment %}
+      </div>
+    </div>
+    <div>
+      <div class="input-label mb-1">Description</div>
+      <div id="" class="bg-white editor" style="height: 15rem"></div>
+      <input
+        value="{{content.description}}"
+        placeholder="{{content.description}}"
+        type="text"
+        name="desc"
+        class="input editorContentInput"
+        hidden
+        id=""
+        required=""
+      />
+    </div>
+  </div>
+        <input type="text" name="parent" value="{{parent}}" hidden />
+
+  <button class="btn bg-[#5679FF] text-sm px-4 !rounded-md mt-3" type="submit">
+    Submit
+  </button>
+</form>
+{% endblock body %}

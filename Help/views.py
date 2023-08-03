@@ -43,9 +43,6 @@ def view_content(request):
     return render(request, 'help/help-center.html', context)
 
 
-def update_content(request):
-    # if request.method == 'POST':
-    pass
 
 
 def add_topic_content(request):
@@ -75,10 +72,60 @@ def view_topic_content(request):
     context['parent'] = id
     return render(request, 'help/help-center-topics.html', context)
 
+# test
+def edit_topic(request, id):
+    content = HelpContent.objects.get(id = str(id))
+    if request.method == 'POST':
+        topic = request.POST.get('topic', None)
+        image = request.FILES.get('image', None)
+        is_recent = request.POST.get('is_recent', False)
+        
+        if is_recent=='on':
+            is_recent_check = True
+        else:
+            is_recent_check = False
+
+
+        content.content = topic
+        if image is not None:
+            content.image = image
+        content.is_recent = is_recent_check
+        content.save()
+        return redirect('view_content')
+
+    return render(request, 'help/edit-topic.html', {'content':content})
+
+
+def help_details(request):
+
+    id = request.GET.get('id')
+
+    all = HelpContent.objects.filter(parent_comment=id).order_by('content')
+    context={}
+    context['content'] = all
+    context['parent'] = id
+    return render(request, 'help/help-details.html', context)
+
+
+
+def edit_topic_content(request):
+    print("********************************")
+    id = request.GET.get('id')
+
+    content = HelpContent.objects.get(id = id)
+    print(content.id)
+    context = {}
+    context['content'] = content
+    return render(request, 'help/edit-topic-content.html', context)
 
 
 
 
+
+
+
+
+# Frontend Side API
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_comment(request):
