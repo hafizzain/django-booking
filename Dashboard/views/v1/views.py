@@ -693,6 +693,8 @@ def get_total_sales_device(request):
                 'total_sales': total_price,
                 'total_checkout_orders' : len(checkout_orders_total),
                 'total_app_orders' : len(apps_checkouts_total),
+                'start_date' : start_date,
+                'end_date' : end_date,
             }
         },
         status=status.HTTP_200_OK
