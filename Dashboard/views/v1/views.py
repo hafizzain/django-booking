@@ -103,7 +103,7 @@ def get_busines_client_appointment(request):
     for order in orders_price:
         order_sale +=1
         if order.total_price is not  None:
-            total += order.total_price
+            total += float(order.total_price)
     #orders_price = Order.objects.aggregate(Total= Sum('total_price'))
     
     price = AppointmentCheckout.objects.filter(
@@ -116,7 +116,7 @@ def get_busines_client_appointment(request):
     for order in price:
         appointmemnt_sale +=1
         if order.total_price is not None:
-            total += order.total_price
+            total += float(order.total_price)
     # //////////////////////////
     
     # avg = footfalls / all_apps_clients if all_apps_clients > 0 else 0
@@ -595,6 +595,27 @@ def get_total_comission(request):
 @permission_classes([AllowAny])
 def get_total_sales_device(request):
     employee_id = request.GET.get('employee_id', None)
+    month = request.GET.get('month', None)
+    year = request.GET.get('year', None)
+
+    if not all([employee_id, month, year]):
+        return Response(
+            {
+                'status': 400,
+                'status_code': '400',
+                'response': {
+                    'message': 'All fields are required',
+                    'error_message': None,
+                    'fields': [
+                        'employee_id',
+                        'month',
+                        'year',
+                    ],
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
     total_price = 0
     
     months = [
@@ -611,34 +632,37 @@ def get_total_sales_device(request):
         "November",
         "December",
     ]
+    intMonth = months.index(month) + 1
+    start_date = f'{year}-{str(intMonth).zfill(2)}-01'
+    end_date = f'{year}-{str(intMonth).zfill(2)}-{calendar.monthrange(int(year), intMonth)[1]}'
+
+
 
     checkout_orders_total = Checkout.objects.filter(
         is_deleted=False, 
         checkout_orders__member__id = employee_id,
+        created_at__date__range = (start_date, end_date),
     ).distinct()
     checkout_orders_months = list(checkout_orders_total.values_list('created_at__month', flat=True))
     
     appointment_services = AppointmentService.objects.filter(
         member__id = employee_id,
-        appointment_status__in = ['Done', 'Paid']
-
+        appointment_status__in = ['Done', 'Paid'],
     )
     apps_checkouts_total = AppointmentCheckout.objects.filter(
         is_deleted=False, 
         member__id=employee_id,
+        created_at__date__range = (start_date, end_date),
     )
     apps_checkouts_months = list(apps_checkouts_total.values_list('created_at__month', flat=True))
     
 
     total_orders = Order.objects.filter(
         member__id = employee_id,
+        created_at__date__range = (start_date, end_date),
     )
 
     for order in total_orders:
-        # total_price += float(price.total_service_price or 0)
-        # total_price += float(price.total_product_price or 0)
-        # total_price += float(price.total_voucher_price or 0)
-        # total_price += float(price.total_membership_price or 0)
         realPrice = order.discount_price or order.total_price
         total_price += float(order.quantity) * float(realPrice)
     
@@ -654,8 +678,6 @@ def get_total_sales_device(request):
         dashboard_data.append({
             'month' : month,
             'count' : count + count_app,
-            'index' : index,
-
         })
 
     return Response(
@@ -669,6 +691,8 @@ def get_total_sales_device(request):
                 'total_sales': total_price,
                 'total_checkout_orders' : len(checkout_orders_total),
                 'total_app_orders' : len(apps_checkouts_total),
+                'start_date' : start_date,
+                'end_date' : end_date,
             }
         },
         status=status.HTTP_200_OK
