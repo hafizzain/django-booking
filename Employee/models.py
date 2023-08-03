@@ -386,7 +386,7 @@ class EmployeDailySchedule(models.Model):
         return str(self.id)
     
     def save(self, *args, **kwargs):
-        if self.is_leave:
+        if self.is_leave or self.is_vacation:
             self.start_time = None
             self.end_time = None
             self.start_time_shift = None
