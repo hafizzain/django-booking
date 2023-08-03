@@ -678,8 +678,6 @@ def get_total_sales_device(request):
         dashboard_data.append({
             'month' : month,
             'count' : count + count_app,
-            'index' : index,
-
         })
 
     return Response(
