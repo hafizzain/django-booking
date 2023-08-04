@@ -1066,12 +1066,11 @@ def create_specificgroupdiscount(request):
     
     if type(products) == list:
         for product_id in products:
-            exl_pId = product_id.get('service_group', '')
             PromotionExcludedItem.objects.create(
                 object_type = 'Specific Group Discount',
                 object_id = f'{sp_grp.id}',
                 excluded_type = 'Product',
-                excluded_id = exl_pId,
+                excluded_id = product_id,
                 is_active = True,
             )
 
@@ -1083,12 +1082,11 @@ def create_specificgroupdiscount(request):
     
     if type(services) == list:
         for service_id in services:
-            exl_pId = service_id.get('service_group', '')
             PromotionExcludedItem.objects.create(
                 object_type = 'Specific Group Discount',
                 object_id = f'{sp_grp.id}',
                 excluded_type = 'Service',
-                excluded_id = exl_pId,
+                excluded_id = service_id,
                 is_active = True,
             )
 
@@ -1100,12 +1098,11 @@ def create_specificgroupdiscount(request):
     
     if type(vouchers) == list:
         for voucher_id in vouchers:
-            exl_pId = voucher_id.get('service_group', '')
             PromotionExcludedItem.objects.create(
                 object_type = 'Specific Group Discount',
                 object_id = f'{sp_grp.id}',
                 excluded_type = 'Voucher',
-                excluded_id = exl_pId,
+                excluded_id = voucher_id,
                 is_active = True,
             )
     serializers= PromtoionsSerializers.SpecificGroupDiscountSerializers(sp_grp, context={'request' : request})
