@@ -2089,24 +2089,24 @@ def new_create_sale_order(request):
         
     
         if price == 0 and free_services_quantity and bool(is_promotion_availed) == True:
-            number = int(float(total_price))
-            rem_price = number - minus_price
-            price =  int(rem_price) / int(free_services_quantity)
+            number = float(total_price)
+            rem_price = number - float(minus_price)
+            price =  float(rem_price) / float(free_services_quantity)
             
             if test == True:
-                checkout.total_service_price = int(float(total_price))
+                checkout.total_service_price = float(total_price)
                 checkout.save()
-                invoice.total_service_price = int(float(total_price))
+                invoice.total_service_price = float(total_price)
                 invoice.save()
                 test = False
         
-        original_price = price
+        original_price = float(price)
         discount_percentage = 0
         order_discount_price = 0
         
         if discount_price is not None:
-            order_discount_price = discount_price
-            discount_percentage = (int(discount_price) / original_price) * 100
+            order_discount_price = float(discount_price)
+            discount_percentage = (float(discount_price) / original_price) * 100
             # price = int(discount_price)
 
         
@@ -2201,13 +2201,13 @@ def new_create_sale_order(request):
                 checkout = checkout,
                 location = business_address,
                 # total_price = total_price, 
-                total_price = original_price, 
+                total_price = float(original_price), 
                 payment_type= payment_type,
                 client_type = client_type,
                 quantity = quantity,
-                current_price = price,
-                discount_percentage = discount_percentage,
-                discount_price = order_discount_price,
+                current_price = float(price),
+                discount_percentage = float(discount_percentage),
+                discount_price = float(order_discount_price),
             )
             product_order.sold_quantity += 1 # product_stock.sold_quantity
             product_order.save()

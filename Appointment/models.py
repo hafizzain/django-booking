@@ -102,9 +102,9 @@ class Appointment(models.Model):
     tip  = models.FloatField(default=0, null=True, blank=True)
     
     discount_price  = models.FloatField(default=0, null=True, blank=True)
-    discount_percentage = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
+    discount_percentage = models.FloatField(default = 0 , null=True, blank=True)
     
-    service_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
+    service_commission = models.FloatField(default = 0 , null=True, blank=True)    
     service_commission_type = models.CharField( max_length=50 , default = '')
 
 
@@ -166,13 +166,13 @@ class AppointmentService(models.Model):
     
     price = models.FloatField(default=0, null=True, blank=True)
     
-    service_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
+    service_commission = models.FloatField(default = 0 , null=True, blank=True)    
     service_commission_type = models.CharField( max_length=50 , default = '')
     
     discount_price = models.FloatField(default = 0 , null=True, blank=True)    
     discount_percentage = models.FloatField(default = 0 , null=True, blank=True)
         
-    total_price = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
+    total_price = models.FloatField(default = 0 , null=True, blank=True)    
     
     end_time = models.TimeField(null=True, blank=True)
     details = models.CharField(max_length=255, null=True, blank=True)

@@ -9,7 +9,6 @@ urlpatterns = [
     path('update_service/',views.update_service),
     
     #Order Sale
-    # path('create_sale_order/', views.create_sale_order),
     path('create_sale_order/', views.new_create_sale_order),
     
     

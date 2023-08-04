@@ -2917,7 +2917,7 @@ def update_commision(request):
                     commision_ser.to_value = to_value
                     commision_ser.commission_percentage = commission_per
                     commision_ser.symbol = symbol
-                    commision_ser.comission_choice = 'percentage' if '%' in symbol else 'currency'
+                    commision_ser.comission_choice = ('percentage' if '%' in symbol else 'currency') if symbol else 'currency'
                     commision_ser.save()           
                     
                 except Exception as err:
