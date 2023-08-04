@@ -548,6 +548,17 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
 
 
 class SaleInvoiceSerializer(serializers.ModelSerializer):
+    file = serializers.SerializerMethodField(read_only = True)
+
+    def get_file(self, obj):
+        if obj.file:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request)
+                return f'{url}{obj.file}'
+            except:
+                return f'{obj.file}'
+        return None
     class Meta:
         model = SaleInvoice
         fields = '__all__'
