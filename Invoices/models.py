@@ -134,7 +134,14 @@ class SaleInvoice(models.Model):
             checkout = Checkout.objects.get(
                 id = self.checkout
             )
-            return [self.get_order_items(checkout), self.get_tips(checkout_type='Checkout', id=self.checkout)]
+            return [
+                    self.get_order_items(checkout), 
+                    self.get_tips(checkout_type='Checkout', id=self.checkout), 
+                    {
+                        'tax_applied' : checkout.tax_applied,
+                        'tax_amount' : checkout.tax_amount,
+                    }
+                ]
         except Exception as err:
             ExceptionRecord.objects.create(
                 text = f'Sale INVOICE ERROR not found {str(err)} -- {self.checkout}'
@@ -143,12 +150,19 @@ class SaleInvoice(models.Model):
                 checkout = AppointmentCheckout.objects.get(
                     id = self.checkout
                 )
-                return [self.get_appointment_services(checkout), self.get_tips(checkout_type='Appointment', id=f'{checkout.appointment.id}')]
+                return [
+                        self.get_appointment_services(checkout), 
+                        self.get_tips(checkout_type='Ap,pointment', id=f'{checkout.appointment.id}'),
+                        {
+                            'tax_applied' : checkout.gst,
+                            'tax_amount' : checkout.gst_price,
+                        }
+                    ]
             except Exception as err:
                 ExceptionRecord.objects.create(
                     text = f'Sale INVOICE ERROR not found {str(err)} -- {self.checkout}'
                 )
-        return [[], []]
+        return [[], [], {}]
 
     def get_tips(self, checkout_type = None, id=None):
         if not checkout_type or not id:
@@ -166,7 +180,7 @@ class SaleInvoice(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.file and self.checkout:
-            order_items, order_tips = self.get_invoice_order_items()
+            order_items, order_tips, tax_details = self.get_invoice_order_items()
             if len(order_items) > 0:
                 sub_total = sum([order['price'] for order in order_items])
                 tips_total = sum([t['tip'] for t in order_tips])
@@ -177,9 +191,10 @@ class SaleInvoice(models.Model):
                     'currency_code' : 'AED',
                     'sub_total' : sub_total,
                     'tips' : order_tips,
-                    'total_tax' : 0,
+                    'total_tax' : tax_details.get('tax_amount', 0),
                     'total' : float(tips_total) + float(sub_total),
                     'created_at' : self.created_at.strftime('%Y-%m-%d') if self.created_at else '',
+                    **tax_details,
                 }
                 schema_name = connection.schema_name
                 output_dir = f'{settings.BASE_DIR}/media/{schema_name}/invoicesFiles'
