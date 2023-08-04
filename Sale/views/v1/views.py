@@ -1294,9 +1294,9 @@ def get_total_revenue(request):
     order_sale = 0
     orders_price = Order.objects.filter(is_deleted=False)
     for order in orders_price:
-        order_sale +=1
+        order_sale += 1
         if order.total_price is not  None:
-            total += order.total_price
+            total += float(order.total_price)
     #orders_price = Order.objects.aggregate(Total= Sum('total_price'))
     
     appointment_checkouts = AppointmentCheckout.objects.filter(
@@ -1308,7 +1308,7 @@ def get_total_revenue(request):
     for checkout_instance in appointment_checkouts:
         appointmemnt_sale +=1
         if checkout_instance.total_price is not None:
-            total += checkout_instance.total_price
+            total += float(checkout_instance.total_price)
     
     return Response(
         {
