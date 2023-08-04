@@ -1026,7 +1026,7 @@ def update_appointment_service(request):
     appointments = request.data.get('appointments', None)
     client_type = request.data.get('client_type', None)
     appointment_notes = request.data.get('appointment_notes', None)
-    appointment_date = request.data.get('appointment_date', None)
+    appointment_date_g = request.data.get('appointment_date', None)
     client = request.data.get('client', None)
     action_type = request.data.get('action_type', None)
     
@@ -1119,7 +1119,7 @@ def update_appointment_service(request):
             pass
         
         for app in appointments:
-            appointment_date = app.get('appointment_date', None)
+            appointment_date = appointment_date_g or app.get('appointment_date', None)
             date_time = app.get('date_time', None)
             service = app.get('service', None)
             client_can_book = app.get('client_can_book', None)
