@@ -192,7 +192,7 @@ class SaleInvoice(models.Model):
                     'sub_total' : sub_total,
                     'tips' : order_tips,
                     'total_tax' : tax_details.get('tax_amount', 0),
-                    'total' : float(tips_total) + float(sub_total),
+                    'total' : float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)),
                     'created_at' : self.created_at.strftime('%Y-%m-%d') if self.created_at else '',
                     **tax_details,
                 }
