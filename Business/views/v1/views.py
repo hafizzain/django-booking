@@ -2585,8 +2585,7 @@ def update_business_tax(request):
         )
     
     if (tax_type != 'Group' and tax_type != 'Location'):
-        tax_rate = int(tax_rate)
-    user = request.user
+        tax_rate = float(tax_rate)
 
     try:
         business = Business.objects.get(id=business_id, is_deleted=False, is_active=True, is_blocked=False)
