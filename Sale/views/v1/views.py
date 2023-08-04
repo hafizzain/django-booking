@@ -2238,13 +2238,13 @@ def new_create_sale_order(request):
                     client = client,
                     location = business_address,
                     # total_price = total_price, 
-                    total_price = original_price, 
+                    total_price = float(original_price), 
                     payment_type=payment_type,
                     client_type = client_type,
                     quantity = quantity,
-                    current_price = price,
-                    discount_percentage = discount_percentage,
-                    discount_price = order_discount_price,
+                    current_price = float(price),
+                    discount_percentage = float(discount_percentage),
+                    discount_price = float(order_discount_price),
                 )
 
                 order_instance = service_order
@@ -2280,14 +2280,14 @@ def new_create_sale_order(request):
                     client = client,
 
                     # total_price = total_price, 
-                    total_price = original_price, 
+                    total_price = float(original_price), 
                     payment_type =payment_type,
                     client_type = client_type,
                     quantity = quantity,
                     location = business_address,
-                    current_price = price,
-                    discount_percentage = discount_percentage,
-                    discount_price = order_discount_price,
+                    current_price = float(price),
+                    discount_percentage = float(discount_percentage),
+                    discount_price = float(order_discount_price),
                 )
             except Exception as err:
                 ExceptionRecord.objects.create(
@@ -2343,15 +2343,15 @@ def new_create_sale_order(request):
                     end_date = end_date_cal,
                     checkout = checkout,
                     client = client,
-                    discount_percentage = discount_percentage,
+                    discount_percentage = float(discount_percentage),
                     # total_price = total_price, 
-                    total_price = original_price, 
+                    total_price = float(original_price), 
                     payment_type =payment_type,
                     client_type = client_type,
                     quantity = quantity,
                     location = business_address,
-                    current_price = price,
-                    discount_price = order_discount_price,
+                    current_price = float(price),
+                    discount_price = float(order_discount_price),
 
                 )
                 
@@ -2375,7 +2375,7 @@ def new_create_sale_order(request):
         if order_instance is not None and is_redeemed:
             order_instance.is_redeemed = True
             order_instance.redeemed_type = 'Membership' if is_membership_redeemed else 'Voucher' if is_voucher_redeemed  else ''
-            order_instance.redeemed_price = redeemed_price
+            order_instance.redeemed_price = float(redeemed_price)
             order_instance.redeemed_instance_id = redeemed_membership_id
             order_instance.save()
 
@@ -2390,15 +2390,15 @@ def new_create_sale_order(request):
 
             sale_price = 0
             if order_discount_price:
-                sale_price = order_discount_price
+                sale_price = float(order_discount_price)
             else:
-                sale_price = price
+                sale_price = float(price)
 
-            total_from_value = sale_price * quantity
+            total_from_value = float(sale_price) * float(quantity)
 
             sale_commissions = CategoryCommission.objects.filter(
                 commission__employee = employee_id,
-                from_value__lte = total_from_value,
+                from_value__lte = float(total_from_value),
                 category_comission__iexact = commission_category
             ).order_by('-from_value')
 
@@ -2415,9 +2415,9 @@ def new_create_sale_order(request):
                     category_commission = commission,
                     commission_category = commission_category,
                     commission_type = commission.comission_choice,
-                    sale_value = order_discount_price if order_discount_price else price,
-                    commission_rate = commission.commission_percentage,
-                    commission_amount = calculated_commission,
+                    sale_value = float(order_discount_price) if order_discount_price else float(price),
+                    commission_rate = float(commission.commission_percentage),
+                    commission_amount = float(calculated_commission),
                     symbol = commission.symbol,
                     item_name = item_name,
                     item_id = item_id,
@@ -2446,7 +2446,7 @@ def new_create_sale_order(request):
                 AppointmentEmployeeTip.objects.create(
                     checkout=checkout,
                     member=employee_tips_id,
-                    tip=checkout_tip,
+                    tip=float(checkout_tip),
                     business_address=business_address,
                 )
             
@@ -2477,7 +2477,7 @@ def new_create_sale_order(request):
                 ExceptionRecord.objects.create(text=f'LOYALTY : {err}')
                 pass
             else:
-                client_points.points_redeemed = client_points.points_redeemed + float(loyalty_points_redeemed)
+                client_points.points_redeemed = float(client_points.points_redeemed) + float(loyalty_points_redeemed)
                 client_points.save()
 
 
