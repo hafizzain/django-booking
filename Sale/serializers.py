@@ -1307,7 +1307,7 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
     def get_invoice(self, obj):
         try:
             invoice = SaleInvoice.objects.get(checkout__icontains = obj)
-            serializer = SaleInvoiceSerializer(invoice)
+            serializer = SaleInvoiceSerializer(invoice, context=self.context)
             return serializer.data
         except Exception as e:
             return str(e)
@@ -1442,7 +1442,7 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
     def get_invoice(self, obj):
         try:
             invoice = SaleInvoice.objects.get(appointment = obj.appointment)
-            serializer = SaleInvoiceSerializer(invoice)
+            serializer = SaleInvoiceSerializer(invoice, context=self.context)
             return serializer.data
         except Exception as e:
             return f" {str(e)} + {obj.appointment}"
@@ -1779,7 +1779,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     def get_invoice(self, obj):
         try:
             invoice = SaleInvoice.objects.get(checkout__icontains = obj)
-            serializer = SaleInvoiceSerializer(invoice)
+            serializer = SaleInvoiceSerializer(invoice, context=self.context)
             return serializer.data
         except Exception as e:
             return str(e)
@@ -1875,7 +1875,7 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
     def get_invoice(self, obj):
         try:
             invoice = SaleInvoice.objects.get(checkout__icontains = obj)
-            serializer = SaleInvoiceSerializer(invoice)
+            serializer = SaleInvoiceSerializer(invoice, context=self.context)
             return serializer.data
         except Exception as e:
             return str(e)

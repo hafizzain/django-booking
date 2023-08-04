@@ -3132,7 +3132,7 @@ def get_customer_detailed_loyalty_points(request):
     page_number = request.GET.get("page") 
     customers_points = paginator.get_page(page_number)
 
-    data = CustomerDetailedLoyaltyPointsLogsSerializer(customers_points, many=True).data
+    data = CustomerDetailedLoyaltyPointsLogsSerializer(customers_points, many=True, context={'request' : request}).data
 
     return Response(
         {

@@ -1153,7 +1153,7 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
         # if checkoutt:
         try:
             invoice = SaleInvoice.objects.get(checkout__icontains = obj.sale_id)
-            serializer = SaleInvoiceSerializer(invoice)
+            serializer = SaleInvoiceSerializer(invoice, context=self.context)
             return serializer.data
         except Exception as e:
             return str(e)
@@ -1322,7 +1322,7 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
     def get_invoice(self, obj):
         try:
             invoice = SaleInvoice.objects.get(checkout__icontains = obj.checkout_id)
-            serializer = DiscountPromotion_SaleInvoiceSerializer(invoice)
+            serializer = DiscountPromotion_SaleInvoiceSerializer(invoice, context=self.context)
             return serializer.data
         except Exception as e:
             return str(e)
