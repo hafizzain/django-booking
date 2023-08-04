@@ -772,8 +772,8 @@ def get_dashboard_target_overview_update(request):
         year__date__year = year,
     )
     for tar in targets:
-        service_target += int(tar.service_target)
-        retail_target += int(tar.retail_target)
+        service_target += float(tar.service_target)
+        retail_target += float(tar.retail_target)
     
     appointment_checkout = AppointmentService.objects.filter(
         appointment_status__in = ['Done', 'Paid'],
