@@ -2772,6 +2772,7 @@ def get_employee_check_time(request):
 @permission_classes([AllowAny])
 def get_employee_check_availability_list(request):
     check_availability = request.data.get('check_availability', None)
+    appointment_date = check.get('appointment_date', None)
     
     if check_availability is None:
         return Response(
@@ -2810,7 +2811,7 @@ def get_employee_check_availability_list(request):
         
         client_can_book = check.get('client_can_book', None)
         slot_availible_for_online = check.get('slot_availible_for_online', None)
-        date = check.get('appointment_date', None)
+        date = check.get('appointment_date', appointment_date)
         
         index = check.get('index', None)
         message = check.get('message', None)
