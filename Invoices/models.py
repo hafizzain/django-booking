@@ -186,6 +186,8 @@ class SaleInvoice(models.Model):
                 tips_total = sum([t['tip'] for t in order_tips])
     
                 context = {
+                    'invoice_by' : self.user.user_full_name if self.user else '',
+                    'invoice_by_arabic_name' : self.user.user_full_name if self.user else '',
                     'invoice_id' : self.short_id,
                     'order_items' : order_items,
                     'currency_code' : 'AED',
@@ -194,6 +196,7 @@ class SaleInvoice(models.Model):
                     'total_tax' : tax_details.get('tax_amount', 0),
                     'total' : float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)),
                     'created_at' : self.created_at.strftime('%Y-%m-%d') if self.created_at else '',
+                    'BACKEND_HOST' : settings.BACKEND_HOST,
                     **tax_details,
                 }
                 schema_name = connection.schema_name
@@ -205,7 +208,8 @@ class SaleInvoice(models.Model):
                 file_name = f'invoice-{self.short_id}.pdf'
                 output_path = f'{output_dir}/{file_name}'
                 no_media_path = f'invoicesFiles/{file_name}'
-                template = get_template(f'{settings.BASE_DIR}/templates/Sales/invoice.html')
+                # template = get_template(f'{settings.BASE_DIR}/templates/Sales/invoice.html')
+                template = get_template(f'{settings.BASE_DIR}/templates/Sales/invoice_2.html') # New Design for Invoice file
                 html_string = template.render(context)
                 pdfkit.from_string(html_string, os.path.join(output_path))
                 self.file = no_media_path
