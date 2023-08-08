@@ -1922,7 +1922,9 @@ def new_create_sale_order(request):
     sale_type = request.data.get('selection_type', None)
     client_id = request.data.get('client', None)
     tax_amount = request.data.get('tax_amount', 0)
+    tax_amount1 = request.data.get('tax_amount1', 0)
     tax_applied = request.data.get('tax_applied', 0)
+    tax_applied1 = request.data.get('tax_applied1', 0)
     # sale_status = request.data.get('status', None)
     
     location_id = request.data.get('location', None)
@@ -2017,7 +2019,9 @@ def new_create_sale_order(request):
         product_commission_type = product_commission_type,
         voucher_commission_type = voucher_commission_type ,  
         tax_amount = tax_amount,
+        tax_amount1 = tax_amount1,
         tax_applied = tax_applied,
+        tax_applied1 = tax_applied1,
     )
 
     checkout.save()

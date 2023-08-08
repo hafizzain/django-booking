@@ -43,7 +43,9 @@ class Checkout(models.Model):
     tip = models.FloatField(default = 0)
 
     tax_applied = models.FloatField(default=0, verbose_name='Tax Applied in Percentage')
+    tax_applied1 = models.FloatField(default=0, verbose_name='Second Tax Applied in Percentage')
     tax_amount = models.FloatField(default=0, verbose_name='Tax total amount')
+    tax_amount1 = models.FloatField(default=0, verbose_name='Second Tax total amount')
     
     total_service_price = models.FloatField(default = 0 , null=True, blank=True)
     total_product_price = models.FloatField(default = 0 , null=True, blank=True)
