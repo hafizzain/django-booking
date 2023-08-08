@@ -717,6 +717,11 @@ class VoucherOrderSerializer(serializers.ModelSerializer):
 
         
 class CheckoutSerializer(serializers.ModelSerializer):
+    gst = serializers.CharField(source='tax_applied')
+    gst1 = serializers.CharField(source='tax_applied1')
+    gst_price = serializers.CharField(source='tax_amount')
+    gst_price1 = serializers.CharField(source='tax_amount1')
+
     product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
     service  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
     membership  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
@@ -834,7 +839,11 @@ class CheckoutSerializer(serializers.ModelSerializer):
                   'voucher','client','location','member','created_at','payment_type', 'tip',
                   'service_commission', 'voucher_commission', 'product_commission', 'service_commission_type',
                   'product_commission_type','voucher_commission_type','ids','membership_product',
-                  'membership_service','membership_type'
+                  'membership_service','membership_type',
+                  'gst',
+                    'gst1',
+                    'gst_price',
+                    'gst_price1',
                   ]
 
 class ParentBusinessTax_RateSerializer(serializers.ModelSerializer):
@@ -1051,6 +1060,10 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class CheckoutCommissionSerializer(serializers.ModelSerializer):
+    gst = serializers.CharField(source='tax_applied')
+    gst1 = serializers.CharField(source='tax_applied1')
+    gst_price = serializers.CharField(source='tax_amount')
+    gst_price1 = serializers.CharField(source='tax_amount1')
 
     employee = serializers.SerializerMethodField()
     commission = serializers.SerializerMethodField()
@@ -1181,11 +1194,21 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
             'sale' : {}
         """
         model = Checkout
-        fields = ['employee', 'location', 'commission', 'commission_rate', 'sale', 'created_at']
+        fields = ['employee', 'location', 'commission', 'commission_rate', 'sale', 'created_at',
+                  'gst',
+                  'gst1',
+                  'gst_price',
+                  'gst_price1',
+                  ]
     
     
 
 class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
+    gst = serializers.CharField(source='tax_applied')
+    gst1 = serializers.CharField(source='tax_applied1')
+    gst_price = serializers.CharField(source='tax_amount')
+    gst_price1 = serializers.CharField(source='tax_amount1')
+
     promotion = serializers.SerializerMethodField(read_only=True)
     invoice = serializers.SerializerMethodField(read_only=True)
     original_price = serializers.SerializerMethodField(read_only=True)
@@ -1350,7 +1373,7 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
         
     class Meta:
         model = Checkout
-        fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location', 'product', 'service', 'membership', 'voucher', 'client', 'ids', 'membership_product', 'membership_service', 'membership_type', 'tip']
+        fields = ['id', 'gst', 'gst1', 'gst_price', 'gst_price1', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location', 'product', 'service', 'membership', 'voucher', 'client', 'ids', 'membership_product', 'membership_service', 'membership_type', 'tip']
 
 class ProductSerializer_CheckoutSerializer(serializers.ModelSerializer):
     class Meta:
@@ -1667,7 +1690,11 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     membership_service = serializers.SerializerMethodField(read_only=True)
     membership_type = serializers.SerializerMethodField(read_only=True)
     invoice = serializers.SerializerMethodField(read_only=True)
-    
+
+    gst = serializers.CharField(source='tax_applied')
+    gst1 = serializers.CharField(source='tax_applied1')
+    gst_price = serializers.CharField(source='tax_amount')
+    gst_price1 = serializers.CharField(source='tax_amount1')
     
     tip = serializers.SerializerMethodField(read_only=True)
 
@@ -1791,6 +1818,10 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             'product', 'service', 'membership', 'voucher',
             'client', 'location', 
             # 'member', 
+            'gst',
+            'gst1',
+            'gst_price',
+            'gst_price1',
             'created_at', 'payment_type', 'tip',
             'service_commission', 'voucher_commission', 'product_commission', 'service_commission_type',
             'product_commission_type', 'voucher_commission_type', 'ids', 'membership_product',

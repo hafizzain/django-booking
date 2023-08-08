@@ -565,6 +565,12 @@ class SaleInvoiceSerializer(serializers.ModelSerializer):
 
 
 class CheckoutSerializer(serializers.ModelSerializer):
+    gst = serializers.CharField(source='tax_applied')
+    gst1 = serializers.CharField(source='tax_applied1')
+    gst_price = serializers.CharField(source='tax_amount')
+    gst_price1 = serializers.CharField(source='tax_amount1')
+
+
     class Meta:
         model = Checkout
         fields = '__all__'
