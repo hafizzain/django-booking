@@ -239,7 +239,9 @@ class AppointmentCheckout(models.Model):
     
     tip = models.FloatField(default=0, null=True, blank=True) # this field is not in use
     gst = models.FloatField(default=0, null=True, blank=True)
+    gst1 = models.FloatField(default=0, null=True, blank=True)
     gst_price = models.FloatField(default=0, null=True, blank=True)
+    gst_price1 = models.FloatField(default=0, null=True, blank=True)
     
     service_price = models.FloatField(default=0, null=True, blank=True)
     total_price = models.FloatField(default=0, null=True, blank=True)

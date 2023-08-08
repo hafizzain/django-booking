@@ -1578,7 +1578,9 @@ def create_checkout(request):
     
     tip = request.data.get('tip', [])
     gst = request.data.get('gst', 0)
+    gst1 = request.data.get('gst1', 0)
     gst_price = request.data.get('gst_price', 0)
+    gst_price1 = request.data.get('gst_price1', 0)
     service_price = request.data.get('service_price', None)
     total_price = request.data.get('total_price', 0)
 
