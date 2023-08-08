@@ -912,7 +912,7 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
         model = AppointmentCheckout
         fields = ['id','appointment','appointment_service','payment_method',
                  'service','member','business_address','voucher','promotion',
-                 'membership','rewards','tip','gst','gst_price','service_price',
+                 'membership','rewards','tip','gst', 'gst1', 'gst_price', 'gst_price1','service_price',
                  'total_price','service_commission','service_commission_type','voucher_discount_percentage',
                  'is_active','is_deleted','created_at', 'order_type', 'client', 'location', 'price', 'promotion_name']
         
@@ -1483,7 +1483,7 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
         
     class Meta:
         model = AppointmentCheckout
-        fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location', 'appointment', 'client', 'order_type','service', 'price', 'voucher_discount_percentage', 'appointment_service', 'promotion_name', 'tip']
+        fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location', 'appointment', 'client', 'order_type','service', 'price', 'voucher_discount_percentage', 'appointment_service', 'promotion_name', 'tip', 'gst', 'gst1', 'gst_price', 'gst_price1',]
 
 
 
@@ -1884,7 +1884,7 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
         model = AppointmentCheckout
         fields = ['id', 'appointment', 'appointment_service', 'payment_method', 'service',
                  'business_address', 'voucher', 'promotion', 
-                 'membership', 'rewards', 'tip', 'gst', 'gst_price', 'service_price',
+                 'membership', 'rewards', 'tip', 'gst', 'gst1', 'gst_price', 'gst_price1', 'service_price',
                  'total_price', 'service_commission', 'service_commission_type', 'voucher_discount_percentage',
                  'created_at', 'order_type', 'client', 'location', 'price', 'promotion_name', 'invoice']
         

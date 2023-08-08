@@ -38,7 +38,7 @@ class AppointmentCheckoutReportSerializer(serializers.ModelSerializer):
         return LocationSerializer(loc ).data
     class Meta:
         model = AppointmentCheckout
-        fields = ['total_price', 'created_at', 'location']
+        fields = ['total_price', 'created_at', 'location', 'gst', 'gst1', 'gst_price', 'gst_price1',]
 
 class ServiceReportSerializer(serializers.ModelSerializer):
     sale = serializers.SerializerMethodField(read_only=True)

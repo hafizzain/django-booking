@@ -932,7 +932,7 @@ class CheckoutSerializer(serializers.ModelSerializer):
         model = AppointmentCheckout
         fields = ['id', 'appointment', 'appointment_service_status', 'service','member','created_at','appointment_service_duration',
                 'payment_method','business_address', 'voucher','promotion',
-                'membership','rewards','tip','gst', 'service_price', 'total_price']
+                'membership','rewards','tip','gst', 'gst1', 'gst_price', 'gst_price1', 'service_price', 'total_price']
         #exclude = ['id' ,'is_deleted', 'is_active']
         
 
