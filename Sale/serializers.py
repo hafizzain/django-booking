@@ -717,10 +717,10 @@ class VoucherOrderSerializer(serializers.ModelSerializer):
 
         
 class CheckoutSerializer(serializers.ModelSerializer):
-    gst = serializers.CharField(source='tax_applied')
-    gst1 = serializers.CharField(source='tax_applied1')
-    gst_price = serializers.CharField(source='tax_amount')
-    gst_price1 = serializers.CharField(source='tax_amount1')
+    gst = serializers.FloatField(source='tax_applied')
+    gst1 = serializers.FloatField(source='tax_applied1')
+    gst_price = serializers.FloatField(source='tax_amount')
+    gst_price1 = serializers.FloatField(source='tax_amount1')
 
     product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
     service  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
@@ -1060,10 +1060,10 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class CheckoutCommissionSerializer(serializers.ModelSerializer):
-    gst = serializers.CharField(source='tax_applied')
-    gst1 = serializers.CharField(source='tax_applied1')
-    gst_price = serializers.CharField(source='tax_amount')
-    gst_price1 = serializers.CharField(source='tax_amount1')
+    gst = serializers.FloatField(source='tax_applied')
+    gst1 = serializers.FloatField(source='tax_applied1')
+    gst_price = serializers.FloatField(source='tax_amount')
+    gst_price1 = serializers.FloatField(source='tax_amount1')
 
     employee = serializers.SerializerMethodField()
     commission = serializers.SerializerMethodField()
@@ -1204,10 +1204,10 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
     
 
 class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
-    gst = serializers.CharField(source='tax_applied')
-    gst1 = serializers.CharField(source='tax_applied1')
-    gst_price = serializers.CharField(source='tax_amount')
-    gst_price1 = serializers.CharField(source='tax_amount1')
+    gst = serializers.FloatField(source='tax_applied')
+    gst1 = serializers.FloatField(source='tax_applied1')
+    gst_price = serializers.FloatField(source='tax_amount')
+    gst_price1 = serializers.FloatField(source='tax_amount1')
 
     promotion = serializers.SerializerMethodField(read_only=True)
     invoice = serializers.SerializerMethodField(read_only=True)
@@ -1691,10 +1691,10 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     membership_type = serializers.SerializerMethodField(read_only=True)
     invoice = serializers.SerializerMethodField(read_only=True)
 
-    gst = serializers.CharField(source='tax_applied')
-    gst1 = serializers.CharField(source='tax_applied1')
-    gst_price = serializers.CharField(source='tax_amount')
-    gst_price1 = serializers.CharField(source='tax_amount1')
+    gst = serializers.FloatField(source='tax_applied')
+    gst1 = serializers.FloatField(source='tax_applied1')
+    gst_price = serializers.FloatField(source='tax_amount')
+    gst_price1 = serializers.FloatField(source='tax_amount1')
     
     tip = serializers.SerializerMethodField(read_only=True)
 
