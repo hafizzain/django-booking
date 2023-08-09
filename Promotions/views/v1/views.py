@@ -663,7 +663,8 @@ def get_discount_and_promotions(request):
     selected_location = request.GET.get('selected_location', None)
 
     if not selected_day or selected_day is None : 
-        selected_day = 'Nothing_Found'
+        # selected_day = 'Nothing_Found'
+        selected_day = datetime.now().strftime('%A')
 
 
     ##Done VERIFIED
