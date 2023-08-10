@@ -52,7 +52,10 @@ def get_busines_client_appointment(request):
     total_price = 0
     appointment = 0
 
-    all_apps_clients = Appointment.objects.filter(client__isnull=False).distinct('client').count()
+    all_apps_clients = Appointment.objects.filter(client__isnull=False).distinct('client')
+    apps_clients_with_app = list(all_apps_clients.values_list('client__full_name'))
+    all_apps_clients = all_apps_clients.count()
+    
 
     clients_booked = Client.objects.filter(is_deleted=False, client_appointments__appointment_services__appointment_status='Appointment_Booked').count()
     footfalls = AppointmentService.objects.filter(is_deleted=False).exclude(appointment_status__iexact ='cancel').count()
@@ -136,6 +139,8 @@ def get_busines_client_appointment(request):
                 'clients_booked':all_apps_clients,
                 'appointments_count': appointment,
                 'average_appointment':avg,
+                'clients_with_sales' : apps_clients_with_app,
+                'clients_with_sales_count' : len(apps_clients_with_app),
             }
         },
         status=status.HTTP_200_OK
