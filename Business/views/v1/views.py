@@ -4538,15 +4538,15 @@ class getUserBusinessProfileCompletionProgress(APIView):
 class BusinessTaxSettingView(APIView):
 
     serializer = BusinessTaxSettingSerializer
-    authentication_classes = [SessionAuthentication]
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        business = Business.objects.get(id=self.kwargs.get('business_id'))
+        business = Business.objects.get(id=request.query_params.get('business_id'))
         bu_tax_setting, created = BusinessTaxSetting.objects.get_or_create(
             business=business,
-            user=request.user
         )
+        bu_tax_setting.user = request.user
+        bu_tax_setting.save()
 
         serializer = self.serializer(bu_tax_setting)
 
@@ -4569,15 +4569,14 @@ class BusinessTaxSettingView(APIView):
         )
     
     def patch(self, request, *args, **kwargs):
-        business = Business.objects.get(id=kwargs.get('business_id'))
+        business = Business.objects.get(id=request.query_params.get('business_id'))
         bu_tax_setting = BusinessTaxSetting.objects.get(
             business=business,
-            user=request.user
         )
 
         bu_tax_setting.tax_setting = request.data.get('tax_setting')
+        bu_tax_setting.user = request.user
         bu_tax_setting.save()
-
 
         serializer = self.serializer(bu_tax_setting)
         data = {
