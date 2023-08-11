@@ -81,4 +81,7 @@ urlpatterns = [
 
     path('get_user_business_profile_completion_progress/', views.getUserBusinessProfileCompletionProgress.as_view()),
 
+    # business tax setting
+    path('tax_setting/', views.BusinessTaxSettingView.as_view())
+
 ]
