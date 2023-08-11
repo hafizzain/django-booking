@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             name='BusinessTaxSetting',
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
-                ('tax_setting', models.CharField(choices=[('Combined', 'Combined'), ('Seperately', 'Seperately')], default='', max_length=15)),
+                ('tax_setting', models.CharField(choices=[('Combined', 'Combined'), ('Seperately', 'Seperately')], default='Combined', max_length=15)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('business', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='business_tax_setting', to='Business.business')),
