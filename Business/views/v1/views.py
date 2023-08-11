@@ -4545,8 +4545,9 @@ class BusinessTaxSettingView(APIView):
         bu_tax_setting, created = BusinessTaxSetting.objects.get_or_create(
             business=business,
         )
-        bu_tax_setting.user = request.user
-        bu_tax_setting.save()
+        if created:
+            bu_tax_setting.user = request.user
+            bu_tax_setting.save()
 
         serializer = self.serializer(bu_tax_setting)
 
@@ -4568,12 +4569,8 @@ class BusinessTaxSettingView(APIView):
             status=status.HTTP_200_OK
         )
     
-    def patch(self, request, *args, **kwargs):
-        business = Business.objects.get(id=request.query_params.get('business_id'))
-        bu_tax_setting = BusinessTaxSetting.objects.get(
-            business=business,
-        )
-
+    def put(self, request, *args, **kwargs):
+        bu_tax_setting = BusinessTaxSetting.objects.get(id=request.data.get('business_tax_id'))
         bu_tax_setting.tax_setting = request.data.get('tax_setting')
         bu_tax_setting.user = request.user
         bu_tax_setting.save()
