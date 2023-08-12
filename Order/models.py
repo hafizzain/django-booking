@@ -46,6 +46,8 @@ class Checkout(models.Model):
     tax_applied1 = models.FloatField(default=0, verbose_name='Second Tax Applied in Percentage')
     tax_amount = models.FloatField(default=0, verbose_name='Tax total amount')
     tax_amount1 = models.FloatField(default=0, verbose_name='Second Tax total amount')
+    tax_name = models.CharField(max_length=250, default='')
+    tax_name1 = models.CharField(max_length=250, default='')
     
     total_service_price = models.FloatField(default = 0 , null=True, blank=True) # Not in Use
     total_product_price = models.FloatField(default = 0 , null=True, blank=True) # Not in Use

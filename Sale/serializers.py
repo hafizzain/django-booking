@@ -844,6 +844,8 @@ class CheckoutSerializer(serializers.ModelSerializer):
                     'gst1',
                     'gst_price',
                     'gst_price1',
+                    'tax_name',
+                    'tax_name1'
                   ]
 
 class ParentBusinessTax_RateSerializer(serializers.ModelSerializer):
@@ -923,7 +925,8 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
                  'service','member','business_address','voucher','promotion',
                  'membership','rewards','tip','gst', 'gst1', 'gst_price', 'gst_price1','service_price',
                  'total_price','service_commission','service_commission_type','voucher_discount_percentage',
-                 'is_active','is_deleted','created_at', 'order_type', 'client', 'location', 'price', 'promotion_name']
+                 'is_active','is_deleted','created_at', 'order_type', 'client', 'location', 'price', 'promotion_name',
+                 'tax_name', 'tax_name1']
         
 class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
@@ -1199,6 +1202,8 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
                   'gst1',
                   'gst_price',
                   'gst_price1',
+                  'tax_name',
+                  'tax_name1'
                   ]
     
     
@@ -1373,7 +1378,10 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
         
     class Meta:
         model = Checkout
-        fields = ['id', 'gst', 'gst1', 'gst_price', 'gst_price1', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location', 'product', 'service', 'membership', 'voucher', 'client', 'ids', 'membership_product', 'membership_service', 'membership_type', 'tip']
+        fields = ['id', 'gst', 'gst1', 'gst_price', 'gst_price1', 'promotion', 'invoice',
+                  'created_at', 'original_price', 'discounted_price', 'location', 'product', 
+                  'service', 'membership', 'voucher', 'client', 'ids', 'membership_product', 
+                  'membership_service', 'membership_type', 'tip', 'tax_name', 'tax_name1']
 
 class ProductSerializer_CheckoutSerializer(serializers.ModelSerializer):
     class Meta:
@@ -1506,7 +1514,10 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
         
     class Meta:
         model = AppointmentCheckout
-        fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location', 'appointment', 'client', 'order_type','service', 'price', 'voucher_discount_percentage', 'appointment_service', 'promotion_name', 'tip', 'gst', 'gst1', 'gst_price', 'gst_price1',]
+        fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price',
+                  'location', 'appointment', 'client', 'order_type','service', 'price',
+                  'voucher_discount_percentage', 'appointment_service', 'promotion_name', 
+                  'tip', 'gst', 'gst1', 'gst_price', 'gst_price1', 'tax_name', 'tax_name1']
 
 
 
@@ -1825,7 +1836,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             'created_at', 'payment_type', 'tip',
             'service_commission', 'voucher_commission', 'product_commission', 'service_commission_type',
             'product_commission_type', 'voucher_commission_type', 'ids', 'membership_product',
-            'membership_service', 'membership_type', 'invoice'
+            'membership_service', 'membership_type', 'invoice', 'tax_name', 'tax_name1'
         ]
 
         # Remove Member from get all sale orders
@@ -1917,5 +1928,6 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
                  'business_address', 'voucher', 'promotion', 
                  'membership', 'rewards', 'tip', 'gst', 'gst1', 'gst_price', 'gst_price1', 'service_price',
                  'total_price', 'service_commission', 'service_commission_type', 'voucher_discount_percentage',
-                 'created_at', 'order_type', 'client', 'location', 'price', 'promotion_name', 'invoice']
+                 'created_at', 'order_type', 'client', 'location', 'price', 'promotion_name', 'invoice',
+                 'tax_name', 'tax_name1']
         
