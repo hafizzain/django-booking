@@ -156,7 +156,7 @@ class SaleInvoice(models.Model):
                 )
                 return [
                         self.get_appointment_services(checkout), 
-                        self.get_tips(checkout_type='Ap,pointment', id=f'{checkout.appointment.id}'),
+                        self.get_tips(checkout_type='Appointment', id=f'{checkout.appointment.id}'),
                         {
                             'tax_applied' : round(checkout.gst, 2),
                             'tax_amount' : round(checkout.gst_price, 2),
