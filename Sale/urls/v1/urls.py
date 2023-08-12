@@ -9,7 +9,6 @@ urlpatterns = [
     path('update_service/',views.update_service),
     
     #Order Sale
-    # path('create_sale_order/', views.create_sale_order),
     path('create_sale_order/', views.new_create_sale_order),
     
     
@@ -18,7 +17,6 @@ urlpatterns = [
     path('get_membership_orders/', views.get_membership_orders),
     path('get_voucher_orders/', views.get_voucher_orders),
     
-    #path('get_all_sale_orders/', views.get_all_sale_orders),
     path('get_all_sale_orders/', views.get_all_sale_orders_pagination),
     
     path('get_total_revenue/', views.get_total_revenue),

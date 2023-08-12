@@ -152,10 +152,10 @@ class Subscription(models.Model):
 
     name = models.CharField(max_length=300, default='')
     days = models.PositiveIntegerField(default=0, verbose_name='Number of Days')
-    select_amount = models.PositiveIntegerField(default=0)
-    services_count = models.PositiveIntegerField(default=0, verbose_name='Total Number of Services')
-    products_count = models.PositiveIntegerField(default=0, verbose_name='Total Number of Products')
-    price = models.PositiveIntegerField(default=0, verbose_name='Subscription Price')
+    select_amount = models.FloatField(default=0)
+    services_count = models.FloatField(default=0, verbose_name='Total Number of Services')
+    products_count = models.FloatField(default=0, verbose_name='Total Number of Products')
+    price = models.FloatField(default=0, verbose_name='Subscription Price')
 
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -199,9 +199,9 @@ class Promotion(models.Model):
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_promotions')
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_promotions')
     
-    purchases  = models.PositiveIntegerField(verbose_name='No. of Purchases', default=0, null=True, blank=True)
+    purchases  = models.FloatField(verbose_name='No. of Purchases', default=0, null=True, blank=True)
 
-    discount = models.PositiveIntegerField(default=0)
+    discount = models.FloatField(default=0)
     
     valid_til= models.CharField(choices=VALIDITY_DAY, default='7 Days', null = True, blank=  True ,verbose_name='No of Days/Month', max_length = 100)
 
@@ -243,23 +243,18 @@ class Vouchers(models.Model):
     
     name = models.CharField(max_length=100, default='')
     arabic_name = models.CharField(max_length=999, default='')
-
-    #value = models.PositiveIntegerField(default=0)
     
     voucher_type = models.CharField(choices= VOUCHER_CHOICES,default= 'Product', verbose_name = 'Voucher Type', max_length=20)
     # service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_voucher')
     # product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_voucher')
     
     #valid_for = models.CharField(choices=VALIDITY_CHOICE, default='Months' , verbose_name='Validity for Days or Months', max_length=20)
-    discount_percentage = models.PositiveIntegerField(default=0,blank= True, null=True)
-    # days = models.PositiveIntegerField(default=0, verbose_name='No. of Days', null=True, blank=True)
-    # months = models.PositiveIntegerField(default=0, verbose_name='No. of Months', null=True, blank=True)
-    #validity = models.PositiveIntegerField(default=0, verbose_name='No of Days/Month')
+    discount_percentage = models.FloatField(default=0,blank= True, null=True)
     validity = models.CharField(choices=VALIDITY_DAY, default='7 Days' ,verbose_name='No of Days/Month', max_length = 100)
     
     
-    sales = models.PositiveIntegerField(default=0)
-    price = models.PositiveIntegerField(default=0)
+    sales = models.FloatField(default=0)
+    price = models.FloatField(default=0)
     
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
@@ -304,12 +299,12 @@ class Rewards(models.Model):
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_rewards')
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_rewards')
 
-    reward_value = models.PositiveIntegerField(default=0)
-    reward_point = models.PositiveIntegerField(default=0)
+    reward_value = models.FloatField(default=0)
+    reward_point = models.FloatField(default=0)
     reward_type =  models.CharField(default='Product', choices=REWARD_TYPES, max_length=20)
 
-    total_points = models.PositiveIntegerField(default=0)
-    discount = models.PositiveIntegerField(default=0)
+    total_points = models.FloatField(default=0)
+    discount = models.FloatField(default=0)
     
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
@@ -351,25 +346,13 @@ class Membership(models.Model):
     arabic_name = models.CharField(max_length=999, default='')
 
     description =  models.CharField(max_length=300, null=True, blank=True)
-    #membership = models.CharField(default='Product', choices=MEMBERSHIP_CHOICES, max_length=30, verbose_name = 'Membership_type')
+    percentage = models.FloatField(default=0)
     
-    # service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_memberships')
-    # product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_memberships')
-    
-    percentage = models.PositiveIntegerField(default=0)
-    
-    #total_number = models.PositiveIntegerField(default=0, null=True, blank=True)
     valid_for = models.CharField(choices=VALIDITY_CHOICE, default='7 Days' , verbose_name='Validity for Days or Months', max_length=20)
     discount = models.CharField(choices=DISCOUNT_CHOICE, default='Unlimited' , verbose_name='Discount Limit', max_length=20)
     
-    #validity = models.PositiveIntegerField(default=0, verbose_name='No. of Validity Days/Month', null=True, blank=True)
-    
-    #color =  models.CharField(max_length=100, default='')
-    term_condition =  models.CharField(max_length=300, null=True, blank=True)
 
-    
-    #price = models.PositiveIntegerField(default=0)
-    #tax_rate = models.PositiveIntegerField(default=0)
+    term_condition =  models.CharField(max_length=300, null=True, blank=True)
 
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -397,7 +380,7 @@ class DiscountMembership(models.Model):
     
     membership = models.ForeignKey(Membership, on_delete=models.CASCADE, related_name='membership_discountmembership')
     duration = models.CharField(choices=DURATION_CHOICE, default='7 Days' , verbose_name='Duration', max_length=50, null=True, blank=True,)
-    percentage = models.PositiveIntegerField(default=0)
+    percentage = models.FloatField(default=0)
 
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_memberships')
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_memberships')
@@ -548,8 +531,6 @@ class ClientPackageValidation(models.Model):
     package = models.ForeignKey('Promotions.PackagesDiscount', on_delete=models.SET_NULL, null=True, blank=True, related_name='package_client_packagevalidation')
     serviceduration = models.ForeignKey('Promotions.ServiceDurationForSpecificTime', on_delete=models.SET_NULL, null=True, blank=True, related_name='serviceduration_client_packagevalidation')
     service = models.ManyToManyField(Service, related_name='service_client_packagevalidation') 
-
-    #month = models.PositiveIntegerField(default=0, null=True, blank=True)
     
     due_date = models.DateField(null=True) 
     

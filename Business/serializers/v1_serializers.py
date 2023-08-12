@@ -9,7 +9,12 @@ from datetime import datetime, timedelta
 from Order.models import Checkout,Order
 from django.contrib.gis.geoip2 import GeoIP2
 
-from Business.models import BookingSetting, BusinessAddressMedia, BusinessType, Business, BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BusinessPaymentMethod, BusinessTax, BusinessVendor,BusinessOpeningHour
+from Business.models import (BookingSetting, BusinessAddressMedia, BusinessType, Business, 
+                             BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, 
+                             ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, 
+                             BusinessPaymentMethod, BusinessTax, BusinessVendor,BusinessOpeningHour,
+                             BusinessTaxSetting
+                        )
 from Authentication.serializers import UserSerializer
 from django.conf import settings
 
@@ -674,3 +679,10 @@ class EmployeAppointmentServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentService
         fields = ( 'appointment_time', 'end_time')
+
+
+class BusinessTaxSettingSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = BusinessTaxSetting
+        fields = '__all__'

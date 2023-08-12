@@ -66,7 +66,7 @@ class EmployeeProfessionalInfo(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_professional_details')
     designation = models.CharField(max_length=300, default='')
     income_type = models.CharField(choices=INCOME_TYPE_CHOICES, default='Hourly_Rate', max_length=30)
-    salary = models.PositiveIntegerField(default=0)
+    salary = models.FloatField(default=0)
     #services = models.ManyToManyField(Service, through='EmployeeSelectedService' , related_name='services_employee')
     
     
@@ -76,7 +76,7 @@ class EmployeeProfessionalInfo(models.Model):
     
     start_time = models.TimeField(null=True, blank=True)
     end_time = models.TimeField(null=True, blank=True)
-    maximum_discount = models.PositiveIntegerField(default=0, null=True, blank=True)
+    maximum_discount = models.FloatField(default=0, null=True, blank=True)
     
     
     monday = models.BooleanField(default=False)
@@ -240,9 +240,9 @@ class CommissionSchemeSetting(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_commission_setting')
     
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_commissioin', null=True, blank=True)
-    from_value = models.PositiveIntegerField(default=0, null=True, blank=True)
-    to_value = models.PositiveIntegerField(default=0, null=True, blank=True)
-    percentage = models.PositiveIntegerField(default=0, null=True, blank=True)
+    from_value = models.FloatField(default=0, null=True, blank=True)
+    to_value = models.FloatField(default=0, null=True, blank=True)
+    percentage = models.FloatField(default=0, null=True, blank=True)
     
     commission_cycle = models.CharField(choices=COMMISSION_CHOICES, max_length=50, default='Every day',)
     
@@ -269,9 +269,9 @@ class CategoryCommission(models.Model):
     id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     commission = models.ForeignKey(CommissionSchemeSetting, on_delete=models.CASCADE, related_name='categorycommission_commission')
     
-    from_value = models.PositiveIntegerField(default=0, null=True, blank=True)
+    from_value = models.FloatField(default=0, null=True, blank=True)
     to_value = models.CharField(max_length=50, null=True, blank= True)
-    commission_percentage = models.PositiveIntegerField(default=0, null=True, blank=True)
+    commission_percentage = models.FloatField(default=0, null=True, blank=True)
     
     category_comission = models.CharField(choices=CATEGORY_CHOICES, max_length=50, default='Service',)
     comission_choice = models.CharField(choices=COMMISSION_CHOICE, max_length=50, default='percentage',)

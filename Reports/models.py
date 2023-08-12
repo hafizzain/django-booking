@@ -187,7 +187,7 @@ class DiscountPromotionSalesReport(models.Model):
     client = models.ForeignKey(Client, on_delete=models.SET_NULL, related_name='client_discount_sales', null=True, blank=True)
     location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, related_name='location_discount_sales', null=True, blank=True)
     quantity = models.PositiveBigIntegerField(default= 0)
-    gst = models.PositiveBigIntegerField(default = 0)
+    gst = models.FloatField(default = 0)
     original_price = models.DecimalField(default = 0 , max_digits=10, decimal_places=5)
     discount_percentage = models.FloatField(default= 0)
     discount_price = models.FloatField(default= 0)

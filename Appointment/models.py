@@ -98,13 +98,13 @@ class Appointment(models.Model):
     discount_type = models.CharField(max_length=50, choices= DISCOUNT_CHOICES, null=True, blank=True)
     payment_method = models.CharField(max_length=100, choices= PAYMENT_CHOICES, default='', null=True, blank=True)  
     
-    extra_price  = models.PositiveIntegerField(default=0, null=True, blank=True)
-    tip  = models.PositiveIntegerField(default=0, null=True, blank=True)
+    extra_price  = models.FloatField(default=0, null=True, blank=True)
+    tip  = models.FloatField(default=0, null=True, blank=True) # Not in Use
     
-    discount_price  = models.PositiveIntegerField(default=0, null=True, blank=True)
-    discount_percentage = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)
+    discount_price  = models.FloatField(default=0, null=True, blank=True)
+    discount_percentage = models.FloatField(default = 0 , null=True, blank=True)
     
-    service_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
+    service_commission = models.FloatField(default = 0 , null=True, blank=True)    
     service_commission_type = models.CharField( max_length=50 , default = '')
 
 
@@ -162,17 +162,17 @@ class AppointmentService(models.Model):
     slot_availible_for_online = models.CharField(max_length=100, default='', null=True, blank=True,)
     
     appointment_status = models.CharField(choices=BOOKED_CHOICES, max_length=100, default='Appointment Booked')
-    tip = models.PositiveIntegerField(default=0, null=True, blank=True)
+    tip = models.FloatField(default=0, null=True, blank=True) # Not in Use
     
     price = models.FloatField(default=0, null=True, blank=True)
     
-    service_commission = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
+    service_commission = models.FloatField(default = 0 , null=True, blank=True)    
     service_commission_type = models.CharField( max_length=50 , default = '')
     
     discount_price = models.FloatField(default = 0 , null=True, blank=True)    
     discount_percentage = models.FloatField(default = 0 , null=True, blank=True)
         
-    total_price = models.PositiveBigIntegerField(default = 0 , null=True, blank=True)    
+    total_price = models.FloatField(default = 0 , null=True, blank=True)    
     
     end_time = models.TimeField(null=True, blank=True)
     details = models.CharField(max_length=255, null=True, blank=True)
@@ -237,9 +237,13 @@ class AppointmentCheckout(models.Model):
     membership =models.ForeignKey(Membership, on_delete=models.CASCADE, related_name='checkout_membership_appointments', null=True, blank=True) 
     rewards =models.ForeignKey(Rewards, on_delete=models.CASCADE, related_name='checkout_reward_appointments', null=True, blank=True) 
     
-    tip = models.PositiveIntegerField(default=0, null=True, blank=True) # this field is not in use
+    tip = models.FloatField(default=0, null=True, blank=True) # this field is not in use
     gst = models.FloatField(default=0, null=True, blank=True)
+    gst1 = models.FloatField(default=0, null=True, blank=True)
     gst_price = models.FloatField(default=0, null=True, blank=True)
+    gst_price1 = models.FloatField(default=0, null=True, blank=True)
+    tax_name = models.CharField(max_length=250, default='')
+    tax_name1 = models.CharField(max_length=250, default='')
     
     service_price = models.FloatField(default=0, null=True, blank=True)
     total_price = models.FloatField(default=0, null=True, blank=True)

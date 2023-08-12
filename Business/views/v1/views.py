@@ -8,6 +8,7 @@ from django.conf import settings
 from operator import ge
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -15,7 +16,7 @@ from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Authentication.serializers import UserTenantLoginSerializer
 
 from Business.models import BusinessAddressMedia, BusinessType
-from Business.serializers.v1_serializers import BusinessAddress_CustomerSerializer, EmployeAppointmentServiceSerializer, EmployeTenatSerializer, OpeningHoursSerializer,AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer
+from Business.serializers.v1_serializers import BusinessAddress_CustomerSerializer, EmployeAppointmentServiceSerializer, EmployeTenatSerializer, OpeningHoursSerializer,AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer, BusinessTaxSettingSerializer
 from Client.models import Client
 from Employee.models import EmployeDailySchedule, Employee, EmployeeProfessionalInfo, EmployeeSelectedService
 from Employee.Constants.Add_Employe import add_employee
@@ -26,7 +27,7 @@ from NStyle.Constants import StatusCodes
 from Appointment.models import AppointmentService
 from Appointment.serializers import PriceServiceSaleSerializer
 from Authentication.models import User, AccountType
-from Business.models import Business, BusinessSocial, BusinessAddress, BusinessOpeningHour, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BookingSetting, BusinessPaymentMethod, BusinessTax, BusinessVendor
+from Business.models import Business, BusinessSocial, BusinessAddress, BusinessOpeningHour, BusinessTheme, StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, BookingSetting, BusinessPaymentMethod, BusinessTax, BusinessVendor, BusinessTaxSetting
 from Product.models import Product, ProductStock
 from Profile.models import UserLanguage
 from Profile.serializers import UserLanguageSerializer
@@ -2585,8 +2586,7 @@ def update_business_tax(request):
         )
     
     if (tax_type != 'Group' and tax_type != 'Location'):
-        tax_rate = int(tax_rate)
-    user = request.user
+        tax_rate = float(tax_rate)
 
     try:
         business = Business.objects.get(id=business_id, is_deleted=False, is_active=True, is_blocked=False)
@@ -4533,4 +4533,76 @@ class getUserBusinessProfileCompletionProgress(APIView):
             },
             status=status.HTTP_200_OK
         )
+    
+
+class BusinessTaxSettingView(APIView):
+
+    serializer = BusinessTaxSettingSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        business = Business.objects.get(id=request.query_params.get('business_id'))
+        try:
+            bu_tax_setting = BusinessTaxSetting.objects.get(
+                business=business,
+            )
+        except:
+            bu_tax_setting = BusinessTaxSetting.objects.create(
+                business=business,
+                user = request.user
+            )
+
+        serializer = self.serializer(bu_tax_setting)
+
+        data = {
+            'data': serializer.data,
+            'choices': self.get_choices()
+        }
+        return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Created tax setting',
+                    'error_message' : None,
+                    'data' : data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    
+    def put(self, request, *args, **kwargs):
+        bu_tax_setting = BusinessTaxSetting.objects.get(id=request.data.get('business_tax_id'))
+        bu_tax_setting.tax_setting = request.data.get('tax_setting')
+        bu_tax_setting.user = request.user
+        bu_tax_setting.save()
+
+        serializer = self.serializer(bu_tax_setting)
+        data = {
+            'data': serializer.data,
+            'choices': self.get_choices()
+        }
+
+        return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'status_code_text' : '200',
+                'response' : {
+                    'message' : 'Updated tax setting',
+                    'error_message' : None,
+                    'data' : data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
+
+    
+    def get_choices(self):
+        """
+        Get available choices for business tax setting    
+        """
+        return [item[0] for item in BusinessTaxSetting.SETTING_TYPE]
     

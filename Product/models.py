@@ -158,7 +158,7 @@ class ProductStock(models.Model):
     low_stock = models.PositiveIntegerField(default=0)
     reorder_quantity = models.PositiveIntegerField(default=0)
     
-    amount = models.PositiveIntegerField(default=0, verbose_name='Usage Amount', null=True, blank=True)
+    amount = models.FloatField(default=0, verbose_name='Usage Amount', null=True, blank=True)
     unit = models.PositiveIntegerField(default=0, verbose_name='Usage Unit', null=True, blank=True)
     product_unit = models.CharField(max_length=50, null=True, blank=True, verbose_name='Product Unit') 
 

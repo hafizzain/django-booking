@@ -242,7 +242,7 @@ def get_commission_reports_by_commission_details_updated(request):
 
     # 'location', 'order_type', 'employee', 'commission', 'commission_rate', 'sale', 'created_at'
 
-    serialized = EmployeeCommissionReportsSerializer(employee_commissions, many=True)
+    serialized = EmployeeCommissionReportsSerializer(employee_commissions, many=True, context={'request' : request})
     data = serialized.data
 
     return Response(
@@ -307,26 +307,8 @@ def get_promotions_and_discounts_sales(request):
         location__id = location_id,
         **queries
     ).order_by('-created_at')
-    data = DiscountPromotionSalesReport_serializer(sales, many=True).data
+    data = DiscountPromotionSalesReport_serializer(sales, many=True, context={'request' : request}).data
     
-    # checkout_order = Checkout.objects.filter(
-    #     is_deleted=False,
-    #     location__id=location_id,
-    #     is_promotion = True,
-    #     **queries,
-    # )
-    # appointment_checkout = AppointmentCheckout.objects.filter(
-    #     appointment_service__appointment_status='Done',
-    #     business_address__id=location_id,
-    #     is_promotion = True,
-    #     **queries,
-    # )
-
-    # data_total = list(PromotionNDiscount_CheckoutSerializer(checkout_order, many=True, context={'request': request}).data) + \
-    #              list(PromotionNDiscount_AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
-                 
-    # sorted_data = sorted(data_total, key=lambda x: x['created_at'], reverse=True)
-
     paginated_data = paginator.paginate_queryset(data, request)
 
     return paginator.get_paginated_response(paginated_data, 'sales')

@@ -2714,8 +2714,12 @@ def get_client_all_memberships(request):
     location_id = request.GET.get('location_id', None)
     client_id = request.GET.get('client_id', None)
 
+    today_date = datetime.now()
+    today_date = today_date.strftime('%Y-%m-%d')
     client_membership = MemberShipOrder.objects.filter(
         # location__id = location_id,
+
+        end_date__gte = today_date,
         client__id = client_id,
     )
     data = ClientMembershipsSerializer(client_membership, many=True).data
@@ -3132,7 +3136,7 @@ def get_customer_detailed_loyalty_points(request):
     page_number = request.GET.get("page") 
     customers_points = paginator.get_page(page_number)
 
-    data = CustomerDetailedLoyaltyPointsLogsSerializer(customers_points, many=True).data
+    data = CustomerDetailedLoyaltyPointsLogsSerializer(customers_points, many=True, context={'request' : request}).data
 
     return Response(
         {

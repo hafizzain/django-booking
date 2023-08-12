@@ -494,7 +494,7 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
     def get_invoice_data(self, c_points):
         try:
             invoice = SaleInvoice.objects.get(id__icontains = c_points.invoice)
-            serializer = SaleInvoiceSerializer(invoice)
+            serializer = SaleInvoiceSerializer(invoice, context=self.context)
             return serializer.data
         except Exception as e:
             return str(e)
@@ -526,12 +526,12 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
         is_checkout = False
         try:
             data = Checkout.objects.filter(id = c_points.checkout)
-            serializer = SaleOrders_CheckoutSerializer(data, many=True)
+            serializer = SaleOrders_CheckoutSerializer(data, many=True, context=self.context)
 
             if len(data) == 0:                
                 data = AppointmentCheckout.objects.filter(id = c_points.checkout)
                 # serializer = AppointmentCheckoutSerializer(data, many=True)
-                serializer = SaleOrders_AppointmentCheckoutSerializer(data, many=True)
+                serializer = SaleOrders_AppointmentCheckoutSerializer(data, many=True, context=self.context)
 
         except Exception as e:
             return str(e)
@@ -548,12 +548,29 @@ class CustomerDetailedLoyaltyPointsLogsSerializer(serializers.ModelSerializer):
 
 
 class SaleInvoiceSerializer(serializers.ModelSerializer):
+    file = serializers.SerializerMethodField(read_only = True)
+
+    def get_file(self, obj):
+        if obj.file:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request)
+                return f'{url}{obj.file}'
+            except:
+                return f'{obj.file}'
+        return None
     class Meta:
         model = SaleInvoice
         fields = '__all__'
 
 
 class CheckoutSerializer(serializers.ModelSerializer):
+    gst = serializers.FloatField(source='tax_applied')
+    gst1 = serializers.FloatField(source='tax_applied1')
+    gst_price = serializers.FloatField(source='tax_amount')
+    gst_price1 = serializers.FloatField(source='tax_amount1')
+
+
     class Meta:
         model = Checkout
         fields = '__all__'

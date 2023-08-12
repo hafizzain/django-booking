@@ -38,7 +38,8 @@ class AppointmentCheckoutReportSerializer(serializers.ModelSerializer):
         return LocationSerializer(loc ).data
     class Meta:
         model = AppointmentCheckout
-        fields = ['total_price', 'created_at', 'location']
+        fields = ['total_price', 'created_at', 'location', 'gst', 'gst1', 'gst_price', 'gst_price1',
+                  'tax_name', 'tax_name1']
 
 class ServiceReportSerializer(serializers.ModelSerializer):
     sale = serializers.SerializerMethodField(read_only=True)
@@ -960,7 +961,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
             for ord  in service_target:
                 created_date = ord.year.date() 
                 if created_date.month == date_obj.month and created_date.year == date_obj.year:
-                    ser_target += int(ord.service_target)            
+                    ser_target += float(ord.service_target)            
             return ser_target
             
         except Exception as err:
@@ -1153,7 +1154,7 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
         # if checkoutt:
         try:
             invoice = SaleInvoice.objects.get(checkout__icontains = obj.sale_id)
-            serializer = SaleInvoiceSerializer(invoice)
+            serializer = SaleInvoiceSerializer(invoice, context=self.context)
             return serializer.data
         except Exception as e:
             return str(e)
@@ -1185,6 +1186,17 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
 
 
 class DiscountPromotion_SaleInvoiceSerializer(serializers.ModelSerializer):
+    file = serializers.SerializerMethodField(read_only = True)
+
+    def get_file(self, obj):
+        if obj.file:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request)
+                return f'{url}{obj.file}'
+            except:
+                return f'{obj.file}'
+        return None
     class Meta:
         model = SaleInvoice
         fields = '__all__'
@@ -1311,7 +1323,7 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
     def get_invoice(self, obj):
         try:
             invoice = SaleInvoice.objects.get(checkout__icontains = obj.checkout_id)
-            serializer = DiscountPromotion_SaleInvoiceSerializer(invoice)
+            serializer = DiscountPromotion_SaleInvoiceSerializer(invoice, context=self.context)
             return serializer.data
         except Exception as e:
             return str(e)

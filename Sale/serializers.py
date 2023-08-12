@@ -717,6 +717,11 @@ class VoucherOrderSerializer(serializers.ModelSerializer):
 
         
 class CheckoutSerializer(serializers.ModelSerializer):
+    gst = serializers.FloatField(source='tax_applied')
+    gst1 = serializers.FloatField(source='tax_applied1')
+    gst_price = serializers.FloatField(source='tax_amount')
+    gst_price1 = serializers.FloatField(source='tax_amount1')
+
     product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
     service  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
     membership  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
@@ -834,7 +839,13 @@ class CheckoutSerializer(serializers.ModelSerializer):
                   'voucher','client','location','member','created_at','payment_type', 'tip',
                   'service_commission', 'voucher_commission', 'product_commission', 'service_commission_type',
                   'product_commission_type','voucher_commission_type','ids','membership_product',
-                  'membership_service','membership_type'
+                  'membership_service','membership_type',
+                  'gst',
+                    'gst1',
+                    'gst_price',
+                    'gst_price1',
+                    'tax_name',
+                    'tax_name1'
                   ]
 
 class ParentBusinessTax_RateSerializer(serializers.ModelSerializer):
@@ -912,9 +923,10 @@ class AppointmentCheckoutSerializer(serializers.ModelSerializer):
         model = AppointmentCheckout
         fields = ['id','appointment','appointment_service','payment_method',
                  'service','member','business_address','voucher','promotion',
-                 'membership','rewards','tip','gst','gst_price','service_price',
+                 'membership','rewards','tip','gst', 'gst1', 'gst_price', 'gst_price1','service_price',
                  'total_price','service_commission','service_commission_type','voucher_discount_percentage',
-                 'is_active','is_deleted','created_at', 'order_type', 'client', 'location', 'price', 'promotion_name']
+                 'is_active','is_deleted','created_at', 'order_type', 'client', 'location', 'price', 'promotion_name',
+                 'tax_name', 'tax_name1']
         
 class AppointmentCheckout_ReportsSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
@@ -1051,6 +1063,10 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class CheckoutCommissionSerializer(serializers.ModelSerializer):
+    gst = serializers.FloatField(source='tax_applied')
+    gst1 = serializers.FloatField(source='tax_applied1')
+    gst_price = serializers.FloatField(source='tax_amount')
+    gst_price1 = serializers.FloatField(source='tax_amount1')
 
     employee = serializers.SerializerMethodField()
     commission = serializers.SerializerMethodField()
@@ -1181,11 +1197,23 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
             'sale' : {}
         """
         model = Checkout
-        fields = ['employee', 'location', 'commission', 'commission_rate', 'sale', 'created_at']
+        fields = ['employee', 'location', 'commission', 'commission_rate', 'sale', 'created_at',
+                  'gst',
+                  'gst1',
+                  'gst_price',
+                  'gst_price1',
+                  'tax_name',
+                  'tax_name1'
+                  ]
     
     
 
 class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
+    gst = serializers.FloatField(source='tax_applied')
+    gst1 = serializers.FloatField(source='tax_applied1')
+    gst_price = serializers.FloatField(source='tax_amount')
+    gst_price1 = serializers.FloatField(source='tax_amount1')
+
     promotion = serializers.SerializerMethodField(read_only=True)
     invoice = serializers.SerializerMethodField(read_only=True)
     original_price = serializers.SerializerMethodField(read_only=True)
@@ -1307,7 +1335,7 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
     def get_invoice(self, obj):
         try:
             invoice = SaleInvoice.objects.get(checkout__icontains = obj)
-            serializer = SaleInvoiceSerializer(invoice)
+            serializer = SaleInvoiceSerializer(invoice, context=self.context)
             return serializer.data
         except Exception as e:
             return str(e)
@@ -1350,7 +1378,10 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
         
     class Meta:
         model = Checkout
-        fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location', 'product', 'service', 'membership', 'voucher', 'client', 'ids', 'membership_product', 'membership_service', 'membership_type', 'tip']
+        fields = ['id', 'gst', 'gst1', 'gst_price', 'gst_price1', 'promotion', 'invoice',
+                  'created_at', 'original_price', 'discounted_price', 'location', 'product', 
+                  'service', 'membership', 'voucher', 'client', 'ids', 'membership_product', 
+                  'membership_service', 'membership_type', 'tip', 'tax_name', 'tax_name1']
 
 class ProductSerializer_CheckoutSerializer(serializers.ModelSerializer):
     class Meta:
@@ -1442,7 +1473,7 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
     def get_invoice(self, obj):
         try:
             invoice = SaleInvoice.objects.get(appointment = obj.appointment)
-            serializer = SaleInvoiceSerializer(invoice)
+            serializer = SaleInvoiceSerializer(invoice, context=self.context)
             return serializer.data
         except Exception as e:
             return f" {str(e)} + {obj.appointment}"
@@ -1483,7 +1514,10 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
         
     class Meta:
         model = AppointmentCheckout
-        fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location', 'appointment', 'client', 'order_type','service', 'price', 'voucher_discount_percentage', 'appointment_service', 'promotion_name', 'tip']
+        fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price',
+                  'location', 'appointment', 'client', 'order_type','service', 'price',
+                  'voucher_discount_percentage', 'appointment_service', 'promotion_name', 
+                  'tip', 'gst', 'gst1', 'gst_price', 'gst_price1', 'tax_name', 'tax_name1']
 
 
 
@@ -1667,7 +1701,11 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     membership_service = serializers.SerializerMethodField(read_only=True)
     membership_type = serializers.SerializerMethodField(read_only=True)
     invoice = serializers.SerializerMethodField(read_only=True)
-    
+
+    gst = serializers.FloatField(source='tax_applied')
+    gst1 = serializers.FloatField(source='tax_applied1')
+    gst_price = serializers.FloatField(source='tax_amount')
+    gst_price1 = serializers.FloatField(source='tax_amount1')
     
     tip = serializers.SerializerMethodField(read_only=True)
 
@@ -1779,7 +1817,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     def get_invoice(self, obj):
         try:
             invoice = SaleInvoice.objects.get(checkout__icontains = obj)
-            serializer = SaleInvoiceSerializer(invoice)
+            serializer = SaleInvoiceSerializer(invoice, context=self.context)
             return serializer.data
         except Exception as e:
             return str(e)
@@ -1791,15 +1829,30 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             'product', 'service', 'membership', 'voucher',
             'client', 'location', 
             # 'member', 
+            'gst',
+            'gst1',
+            'gst_price',
+            'gst_price1',
             'created_at', 'payment_type', 'tip',
             'service_commission', 'voucher_commission', 'product_commission', 'service_commission_type',
             'product_commission_type', 'voucher_commission_type', 'ids', 'membership_product',
-            'membership_service', 'membership_type', 'invoice'
+            'membership_service', 'membership_type', 'invoice', 'tax_name', 'tax_name1'
         ]
 
         # Remove Member from get all sale orders
 
 class SaleInvoiceSerializer(serializers.ModelSerializer):
+    file = serializers.SerializerMethodField(read_only = True)
+
+    def get_file(self, obj):
+        if obj.file:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request)
+                return f'{url}{obj.file}'
+            except:
+                return f'{obj.file}'
+        return None
     class Meta:
         model = SaleInvoice
         fields = '__all__'
@@ -1864,7 +1917,7 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
     def get_invoice(self, obj):
         try:
             invoice = SaleInvoice.objects.get(checkout__icontains = obj)
-            serializer = SaleInvoiceSerializer(invoice)
+            serializer = SaleInvoiceSerializer(invoice, context=self.context)
             return serializer.data
         except Exception as e:
             return str(e)
@@ -1873,7 +1926,8 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
         model = AppointmentCheckout
         fields = ['id', 'appointment', 'appointment_service', 'payment_method', 'service',
                  'business_address', 'voucher', 'promotion', 
-                 'membership', 'rewards', 'tip', 'gst', 'gst_price', 'service_price',
+                 'membership', 'rewards', 'tip', 'gst', 'gst1', 'gst_price', 'gst_price1', 'service_price',
                  'total_price', 'service_commission', 'service_commission_type', 'voucher_discount_percentage',
-                 'created_at', 'order_type', 'client', 'location', 'price', 'promotion_name', 'invoice']
+                 'created_at', 'order_type', 'client', 'location', 'price', 'promotion_name', 'invoice',
+                 'tax_name', 'tax_name1']
         

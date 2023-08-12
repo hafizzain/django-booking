@@ -31,10 +31,10 @@ class ServiceGroupDiscount(models.Model):
     specificgroupdiscount = models.ForeignKey(SpecificGroupDiscount, on_delete=models.CASCADE, related_name='servicegroupdiscount_specificgroupdiscount')
     
     servicegroup = models.ForeignKey(ServiceGroup, on_delete=models.CASCADE, related_name='servicegroup_specificgroupdiscount')
-    discount = models.PositiveIntegerField(default=0, blank= True, null=True)
+    discount = models.FloatField(default=0, blank= True, null=True)
     
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, blank= True, null=True, related_name='brand_specificgroupdiscount')
-    brand_discount = models.PositiveIntegerField(default=0, blank= True, null=True)
+    brand_discount = models.FloatField(default=0, blank= True, null=True)
 
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -58,12 +58,12 @@ class PurchaseDiscount(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True, related_name='product_purchase_discount')
     service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='service_purchase_discount')
     
-    purchase = models.PositiveIntegerField(default=0, blank= True, null=True)
+    purchase = models.FloatField(default=0, blank= True, null=True)
     
     discount_product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True, related_name='discountproduct_purchase_discount')
     discount_service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='discountservice_purchase_discount')
     
-    discount_value = models.PositiveIntegerField(default=0, blank= True, null=True)
+    discount_value = models.FloatField(default=0, blank= True, null=True)
     
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -101,14 +101,14 @@ class SpendDiscount(models.Model):
     
     promotion_name = models.CharField(default='Promotion Name', max_length=999)
 
-    spend_amount = models.PositiveIntegerField(default=0, blank= True, null=True)
+    spend_amount = models.FloatField(default=0, blank= True, null=True)
     select_type= models.CharField(choices=TYPE_CHOICES, max_length=50, default = 'Service')
     service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='service_spend_discount')
     
     discount_product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True, related_name='discountproduct_spend_discount')
     discount_service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='discountservice_spend_discount')
     
-    discount_value = models.PositiveIntegerField(default=0, blank= True, null=True)
+    discount_value = models.FloatField(default=0, blank= True, null=True)
     
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -138,7 +138,7 @@ class SpendSomeAmount(models.Model):
 class SpendSomeAmountAndGetDiscount(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     
-    spend_amount = models.PositiveIntegerField(default=0, blank= True, null=True)
+    spend_amount = models.FloatField(default=0, blank= True, null=True)
     service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='service_spendandgetdiscount')
     
     spandsomeamount = models.ForeignKey(SpendSomeAmount, on_delete=models.CASCADE, null=True, blank=True, related_name='spendandgetdiscount_spendsomeamount')
@@ -161,7 +161,7 @@ class FixedPriceService(models.Model):
     promotion_name = models.CharField(default='Promotion Name', max_length=999)
 
     
-    spend_amount = models.PositiveIntegerField(default=0, blank= True, null=True)
+    spend_amount = models.FloatField(default=0, blank= True, null=True)
     duration = models.CharField(max_length=100, default='')
     service = models.ManyToManyField(Service, null=True, blank=True, related_name='service_fixedpriceservice')
     
@@ -183,8 +183,8 @@ class SpecificBrand(models.Model):
     servicegroup = models.ForeignKey(ServiceGroup, on_delete=models.CASCADE, related_name='servicegroup_specific_brand')
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='brand_specific_brand')
     
-    discount_brand = models.PositiveIntegerField(default=0, blank= True, null=True)
-    discount_service_group = models.PositiveIntegerField(default=0, blank= True, null=True)
+    discount_brand = models.FloatField(default=0, blank= True, null=True)
+    discount_service_group = models.FloatField(default=0, blank= True, null=True)
     
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -207,7 +207,7 @@ class CategoryDiscount(models.Model):
     directorflat = models.ForeignKey(DirectOrFlatDiscount, on_delete=models.CASCADE, related_name='directorflat_categorydiscount')
     
     category_type= models.CharField(choices=TYPE_CHOICES, max_length=50, null=True, blank=True, )
-    discount = models.PositiveIntegerField(default=0, blank= True, null=True)
+    discount = models.FloatField(default=0, blank= True, null=True)
     
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -262,7 +262,7 @@ class BundleFixed(models.Model):
 
     
     service = models.ManyToManyField(Service, null=True, blank=True, related_name='service_bundlefixed')    
-    spend_amount = models.PositiveIntegerField(default=0, blank= True, null=True)
+    spend_amount = models.FloatField(default=0, blank= True, null=True)
     
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -330,7 +330,7 @@ class UserRestrictedDiscount(models.Model):
     
     corporate_type = models.CharField(choices=CORPORATE_CHOICE, default='All_Service', max_length=50)
     client = models.ManyToManyField(Client, related_name='client_userrestricteddiscount')
-    discount_percentage = models.PositiveIntegerField(default=0, blank= True, null=True)
+    discount_percentage = models.FloatField(default=0, blank= True, null=True)
     
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -383,7 +383,7 @@ class ServiceDurationForSpecificTime(models.Model):
 
     service_duration= models.CharField(max_length=100, null=True, blank=True )
     package_duration= models.CharField(max_length=100, null=True, blank=True )
-    total_amount = models.PositiveIntegerField(default=0, blank= True, null=True)
+    total_amount = models.FloatField(default=0, blank= True, null=True)
     
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -407,7 +407,7 @@ class DiscountOnFreeService(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     complimentary = models.ForeignKey(ComplimentaryDiscount, on_delete=models.CASCADE, null=True, blank=True, related_name='complimentary_discountonfreeservice')    
 
-    discount_percentage = models.PositiveIntegerField(default=0, blank= True, null=True)
+    discount_percentage = models.FloatField(default=0, blank= True, null=True)
     service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, related_name='service_discountonfreeservice')    
     discount_duration= models.CharField(choices=TYPE_CHOICES, max_length=100, null=True, blank=True,default= 'Next 1 visit' )
     

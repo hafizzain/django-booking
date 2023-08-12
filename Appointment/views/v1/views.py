@@ -1026,7 +1026,7 @@ def update_appointment_service(request):
     appointments = request.data.get('appointments', None)
     client_type = request.data.get('client_type', None)
     appointment_notes = request.data.get('appointment_notes', None)
-    appointment_date = request.data.get('appointment_date', None)
+    appointment_date_g = request.data.get('appointment_date', None)
     client = request.data.get('client', None)
     action_type = request.data.get('action_type', None)
     
@@ -1119,7 +1119,7 @@ def update_appointment_service(request):
             pass
         
         for app in appointments:
-            appointment_date = app.get('appointment_date', None)
+            appointment_date = appointment_date_g or app.get('appointment_date', None)
             date_time = app.get('date_time', None)
             service = app.get('service', None)
             client_can_book = app.get('client_can_book', None)
@@ -1578,9 +1578,13 @@ def create_checkout(request):
     
     tip = request.data.get('tip', [])
     gst = request.data.get('gst', 0)
+    gst1 = request.data.get('gst1', 0)
     gst_price = request.data.get('gst_price', 0)
+    gst_price1 = request.data.get('gst_price1', 0)
     service_price = request.data.get('service_price', None)
     total_price = request.data.get('total_price', 0)
+    tax_name = request.data.get('tax_name', '')
+    tax_name1 = request.data.get('tax_name1', '')
 
     is_promotion_availed = request.data.get('is_promotion_availed', False)
     
@@ -1657,7 +1661,7 @@ def create_checkout(request):
                 else:
                     print(f"Error: Employee with ID {employee_id} does not exist")
             except Exception as err:
-                Errors.append(str(err))
+                Errors.append(f'Appointment Tip Error :: {str(err)}')
                 pass
         
         
@@ -1760,7 +1764,11 @@ def create_checkout(request):
         business_address=business_address,
         # tip = tip,
         gst = gst,
+        gst1 = gst1,
         gst_price = gst_price,
+        gst_price1 = gst_price1,
+        tax_name = tax_name,
+        tax_name1 = tax_name1,
         service_price = service_price,
         total_price = total_price,
         service_commission = float(service_commission),
@@ -2768,6 +2776,7 @@ def get_employee_check_time(request):
 @permission_classes([AllowAny])
 def get_employee_check_availability_list(request):
     check_availability = request.data.get('check_availability', None)
+    appointment_date = request.data.get('appointment_date', None)
     
     if check_availability is None:
         return Response(
@@ -2806,7 +2815,7 @@ def get_employee_check_availability_list(request):
         
         client_can_book = check.get('client_can_book', None)
         slot_availible_for_online = check.get('slot_availible_for_online', None)
-        date = check.get('appointment_date', None)
+        date = check.get('appointment_date', appointment_date)
         
         index = check.get('index', None)
         message = check.get('message', None)

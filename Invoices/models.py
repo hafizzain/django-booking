@@ -100,7 +100,7 @@ class SaleInvoice(models.Model):
             data = {
                 'name' : f'{order.service.name}',
                 'arabic_name' : f'{order.service.arabic_name}',
-                'price' : price,
+                'price' : round(price, 2),
                 'quantity' : 1
             }
             ordersData.append(data)
@@ -122,7 +122,7 @@ class SaleInvoice(models.Model):
             data = {
                 'name' : f'{order.name}',
                 'arabic_name' : f'{order.arabic_name}',
-                'price' : total_price,
+                'price' : round(total_price, 2),
                 'quantity' : order.quantity
             }
             ordersData.append(data)
@@ -134,7 +134,18 @@ class SaleInvoice(models.Model):
             checkout = Checkout.objects.get(
                 id = self.checkout
             )
-            return [self.get_order_items(checkout), self.get_tips(checkout_type='Checkout', id=self.checkout)]
+            return [
+                    self.get_order_items(checkout), 
+                    self.get_tips(checkout_type='Checkout', id=self.checkout), 
+                    {
+                        'tax_applied' : round(checkout.tax_applied, 2),
+                        'tax_amount' : round(checkout.tax_amount, 2),
+                        'tax_applied1' : round(checkout.tax_applied1, 2),
+                        'tax_amount1' : round(checkout.tax_amount1, 2),
+                        'tax_name': checkout.tax_name,
+                        'tax_name1': checkout.tax_name1
+                    }
+                ]
         except Exception as err:
             ExceptionRecord.objects.create(
                 text = f'Sale INVOICE ERROR not found {str(err)} -- {self.checkout}'
@@ -143,12 +154,23 @@ class SaleInvoice(models.Model):
                 checkout = AppointmentCheckout.objects.get(
                     id = self.checkout
                 )
-                return [self.get_appointment_services(checkout), self.get_tips(checkout_type='Appointment', id=f'{checkout.appointment.id}')]
+                return [
+                        self.get_appointment_services(checkout), 
+                        self.get_tips(checkout_type='Appointment', id=f'{checkout.appointment.id}'),
+                        {
+                            'tax_applied' : round(checkout.gst, 2),
+                            'tax_amount' : round(checkout.gst_price, 2),
+                            'tax_applied1' : round(checkout.gst1, 2),
+                            'tax_amount1' : round(checkout.gst_price1, 2),
+                            'tax_name': checkout.tax_name,
+                            'tax_name1': checkout.tax_name1
+                        }
+                    ]
             except Exception as err:
                 ExceptionRecord.objects.create(
                     text = f'Sale INVOICE ERROR not found {str(err)} -- {self.checkout}'
                 )
-        return [[], []]
+        return [[], [], {}]
 
     def get_tips(self, checkout_type = None, id=None):
         if not checkout_type or not id:
@@ -161,25 +183,28 @@ class SaleInvoice(models.Model):
             query['checkout__id'] = id
         
         tips = AppointmentEmployeeTip.objects.filter(**query)
-        tips = [{'tip' : tip.tip, 'employee_name' : tip.member.full_name} for tip in tips]
+        tips = [{'tip' : round(tip.tip, 2), 'employee_name' : tip.member.full_name} for tip in tips]
         return tips
     
     def save(self, *args, **kwargs):
         if not self.file and self.checkout:
-            order_items, order_tips = self.get_invoice_order_items()
+            order_items, order_tips, tax_details = self.get_invoice_order_items()
             if len(order_items) > 0:
                 sub_total = sum([order['price'] for order in order_items])
                 tips_total = sum([t['tip'] for t in order_tips])
     
                 context = {
+                    'invoice_by' : self.user.user_full_name if self.user else '',
+                    'invoice_by_arabic_name' : self.user.user_full_name if self.user else '',
                     'invoice_id' : self.short_id,
                     'order_items' : order_items,
                     'currency_code' : 'AED',
-                    'sub_total' : sub_total,
+                    'sub_total' : round(sub_total, 2),
                     'tips' : order_tips,
-                    'total_tax' : 0,
-                    'total' : float(tips_total) + float(sub_total),
+                    'total' : round((float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)) + float(tax_details.get('tax_amount1', 0))), 2),
                     'created_at' : self.created_at.strftime('%Y-%m-%d') if self.created_at else '',
+                    'BACKEND_HOST' : settings.BACKEND_HOST,
+                    **tax_details,
                 }
                 schema_name = connection.schema_name
                 output_dir = f'{settings.BASE_DIR}/media/{schema_name}/invoicesFiles'
@@ -190,7 +215,8 @@ class SaleInvoice(models.Model):
                 file_name = f'invoice-{self.short_id}.pdf'
                 output_path = f'{output_dir}/{file_name}'
                 no_media_path = f'invoicesFiles/{file_name}'
-                template = get_template(f'{settings.BASE_DIR}/templates/Sales/invoice.html')
+                # template = get_template(f'{settings.BASE_DIR}/templates/Sales/invoice.html')
+                template = get_template(f'{settings.BASE_DIR}/templates/Sales/invoice_2.html') # New Design for Invoice file
                 html_string = template.render(context)
                 pdfkit.from_string(html_string, os.path.join(output_path))
                 self.file = no_media_path

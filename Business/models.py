@@ -380,7 +380,7 @@ class BusinessTax(models.Model):
     tax_type = models.CharField(choices=TAX_TYPES, default='Individual', max_length=20)
     name = models.CharField(default='', max_length=100)
     parent_tax = models.ManyToManyField('BusinessTax', blank=True,)
-    tax_rate = models.PositiveIntegerField(default=0, null=True, blank=True)
+    tax_rate = models.FloatField(default=0, null=True, blank=True)
     location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='locations_taxs')
 
     is_active = models.BooleanField(default=True)
@@ -448,3 +448,23 @@ class BusinessVendor(models.Model):
 
 #     def __str__(self):
 #         return str(self.id)
+
+
+class BusinessTaxSetting(models.Model):
+
+    SETTING_TYPE = [
+        ('Combined', 'Combined'),
+        ('Seperately', 'Seperately')
+    ]
+
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_tax_setting')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_tax_setting')
+    tax_setting = models.CharField(max_length=15, choices=SETTING_TYPE, default='Combined')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+    def __str__(self) -> str:
+        return str(self.id)

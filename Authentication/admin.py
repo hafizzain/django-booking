@@ -3,6 +3,8 @@ from django.contrib import admin
 from .models import User, AccountType, NewsLetterDetail, VerificationOTP
 
 
+from Business.models import Business
+from django_tenants.utils import tenant_context
 from Tenants.models import Tenant, Domain
 
 @admin.register(User)
@@ -55,7 +57,12 @@ class UserAdmin(admin.ModelAdmin):
             ).delete()
 
             user.delete()
-
+            for tenant in user_tenants:
+                with tenant_context(tenant):
+                    users = User.objects.all()
+                    users.delete()
+                    businesses = Business.objects.all()
+                    businesses.delete()
 
     is_tenant_user.boolean = True
 

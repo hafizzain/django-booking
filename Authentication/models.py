@@ -110,6 +110,16 @@ class User(AbstractBaseUser):
     def get_all_permissions(self):
         return []
 
+    @property
+    def user_full_name(self):
+        if self.first_name and self.last_name:
+            return f'{self.first_name} {self.last_name}'
+        
+        elif self.full_name:
+            return f'{self.full_name}'
+        else:
+            return self.username
+
 class AccountType(models.Model):
     ACCOUNT_TYPES = [
         ('Everyone', 'Everyone'),
