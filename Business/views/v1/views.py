@@ -4542,12 +4542,15 @@ class BusinessTaxSettingView(APIView):
 
     def get(self, request, *args, **kwargs):
         business = Business.objects.get(id=request.query_params.get('business_id'))
-        bu_tax_setting, created = BusinessTaxSetting.objects.get_or_create(
-            business=business,
-        )
-        if created:
-            bu_tax_setting.user = request.user
-            bu_tax_setting.save()
+        try:
+            bu_tax_setting = BusinessTaxSetting.objects.get(
+                business=business,
+            )
+        except:
+            bu_tax_setting = BusinessTaxSetting.objects.create(
+                business=business,
+                user = request.user
+            )
 
         serializer = self.serializer(bu_tax_setting)
 
