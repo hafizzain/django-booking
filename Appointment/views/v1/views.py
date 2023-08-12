@@ -1661,7 +1661,7 @@ def create_checkout(request):
                 else:
                     print(f"Error: Employee with ID {employee_id} does not exist")
             except Exception as err:
-                Errors.append(str(err))
+                Errors.append(f'Appointment Tip Error :: {str(err)}')
                 pass
         
         
