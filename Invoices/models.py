@@ -142,6 +142,8 @@ class SaleInvoice(models.Model):
                         'tax_amount' : checkout.tax_amount,
                         'tax_applied1' : checkout.tax_applied1,
                         'tax_amount1' : checkout.tax_amount1,
+                        'tax_name': checkout.tax_name,
+                        'tax_name1': checkout.tax_name1
                     }
                 ]
         except Exception as err:
@@ -160,6 +162,8 @@ class SaleInvoice(models.Model):
                             'tax_amount' : checkout.gst_price,
                             'tax_applied1' : checkout.gst1,
                             'tax_amount1' : checkout.gst_price1,
+                            'tax_name': checkout.tax_name,
+                            'tax_name1': checkout.tax_name1
                         }
                     ]
             except Exception as err:
