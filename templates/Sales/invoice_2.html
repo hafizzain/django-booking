@@ -90,7 +90,16 @@
                                     <p> Taxes ({{tax_applied}}%) </p>
                                     <p class="arabic">الضرائب</p>
                                 </div>
-                                <p>{{total_tax}} {{currency_code}}</p>
+                                <p>{{tax_amount}} {{currency_code}}</p>
+                            </div>
+                        {% endif %}
+                        {% if tax_applied1 %}
+                            <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
+                                <div class="font-semibold text-black">
+                                    <p> Taxes ({{tax_applied1}}%) </p>
+                                    <p class="arabic">الضرائب</p>
+                                </div>
+                                <p>{{tax_amount1}} {{currency_code}}</p>
                             </div>
                         {% endif %}
                     </div>

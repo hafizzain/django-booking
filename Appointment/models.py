@@ -99,7 +99,7 @@ class Appointment(models.Model):
     payment_method = models.CharField(max_length=100, choices= PAYMENT_CHOICES, default='', null=True, blank=True)  
     
     extra_price  = models.FloatField(default=0, null=True, blank=True)
-    tip  = models.FloatField(default=0, null=True, blank=True)
+    tip  = models.FloatField(default=0, null=True, blank=True) # Not in Use
     
     discount_price  = models.FloatField(default=0, null=True, blank=True)
     discount_percentage = models.FloatField(default = 0 , null=True, blank=True)
@@ -162,7 +162,7 @@ class AppointmentService(models.Model):
     slot_availible_for_online = models.CharField(max_length=100, default='', null=True, blank=True,)
     
     appointment_status = models.CharField(choices=BOOKED_CHOICES, max_length=100, default='Appointment Booked')
-    tip = models.FloatField(default=0, null=True, blank=True)
+    tip = models.FloatField(default=0, null=True, blank=True) # Not in Use
     
     price = models.FloatField(default=0, null=True, blank=True)
     

@@ -140,6 +140,8 @@ class SaleInvoice(models.Model):
                     {
                         'tax_applied' : checkout.tax_applied,
                         'tax_amount' : checkout.tax_amount,
+                        'tax_applied1' : checkout.tax_applied1,
+                        'tax_amount1' : checkout.tax_amount1,
                     }
                 ]
         except Exception as err:
@@ -156,6 +158,8 @@ class SaleInvoice(models.Model):
                         {
                             'tax_applied' : checkout.gst,
                             'tax_amount' : checkout.gst_price,
+                            'tax_applied1' : checkout.gst1,
+                            'tax_amount1' : checkout.gst_price1,
                         }
                     ]
             except Exception as err:
@@ -193,8 +197,7 @@ class SaleInvoice(models.Model):
                     'currency_code' : 'AED',
                     'sub_total' : sub_total,
                     'tips' : order_tips,
-                    'total_tax' : tax_details.get('tax_amount', 0),
-                    'total' : float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)),
+                    'total' : float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)) + float(tax_details.get('tax_amount1', 0)),
                     'created_at' : self.created_at.strftime('%Y-%m-%d') if self.created_at else '',
                     'BACKEND_HOST' : settings.BACKEND_HOST,
                     **tax_details,

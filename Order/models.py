@@ -40,25 +40,25 @@ class Checkout(models.Model):
     client_type = models.CharField(choices = CLIENT_TYPE, max_length=50 , default = '' )
     payment_type = models.CharField(choices = PAYMENT_TYPE, max_length=50 , default = '' )
     
-    tip = models.FloatField(default = 0)
+    tip = models.FloatField(default = 0) # Not in Use
 
     tax_applied = models.FloatField(default=0, verbose_name='Tax Applied in Percentage')
     tax_applied1 = models.FloatField(default=0, verbose_name='Second Tax Applied in Percentage')
     tax_amount = models.FloatField(default=0, verbose_name='Tax total amount')
     tax_amount1 = models.FloatField(default=0, verbose_name='Second Tax total amount')
     
-    total_service_price = models.FloatField(default = 0 , null=True, blank=True)
-    total_product_price = models.FloatField(default = 0 , null=True, blank=True)
-    total_voucher_price = models.FloatField(default = 0 , null=True, blank=True)
-    total_membership_price = models.FloatField(default = 0 , null=True, blank=True)
+    total_service_price = models.FloatField(default = 0 , null=True, blank=True) # Not in Use
+    total_product_price = models.FloatField(default = 0 , null=True, blank=True) # Not in Use
+    total_voucher_price = models.FloatField(default = 0 , null=True, blank=True) # Not in Use
+    total_membership_price = models.FloatField(default = 0 , null=True, blank=True) # Not in Use
     
-    service_commission = models.FloatField(default = 0 , null=True, blank=True)
-    product_commission = models.FloatField(default = 0 , null=True, blank=True)
-    voucher_commission = models.FloatField(default = 0 , null=True, blank=True)
+    service_commission = models.FloatField(default = 0 , null=True, blank=True) # Not in Use
+    product_commission = models.FloatField(default = 0 , null=True, blank=True) # Not in Use
+    voucher_commission = models.FloatField(default = 0 , null=True, blank=True) # Not in Use
     
-    service_commission_type = models.CharField( max_length=50 , default = '')
-    product_commission_type = models.CharField( max_length=50 , default = '')
-    voucher_commission_type = models.CharField( max_length=50 , default = '')
+    service_commission_type = models.CharField( max_length=50 , default = '') # Not in Use
+    product_commission_type = models.CharField( max_length=50 , default = '') # Not in Use
+    voucher_commission_type = models.CharField( max_length=50 , default = '') # Not in Use
     
     is_promotion = models.BooleanField(default=False)
     selected_promotion_id = models.CharField(default='', max_length=800)
