@@ -1583,6 +1583,8 @@ def create_checkout(request):
     gst_price1 = request.data.get('gst_price1', 0)
     service_price = request.data.get('service_price', None)
     total_price = request.data.get('total_price', 0)
+    tax_name = request.data.get('tax_name', '')
+    tax_name1 = request.data.get('tax_name1', '')
 
     is_promotion_availed = request.data.get('is_promotion_availed', False)
     
@@ -1765,6 +1767,8 @@ def create_checkout(request):
         gst1 = gst1,
         gst_price = gst_price,
         gst_price1 = gst_price1,
+        tax_name = tax_name,
+        tax_name1 = tax_name1,
         service_price = service_price,
         total_price = total_price,
         service_commission = float(service_commission),

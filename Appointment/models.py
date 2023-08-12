@@ -242,6 +242,8 @@ class AppointmentCheckout(models.Model):
     gst1 = models.FloatField(default=0, null=True, blank=True)
     gst_price = models.FloatField(default=0, null=True, blank=True)
     gst_price1 = models.FloatField(default=0, null=True, blank=True)
+    tax_name = models.CharField(max_length=250, default='')
+    tax_name1 = models.CharField(max_length=250, default='')
     
     service_price = models.FloatField(default=0, null=True, blank=True)
     total_price = models.FloatField(default=0, null=True, blank=True)
