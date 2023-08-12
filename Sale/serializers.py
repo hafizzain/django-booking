@@ -844,6 +844,8 @@ class CheckoutSerializer(serializers.ModelSerializer):
                     'gst1',
                     'gst_price',
                     'gst_price1',
+                    'tax_name',
+                    'tax_name1'
                   ]
 
 class ParentBusinessTax_RateSerializer(serializers.ModelSerializer):
