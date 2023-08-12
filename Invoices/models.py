@@ -138,10 +138,10 @@ class SaleInvoice(models.Model):
                     self.get_order_items(checkout), 
                     self.get_tips(checkout_type='Checkout', id=self.checkout), 
                     {
-                        'tax_applied' : checkout.tax_applied,
-                        'tax_amount' : checkout.tax_amount,
-                        'tax_applied1' : checkout.tax_applied1,
-                        'tax_amount1' : checkout.tax_amount1,
+                        'tax_applied' : round(checkout.tax_applied, 2),
+                        'tax_amount' : round(checkout.tax_amount, 2),
+                        'tax_applied1' : round(checkout.tax_applied1, 2),
+                        'tax_amount1' : round(checkout.tax_amount1, 2),
                         'tax_name': checkout.tax_name,
                         'tax_name1': checkout.tax_name1
                     }
@@ -158,10 +158,10 @@ class SaleInvoice(models.Model):
                         self.get_appointment_services(checkout), 
                         self.get_tips(checkout_type='Ap,pointment', id=f'{checkout.appointment.id}'),
                         {
-                            'tax_applied' : checkout.gst,
-                            'tax_amount' : checkout.gst_price,
-                            'tax_applied1' : checkout.gst1,
-                            'tax_amount1' : checkout.gst_price1,
+                            'tax_applied' : round(checkout.gst, 2),
+                            'tax_amount' : round(checkout.gst_price, 2),
+                            'tax_applied1' : round(checkout.gst1, 2),
+                            'tax_amount1' : round(checkout.gst_price1, 2),
                             'tax_name': checkout.tax_name,
                             'tax_name1': checkout.tax_name1
                         }
