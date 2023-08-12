@@ -100,7 +100,7 @@ class SaleInvoice(models.Model):
             data = {
                 'name' : f'{order.service.name}',
                 'arabic_name' : f'{order.service.arabic_name}',
-                'price' : price,
+                'price' : round(price, 2),
                 'quantity' : 1
             }
             ordersData.append(data)
@@ -122,7 +122,7 @@ class SaleInvoice(models.Model):
             data = {
                 'name' : f'{order.name}',
                 'arabic_name' : f'{order.arabic_name}',
-                'price' : total_price,
+                'price' : round(total_price, 2),
                 'quantity' : order.quantity
             }
             ordersData.append(data)
@@ -179,7 +179,7 @@ class SaleInvoice(models.Model):
             query['checkout__id'] = id
         
         tips = AppointmentEmployeeTip.objects.filter(**query)
-        tips = [{'tip' : tip.tip, 'employee_name' : tip.member.full_name} for tip in tips]
+        tips = [{'tip' : round(tip.tip, 2), 'employee_name' : tip.member.full_name} for tip in tips]
         return tips
     
     def save(self, *args, **kwargs):
@@ -195,9 +195,9 @@ class SaleInvoice(models.Model):
                     'invoice_id' : self.short_id,
                     'order_items' : order_items,
                     'currency_code' : 'AED',
-                    'sub_total' : sub_total,
+                    'sub_total' : round(sub_total, 2),
                     'tips' : order_tips,
-                    'total' : float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)) + float(tax_details.get('tax_amount1', 0)),
+                    'total' : round((float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)) + float(tax_details.get('tax_amount1', 0))), 2),
                     'created_at' : self.created_at.strftime('%Y-%m-%d') if self.created_at else '',
                     'BACKEND_HOST' : settings.BACKEND_HOST,
                     **tax_details,
