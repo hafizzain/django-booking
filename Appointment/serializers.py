@@ -815,7 +815,6 @@ class NoteSerializer(serializers.ModelSerializer):
 class SingleNoteSerializer(serializers.ModelSerializer):
     
     notes = serializers.SerializerMethodField(read_only=True)
-    client = ClientSerializer()
     customer_note = serializers.SerializerMethodField(read_only=True)
     appointmnet_service = serializers.SerializerMethodField(read_only=True)
     appointment_tips = serializers.SerializerMethodField(read_only=True)
@@ -847,6 +846,9 @@ class SingleNoteSerializer(serializers.ModelSerializer):
     def get_appointmnet_service(self, obj):
             note = AppointmentService.objects.filter(appointment=obj)
             return AllAppoinment_EmployeeSerializer(note, many = True).data
+    
+    def get_client(self, obj):
+        return obj.client.id if obj.client else None
             #return serializers
     class Meta:
         model = Appointment
