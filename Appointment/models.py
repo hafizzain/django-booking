@@ -141,6 +141,11 @@ class AppointmentService(models.Model):
         ('Cancel', 'Cancel'),
     ]
 
+    REDEEMED_TYPES = [
+        ('Voucher', 'Voucher'),
+        ('Membership', 'Membership')
+    ]
+
     
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     
@@ -171,8 +176,15 @@ class AppointmentService(models.Model):
     
     discount_price = models.FloatField(default = 0 , null=True, blank=True)    
     discount_percentage = models.FloatField(default = 0 , null=True, blank=True)
-        
-    total_price = models.FloatField(default = 0 , null=True, blank=True)    
+
+    total_price = models.FloatField(default = 0 , null=True, blank=True)
+
+    # redeemed attributes
+    is_redeemed = models.BooleanField(default=False)
+    redeemed_type = models.CharField(default='', max_length=300)
+    redeemed_price = models.FloatField(default=0)
+    redeemed_instance_id = models.CharField(default='', max_length=800)
+    
     
     end_time = models.TimeField(null=True, blank=True)
     details = models.CharField(max_length=255, null=True, blank=True)
@@ -181,6 +193,10 @@ class AppointmentService(models.Model):
     is_deleted = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
+
+    def get_final_price(self):
+        price = self.redeemed_price or self.discount_price or self.price or self.total_price
+        return round(price, 2)
     
     def member_name(self):
         try:

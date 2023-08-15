@@ -1592,7 +1592,13 @@ def create_checkout(request):
     is_redeemed = request.data.get('is_redeemed', None)
     redeemed_id = request.data.get('redeemed_id', None)
     redeemed_points = request.data.get('redeemed_points', None)
-    
+
+    is_membership_redeemed = request.data.get('is_membership_redeemed', False)
+    is_voucher_redeemed = request.data.get('is_voucher_redeemed', False)
+
+    redeemed_membership_id = request.data.get('redeemed_membership_id', None)
+    redeemed_voucher_id = request.data.get('redeemed_voucher_id', None)
+
     # appointment_checkout_tip = request.data.get('appointment_checkout', None)
     # employee_tip = request.data.get('employee_tip', None)
 
@@ -1684,10 +1690,30 @@ def create_checkout(request):
             )
         except:
             pass
+
+
         id = app.get('id', None)
+        redeemed_price = app.get('redeemed_price', 0)
+        
         try:
             service_appointment = AppointmentService.objects.get(id=id)
             service_appointment.appointment_status= 'Done'
+
+            # if membership is redeemed then set redeemed price and redeemed
+            # membership id to redeemed_instance_id
+            if is_membership_redeemed:
+                service_appointment.redeemed_price = redeemed_price
+                service_appointment.redeemed_instance_id = redeemed_membership_id
+                service_appointment.is_redeemed = True
+                service_appointment.redeemed_type = AppointmentService.REDEEMED_TYPES[1][0]
+            elif is_voucher_redeemed:
+                service_appointment.redeemed_price = redeemed_price
+                service_appointment.redeemed_instance_id = redeemed_voucher_id
+                service_appointment.is_redeemed = True
+                service_appointment.redeemed_type = AppointmentService.REDEEMED_TYPES[0][0]
+            else:
+                pass
+
             service_appointment.save()
             appointment_logs = AppointmentLogs.objects.create( 
                 user = request.user,

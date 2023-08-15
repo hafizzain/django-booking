@@ -47,6 +47,11 @@ class ServiceSaleSerializer(serializers.ModelSerializer):
 class UpdateAppointmentSerializer(serializers.ModelSerializer):
     service_name  = serializers.SerializerMethodField(read_only=True)
     service_arabic_name  = serializers.SerializerMethodField(read_only=True)
+    final_price = serializers.SerializerMethodField(read_only=True)
+
+
+    def get_final_price(self, obj):
+        return obj.get_final_price()
     
     def get_service_name(self, obj):
         try:

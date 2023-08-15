@@ -96,7 +96,7 @@ class SaleInvoice(models.Model):
         )
         ordersData = []
         for order in services:
-            price = order.discount_price or order.total_price
+            price = order.get_final_price()
             data = {
                 'name' : f'{order.service.name}',
                 'arabic_name' : f'{order.service.arabic_name}',
