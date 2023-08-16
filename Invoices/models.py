@@ -199,7 +199,7 @@ class SaleInvoice(models.Model):
                     'invoice_by_arabic_name' : self.user.user_full_name if self.user else '',
                     'invoice_id' : self.short_id,
                     'order_items' : order_items,
-                    'currency_code' : self.location.currency.code if self.location and self.location.currency else None,
+                    'currency_code' : self.get_currency_for_invoice(),
                     'sub_total' : round(sub_total, 2),
                     'tips' : order_tips,
                     'total' : round((float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)) + float(tax_details.get('tax_amount1', 0))), 2),
@@ -223,3 +223,10 @@ class SaleInvoice(models.Model):
                 self.file = no_media_path
 
         super(SaleInvoice, self).save(*args, **kwargs)
+
+    def get_currency_for_invoice(self):
+        """
+        Returns the currency of BusinessAddress(location) - see model
+        """
+        if self.location and self.location.currency:
+            return self.location.currency.code or 'for test'
