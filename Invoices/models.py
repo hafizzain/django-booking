@@ -194,12 +194,9 @@ class SaleInvoice(models.Model):
                 sub_total = sum([order['price'] for order in order_items])
                 tips_total = sum([t['tip'] for t in order_tips])
 
-                currency = 'AED'
-                try:
-                    location = BusinessAddress.objects.get(id=str(self.business_address))
-                    currency = location.currency.code
-                except:
-                    pass
+                location = BusinessAddress.objects.get(id=str(self.business_address))
+                currency = location.currency.code
+
 
                 context = {
                     'invoice_by' : self.user.user_full_name if self.user else '',
