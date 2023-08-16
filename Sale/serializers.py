@@ -719,7 +719,7 @@ class VoucherOrderSerializer(serializers.ModelSerializer):
 class CheckoutSerializer(serializers.ModelSerializer):
     gst = serializers.FloatField(source='tax_applied')
     gst1 = serializers.FloatField(source='tax_applied1')
-    gst_price = serializers.FloatField(source='tax_amount')
+    gst_price = serializers.SerializerMethodField()
     gst_price1 = serializers.FloatField(source='tax_amount1')
 
     product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
@@ -831,7 +831,13 @@ class CheckoutSerializer(serializers.ModelSerializer):
             return ids_data
         except Exception as err:
             print(str(err))
-    
+
+    def get_gst_price(self, obj):
+        try:
+            return obj.tax_amount
+        except:
+            return 0
+
     
     class Meta:
         model = Checkout
