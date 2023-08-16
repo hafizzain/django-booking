@@ -194,16 +194,12 @@ class SaleInvoice(models.Model):
                 sub_total = sum([order['price'] for order in order_items])
                 tips_total = sum([t['tip'] for t in order_tips])
 
-                location = BusinessAddress.objects.get(id=str(self.business_address))
-                currency = location.currency.code
-
-
                 context = {
                     'invoice_by' : self.user.user_full_name if self.user else '',
                     'invoice_by_arabic_name' : self.user.user_full_name if self.user else '',
                     'invoice_id' : self.short_id,
                     'order_items' : order_items,
-                    'currency_code' : currency,
+                    'currency_code' : self.location.currency.code,
                     'sub_total' : round(sub_total, 2),
                     'tips' : order_tips,
                     'total' : round((float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)) + float(tax_details.get('tax_amount1', 0))), 2),

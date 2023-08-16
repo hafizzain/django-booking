@@ -1814,6 +1814,7 @@ def create_checkout(request):
         service = f'{services.id}' if services else '',
         member = f'{members.id}' if members else '',
         business_address = f'{business_address.id}',
+        location = business_address,
         # tip = tip,
         gst = gst,
         gst_price = gst_price,
