@@ -2159,10 +2159,10 @@ def service_appointment_count(request):
             day = today - timedelta(days=int(duration))
 
             app_service = AppointmentService.objects.filter(service = ser, business_address =adds , created_at__gte = day )
-            sale_services = ServiceOrder.objects.filter(service = ser, created_at__gte = day)
+            sale_services = ServiceOrder.objects.filter(service = ser, created_at__gte = day, location=adds)
         else:
             app_service = AppointmentService.objects.filter(service = ser, business_address =adds )
-            sale_services = ServiceOrder.objects.filter(service = ser)
+            sale_services = ServiceOrder.objects.filter(service=ser, location=adds)
 
 
         count += app_service.count()
