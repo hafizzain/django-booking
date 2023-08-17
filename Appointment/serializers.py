@@ -853,7 +853,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
             return AllAppoinment_EmployeeSerializer(note, many = True).data
     
     def get_client(self, obj):
-        return obj.client.id if obj.client else None
+        return obj.client if obj.client else None
             #return serializers
     class Meta:
         model = Appointment
