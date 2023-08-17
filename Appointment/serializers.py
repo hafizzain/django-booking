@@ -24,11 +24,11 @@ from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 from Utility.models import ExceptionRecord
 
 class PriceServiceSaleSerializer(serializers.ModelSerializer):
-    # currency = CurrencySerializer()
+    currency = CurrencySerializer()
     
     class Meta:
         model = PriceService
-        fields = ['id','service', 'duration', 'price']
+        fields = ['id','service', 'duration', 'price', 'currency']
 
 class MemberSaleSerializer(serializers.ModelSerializer):
     class Meta:

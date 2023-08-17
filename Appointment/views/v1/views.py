@@ -2105,6 +2105,7 @@ def create_checkout_device(request):
         payment_type = payment_method,
         service = f'{services.id}' if services else '',
         member = f'{members.id}' if members else '',
+        location = business_address,
         business_address = f'{business_address.id}',
         gst = gst,
         service_price = service_price,
