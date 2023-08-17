@@ -114,9 +114,9 @@ def get_user_default_data(request):
         client_instance = clients[0]
         data['client'] = {
             'id' : f'{client_instance.id}',
-            'name' : f'{client_instance.full_name}',
-            'email' : f'{client_instance.email}',
-            'phone_number' : f'{client_instance.mobile_number}',
+            'name' : '',
+            'email' : '',
+            'phone_number' : '',
             'type' : 'client'
         }
     
@@ -135,9 +135,9 @@ def get_user_default_data(request):
         
         data['employee'] = {
             'id' : f'{employee_instance.id}',
-            'name' : f'{employee_instance.full_name}',
+            'name' : '',
             'type' : 'employee',
-            'email' : f'{employee_instance.email}',
+            'email' : '',
             'address' : f'{employee_instance.address}',
             'designation' : f'{info.designation}' if info else '',
             'income_type' : f'{info.income_type}' if info else '',
