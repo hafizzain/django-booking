@@ -156,7 +156,11 @@ def get_appointments_service(request):
 @permission_classes([AllowAny])
 def get_appointments_device(request):
     employee_id = request.GET.get('employee_id', None) 
-    appointment_status = request.GET.get('status', None) 
+    appointment_status = request.GET.get('status', None)
+
+    # Because we have a common serializer (see SingleNoteSerializer)
+    # is_mobile is used to differentiate between mobile and web
+    is_mobile = request.GET.get('is_mobile', None)
 
     query = {}
     if appointment_status == 'Appointment Booked':
@@ -218,8 +222,7 @@ def get_appointments_device(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-        
-    serialized = SingleNoteSerializer(appointment, many = True)
+    serialized = SingleNoteSerializer(appointment, many = True, context={'is_mobile':is_mobile})
     return Response(
         {
             'status' : True,
