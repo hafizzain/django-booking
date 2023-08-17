@@ -161,8 +161,10 @@ def get_appointments_device(request):
     # Because we have a common serializer (see SingleNoteSerializer)
     # is_mobile is used to differentiate between mobile and web
     is_mobile = request.GET.get('is_mobile', None)
-    if is_mobile in [True, 'true']:
+    if is_mobile == 'true':
         is_mobile = True
+
+
     query = {}
     if appointment_status == 'Appointment Booked':
         query['appointment_services__appointment_status__in'] = ['Appointment_Booked', 'Appointment Booked', 'Arrived', 'In Progress']
