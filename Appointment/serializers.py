@@ -823,6 +823,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
     customer_note = serializers.SerializerMethodField(read_only=True)
     appointmnet_service = serializers.SerializerMethodField(read_only=True)
     appointment_tips = serializers.SerializerMethodField(read_only=True)
+    client = serializers.SerializerMethodField(read_only=True)
 
     def get_appointment_tips(self, obj):
         tips = AppointmentEmployeeTip.objects.filter(
