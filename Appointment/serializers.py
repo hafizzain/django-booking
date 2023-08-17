@@ -857,7 +857,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
         If is_mobile is true send complete client 
         object, otherwise just send client ID.
         """
-        is_mobile = self.context.get('is_mobile')
+        is_mobile = self.context.get('is_mobile', False)
         if is_mobile:
             return obj.client if obj.client else None
         else:
