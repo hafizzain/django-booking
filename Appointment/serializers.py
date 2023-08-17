@@ -24,11 +24,11 @@ from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 from Utility.models import ExceptionRecord
 
 class PriceServiceSaleSerializer(serializers.ModelSerializer):
-    currency = CurrencySerializer()
+    # currency = CurrencySerializer()
     
     class Meta:
         model = PriceService
-        fields = ['id','service', 'duration', 'price', 'currency']
+        fields = ['id','service', 'duration', 'price']
 
 class MemberSaleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -919,8 +919,8 @@ class CheckoutSerializer(serializers.ModelSerializer):
     
     def get_service(self, obj):
         try:
-            price = Service.objects.get(id  = obj.service.id)
-            return ServiceSaleSerializer(price).data
+            service = Service.objects.get(id  = obj.service.id)
+            return ServiceSaleSerializer(service).data
         except Exception as err:
             print(err)
             
