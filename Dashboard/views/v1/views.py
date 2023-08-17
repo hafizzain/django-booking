@@ -1,24 +1,18 @@
-from django.conf import settings
-from operator import ge
-from Appointment.serializers import CheckoutSerializer
 from Order.models import Checkout, ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder
 from Utility.Constants.Data.months import  FIXED_MONTHS, MONTHS
 from Order.models import Order, ProductOrder,VoucherOrder,MemberShipOrder,ServiceOrder,Checkout
-from Sale.serializers import AppointmentCheckoutSerializer, CheckoutSerializer, OrderSerializer
 from Utility.Constants.Data.months import  FIXED_MONTHS, MONTH_DICT, MONTHS, MONTHS_DEVICE
 
 from Dashboard.serializers import EmployeeDashboradSerializer
-from Employee.models import Employee,CategoryCommission,CommissionSchemeSetting, EmployeeCommission
+from Employee.models import Employee, EmployeeCommission
 from TragetControl.models import StaffTarget
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from Appointment.models import Appointment, AppointmentCheckout, AppointmentService, AppointmentEmployeeTip
 from Client.models import Client
 from NStyle.Constants import StatusCodes
-from Business.models import Business, BusinessAddress
-from Product.models import ProductStock
 from datetime import datetime,timedelta
 from django.db.models import Q
 import calendar
@@ -28,7 +22,7 @@ import calendar
 @permission_classes([AllowAny])
 def get_busines_client_appointment(request):
     business_id = request.GET.get('location', None)
-    duration = request.GET.get('duration', None) 
+    duration = request.GET.get('duration', None)
     
     if business_id is None:
         return Response(
@@ -47,21 +41,15 @@ def get_busines_client_appointment(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     avg = 0
-    revenue = 0
     footfalls = 0
     total_price = 0
     appointment = 0
 
-    all_apps_clients = Appointment.objects.filter(client__isnull=False).distinct('client')
+    all_apps_clients = Appointment.objects.filter(client__isnull=False, business_address__id = business_id).distinct('client')
     apps_clients_with_app = list(all_apps_clients.values_list('client__full_name'))
     all_apps_clients = all_apps_clients.count()
-    
+    footfalls = AppointmentService.objects.filter(is_deleted=False, business_address__id = business_id).exclude(appointment_status__iexact ='cancel').count()
 
-    clients_booked = Client.objects.filter(is_deleted=False, client_appointments__appointment_services__appointment_status='Appointment_Booked').count()
-    footfalls = AppointmentService.objects.filter(is_deleted=False).exclude(appointment_status__iexact ='cancel').count()
-    
-
-    client_count = Client.objects.prefetch_related('client_appointments__business_address').filter(client_appointments__business_address__id = business_id).count()
  
     if duration is not None:
         today = datetime.today()
@@ -71,13 +59,11 @@ def get_busines_client_appointment(request):
         checkout_orders_total = Checkout.objects.filter(
         is_deleted=False, 
         location__id = business_id
-        #member__id=employee_id,
         )   
         
         checkouts = AppointmentCheckout.objects.filter(
             is_deleted=False, 
             business_address__id = business_id
-            #member__id=employee_id,
         )
         
         for price in checkout_orders_total:
@@ -107,22 +93,17 @@ def get_busines_client_appointment(request):
         order_sale +=1
         if order.total_price is not  None:
             total += float(order.total_price)
-    #orders_price = Order.objects.aggregate(Total= Sum('total_price'))
     
     price = AppointmentCheckout.objects.filter(
         Q(appointment_service__appointment_status = 'Paid') |
         Q(appointment_service__appointment_status = 'Done'),
         business_address__id = business_id
     )
-    # appointment_service__appointment_status = 'Paid', 
-    # appointment_service__appointment_status = 'Done'
     for order in price:
         appointmemnt_sale +=1
         if order.total_price is not None:
             total += float(order.total_price)
-    # //////////////////////////
     
-    # avg = footfalls / all_apps_clients if all_apps_clients > 0 else 0
     avg = appointment / all_apps_clients if all_apps_clients > 0 else 0
     avg = round(avg, 2)
     return Response(
@@ -133,7 +114,6 @@ def get_busines_client_appointment(request):
                 'message' : 'Total Revenue',
                 'error_message' : None,
                 'revenue' : total,
-                # 'client_count':all_apps_clients,
                 'client_count':avg,
                 'footfalls': footfalls,
                 'clients_booked':all_apps_clients,
