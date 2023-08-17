@@ -859,7 +859,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
         """
         is_mobile = self.context.get('is_mobile', False)
         if is_mobile:
-            return obj.client if obj.client else None
+            return ClientSerializer(obj.client).data if obj.client else None
         else:
             return obj.client.id if obj.client else None
         
