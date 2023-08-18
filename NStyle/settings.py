@@ -14,6 +14,8 @@ from pathlib import Path
 import environ
 import os
 
+from firebase_admin import initialize_app
+
 env = environ.Env()
 environ.Env.read_env()
 
@@ -71,6 +73,7 @@ NSTYLE_APPS = [
     'Help.apps.HelpConfig',
     'MultiLanguage.apps.MultilanguageConfig',
     'SuperInsight.apps.SuperinsightConfig',
+    'Notification.apps.NotificationConfig'
 ]
 
 
@@ -89,6 +92,7 @@ SHARED_APPS = [
     'geoip2',
     'django_crontab',
     'debug_toolbar',
+    'fcm_django',
     
 
     'Tenants.apps.TenantsConfig',
@@ -300,3 +304,22 @@ EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 
 GEOIP_PATH =os.path.join('geoip')
+
+
+# FCM_DJANGO CONFIGURATION
+
+FIREBASE_APP = initialize_app()
+FCM_DJANGO_SETTINGS = {
+     # an instance of firebase_admin.App to be used as default for all fcm-django requests
+     # default: None (the default Firebase app)
+    "DEFAULT_FIREBASE_APP": None,
+     # default: _('FCM Django')
+    "APP_VERBOSE_NAME": "[string for AppConfig's verbose_name]",
+     # true if you want to have only one active device per registered user at a time
+     # default: False
+    "ONE_DEVICE_PER_USER": True,
+     # devices to which notifications cannot be sent,
+     # are deleted upon receiving error response from FCM
+     # default: False
+    "DELETE_INACTIVE_DEVICES": False,
+}

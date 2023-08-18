@@ -48,7 +48,8 @@ from django.utils.html import strip_tags
 from django.conf import settings
 from django.core.paginator import Paginator
 
-
+from Notification.models import CustomFCMDevice
+from Notification.notification_processor import NotificationProcessor
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -2554,9 +2555,13 @@ def create_commission(request):
                 ExceptionRecord.objects.create(
                     text = f'Both data {str(err)}'
                 )
-            
+
+    # Send Notification to Employee
+    employee_user = employee_id.user
+    NotificationProcessor.send_notification(employee_user,
+                                            'Commission',
+                                            'Commission Added by Admin')
     serializers= CommissionSerializer(commission_setting, context={'request' : request})
-    
     return Response(
             {
                 'status' : True,
@@ -4581,6 +4586,7 @@ def employee_login(request):
     username = request.data.get('username', None)
     password = request.data.get('password', None)
     tenant_id = request.data.get('tenant_id', None)
+    device_token = request.data.get('device_token', None)
     
     data = []
     
@@ -4609,7 +4615,7 @@ def employee_login(request):
             is_deleted=False,
             user_account_type__account_type = 'Employee'
         )
-        
+
     except Exception as err:
         return Response(
             {
@@ -4670,6 +4676,13 @@ def employee_login(request):
                 email__icontains = user.email,
                 is_deleted = False
             )
+
+            # registering device token for employee
+            # for mobile to send push notifications
+            employee_device = CustomFCMDevice()
+            employee_device.user = user
+            employee_device.registration_id = device_token
+            employee_device.save()
         except:
             return Response(
                 {
