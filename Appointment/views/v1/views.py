@@ -47,6 +47,7 @@ from django.db.models import Prefetch
 from Invoices.models import SaleInvoice
 from Reports.models import DiscountPromotionSalesReport
 
+from Notification.notification_processor import NotificationProcessor
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -755,8 +756,14 @@ def create_appointment(request):
         is_active = True,
         is_blocked = False,
     ).order_by('-created_at')
-    serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request' : request})
 
+    # Send Notification to Employee
+    employee_user = active_user_staff.user
+    NotificationProcessor.send_notification(employee_user,
+                                            "Appointment"
+                                            "Appointment Created by Admin")
+
+    serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request' : request})
     return Response(
             {
                 'status' : True,
@@ -913,7 +920,14 @@ def update_appointment(request):
         except Exception as err:
             print(err)
             pass
-        
+    
+    employee_user = employee.user
+    NotificationProcessor.send_notification(
+        employee_user,
+        'Appointment',
+        'Appointment Cancelled by Admin'
+    )
+
     return Response(
         {
             'status' : True,
@@ -1955,6 +1969,13 @@ def create_checkout(request):
     
     invoice.save() # Do not remove this
     serialized = CheckoutSerializer(checkout)
+
+    employee_user = members.user
+    NotificationProcessor.send_notification(
+        employee_user,
+        'Appointment'
+        'Appointment completed by Admin'
+    )
     return Response(
             {
                 'status' : True,
