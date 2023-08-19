@@ -506,7 +506,7 @@ def create_appointment(request):
 
     # log_details = []
     all_members = []
-    all_employee_users = []
+    users = []
     for appoinmnt in appointments:
         member = appoinmnt['member']
         service = appoinmnt['service']
@@ -557,7 +557,7 @@ def create_appointment(request):
         try:
             member=Employee.objects.get(id=member)
             all_members.append(str(member.id))
-            all_employee_users.append(member.user)
+            users.append(member.user)
         except Exception as err:
             return Response(
             {
@@ -759,7 +759,7 @@ def create_appointment(request):
     ).order_by('-created_at')
 
     # Send Notification to one or multiple Employee
-    NotificationProcessor.send_notifications_to_users(all_employee_users,
+    NotificationProcessor.send_notifications_to_users(users,
                                             "Appointment"
                                             "Appointment Created by Admin")
 
