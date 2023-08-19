@@ -506,7 +506,7 @@ def create_appointment(request):
 
     # log_details = []
     all_members = []
-    users = []
+    employee_users = []
     for appoinmnt in appointments:
         member = appoinmnt['member']
         service = appoinmnt['service']
@@ -557,7 +557,7 @@ def create_appointment(request):
         try:
             member=Employee.objects.get(id=member)
             all_members.append(str(member.id))
-            users.append(member.user)
+            employee_users.append(member.user)
         except Exception as err:
             return Response(
             {
@@ -759,10 +759,11 @@ def create_appointment(request):
     ).order_by('-created_at')
 
     # Send Notification to one or multiple Employee
+    user = employee_users
     NotificationProcessor.send_notifications_to_users(
-        users=users,
-        title="Appointment",
-        body= "Appointment Created by Admin"
+        user,
+        "Appointment",
+        "Appointment Created by Admin"
     )
 
     serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request' : request})
@@ -923,11 +924,11 @@ def update_appointment(request):
             print(err)
             pass
     
-    employee_user = employee.user
+    user = employee.user
     NotificationProcessor.send_notifications_to_users(
-        users=employee_user,
-        title='Appointment',
-        body='Appointment Cancelled by Admin'
+        user,
+        'Appointment',
+        'Appointment Cancelled by Admin'
     )
 
     return Response(
@@ -1972,11 +1973,11 @@ def create_checkout(request):
     invoice.save() # Do not remove this
     serialized = CheckoutSerializer(checkout)
 
-    employee_user = members.user
+    user = members.user
     NotificationProcessor.send_notifications_to_users(
-        users=employee_user,
-        title='Appointment',
-        body='Appointment completed by Admin'
+        user,
+        'Appointment',
+        'Appointment completed by Admin'
     )
     return Response(
             {
