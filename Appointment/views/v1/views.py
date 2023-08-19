@@ -759,9 +759,11 @@ def create_appointment(request):
     ).order_by('-created_at')
 
     # Send Notification to one or multiple Employee
-    NotificationProcessor.send_notifications_to_users(users,
-                                            "Appointment"
-                                            "Appointment Created by Admin")
+    NotificationProcessor.send_notifications_to_users(
+        users,
+        "Appointment",
+        "Appointment Created by Admin"
+    )
 
     serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request' : request})
     return Response(
@@ -1973,7 +1975,7 @@ def create_checkout(request):
     employee_user = members.user
     NotificationProcessor.send_notifications_to_users(
         employee_user,
-        'Appointment'
+        'Appointment',
         'Appointment completed by Admin'
     )
     return Response(
