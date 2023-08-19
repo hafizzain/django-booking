@@ -485,15 +485,14 @@ def create_appointment(request):
                     appointment=appointment,
                     text = note
                 )
-    
     active_user_staff = None
     try:
-        active_user_staff = Employee.objects.get(
+        active_user_staff = Employee.objects.filter(
             email = request.user.email,
             is_deleted = False,
             is_active = True,
             is_blocked = False
-        )
+        ).first()
     except:
         pass
     
@@ -507,6 +506,7 @@ def create_appointment(request):
 
     # log_details = []
     all_members = []
+    all_employee_users = []
     for appoinmnt in appointments:
         member = appoinmnt['member']
         service = appoinmnt['service']
@@ -557,6 +557,7 @@ def create_appointment(request):
         try:
             member=Employee.objects.get(id=member)
             all_members.append(str(member.id))
+            all_employee_users.append(member.user)
         except Exception as err:
             return Response(
             {
@@ -757,9 +758,8 @@ def create_appointment(request):
         is_blocked = False,
     ).order_by('-created_at')
 
-    # Send Notification to Employee
-    employee_user = active_user_staff.user
-    NotificationProcessor.send_notification(employee_user,
+    # Send Notification to one or multiple Employee
+    NotificationProcessor.send_notifications_to_users(all_employee_users,
                                             "Appointment"
                                             "Appointment Created by Admin")
 
@@ -922,7 +922,7 @@ def update_appointment(request):
             pass
     
     employee_user = employee.user
-    NotificationProcessor.send_notification(
+    NotificationProcessor.send_notifications_to_users(
         employee_user,
         'Appointment',
         'Appointment Cancelled by Admin'
@@ -1971,7 +1971,7 @@ def create_checkout(request):
     serialized = CheckoutSerializer(checkout)
 
     employee_user = members.user
-    NotificationProcessor.send_notification(
+    NotificationProcessor.send_notifications_to_users(
         employee_user,
         'Appointment'
         'Appointment completed by Admin'

@@ -11,7 +11,7 @@ class NotificationProcessor:
     """
 
     @classmethod
-    def send_notification(user, title, body):
+    def send_notification_per_user(user, title, body):
         """
         args:
          - user: Employee User
@@ -34,3 +34,25 @@ class NotificationProcessor:
                 ExceptionRecord.objects.create(text='Exception in sendding notification')
         else:
             pass
+
+
+    @classmethod
+    def send_notifications_to_users(users, title, body):
+        """
+        A method to handle one or multiple users
+        """
+
+        # multiple users
+        if type(users) == list:
+            for user in users:
+                NotificationProcessor.send_notification_per_user(
+                    user,
+                    title,
+                    body
+                )
+        else: # single user
+            NotificationProcessor.send_notification_per_user(
+                users,
+                title,
+                body
+            )
