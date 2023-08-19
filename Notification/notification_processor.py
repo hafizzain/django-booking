@@ -52,7 +52,7 @@ class NotificationProcessor:
                 )
         else: # single user
             NotificationProcessor.send_notification_per_user(
-                user=users
-                title=title
+                user=users,
+                title=title,
                 body=body
             )
