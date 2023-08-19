@@ -2558,7 +2558,7 @@ def create_commission(request):
 
     # Send Notification to Employee
     employee_user = employee_id.user
-    NotificationProcessor.send_notification(employee_user,
+    NotificationProcessor.send_notifications_to_users(employee_user,
                                             'Commission',
                                             'Commission Added by Admin')
     serializers= CommissionSerializer(commission_setting, context={'request' : request})
