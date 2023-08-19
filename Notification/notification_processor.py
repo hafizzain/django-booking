@@ -46,13 +46,13 @@ class NotificationProcessor:
         if type(users) == list:
             for user in users:
                 NotificationProcessor.send_notification_per_user(
-                    user,
-                    title,
-                    body
+                    user=user,
+                    title=title,
+                    body=body
                 )
         else: # single user
             NotificationProcessor.send_notification_per_user(
-                users,
-                title,
-                body
+                user=users,
+                title=title,
+                body=body
             )
