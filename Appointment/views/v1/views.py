@@ -758,11 +758,11 @@ def create_appointment(request):
         is_blocked = False,
     ).order_by('-created_at')
 
-    # Send Notification to one or multiple Employee
-    # user = employee_users
-    # title = "Appointment"
-    # body = "Appointment Created by Admin"
-    # NotificationProcessor.send_notifications_to_users(user, title, body)
+    Send Notification to one or multiple Employee
+    user = employee_users
+    title = "Appointment"
+    body = "Appointment Created by Admin"
+    NotificationProcessor.send_notifications_to_users(user, title, body)
 
     serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request' : request})
     return Response(
