@@ -486,16 +486,12 @@ def create_appointment(request):
                     text = note
                 )
     
-    active_user_staff = None
-    try:
-        active_user_staff = Employee.objects.get(
-            email = request.user.email,
-            is_deleted = False,
-            is_active = True,
-            is_blocked = False
-        )
-    except:
-        pass
+    active_user_staff = Employee.objects.filter(
+        email = request.user.email,
+        is_deleted = False,
+        is_active = True,
+        is_blocked = False
+    ).first()
     
     appointment_logs = AppointmentLogs.objects.create( 
         user = request.user,
