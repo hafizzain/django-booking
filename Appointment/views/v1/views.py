@@ -760,11 +760,9 @@ def create_appointment(request):
 
     # Send Notification to one or multiple Employee
     user = employee_users
-    NotificationProcessor.send_notifications_to_users(
-        user,
-        "Appointment",
-        "Appointment Created by Admin"
-    )
+    title = "Appointment"
+    body = "Appointment Created by Admin"
+    NotificationProcessor.send_notifications_to_users(user, title, body)
 
     serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request' : request})
     return Response(
@@ -925,11 +923,9 @@ def update_appointment(request):
             pass
     
     user = employee.user
-    NotificationProcessor.send_notifications_to_users(
-        user,
-        'Appointment',
-        'Appointment Cancelled by Admin'
-    )
+    title = 'Appointment'
+    body = 'Appointment Cancelled by Admin'
+    NotificationProcessor.send_notifications_to_users(user, title, body)
 
     return Response(
         {
@@ -1974,11 +1970,9 @@ def create_checkout(request):
     serialized = CheckoutSerializer(checkout)
 
     user = members.user
-    NotificationProcessor.send_notifications_to_users(
-        user,
-        'Appointment',
-        'Appointment completed by Admin'
-    )
+    title = 'Appointment'
+    body = 'Appointment completed by Admin'
+    NotificationProcessor.send_notifications_to_users(user, title, body)
     return Response(
             {
                 'status' : True,
