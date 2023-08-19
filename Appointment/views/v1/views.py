@@ -758,7 +758,7 @@ def create_appointment(request):
         is_blocked = False,
     ).order_by('-created_at')
 
-    Send Notification to one or multiple Employee
+    # Send Notification to one or multiple Employee
     user = employee_users
     title = "Appointment"
     body = "Appointment Created by Admin"
