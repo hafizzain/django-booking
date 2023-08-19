@@ -37,7 +37,7 @@ class NotificationProcessor:
 
 
     @classmethod
-    def send_notifications_to_users(users, title, body):
+    def send_notifications_to_users(users=None, title=None, body=None):
         """
         A method to handle one or multiple users
         """
