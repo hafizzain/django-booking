@@ -37,22 +37,23 @@ class NotificationProcessor:
 
 
     @classmethod
-    def send_notifications_to_users(users=None, title=None, body=None):
+    def send_notifications_to_users(user, title, body):
         """
         A method to handle one or multiple users
         """
 
         # multiple users
-        if type(users) == list:
-            for user in users:
+        if type(user) == list:
+            user_list = user
+            for user in user_list:
                 NotificationProcessor.send_notification_per_user(
-                    user=user,
-                    title=title,
-                    body=body
+                    user,
+                    title,
+                    body
                 )
         else: # single user
             NotificationProcessor.send_notification_per_user(
-                user=users,
-                title=title,
-                body=body
+                user,
+                title,
+                body
             )
