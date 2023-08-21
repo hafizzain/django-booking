@@ -789,8 +789,6 @@ def update_appointment(request):
     employee_id = request.data.get('employee_id', None)
     appointment_status = request.data.get('appointment_status', None)
 
-
-    notify_employee = Employee.objects.get(id=employee_id, is_deleted=False)
     if appointment_service_id is None: 
        return Response(
             {
