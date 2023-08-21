@@ -825,7 +825,6 @@ def update_appointment(request):
     if employee_id:
         try: 
             employee = Employee.objects.get(id=employee_id, is_deleted=False)
-            notify_employee = employee
         except Exception as err:
             return Response(
                     {
@@ -925,7 +924,7 @@ def update_appointment(request):
             pass
     
     # Send Notification to Employee
-    user = service_appointment.member
+    user = service_appointment.member.user
     title = 'Appointment'
     body = 'Appointment Updated by Admin'
     NotificationProcessor.send_notifications_to_users(user, title, body)
