@@ -788,6 +788,7 @@ def update_appointment(request):
     start_time = request.data.get('start_time', None)
     employee_id = request.data.get('employee_id', None)
     appointment_status = request.data.get('appointment_status', None)
+    notify_employee = None
     if appointment_service_id is None: 
        return Response(
             {
@@ -824,6 +825,7 @@ def update_appointment(request):
     if employee_id:
         try: 
             employee = Employee.objects.get(id=employee_id, is_deleted=False)
+            notify_employee = employee
         except Exception as err:
             return Response(
                     {
@@ -923,7 +925,7 @@ def update_appointment(request):
             pass
     
     # Send Notification to Employee
-    user = employee.user
+    user = notify_employee.user
     title = 'Appointment'
     body = 'Appointment Cancelled by Admin'
     NotificationProcessor.send_notifications_to_users(user, title, body)
