@@ -1778,7 +1778,7 @@ def create_checkout(request):
                     tip = 0
                 )
                 empl_commissions_instances.append(employee_commission)
-                notify_users.append(service_appointment.member)
+                notify_users.append(service_appointment.member.user)
             
     # if gst is None:
     #     gst = 0
