@@ -922,10 +922,11 @@ def update_appointment(request):
             print(err)
             pass
     
-    # user = employee.user
-    # title = 'Appointment'
-    # body = 'Appointment Cancelled by Admin'
-    # NotificationProcessor.send_notifications_to_users(user, title, body)
+    # Send Notification to Employee
+    user = employee.user
+    title = 'Appointment'
+    body = 'Appointment Cancelled by Admin'
+    NotificationProcessor.send_notifications_to_users(user, title, body)
 
     return Response(
         {
@@ -1969,10 +1970,11 @@ def create_checkout(request):
     invoice.save() # Do not remove this
     serialized = CheckoutSerializer(checkout)
 
-    # user = members.user
-    # title = 'Appointment'
-    # body = 'Appointment completed by Admin'
-    # NotificationProcessor.send_notifications_to_users(user, title, body)
+    # Send Notification to Employee
+    user = members.user
+    title = 'Appointment'
+    body = 'Appointment completed by Admin'
+    NotificationProcessor.send_notifications_to_users(user, title, body)
     return Response(
             {
                 'status' : True,
