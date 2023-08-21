@@ -1628,6 +1628,7 @@ def create_checkout(request):
     
     Errors = []
     total_price_app = 0
+    notify_users = []
     # if not all([]){
         
     # }
@@ -1777,6 +1778,7 @@ def create_checkout(request):
                     tip = 0
                 )
                 empl_commissions_instances.append(employee_commission)
+                notify_users.append(service_appointment.member)
             
     # if gst is None:
     #     gst = 0
@@ -1971,7 +1973,7 @@ def create_checkout(request):
     serialized = CheckoutSerializer(checkout)
 
     # Send Notification to Employee
-    user = members.user
+    user = notify_users
     title = 'Appointment'
     body = 'Appointment completed by Admin'
     NotificationProcessor.send_notifications_to_users(user, title, body)
