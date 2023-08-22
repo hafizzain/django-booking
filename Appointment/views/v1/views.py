@@ -1705,7 +1705,7 @@ def create_checkout(request):
 
     empl_commissions_instances = []
     for app in appointment_service_obj:
-        client_name = appointment_service_obj.get('client', None)
+        client_name = app.get('client', None)
         active_user_staff = None
         try:
             active_user_staff = Employee.objects.get(
