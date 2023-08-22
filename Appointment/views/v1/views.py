@@ -1847,6 +1847,7 @@ def create_checkout(request):
         service_commission_type = service_commission_type,      
         checkout = f'{checkout.id}'
     )
+    invoice.save()
     # checkout.business_address = service_appointment.business_address
     # checkout.save()
 
