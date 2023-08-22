@@ -1595,7 +1595,6 @@ def create_checkout(request):
     payment_method = request.data.get('payment_method', None)
     service = request.data.get('service', None)
     member = request.data.get('member', None)
-    client_name = request.data.get('client', None)
     business_address = request.data.get('business_address', None)
     
     tip = request.data.get('tip', [])
@@ -1631,6 +1630,9 @@ def create_checkout(request):
     Errors = []
     total_price_app = 0
     notify_users = []
+    # Extract client name from appointtment_service_obj
+    client_name = None
+    client_invoice = None
     # if not all([]){
         
     # }
@@ -1703,6 +1705,7 @@ def create_checkout(request):
 
     empl_commissions_instances = []
     for app in appointment_service_obj:
+        client_name = appointment_service_obj.get('client', None)
         active_user_staff = None
         try:
             active_user_staff = Employee.objects.get(
@@ -1829,8 +1832,9 @@ def create_checkout(request):
         i_employee_commission.sale_id = checkout.id
         i_employee_commission.save()
 
-    client_invoice = Client.objects.filter(full_name=client_name).first()
-    
+    if client_name is not None:
+        client_invoice = Client.objects.filter(full_name=client_name).first()
+
     invoice = SaleInvoice.objects.create(
         client= client_invoice if client_invoice else None,
         appointment = appointments,
