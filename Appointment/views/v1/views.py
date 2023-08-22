@@ -1595,6 +1595,7 @@ def create_checkout(request):
     payment_method = request.data.get('payment_method', None)
     service = request.data.get('service', None)
     member = request.data.get('member', None)
+    client_name = request.data.get('client_name', None)
     business_address = request.data.get('business_address', None)
     
     tip = request.data.get('tip', [])
@@ -1828,9 +1829,10 @@ def create_checkout(request):
         i_employee_commission.sale_id = checkout.id
         i_employee_commission.save()
 
-
+    client_invoice = Client.objects.filter(full_name=client_name).first()
     
     invoice = SaleInvoice.objects.create(
+        client= client_invoice if client_invoice else None,
         appointment = appointments,
         appointment_service = f'{service_appointment.id}',
         payment_type = payment_method,
