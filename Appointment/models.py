@@ -195,8 +195,20 @@ class AppointmentService(models.Model):
     created_at = models.DateTimeField(auto_now_add=now)
 
     def get_final_price(self):
-        price = self.redeemed_price or self.discount_price or self.price or self.total_price
-        return round(price, 2)
+        if self.redeemed_price:
+            price = self.redeemed_price
+            return round(price, 2)
+        elif self.discount_price:
+            price = self.discount_price
+            return round(price, 2)
+        elif self.price:
+            price = self.price
+            return round(price, 2)
+        else:
+            price = self.total_price
+            return round(price, 2)
+
+        
     
     def member_name(self):
         try:
