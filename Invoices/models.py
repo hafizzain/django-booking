@@ -195,6 +195,7 @@ class SaleInvoice(models.Model):
                 tips_total = sum([t['tip'] for t in order_tips])
 
                 context = {
+                    'client': self.client,
                     'invoice_by' : self.user.user_full_name if self.user else '',
                     'invoice_by_arabic_name' : self.user.user_full_name if self.user else '',
                     'invoice_id' : self.short_id,

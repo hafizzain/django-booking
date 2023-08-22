@@ -45,7 +45,15 @@
                         </div>
                         <div class="h-[1.5rem] w-[1px] border-l"></div>
                         <div>
-                            <p>Billed to <span class="font-bold">Walk In</span></p>
+                            <p>Billed to 
+                                <span class="font-bold">
+                                    {% if client %}
+                                        {{ client.full_name }}
+                                    {% else %}
+                                        Walk In
+                                    {% endif %}
+                                </span>
+                            </p>
                         </div>
                     </div>
                     <div>
