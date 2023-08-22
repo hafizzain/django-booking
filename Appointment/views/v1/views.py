@@ -1719,7 +1719,7 @@ def create_checkout(request):
 
 
         id = app.get('id', None)
-        redeemed_price = app.get('redeemed_price', 0)
+        redeemed_price = app.get('redeemed_price', 0.00)
         
         try:
             service_appointment = AppointmentService.objects.get(id=id)
