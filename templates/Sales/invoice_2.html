@@ -45,7 +45,8 @@
                         </div>
                         <div class="h-[1.5rem] w-[1px] border-l"></div>
                         <div>
-                            <p>Billed to 
+                            <p> Hello {{ client }} </p>
+                            {% comment %} <p>Billed to 
                                 <span class="font-bold">
                                     {% if client %}
                                         {{ client.full_name }}
@@ -53,7 +54,7 @@
                                         Walk In
                                     {% endif %}
                                 </span>
-                            </p>
+                            </p> {% endcomment %}
                         </div>
                     </div>
                     <div>
