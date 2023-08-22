@@ -1595,7 +1595,7 @@ def create_checkout(request):
     payment_method = request.data.get('payment_method', None)
     service = request.data.get('service', None)
     member = request.data.get('member', None)
-    client_name = request.data.get('client_name', None)
+    client_name = request.data.get('client', None)
     business_address = request.data.get('business_address', None)
     
     tip = request.data.get('tip', [])
