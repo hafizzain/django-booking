@@ -10,7 +10,7 @@ from Product.Constants.index import tenant_media_base_url
 from django.db.models import Sum, Q
 from django.db.models.functions import Coalesce
 
-from Order.models import MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
+from Order.models import MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder, Order
 from Sale.serializers import ProductOrderSerializer, SaleOrder_ProductSerializer, SaleOrder_ServiceSerializer, CheckoutTipsSerializer, SaleOrder_MemberShipSerializer, SaleOrder_VoucherSerializer, ClientSerializer
 from Service.models import Service, ServiceGroup
 from TragetControl.models import RetailTarget, ServiceTarget, StaffTarget, StoreTarget, TierStoreTarget
@@ -1219,6 +1219,28 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
     membership_service = serializers.SerializerMethodField(read_only=True)
     
     tip = serializers.SerializerMethodField(read_only=True)
+    gst = serializers.SerializerMethodField(read_only=True)
+    gst1 = serializers.SerializerMethodField(read_onnly=True)
+    gst_price = serializers.SerializerMethodField(read_onnly=True)
+    gst_price1 = serializers.SerializerMethodField(read_onnly=True)
+
+
+    def get_gst(self, obj):
+        checkout = Checkout.objects.get(id=obj.checkout_id)
+        return checkout.tax_applied
+    
+    def get_gst1(self, obj):
+        checkout = Checkout.objects.get(id=obj.checkout_id)
+        return checkout.tax_applied1
+    
+    def get_price(self, obj):
+        checkout = Checkout.objects.get(id=obj.checkout_id)
+        return checkout.tax_amount
+    
+    def get_price1(self, obj):
+        checkout = Checkout.objects.get(id=obj.checkout_id)
+        return checkout.tax_amount1
+    
         
     def get_membership(self, obj):
         
