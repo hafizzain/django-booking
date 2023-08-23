@@ -376,7 +376,7 @@ class Membership(models.Model):
         
         split_them = self.valid_for.split(" ")
 
-        duration = split_them[0]
+        duration = int(split_them[0])
         term = split_them[1]
         validity_time = None
 
