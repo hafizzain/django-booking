@@ -1394,8 +1394,8 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
             'gst1',
             'gst_price',
             'gst_price1',
-            'gst_name',
-            'gst_name1'
+            'tax_name',
+            'tax_name1'
             
         ]
 
