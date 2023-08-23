@@ -300,7 +300,6 @@ def create_client(tenant=None, user = None, business=None):
                 business = business,
                 user = user,
                 full_name = user.first_name, # 'ABCD',
-                mobile_number = user.mobile_number,
                 gender = 'Male',
                 language = language_id,
                 client_id = client_unique_id,
