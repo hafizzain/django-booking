@@ -1219,37 +1219,37 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
     membership_service = serializers.SerializerMethodField(read_only=True)
     
     tip = serializers.SerializerMethodField(read_only=True)
-    gst = serializers.SerializerMethodField(read_only=True)
-    gst1 = serializers.SerializerMethodField(read_only=True)
-    gst_price = serializers.SerializerMethodField(read_only=True)
-    gst_price1 = serializers.SerializerMethodField(read_only=True)
-    tax_name = serializers.SerializerMethodField(read_only=True)
-    tax_name1 = serializers.SerializerMethodField(read_only=True)
+    # gst = serializers.SerializerMethodField(read_only=True)
+    # gst1 = serializers.SerializerMethodField(read_only=True)
+    # gst_price = serializers.SerializerMethodField(read_only=True)
+    # gst_price1 = serializers.SerializerMethodField(read_only=True)
+    # tax_name = serializers.SerializerMethodField(read_only=True)
+    # tax_name1 = serializers.SerializerMethodField(read_only=True)
 
 
-    def get_gst(self, obj):
-        checkout = Checkout.objects.get(id=obj.checkout_id)
-        return checkout.tax_applied
+    # def get_gst(self, obj):
+    #     checkout = Checkout.objects.get(id=obj.checkout_id)
+    #     return checkout.tax_applied
     
-    def get_gst1(self, obj):
-        checkout = Checkout.objects.get(id=obj.checkout_id)
-        return checkout.tax_applied1
+    # def get_gst1(self, obj):
+    #     checkout = Checkout.objects.get(id=obj.checkout_id)
+    #     return checkout.tax_applied1
     
-    def get_price(self, obj):
-        checkout = Checkout.objects.get(id=obj.checkout_id)
-        return checkout.tax_amount
+    # def get_price(self, obj):
+    #     checkout = Checkout.objects.get(id=obj.checkout_id)
+    #     return checkout.tax_amount
     
-    def get_price1(self, obj):
-        checkout = Checkout.objects.get(id=obj.checkout_id)
-        return checkout.tax_amount1
+    # def get_price1(self, obj):
+    #     checkout = Checkout.objects.get(id=obj.checkout_id)
+    #     return checkout.tax_amount1
     
-    def gst_name(self, obj):
-        checkout = Checkout.objects.get(id=obj.checkout_id)
-        return checkout.tax_name
+    # def gst_name(self, obj):
+    #     checkout = Checkout.objects.get(id=obj.checkout_id)
+    #     return checkout.tax_name
     
-    def gst_name1(self, obj):
-        checkout = Checkout.objects.get(id=obj.checkout_id)
-        return checkout.tax_name1
+    # def gst_name1(self, obj):
+    #     checkout = Checkout.objects.get(id=obj.checkout_id)
+    #     return checkout.tax_name1
     
         
     def get_membership(self, obj):
@@ -1390,12 +1390,12 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
             'membership_product', 
             'membership_service', 
             'tip',
-            'gst',
-            'gst1',
-            'gst_price',
-            'gst_price1',
-            'tax_name',
-            'tax_name1'
+            # 'gst',
+            # 'gst1',
+            # 'gst_price',
+            # 'gst_price1',
+            # 'tax_name',
+            # 'tax_name1'
             
         ]
 
