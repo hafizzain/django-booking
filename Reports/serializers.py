@@ -1220,9 +1220,11 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
     
     tip = serializers.SerializerMethodField(read_only=True)
     gst = serializers.SerializerMethodField(read_only=True)
-    gst1 = serializers.SerializerMethodField(read_onnly=True)
-    gst_price = serializers.SerializerMethodField(read_onnly=True)
-    gst_price1 = serializers.SerializerMethodField(read_onnly=True)
+    gst1 = serializers.SerializerMethodField(read_only=True)
+    gst_price = serializers.SerializerMethodField(read_only=True)
+    gst_price1 = serializers.SerializerMethodField(read_only=True)
+    tax_name = serializers.SerializerMethodField(read_only=True)
+    tax_name1 = serializers.SerializerMethodField(read_only=True)
 
 
     def get_gst(self, obj):
@@ -1240,6 +1242,14 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
     def get_price1(self, obj):
         checkout = Checkout.objects.get(id=obj.checkout_id)
         return checkout.tax_amount1
+    
+    def gst_name(self, obj):
+        checkout = Checkout.objects.get(id=obj.checkout_id)
+        return checkout.tax_name
+    
+    def gst_name1(self, obj):
+        checkout = Checkout.objects.get(id=obj.checkout_id)
+        return checkout.tax_name1
     
         
     def get_membership(self, obj):
@@ -1379,7 +1389,13 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
             'ids', 
             'membership_product', 
             'membership_service', 
-            'tip'
+            'tip',
+            'gst',
+            'gst1',
+            'gst_price',
+            'gst_price1',
+            'gst_name',
+            'gst_name1'
             
         ]
 
