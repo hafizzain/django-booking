@@ -1373,7 +1373,8 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
     class Meta:
         model = DiscountPromotionSalesReport
         fields = [
-            'id', 
+            'id',
+            'checkout_id',
             'checkout_type', 
             'promotion', 
             'invoice', 
