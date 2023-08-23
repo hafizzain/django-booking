@@ -257,11 +257,11 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 vouchers_commissions += full_commission
 
         data = {
-            'product_sale_price': total_product_price,
-            'commission_total': commission_total,
-            'service_commission': service_commissions,
-            'product_commission': product_commission,
-            'voucher_commission': vouchers_commissions,
+            'product_sale_price': round(total_product_price, 2),
+            'commission_total': round(commission_total, 2),
+            'service_commission': round(service_commissions, 2),
+            'product_commission': round(product_commission, 2),
+            'voucher_commission': round(vouchers_commissions, 2)
         }
         return data
         
@@ -962,7 +962,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
                 created_date = ord.year.date() 
                 if created_date.month == date_obj.month and created_date.year == date_obj.year:
                     ser_target += float(ord.service_target)            
-            return ser_target
+            return round(ser_target, 2)
             
         except Exception as err:
             return str(err)        
@@ -1007,7 +1007,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
                 ser_target += float(price)
 
 
-            return ser_target
+            return round(ser_target, 2)
         except Exception as err:
             return str(err)
     class Meta:
