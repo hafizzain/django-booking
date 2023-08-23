@@ -172,6 +172,14 @@ class Order(models.Model):
     def __str__(self):
         return str(self.id)
     
+    def get_price(self):
+        if self.is_redeemed == True:
+            return self.redeemed_price
+        elif self.discount_price:
+            return self.discount_price
+        else:
+            return self.current_price
+    
 
 class ProductOrder(Order):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_orders')

@@ -1617,12 +1617,7 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
         return None
     
     def get_price(self, obj):
-        if obj.is_redeemed == True:
-            return obj.redeemed_price
-        elif obj.discount_price:
-            return obj.discount_price
-        else:
-            return obj.current_price
+        return obj.get_price()
 
     class Meta:
         model = ServiceOrder
@@ -1706,10 +1701,10 @@ class AppointmentTipsSerializer(serializers.ModelSerializer):
         fields = ['id','member','tip', 'member_name']
        
 class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
-    product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
-    service  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
-    membership  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
-    voucher  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
+    product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True) #backend_calculations
+    service  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True) #backend_calculations
+    membership  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True) #backend_calculations
+    voucher  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True) #backend_calculations
     
     client = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
@@ -1720,12 +1715,19 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     membership_type = serializers.SerializerMethodField(read_only=True)
     invoice = serializers.SerializerMethodField(read_only=True)
 
-    gst = serializers.FloatField(source='tax_applied')
-    gst1 = serializers.FloatField(source='tax_applied1')
+    total_gst = serializers.SerializerMethodField(read_only=True)
+    gst = serializers.FloatField(source='tax_applied') #backend_calculations
+    gst1 = serializers.FloatField(source='tax_applied1') #backend_calculations
     gst_price = serializers.SerializerMethodField()
     gst_price1 = serializers.FloatField(source='tax_amount1')
     
-    tip = serializers.SerializerMethodField(read_only=True)
+    tip = serializers.SerializerMethodField(read_only=True) #backend_calculations
+    tips_sum = serializers.SerializerMethodField(read_only=True)
+    service_total_quantiity = serializers.SerializerMethodField(read_only=True)
+    voucher_total_quantity = serializers.SerializerMethodField(read_only=True)
+    membership_total_quantity = serializers.SerializerMethodField(read_only=True)
+    product_total_quantity = serializers.SerializerMethodField(read_only=True)
+
 
     def get_client(self, obj):
         if obj.client:
@@ -1771,6 +1773,25 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
         # return VoucherOrderSerializer(check, many = True , context=self.context ).data
         return SaleOrder_VoucherSerializer(check, many = True ).data
 
+
+
+    def get_product_total_quantity(self, obj):
+        total = 0
+        product_orders = ProductOrder.objects.only(
+                            'current_price', 
+                            'id',
+                            'quantity',
+                            'product',
+                        ).select_related(
+                            'product',
+                        ).filter(
+                        checkout = obj
+                    )
+
+        for item in product_orders:
+            total += item.get_price()
+        
+        return total
 
     def get_product(self, obj):
         
@@ -1845,6 +1866,60 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             return obj.tax_amount
         except:
             return 0
+        
+    def get_c(self, obj):
+        total_quantity = MemberShipOrder.objects.only(
+            'id',
+            'membership',
+            'current_price',
+            'quantity',
+        ).select_related(
+            'membership',
+        ).filter(
+            checkout = obj
+        ).aggregate(Sum('current_price'))['curreent_price']
+        return total_quantity
+        
+    def get_voucher_total_quantity(self, obj):
+        voucher_total = VoucherOrder.objects.only(
+                'id',
+                'voucher',
+                'current_price',
+                'quantity',
+            ).select_related(
+                'voucher',
+            ).filter(
+                checkout = obj
+            ).aggregate(Sum('current_price'))['current_price__sum']
+        
+        return voucher_total
+        
+    def get_total_gst(self, obj):
+        return obj.tax_applied + obj.tax_applied1
+
+    def get_tips_sum(self, obj):
+        tip_totals = AppointmentEmployeeTip.objects \
+                        .filter(checkout=obj) \
+                        .aggregate(Sum('tip'))['tip__sum']
+        return tip_totals
+    
+
+    def get_service_total_quantiity(self, obj):
+        total = 0
+        service = ServiceOrder.objects.only(
+            'id',
+            'quantity',
+            'current_price',
+            'service',
+        ).select_related(
+            'service',
+        ).filter(
+            checkout = obj
+        )
+        for s in service:
+            total += s.get_price()
+
+        return total
     
     class Meta:
         model = Checkout
@@ -1860,7 +1935,8 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             'created_at', 'payment_type', 'tip',
             'service_commission', 'voucher_commission', 'product_commission', 'service_commission_type',
             'product_commission_type', 'voucher_commission_type', 'ids', 'membership_product',
-            'membership_service', 'membership_type', 'invoice', 'tax_name', 'tax_name1'
+            'membership_service', 'membership_type', 'invoice', 'tax_name', 'tax_name1',
+            'tips_sum', 'total_gst', 'service_total_quantiity',
         ]
 
         # Remove Member from get all sale orders
