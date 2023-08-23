@@ -15,6 +15,7 @@ from Product.models import Product
 from Service.models import Service
 import uuid
 from googletrans import Translator
+from dateutil.relativedelta import relativedelta
 
 
 class Client(models.Model):
@@ -367,6 +368,32 @@ class Membership(models.Model):
 
         super(Membership, self).save(*args, **kwargs)
 
+    def is_expired(self):
+        """
+        This functions is used to check tthe expiration of Membership
+        based on the valid_for attribute.
+        """
+        
+        split_them = self.valid_for.split(" ")
+
+        duration = split_them[0]
+        term = split_them[1]
+        validity_time = None
+
+        if term == 'Days':
+            validity_time = self.created_at + relativedelta(months=duration)
+        elif term == 'Months':
+            validity_time = self.created_at + relativedelta(months=duration)
+        elif term == 'years':
+            validity_time = self.created_at + relativedelta(years=duration)
+
+        if validity_time:
+            current_time = timezone.now()
+            if validity_time >= current_time:
+                return True
+            else:
+                return False
+        
     def __str__(self):
         return str(self.id)
     

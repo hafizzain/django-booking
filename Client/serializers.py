@@ -195,6 +195,7 @@ class MembershipSerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField()
     services = serializers.SerializerMethodField()
     currency_membership = serializers.SerializerMethodField()
+    is_expired = serializers.SerializerMethodField(read_only=True)
     
     def get_products(self, obj):
         try:
@@ -217,11 +218,14 @@ class MembershipSerializer(serializers.ModelSerializer):
             return CurrencyPriceMembershipSerializers(pro, many= True).data
         except Exception as err:
             print(err)
+
+    def get_is_expired(self, obj):
+        return obj.is_expired()
             
     class Meta:
         model = Membership
-        fields = ['id', 'name', 'arabic_name', 'valid_for','discount','description', 'term_condition','products', 'services', 'currency_membership']
-        read_only_fields = ['arabic_name']
+        fields = ['id', 'name', 'arabic_name', 'is_expired', 'valid_for','discount','description', 'term_condition','products', 'services', 'currency_membership']
+        read_only_fields = ['arabic_name', 'is_expired']
 
 class VoucherSerializer(serializers.ModelSerializer):
     # currency_voucher_prices = serializers.SerializerMethodField(read_only=True)
