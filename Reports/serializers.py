@@ -18,7 +18,7 @@ from TragetControl.serializers import RetailTargetSerializers, StaffTargetSerial
 from Utility.Constants.Data.months import MONTH_DICT
 from .models import DiscountPromotionSalesReport
 from Invoices.models import SaleInvoice
-from Sale.serializers import SaleInvoiceSerializer
+from Sale.serializers import SaleInvoiceSerializer, CheckoutSerializer
 
 class ServiceOrderSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
@@ -1219,37 +1219,42 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
     membership_service = serializers.SerializerMethodField(read_only=True)
     
     tip = serializers.SerializerMethodField(read_only=True)
-    gst = serializers.SerializerMethodField(read_only=True)
-    gst1 = serializers.SerializerMethodField(read_only=True)
-    gst_price = serializers.SerializerMethodField(read_only=True)
-    gst_price1 = serializers.SerializerMethodField(read_only=True)
-    tax_name = serializers.SerializerMethodField(read_only=True)
-    tax_name1 = serializers.SerializerMethodField(read_only=True)
+    checkout = serializers.SerializerMethodField(read_only=True)
+    # gst = serializers.SerializerMethodField(read_only=True)
+    # gst1 = serializers.SerializerMethodField(read_only=True)
+    # gst_price = serializers.SerializerMethodField(read_only=True)
+    # gst_price1 = serializers.SerializerMethodField(read_only=True)
+    # tax_name = serializers.SerializerMethodField(read_only=True)
+    # tax_name1 = serializers.SerializerMethodField(read_only=True)
 
 
-    def get_gst(self, obj):
-        checkout = Checkout.objects.filter(id=str(obj.checkout_id)).first()
-        return checkout.tax_applied if checkout else None
+    # def get_gst(self, obj):
+    #     checkout = Checkout.objects.filter(id=str(obj.checkout_id)).first()
+    #     return checkout.tax_applied if checkout else None
     
-    def get_gst1(self, obj):
-        checkout = Checkout.objects.filter(id=str(obj.checkout_id)).first()
-        return checkout.tax_applied1 if checkout else None
+    # def get_gst1(self, obj):
+    #     checkout = Checkout.objects.get(id=str(obj.checkout_id))
+    #     return checkout.tax_applied1
     
-    def get_price(self, obj):
-        checkout = Checkout.objects.filter(id=str(obj.checkout_id)).first()
-        return checkout.tax_amount if checkout else None
+    # def get_price(self, obj):
+    #     checkout = Checkout.objects.get(id=str(obj.checkout_id))
+    #     return checkout.tax_amount
     
-    def get_price1(self, obj):
-        checkout = Checkout.objects.filter(id=str(obj.checkout_id)).first()
-        return checkout.tax_amount1 if checkout else None
+    # def get_price1(self, obj):
+    #     checkout = Checkout.objects.get(id=str(obj.checkout_id))
+    #     return checkout.tax_amount1
     
-    def gst_name(self, obj):
-        checkout = Checkout.objects.filter(id=str(obj.checkout_id)).first()
-        return checkout.tax_name if checkout else None
+    # def gst_name(self, obj):
+    #     checkout = Checkout.objects.get(id=str(obj.checkout_id))
+    #     return checkout.tax_name
     
-    def gst_name1(self, obj):
-        checkout = Checkout.objects.filter(id=str(obj.checkout_id)).first()
-        return checkout.tax_name1 if checkout else None
+    # def gst_name1(self, obj):
+    #     checkout = Checkout.objects.get(id=str(obj.checkout_id))
+    #     return checkout.tax_name1
+
+    def get_checkout(self, obj):
+        checkout = Checkout.objects.filter(id=obj.checkout_id).first()
+        return CheckoutSerializer(checkout).data
     
         
     def get_membership(self, obj):
@@ -1391,12 +1396,13 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
             'membership_product', 
             'membership_service', 
             'tip',
-            'gst',
-            'gst1',
-            'gst_price',
-            'gst_price1',
-            'tax_name',
-            'tax_name1'
+            'checkout',
+            # 'gst',
+            # 'gst1',
+            # 'gst_price',
+            # 'gst_price1',
+            # 'tax_name',
+            # 'tax_name1'
             
         ]
 
