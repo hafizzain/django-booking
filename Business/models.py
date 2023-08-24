@@ -54,9 +54,9 @@ class Business(models.Model):
     created_at = models.DateTimeField(auto_now_add=now)
 
     def save(self, *args, **kwargs):
-        if not self.is_logo_uploaded_s3 and self.logo:
-            upload_to_bucket(self.logo.path, self.logo.name)
-            self.is_logo_uploaded_s3 = True
+        # if not self.is_logo_uploaded_s3 and self.logo:
+        upload_to_bucket(self.logo.path, self.logo.name)
+        self.is_logo_uploaded_s3 = True
 
         super(Business, self).save(*args, **kwargs)
     
