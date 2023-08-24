@@ -1228,28 +1228,28 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
 
 
     def get_gst(self, obj):
-        checkout = Checkout.objects.get(id=str(obj.checkout_id))
-        return checkout.tax_applied
+        checkout = Checkout.objects.filter(id=str(obj.checkout_id)).first()
+        return checkout.tax_applied if checkout else None
     
     def get_gst1(self, obj):
-        checkout = Checkout.objects.get(id=str(obj.checkout_id))
-        return checkout.tax_applied1
+        checkout = Checkout.objects.filter(id=str(obj.checkout_id)).first()
+        return checkout.tax_applied1 if checkout else None
     
     def get_price(self, obj):
-        checkout = Checkout.objects.get(id=str(obj.checkout_id))
-        return checkout.tax_amount
+        checkout = Checkout.objects.filter(id=str(obj.checkout_id)).first()
+        return checkout.tax_amount if checkout else None
     
     def get_price1(self, obj):
-        checkout = Checkout.objects.get(id=str(obj.checkout_id))
-        return checkout.tax_amount1
+        checkout = Checkout.objects.filter(id=str(obj.checkout_id)).first()
+        return checkout.tax_amount1 if checkout else None
     
     def gst_name(self, obj):
-        checkout = Checkout.objects.get(id=str(obj.checkout_id))
-        return checkout.tax_name
+        checkout = Checkout.objects.filter(id=str(obj.checkout_id)).first()
+        return checkout.tax_name if checkout else None
     
     def gst_name1(self, obj):
-        checkout = Checkout.objects.get(id=str(obj.checkout_id))
-        return checkout.tax_name1
+        checkout = Checkout.objects.filter(id=str(obj.checkout_id)).first()
+        return checkout.tax_name1 if checkout else None
     
         
     def get_membership(self, obj):
