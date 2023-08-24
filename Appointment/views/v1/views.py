@@ -271,14 +271,14 @@ def get_today_appointments(request):
 @permission_classes([AllowAny])
 def get_employee_appointment_insights(request):
     # incoming string date format: 2023-05-25  YEAR-MONTH-DAY
-    _start_date =str(request.query_params.get('start_date')).split('-')
+    _start_date = str(request.query_params.get('start_date')).split('-')
     _end_date = str(request.query_params.get('end_date')).split('-')
     employee_ids = list(request.query_params.get('employees'))
     business_address_id = request.query_params.get('business_address_id')
 
     # date objects
-    start_date = date(_start_date[0], _start_date[1], _start_date[2])
-    end_date = date(_end_date[0], _end_date[1], _end_date[2])
+    start_date = date(int(_start_date[0]), int(_start_date[1]), int(_start_date[2]))
+    end_date = date(int(_end_date[0]),int(_end_date[1]), int(_end_date[2]))
     delta = timedelta(days=1)
     formatted_date = start_date.strftime("%Y-%m-%d")
 

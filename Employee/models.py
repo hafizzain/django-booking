@@ -14,7 +14,7 @@ class EmployeeManager(models.Manager):
     
     def with_completed_appointments(self, date, business_address):
         appointment_filter = Q(appointment_date=date) \
-                            & Q(business_address=location)
+                            & Q(business_address=business_address)
         
         return self.get_queryset().annotate(
             appointments_done = Count('member_appointments', filter=appointment_filter)
