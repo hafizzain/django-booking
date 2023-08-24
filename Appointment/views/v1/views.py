@@ -46,6 +46,7 @@ from Utility.models import ExceptionRecord
 from django.db.models import Prefetch
 from Invoices.models import SaleInvoice
 from Reports.models import DiscountPromotionSalesReport
+from Employee.serializers import EmplooyeeAppointmentInsightsSerializer
 
 from Notification.notification_processor import NotificationProcessor
 
@@ -260,6 +261,48 @@ def get_today_appointments(request):
                 'message' : 'Today Appointments',
                 'error_message' : None,
                 'appointments' : serialize.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_employee_appointment_insights(request):
+    # incoming string date format: 2023-05-25  YEAR-MONTH-DAY
+    _start_date =str(request.data['start_date']).split('-')
+    _end_date = str(request.data['end_date']).split('-')
+    employee_ids = list(request.data['employees'])
+
+    # date objects
+    start_date = date(_start_date[0], _start_date[1], _start_date[2])
+    end_date = date(_end_date[0], _end_date[1], _end_date[2])
+    delta = timedelta(days=1)
+    formatted_date = start_date.strftime("%Y-%m-%d")
+
+
+    data = []
+
+    while start_date <= end_date:
+        employees = Employee.objects \
+                    .filter(id__in=employee_ids) \
+                    .with_completed_appointments(date=start_date)
+        data.append(
+            {
+                formatted_date: EmplooyeeAppointmentInsightsSerializer(employees, many=True).data
+            }
+        )
+        start_date += delta
+
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Employee Insights',
+                'error_message' : None,
+                'data' : data
             }
         },
         status=status.HTTP_200_OK

@@ -1,5 +1,6 @@
 from uuid import uuid4
 from django.db import models
+from django.db.models import Q, Count
 from django.utils.timezone import now
 
 
@@ -7,6 +8,15 @@ from Authentication.models import User
 from Business.models import Business, BusinessAddress
 from Utility.models import Country, State, City
 from Service.models  import Service
+
+
+class EmployeeManager(models.Manager):
+    
+    def with_completed_appointments(self, date):
+        appointment_filter = Q(appointment_status='Paid') & Q(appointment_date=date)
+        return self.get_queryset().annotate(
+            appointments_done = Count('member_appointments', filter=appointment_filter)
+        )
 
 class Employee(models.Model):
     GENDER_CHOICES = [
@@ -48,6 +58,9 @@ class Employee(models.Model):
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(null=True, blank=True)
+
+
+    objects = EmployeeManager()
 
     def __str__(self):
         return str(self.id)
