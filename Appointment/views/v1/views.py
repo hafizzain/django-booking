@@ -271,9 +271,10 @@ def get_today_appointments(request):
 @permission_classes([AllowAny])
 def get_employee_appointment_insights(request):
     # incoming string date format: 2023-05-25  YEAR-MONTH-DAY
-    _start_date =str(request.data['start_date']).split('-')
-    _end_date = str(request.data['end_date']).split('-')
-    employee_ids = list(request.data['employees'])
+    _start_date =str(request.query_params.get('start_date')).split('-')
+    _end_date = str(request.query_params.get('end_date')).split('-')
+    employee_ids = list(request.query_params.get('employees'))
+    business_address_id = request.query_params.get('business_address_id')
 
     # date objects
     start_date = date(_start_date[0], _start_date[1], _start_date[2])
@@ -283,11 +284,11 @@ def get_employee_appointment_insights(request):
 
 
     data = []
-
+    business_address = BusinessAddress.objects.get(id=business_address_id)
     while start_date <= end_date:
         employees = Employee.objects \
                     .filter(id__in=employee_ids) \
-                    .with_completed_appointments(date=start_date)
+                    .with_completed_appointments(date=start_date, business_address=business_address)
         data.append(
             {
                 formatted_date: EmplooyeeAppointmentInsightsSerializer(employees, many=True).data
