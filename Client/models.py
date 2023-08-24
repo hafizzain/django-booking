@@ -388,7 +388,7 @@ class Membership(models.Model):
             validity_time = self.created_at + relativedelta(years=duration)
 
         if validity_time:
-            current_time = timezone.now()
+            current_time = datetime.now()
             if validity_time >= current_time:
                 return True
             else:
