@@ -1363,3 +1363,10 @@ class NewAbsenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vacation
         fields = ('id', 'employee', 'from_date', 'to_date', 'absence_details','holiday_type')
+
+
+class EmplooyeeAppointmentInsightsSerializer(serializers.ModelSerializer):
+    appointments_done = serializers.IntegerField() #annotated field from manager
+    class Meta:
+        model = Employee
+        fields = ['id', 'name', 'appointments_done']
