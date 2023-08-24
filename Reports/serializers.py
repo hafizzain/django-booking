@@ -1391,7 +1391,6 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
             'membership_product', 
             'membership_service', 
             'tip',
-            'gst'
             'gst',
             'gst1',
             'gst_price',
