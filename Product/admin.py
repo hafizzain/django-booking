@@ -19,7 +19,7 @@ class ProductMediaAdmin(admin.ModelAdmin):
 
     def image_name(self, obj):
         if obj.image:
-            return obj.image.path
+            return obj.image.name
 
     def image_path(self, obj):
         if obj.image:
