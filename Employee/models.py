@@ -12,8 +12,11 @@ from Service.models  import Service
 
 class EmployeeManager(models.Manager):
     
-    def with_completed_appointments(self, date):
-        appointment_filter = Q(appointment_status='Paid') & Q(appointment_date=date)
+    def with_completed_appointments(self, date, location):
+        appointment_filter = Q(appointment_status='Paid') \
+                            & Q(appointment_date=date) \
+                            & Q(business_address=location)
+        
         return self.get_queryset().annotate(
             appointments_done = Count('member_appointments', filter=appointment_filter)
         )

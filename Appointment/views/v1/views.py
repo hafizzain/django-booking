@@ -274,6 +274,7 @@ def get_employee_appointment_insights(request):
     _start_date =str(request.data['start_date']).split('-')
     _end_date = str(request.data['end_date']).split('-')
     employee_ids = list(request.data['employees'])
+    business_address_id = request.data['location']
 
     # date objects
     start_date = date(_start_date[0], _start_date[1], _start_date[2])
@@ -283,11 +284,11 @@ def get_employee_appointment_insights(request):
 
 
     data = []
-
+    business_address = BusinessAddress.objects.get(id=business_address_id)
     while start_date <= end_date:
         employees = Employee.objects \
                     .filter(id__in=employee_ids) \
-                    .with_completed_appointments(date=start_date)
+                    .with_completed_appointments(date=start_date, location=business_address_id)
         data.append(
             {
                 formatted_date: EmplooyeeAppointmentInsightsSerializer(employees, many=True).data
