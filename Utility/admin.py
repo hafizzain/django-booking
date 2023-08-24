@@ -35,9 +35,13 @@ class CityAdmin(admin.ModelAdmin):
 @admin.register(Language)
 class LanguageAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'is_active', 'is_deleted']
+
 @admin.register(ExceptionRecord)
 class ExceptionRecordAdmin(admin.ModelAdmin):
-    list_display = ['id', 'text', 'is_resolved', 'created_at']
+    list_display = ['id', 'short_text', 'is_resolved', 'created_at']
     search_fields = ['text']
+
+    def short_text(self, obj):
+        return obj.text[:100]
 
     ordering = ['-created_at']
