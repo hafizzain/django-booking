@@ -1,5 +1,6 @@
 from datetime import timezone
 from datetime import datetime
+import pytz
 
 from itertools import count
 from django.db import models
@@ -375,7 +376,7 @@ class Membership(models.Model):
         """
         
         split_them = self.valid_for.split(" ")
-
+        utc = pytz.UTC
         duration = int(split_them[0])
         term = split_them[1]
         validity_time = None
@@ -388,7 +389,7 @@ class Membership(models.Model):
             validity_time = self.created_at + relativedelta(years=duration)
 
         if validity_time:
-            current_time = datetime.now()
+            current_time = datetime.now(tz=pytz.UTC)
             if validity_time >= current_time:
                 return True
             else:
