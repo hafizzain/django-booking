@@ -3,6 +3,7 @@ from django.utils.timezone import now
 from Authentication.models import User
 from Profile.models import Profile, UserLanguage
 from Utility.models import Country, State, City, Software, Currency, Language
+from Utility.Constants.compressImage import upload_to_bucket
 import uuid
 
 
@@ -30,6 +31,7 @@ class Business(models.Model):
     business_name = models.CharField(default='', max_length=300)
 
     logo = models.ImageField(upload_to='business/logo/')
+    is_logo_uploaded_s3 = models.BooleanField(default=False)
     banner = models.ImageField(upload_to='business/banner/')
 
     postal_code = models.CharField(max_length=30, default='')
@@ -50,9 +52,17 @@ class Business(models.Model):
     is_deleted = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
+
+    def save(self, *args, **kwargs):
+        if not self.is_logo_uploaded_s3 and self.logo:
+            upload_to_bucket(self.logo.path, self.logo.name)
+            self.is_logo_uploaded_s3 = True
+
+        super(Business, self).save(*args, **kwargs)
     
 
     def __str__(self):
+        
         return str(self.id)
 
 
