@@ -273,7 +273,7 @@ def get_employee_appointment_insights(request):
     # incoming string date format: 2023-05-25  YEAR-MONTH-DAY
     _start_date = str(request.query_params.get('start_date')).split('-')
     _end_date = str(request.query_params.get('end_date')).split('-')
-    employee_ids = list(request.query_params.get('employees'))
+    employee_ids = request.query_params.get('employees')
     business_address_id = request.query_params.get('business_address_id')
     data_type = None
 
