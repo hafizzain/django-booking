@@ -1369,4 +1369,4 @@ class EmplooyeeAppointmentInsightsSerializer(serializers.ModelSerializer):
     appointments_done = serializers.IntegerField() #annotated field from manager
     class Meta:
         model = Employee
-        fields = ['id', 'name', 'appointments_done']
+        fields = ['id', 'full_name', 'appointments_done']
