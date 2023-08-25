@@ -4682,10 +4682,10 @@ def employee_login(request):
             # registering device token for employee
             # for mobile to send push notifications
             employee_device = CustomFCMDevice()
-            employee_device.user = employee
+            employee_device.user = user
             employee_device.registration_id = device_token
             employee_device.save()
-        except:
+        except Exception as exc:
             return Response(
                 {
                     'status' : False,
@@ -4693,6 +4693,7 @@ def employee_login(request):
                     'status_code_text' : 'EMPLOYEEE_IS_DELETED',
                     'response' : {
                         'message' : 'User Does not exist',
+                        'exception': exc
                     }
                 },
                 status=status.HTTP_404_NOT_FOUND
