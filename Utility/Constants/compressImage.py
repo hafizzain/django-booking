@@ -1,6 +1,7 @@
 
 import boto3
 from django.conf import settings
+from django.db import connection
 
 
 def upload_to_bucket(input_file, output_file):
@@ -11,5 +12,7 @@ def upload_to_bucket(input_file, output_file):
     s3 = session.resource('s3')
     filename = input_file
     bucket = settings.AWS_STORAGE_BUCKET_NAME
-    key = output_file
+    schema_name = connection.schema_name
+
+    key = f'{schema_name}/{output_file}'
     s3.meta.client.upload_file(Filename=filename, Bucket=bucket, Key=key)

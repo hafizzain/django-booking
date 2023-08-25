@@ -54,12 +54,12 @@ class Business(models.Model):
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
 
-    # def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):
         # if not self.is_logo_uploaded_s3 and self.logo:
-        # upload_to_bucket(self.logo.path, self.logo.name)
-        # self.is_logo_uploaded_s3 = True
+        upload_to_bucket(self.logo.path, self.logo.name)
+        self.is_logo_uploaded_s3 = True
 
-        # super(Business, self).save(*args, **kwargs)
+        super(Business, self).save(*args, **kwargs)
     
 
     def __str__(self):
