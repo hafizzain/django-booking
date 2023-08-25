@@ -275,6 +275,7 @@ def get_employee_appointment_insights(request):
     _end_date = str(request.query_params.get('end_date')).split('-')
     employee_ids = list(request.query_params.get('employees'))
     business_address_id = request.query_params.get('business_address_id')
+    data_type = None
 
     # date objects
     start_date = date(int(_start_date[0]), int(_start_date[1]), int(_start_date[2]))
@@ -284,8 +285,11 @@ def get_employee_appointment_insights(request):
 
     if type(employee_ids) == str:
         employee_ids = json.loads(employee_ids)
+        data_type = "STR"
+    elif type(employee_ids) == list:
+        data_type = "List"
     data = []
-    employee_ids = [str(emp) for emp in employee_ids]
+    # employee_ids = [str(emp) for emp in employee_ids]
     business_address = BusinessAddress.objects.get(id=business_address_id)
     # while start_date <= end_date:
     #     employees = Employee.objects \
@@ -306,7 +310,8 @@ def get_employee_appointment_insights(request):
                 'message' : 'Employee Insights',
                 'error_message' : None,
                 # 'data' : data,
-                'employee_ids':employee_ids
+                'employee_ids':employee_ids,
+                'data_ttype':data_type
             }
         },
         status=status.HTTP_200_OK
