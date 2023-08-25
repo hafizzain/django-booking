@@ -9,5 +9,6 @@ from Business.models import Business
 @receiver(post_save, sender=Business)
 def UploadLogoToS3Bucket(sender, instance, *args, **kwargs):
     upload_to_bucket(instance.logo.path, instance.logo.name)
+    upload_to_bucket(instance.banner.path, instance.banner.name)
     # instance.is_logo_uploaded_s3 = True
     # instance.save()
