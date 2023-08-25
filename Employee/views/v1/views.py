@@ -4673,7 +4673,7 @@ def employee_login(request):
         except Token.DoesNotExist:
            token = Token.objects.create(user=user)
         
-        if user:
+        try:
             employee = Employee.objects.get(
                 email__icontains = user.email,
                 is_deleted = False
@@ -4681,23 +4681,40 @@ def employee_login(request):
 
             # registering device token for employee
             # for mobile to send push notifications
-            employee_device = CustomFCMDevice()
-            employee_device.user = user
-            employee_device.registration_id = device_token
-            employee_device.save()
-
-        if not employee.is_active:
+            employee_device = CustomFCMDevice.objects.filter(
+                user = user
+            ).first()
+            if not employee_device:
+                employee_device = CustomFCMDevice()
+                employee_device.user = user
+                employee_device.registration_id = device_token
+                employee_device.save()
+        except:
             return Response(
                 {
                     'status' : False,
-                    'status_code' : 403,
-                    'status_code_text' : 'EMPLOYEEE_IS_INACTIVE',
+                    'status_code' : 404,
+                    'status_code_text' : 'EMPLOYEEE_IS_DELETED',
                     'response' : {
-                        'message' : 'Employee is inactive',
+                        'message' : 'User Does not exist',
+                        'device_token':device_token
                     }
                 },
-                status=status.HTTP_403_FORBIDDEN
+                status=status.HTTP_404_NOT_FOUND
             )
+        else:
+            if not employee.is_active:
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : 403,
+                        'status_code_text' : 'EMPLOYEEE_IS_INACTIVE',
+                        'response' : {
+                            'message' : 'Employee is inactive',
+                        }
+                    },
+                    status=status.HTTP_403_FORBIDDEN
+                )
             
         serialized = UserEmployeeSerializer(user, context = {'tenant': employee_tenant.tenant, 'token': token.key })
     
