@@ -286,22 +286,22 @@ def get_employee_appointment_insights(request):
     if type(employee_ids) == str:
         employee_ids = employee_ids.replace("'", '"')
         employee_ids = json.loads(employee_ids)
-        data_type = "STR"
     elif type(employee_ids) == list:
-        data_type = "List"
+        pass
+    
+    employee_ids = [emp['id'] for emp in employee_ids]
     data = []
-    # employee_ids = [str(emp) for emp in employee_ids]
     business_address = BusinessAddress.objects.get(id=business_address_id)
-    # while start_date <= end_date:
-    #     employees = Employee.objects \
-    #                 .filter(id__in=employee_ids) \
-    #                 .with_completed_appointments(date=start_date, business_address=business_address)
-    #     data.append(
-    #         {
-    #             formatted_date: EmplooyeeAppointmentInsightsSerializer(employees, many=True).data
-    #         }
-    #     )
-    #     start_date += delta
+    while start_date <= end_date:
+        employees = Employee.objects \
+                    .filter(id__in=employee_ids) \
+                    .with_completed_appointments(date=start_date, business_address=business_address)
+        data.append(
+            {
+                formatted_date: EmplooyeeAppointmentInsightsSerializer(employees, many=True).data
+            }
+        )
+        start_date += delta
 
     return Response(
         {
@@ -310,7 +310,7 @@ def get_employee_appointment_insights(request):
             'response' : {
                 'message' : 'Employee Insights',
                 'error_message' : None,
-                # 'data' : data,
+                'data' : data,
                 'employee_ids':employee_ids,
                 'data_ttype':data_type
             }
