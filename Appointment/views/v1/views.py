@@ -275,7 +275,6 @@ def get_employee_appointment_insights(request):
     _end_date = str(request.query_params.get('end_date')).split('-')
     employee_ids = request.query_params.get('employees')
     business_address_id = request.query_params.get('business_address_id')
-    data_type = None
 
     # date objects
     start_date = date(int(_start_date[0]), int(_start_date[1]), int(_start_date[2]))
@@ -314,8 +313,6 @@ def get_employee_appointment_insights(request):
                 'message' : 'Employee Insights',
                 'error_message' : None,
                 'data' : data,
-                'employee_ids':employee_ids,
-                'data_ttype':data_type
             }
         },
         status=status.HTTP_200_OK
