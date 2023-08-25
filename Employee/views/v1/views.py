@@ -4673,7 +4673,7 @@ def employee_login(request):
         except Token.DoesNotExist:
            token = Token.objects.create(user=user)
         
-        try:
+        if user:
             employee = Employee.objects.get(
                 email__icontains = user.email,
                 is_deleted = False
@@ -4685,32 +4685,19 @@ def employee_login(request):
             employee_device.user = user
             employee_device.registration_id = device_token
             employee_device.save()
-        except Exception as exc:
+
+        if not employee.is_active:
             return Response(
                 {
                     'status' : False,
-                    'status_code' : 404,
-                    'status_code_text' : 'EMPLOYEEE_IS_DELETED',
+                    'status_code' : 403,
+                    'status_code_text' : 'EMPLOYEEE_IS_INACTIVE',
                     'response' : {
-                        'message' : 'User Does not exist',
-                        'exception': exc
+                        'message' : 'Employee is inactive',
                     }
                 },
-                status=status.HTTP_404_NOT_FOUND
+                status=status.HTTP_403_FORBIDDEN
             )
-        else:
-            if not employee.is_active:
-                return Response(
-                    {
-                        'status' : False,
-                        'status_code' : 403,
-                        'status_code_text' : 'EMPLOYEEE_IS_INACTIVE',
-                        'response' : {
-                            'message' : 'Employee is inactive',
-                        }
-                    },
-                    status=status.HTTP_403_FORBIDDEN
-                )
             
         serialized = UserEmployeeSerializer(user, context = {'tenant': employee_tenant.tenant, 'token': token.key })
     
