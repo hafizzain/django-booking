@@ -46,6 +46,8 @@ class Client(models.Model):
 
     full_name = models.CharField(max_length=300, default='')
     image = models.ImageField(upload_to='client/client_images/', null=True, blank=True)
+    is_image_uploaded_s3 = models.BooleanField(default=False)
+
     client_id = models.CharField(max_length=50, default='')
     email = models.EmailField(default='')
     mobile_number = models.CharField(max_length=30, null=True, blank=True)

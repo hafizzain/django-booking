@@ -7,6 +7,8 @@ class HelpContent(models.Model):
     content = models.TextField()
     parent_comment = models.ForeignKey('HelpContent', on_delete=models.CASCADE, null=True, blank=True)
     image = models.ImageField(upload_to='helpcenter/images/', null=True, blank=True)
+    is_image_uploaded_s3 = models.BooleanField(default=False)
+
     description = models.TextField(null=True, blank=True)
     is_recent = models.BooleanField(default=False)
     order = models.IntegerField(null=True, blank=True)

@@ -32,6 +32,8 @@ class Employee(models.Model):
 
     full_name = models.CharField(max_length=300, default='')
     image = models.ImageField(upload_to='employee/employee_images/', null=True, blank=True)
+    is_image_uploaded_s3 = models.BooleanField(default=False)
+
     employee_id = models.CharField(max_length=50, default='')
     email = models.EmailField(verbose_name="email", max_length=60)
     mobile_number = models.CharField(max_length=30, null=True, blank=True)

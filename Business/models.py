@@ -31,8 +31,9 @@ class Business(models.Model):
     business_name = models.CharField(default='', max_length=300)
 
     logo = models.ImageField(upload_to='business/logo/')
-    # is_logo_uploaded_s3 = models.BooleanField(default=False)
+    is_logo_uploaded_s3 = models.BooleanField(default=False)
     banner = models.ImageField(upload_to='business/banner/')
+    is_banner_uploaded_s3 = models.BooleanField(default=False)
 
     postal_code = models.CharField(max_length=30, default='')
 
@@ -163,6 +164,8 @@ class BusinessAddressMedia(models.Model):
     business_address = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_address_businessaddress_media')
 
     image = models.ImageField(upload_to='business/address_media/', null= True, blank= True)
+    is_image_uploaded_s3 = models.BooleanField(default=False)
+
     is_cover = models.BooleanField(default=False)
 
     is_deleted = models.BooleanField(default=False)
