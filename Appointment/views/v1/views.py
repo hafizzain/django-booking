@@ -283,12 +283,12 @@ def get_employee_appointment_insights(request):
     delta = timedelta(days=1)
     formatted_date = start_date.strftime("%Y-%m-%d")
 
-    if type(employee_ids) == str:
-        employee_ids = employee_ids.replace("'", '"')
-        employee_ids = json.loads(employee_ids)
-        data_type = "STR"
-    elif type(employee_ids) == list:
-        data_type = "List"
+    # if type(employee_ids) == str:
+    #     employee_ids = employee_ids.replace("'", '"')
+    #     employee_ids = json.loads(employee_ids)
+    #     data_type = "STR"
+    # elif type(employee_ids) == list:
+    #     data_type = "List"
     data = []
     # employee_ids = [str(emp) for emp in employee_ids]
     business_address = BusinessAddress.objects.get(id=business_address_id)
