@@ -280,7 +280,7 @@ def get_employee_appointment_insights(request):
     start_date = date(int(_start_date[0]), int(_start_date[1]), int(_start_date[2]))
     end_date = date(int(_end_date[0]),int(_end_date[1]), int(_end_date[2]))
     delta = timedelta(days=1)
-    formatted_date = start_date.strftime("%Y-%m-%d")
+    
 
     if type(employee_ids) == str:
         employee_ids = employee_ids.replace("'", '"')
@@ -298,6 +298,7 @@ def get_employee_appointment_insights(request):
                         date=start_date, 
                         business_address=business_address
                     )
+        formatted_date = start_date.strftime("%Y-%m-%d") # changes over loop
         data.append(
             {
                 formatted_date: EmplooyeeAppointmentInsightsSerializer(employees, many=True).data
