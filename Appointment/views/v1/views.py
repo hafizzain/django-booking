@@ -284,6 +284,7 @@ def get_employee_appointment_insights(request):
     formatted_date = start_date.strftime("%Y-%m-%d")
 
     if type(employee_ids) == str:
+        employee_ids = employee_ids.replace("'", '"')
         employee_ids = json.loads(employee_ids)
         data_type = "STR"
     elif type(employee_ids) == list:
