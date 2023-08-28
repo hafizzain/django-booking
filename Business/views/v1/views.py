@@ -2235,6 +2235,8 @@ def update_business_booking_settings(request):
 def add_payment_method(request):
     method_type = request.data.get('method_type', None)
     business_id = request.data.get('business', None)
+    method_status = request.data.get('status', None)
+
     
     if not all([method_type, business_id]):
         return Response(
@@ -2276,7 +2278,8 @@ def add_payment_method(request):
     payment_method = BusinessPaymentMethod(
         user=user,
         business=business,
-        method_type=method_type
+        method_type=method_type,
+        is_active=method_status
     )
     payment_method.save()
     serialized = PaymentMethodSerializer(payment_method)
@@ -2301,6 +2304,7 @@ def add_payment_method(request):
 def update_payment_method(request):
     method_type = request.data.get('method_type', None)
     method_id = request.data.get('id', None)
+    method_status = request.data.get('status', None)
 
     if not all([method_type, method_id]):
         return Response(
@@ -2337,6 +2341,7 @@ def update_payment_method(request):
             status=status.HTTP_404_NOT_FOUND
         )
     payment_method.method_type = method_type
+    payment_method.is_active = method_status
     payment_method.save()
     serialized = PaymentMethodSerializer(payment_method, context={'request':request})
 
