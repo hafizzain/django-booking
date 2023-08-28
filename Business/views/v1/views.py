@@ -2235,7 +2235,7 @@ def update_business_booking_settings(request):
 def add_payment_method(request):
     method_type = request.data.get('method_type', None)
     business_id = request.data.get('business', None)
-    method_status = request.data.get('status', None)
+    method_status = request.data.get('is_active', None)
 
     
     if not all([method_type, business_id]):
@@ -2304,7 +2304,7 @@ def add_payment_method(request):
 def update_payment_method(request):
     method_type = request.data.get('method_type', None)
     method_id = request.data.get('id', None)
-    method_status = request.data.get('status', None)
+    method_status = request.data.get('is_active', None)
 
     if not all([method_type, method_id]):
         return Response(
