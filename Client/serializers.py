@@ -84,7 +84,7 @@ class ClientSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return f'{obj.image}'
@@ -558,7 +558,7 @@ class SaleInvoiceSerializer(serializers.ModelSerializer):
         if obj.file:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=False)
                 return f'{url}{obj.file}'
             except:
                 return f'{obj.file}'

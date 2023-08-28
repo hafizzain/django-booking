@@ -224,7 +224,7 @@ class EmployeSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -377,7 +377,7 @@ class EmployeeNameSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -653,7 +653,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -766,7 +766,7 @@ class AssetdocmemtSerializer(serializers.ModelSerializer):
     def get_document(self, obj):
         try:
             request = self.context["request"]
-            url = tenant_media_base_url(request)
+            url = tenant_media_base_url(request, is_s3_url=False)
             return f'{url}{obj.document}'
         except Exception as err:
             print(err)
@@ -921,7 +921,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -973,7 +973,7 @@ class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -1130,7 +1130,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -1263,7 +1263,7 @@ class Payroll_Working_deviceScheduleSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image

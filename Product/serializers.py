@@ -42,7 +42,7 @@ class BrandSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except Exception as err:
                 return f'{obj.image}'
@@ -60,7 +60,7 @@ class ProductMediaSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context['request']
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -299,11 +299,11 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_cover_image(self, obj):
         cvr_img = ProductMedia.objects.filter(product=obj, is_cover=True, is_deleted=False).order_by('-created_at')
         try:
-            request = self.context['request']
-            url = tenant_media_base_url(request)
             if len(cvr_img) > 0 :
                 cvr_img = cvr_img[0]
-            return f'{url}{cvr_img.image}'
+                request = self.context['request']
+                url = tenant_media_base_url(request, is_s3_url=cvr_img.is_image_uploaded_s3)
+                return f'{url}{cvr_img.image}'
         except:
             return None
 
