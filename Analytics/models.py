@@ -1,3 +1,4 @@
+import pytz
 from uuid import uuid4
 from django.db import models
 
@@ -40,9 +41,10 @@ class EmployeeBookingDailyInsights(models.Model):
 
     def set_employee_time(self):
 
+        utc = pytz.UTC
         # setting employee appointment daily time here in save method
         if not self.day_time_choice:
-            created_at_time = self.created_at.time()
+            created_at_time = self.created_at.time().replace(tzinfo=None)
             if created_at_time >= EMPLOYEE_MORNING_TIME['lower'] and \
                created_at_time < EMPLOYEE_MORNING_TIME['upper']:
                 self.day_time_choice = EmployeeDailyInsightChoices.MORNING
