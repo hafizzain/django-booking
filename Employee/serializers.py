@@ -990,7 +990,7 @@ class EmployeeInformationSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 tenant = self.context["tenant"]
-                url = tenant_media_domain(tenant.schema_name)
+                url = tenant_media_domain(tenant.schema_name, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image

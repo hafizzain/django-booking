@@ -111,7 +111,7 @@ class Client_TenantSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["tenant"]
-                url = tenant_media_domain(request)
+                url = tenant_media_domain(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image

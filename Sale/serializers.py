@@ -241,8 +241,8 @@ class EmployeeSelected_TenantServiceSerializer(serializers.ModelSerializer):
     def get_image(self, obj):
         try:
             tenant = self.context["tenant"]
-            url = tenant_media_domain(tenant)
             img = Employee.objects.get(id = obj.employee.id)
+            url = tenant_media_domain(tenant, is_s3_url=img.is_image_uploaded_s3)
             return f'{url}{img.image}'
         except Exception as err:
             print(str(err))

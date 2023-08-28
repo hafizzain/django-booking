@@ -82,7 +82,11 @@ class Client(models.Model):
     def __str__(self):
         return str(self.id)
 
+
     def save(self, *args, **kwargs):
+        if self.image:
+            self.is_image_uploaded_s3 = True
+            
         if not self.client_id:
             tenant = connection.get_tenant()
 

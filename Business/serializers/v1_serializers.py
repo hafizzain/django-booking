@@ -418,7 +418,7 @@ class BusinessAddress_CustomerSerializer(serializers.ModelSerializer):
             if image.image:
                 try:
                     tenant = self.context["tenant"]
-                    url = tenant_media_domain(tenant)
+                    url = tenant_media_domain(tenant, is_s3_url=image.is_image_uploaded_s3)
                     return f'{url}{image.image}'
                 except:
                     return image.image
