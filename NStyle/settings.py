@@ -73,7 +73,8 @@ NSTYLE_APPS = [
     'Help.apps.HelpConfig',
     'MultiLanguage.apps.MultilanguageConfig',
     'SuperInsight.apps.SuperinsightConfig',
-    'Notification.apps.NotificationConfig'
+    'Notification.apps.NotificationConfig',
+    'Analytics.apps.AnalyticsConfig'
 ]
 
 
@@ -147,6 +148,7 @@ MIDDLEWARE = [
     'Utility.error_logging_middleware.ServerErrorLoggingMiddleware',
     'MultiLanguage.error_logging_middleware.ServerErrorLoggingMiddleware',
     'Help.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Analytics.error_logging_middleware.ServerErrorLoggingMiddleware'
     
 ]
 
@@ -308,7 +310,10 @@ GEOIP_PATH =os.path.join('geoip')
 
 # FCM_DJANGO CONFIGURATION
 
-FIREBASE_APP = initialize_app()
+try:
+    FIREBASE_APP = initialize_app()
+except ValueError:
+    pass
 FCM_DJANGO_SETTINGS = {
      # an instance of firebase_admin.App to be used as default for all fcm-django requests
      # default: None (the default Firebase app)

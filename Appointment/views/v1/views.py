@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.db import transaction
 from Appointment.Constants.AddApp import AddApp
 
 from Appointment.Constants.Reschedulen import reschedule_appointment_n
@@ -49,6 +50,8 @@ from Reports.models import DiscountPromotionSalesReport
 from Employee.serializers import EmplooyeeAppointmentInsightsSerializer
 
 from Notification.notification_processor import NotificationProcessor
+from Analytics.models import EmployeeBookingDailyInsights
+from Analytics.serializers import EmployeeDailyInsightsSerializer
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -481,7 +484,7 @@ def create_appointment(request):
                     'status' : False,
                     'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
                     'response' : {
-                    'message' : 'Business not found',
+                    'message' : 'Business Address not found',
                 }
             }
         )
@@ -561,6 +564,7 @@ def create_appointment(request):
     # log_details = []
     all_members = []
     employee_users = []
+    employee_insights_data = [] # for insight debugging
     for appoinmnt in appointments:
         member = appoinmnt['member']
         service = appoinmnt['service']
@@ -769,6 +773,26 @@ def create_appointment(request):
             duration = appointment_service.duration,
             member = appointment_service.member
         )
+
+        # Creating Employee Anatylics Here
+
+        with transaction.atomic():
+            try:
+                employee_insight_obj = EmployeeBookingDailyInsights.objects.create(
+                                            user=user,
+                                            employee=member,
+                                            business=business,
+                                            service=service,
+                                            appointment=appointment,
+                                            business_address=business_address,
+                                            appointment_service = appointment_service
+                                        )
+                insight_serialied = EmployeeDailyInsightsSerializer(employee_insight_obj) # for insight debugging
+                employee_insights_data.append(insight_serialied) # for insight debugging
+            except:
+                pass
+
+        
     
     service_commission = 0
     service_commission_type = ''
@@ -828,6 +852,7 @@ def create_appointment(request):
                     'error_message' : None,
                     'error' : Errors,
                     'appointments' : serialized.data,
+                    'insights':employee_insights_data  # for insight debugging
                 }
             },
             status=status.HTTP_201_CREATED
