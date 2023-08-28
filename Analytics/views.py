@@ -17,7 +17,7 @@ class EmployeeDailyInsightsView(APIView):
 
     def get(self, request, *args, **kwargs):
         business_address_id = request.query_params.get('business_address_id')
-        emplopyee_ids = request.query_params.get('emplopyee_ids', None)
+        emplopyee_ids = request.query_params.get('employees', None)
         emplopyee_ids = self.get_employee_ids(emplopyee_ids)
 
         business_address = BusinessAddress.objects.get(id=business_address_id)
