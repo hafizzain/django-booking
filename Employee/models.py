@@ -36,20 +36,35 @@ class EmployeeManager(models.Manager):
             evening_count = Count('employee_daily_insights', filter=evening_filter),
             other_count = Count('employee_daily_insights', filter=other_filter)
         ).annotate(
-            hint=Case(
+            hint1=Case(
             
                 When(Q(morning_count__lt=F('afternoon_count')) &  
                      Q(morning_count__lt=F('evening_count')) &
                      Q(morning_count__lt=F('other_count')),
-                     then=Value('should be busy in the morning.')),
+                     then=Value('morning')),
                 
                 When(Q(afternoon_count__lt=F('evening_count')) &
                      Q(afternoon_count__lt=F('other_count')),
-                     then=Value('should be busy in the afternoon.')),
+                     then=Value('afternoon')),
 
                 When(Q(evening_count__lt=F('other_count')),
-                     then=Value('should be busy in the evening.')),
+                     then=Value('evening')),
 
+                output_field=CharField()
+            )
+        ).annotate(
+            hint2=Case(
+                
+                When(Q(hint1='morning') &
+                     Q(afternoon_count__lt=F('evening_count')) &
+                     Q(afternoon_count__lt=F('other_count')),
+                     then=Value('afternoon')
+                     ),
+
+                When(Q(hint1='afternoon') &
+                     Q(evening_count__lt=F('other_count')),
+                     then=Value('evening')
+                     ),
                 output_field=CharField()
             )
         )
