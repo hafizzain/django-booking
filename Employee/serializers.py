@@ -1384,5 +1384,5 @@ class EmployeeDailyInsightSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ['id', 'full_name', 'image', 'morning_count', 'afternoon_count' 'evening_count',
+        fields = ['id', 'full_name', 'image', 'morning_count', 'afternoon_count', 'evening_count',
                   'other_count', 'hint']
