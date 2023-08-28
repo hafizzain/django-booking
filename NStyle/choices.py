@@ -4,7 +4,7 @@ This is the common file used to declare choices for various models etc.
 
 from django.db import models
 from datetime import time
-
+import pytz
 
 class EmployeeDailyInsightChoices(models.TextChoices):
 
@@ -14,18 +14,18 @@ class EmployeeDailyInsightChoices(models.TextChoices):
     OTHER = 'O', 'Other'
 
 EMPLOYEE_MORNING_TIME = {
-    'lower': time(9,00, 00),
-    'upper': time(12, 0, 0)
+    'lower': time(9,00, 00, tzinfo=pytz.UTC),
+    'upper': time(12, 0, 0, tzinfo=pytz.UTC)
 }
 
 EMPLOYEE_AFTERNOON_TIME = {
-    'lower': time(12, 0, 0),
-    'upper': time(18, 0, 0)
+    'lower': time(12, 0, 0, tzinfo=pytz.UTC),
+    'upper': time(18, 0, 0, tzinfo=pytz.UTC)
 }
 
 EMPLOYEE_EVENING_TIME = {
-    'lower': time(18, 0, 0),
-    'upper': time(22, 0, 0)
+    'lower': time(18, 0, 0, tzinfo=pytz.UTC),
+    'upper': time(22, 0, 0, tzinfo=pytz.UTC)
 }
 
 

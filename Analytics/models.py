@@ -1,4 +1,3 @@
-from datetime import datetime, date, time
 from uuid import uuid4
 from django.db import models
 
@@ -44,14 +43,14 @@ class EmployeeBookingDailyInsights(models.Model):
         # setting employee appointment daily time here in save method
         if not self.day_time_choice:
             created_at_time = self.created_at.time()
-            if created_at_time >= time(9, 0, 0) and \
-               created_at_time < time(12, 0, 0):
+            if created_at_time >= EMPLOYEE_MORNING_TIME and \
+               created_at_time < EMPLOYEE_MORNING_TIME['upper']:
                 self.day_time_choice = EmployeeDailyInsightChoices.MORNING
-            elif created_at_time >= time(12, 0, 0) and \
-                 created_at_time < time(18, 0, 0):
+            elif created_at_time >= EMPLOYEE_AFTERNOON_TIME['lower'] and \
+                 created_at_time < EMPLOYEE_AFTERNOON_TIME['upper']:
                 self.day_time_choice = EmployeeDailyInsightChoices.AFTERNOON
-            elif created_at_time >= time(18, 0, 0) and \
-                 created_at_time < time(22, 0, 0):
+            elif created_at_time >= EMPLOYEE_EVENING_TIME['lower'] and \
+                 created_at_time < EMPLOYEE_EVENING_TIME['upper']:
                 self.day_time_choice = EmployeeDailyInsightChoices.EVENING
             else:
                 self.day_time_choice = EmployeeDailyInsightChoices.OTHER
