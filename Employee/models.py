@@ -39,7 +39,7 @@ class EmployeeManager(models.Manager):
             hint=Case(
             
                 When(Q(morning_count__lt=F('afternoon_count')) &  
-                     Q(morning_count__lt=F('evening_filter')) &
+                     Q(morning_count__lt=F('evening_count')) &
                      Q(morning_count__lt=F('other_count')),
                      then=Value(F('full_name') + ' should be busy in the morning.')),
                 
