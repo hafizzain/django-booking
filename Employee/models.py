@@ -41,15 +41,15 @@ class EmployeeManager(models.Manager):
                 When(Q(morning_count__lt=F('afternoon_count')) &  
                      Q(morning_count__lt=F('evening_count')) &
                      Q(morning_count__lt=F('other_count')),
-                     then=Value(F('full_name') + ' should be busy in the morning.')),
+                     then=Value('should be busy in the morning.')),
                 
                 When(Q(afternoon_count__lt=F('evening_count')) &
                      Q(afternoon_count__lt=F('other_count')),
-                     then=Value(F('full_name') + ' should be busy in the afternoon.')),
+                     then=Value('should be busy in the afternoon.')),
 
                 When(Q(evening_count__lt=F('other_count')),
-                     then=Value(F('full_name') + ' should be busy in the evening.')),
-                
+                     then=Value('should be busy in the evening.')),
+
                 output_field=CharField()
             )
         )
