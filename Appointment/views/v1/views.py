@@ -776,21 +776,21 @@ def create_appointment(request):
 
         # Creating Employee Anatylics Here
 
-        with transaction.atomic():
-            try:
-                employee_insight_obj = EmployeeBookingDailyInsights.objects.create(
-                                            user=user,
-                                            employee=member,
-                                            business=business,
-                                            service=service,
-                                            appointment=appointment,
-                                            business_address=business_address,
-                                            appointment_service = appointment_service
-                                        )
-                insight_serialied = EmployeeDailyInsightsSerializer(employee_insight_obj) # for insight debugging
-                employee_insights_data.append(insight_serialied) # for insight debugging
-            except:
-                pass
+        # with transaction.atomic():
+        #     try:
+        employee_insight_obj = EmployeeBookingDailyInsights.objects.create(
+                                    user=user,
+                                    employee=member,
+                                    business=business,
+                                    service=service,
+                                    appointment=appointment,
+                                    business_address=business_address,
+                                    appointment_service = appointment_service
+                                )
+        insight_serialied = EmployeeDailyInsightsSerializer(employee_insight_obj) # for insight debugging
+        employee_insights_data.append(insight_serialied) # for insight debugging
+            # except:
+            #     pass
 
         
     
