@@ -7,7 +7,7 @@ class EmployeeDailyInsightsSerializer(serializers.ModelSerializer):
     time_debug = serializers.SerializerMethodField()
     class Meta:
         model = EmployeeBookingDailyInsights
-        fields = ['created_at', 'time_debug', 'day_time_choices']
+        fields = ['created_at', 'time_debug', 'day_time_choice']
 
 
     def get_time_debug(self, obj):
