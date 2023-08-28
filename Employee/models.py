@@ -22,13 +22,15 @@ class EmployeeManager(models.Manager):
         )
     
 
-    def with_daily_booking_insights(self, insight_filters):
+    def with_daily_booking_insights(self, employee_ids, insight_filters):
         morning_filter = insight_filters & Q(day_time_choice=EmployeeDailyInsightChoices.MORNING)
         afternoon_filter = insight_filters & Q(day_time_choice=EmployeeDailyInsightChoices.AFTERNOON)
         evening_filter = insight_filters & Q(day_time_choice=EmployeeDailyInsightChoices.EVENING)
         other_filter = insight_filters & Q(day_time_choice=EmployeeDailyInsightChoices.OTHER)
 
-        return self.get_queryset().annotate(
+        return self.get_queryset().filter(
+            id__in=employee_ids
+        ).annotate(
             morning_count = Count('employee_daily_insights', filter=morning_filter),
             afternoon_count = Count('employee_daily_insights', filter=afternoon_filter),
             evening_count = Count('employee_daily_insights', filter=evening_filter),

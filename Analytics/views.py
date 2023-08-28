@@ -23,13 +23,7 @@ class EmployeeDailyInsightsView(APIView):
         business_address = BusinessAddress.objects.get(id=business_address_id)
         
         insight_filter = Q(business_address=business_address)
-
-        employees = Employee.objects.filter(
-            id__in=emplopyee_ids
-        ).with_daily_booking_insights(insight_filter)
-
-
-
+        employees = Employee.objects.with_daily_booking_insights(emplopyee_ids, insight_filter)
         serializer = self.serializer_class(employees, many=True)
         return serializer.data
     
