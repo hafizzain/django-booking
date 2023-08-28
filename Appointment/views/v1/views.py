@@ -785,10 +785,11 @@ def create_appointment(request):
                                     service=service,
                                     appointment=appointment,
                                     business_address=business_address,
-                                    appointment_service = appointment_service
+                                    appointment_service = appointment_service,
+                                    booking_time=date_time
                                 )
         if employee_insight_obj:
-            employee_insight_obj.set_employee_time()
+            employee_insight_obj.set_employee_time(date_time)
             insight_serialied = EmployeeDailyInsightsSerializer(employee_insight_obj) # for insight debugging
             employee_insights_data.append(insight_serialied.data) # for insight debugging
             # except:

@@ -1,6 +1,6 @@
-import pytz
 from uuid import uuid4
 from django.db import models
+from datetime import time
 
 from Authentication.models import User
 from Employee.models import Employee
@@ -29,6 +29,7 @@ class EmployeeBookingDailyInsights(models.Model):
         - we will filter out with a particular choice and aggregate( COUNT ) the objects
         - while getting employee records.
     """
+    booking_time = models.TimeField(verbose_name='Appointment Start Time', null=True, blank=True)
     day_time_choice = models.CharField(max_length=2, choices=EmployeeDailyInsightChoices.choices, null=True, blank=True)
 
     # time_stamps
@@ -39,12 +40,15 @@ class EmployeeBookingDailyInsights(models.Model):
         return f"{self.employee.full_name}-{self.day_time_choice}"
 
 
-    def set_employee_time(self):
+    def set_employee_time(self, date_time):
 
-        utc = pytz.UTC
         # setting employee appointment daily time here in save method
         if not self.day_time_choice:
-            created_at_time = self.created_at.time().replace(tzinfo=None)
+            split_time = date_time.split(':')
+            hour = int(split_time[0])
+            minute = int(split_time[1])
+            second = int(split_time[2])
+            created_at_time = time(hour, minute, second)
             if created_at_time >= EMPLOYEE_MORNING_TIME['lower'] and \
                created_at_time < EMPLOYEE_MORNING_TIME['upper']:
                 self.day_time_choice = EmployeeDailyInsightChoices.MORNING
