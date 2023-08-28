@@ -9,12 +9,12 @@ from Employee.models import Employee
 from Business.models import BusinessAddress
 
 
-from .serializers import EmployeeDailyInsightsSerializer
+from Employee.serializers import EmployeeDailyInsightSerializer
 
 
 class EmployeeDailyInsightsView(APIView):
 
-    serializer_class = EmployeeDailyInsightsSerializer
+    serializer_class = EmployeeDailyInsightSerializer
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
