@@ -37,11 +37,11 @@ class EmployeeBookingDailyInsights(models.Model):
 
     def __str__(self) -> str:
         return f"{self.employee.full_name}-{self.day_time_choice}"
-    
 
-    def save(self, *args, **kwargs):
 
-        # choosing employee appointment daily time here in save method
+    def set_employee_time(self):
+
+        # setting employee appointment daily time here in save method
         if not self.day_time_choice:
             created_at = self.created_at.time()
             if created_at >= EMPLOYEE_MORNING_TIME['lower'] and \
@@ -55,5 +55,5 @@ class EmployeeBookingDailyInsights(models.Model):
                 self.day_time_choice = EmployeeDailyInsightChoices.EVENING
             else:
                 self.day_time_choice = EmployeeDailyInsightChoices.OTHER
-
-        super(EmployeeBookingDailyInsights, self).save(*args, **kwargs)
+        
+        self.save()
