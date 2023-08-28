@@ -281,21 +281,6 @@ class Employee_TenantServiceSerializer(serializers.ModelSerializer):
             return f'{url}{img.image}'
         except Exception as err:
             print(str(err))
-        # try:    
-        #     print(obj.employee.image)
-        #     if obj.employee.image:
-        #         try:
-        #             print('test')
-        #             request = self.context["request"]
-        #             url = tenant_media_base_url(request)
-        #             return f'{url}{obj.employee.image}'
-        #         except Exception as err:
-        #             print(err)
-        #             return obj.employee.image
-                    
-        #     return None
-        # except Exception as err:
-        #     print(err)
     
     class Meta:
         model = EmployeeSelectedService
