@@ -43,7 +43,7 @@ class EmployeeBookingDailyInsights(models.Model):
         # setting employee appointment daily time here in save method
         if not self.day_time_choice:
             created_at_time = self.created_at.time()
-            if created_at_time >= EMPLOYEE_MORNING_TIME and \
+            if created_at_time >= EMPLOYEE_MORNING_TIME['lower'] and \
                created_at_time < EMPLOYEE_MORNING_TIME['upper']:
                 self.day_time_choice = EmployeeDailyInsightChoices.MORNING
             elif created_at_time >= EMPLOYEE_AFTERNOON_TIME['lower'] and \
