@@ -54,6 +54,14 @@ class Business(models.Model):
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
 
+    def save(self, *args, **kwargs):
+        if self.logo:
+            self.is_logo_uploaded_s3 = True
+        
+        if self.banner:
+            self.is_banner_uploaded_s3 = True
+        super(Business, self).save(*args, **kwargs)
+
 
     def __str__(self):
         
@@ -163,6 +171,12 @@ class BusinessAddressMedia(models.Model):
 
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
+
+    def save(self, *args, **kwargs):
+        if self.image:
+            self.is_image_uploaded_s3 = True
+        
+        super(BusinessAddressMedia, self).save(*args, **kwargs)
 
 
     def __str__(self):
