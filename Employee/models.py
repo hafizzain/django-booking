@@ -3,13 +3,11 @@ from django.db import models
 from django.db.models import Q, Count
 from django.utils.timezone import now
 
-from NStyle.choices import EmployeeDailyInsightChoices
 
 from Authentication.models import User
 from Business.models import Business, BusinessAddress
 from Utility.models import Country, State, City
 from Service.models  import Service
-from Appointment.models import Appointment, AppointmentService
 
 
 class EmployeeManager(models.Manager):
@@ -540,30 +538,4 @@ class EmployeeCommission(models.Model):
     def __str__(self):
         return str(self.id)
 
-
-class EmployeeBookingDailyInsights(models.Model):
-    # Foreign Keys
-    id = models.UUIDField(default=uuid4, unique=True, primary_key=True, editable=False)
-    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name='employee_daily_insights')
-    employee = models.ForeignKey(Employee, blank=True, null=True, on_delete=models.CASCADE, related_name='employee_daily_insights')
-    business = models.ForeignKey(Business, blank=True, null=True, on_delete=models.CASCADE, related_name='employee_daily_insights')
-    service = models.ForeignKey(Service, blank=True, null=True, on_delete=models.CASCADE, related_name='employee_daily_insights')
-    appointment = models.ForeignKey(Appointment, blank=True, null=True, on_delete=models.CASCADE, related_name='employee_daily_insights')
-    business_address = models.ForeignKey(BusinessAddress, blank=True, null=True, on_delete=models.CASCADE, related_name='employee_daily_insights')
-    appointment_service = models.ForeignKey(AppointmentService, blank=True, null=True, on_delete=models.CASCADE, related_name='employee_daily_insights')
-
-    """
-        - EmployeeDailyInsightChoices.choices =  MORNING, AFTERNOON, EVENING
-        - we will use created_at to extract time and populate day_time_choice based on that
-        - we will filter out with a particular choice and aggregate( COUNT ) the objects
-        - while getting employee records.
-    """
-    day_time_choice = models.CharField(max_length=2, choices=EmployeeDailyInsightChoices.choices, default=None)
-
-    # time_stamps
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self) -> str:
-        return f"{self.employee.full_name}-{self.day_time_choice}"
 
