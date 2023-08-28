@@ -146,7 +146,7 @@ class Business_GetSerializer(serializers.ModelSerializer):
         if obj.logo :
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_logo_uploaded_s3)
                 return f'{url}{obj.logo}'
             except:
                 obj.logo
@@ -181,6 +181,7 @@ class Business_GetSerializer(serializers.ModelSerializer):
             'id',
             'business_name',
             'logo',
+            'is_logo_uploaded_s3',
             'banner',
             'postal_code',
             'week_start',
