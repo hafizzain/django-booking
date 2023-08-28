@@ -14,7 +14,7 @@ class EmployeeDailyInsightChoices(models.TextChoices):
     OTHER = 'O', 'Other'
 
 EMPLOYEE_MORNING_TIME = {
-    'lower': time(9,00, 00, tzinfo=pytz.UTC),
+    'lower': time(9,0, 0, tzinfo=pytz.UTC),
     'upper': time(12, 0, 0, tzinfo=pytz.UTC)
 }
 

@@ -44,7 +44,7 @@ class EmployeeBookingDailyInsights(models.Model):
         utc = pytz.UTC
         # setting employee appointment daily time here in save method
         if not self.day_time_choice:
-            created_at_time = self.created_at.time().replace(tzinfo=utc)
+            created_at_time = self.created_at.time().replace(tzinfo=None)
             if created_at_time >= EMPLOYEE_MORNING_TIME['lower'] and \
                created_at_time < EMPLOYEE_MORNING_TIME['upper']:
                 self.day_time_choice = EmployeeDailyInsightChoices.MORNING
