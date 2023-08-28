@@ -1370,3 +1370,19 @@ class EmplooyeeAppointmentInsightsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ['id', 'full_name', 'appointments_done']
+
+
+class EmployeeDailyInsightSerializer(serializers.ModelSerializer):
+
+    # annotated fields
+    morning_count = serializers.IntegerField()
+    afternoon_count = serializers.IntegerField()
+    evening_count = serializers.IntegerField()
+    other_count = serializers.IntegerField()
+    hint = serializers.CharField()
+
+
+    class Meta:
+        model = Employee
+        fields = ['id', 'full_name', 'image', 'morning_count', 'afternoon_count' 'evening_count',
+                  'other_count', 'hint']

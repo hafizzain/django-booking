@@ -25,10 +25,11 @@ class EmployeeBookingDailyInsights(models.Model):
 
     """
         - EmployeeDailyInsightChoices.choices =  MORNING, AFTERNOON, EVENING
-        - we will use created_at to extract time and populate day_time_choice based on that
+        - we will use bookking_time to extract time and populate day_time_choice based on that
         - we will filter out with a particular choice and aggregate( COUNT ) the objects
         - while getting employee records.
     """
+
     booking_time = models.TimeField(verbose_name='Appointment Start Time', null=True, blank=True)
     day_time_choice = models.CharField(max_length=2, choices=EmployeeDailyInsightChoices.choices, null=True, blank=True)
 

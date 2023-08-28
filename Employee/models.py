@@ -1,6 +1,6 @@
 from uuid import uuid4
 from django.db import models
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Case, When, Value, F, CharField
 from django.utils.timezone import now
 
 
@@ -8,6 +8,7 @@ from Authentication.models import User
 from Business.models import Business, BusinessAddress
 from Utility.models import Country, State, City
 from Service.models  import Service
+from NStyle.choices import EmployeeDailyInsightChoices
 
 
 class EmployeeManager(models.Manager):
@@ -18,6 +19,37 @@ class EmployeeManager(models.Manager):
         
         return self.get_queryset().filter(id__in=employee_ids).annotate(
             appointments_done = Count('member_appointments', filter=appointment_filter)
+        )
+    
+
+    def with_daily_booking_insights(self, insight_filters):
+        morning_filter = insight_filters & Q(day_time_choice=EmployeeDailyInsightChoices.MORNING)
+        afternoon_filter = insight_filters & Q(day_time_choice=EmployeeDailyInsightChoices.AFTERNOON)
+        evening_filter = insight_filters & Q(day_time_choice=EmployeeDailyInsightChoices.EVENING)
+        other_filter = insight_filters & Q(day_time_choice=EmployeeDailyInsightChoices.OTHER)
+
+        return self.get_queryset().annotate(
+            morning_count = Count('employee_daily_insights', filter=morning_filter),
+            afternoon_count = Count('employee_daily_insights', filter=afternoon_filter),
+            evening_count = Count('employee_daily_insights', filter=evening_filter),
+            other_count = Count('employee_daily_insights', filter=other_filter)
+        ).annotate(
+            hint=Case(
+            
+                When(Q(morning_count__lt=F('afternoon_count')) &  
+                     Q(morning_count__lt=F('evening_filter')) &
+                     Q(morning_count__lt=F('other_count')),
+                     then=Value(F('full_name') + ' should be busy in the morning.')),
+                
+                When(Q(afternoon_count__lt=F('evening_count')) &
+                     Q(afternoon_count__lt=F('other_count')),
+                     then=Value(F('full_name') + ' should be busy in the afternoon.')),
+
+                When(Q(evening_count__lt=F('other_count')),
+                     then=Value(F('full_name') + ' should be busy in the evening.')),
+                
+                output_field=CharField()
+            )
         )
 
 class Employee(models.Model):
