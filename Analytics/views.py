@@ -1,7 +1,9 @@
 import json
 from django.db.models import Q
+
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 
 from Employee.models import Employee
 from Business.models import BusinessAddress
@@ -25,7 +27,7 @@ class EmployeeDailyInsightsView(APIView):
         insight_filter = Q(employee_daily_insights__business_address=business_address)
         employees = Employee.objects.with_daily_booking_insights(emplopyee_ids, insight_filter)
         serializer = self.serializer_class(employees, many=True)
-        return serializer.data
+        return Response(serializer.data)
     
 
     def get_employee_ids(self, employee_ids):
