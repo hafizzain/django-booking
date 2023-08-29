@@ -63,7 +63,7 @@ class EmployeeDailyInsightsView(APIView):
                 else:
                     # Condition 3 (morning < afternoon < evening)
                     if morning < afternoon and afternoon < evening:
-                        if evening > EMP_MIN_BOOKINGS:
+                        if evening >= EMP_MIN_BOOKINGS:
                             if afternoon > EMP_MIN_BOOKINGS:
                                 emp['overall_hint'] = f"{emp_name} should busy in the {MORNING}."
                             elif afternoon < EMP_MIN_BOOKINGS:
@@ -71,14 +71,14 @@ class EmployeeDailyInsightsView(APIView):
 
                     # Condition 4 (afternoon < eveninng < morning)
                     elif afternoon < evening and evening < morning:
-                        if morning > EMP_MIN_BOOKINGS:
+                        if morning >= EMP_MIN_BOOKINGS:
                             if evening > EMP_MIN_BOOKINGS:
                                 emp['overall_hint'] = f"{emp_name} should busy in the {AFTERNOON}."
                             elif evening < EMP_MIN_BOOKINGS:
                                 emp['overall_hint'] = f"{emp_name} should busy in the {AFTERNOON} and {EVENING}."
                     # Condition 5 (evening < morning < afternoon)
                     elif evening < morning and morning < afternoon:
-                        if afternoon > EMP_MIN_BOOKINGS:
+                        if afternoon >= EMP_MIN_BOOKINGS:
                             if morning > EMP_MIN_BOOKINGS:
                                 emp['overall_hint'] = f"{emp_name} should busy in the {EVENING}."
                             elif morning < EMP_MIN_BOOKINGS:
