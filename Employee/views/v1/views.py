@@ -49,6 +49,7 @@ from django.conf import settings
 from django.core.paginator import Paginator
 
 from Notification.models import CustomFCMDevice
+from Notification.serializers import FCMDeviceSerializer
 from Notification.notification_processor import NotificationProcessor
 
 @api_view(['POST'])
@@ -4585,9 +4586,7 @@ def create_employe_account(request):
 @permission_classes([AllowAny])
 def employee_login(request):
     email = request.data.get('email', None)
-    username = request.data.get('username', None)
     password = request.data.get('password', None)
-    tenant_id = request.data.get('tenant_id', None)
     device_token = request.data.get('device_token', None)
     
     data = []
@@ -4689,6 +4688,7 @@ def employee_login(request):
                 employee_device.user = user
                 employee_device.registration_id = device_token
                 employee_device.save()
+            device_serialized = FCMDeviceSerializer(employee_device)
         except:
             return Response(
                 {
@@ -4724,7 +4724,8 @@ def employee_login(request):
                 'status_code' : 200,
                 'response' : {
                     'message' : 'Authenticated',
-                    'data' : serialized.data
+                    'data' : serialized.data,
+                    'device_data':device_serialized.data
                 }
             },
             status=status.HTTP_200_OK
