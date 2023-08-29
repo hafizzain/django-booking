@@ -932,8 +932,8 @@ def update_appointment(request):
         # on changing appointment service.
         employee_insight_obj = EmployeeBookingDailyInsights.objects.filter(
             appointment_service=service_appointment,
-            employee=employee,
         ).first()
+        employee.employee = employee
         employee_insight_obj.set_employee_time(start_time)
         employee_insight_obj.save()
 
@@ -1276,10 +1276,10 @@ def update_appointment_service(request):
             # on changing appointment service.
             employee_insight_obj = EmployeeBookingDailyInsights.objects.filter(
                 appointment_service=service_appointment,
-                employee=member_id,
-                service=service_id
-
+                service=service_id,
+                client=client
             ).first()
+            employee_insight_obj.employee = member_id
             employee_insight_obj.set_employee_time(date_time)
             employee_insight_obj.save()
 
