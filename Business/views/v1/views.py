@@ -1926,7 +1926,10 @@ def delete_languages(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_all_languages(request):
-    all_languages = Language.objects.filter(is_active=True, is_deleted=False)
+    only_english_arabic = ['English', 'Arabic']
+    all_languages = Language.objects.filter(is_active=True,
+                                            is_deleted=False,
+                                            name__in=only_english_arabic)
 
     serialized = LanguageSerializer(all_languages, many=True)
     return Response(
