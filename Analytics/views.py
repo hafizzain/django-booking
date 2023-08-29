@@ -41,7 +41,7 @@ class EmployeeDailyInsightsView(APIView):
             evening = emp['evening_count']
             emp_name = emp['full_name']
             # declaring messages hint1 and hint2
-            emp['overall_hint'] = None
+
             cal_sum = sum([morning, afternoon, evening])
 
             if cal_sum > 0:
