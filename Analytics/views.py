@@ -54,19 +54,20 @@ class EmployeeDailyInsightsView(APIView):
 
             cal_sum = sum([morning, afternoon, evening])
 
+            # Early exit from the various conditions
             if cal_sum > 0:
                 
                 # Condition 1 - Employee is doing great.
                 if morning == afternoon == evening == EMP_MIN_BOOKINGS:
                     emp['overall_hint'] = f"Bookings for {emp_name} are steady all day."
                 
-                # Condition 2 
+                # Condition 2 - Employee have few bookings in every shift
                 elif (morning < EMP_MIN_BOOKINGS) and \
                      (afternoon < EMP_MIN_BOOKINGS) and \
                      (evening < EMP_MIN_BOOKINGS):
                     
                     emp['overall_hint'] = f"{emp_name} has few bookings in every shift."
-
+                # Other conditions on which we are sennding overall hint about employee
                 else:
                     
                     if morning < afternoon:
@@ -104,30 +105,9 @@ class EmployeeDailyInsightsView(APIView):
                                 emp['overall_hint'] = f"{emp_name} should busy in the {AFTERNOON} and {EVENING}."
                             else:
                                 emp['overall_hint'] = f"{emp_name} should busy in the {EVENING}."
-                    # Condition 3 (morning < afternoon < evening)
-                    # if morning < afternoon and afternoon < evening:
-                    #     if evening >= EMP_MIN_BOOKINGS:
-                    #         if afternoon > EMP_MIN_BOOKINGS:
-                    #             emp['overall_hint'] = f"{emp_name} should busy in the {MORNING}."
-                    #         elif afternoon < EMP_MIN_BOOKINGS:
-                    #             emp['overall_hint'] = f"{emp_name} should busy in the {MORNING} and {AFTERNOON}."
 
-                    # # Condition 4 (afternoon < eveninng < morning)
-                    # elif afternoon < evening and evening < morning:
-                    #     if morning >= EMP_MIN_BOOKINGS:
-                    #         if evening > EMP_MIN_BOOKINGS:
-                    #             emp['overall_hint'] = f"{emp_name} should busy in the {AFTERNOON}."
-                    #         elif evening < EMP_MIN_BOOKINGS:
-                    #             emp['overall_hint'] = f"{emp_name} should busy in the {AFTERNOON} and {EVENING}."
-                    # # Condition 5 (evening < morning < afternoon)
-                    # elif evening < morning and morning < afternoon:
-                    #     if afternoon >= EMP_MIN_BOOKINGS:
-                    #         if morning > EMP_MIN_BOOKINGS:
-                    #             emp['overall_hint'] = f"{emp_name} should busy in the {EVENING}."
-                    #         elif morning < EMP_MIN_BOOKINGS:
-                    #             emp['overall_hint'] = f"{emp_name} should busy in the {EVENING} and {MORNING}."
             else:
-                # Condition 6
+                # Condition 6 - Employee have zero bookinngs all day.
                 emp['overall_hint'] = f"{emp_name} is free all day."
 
         return Response(

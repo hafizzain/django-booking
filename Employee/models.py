@@ -14,6 +14,9 @@ from NStyle.choices import EmployeeDailyInsightChoices
 class EmployeeManager(models.Manager):
     
     def with_completed_appointments(self, employee_ids, date, business_address):
+        """
+        
+        """
         appointment_filter = Q(member_appointments__appointment_date=date) \
                             & Q(member_appointments__business_address=business_address)
         
@@ -34,49 +37,6 @@ class EmployeeManager(models.Manager):
             afternoon_count = Count('employee_daily_insights', filter=afternoon_filter),
             evening_count = Count('employee_daily_insights', filter=evening_filter),
         ) 
-        # .annotate(
-
-        #     all_zero=Case(
-                
-        #         When(Q(morning_count=0) &
-        #              Q(afternoon_count=0) &
-        #              Q(evening_count=0) &
-        #              Q(other_count=0),
-        #              then=Value('Employee should be working hard'))
-        #     ),
-        #     hint1=Case(
-            
-        #         When(Q(morning_count=0) &
-        #              Q(morning_count__lt=F('afternoon_count')) &
-        #              Q(morning_count__lt=F('evening_count')) &
-        #              Q(morning_count__lt=F('other_count')),
-        #              then=Value('morning')),
-                
-        #         When(Q(afternoon_count__lt=F('evening_count')) &
-        #              Q(afternoon_count__lt=F('other_count')),
-        #              then=Value('afternoon')),
-
-        #         When(Q(evening_count__lt=F('other_count')),
-        #              then=Value('evening')),
-
-        #         output_field=CharField()
-        #     )
-        # ).annotate(
-        #     hint2=Case(
-                
-        #         When(Q(hint1='morning') &
-        #              Q(afternoon_count__lt=F('evening_count')) &
-        #              Q(afternoon_count__lt=F('other_count')),
-        #              then=Value('afternoon')
-        #              ),
-
-        #         When(Q(hint1='afternoon') &
-        #              Q(evening_count__lt=F('other_count')),
-        #              then=Value('evening')
-        #              ),
-        #         output_field=CharField()
-        #     )
-        # )
 
 class Employee(models.Model):
     GENDER_CHOICES = [
