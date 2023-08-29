@@ -44,22 +44,22 @@ class EmployeeBookingDailyInsights(models.Model):
     def set_employee_time(self, date_time):
 
         # setting employee appointment daily time here in save method
-        if not self.day_time_choice:
-            split_time = date_time.split(':')
-            hour = int(split_time[0])
-            minute = int(split_time[1])
-            second = int(split_time[2])
-            created_at_time = time(hour, minute, second)
-            if created_at_time >= EMPLOYEE_MORNING_TIME['lower'] and \
-               created_at_time < EMPLOYEE_MORNING_TIME['upper']:
-                self.day_time_choice = EmployeeDailyInsightChoices.MORNING
-            elif created_at_time >= EMPLOYEE_AFTERNOON_TIME['lower'] and \
-                 created_at_time < EMPLOYEE_AFTERNOON_TIME['upper']:
-                self.day_time_choice = EmployeeDailyInsightChoices.AFTERNOON
-            elif created_at_time >= EMPLOYEE_EVENING_TIME['lower'] and \
-                 created_at_time < EMPLOYEE_EVENING_TIME['upper']:
-                self.day_time_choice = EmployeeDailyInsightChoices.EVENING
-            else:
-                self.day_time_choice = EmployeeDailyInsightChoices.OTHER
+        split_time = date_time.split(':')
+        hour = int(split_time[0])
+        minute = int(split_time[1])
+        second = int(split_time[2])
+        created_at_time = time(hour, minute, second)
+        
+        if created_at_time >= EMPLOYEE_MORNING_TIME['lower'] and \
+            created_at_time < EMPLOYEE_MORNING_TIME['upper']:
+            self.day_time_choice = EmployeeDailyInsightChoices.MORNING
+        elif created_at_time >= EMPLOYEE_AFTERNOON_TIME['lower'] and \
+                created_at_time < EMPLOYEE_AFTERNOON_TIME['upper']:
+            self.day_time_choice = EmployeeDailyInsightChoices.AFTERNOON
+        elif created_at_time >= EMPLOYEE_EVENING_TIME['lower'] and \
+                created_at_time < EMPLOYEE_EVENING_TIME['upper']:
+            self.day_time_choice = EmployeeDailyInsightChoices.EVENING
+        else:
+            self.day_time_choice = EmployeeDailyInsightChoices.OTHER
         
         self.save()

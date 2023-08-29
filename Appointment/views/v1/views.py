@@ -928,6 +928,15 @@ def update_appointment(request):
         service_appointment.end_time = datetime_duration
         service_appointment.save()
 
+        # updating employee booking insight data
+        # on changing appointment service.
+        employee_insight_obj = EmployeeBookingDailyInsights.objects.filter(
+            appointment_service=service_appointment,
+            employee=employee,
+        ).first()
+        employee_insight_obj.set_employee_time(start_time)
+        employee_insight_obj.save()
+
         
     
     serializer = UpdateAppointmentSerializer(service_appointment , data=request.data, partial=True)
@@ -1262,6 +1271,18 @@ def update_appointment_service(request):
                         duration = service_appointment.duration,
                         member = service_appointment.member
                     )
+            
+            # updating employee booking insight data
+            # on changing appointment service.
+            employee_insight_obj = EmployeeBookingDailyInsights.objects.filter(
+                appointment_service=service_appointment,
+                employee=member_id,
+                service=service_id
+
+            ).first()
+            employee_insight_obj.set_employee_time(date_time)
+            employee_insight_obj.save()
+
     
     try:
         ExceptionRecord.objects.create(
