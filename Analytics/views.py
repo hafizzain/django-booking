@@ -27,7 +27,9 @@ class EmployeeDailyInsightsView(APIView):
         
         insight_filter = Q(employee_daily_insights__business_address=business_address)
         employees = Employee.objects.with_daily_booking_insights(emplopyee_ids, insight_filter)
-        serializer_data = list(self.serializer_class(employees, many=True).data)
+        serializer_data = list(self.serializer_class(employees, 
+                                                     many=True, 
+                                                     context={'request' : request}).data)
 
         MORNING = "Morning"
         AFTERNOON = "Afternoon"
