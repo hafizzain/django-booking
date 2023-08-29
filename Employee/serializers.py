@@ -1378,6 +1378,7 @@ class EmployeeDailyInsightSerializer(serializers.ModelSerializer):
     morning_count = serializers.IntegerField()
     afternoon_count = serializers.IntegerField()
     evening_count = serializers.IntegerField()
+    image = serializers.SerializerMethodField()
 
     def get_image(self, obj):
         if obj.image:
