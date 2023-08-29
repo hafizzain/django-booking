@@ -1,4 +1,5 @@
 import json
+from datetime import date
 from django.db.models import Q
 
 from rest_framework.views import APIView
@@ -19,16 +20,23 @@ class EmployeeDailyInsightsView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
+        _start_date = str(request.query_params.get('start_date')).split('-')
+        _end_date = str(request.query_params.get('end_date')).split('-')
         business_address_id = request.query_params.get('business_address_id')
         emplopyee_ids = request.query_params.get('employees', None)
         emplopyee_ids = self.get_employee_ids(emplopyee_ids)
 
+
+        start_date = date(int(_start_date[0]), int(_start_date[1]), int(_start_date[2]))
+        end_date = date(int(_end_date[0]),int(_end_date[1]), int(_end_date[2]))
+
         business_address = BusinessAddress.objects.get(id=business_address_id)
         
-        insight_filter = Q(employee_daily_insights__business_address=business_address)
+        insight_filter = Q(employee_daily_insights__business_address=business_address) & \
+                         Q(employee_daily_insights__created_at__date__range=(start_date, end_date))
         employees = Employee.objects.with_daily_booking_insights(emplopyee_ids, insight_filter)
-        serializer_data = list(self.serializer_class(employees, 
-                                                     many=True, 
+        serializer_data = list(self.serializer_class(employees,
+                                                     many=True,
                                                      context={'request' : request}).data)
 
         MORNING = "Morning"
