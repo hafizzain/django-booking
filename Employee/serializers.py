@@ -1378,7 +1378,6 @@ class EmployeeDailyInsightSerializer(serializers.ModelSerializer):
     morning_count = serializers.IntegerField()
     afternoon_count = serializers.IntegerField()
     evening_count = serializers.IntegerField()
-    other_count = serializers.IntegerField()
     hint1 = serializers.CharField()
     hint2 = serializers.CharField()
 
@@ -1386,4 +1385,4 @@ class EmployeeDailyInsightSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ['id', 'full_name', 'image', 'morning_count', 'afternoon_count', 'evening_count',
-                  'other_count', 'hint1', 'hint2']
+                  'hint1', 'hint2']
