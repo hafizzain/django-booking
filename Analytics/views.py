@@ -83,7 +83,7 @@ class EmployeeDailyInsightsView(APIView):
                                 emp['overall_hint'] = f"{emp_name} should busy in the {EVENING} and {MORNING}."
             else:
                 # Condition 6
-                emp['overall_hint']['message'] = f"{emp_name} is free all day."
+                emp['overall_hint'] = f"{emp_name} is free all day."
 
         return Response(
         {
