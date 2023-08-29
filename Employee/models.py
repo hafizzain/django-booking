@@ -115,6 +115,13 @@ class Employee(models.Model):
 
     objects = EmployeeManager()
 
+    
+    def save(self, *args, **kwargs):
+        if self.image:
+            self.is_image_uploaded_s3 = True
+        
+        super(Employee, self).save(*args, **kwargs)
+
     def __str__(self):
         return str(self.id)
     

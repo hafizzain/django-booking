@@ -34,6 +34,11 @@ class Brand(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=now)
 
+    def save(self, *args, **kwargs):
+        if self.image:
+            self.is_image_uploaded_s3 = True
+        super(Brand, self).save(*args, **kwargs)
+
     def __str__(self):
         return str(self.id)
 
@@ -135,6 +140,10 @@ class ProductMedia(models.Model):
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
 
+    def save(self, *args, **kwargs):
+        if self.image:
+            self.is_image_uploaded_s3 = True
+        super(ProductMedia, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.id)

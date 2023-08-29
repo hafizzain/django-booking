@@ -143,7 +143,7 @@ class MemberSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return f'{obj.image}'
@@ -200,7 +200,7 @@ class EmployeeSelectedServiceSerializer(serializers.ModelSerializer):
             img = Employee.objects.get(id = obj.employee.id)
             if img.image:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=img.is_image_uploaded_s3)
                 return f'{url}{img.image}'
             else:
                 return None
@@ -241,8 +241,8 @@ class EmployeeSelected_TenantServiceSerializer(serializers.ModelSerializer):
     def get_image(self, obj):
         try:
             tenant = self.context["tenant"]
-            url = tenant_media_domain(tenant)
             img = Employee.objects.get(id = obj.employee.id)
+            url = tenant_media_domain(tenant, is_s3_url=img.is_image_uploaded_s3)
             return f'{url}{img.image}'
         except Exception as err:
             print(str(err))
@@ -276,26 +276,11 @@ class Employee_TenantServiceSerializer(serializers.ModelSerializer):
     def get_image(self, obj):
         try:
             request = self.context["request"]
-            url = tenant_media_base_url(request)
             img = Employee.objects.get(id = obj.employee.id)
+            url = tenant_media_base_url(request, is_s3_url=img.is_image_uploaded_s3)
             return f'{url}{img.image}'
         except Exception as err:
             print(str(err))
-        # try:    
-        #     print(obj.employee.image)
-        #     if obj.employee.image:
-        #         try:
-        #             print('test')
-        #             request = self.context["request"]
-        #             url = tenant_media_base_url(request)
-        #             return f'{url}{obj.employee.image}'
-        #         except Exception as err:
-        #             print(err)
-        #             return obj.employee.image
-                    
-        #     return None
-        # except Exception as err:
-        #     print(err)
     
     class Meta:
         model = EmployeeSelectedService
@@ -1872,7 +1857,7 @@ class SaleInvoiceSerializer(serializers.ModelSerializer):
         if obj.file:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=False)
                 return f'{url}{obj.file}'
             except:
                 return f'{obj.file}'
