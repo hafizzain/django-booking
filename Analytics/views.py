@@ -76,11 +76,20 @@ class EmployeeDailyInsightsView(APIView):
                                 emp['overall_hint'] = f"{emp_name} should busy in the {MORNING} and {AFTERNOON}."
                             else:
                                 emp['overall_hint'] = f"{emp_name} should busy in the {MORNING}."
-
+                        elif afternoon > evening:
+                            if afternoon >= EMP_MIN_BOOKINGS and evening < EMP_MIN_BOOKINGS:
+                                emp['overall_hint'] = f"{emp_name} should busy in the {MORNING} and {AFTERNOON}."
+                            else:
+                                emp['overall_hint'] = f"{emp_name} should busy in the {MORNING}."
                     
                     if afternoon < evening:
                         if evening < morning:
                             if morning >= EMP_MIN_BOOKINGS and evening < EMP_MIN_BOOKINGS:
+                                emp['overall_hint'] = f"{emp_name} should busy in the {AFTERNOON} and {EVENING}."
+                            else:
+                                emp['overall_hint'] = f"{emp_name} should busy in the {AFTERNOON}."
+                        elif evening > morning:
+                            if evening >= EMP_MIN_BOOKINGS and morning < EMP_MIN_BOOKINGS:
                                 emp['overall_hint'] = f"{emp_name} should busy in the {AFTERNOON} and {EVENING}."
                             else:
                                 emp['overall_hint'] = f"{emp_name} should busy in the {AFTERNOON}."
@@ -91,7 +100,11 @@ class EmployeeDailyInsightsView(APIView):
                                 emp['overall_hint'] = f"{emp_name} should busy in the {MORNING} and {EVENING}."
                             else:
                                 emp['overall_hint'] = f"{emp_name} should busy in the {EVENING}."
-
+                        elif morning > afternoon:
+                            if morning >= EMP_MIN_BOOKINGS and afternoon < EMP_MIN_BOOKINGS:
+                                emp['overall_hint'] = f"{emp_name} should busy in the {MORNING} and {EVENING}."
+                            else:
+                                emp['overall_hint'] = f"{emp_name} should busy in the {EVENING}."
                     # Condition 3 (morning < afternoon < evening)
                     # if morning < afternoon and afternoon < evening:
                     #     if evening >= EMP_MIN_BOOKINGS:
