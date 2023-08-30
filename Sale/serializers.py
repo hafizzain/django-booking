@@ -1609,8 +1609,8 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
         if obj.discount_price:
             return obj.discount_price
         
-        if obj.price:
-            return obj.price
+        if obj.current_price:
+            return obj.current_price
     #endregion
 
     class Meta:
