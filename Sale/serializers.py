@@ -1601,13 +1601,15 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
         
         return None
     
+    #region debugging
     def get_price(self, obj):
         if obj.is_redeemed == True:
             return obj.redeemed_price
         elif obj.discount_price:
-            return obj.discount_price
+            return 5
         else:
             return obj.current_price
+    #endregion
 
     class Meta:
         model = ServiceOrder
