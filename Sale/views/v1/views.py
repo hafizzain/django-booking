@@ -2116,6 +2116,7 @@ def new_create_sale_order(request):
         order_discount_price = 0
         
         if discount_price is not None:
+            taking_not_none = discount_price
             order_discount_price = float(discount_price)
             discount_percentage = (float(discount_price) / original_price) * 100
             # price = int(discount_price)
@@ -2571,6 +2572,7 @@ def new_create_sale_order(request):
                     'message' : 'Product Order Sale Created!',
                     'error_message' : errors,
                     'sale' : serialized.data,
+                    'discount_price': taking_not_none
                 }
             },
             status=status.HTTP_201_CREATED
