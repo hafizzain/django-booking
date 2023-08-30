@@ -1605,8 +1605,10 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
     def get_price(self, obj):
         if obj.is_redeemed == True:
             return obj.redeemed_price
-        
-        return 0
+        elif obj.discount_price is not None:
+            return obj.discount_price
+        else:
+            return obj.current_price
     #endregion
 
     class Meta:
