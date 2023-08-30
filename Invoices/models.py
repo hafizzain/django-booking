@@ -118,11 +118,20 @@ class SaleInvoice(models.Model):
         ordersData = []
         for order in orders:
             # pricing order for invoice PDF
-            price = order.redeemed_price or order.discount_price or order.total_price
+            price = None
+            if order.is_redeemed == True:
+                price = order.redeemed_price
+            elif order.discount_price:
+                price = order.discount_price
+            else:
+                price = order.current_price
+            
+            # will remove tthis code after debugging
+            # price = order.redeemed_price or order.discount_price or order.total_price
 
 
             #region debugging
-            total_price = float(5) * float(5)
+            total_price = float(price) * float()
             #endregion
 
             data = {
