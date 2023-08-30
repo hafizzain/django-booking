@@ -1606,9 +1606,9 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
         if obj.is_redeemed == True:
             return obj.redeemed_price
         elif obj.discount_price:
-            return 5
+            return obj.discount_price
         else:
-            return obj.current_price
+            return 5
     #endregion
 
     class Meta:
