@@ -5,6 +5,7 @@ from cmath import e
 from django_tenants.utils import tenant_context
 from Tenants.models import Tenant
 from Authentication.models import User
+from Utility.Constants.Tenant.create_dummy_tenants import CreateDummyTenants
 
 
 def set_schema(schema_name_=None, user=None):
@@ -45,3 +46,14 @@ def verify_tenant_email_mobile(prev_tenant_name='public', user=None, verify='Mob
                 print('ERROR ' , err)
                 return None
         set_schema(schema_name_=prev_tenant_name)
+    
+def createFreeAvailableTenants():
+    unAsigned = Tenant.objects.filter(
+        is_active = False,
+        is_ready = True,
+        user__isnull = True
+    )
+    if unAsigned.count() < 20:
+        CreateDummyTenants()
+
+        

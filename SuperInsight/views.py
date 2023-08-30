@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, HttpResponse
 from MultiLanguage.models import *
 from Utility.models import ExceptionRecord
+from Tenants.models import Tenant
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib.auth import authenticate, login, logout
@@ -20,6 +21,13 @@ def ExceptionPage(request):
     context={}
     context['exceptions'] = exceptions
     return render(request, 'SuperAdminPanel/pages/Exception/exception.html', context)
+
+@login_required(login_url='/super-admin/super-login/')
+def TenantsListingPage(request):
+    tenants = Tenant.objects.all()
+    context={}
+    context['tenants'] = tenants
+    return render(request, 'SuperAdminPanel/pages/Tenants/index.html', context)
 
 
 @login_required(login_url='/super-admin/super-login/')
