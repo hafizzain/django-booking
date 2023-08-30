@@ -1608,12 +1608,13 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
         elif obj.discount_price:
             return obj.discount_price
         else:
-            return 5
+            return obj.current_price
     #endregion
 
     class Meta:
         model = ServiceOrder
-        fields = ['id', 'price', 'service_original_price', 'quantity', 'service', 'selection_type' ]
+        fields = ['id', 'price', 'service_original_price', 'quantity', 'service', 'selection_type',
+                  'discount_price']
             # 'client','created_at' ,'user',
             #       'duration', 'location', 'member', 'total_price',
             #       'payment_type','tip','gst', 'order_type','created_at'
