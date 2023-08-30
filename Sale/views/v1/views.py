@@ -2114,7 +2114,7 @@ def new_create_sale_order(request):
         
         original_price = float(price)
         discount_percentage = 0
-        order_discount_price = 0
+        order_discount_price = None
         
         if discount_price is not None:
             order_discount_price = float(discount_price)
