@@ -123,7 +123,7 @@ class SaleInvoice(models.Model):
             price = None
             if order.is_redeemed == True:
                 price = order.redeemed_price
-            elif order.discount_price:
+            elif order.discount_price is not None:
                 price = order.discount_price
             else:
                 price = order.current_price
