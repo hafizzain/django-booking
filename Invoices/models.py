@@ -131,7 +131,7 @@ class SaleInvoice(models.Model):
 
 
             #region debugging
-            total_price = float(price) * float()
+            total_price = float(price) * float(order.quantity)
             #endregion
 
             data = {
