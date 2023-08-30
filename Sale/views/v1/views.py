@@ -2070,8 +2070,7 @@ def new_create_sale_order(request):
         price = id['price']  
         employee_id = id['employee_id']      
         discount_price = id.get('discount_price', None)
-
-        discounnt_price_debug = None
+        
 
         is_membership_redeemed = id.get('is_membership_redeemed', None)
         is_voucher_redeemed = id.get('is_voucher_redeemed', None)
@@ -2246,7 +2245,6 @@ def new_create_sale_order(request):
                 )
 
                 order_instance = service_order
-                discounnt_price_debug = service_order.discount_price
 
                 
                 
@@ -2559,7 +2557,6 @@ def new_create_sale_order(request):
                     'message' : 'Product Order Sale Created!',
                     'error_message' : errors,
                     'sale' : serialized.data,
-                    'discount_price': discounnt_price_debug
                 }
             },
             status=status.HTTP_201_CREATED
