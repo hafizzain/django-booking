@@ -119,7 +119,12 @@ class SaleInvoice(models.Model):
         for order in orders:
             # pricing order for invoice PDF
             price = order.redeemed_price or order.discount_price or order.total_price
-            total_price = float(price) * float(order.quantity)
+
+
+            #region debugging
+            total_price = float(5) * float(5)
+            #endregion
+
             data = {
                 'name' : f'{order.name}',
                 'arabic_name' : f'{order.arabic_name}',
