@@ -1,5 +1,5 @@
 import json
-from datetime import date
+from datetime import date, timedelta
 from django.db.models import Q
 
 from rest_framework.views import APIView
@@ -29,6 +29,9 @@ class EmployeeDailyInsightsView(APIView):
 
         start_date = date(int(_start_date[0]), int(_start_date[1]), int(_start_date[2]))
         end_date = date(int(_end_date[0]),int(_end_date[1]), int(_end_date[2]))
+
+        #debugging
+        end_date += timedelta(days=1)
 
         business_address = BusinessAddress.objects.get(id=business_address_id)
         
