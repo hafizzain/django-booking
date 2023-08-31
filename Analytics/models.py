@@ -29,7 +29,6 @@ class EmployeeBookingDailyInsights(models.Model):
         - we will filter out with a particular choice and aggregate( COUNT ) the objects
         - while getting employee records.
     """
-    appointment_date = models.DateTimeField(default=None, null=True, blank=True)
     booking_time = models.TimeField(verbose_name='Appointment Start Time', null=True, blank=True)
     day_time_choice = models.CharField(max_length=2, choices=EmployeeDailyInsightChoices.choices, null=True, blank=True)
 
