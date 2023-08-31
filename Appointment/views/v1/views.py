@@ -783,7 +783,8 @@ def create_appointment(request):
                                     appointment=appointment,
                                     business_address=business_address,
                                     appointment_service = appointment_service,
-                                    booking_time=date_time
+                                    booking_time=date_time,
+                                    appointment_date=datetime.now()
                                 )
         if employee_insight_obj:
             employee_insight_obj.set_employee_time(date_time)
@@ -933,7 +934,8 @@ def update_appointment(request):
         employee_insight_obj = EmployeeBookingDailyInsights.objects.filter(
             appointment_service=service_appointment,
         ).first()
-        employee.employee = employee
+        employee_insight_obj.appointment_date=datetime.now()
+        employee_insight_obj.employee = employee
         employee_insight_obj.set_employee_time(start_time)
         employee_insight_obj.save()
 
@@ -1260,7 +1262,7 @@ def update_appointment_service(request):
                     service_appointment.duration = duration
                     service_appointment.price = price
                     service_appointment.member = member_id
-                    service_appointment.save()                    
+                    service_appointment.save()
                 except Exception as err:
                     errors.append(str(err))
                 else:
@@ -1281,6 +1283,7 @@ def update_appointment_service(request):
                 appointment_service=service_appointment,
                 service=service_id
             ).first()
+            employee_insight_obj.appointment_date=datetime.now()
             employee_insight_obj.employee = member_id
             employee_insight_obj.set_employee_time(date_time)
             employee_insight_obj.save()
