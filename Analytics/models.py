@@ -50,14 +50,16 @@ class EmployeeBookingDailyInsights(models.Model):
         second = int(split_time[2])
         created_at_time = time(hour, minute, second)
         
+        # order of conditions is very important
         if created_at_time >= EMPLOYEE_MORNING_TIME['lower'] and \
             created_at_time < EMPLOYEE_MORNING_TIME['upper']:
             self.day_time_choice = EmployeeDailyInsightChoices.MORNING
+            
         elif created_at_time >= EMPLOYEE_AFTERNOON_TIME['lower'] and \
                 created_at_time < EMPLOYEE_AFTERNOON_TIME['upper']:
             self.day_time_choice = EmployeeDailyInsightChoices.AFTERNOON
-        elif created_at_time >= EMPLOYEE_EVENING_TIME['lower'] and \
-                created_at_time < EMPLOYEE_EVENING_TIME['upper']:
+
+        elif created_at_time >= EMPLOYEE_EVENING_TIME['lower']:
             self.day_time_choice = EmployeeDailyInsightChoices.EVENING
 
         
