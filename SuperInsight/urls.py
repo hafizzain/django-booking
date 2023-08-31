@@ -7,6 +7,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', insightViews.DashboardPage, name='DashboardPage'),
     path('exception/', insightViews.ExceptionPage, name='ExceptionPage'),
+    path('tenants/', insightViews.TenantsListingPage, name='TenantsListingPage'),
     path('exception-detail/', insightViews.ExceptionDetailPage, name='ExceptionDetailPage'),
     path('language/', insightViews.LanguagePage, name='LanguagePage'),
     path('language/section/', insightViews.LanguageSectionPage, name='LanguageSectionPage'),
