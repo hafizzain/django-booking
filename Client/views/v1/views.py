@@ -2011,7 +2011,10 @@ def update_memberships(request):
     errors.append(services)
     for serv in services:
         service_id = serv['service']
-        duration = serv['duration']
+        if 'duration' in service:
+            duration = serv['duration']
+        else:
+            duration = None
         try:
             service_instance = Service.objects.get(id=service_id)
         except Exception as err:
@@ -2025,7 +2028,7 @@ def update_memberships(request):
             except Exception as err:
                 errors.append(str(err))
             else:
-                if created:
+                if created and duration:
                     membership_service.duration = duration
                     membership_service.save()
     
@@ -2077,14 +2080,6 @@ def update_memberships(request):
             except Exception as err:
                 pass
             else:
-            # if id is not None:
-            #     try:
-            #         currency_price = CurrencyPriceMembership.objects.get(id=id)
-            #     except Exception as err:
-            #         pass
-            #     else:                
-            #         currency_price.price = price
-            #         currency_price.save()
             
                 currency_price, created = CurrencyPriceMembership.objects.get_or_create(
                     currency = currency_instance,
@@ -2092,12 +2087,7 @@ def update_memberships(request):
                 )
                 currency_price.price = price
                 currency_price.save()
-                    
-                    # services_obj = CurrencyPriceMembership.objects.create(
-                    #     membership = membership,
-                    #     currency = currency_instance,
-                    #     price = price,
-                    # )                
+     
                 
                 
     serializer = MembershipSerializer(membership, data=request.data, partial=True)
