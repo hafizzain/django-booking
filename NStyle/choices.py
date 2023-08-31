@@ -11,7 +11,6 @@ class EmployeeDailyInsightChoices(models.TextChoices):
     MORNING = 'M', 'Morning'
     AFTERNOON = 'A', 'Afternoon'
     EVENING = 'E', 'Evening'
-    OTHER = 'O', 'Other'
 
 EMPLOYEE_MORNING_TIME = {
     'lower': time(6,0, 0),

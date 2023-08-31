@@ -59,7 +59,6 @@ class EmployeeBookingDailyInsights(models.Model):
         elif created_at_time >= EMPLOYEE_EVENING_TIME['lower'] and \
                 created_at_time < EMPLOYEE_EVENING_TIME['upper']:
             self.day_time_choice = EmployeeDailyInsightChoices.EVENING
-        else:
-            self.day_time_choice = EmployeeDailyInsightChoices.OTHER
+
         
         self.save()
