@@ -72,7 +72,7 @@ class EmployeeDailyInsightsView(APIView):
                      (afternoon < EMP_MIN_BOOKINGS and afternoon > 0) and \
                      (evening < EMP_MIN_BOOKINGS and evening > 0):
                     
-                    emp['overall_hint'] = f"{emp_name} has few bookings in every shift."
+                    emp['overall_hint'] = f"{emp_name} has few bookings in all day"
                 # Other conditions on which we are sennding overall hint about employee
                 else:
                     
