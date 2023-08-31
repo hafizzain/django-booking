@@ -46,6 +46,7 @@ class EmployeeDailyInsightsView(APIView):
         AFTERNOON = "Afternoon"
         EVENING = "Evening"
         EMP_MIN_BOOKINGS = 5
+        ZERO = 0
 
         for emp in serializer_data:
 
@@ -76,49 +77,62 @@ class EmployeeDailyInsightsView(APIView):
                 else:
 
                     # Additional condition for zero bookings in two slots and at least one booking in the third slot
-                    if morning == 0 and afternoon == 0 and evening > 0:
-                        emp['overall_hint'] = f"{emp_name} should busy in the {MORNING} and {AFTERNOON}"
+                    # if  evening > 0:
+                    #     if morning > 0:
+                    #         if afternoon == 0:
+                    #             emp['overall_hint'] = f"{emp_name} should busy in the {AFTERNOON}"
+                    #         else:
+                    #             pass
+                    #     elif morning == 0:
+                    #         emp['overall_hint'] = f"{emp_name} should busy in the {MORNING} and {AFTERNOON}"
 
-                    elif morning == 0 and evening == 0 and afternoon > 0:
-                        emp['overall_hint'] = f"{emp_name} should busy in the {MORNING} and {EVENING}"
 
-                    elif afternoon == 0 and evening == 0 and morning > 0:
-                        emp['overall_hint'] = f"{emp_name} should busy in the {AFTERNOON} and {EVENING}"
+                    # elif morning > 0:
+                    #     if afternoon > 0:
+                    #         emp['overall_hint'] = f"{emp_name} should busy in the {EVENING}"
+                    #     else:
+                    #         emp['overall_hint'] = f"{emp_name} should busy in the {AFTERNOON} and {EVENING}"
+
+                    # elif afternoon > 0:
+                    #     if afternoon > 0:
+                    #         emp['overall_hint'] = f"{emp_name} should busy in the {EVENING}"
+                    #     else:
+                    #         emp['overall_hint'] = f"{emp_name} should busy in the {AFTERNOON} and {EVENING}"
                     
-                    else:
+                    # else:
                     
                         if morning < afternoon:
                             if afternoon < evening:
-                                if evening >= EMP_MIN_BOOKINGS and afternoon < EMP_MIN_BOOKINGS:
+                                if evening > ZERO and afternoon < EMP_MIN_BOOKINGS:
                                     emp['overall_hint'] = f"{emp_name} should busy in the {MORNING} and {AFTERNOON}."
                                 else:
                                     emp['overall_hint'] = f"{emp_name} should busy in the {MORNING}."
                             elif afternoon > evening:
-                                if afternoon >= EMP_MIN_BOOKINGS and evening < EMP_MIN_BOOKINGS:
+                                if afternoon > ZERO and evening < EMP_MIN_BOOKINGS:
                                     emp['overall_hint'] = f"{emp_name} should busy in the {MORNING} and {EVENING}."
                                 else:
                                     emp['overall_hint'] = f"{emp_name} should busy in the {MORNING}."
                         
                         if afternoon < evening:
                             if evening < morning:
-                                if morning >= EMP_MIN_BOOKINGS and evening < EMP_MIN_BOOKINGS:
+                                if morning > ZERO and evening < EMP_MIN_BOOKINGS:
                                     emp['overall_hint'] = f"{emp_name} should busy in the {AFTERNOON} and {EVENING}."
                                 else:
                                     emp['overall_hint'] = f"{emp_name} should busy in the {AFTERNOON}."
                             elif evening > morning:
-                                if evening >= EMP_MIN_BOOKINGS and morning < EMP_MIN_BOOKINGS:
+                                if evening > ZERO and morning < EMP_MIN_BOOKINGS:
                                     emp['overall_hint'] = f"{emp_name} should busy in the {MORNING} and {AFTERNOON}."
                                 else:
                                     emp['overall_hint'] = f"{emp_name} should busy in the {AFTERNOON}."
 
                         if evening < morning:
                             if morning < afternoon:
-                                if afternoon >=EMP_MIN_BOOKINGS and morning < EMP_MIN_BOOKINGS:
+                                if afternoon > ZERO and morning < EMP_MIN_BOOKINGS:
                                     emp['overall_hint'] = f"{emp_name} should busy in the {MORNING} and {EVENING}."
                                 else:
                                     emp['overall_hint'] = f"{emp_name} should busy in the {EVENING}."
                             elif morning > afternoon:
-                                if morning >= EMP_MIN_BOOKINGS and afternoon < EMP_MIN_BOOKINGS:
+                                if morning > ZERO and afternoon < EMP_MIN_BOOKINGS:
                                     emp['overall_hint'] = f"{emp_name} should busy in the {AFTERNOON} and {EVENING}."
                                 else:
                                     emp['overall_hint'] = f"{emp_name} should busy in the {EVENING}."
