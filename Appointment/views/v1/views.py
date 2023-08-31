@@ -1274,10 +1274,12 @@ def update_appointment_service(request):
             
             # updating employee booking insight data
             # on changing appointment service.
+            # taking client from appoinntment object
             employee_insight_obj = EmployeeBookingDailyInsights.objects.filter(
+                appointment=appointment,
+                appointment__client=client,
                 appointment_service=service_appointment,
-                service=service_id,
-                client=client
+                service=service_id
             ).first()
             employee_insight_obj.employee = member_id
             employee_insight_obj.set_employee_time(date_time)
