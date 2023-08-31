@@ -55,19 +55,21 @@ class EmployeeDailyInsightsView(APIView):
             emp_name = emp['full_name']
             # declaring messages hint1 and hint2
 
-            cal_sum = sum([morning, afternoon, evening])
+            slots = [morning, afternoon, evening]
+            cal_sum = sum(slots)
+            steady_all_day = [slot >= EMP_MIN_BOOKINGS for slot in slots]
 
             # Early exit from the various conditions
             if cal_sum > 0:
                 
                 # Condition 1 - Employee is doing great.
-                if morning == afternoon == evening == EMP_MIN_BOOKINGS:
+                if all(steady_all_day):
                     emp['overall_hint'] = f"Bookings for {emp_name} are steady all day."
                 
                 # Condition 2 - Employee have few bookings in every shift
-                elif (morning < EMP_MIN_BOOKINGS) and \
-                     (afternoon < EMP_MIN_BOOKINGS) and \
-                     (evening < EMP_MIN_BOOKINGS):
+                elif (morning < EMP_MIN_BOOKINGS and morning > 0) and \
+                     (afternoon < EMP_MIN_BOOKINGS and afternoon > 0) and \
+                     (evening < EMP_MIN_BOOKINGS and evening > 0):
                     
                     emp['overall_hint'] = f"{emp_name} has few bookings in every shift."
                 # Other conditions on which we are sennding overall hint about employee
