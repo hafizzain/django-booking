@@ -2011,7 +2011,7 @@ def update_memberships(request):
     errors.append(services)
     for serv in services:
         service_id = serv['service']
-        if 'duration' in service:
+        if 'duration' in serv:
             duration = serv['duration']
         else:
             duration = None
