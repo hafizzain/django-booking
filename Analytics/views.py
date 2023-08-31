@@ -90,7 +90,7 @@ class EmployeeDailyInsightsView(APIView):
                                 emp['overall_hint'] = f"{emp_name} should busy in the {AFTERNOON}."
                         elif evening > morning:
                             if evening >= EMP_MIN_BOOKINGS and morning < EMP_MIN_BOOKINGS:
-                                emp['overall_hint'] = f"{emp_name} should busy in the {AFTERNOON} and {MORNING}."
+                                emp['overall_hint'] = f"{emp_name} should busy in the {MORNING} and {AFTERNOON}."
                             else:
                                 emp['overall_hint'] = f"{emp_name} should busy in the {AFTERNOON}."
 
