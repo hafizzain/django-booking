@@ -2204,7 +2204,7 @@ def new_create_sale_order(request):
                 quantity = quantity,
                 current_price = float(price),
                 discount_percentage = float(discount_percentage),
-                discount_price = float(order_discount_price),
+                discount_price = order_discount_price,
             )
             product_order.sold_quantity += 1 # product_stock.sold_quantity
             product_order.save()
@@ -2284,7 +2284,7 @@ def new_create_sale_order(request):
                     location = business_address,
                     current_price = float(price),
                     discount_percentage = float(discount_percentage),
-                    discount_price = float(order_discount_price),
+                    discount_price = order_discount_price,
                 )
             except Exception as err:
                 ExceptionRecord.objects.create(
@@ -2348,7 +2348,7 @@ def new_create_sale_order(request):
                     quantity = quantity,
                     location = business_address,
                     current_price = float(price),
-                    discount_price = float(order_discount_price),
+                    discount_price = order_discount_price,
 
                 )
                 
