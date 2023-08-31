@@ -72,6 +72,16 @@ class EmployeeDailyInsightsView(APIView):
                     emp['overall_hint'] = f"{emp_name} has few bookings in every shift."
                 # Other conditions on which we are sennding overall hint about employee
                 else:
+
+                    # Additional condition for zero bookings in two slots and at least one booking in the third slot
+                    if morning == 0 and afternoon == 0 and evening > 0:
+                        emp['overall_hint'] = f"{emp_name} should busy in the {MORNING} and {AFTERNOON}"
+
+                    elif morning == 0 and evening == 0 and afternoon > 0:
+                        emp['overall_hint'] = f"{emp_name} should busy in the {MORNING} and {EVENING}"
+
+                    elif afternoon == 0 and evening == 0 and morning > 0:
+                        emp['overall_hint'] = f"{emp_name} should busy in the {AFTERNOON} and {EVENING}"
                     
                     if morning < afternoon:
                         if afternoon < evening:
