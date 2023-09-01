@@ -313,21 +313,15 @@ GEOIP_PATH =os.path.join('geoip')
 
 # FCM_DJANGO CONFIGURATION
 fcm_credentials = env('GOOGLE_APPLICATION_CREDENTIALS')
-cred = credentials.Certificate(fcm_credentials)
+with open(fcm_credentials, 'r') as cred:
+    json_data = json.loads(cred.read())
 
+cred = credentials.Certificate(json_data)
 FIREBASE_APP = initialize_app(cred)
 FCM_DJANGO_SETTINGS = {
-     # an instance of firebase_admin.App to be used as default for all fcm-django requests
-     # default: None (the default Firebase app)
     "DEFAULT_FIREBASE_APP": FIREBASE_APP,
-     # default: _('FCM Django')s
     "APP_VERBOSE_NAME": "FCM Devices",
-     # true if you want to have only one active device per registered user at a time
-     # default: False
     "ONE_DEVICE_PER_USER": True,
-     # devices to which notifications cannot be sent,
-     # are deleted upon receiving error response from FCM
-     # default: False
     "DELETE_INACTIVE_DEVICES": False,
 }
 
