@@ -4689,7 +4689,7 @@ def employee_login(request):
                     registration_id=device_token
                 )
             else:
-                employee_device.registration_id = device_serialized
+                employee_device.registration_id = device_token
                 employee_device.save()
             device_serialized = FCMDeviceSerializer(employee_device)
         except:
