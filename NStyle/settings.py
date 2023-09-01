@@ -13,8 +13,9 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 import environ
 import os
+import json
 
-from firebase_admin import initialize_app
+from firebase_admin import initialize_app, credentials
 
 env = environ.Env()
 environ.Env.read_env()
@@ -311,16 +312,15 @@ GEOIP_PATH =os.path.join('geoip')
 
 
 # FCM_DJANGO CONFIGURATION
+fcm_credentials = env('GOOGLE_APPLICATION_CREDENTIALS')
+cred = credentials.Certificate(fcm_credentials)
 
-try:
-    FIREBASE_APP = initialize_app()
-except ValueError:
-    pass
+FIREBASE_APP = initialize_app(cred)
 FCM_DJANGO_SETTINGS = {
      # an instance of firebase_admin.App to be used as default for all fcm-django requests
      # default: None (the default Firebase app)
-    "DEFAULT_FIREBASE_APP": None,
-     # default: _('FCM Django')
+    "DEFAULT_FIREBASE_APP": FIREBASE_APP,
+     # default: _('FCM Django')s
     "APP_VERBOSE_NAME": "FCM Devices",
      # true if you want to have only one active device per registered user at a time
      # default: False
