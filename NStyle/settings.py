@@ -311,16 +311,15 @@ GEOIP_PATH =os.path.join('geoip')
 
 
 # FCM_DJANGO CONFIGURATION
-FCM_CREDENTIALS = env('GOOGLE_APPLICATION_CREDENTIALS')
+
 try:
-    FIREBASE_APP = initialize_app(credential=FCM_CREDENTIALS)
+    FIREBASE_APP = initialize_app()
 except ValueError:
     pass
-
 FCM_DJANGO_SETTINGS = {
      # an instance of firebase_admin.App to be used as default for all fcm-django requests
      # default: None (the default Firebase app)
-    "DEFAULT_FIREBASE_APP": FIREBASE_APP,
+    "DEFAULT_FIREBASE_APP": None,
      # default: _('FCM Django')
     "APP_VERBOSE_NAME": "FCM Devices",
      # true if you want to have only one active device per registered user at a time
