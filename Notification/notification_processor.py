@@ -20,20 +20,20 @@ class NotificationProcessor:
         """
 
         # may be employee didnt registered a mobile device
-        is_device_registered = CustomFCMDevice.objects.filter(user=user).first()
-        if is_device_registered:
+        device_registered = CustomFCMDevice.objects.filter(user=user).first()
+        # if device_registered:
             # try:
-                message = Message(
-                    notification=Notification(title=title, body=body)
-                )
+        message = Message(
+            notification=Notification(title=title, body=body)
+        )
 
-                # get device and send message
-                device = CustomFCMDevice.objects.get(user=user)
-                device.send_message(message)
+        # get device and send message
+        # device = CustomFCMDevice.objects.get(user=user)
+        device_registered.send_message(message)
                 # except:
                 #     ExceptionRecord.objects.create(text='Exception in sendding notification')
-        else:
-            pass
+        # else:
+        #     pass
 
 
     @staticmethod
