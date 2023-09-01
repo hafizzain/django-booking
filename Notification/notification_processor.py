@@ -21,13 +21,13 @@ class NotificationProcessor:
 
         # may be employee didnt registered a mobile device
         device_registered = CustomFCMDevice.objects.filter(user=user).first()
-        # if device_registered:
-        message = Message(
-            notification=Notification(title=title, body=body)
-        )
-        device_registered.send_message(message)
-        # else:
-        #     pass
+        if device_registered:
+            message = Message(
+                notification=Notification(title=title, body=body)
+            )
+            device_registered.send_message(message)
+        else:
+            pass
 
 
     @staticmethod
