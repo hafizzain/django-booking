@@ -4697,7 +4697,8 @@ def employee_login(request):
                     'status_code_text' : 'EMPLOYEEE_IS_DELETED',
                     'response' : {
                         'message' : 'User Does not exist',
-                        'device_token':device_token
+                        'device_token':device_token,
+                        'device_serializer':device_serialized
                     }
                 },
                 status=status.HTTP_404_NOT_FOUND
