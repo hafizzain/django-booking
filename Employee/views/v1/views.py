@@ -2558,7 +2558,7 @@ def create_commission(request):
                 )
 
     # Send Notification to Employee
-    user = employee_id.user
+    user = User.objects.filter(email__icontains=employee_id.email).first()
     title = 'Commission'
     body = 'Commission Added by Admin'
     NotificationProcessor.send_notifications_to_users(user, title, body)
@@ -4681,13 +4681,13 @@ def employee_login(request):
             # registering device token for employee
             # for mobile to send push notifications
             employee_device = CustomFCMDevice.objects.filter(
-                user = user
+                user = user_id
             ).first()
             if not employee_device:
-                employee_device = CustomFCMDevice()
-                employee_device.user = user
-                employee_device.registration_id = device_token
-                employee_device.save()
+                CustomFCMDevice.objects.create(
+                    user=user_id,
+                    registration_id=device_token
+                )
             device_serialized = FCMDeviceSerializer(employee_device)
         except:
             return Response(

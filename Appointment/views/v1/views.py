@@ -614,7 +614,7 @@ def create_appointment(request):
         try:
             member=Employee.objects.get(id=member)
             all_members.append(str(member.id))
-            employee_users.append(member.user)
+            employee_users.append(User.objects.filter(email__icontains=member.email).first())
         except Exception as err:
             return Response(
             {
@@ -1004,7 +1004,7 @@ def update_appointment(request):
             pass
     
     # Send Notification to Employee
-    user = service_appointment.member.user
+    user = User.objects.filter(email__icontains=service_appointment.member.email).first()
     title = 'Appointment'
     body = 'Appointment Updated by Admin'
     NotificationProcessor.send_notifications_to_users(user, title, body)
@@ -1877,7 +1877,9 @@ def create_checkout(request):
                     tip = 0
                 )
                 empl_commissions_instances.append(employee_commission)
-                notify_users.append(service_appointment.member.user)
+                notify_users.append(User.objects.filter(
+                    email__icontains=service_appointment.member.email
+                    ).first())
             
     # if gst is None:
     #     gst = 0
