@@ -10,8 +10,8 @@ class NotificationProcessor:
     from the admin.
     """
 
-    @classmethod
-    def send_notification_per_user(cls, user, title, body):
+    @staticmethod
+    def send_notification_per_user(user, title, body):
         """
         args:
          - user: Employee User
@@ -30,15 +30,14 @@ class NotificationProcessor:
                 # get device and send message
                 device = CustomFCMDevice.objects.get(user=user)
                 device.send_message(message)
-                return "Message Sent"
                 # except:
                 #     ExceptionRecord.objects.create(text='Exception in sendding notification')
         else:
-            return 'Device Not found'
+            pass
 
 
-    @classmethod
-    def send_notifications_to_users(cls, user, title, body):
+    @staticmethod
+    def send_notifications_to_users(user, title, body):
         """
         A method to handle one or multiple users
         """
@@ -52,9 +51,11 @@ class NotificationProcessor:
                     title,
                     body
                 )
+            return "Sent To List"
         else: # single user
             NotificationProcessor.send_notification_per_user(
                 user,
                 title,
                 body
             )
+            return "Sent To User"
