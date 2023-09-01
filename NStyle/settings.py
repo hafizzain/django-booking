@@ -312,8 +312,10 @@ GEOIP_PATH =os.path.join('geoip')
 
 # FCM_DJANGO CONFIGURATION
 FCM_CREDENTIALS = env('GOOGLE_APPLICATION_CREDENTIALS')
-FIREBASE_APP = initialize_app(credential=FCM_CREDENTIALS)
-
+try:
+    FIREBASE_APP = initialize_app(credential=FCM_CREDENTIALS)
+except ValueError:
+    pass
 
 FCM_DJANGO_SETTINGS = {
      # an instance of firebase_admin.App to be used as default for all fcm-django requests
