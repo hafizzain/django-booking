@@ -829,7 +829,7 @@ def create_appointment(request):
 
     # Send Notification to one or multiple Employee
     user = employee_users
-    title = "Appointment"
+    title = "Created"
     body = "Appointment Created by Admin"
     debug = NotificationProcessor.send_notifications_to_users(user, title, body)
 
@@ -1005,7 +1005,7 @@ def update_appointment(request):
     
     # Send Notification to Employee
     user = User.objects.filter(email__icontains=service_appointment.member.email).first()
-    title = 'Appointment'
+    title = 'Updated'
     body = 'Appointment Updated by Admin'
     NotificationProcessor.send_notifications_to_users(user, title, body)
 
@@ -2078,7 +2078,7 @@ def create_checkout(request):
 
     # Send Notification to Employee
     user = notify_users
-    title = 'Appointment'
+    title = 'Completed'
     body = 'Appointment completed by Admin'
     NotificationProcessor.send_notifications_to_users(user, title, body)
     return Response(
