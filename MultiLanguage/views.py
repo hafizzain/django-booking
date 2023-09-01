@@ -332,6 +332,7 @@ def update_invoiceTranslation(request):
 
 
         invoice_data.save()
+        invoiceTranslation_data = InvoiceTransSerializer(invoice_data).data
 
         return Response(
                 {
@@ -341,7 +342,7 @@ def update_invoiceTranslation(request):
                     'response':
                     {
                         'message':'Invoice Translation Updated Successfully',
-                        'data':[]
+                        'data': invoiceTranslation_data
                     }
                 },
                 status=status.HTTP_200_OK
