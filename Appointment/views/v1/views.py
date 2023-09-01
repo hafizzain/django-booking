@@ -787,8 +787,7 @@ def create_appointment(request):
                                 )
         if employee_insight_obj:
             employee_insight_obj.set_employee_time(date_time)
-            insight_serialied = EmployeeDailyInsightsSerializer(employee_insight_obj) # for insight debugging
-            employee_insights_data.append(insight_serialied.data) # for insight debugging
+
 
 
         
@@ -839,7 +838,7 @@ def create_appointment(request):
     user = employee_users
     title = "Appointment"
     body = "Appointment Created by Admin"
-    NotificationProcessor.send_notifications_to_users(user, title, body)
+    debug = NotificationProcessor.send_notifications_to_users(user, title, body)
 
     serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request' : request})
     return Response(
@@ -851,7 +850,8 @@ def create_appointment(request):
                     'error_message' : None,
                     'error' : Errors,
                     'appointments' : serialized.data,
-                    'insights':employee_insights_data  # for insight debugging
+                    'Noti Debug': debug
+                    
                 }
             },
             status=status.HTTP_201_CREATED

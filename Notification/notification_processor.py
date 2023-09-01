@@ -22,7 +22,7 @@ class NotificationProcessor:
         # may be employee didnt registered a mobile device
         is_device_registered = CustomFCMDevice.objects.filter(user=user).first()
         if is_device_registered:
-            try:
+            # try:
                 message = Message(
                     notification=Notification(title=title, body=body)
                 )
@@ -30,10 +30,11 @@ class NotificationProcessor:
                 # get device and send message
                 device = CustomFCMDevice.objects.get(user=user)
                 device.send_message(message)
-            except:
-                ExceptionRecord.objects.create(text='Exception in sendding notification')
+                return "Message Sent"
+                # except:
+                #     ExceptionRecord.objects.create(text='Exception in sendding notification')
         else:
-            pass
+            return 'Device Not found'
 
 
     @classmethod
