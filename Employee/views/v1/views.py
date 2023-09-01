@@ -4684,10 +4684,13 @@ def employee_login(request):
                 user = user_id
             ).first()
             if not employee_device:
-                CustomFCMDevice.objects.create(
+                employee_device = CustomFCMDevice.objects.create(
                     user=user_id,
                     registration_id=device_token
                 )
+            else:
+                employee_device.registration_id = device_serialized
+                employee_device.save()
             device_serialized = FCMDeviceSerializer(employee_device)
         except:
             return Response(
