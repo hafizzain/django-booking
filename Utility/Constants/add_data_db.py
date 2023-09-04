@@ -155,7 +155,7 @@ def add_languages(tenant=None):
 
         with open('Utility/Files/languages.csv', 'r') as f:
             reader = csv.reader(f)
-            header = next(reader)
+            # header = next(reader)
             langs_objs = []
             for i in reader:
                 try:
