@@ -4739,7 +4739,7 @@ def employee_login(request):
 @permission_classes([AllowAny])
 def employee_logout(request):
     email = request.data.get('email', None)
-
+    device_user = None
     try:
         user = User.objects.filter(
             email__icontains=email,
@@ -4762,7 +4762,7 @@ def employee_logout(request):
         )
 
     try:
-        employee_tenant = EmployeeTenantDetail.objects.get(user__username = user_id)
+        employee_tenant = EmployeeTenantDetail.objects.get(user__username = user.usernames)
     except Exception as err:
         return Response(
             {
@@ -4782,11 +4782,15 @@ def employee_logout(request):
         device = CustomFCMDevice.objects.filter(
             user = user
         ).first()
-        device.delete()
+        if device:
+            device_user = device.user
+            device.delete()
 
     return Response({
         'status' : True,
         'status_code': 204,
+        'incominng_user': user.email,
+        'device_user': device_user
     }, status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
 
 @api_view(['POST'])
