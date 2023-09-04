@@ -4736,6 +4736,7 @@ def employee_login(request):
         )
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def employee_logout(request):
     email = request.data.get('email', None)
 
