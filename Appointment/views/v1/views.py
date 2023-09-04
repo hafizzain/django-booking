@@ -831,7 +831,7 @@ def create_appointment(request):
     user = employee_users
     title = "Created"
     body = "Appointment Created by Admin"
-    debug = NotificationProcessor.send_notifications_to_users(user, title, body)
+    NotificationProcessor.send_notifications_to_users(user, title, body)
 
     serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request' : request})
     return Response(
@@ -843,7 +843,6 @@ def create_appointment(request):
                     'error_message' : None,
                     'error' : Errors,
                     'appointments' : serialized.data,
-                    'Noti Debug': debug
                     
                 }
             },

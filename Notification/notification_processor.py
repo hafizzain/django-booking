@@ -45,11 +45,9 @@ class NotificationProcessor:
                     title,
                     body
                 )
-            return "Sent To List"
         else: # single user
             NotificationProcessor.send_notification_per_user(
                 user,
                 title,
                 body
             )
-            return "Sent To User"
