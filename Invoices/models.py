@@ -223,7 +223,7 @@ class SaleInvoice(models.Model):
                     **tax_details,
                 }
                 schema_name = connection.schema_name
-                output_dir = f'{settings.CLOUD_FRONT_S3_BUCKET_URL}/media/{schema_name}/invoicesFiles'
+                output_dir = f'{settings.BACKEND_HOST}/media/{schema_name}/invoicesFiles'
                 is_exist = os.path.isdir(output_dir)
                 if not is_exist:
                     os.mkdir(output_dir)
