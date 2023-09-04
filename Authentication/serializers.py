@@ -154,7 +154,7 @@ class UserTenantLoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'first_name', 'last_name', 'email','employee', #employee_permission',
-                  'domain', 'is_tenant', 'access_token','joined_at', '']
+                  'domain', 'is_tenant', 'access_token','joined_at']
         
 class UserSerializerByClient(serializers.ModelSerializer):
     domain = serializers.SerializerMethodField()
