@@ -564,7 +564,6 @@ def create_appointment(request):
     # log_details = []
     all_members = []
     employee_users = []
-    employee_insights_data = [] # for insight debugging
     for appoinmnt in appointments:
         member = appoinmnt['member']
         service = appoinmnt['service']
@@ -615,7 +614,7 @@ def create_appointment(request):
         try:
             member=Employee.objects.get(id=member)
             all_members.append(str(member.id))
-            employee_users.append(member.user)
+            employee_users.append(User.objects.filter(email__icontains=member.email).first())
         except Exception as err:
             return Response(
             {
@@ -752,9 +751,7 @@ def create_appointment(request):
             appointment_service.service_commission = service_commission
             appointment_service.service_commission_type = service_commission_type
             appointment_service.save()
-        #     ExceptionRecord.objects.create(
-        #         text = f'commsion {service_commission} service_commission_type {service_commission_type} dicount {discount_price}'
-        # )
+
         except Exception as err:
             Errors.append(str(err))
         
@@ -787,12 +784,7 @@ def create_appointment(request):
                                 )
         if employee_insight_obj:
             employee_insight_obj.set_employee_time(date_time)
-            insight_serialied = EmployeeDailyInsightsSerializer(employee_insight_obj) # for insight debugging
-            employee_insights_data.append(insight_serialied.data) # for insight debugging
 
-
-        
-    
     service_commission = 0
     service_commission_type = ''
     toValue = 0
@@ -837,7 +829,7 @@ def create_appointment(request):
 
     # Send Notification to one or multiple Employee
     user = employee_users
-    title = "Appointment"
+    title = "Created"
     body = "Appointment Created by Admin"
     NotificationProcessor.send_notifications_to_users(user, title, body)
 
@@ -851,7 +843,7 @@ def create_appointment(request):
                     'error_message' : None,
                     'error' : Errors,
                     'appointments' : serialized.data,
-                    'insights':employee_insights_data  # for insight debugging
+                    
                 }
             },
             status=status.HTTP_201_CREATED
@@ -1011,8 +1003,8 @@ def update_appointment(request):
             pass
     
     # Send Notification to Employee
-    user = service_appointment.member.user
-    title = 'Appointment'
+    user = User.objects.filter(email__icontains=service_appointment.member.email).first()
+    title = 'Updated'
     body = 'Appointment Updated by Admin'
     NotificationProcessor.send_notifications_to_users(user, title, body)
 
@@ -1884,7 +1876,9 @@ def create_checkout(request):
                     tip = 0
                 )
                 empl_commissions_instances.append(employee_commission)
-                notify_users.append(service_appointment.member.user)
+                notify_users.append(User.objects.filter(
+                    email__icontains=service_appointment.member.email
+                    ).first())
             
     # if gst is None:
     #     gst = 0
@@ -2083,7 +2077,7 @@ def create_checkout(request):
 
     # Send Notification to Employee
     user = notify_users
-    title = 'Appointment'
+    title = 'Completed'
     body = 'Appointment completed by Admin'
     NotificationProcessor.send_notifications_to_users(user, title, body)
     return Response(
