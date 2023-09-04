@@ -4762,7 +4762,7 @@ def employee_logout(request):
         )
 
     try:
-        employee_tenant = EmployeeTenantDetail.objects.get(user__username = user.usernames)
+        employee_tenant = EmployeeTenantDetail.objects.get(user__username = user)
     except Exception as err:
         return Response(
             {
