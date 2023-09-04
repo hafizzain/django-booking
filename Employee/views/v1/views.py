@@ -4776,12 +4776,19 @@ def employee_logout(request):
         )
 
     with tenant_context(employee_tenant.tenant):
+
+        user_id = User.objects.get(
+            email=email,
+            is_deleted=False,
+            #user_account_type__account_type = 'Employee'
+        )
         # deleting device token for employee
         # for mobile to not send push notifications
         # when it is logout
         device = CustomFCMDevice.objects.filter(
-            user = user
+            user = user_id
         ).first()
+        
         if device:
             device_user = device.user
             device.delete()
