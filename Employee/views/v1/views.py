@@ -4735,6 +4735,59 @@ def employee_login(request):
             status=status.HTTP_200_OK
         )
 
+@api_view(['GET'])
+def employee_logout(request):
+    email = request.data.get('email', None)
+
+    try:
+        user_id = User.objects.get(
+            email=email,
+            is_deleted=False,
+            user_account_type__account_type = 'Employee'
+        )
+
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
+                'status_code_text' : 'INVALID_CREDENTIALS_4013',
+                'response' : {
+                    'message' : 'User does not exist with this email',
+                    'error_message' : str(err),
+                    'fields' : ['email']
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    try:
+        employee_tenant = EmployeeTenantDetail.objects.get(user__username = user_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Authenticated',
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
+    with tenant_context(employee_tenant.tenant):
+        # deleting device token for employee
+        # for mobile to not send push notifications
+        # when it is logout
+        CustomFCMDevice.objects.filter(
+            user = user_id
+        ).first().delete()
+
+    return Response({
+        'status' : True,
+        'status_code': 204,
+    }, status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def resend_password(request):

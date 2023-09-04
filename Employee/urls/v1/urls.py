@@ -84,6 +84,7 @@ urlpatterns = [
     #Create User Account
     path('create_employe_account/', views.create_employe_account),
     path('employee_login/', views.employee_login),
+    path('employee_logout/', views.employee_logout),
     path('forget_password/', views.forgot_password),
     path('verify_email/', views.verify_email),
     path('resend_password/', views.resend_password),
