@@ -4741,10 +4741,10 @@ def employee_logout(request):
     email = request.data.get('email', None)
 
     try:
-        user_id = User.objects.get(
-            email=email,
+        user = User.objects.filter(
+            email__icontains=email,
             is_deleted=False,
-        )
+        ).first()
 
     except Exception as err:
         return Response(
@@ -4779,9 +4779,10 @@ def employee_logout(request):
         # deleting device token for employee
         # for mobile to not send push notifications
         # when it is logout
-        CustomFCMDevice.objects.filter(
-            user = user_id
-        ).first().delete()
+        device = CustomFCMDevice.objects.filter(
+            user = user
+        ).first()
+        device.delete()
 
     return Response({
         'status' : True,
