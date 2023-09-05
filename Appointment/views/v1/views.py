@@ -581,8 +581,6 @@ def create_appointment(request):
         membership_id = appoinmnt.get('membership', None)
         promotion_id = appoinmnt.get('promotion', None)
         discount_price = appoinmnt.get('discount_price', None)
-        gst_id = appoinmnt.get('gst_id', None)
-        # tip = appoinmnt['tip']
         
         app_date_time = f'2000-01-01 {date_time}'
         
@@ -591,26 +589,6 @@ def create_appointment(request):
         datetime_duration = app_date_time + timedelta(minutes=duration)
         datetime_duration = datetime_duration.strftime('%H:%M:%S')
         end_time = datetime_duration
-        
-        try:
-            voucher = Vouchers.objects.get(id = voucher_id )
-        except:
-            voucher = None
-            
-        try:
-            reward = Rewards.objects.get(id = reward_id )
-        except:
-            reward = None
-        
-        try:
-            membership = Membership.objects.get(id = membership_id )
-        except:
-            membership = None
-        
-        try:
-            promotion = Promotion.objects.get(id = promotion_id )
-        except:
-            promotion = None
             
         try:
             member=Employee.objects.get(id=member)
@@ -652,10 +630,6 @@ def create_appointment(request):
                     client = client,
                     complimentary =  complimentary,
                     service = service,
-                    # defaults={
-                    #     'visits': 1
-                    # },
-                    # visits=F('visits') + 1
                     visits = 1
                 )
             except Exception as err:
@@ -707,7 +681,7 @@ def create_appointment(request):
         total_price_app += int(price)
         service_commission = 0
         service_commission_type = ''
-        toValue = 0  
+        toValue = 0
         
 
 
@@ -724,10 +698,6 @@ def create_appointment(request):
             member = member,
             discount_price = discount_price,
             total_price = price,
-            
-            # service_commission = service_commission,
-            # service_commission_type= service_commission_type,
-            
             slot_availible_for_online = slot_availible_for_online,
             client_can_book = client_can_book,
         )
@@ -1714,9 +1684,6 @@ def create_checkout(request):
     redeemed_membership_id = request.data.get('redeemed_membership_id', None)
     redeemed_voucher_id = request.data.get('redeemed_voucher_id', None)
 
-    # appointment_checkout_tip = request.data.get('appointment_checkout', None)
-    # employee_tip = request.data.get('employee_tip', None)
-
     service_commission = 0
     service_commission_type = ''
     toValue = 0
@@ -1727,9 +1694,7 @@ def create_checkout(request):
     # Extract client name from appointtment_service_obj
     client_name = None
     client_invoice = None
-    # if not all([]){
-        
-    # }
+
     try:
         members=Employee.objects.get(id=member)
     except Exception as err:
@@ -1798,7 +1763,6 @@ def create_checkout(request):
         pass
 
     empl_commissions_instances = []
-    empoloyee_users_notification = []
     for app in appointment_service_obj:
         client_name = app.get('client', None)
         active_user_staff = None
@@ -1850,7 +1814,6 @@ def create_checkout(request):
 
             sale_commissions = CategoryCommission.objects.filter(
                 commission__employee = service_appointment.member,
-                # from_value__lte = total_price,
                 from_value__lte = service_total_price,
                 category_comission__iexact = 'Service'
             ).order_by('-from_value')

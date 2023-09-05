@@ -50,7 +50,7 @@ class UpdateAppointmentSerializer(serializers.ModelSerializer):
     final_price = serializers.SerializerMethodField(read_only=True)
 
 
-    def get_final_price(self, obj):
+    def get_final_price(self, obj: AppointmentService):
         return obj.get_final_price()
     
     def get_service_name(self, obj):
