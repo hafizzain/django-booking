@@ -183,7 +183,7 @@
             class="p-[1.2rem] overflow-y-auto overflow-x-hidden scroll-hidden text-center flex flex-col gap-5"
           >
             <h1 class="font-bold text-xl normal-case">
-              <p>Invoice <span class="arabic">فاتورة</span></p>
+              <p>Invoice <span class="arabic">{{invoice_trans.invoice}}</span></p>
               #{{invoice_id}}
             </h1>
 
@@ -210,9 +210,9 @@
                     class="flex items-center justify-between text-sm font-semibold"
                   >
                     <p class="text-left">
-                      Item <span class="arabic">غرض</span>
+                      Item <span class="arabic">{{invoice_trans.items}}</span>
                     </p>
-                    <p>Amount <span class="arabic">كمية</span></p>
+                    <p>Amount <span class="arabic">{{invoice_trans.amount}}</span></p>
                   </div>
                   {% for order in order_items %}
                   <div
@@ -237,7 +237,7 @@
               >
                 <div>
                   <p>Subtotal</p>
-                  <p class="arabic">المجموع الفرعي</p>
+                  <p class="arabic">{{invoice_trans.subtotal}}</p>
                 </div>
                 <p>{{sub_total}} {{currency_code}}</p>
               </div>
@@ -280,7 +280,7 @@
             >
               <div>
                 <p class="text-left">Total</p>
-                <p class="arabic">المجموع</p>
+                <p class="arabic">{{invoice_trans.total}}</p>
               </div>
               <p class="text-sm">{{total}} {{currency_code}}</p>
             </div>
