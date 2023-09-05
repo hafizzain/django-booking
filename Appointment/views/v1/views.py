@@ -830,8 +830,8 @@ def create_appointment(request):
 
     # Send Notification to one or multiple Employee
     user = employee_users
-    title = "Created"
-    body = "Appointment Created by Admin"
+    title = "Appointment"
+    body = "Appointment Created"
     NotificationProcessor.send_notifications_to_users(user, title, body)
 
     serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request' : request})
@@ -1005,8 +1005,8 @@ def update_appointment(request):
     
     # Send Notification to Employee
     user = User.objects.filter(email__icontains=service_appointment.member.email).first()
-    title = 'Updated'
-    body = 'Appointment Updated by Admin'
+    title = 'Appointment'
+    body = 'Appointment Updated'
     NotificationProcessor.send_notifications_to_users(user, title, body)
 
     return Response(
@@ -1798,6 +1798,7 @@ def create_checkout(request):
         pass
 
     empl_commissions_instances = []
+    empoloyee_users_notification = []
     for app in appointment_service_obj:
         client_name = app.get('client', None)
         active_user_staff = None
@@ -1876,6 +1877,7 @@ def create_checkout(request):
                     quantity = 1,
                     tip = 0
                 )
+                user = User.objects.filter(email__iconntains=service_appointment.member.email).first()
                 empl_commissions_instances.append(employee_commission)
                 notify_users.append(User.objects.filter(
                     email__icontains=service_appointment.member.email
@@ -2078,8 +2080,8 @@ def create_checkout(request):
 
     # Send Notification to Employee
     user = notify_users
-    title = 'Completed'
-    body = 'Appointment completed by Admin'
+    title = 'Appointment'
+    body = 'Appointment completed'
     NotificationProcessor.send_notifications_to_users(user, title, body)
     return Response(
             {
