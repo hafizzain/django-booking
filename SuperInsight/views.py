@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect, HttpResponse
+from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect
 from MultiLanguage.models import *
 from Utility.models import ExceptionRecord
 from Tenants.models import Tenant
@@ -7,7 +8,8 @@ from django.contrib.auth import logout
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
-
+from threading import Thread
+from Utility.Constants.Tenant.create_dummy_tenants import CreateDummyTenants
 
 
 
@@ -27,7 +29,21 @@ def TenantsListingPage(request):
     tenants = Tenant.objects.all()
     context={}
     context['tenants'] = tenants
+    context['free_tenants'] = tenants.filter(is_ready = True, is_active = False)
+    context['creating_tenants'] = tenants.filter(is_ready = False, is_active = False)
     return render(request, 'SuperAdminPanel/pages/Tenants/index.html', context)
+
+@login_required(login_url='/super-admin/super-login/')
+def CreateFreeTenants(request):
+    try:
+        thrd = Thread(target=CreateDummyTenants)
+        thrd.start()
+    except Exception as err:
+        messages.error(request, str(err))
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/super-admin/tenants/'))
+    else:
+        messages.success(request, 'You will be notify when tenants are successfully created')
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/super-admin/tenants/'))
 
 
 @login_required(login_url='/super-admin/super-login/')

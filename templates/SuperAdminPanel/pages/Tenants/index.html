@@ -3,7 +3,29 @@
   SideBarActive("tenants");
 </script>
 <div class="flex flex-col gap-6">
-  <h1 class="font-semibold text-2xl">Tenants <span class="text-sm text-gray-500">({{tenants|length}})</span></h1>
+  <div class="flex items-center justify-between">
+    <h1 class="font-semibold text-2xl">Tenants <span class="text-sm text-gray-500">({{tenants|length}})</span></h1>
+    <div>
+      <a href="{% url 'CreateFreeTenants' %}" class="px-3 py-4 active_sidebar cursor-pointer rounded-lg flex items-center gap-3 active_sidebar_active">
+        Create Free Tenants
+      </a>
+    </div>
+  </div>
+  <div class="flex items-center gap-4">
+    <div class="bg-white border rounded-lg p-4 min-w-[100px]">
+      <h3 class="font-semibold text-center">Total Tenants</h3>
+      <p class="text-center">{{tenants|length}}</p>
+    </div>
+    <div class="bg-white border rounded-lg p-4 min-w-[100px]">
+      <h3 class="font-semibold text-center">Free Tenants</h3>
+      <p class="text-center">{{free_tenants|length}}</p>
+    </div>
+    <div class="bg-white border rounded-lg p-4 min-w-[100px]">
+      <h3 class="font-semibold text-center">Creating</h3>
+      <p class="text-center">{{creating_tenants|length}}</p>
+    </div>
+
+  </div>
   <div class="border rounded-lg">
     <div class="overflow-x-auto">
       <div
@@ -20,7 +42,7 @@
         {% for tenant in tenants %}
 
         <div class="px-12 py-3 inline-grid xl:grid grid-cols-[repeat(6,minmax(200px,1fr))]">
-          <div class="flex items-center"><p class="text-sm">{{tenant.id}}</p></div>
+          <div class="flex items-center pr-3"><p class="text-sm line-clamp-1">{{tenant.id}}</p></div>
           <div class="flex items-center"><p class="text-sm">{{tenant.user.user_full_name}}</p></div>
           <div class="flex items-center"><p class="text-sm">{{tenant.domain}}</p></div>
           <div class="flex items-center"><p class="text-sm">{% if tenant.is_ready %}<img src="/static/admin/img/icon-yes.svg" alt="True">{% else %}<img src="/static/admin/img/icon-no.svg" alt="False">{% endif %}</p></div>
