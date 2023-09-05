@@ -223,11 +223,11 @@ class SaleInvoice(models.Model):
                     'total' : round((float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)) + float(tax_details.get('tax_amount1', 0))), 2),
                     'created_at' : self.created_at.strftime('%Y-%m-%d') if self.created_at else '',
                     'BACKEND_HOST' : settings.BACKEND_HOST,
-                    'invoice_trans': invoice_trans['invoice'],
-                    'items_trans': invoice_trans['items'],
-                    'amount_trans': invoice_trans['amount'],
-                    'subtotal_trans': invoice_trans['subtotal'],
-                    'total_trans': invoice_trans['total'],
+                    'invoice_trans': invoice_trans['invoice'] if invoice_trans else '',
+                    'items_trans': invoice_trans['items'] if invoice_trans else '',
+                    'amount_trans': invoice_trans['amount'] if invoice_trans else '',
+                    'subtotal_trans': invoice_trans['subtotal'] if invoice_trans else '',
+                    'total_trans': invoice_trans['total'] if invoice_trans else '',
                     **tax_details,
                 }
                 schema_name = connection.schema_name
@@ -258,11 +258,13 @@ class SaleInvoice(models.Model):
         based on the invoice business address / location. That 
         translation will then embed into invoice template.
         """
+        if self.business_address:
+            invoice_trans = InvoiceTranslation.objects.filter(
+                location=self.business_address
+            ).first()
 
-        invoice_trans = InvoiceTranslation.objects.filter(
-            location=self.business_address
-        ).first()
-
-        translation_data = InvoiceTransSerializer(invoice_trans).data
-        return dict(translation_data)
+            translation_data = InvoiceTransSerializer(invoice_trans).data
+            return dict(translation_data)
+        else:
+            return None
 
