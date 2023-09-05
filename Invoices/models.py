@@ -223,6 +223,7 @@ class SaleInvoice(models.Model):
                     'total' : round((float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)) + float(tax_details.get('tax_amount1', 0))), 2),
                     'created_at' : self.created_at.strftime('%Y-%m-%d') if self.created_at else '',
                     'BACKEND_HOST' : settings.BACKEND_HOST,
+                    'invoice_trans_all': invoice_trans,
                     'invoice_trans': invoice_trans['invoice'],
                     'items_trans': invoice_trans['items'],
                     'amount_trans': invoice_trans['amount'],
