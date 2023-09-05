@@ -259,5 +259,5 @@ class SaleInvoice(models.Model):
         ).first()
 
         translation_data = InvoiceTransSerializer(invoice_trans).data
-        return dict(translation_data)
+        return translation_data
 
