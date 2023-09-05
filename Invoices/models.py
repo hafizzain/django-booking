@@ -15,6 +15,8 @@ from django.db.models import F, Q
 from Order.models import Order, Checkout, ProductOrder, ServiceOrder, VoucherOrder, MemberShipOrder
 from Appointment.models import Appointment, AppointmentCheckout, AppointmentService, AppointmentEmployeeTip
 from Utility.models import ExceptionRecord
+from MultiLanguage.models import InvoiceTranslation
+from MultiLanguage.serializers import InvoiceTransSerializer
 
 
 class SaleInvoice(models.Model):
@@ -220,6 +222,7 @@ class SaleInvoice(models.Model):
                     'total' : round((float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)) + float(tax_details.get('tax_amount1', 0))), 2),
                     'created_at' : self.created_at.strftime('%Y-%m-%d') if self.created_at else '',
                     'BACKEND_HOST' : settings.BACKEND_HOST,
+                    'invoice_trans': self.get_invoice_translations()
                     **tax_details,
                 }
                 schema_name = connection.schema_name
@@ -244,9 +247,17 @@ class SaleInvoice(models.Model):
 
         super(SaleInvoice, self).save(*args, **kwargs)
 
-    # def get_currency_for_invoice(self):
-    #     """
-    #     Returns the currency of BusinessAddress(location) - see model
-    #     """
-    #     if self.location and self.location.currency:
-    #         return self.location.currency.code or 'for test'
+    def get_invoice_translations(self):
+        """
+        This function will return the invoice translation object
+        based on the invoice business address / location. That 
+        translation will then embed into invoice template.
+        """
+
+        invoice_trans = InvoiceTranslation.objects.filter(
+            location=self.business_address
+        ).first()
+
+        translation_data = InvoiceTransSerializer(invoice_trans).data
+        return dict(translation_data)
+
