@@ -2559,8 +2559,8 @@ def create_commission(request):
 
     # Send Notification to Employee
     user = User.objects.filter(email__icontains=employee_id.email).first()
-    title = 'Commission Added'
-    body = 'Commission Added by Admin'
+    title = 'Commission'
+    body = 'Commission Added'
     NotificationProcessor.send_notifications_to_users(user, title, body)
 
 
@@ -4735,7 +4735,7 @@ def employee_login(request):
             status=status.HTTP_200_OK
         )
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def employee_logout(request):
     email = request.data.get('email', None)
@@ -4795,6 +4795,7 @@ def employee_logout(request):
     return Response({
         'status' : True,
         'status_code': 204,
+        'message': 'Device unlinked for notifications'
     }, status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
 
 @api_view(['POST'])
