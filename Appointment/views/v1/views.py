@@ -252,7 +252,8 @@ def get_today_appointments(request):
     today = date.today()
     today_appointment = AppointmentService.objects.filter(
         appointment_date__icontains = today, is_blocked=False 
-        ).exclude(appointment_status__in=['Cancel', 'Done', 'Paid'])
+        ).exclude(appointment_status__in=['Cancel', 'Done', 'Paid']) \
+         .order_by('appointment_time')
     
 
     serialize = TodayAppoinmentSerializer(today_appointment, many=True)
