@@ -222,7 +222,7 @@ class SaleInvoice(models.Model):
                     'total' : round((float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)) + float(tax_details.get('tax_amount1', 0))), 2),
                     'created_at' : self.created_at.strftime('%Y-%m-%d') if self.created_at else '',
                     'BACKEND_HOST' : settings.BACKEND_HOST,
-                    'invoice_trans': self.get_invoice_translations()
+                    'invoice_trans': self.get_invoice_translations(),
                     **tax_details,
                 }
                 schema_name = connection.schema_name
@@ -259,5 +259,5 @@ class SaleInvoice(models.Model):
         ).first()
 
         translation_data = InvoiceTransSerializer(invoice_trans).data
-        return translation_data
+        return dict(translation_data)
 
