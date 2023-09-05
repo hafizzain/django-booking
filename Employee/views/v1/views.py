@@ -4735,10 +4735,10 @@ def employee_login(request):
             status=status.HTTP_200_OK
         )
 
-@api_view(['POST'])
+@api_view(['GET'])
 @permission_classes([AllowAny])
 def employee_logout(request):
-    email = request.data.get('email', None)
+    email = request.query_params.get('email', None)
 
     try:
         user = User.objects.filter(
@@ -4780,7 +4780,6 @@ def employee_logout(request):
         user_id = User.objects.get(
             email=email,
             is_deleted=False,
-            #user_account_type__account_type = 'Employee'
         )
         # deleting device token for employee
         # for mobile to not send push notifications
