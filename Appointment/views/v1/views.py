@@ -1840,7 +1840,6 @@ def create_checkout(request):
                     quantity = 1,
                     tip = 0
                 )
-                user = User.objects.filter(email__iconntains=service_appointment.member.email).first()
                 empl_commissions_instances.append(employee_commission)
                 notify_users.append(User.objects.filter(
                     email__icontains=service_appointment.member.email
