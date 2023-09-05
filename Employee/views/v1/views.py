@@ -4794,8 +4794,8 @@ def employee_logout(request):
     return Response({
         'status' : True,
         'status_code': 200,
-        'message': 'Device unlinked for notifications'
-    }, status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
+        'message': 'Device Unlinked'
+    }, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
