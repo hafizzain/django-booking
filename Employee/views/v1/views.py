@@ -4793,7 +4793,7 @@ def employee_logout(request):
 
     return Response({
         'status' : True,
-        'status_code': 204,
+        'status_code': 200,
         'message': 'Device unlinked for notifications'
     }, status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
 
