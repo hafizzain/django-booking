@@ -206,6 +206,7 @@ class SaleInvoice(models.Model):
     def save(self, *args, **kwargs):
         if not self.file and self.checkout:
             order_items, order_tips, tax_details = self.get_invoice_order_items()
+            invoice_trans = self.get_invoice_translations()
             if len(order_items) > 0:
                 sub_total = sum([order['price'] for order in order_items])
                 tips_total = sum([t['tip'] for t in order_tips])
@@ -222,7 +223,11 @@ class SaleInvoice(models.Model):
                     'total' : round((float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)) + float(tax_details.get('tax_amount1', 0))), 2),
                     'created_at' : self.created_at.strftime('%Y-%m-%d') if self.created_at else '',
                     'BACKEND_HOST' : settings.BACKEND_HOST,
-                    'invoice_trans': self.get_invoice_translations(),
+                    'invoice_trans': invoice_trans['invoice'],
+                    'items_trans': invoice_trans['items'],
+                    'amount_trans': invoice_trans['amount'],
+                    'subtotal_trans': invoice_trans['subtotal'],
+                    'total_trans': invoice_trans['total'],
                     **tax_details,
                 }
                 schema_name = connection.schema_name
