@@ -263,12 +263,20 @@ def get_filtered_chat_products(request):
             status=status.HTTP_200_OK
         )
     
+    # products = Product.objects.annotate(
+    #     most_transferred_products = Sum('products_stock_transfers__quantity')
+    # ).filter(
+    #     product_stock__location__id = location_id,
+    #     is_deleted = False,
+    #     products_stock_transfers__created_at__range = ('2020-01-01', f'{selected_year}-12-31')
+    # ).order_by('-most_transferred_products')[:10]
+
     products = Product.objects.annotate(
-        most_transferred_products = Sum('products_stock_transfers__quantity')
+        most_transferred_products = Sum('product_orders__quantity')
     ).filter(
         product_stock__location__id = location_id,
         is_deleted = False,
-        products_stock_transfers__created_at__range = ('2020-01-01', f'{selected_year}-12-31')
+        product_orders__created_at__range = ('2020-01-01', f'{selected_year}-12-31')
     ).order_by('-most_transferred_products')[:10]
 
 
