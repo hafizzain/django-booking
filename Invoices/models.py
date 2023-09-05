@@ -223,6 +223,11 @@ class SaleInvoice(models.Model):
                     **tax_details,
                 }
                 schema_name = connection.schema_name
+                schema_dir = f'{settings.BASE_DIR}/media/{schema_name}'
+                is_schema_dir_exist = os.path.isdir(schema_dir)
+                if not is_schema_dir_exist:
+                    os.mkdir(schema_dir)
+
                 output_dir = f'{settings.BASE_DIR}/media/{schema_name}/invoicesFiles'
                 is_exist = os.path.isdir(output_dir)
                 if not is_exist:
