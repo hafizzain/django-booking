@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.db import models
 from django.utils.timezone import now
 from Authentication.models import User
@@ -221,13 +222,14 @@ class SaleInvoice(models.Model):
                     'sub_total' : round(sub_total, 2),
                     'tips' : order_tips,
                     'total' : round((float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)) + float(tax_details.get('tax_amount1', 0))), 2),
-                    'created_at' : self.created_at.strftime('%Y-%m-%d') if self.created_at else '',
+                    'created_at' : datetime.now().strftime('%Y-%m-%d'),
                     'BACKEND_HOST' : settings.BACKEND_HOST,
                     'invoice_trans': invoice_trans['invoice'] if invoice_trans else '',
                     'items_trans': invoice_trans['items'] if invoice_trans else '',
                     'amount_trans': invoice_trans['amount'] if invoice_trans else '',
                     'subtotal_trans': invoice_trans['subtotal'] if invoice_trans else '',
                     'total_trans': invoice_trans['total'] if invoice_trans else '',
+                    'payment_type': self.payment_type,
                     **tax_details,
                 }
                 schema_name = connection.schema_name
@@ -260,6 +262,7 @@ class SaleInvoice(models.Model):
         """
         if self.business_address:
             invoice_trans = InvoiceTranslation.objects.filter(
+                status= 'active',
                 location=self.business_address
             ).first()
 

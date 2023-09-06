@@ -297,7 +297,7 @@
               <div
                 class="flex items-center justify-between text-primary text-sm"
               >
-                <p class="text-[#7B7B7B]">Cash Payment on {{created_at}}</p>
+                <p class="text-[#7B7B7B]">{{payment_type}} on {{created_at}} </p>
               </div>
             </div>
           </div>
@@ -323,10 +323,10 @@
           <div
             class="p-[1.2rem] overflow-y-auto overflow-hidden scroll-hidden text-center flex flex-col gap-5"
           >
-            <div class="text-left text-sm">
+            {% comment %} <div class="text-left text-sm">
               <p>Cashier: {{invoice_by}}</p>
               <p class="arabic">{{invoice_by_arabic_name}} : أمين الصندوق</p>
-            </div>
+            </div> {% endcomment %}
             <hr class="border" />
 
             <div class="leading-1 text-center font-semibold">
