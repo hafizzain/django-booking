@@ -1,7 +1,6 @@
 from firebase_admin.messaging import Message, Notification
 
 from Notification.models import CustomFCMDevice
-from Utility.models import ExceptionRecord
 
 class NotificationProcessor:
 

@@ -112,7 +112,7 @@ def create_stafftarget(request):
     # Send Notification to Employee
     user = User.objects.filter(email__icontains=employee_id.email).first()
     title = 'Target'
-    body = 'Target Added'
+    body = 'New Sales Target Assigned'
     NotificationProcessor.send_notifications_to_users(user, title, body)
     
     

@@ -2560,7 +2560,7 @@ def create_commission(request):
     # Send Notification to Employee
     user = User.objects.filter(email__icontains=employee_id.email).first()
     title = 'Commission'
-    body = 'Commission Added'
+    body = 'Admin Assigns New Commission'
     NotificationProcessor.send_notifications_to_users(user, title, body)
 
 

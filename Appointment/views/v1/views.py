@@ -801,7 +801,7 @@ def create_appointment(request):
     # Send Notification to one or multiple Employee
     user = employee_users
     title = "Appointment"
-    body = "Appointment Created"
+    body = "New Booking Assigned"
     NotificationProcessor.send_notifications_to_users(user, title, body)
 
     serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request' : request})
@@ -976,7 +976,7 @@ def update_appointment(request):
     # Send Notification to Employee
     user = User.objects.filter(email__icontains=service_appointment.member.email).first()
     title = 'Appointment'
-    body = 'Appointment Updated'
+    body = 'Appointment Cancelled'
     NotificationProcessor.send_notifications_to_users(user, title, body)
 
     return Response(
@@ -1260,6 +1260,12 @@ def update_appointment_service(request):
             text = f'reschedule_appointment {str(err)}'
         )
         pass
+
+    # Send Notification to Employee
+    user = User.objects.filter(email__icontains=service_appointment.member.email).first()
+    title = 'Appointment'
+    body = 'Booking Updated'
+    NotificationProcessor.send_notifications_to_users(user, title, body)
 
     return Response(
         {
@@ -1914,8 +1920,6 @@ def create_checkout(request):
         checkout = f'{checkout.id}'
     )
     invoice.save()
-    # checkout.business_address = service_appointment.business_address
-    # checkout.save()
 
     try:
         if checkout.appointment.is_promotion:
