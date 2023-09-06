@@ -273,10 +273,11 @@ def get_filtered_chat_products(request):
     #     is_deleted = False,
     #     products_stock_transfers__created_at__range = ('2020-01-01', f'{selected_year}-12-31')
     # ).order_by('-most_transferred_products')[:10]
-    sum_filter = Q(location=location_obj)
+
+    # sum_filter = Q(location=location_obj)
     products = Product.objects \
     .annotate(
-        most_transferred_products = Coalesce(Sum('product_orders__quantity', filter=sum_filter), 0)
+        most_transferred_products = Coalesce(Sum('product_orders__quantity'), 0)
     ).filter(
         product_stock__location__id = location_id,
         is_deleted = False,
