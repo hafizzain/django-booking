@@ -174,7 +174,6 @@ class FilteredInsightProducts(APIView):
                 status=status.HTTP_200_OK
             )
 
-        location_obj = BusinessAddress.objects.get(id=location_id)
         self.retreive_top_sold_query(request)
         self.retreive_most_consumed_query(request)
         self.retreive_most_ordered_query(request)
@@ -186,7 +185,6 @@ class FilteredInsightProducts(APIView):
             **self.queries['annotate'],
         ).filter(
             is_deleted = False,
-            location=location_obj,
             product_stock__location__id = location_id,
             **self.queries['filter'],
         ).distinct().order_by(*self.queries['order_by'])
