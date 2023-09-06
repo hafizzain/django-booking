@@ -830,6 +830,8 @@ def update_appointment(request):
     employee_id = request.data.get('employee_id', None)
     appointment_status = request.data.get('appointment_status', None)
 
+    is_cancelled = False
+
     if appointment_service_id is None: 
        return Response(
             {
@@ -954,6 +956,7 @@ def update_appointment(request):
         except Exception as err:
             print(err)
             pass
+        is_cancelled = True
     else:
         res_service_appointment = AppointmentService.objects.filter(appointment=service_appointment.appointment)
         for appointment_service in res_service_appointment:
@@ -973,11 +976,18 @@ def update_appointment(request):
             print(err)
             pass
     
-    # Send Notification to Employee
-    user = User.objects.filter(email__icontains=service_appointment.member.email).first()
-    title = 'Appointment'
-    body = 'Appointment Cancelled'
-    NotificationProcessor.send_notifications_to_users(user, title, body)
+    if is_cancelled:
+        #  deleted the appointment
+        user = User.objects.filter(email__icontains=employee.email).first()
+        title = 'Appointment'
+        body = 'Appointment Cancelled'
+        NotificationProcessor.send_notifications_to_users(user, title, body)
+    else:
+        # changed the employee of the existing appointment
+        user = User.objects.filter(email__icontains=service_appointment.member.email).first()
+        title = 'Appointment'
+        body = 'New Booking Assigned'
+        NotificationProcessor.send_notifications_to_users(user, title, body)
 
     return Response(
         {
