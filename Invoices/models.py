@@ -261,6 +261,7 @@ class SaleInvoice(models.Model):
         """
         if self.business_address:
             invoice_trans = InvoiceTranslation.objects.filter(
+                status= 'active',
                 location=self.business_address
             ).first()
 
