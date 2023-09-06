@@ -265,7 +265,7 @@ def get_filtered_chat_products(request):
             },
             status=status.HTTP_200_OK
         )
-    
+    location_obj = BusinessAddress.objects.get(id=location_id)
     # products = Product.objects.annotate(
     #     most_transferred_products = Sum('products_stock_transfers__quantity')
     # ).filter(
@@ -277,6 +277,7 @@ def get_filtered_chat_products(request):
     products = Product.objects.annotate(
         most_transferred_products = Sum('product_orders__quantity')
     ).filter(
+        location=location_obj,
         product_stock__location__id = location_id,
         is_deleted = False,
         product_orders__created_at__range = ('2020-01-01', f'{selected_year}-12-31')
