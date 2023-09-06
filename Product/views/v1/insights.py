@@ -280,7 +280,7 @@ def get_filtered_chat_products(request):
         product_stock__location__id = location_id,
         is_deleted = False,
         product_orders__created_at__range = ('2020-01-01', f'{selected_year}-12-31'),
-        product__orders__location=location_obj
+        product_orders__location=location_obj
     ).order_by('-most_transferred_products')[:10]
 
 
