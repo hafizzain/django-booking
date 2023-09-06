@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.db import models
 from django.utils.timezone import now
 from Authentication.models import User
@@ -221,7 +222,7 @@ class SaleInvoice(models.Model):
                     'sub_total' : round(sub_total, 2),
                     'tips' : order_tips,
                     'total' : round((float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)) + float(tax_details.get('tax_amount1', 0))), 2),
-                    'created_at' : self.created_at.strftime('%Y-%m-%d') if self.created_at else '',
+                    'created_at' : datetime.now().strftime('%Y-%m-%d'),
                     'BACKEND_HOST' : settings.BACKEND_HOST,
                     'invoice_trans': invoice_trans['invoice'] if invoice_trans else '',
                     'items_trans': invoice_trans['items'] if invoice_trans else '',
