@@ -7,8 +7,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 from rest_framework.views import APIView
 
-from django.db.models import Count, F, Sum, Q
-from Product.serializers import ProductInsightSerializer
+from django.db.models import F, Sum, Q
+from django.db.models.functions import Coalesce
 from Business.models import BusinessAddress
 import re
 
@@ -274,14 +274,16 @@ def get_filtered_chat_products(request):
     #     products_stock_transfers__created_at__range = ('2020-01-01', f'{selected_year}-12-31')
     # ).order_by('-most_transferred_products')[:10]
     sum_filter = Q(location=location_obj)
-    products = Product.objects.annotate(
-        most_transferred_products = Sum('product_orders__quantity', filter=sum_filter)
+    products = Product.objects \
+    .annotate(
+        most_transferred_products = Coalesce(Sum('product_orders__quantity', filter=sum_filter), 0)
     ).filter(
         product_stock__location__id = location_id,
         is_deleted = False,
         product_orders__created_at__range = ('2020-01-01', f'{selected_year}-12-31'),
         product_orders__location=location_obj
-    ).order_by('-most_transferred_products')[:10]
+    ).exclude(most_transferred_products=0) \
+     .order_by('-most_transferred_products')[:10]
 
 
     data = []
