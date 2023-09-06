@@ -260,10 +260,10 @@ class SaleInvoice(models.Model):
         based on the invoice business address / location. That 
         translation will then embed into invoice template.
         """
-        if self.business_address:
+        if self.location:
             invoice_trans = InvoiceTranslation.objects.filter(
                 status= 'active',
-                location=self.business_address
+                location=self.location
             ).first()
 
             translation_data = InvoiceTransSerializer(invoice_trans).data
