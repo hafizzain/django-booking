@@ -202,7 +202,7 @@ class FilteredInsightProducts(APIView):
                 'category_name' : f'{product_instance.category.name}' if product_instance.category else '-------',
             }
 
-            if self.top_sold:
+            if self.top_sold and product_instance.top_sold_orders:
                 product['top_sold_orders'] = int(product_instance.top_sold_orders)
 
             if self.most_consumed and product_instance.most_consumed_products:
@@ -225,12 +225,27 @@ class FilteredInsightProducts(APIView):
 
             data.append(product)
 
+        self.top_sold = None
+        self.most_consumed = None
+        self.most_transferred = None
+        self.low_stock_products = None
+        self.out_of_stock_products = None
+        self.most_ordered = None
+        self.today_date = None
+        self.today_date_format = None
+        self.days_before_7 = None
+        self.days_before_30 = None
+        query_copy = self.queries
+        
+        self.queries = {
+            'filter' : {},'order_by' : [], 'annotate' : {}
+        }
         response = Response(
             {
                 'status' : True,
                 'status_code' : 200,
                 'request' : {
-                    'queries' : str(self.queries)
+                    'queries' : str(query_copy)
                 },
                 'response' : {
                     'message' : 'Insight Products',
