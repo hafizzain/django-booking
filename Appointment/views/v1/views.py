@@ -859,32 +859,27 @@ def update_appointment(request):
                     },
                     status=status.HTTP_404_NOT_FOUND
                 )
-        selected_services = employee.employee_selected_service.values_list('service__id', flat=True)
-        if service_appointment.service.id in selected_services:
-            service_appointment.member = employee
-            service_appointment.appointment_time = start_time
 
-            duration = DURATION_CHOICES[service_appointment.duration]
-            app_date_time = datetime.fromisoformat(f'{service_appointment.appointment_date} {start_time}')
-            datetime_duration = app_date_time + timedelta(minutes=duration)
-            datetime_duration = datetime_duration.strftime('%H:%M:%S')
+        service_appointment.member = employee
+        service_appointment.appointment_time = start_time
 
-            service_appointment.end_time = datetime_duration
-            service_appointment.save()
+        duration = DURATION_CHOICES[service_appointment.duration]
+        app_date_time = datetime.fromisoformat(f'{service_appointment.appointment_date} {start_time}')
+        datetime_duration = app_date_time + timedelta(minutes=duration)
+        datetime_duration = datetime_duration.strftime('%H:%M:%S')
 
-            # updating employee booking insight data
-            # on changing appointment service.
-            employee_insight_obj = EmployeeBookingDailyInsights.objects.filter(
-                appointment_service=service_appointment,
-            ).first()
-            employee_insight_obj.employee = employee
-            employee_insight_obj.set_employee_time(start_time)
-            employee_insight_obj.save()
-        else:
-            return Response({
-                'status': 'Not OK',
-                'message':'cannot assign this services'
-            })
+        service_appointment.end_time = datetime_duration
+        service_appointment.save()
+
+        # updating employee booking insight data
+        # on changing appointment service.
+        employee_insight_obj = EmployeeBookingDailyInsights.objects.filter(
+            appointment_service=service_appointment,
+        ).first()
+        employee_insight_obj.employee = employee
+        employee_insight_obj.set_employee_time(start_time)
+        employee_insight_obj.save()
+
 
         
     
@@ -2314,7 +2309,6 @@ def get_employees_for_selected_service(request):
 def get_client_sale(request):
     client = request.GET.get('client', None)
     data = []
-    employee_ids = []
     if client is None :
         return Response(
             {
