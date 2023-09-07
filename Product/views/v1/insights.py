@@ -225,6 +225,19 @@ class FilteredInsightProducts(APIView):
 
             data.append(product)
 
+        self.top_sold = None
+        self.most_consumed = None
+        self.most_transferred = None
+        self.low_stock_products = None
+        self.out_of_stock_products = None
+        self.most_ordered = None
+        self.today_date = None
+        self.today_date_format = None
+        self.days_before_7 = None
+        self.days_before_30 = None
+        self.queries = {
+            'filter' : {},'order_by' : [], 'annotate' : {}
+        }
         response = Response(
             {
                 'status' : True,
