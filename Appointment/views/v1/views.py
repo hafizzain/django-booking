@@ -881,8 +881,8 @@ def update_appointment(request):
                     },
                     status=status.HTTP_404_NOT_FOUND
                 )
-        selected_services = employee.employee_selected_service.values_list('service', flat=True)
-        if service_appointment.service in selected_services:
+        selected_services = employee.employee_selected_service.values_list('service__id', flat=True)
+        if service_appointment.service.id in selected_services:
             service_appointment.member = employee
             service_appointment.appointment_time = start_time
 
