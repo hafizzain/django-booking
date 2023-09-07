@@ -236,7 +236,7 @@ class FilteredInsightProducts(APIView):
         self.days_before_7 = None
         self.days_before_30 = None
         query_copy = self.queries
-        
+
         self.queries = {
             'filter' : {},'order_by' : [], 'annotate' : {}
         }
@@ -245,7 +245,7 @@ class FilteredInsightProducts(APIView):
                 'status' : True,
                 'status_code' : 200,
                 'request' : {
-                    'queries' : str(query_copy)
+                    'queries' : query_copy
                 },
                 'response' : {
                     'message' : 'Insight Products',
