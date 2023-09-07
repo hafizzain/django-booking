@@ -202,7 +202,7 @@ class FilteredInsightProducts(APIView):
                 'category_name' : f'{product_instance.category.name}' if product_instance.category else '-------',
             }
 
-            if self.top_sold:
+            if self.top_sold and product_instance.top_sold_orders:
                 product['top_sold_orders'] = int(product_instance.top_sold_orders)
 
             if self.most_consumed and product_instance.most_consumed_products:
