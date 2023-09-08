@@ -155,6 +155,12 @@ class FilteredInsightProducts(APIView):
 
 
     def get(self, request):
+        self.queries = {
+            'filter' : {},'order_by' : [], 'annotate' : {}
+        }
+        self.queries['filter'] = {}
+        self.queries['annotate'] = {}
+        self.queries['order_by'] = []
 
         location_id = request.GET.get('location', None)
 
