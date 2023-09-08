@@ -1258,7 +1258,7 @@ def get_products(request):
         'consumptions',
         'product_medias',
         'product_stock',
-    ).filter(is_deleted=False, is_active=True).order_by('-created_at')
+    ).filter(is_deleted=False).order_by('-created_at')
     
     all_products_count = all_products.count()
     
