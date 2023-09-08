@@ -29,7 +29,6 @@ def reschedule_appointment(appointment = None , tenant = None, client =  None):
             for appo in appointment:
                 
                 email_c = appo.appointment.client.email
-                phone = appo.appointment.client.mobile_number
                 name_c = appo.appointment.client.full_name
                 ser_name = appo.service.name
                 dat = appo.appointment_date
@@ -77,7 +76,8 @@ def reschedule_appointment(appointment = None , tenant = None, client =  None):
                     html_file = render_to_string("AppointmentEmail/appointment_reschedule_n.html", {'name': name_c, 
                                 'ser_name':ser_name ,'t_name':name , 
                                 'date':dat, 'mem_id':mem_id,'location': location, 'duration': duration,
-                                'time': current_time, 'email_c': email_c , 'phone': phone, 'client': client
+                                'time': current_time,
+                                'appointments': appointment
                                 })
                     text_content = strip_tags(html_file)
                         
