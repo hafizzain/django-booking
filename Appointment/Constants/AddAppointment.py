@@ -45,6 +45,7 @@ def Add_appointment(appointment = None, tenant = None, client =  None):
                 mem_id= appo.member.employee_id
                 location = appo.business_address.address_name
                 duration = appo.duration
+                appointment_time = appo.appointment_time
                 
                 
                 if staff_email.sms_daily_sale == True:
@@ -55,6 +56,7 @@ def Add_appointment(appointment = None, tenant = None, client =  None):
                             't_name':mem_name , 'ser_name':ser_name ,'client': client,
                             'date':dat, 'mem_id':mem_id, 
                             'location':location, 'duration': duration, 'current_time': current_time,
+                            'appointment_time':appointment_time
                             })
                         text_content = strip_tags(html_file)
                         
