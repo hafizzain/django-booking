@@ -331,7 +331,10 @@ class ProductSerializer(serializers.ModelSerializer):
             all_stocks = ProductStock.objects.filter(product=obj, location__is_deleted=False, location__id = location).order_by('-created_at')
             return ProductStockSerializer(all_stocks, many=True).data
         else:
-            all_stocks = ProductStock.objects.filter(product=obj, location__is_deleted=False,).order_by('-created_at')
+            all_stocks = ProductStock.objects.filter(product=obj,
+                                                     location__is_deleted=False,
+                                                     location__is_closed=False,
+                                                     location__is_active=True).order_by('-created_at')
             return ProductStockSerializer(all_stocks, many=True).data
         
     def get_invoices(self, obj):
