@@ -332,6 +332,7 @@ class ProductSerializer(serializers.ModelSerializer):
             return ProductStockSerializer(all_stocks, many=True).data
         else:
             all_stocks = ProductStock.objects.filter(product=obj,
+                                                     is_deleted=False,
                                                      location__is_deleted=False,
                                                      location__is_closed=False,
                                                      location__is_active=True).order_by('-created_at')
