@@ -48,12 +48,14 @@ def reschedule_appointment(appointment = None , tenant = None, client =  None):
                     client_email = ClientNotificationSetting.objects.get(business = str(appo.appointment.business))
                 except:
                     pass
+
                 if staff_email.sms_daily_sale == True:
                     try:
                         html_file = render_to_string("AppointmentEmail/appointment_reschedule_n.html", {'name': name_c, 
                                     'ser_name':ser_name ,'t_name':mem_name , 
-                                    'date':dat, 'mem_id':mem_id,'location': location, 'duration': duration,
-                                    'time': time
+                                    'appointment_date':dat, 'mem_id':mem_id,'location': location, 'duration': duration,
+                                    'appointment_time': time,
+                                    'is_client_email': False
                                     })
                         text_content = strip_tags(html_file)
                             
@@ -77,7 +79,8 @@ def reschedule_appointment(appointment = None , tenant = None, client =  None):
                                 'ser_name':ser_name ,'t_name':name , 
                                 'date':dat, 'mem_id':mem_id,'location': location, 'duration': duration,
                                 'time': current_time,
-                                'appointments': appointment
+                                'appointments': appointment,
+                                'is_client_email': True
                                 })
                     text_content = strip_tags(html_file)
                         

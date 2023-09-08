@@ -179,16 +179,25 @@
                         </tr>
                       </thead>
                       <tbody>
+                        {% if is_client_email %}
                         <tr>
                           {% for appo in appointments %}
                           <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ appo.appointment.business_address.address_name }}</td>
                           <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ appo.service.name }}</td>
                           <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ appo.duration }}</td>
                           <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ appo.appointment_date }}</td>
-
                           <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ appo.appointment_time }}</td>
                           {% endfor %}
                         </tr>
+                        {% else %}
+                        <tr>
+                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ location }}</td>
+                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ ser_name }}</td>
+                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ duration }}</td>
+                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ appointment_date }}</td>
+                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ appointment_time }}</td>
+                        </tr>
+                        {% endif%}
                         
                       </tbody>
                     </table>
@@ -196,6 +205,34 @@
                 </tr>
               </tbody>
             </table>
+
+            {% if client is not None and is_client_email is True %}
+              <tr>
+                <td bgcolor="#ffffff" align="left" style="padding: 0px 30px 0px 30px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 25px;">
+                  <h2 style="font-size: 20px; font-weight: 400; margin: 0;">Client Details:</h2>
+                </td>
+              </tr>
+                <td bgcolor="#ffffff" align="left" style="padding: 20px 30px;border-radius: 0px 0px 4px 4px;color: #666666;font-family: 'Lato', Helvetica, Arial, sans-serif;font-size: 16px;font-weight: 400;line-height: 25px;">
+                  
+                  <table style="border-spacing:0;table-layout:fixed;margin:0 auto;width:100%;text-align:left;vertical-align:top;color:black;border:1px solid #ffffff;font-family:'Axiforma Book','Lato',Helvetica,Arial,sans-serif;border-collapse:collapse">
+                    <thead>
+                      <tr>
+                        <th style="font-size:11px;padding:7px 5px;border-left:1px solid #ffffff">Name</th>
+                        <th style="font-size:11px;padding:7px 5px;border-left:1px solid #ffffff">Phone</th>
+                        <th style="font-size:11px;padding:7px 5px;border-left:1px solid #ffffff">Email</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ client.full_name }}</td>
+                        <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ client.mobile_number }}</td>
+                        <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ client.email }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            {% endif %}
 
             <!-- [if (gte mso 9)|(IE)]>
             </td>
@@ -240,14 +277,9 @@
               <tbody>
                 <tr></tr>
 
-                <!-- ADDRESS -->
               </tbody>
             </table>
-            <!-- [if (gte mso 9)|(IE)]>
-            </td>
-            </tr>
-            </table>
-            <![endif] -->
+
           </td>
         </tr>
       </tbody>
