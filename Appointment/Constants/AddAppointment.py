@@ -12,7 +12,8 @@ from datetime import datetime,date
 from Utility.models import ExceptionRecord
 
 
-def Add_appointment(appointment = None, tenant = None, client =  None):
+def Add_appointment(appointment=None, tenant=None, client=None):
+
     if appointment is None or tenant is None:
         ExceptionRecord.objects.create(
             text='Appointment, Tenant Is None'
@@ -20,7 +21,7 @@ def Add_appointment(appointment = None, tenant = None, client =  None):
     current_time = datetime.now().time()
     with tenant_context(tenant):
         try:
-            appointment =  AppointmentService.objects.filter(appointment = appointment)           
+            appointment =  AppointmentService.objects.filter(appointment=appointment)           
             
             for appo in appointment:
                 try:
@@ -55,7 +56,7 @@ def Add_appointment(appointment = None, tenant = None, client =  None):
                             'staff': True, #'name': name_c,'client_type': client_type , 'client': False,
                             't_name':mem_name , 'ser_name':ser_name ,'client': client,
                             'date':dat, 'mem_id':mem_id, 
-                            'location':location, 'duration': duration, 'current_time': current_time,
+                            'location':location, 'duration': duration,
                             'appointment_time':appointment_time
                             })
                         text_content = strip_tags(html_file)
@@ -64,7 +65,6 @@ def Add_appointment(appointment = None, tenant = None, client =  None):
                                 'Appointment Booked',
                                 text_content,
                                 settings.EMAIL_HOST_USER,
-                                #to = [mem_email],
                                 to = [mem_email],
                             
                             )
@@ -77,7 +77,6 @@ def Add_appointment(appointment = None, tenant = None, client =  None):
         
             if client_email.sms_appoinment == True and client is not None :
                 try:
-                    #html_file = render_to_string("AppointmentEmail/add_appointment.html",{'client': False, 'appointment' : appointment,'staff': True,'t_name':name_c} )
                     html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'client': True, 'appointment' : appointment,'staff': False,'t_name':name_c ,'time': current_time,} )
                     text_content = strip_tags(html_file)
                     
@@ -86,7 +85,6 @@ def Add_appointment(appointment = None, tenant = None, client =  None):
                         text_content,
                         settings.EMAIL_HOST_USER,
                         to = [email_c],
-                        #to = [mem_email],
                     )
                         
                     email.attach_alternative(html_file, "text/html")
