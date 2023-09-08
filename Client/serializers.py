@@ -84,7 +84,7 @@ class ClientSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return f'{obj.image}'
@@ -111,7 +111,7 @@ class Client_TenantSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["tenant"]
-                url = tenant_media_domain(request)
+                url = tenant_media_domain(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -195,6 +195,7 @@ class MembershipSerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField()
     services = serializers.SerializerMethodField()
     currency_membership = serializers.SerializerMethodField()
+    is_expired = serializers.SerializerMethodField(read_only=True)
     
     def get_products(self, obj):
         try:
@@ -217,11 +218,14 @@ class MembershipSerializer(serializers.ModelSerializer):
             return CurrencyPriceMembershipSerializers(pro, many= True).data
         except Exception as err:
             print(err)
+
+    def get_is_expired(self, obj):
+        return obj.is_expired()
             
     class Meta:
         model = Membership
-        fields = ['id', 'name', 'arabic_name', 'valid_for','discount','description', 'term_condition','products', 'services', 'currency_membership']
-        read_only_fields = ['arabic_name']
+        fields = ['id', 'name', 'arabic_name', 'is_expired', 'valid_for','discount','description', 'term_condition','products', 'services', 'currency_membership']
+        read_only_fields = ['arabic_name', 'is_expired']
 
 class VoucherSerializer(serializers.ModelSerializer):
     # currency_voucher_prices = serializers.SerializerMethodField(read_only=True)
@@ -554,7 +558,7 @@ class SaleInvoiceSerializer(serializers.ModelSerializer):
         if obj.file:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=False)
                 return f'{url}{obj.file}'
             except:
                 return f'{obj.file}'

@@ -28,9 +28,16 @@ class Brand(models.Model):
     description = models.TextField(default='', null=True, blank=True)
     website = models.URLField(null=True, blank=True)
     image = models.ImageField(upload_to='brand/images/')
+    is_image_uploaded_s3 = models.BooleanField(default=False)
+
 
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=now)
+
+    def save(self, *args, **kwargs):
+        if self.image:
+            self.is_image_uploaded_s3 = True
+        super(Brand, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.id)
@@ -126,11 +133,17 @@ class ProductMedia(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_medias')
 
     image = models.ImageField(upload_to='business/product_images/')
+    is_image_uploaded_s3 = models.BooleanField(default=False)
+
     is_cover = models.BooleanField(default=False)
 
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
 
+    def save(self, *args, **kwargs):
+        if self.image:
+            self.is_image_uploaded_s3 = True
+        super(ProductMedia, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.id)

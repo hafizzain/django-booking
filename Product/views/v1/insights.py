@@ -7,8 +7,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 from rest_framework.views import APIView
 
-from django.db.models import Count, F, Sum
-from Product.serializers import ProductInsightSerializer
+from django.db.models import F, Sum, Q
+from django.db.models.functions import Coalesce
+from Business.models import BusinessAddress
 import re
 
 from datetime import datetime, timedelta
@@ -55,16 +56,16 @@ class FilteredInsightProducts(APIView):
             
     def retreive_most_consumed_query(self, request):
         self.most_consumed = request.GET.get('most_consumed', None)
-        MOST_COMSUMED_CHOICES = {'MOST_COMSUMED_PRODUCTS' : None, 'LAST_7_DAYS' : self.days_before_7 , 'LAST_30_DAYS' : self.days_before_30 }
+        MOST_CONSUMED_CHOICES = {'MOST_CONSUMED_PRODUCTS' : None, 'LAST_7_DAYS' : self.days_before_7 , 'LAST_30_DAYS' : self.days_before_30 }
 
         if self.most_consumed :
             self.queries['order_by'].append('-most_consumed_products')
             self.queries['annotate']['most_consumed_products'] = Sum('consumptions__quantity')
-            if self.most_consumed in MOST_COMSUMED_CHOICES or re.match(DATE_REGEX, self.most_consumed):
-                if self.most_consumed != 'MOST_COMSUMED_PRODUCTS':
+            if self.most_consumed in MOST_CONSUMED_CHOICES or re.match(DATE_REGEX, self.most_consumed):
+                if self.most_consumed != 'MOST_CONSUMED_PRODUCTS':
                     value = self.most_consumed
                     if value in ['LAST_7_DAYS', 'LAST_30_DAYS']:
-                        value = MOST_COMSUMED_CHOICES.get(value)
+                        value = MOST_CONSUMED_CHOICES.get(value)
                     self.queries['filter']['consumptions__created_at__range'] = (value, self.today_date_format)
             else:
                 return Response(
@@ -154,6 +155,12 @@ class FilteredInsightProducts(APIView):
 
 
     def get(self, request):
+        self.queries = {
+            'filter' : {},'order_by' : [], 'annotate' : {}
+        }
+        self.queries['filter'] = {}
+        self.queries['annotate'] = {}
+        self.queries['order_by'] = []
 
         location_id = request.GET.get('location', None)
 
@@ -173,7 +180,6 @@ class FilteredInsightProducts(APIView):
                 status=status.HTTP_200_OK
             )
 
-        
         self.retreive_top_sold_query(request)
         self.retreive_most_consumed_query(request)
         self.retreive_most_ordered_query(request)
@@ -202,32 +208,50 @@ class FilteredInsightProducts(APIView):
                 'category_name' : f'{product_instance.category.name}' if product_instance.category else '-------',
             }
 
-            if self.top_sold:
+            if self.top_sold and product_instance.top_sold_orders:
                 product['top_sold_orders'] = int(product_instance.top_sold_orders)
 
-            if self.most_consumed:
+            if self.most_consumed and product_instance.most_consumed_products:
                 product['most_consumed_products'] = int(product_instance.most_consumed_products)
-            if self.most_ordered:
+            if self.most_ordered and product_instance.most_ordered_products:
                 product['most_ordered_products'] = int(product_instance.most_ordered_products)
-            if self.most_transferred:
+            if self.most_transferred and product_instance.most_transferred_products:
                 product['most_transferred_products'] = int(product_instance.most_transferred_products)
 
-            if self.low_stock_products:
-                product['sum_of_total_available_stock'] = int(product_instance.sum_of_total_available_stock)
-                product['sum_of_total_lowest_stock_amount'] = int(product_instance.sum_of_total_lowest_stock_amount)
-                product['lowest_stock'] = int(product_instance.remaing_stock)
+            if self.low_stock_products :
+                if product_instance.sum_of_total_available_stock:
+                    product['sum_of_total_available_stock'] = int(product_instance.sum_of_total_available_stock)
+                if product_instance.sum_of_total_lowest_stock_amount:
+                    product['sum_of_total_lowest_stock_amount'] = int(product_instance.sum_of_total_lowest_stock_amount)
+                if product_instance.remaing_stock:
+                    product['lowest_stock'] = int(product_instance.remaing_stock)
 
             # if self.out_of_stock_products:
             #     product['available_stock'] = int(product_instance.product_stock.all().available_quantity)
 
             data.append(product)
 
+        self.top_sold = None
+        self.most_consumed = None
+        self.most_transferred = None
+        self.low_stock_products = None
+        self.out_of_stock_products = None
+        self.most_ordered = None
+        self.today_date = None
+        self.today_date_format = None
+        self.days_before_7 = None
+        self.days_before_30 = None
+        query_copy = self.queries
+        
+        self.queries = {
+            'filter' : {},'order_by' : [], 'annotate' : {}
+        }
         response = Response(
             {
                 'status' : True,
                 'status_code' : 200,
                 'request' : {
-                    'queries' : str(self.queries)
+                    'queries' : str(query_copy)
                 },
                 'response' : {
                     'message' : 'Insight Products',
@@ -262,13 +286,24 @@ def get_filtered_chat_products(request):
             },
             status=status.HTTP_200_OK
         )
-    
-    products = Product.objects.annotate(
-        most_transferred_products = Sum('products_stock_transfers__quantity')
-    ).filter(
-        product_stock__location__id = location_id,
+    location_obj = BusinessAddress.objects.get(id=location_id)
+    # products = Product.objects.annotate(
+    #     most_transferred_products = Sum('products_stock_transfers__quantity')
+    # ).filter(
+    #     product_stock__location__id = location_id,
+    #     is_deleted = False,
+    #     products_stock_transfers__created_at__range = ('2020-01-01', f'{selected_year}-12-31')
+    # ).order_by('-most_transferred_products')[:10]
+
+    sum_filter = Q(product_orders__location=location_obj)
+    products = Product.objects \
+    .filter(
+        product_stock__location = location_obj,
         is_deleted = False,
-        products_stock_transfers__created_at__range = ('2020-01-01', f'{selected_year}-12-31')
+        product_orders__created_at__range = ('2020-01-01', f'{selected_year}-12-31'),
+        product_orders__location=location_obj) \
+    .annotate(
+        most_transferred_products = Coalesce(Sum('product_orders__quantity', filter=sum_filter), 0) \
     ).order_by('-most_transferred_products')[:10]
 
 

@@ -19,7 +19,6 @@ class AppoinmentnotesSerializer(serializers.ModelSerializer):
 
 class EmployeAppoinmentSerializer(serializers.ModelSerializer):
     designation = serializers.SerializerMethodField()
-    #image = serializers.SerializerMethodField()
     
     def get_designation(self, obj):
         try:
@@ -27,19 +26,6 @@ class EmployeAppoinmentSerializer(serializers.ModelSerializer):
             return designation.designation
         except Exception as err:
             pass
-            
-    # def get_image(self, obj):
-    #     try:
-    #         if obj.image:
-    #             try:
-    #                 tenant = self.context["tenant"]
-    #                 url = tenant_media_base_url(tenant)
-    #                 return f'{url}{obj.image}'
-    #             except:
-    #                 return obj.image
-    #         return None
-    #     except Exception as err:
-    #         return str(err)
     
     class Meta:
         model = Employee
@@ -62,13 +48,6 @@ class AppointmentServiceClientSerializer(serializers.ModelSerializer):
         except Exception as err:
             pass
 
-    # def get_business_addresses(self, obj):
-    #     try:
-    #         addresses = BusinessAddress.objects.filter(id=str(obj.business_addresses))
-    #         return LocationSerializer(addresses, many=True).data
-    #     except Exception as err:
-    #         pass
-        
     def get_member(self, obj):
         try:
             emp = Employee.objects.get(id = str(obj.member) )
@@ -114,7 +93,6 @@ class AppointmentClientSerializer(serializers.ModelSerializer):
     def get_tip(self,obj):
         total_tip = 0
         service = AppointmentCheckout.objects.filter(appointment = obj)
-        #total_tip = sum(int(obj.tip) for obj in service)
         for tip in service:
             if tip.tip is not None:
                 total_tip +=  tip.tip

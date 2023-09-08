@@ -1,5 +1,6 @@
 from uuid import uuid4
 from django.db import models
+from django.db.models import Q, Count, Case, When, Value, F, CharField
 from django.utils.timezone import now
 
 
@@ -7,6 +8,35 @@ from Authentication.models import User
 from Business.models import Business, BusinessAddress
 from Utility.models import Country, State, City
 from Service.models  import Service
+from NStyle.choices import EmployeeDailyInsightChoices
+
+
+class EmployeeManager(models.Manager):
+    
+    def with_completed_appointments(self, employee_ids, date, business_address):
+        """
+        
+        """
+        appointment_filter = Q(member_appointments__appointment_date=date) \
+                            & Q(member_appointments__business_address=business_address)
+        
+        return self.get_queryset().filter(id__in=employee_ids).annotate(
+            appointments_done = Count('member_appointments', filter=appointment_filter)
+        )
+    
+
+    def with_daily_booking_insights(self, employee_ids, insight_filter):
+        morning_filter = insight_filter & Q(employee_daily_insights__day_time_choice=EmployeeDailyInsightChoices.MORNING)
+        afternoon_filter = insight_filter & Q(employee_daily_insights__day_time_choice=EmployeeDailyInsightChoices.AFTERNOON)
+        evening_filter = insight_filter & Q(employee_daily_insights__day_time_choice=EmployeeDailyInsightChoices.EVENING)
+
+        return self.get_queryset().filter(
+            id__in=employee_ids
+        ).annotate(
+            morning_count = Count('employee_daily_insights', filter=morning_filter),
+            afternoon_count = Count('employee_daily_insights', filter=afternoon_filter),
+            evening_count = Count('employee_daily_insights', filter=evening_filter),
+        ) 
 
 class Employee(models.Model):
     GENDER_CHOICES = [
@@ -20,6 +50,8 @@ class Employee(models.Model):
 
     full_name = models.CharField(max_length=300, default='')
     image = models.ImageField(upload_to='employee/employee_images/', null=True, blank=True)
+    is_image_uploaded_s3 = models.BooleanField(default=False)
+
     employee_id = models.CharField(max_length=50, default='')
     email = models.EmailField(verbose_name="email", max_length=60)
     mobile_number = models.CharField(max_length=30, null=True, blank=True)
@@ -49,14 +81,21 @@ class Employee(models.Model):
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(null=True, blank=True)
 
+
+    objects = EmployeeManager()
+
+    
+    def save(self, *args, **kwargs):
+        if self.image:
+            self.is_image_uploaded_s3 = True
+        
+        super(Employee, self).save(*args, **kwargs)
+
     def __str__(self):
         return str(self.id)
     
 class EmployeeProfessionalInfo(models.Model):
-    # LEVEL_CHOICE =[
-    #     ('Average', 'Average'),
-    #     ('Above_Averge', 'Above Average'),
-    # ]
+
     INCOME_TYPE_CHOICES = [
         ('Hourly_Rate', 'Hourly_Rate'),
         ('Daily_Income', 'Daily_Income'),
@@ -67,13 +106,7 @@ class EmployeeProfessionalInfo(models.Model):
     designation = models.CharField(max_length=300, default='')
     income_type = models.CharField(choices=INCOME_TYPE_CHOICES, default='Hourly_Rate', max_length=30)
     salary = models.FloatField(default=0)
-    #services = models.ManyToManyField(Service, through='EmployeeSelectedService' , related_name='services_employee')
-    
-    
-    #level= models.CharField(max_length=100, choices=LEVEL_CHOICE, default = 'Average', verbose_name = 'Employee Level')
-    
-    #working_days = models.ManyToManyField(WorkingDays, related_name='days_employee')
-    
+
     start_time = models.TimeField(null=True, blank=True)
     end_time = models.TimeField(null=True, blank=True)
     maximum_discount = models.FloatField(default=0, null=True, blank=True)
@@ -92,6 +125,7 @@ class EmployeeProfessionalInfo(models.Model):
         return str(self.id)
 
 class EmployeeSelectedService(models.Model):
+    
     LEVEL_CHOICE =[
         ('Average', 'Average'),
         ('Above_Averge', 'Above Average'),
@@ -522,3 +556,5 @@ class EmployeeCommission(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+

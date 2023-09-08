@@ -114,9 +114,9 @@ def get_user_default_data(request):
         client_instance = clients[0]
         data['client'] = {
             'id' : f'{client_instance.id}',
-            'name' : f'{client_instance.full_name}',
-            'email' : f'{client_instance.email}',
-            'phone_number' : f'{client_instance.mobile_number}',
+            'name' : '',
+            'email' : '',
+            'phone_number' : '',
             'type' : 'client'
         }
     
@@ -135,9 +135,9 @@ def get_user_default_data(request):
         
         data['employee'] = {
             'id' : f'{employee_instance.id}',
-            'name' : f'{employee_instance.full_name}',
+            'name' : '',
             'type' : 'employee',
-            'email' : f'{employee_instance.email}',
+            'email' : '',
             'address' : f'{employee_instance.address}',
             'designation' : f'{info.designation}' if info else '',
             'income_type' : f'{info.income_type}' if info else '',
@@ -1926,7 +1926,10 @@ def delete_languages(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_all_languages(request):
-    all_languages = Language.objects.filter(is_active=True, is_deleted=False)
+    only_english_arabic = ['English', 'Arabic']
+    all_languages = Language.objects.filter(is_active=True,
+                                            is_deleted=False,
+                                            name__in=only_english_arabic)
 
     serialized = LanguageSerializer(all_languages, many=True)
     return Response(
@@ -2235,6 +2238,8 @@ def update_business_booking_settings(request):
 def add_payment_method(request):
     method_type = request.data.get('method_type', None)
     business_id = request.data.get('business', None)
+    method_status = request.data.get('is_active', None)
+
     
     if not all([method_type, business_id]):
         return Response(
@@ -2276,7 +2281,8 @@ def add_payment_method(request):
     payment_method = BusinessPaymentMethod(
         user=user,
         business=business,
-        method_type=method_type
+        method_type=method_type,
+        is_active=method_status
     )
     payment_method.save()
     serialized = PaymentMethodSerializer(payment_method)
@@ -2301,6 +2307,7 @@ def add_payment_method(request):
 def update_payment_method(request):
     method_type = request.data.get('method_type', None)
     method_id = request.data.get('id', None)
+    method_status = request.data.get('is_active', None)
 
     if not all([method_type, method_id]):
         return Response(
@@ -2337,6 +2344,7 @@ def update_payment_method(request):
             status=status.HTTP_404_NOT_FOUND
         )
     payment_method.method_type = method_type
+    payment_method.is_active = method_status
     payment_method.save()
     serialized = PaymentMethodSerializer(payment_method, context={'request':request})
 

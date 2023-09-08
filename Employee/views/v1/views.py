@@ -48,7 +48,9 @@ from django.utils.html import strip_tags
 from django.conf import settings
 from django.core.paginator import Paginator
 
-
+from Notification.models import CustomFCMDevice
+from Notification.serializers import FCMDeviceSerializer
+from Notification.notification_processor import NotificationProcessor
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -1192,7 +1194,7 @@ def update_employee(request):
                 else:
                     for opt in value:
                         try:
-                            option = GlobalPermissionChoices.objects.get(text=opt)
+                            option = GlobalPermissionChoices.objects.filter(text=opt).first()
                             PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
                         except GlobalPermissionChoices.DoesNotExist:
                             pass
@@ -2554,9 +2556,15 @@ def create_commission(request):
                 ExceptionRecord.objects.create(
                     text = f'Both data {str(err)}'
                 )
-            
+
+    # Send Notification to Employee
+    user = User.objects.filter(email__icontains=employee_id.email).first()
+    title = 'Commission'
+    body = 'Admin Assigns New Commission'
+    NotificationProcessor.send_notifications_to_users(user, title, body)
+
+
     serializers= CommissionSerializer(commission_setting, context={'request' : request})
-    
     return Response(
             {
                 'status' : True,
@@ -4578,9 +4586,8 @@ def create_employe_account(request):
 @permission_classes([AllowAny])
 def employee_login(request):
     email = request.data.get('email', None)
-    username = request.data.get('username', None)
     password = request.data.get('password', None)
-    tenant_id = request.data.get('tenant_id', None)
+    device_token = request.data.get('device_token', None)
     
     data = []
     
@@ -4609,7 +4616,7 @@ def employee_login(request):
             is_deleted=False,
             user_account_type__account_type = 'Employee'
         )
-        
+
     except Exception as err:
         return Response(
             {
@@ -4670,6 +4677,21 @@ def employee_login(request):
                 email__icontains = user.email,
                 is_deleted = False
             )
+
+            # registering device token for employee
+            # for mobile to send push notifications
+            employee_device = CustomFCMDevice.objects.filter(
+                user = user_id
+            ).first()
+            if not employee_device:
+                employee_device = CustomFCMDevice.objects.create(
+                    user=user_id,
+                    registration_id=device_token
+                )
+            else:
+                employee_device.registration_id = device_token
+                employee_device.save()
+            device_serialized = FCMDeviceSerializer(employee_device)
         except:
             return Response(
                 {
@@ -4678,6 +4700,8 @@ def employee_login(request):
                     'status_code_text' : 'EMPLOYEEE_IS_DELETED',
                     'response' : {
                         'message' : 'User Does not exist',
+                        'device_token':device_token,
+                        'device_serializer':device_serialized
                     }
                 },
                 status=status.HTTP_404_NOT_FOUND
@@ -4704,11 +4728,74 @@ def employee_login(request):
                 'status_code' : 200,
                 'response' : {
                     'message' : 'Authenticated',
-                    'data' : serialized.data
+                    'data' : serialized.data,
+                    'device_data':device_serialized.data
                 }
             },
             status=status.HTTP_200_OK
         )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def employee_logout(request):
+    email = request.query_params.get('email', None)
+
+    try:
+        user = User.objects.filter(
+            email__icontains=email,
+            is_deleted=False,
+        ).first()
+
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
+                'status_code_text' : 'INVALID_CREDENTIALS_4013',
+                'response' : {
+                    'message' : 'User does not exist with this email',
+                    'error_message' : str(err),
+                    'fields' : ['email']
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    try:
+        employee_tenant = EmployeeTenantDetail.objects.get(user__username = user)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Authenticated',
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
+    with tenant_context(employee_tenant.tenant):
+
+        user_id = User.objects.get(
+            email=email,
+            is_deleted=False,
+        )
+        # deleting device token for employee
+        # for mobile to not send push notifications
+        # when it is logout
+        device = CustomFCMDevice.objects.filter(
+            user = user_id
+        ).first()
+
+        if device:
+            device.delete()
+
+    return Response({
+        'status' : True,
+        'status_code': 200,
+        'message': 'Device Unlinked'
+    }, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 @permission_classes([AllowAny])

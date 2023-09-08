@@ -1564,6 +1564,7 @@ def create_sale_order(request):
         voucher_commission_type = voucher_commission_type,
         checkout = f'{checkout.id}'
     )
+    invoice.save()
     
 
     if bool(is_promotion) == True:
@@ -2047,6 +2048,7 @@ def new_create_sale_order(request):
         voucher_commission_type = voucher_commission_type,  
         checkout = f'{checkout.id}'
     )
+    invoice.save()
 
     test = True
     
@@ -2068,6 +2070,7 @@ def new_create_sale_order(request):
         price = id['price']  
         employee_id = id['employee_id']      
         discount_price = id.get('discount_price', None)
+        
 
         is_membership_redeemed = id.get('is_membership_redeemed', None)
         is_voucher_redeemed = id.get('is_voucher_redeemed', None)
@@ -2111,26 +2114,11 @@ def new_create_sale_order(request):
         
         original_price = float(price)
         discount_percentage = 0
-        order_discount_price = 0
+        order_discount_price = None
         
         if discount_price is not None:
             order_discount_price = float(discount_price)
             discount_percentage = (float(discount_price) / original_price) * 100
-            # price = int(discount_price)
-
-        
-        # discounted_price
-        # discounted_percentage 
-        # original_price
-
-
-        # commission
-        # from_value
-
-        # to_value
-        # commission_rate
-        # category_comission
-        # symbol
 
         order_instance = None
         if sale_type == 'PRODUCT':
@@ -2216,7 +2204,7 @@ def new_create_sale_order(request):
                 quantity = quantity,
                 current_price = float(price),
                 discount_percentage = float(discount_percentage),
-                discount_price = float(order_discount_price),
+                discount_price = order_discount_price,
             )
             product_order.sold_quantity += 1 # product_stock.sold_quantity
             product_order.save()
@@ -2253,7 +2241,7 @@ def new_create_sale_order(request):
                     quantity = quantity,
                     current_price = float(price),
                     discount_percentage = float(discount_percentage),
-                    discount_price = float(order_discount_price),
+                    discount_price = order_discount_price,
                 )
 
                 order_instance = service_order
@@ -2296,7 +2284,7 @@ def new_create_sale_order(request):
                     location = business_address,
                     current_price = float(price),
                     discount_percentage = float(discount_percentage),
-                    discount_price = float(order_discount_price),
+                    discount_price = order_discount_price,
                 )
             except Exception as err:
                 ExceptionRecord.objects.create(
@@ -2360,7 +2348,7 @@ def new_create_sale_order(request):
                     quantity = quantity,
                     location = business_address,
                     current_price = float(price),
-                    discount_price = float(order_discount_price),
+                    discount_price = order_discount_price,
 
                 )
                 

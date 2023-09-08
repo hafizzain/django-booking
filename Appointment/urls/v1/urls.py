@@ -52,4 +52,7 @@ urlpatterns = [
 
     #Appointment Logs
     path('get_appointment_logs/', views.get_appointment_logs),
+
+    # Employee Inshights
+    path('get_employee_insights/', views.get_employee_appointment_insights),
 ]

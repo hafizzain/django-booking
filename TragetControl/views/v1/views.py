@@ -12,7 +12,8 @@ from Service.models import ServiceGroup
 from TragetControl.models import RetailTarget, ServiceTarget, StaffTarget, StoreTarget, TierStoreTarget
 from TragetControl.serializers import GETStoreTargetSerializers, RetailTargetSerializers, ServiceTargetSerializers, StaffTargetSerializers, StoreTargetSerializers
 from Utility.models import ExceptionRecord
-
+from Authentication.models import User
+from Notification.notification_processor import NotificationProcessor
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -107,6 +108,12 @@ def create_stafftarget(request):
     c_year = datetime.strptime(date_string, '%Y %B %d')
     staff_target.year = c_year
     staff_target.save()
+
+    # Send Notification to Employee
+    user = User.objects.filter(email__icontains=employee_id.email).first()
+    title = 'Target'
+    body = 'New Sales Target Assigned'
+    NotificationProcessor.send_notifications_to_users(user, title, body)
     
     
     serializers= StaffTargetSerializers(staff_target, context={'request' : request})

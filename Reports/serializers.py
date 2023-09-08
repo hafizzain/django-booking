@@ -10,7 +10,7 @@ from Product.Constants.index import tenant_media_base_url
 from django.db.models import Sum, Q
 from django.db.models.functions import Coalesce
 
-from Order.models import MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
+from Order.models import MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder, Order
 from Sale.serializers import ProductOrderSerializer, SaleOrder_ProductSerializer, SaleOrder_ServiceSerializer, CheckoutTipsSerializer, SaleOrder_MemberShipSerializer, SaleOrder_VoucherSerializer, ClientSerializer
 from Service.models import Service, ServiceGroup
 from TragetControl.models import RetailTarget, ServiceTarget, StaffTarget, StoreTarget, TierStoreTarget
@@ -18,7 +18,7 @@ from TragetControl.serializers import RetailTargetSerializers, StaffTargetSerial
 from Utility.Constants.Data.months import MONTH_DICT
 from .models import DiscountPromotionSalesReport
 from Invoices.models import SaleInvoice
-from Sale.serializers import SaleInvoiceSerializer
+from Sale.serializers import SaleInvoiceSerializer, CheckoutSerializer
 
 class ServiceOrderSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
@@ -197,7 +197,7 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -257,11 +257,11 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 vouchers_commissions += full_commission
 
         data = {
-            'product_sale_price': total_product_price,
-            'commission_total': commission_total,
-            'service_commission': service_commissions,
-            'product_commission': product_commission,
-            'voucher_commission': vouchers_commissions,
+            'product_sale_price': round(total_product_price, 2),
+            'commission_total': round(commission_total, 2),
+            'service_commission': round(service_commissions, 2),
+            'product_commission': round(product_commission, 2),
+            'voucher_commission': round(vouchers_commissions, 2)
         }
         return data
         
@@ -468,7 +468,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -910,7 +910,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -962,7 +962,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
                 created_date = ord.year.date() 
                 if created_date.month == date_obj.month and created_date.year == date_obj.year:
                     ser_target += float(ord.service_target)            
-            return ser_target
+            return round(ser_target, 2)
             
         except Exception as err:
             return str(err)        
@@ -1007,7 +1007,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
                 ser_target += float(price)
 
 
-            return ser_target
+            return round(ser_target, 2)
         except Exception as err:
             return str(err)
     class Meta:
@@ -1192,7 +1192,7 @@ class DiscountPromotion_SaleInvoiceSerializer(serializers.ModelSerializer):
         if obj.file:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=False)
                 return f'{url}{obj.file}'
             except:
                 return f'{obj.file}'
@@ -1219,6 +1219,12 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
     membership_service = serializers.SerializerMethodField(read_only=True)
     
     tip = serializers.SerializerMethodField(read_only=True)
+    checkout = serializers.SerializerMethodField(read_only=True)
+
+    def get_checkout(self, obj):
+        checkout = Checkout.objects.filter(id=obj.checkout_id).first()
+        return CheckoutSerializer(checkout).data
+    
         
     def get_membership(self, obj):
         
@@ -1341,7 +1347,8 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
     class Meta:
         model = DiscountPromotionSalesReport
         fields = [
-            'id', 
+            'id',
+            'checkout_id',
             'checkout_type', 
             'promotion', 
             'invoice', 
@@ -1357,8 +1364,8 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
             'ids', 
             'membership_product', 
             'membership_service', 
-            'tip'
-            
+            'tip',
+            'checkout',
         ]
 
         
