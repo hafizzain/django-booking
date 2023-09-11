@@ -73,7 +73,7 @@ def send_membership_order_email(membership_order, business_address, request):
         membership_currency = membership_order.membersheip.membership_currenypricemembership.filter(currency=business_address.currency).first()
         html_file = render_to_string('ClientOrderMail/membership_sale_order.html',
                                      {'membership_order':membership_order,
-                                      'membership_currency':membership_currencys}
+                                      'membership_currency':membership_currency}
                                     )
         text_content = strip_tags(html_file)
 
