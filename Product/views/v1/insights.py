@@ -19,14 +19,15 @@ DATE_REGEX = '\d{4}-\d{2}-\d{2}'
 class FilteredInsightProducts(APIView):
     permission_classes = [AllowAny]
 
-    today_date = datetime.now()
-    today_date_format = (today_date + timedelta(days=1)).strftime('%Y-%m-%d')
-    days_before_7 = (today_date - timedelta(days=7)).strftime('%Y-%m-%d')
-    days_before_30 = (today_date - timedelta(days=30)).strftime('%Y-%m-%d')
+    def __init__(self):
+        self.today_date = datetime.now()
+        self.today_date_format = (self.today_date + timedelta(days=1)).strftime('%Y-%m-%d')
+        self.days_before_7 = (self.today_date - timedelta(days=7)).strftime('%Y-%m-%d')
+        self.days_before_30 = (self.today_date - timedelta(days=30)).strftime('%Y-%m-%d')
 
-    queries = {
-        'filter' : {},'order_by' : [], 'annotate' : {}
-    }
+        self.queries = {
+            'filter' : {},'order_by' : [], 'annotate' : {}
+        }
 
     def retreive_top_sold_query(self, request):
         self.top_sold = request.GET.get('top_sold', None)
