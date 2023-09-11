@@ -68,6 +68,10 @@ class FilteredInsightProducts(APIView):
                 value = self.most_consumed
                 if value in ['LAST_7_DAYS', 'LAST_30_DAYS', 'MOST_CONSUMED_PRODUCTS']:
                     value = MOST_CONSUMED_CHOICES.get(value)
+                else:
+                    self.queries['error'] = []
+                    self.queries['error'].append('value not in list')
+
                 self.queries['filter']['consumptions__created_at__range'] = (value, self.today_date_format)
             else:
                 return Response(
