@@ -64,3 +64,24 @@ def send_order_email(checkout, request):
         
         email.attach_alternative(html_file, "text/html")
         email.send()
+
+
+def send_membership_order_email(membership_order, request):
+    
+    with tenant_context(request.tenant):
+
+        
+
+        html_file = render_to_string('ClientOrderMail/membership_sale_order.html', membership_order)
+        text_content = strip_tags(html_file)
+
+
+        email = EmailMultiAlternatives(
+                'Membership Sale Alert',
+                text_content,
+                settings.EMAIL_HOST_USER,
+                to = [membership_order.client.email],
+            )
+        
+        email.attach_alternative(html_file, "text/html")
+        email.send()
