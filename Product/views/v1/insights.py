@@ -223,26 +223,26 @@ class FilteredInsightProducts(APIView):
                 'category_name' : f'{product_instance.category.name}' if product_instance.category else '-------',
             }
 
-            if self.top_sold and product_instance.top_sold_orders:
+            if self.top_sold and (product_instance.top_sold_orders or product_instance.top_sold_orders == 0):
                 product['top_sold_orders'] = int(product_instance.top_sold_orders)
                 product['quantity'] = int(product_instance.top_sold_orders)
             else:
                 product['top_sold_orders'] = self.top_sold
 
 
-            if self.most_consumed and product_instance.most_consumed_products:
+            if self.most_consumed and (product_instance.most_consumed_products or product_instance.most_consumed_products == 0):
                 product['most_consumed_products'] = int(product_instance.most_consumed_products)
                 product['quantity'] = int(product_instance.most_consumed_products)
             else:
                 product['most_consumed_products'] = self.most_consumed
 
-            if self.most_ordered and product_instance.most_ordered_products:
+            if self.most_ordered and (product_instance.most_ordered_products or product_instance.most_ordered_products == 0):
                 product['most_ordered_products'] = int(product_instance.most_ordered_products)
                 product['quantity'] = int(product_instance.most_ordered_products)
             else:
                 product['most_ordered_products'] = self.most_ordered
 
-            if self.most_transferred and product_instance.most_transferred_products:
+            if self.most_transferred and (product_instance.most_transferred_products or product_instance.most_transferred_products == 0):
                 product['most_transferred_products'] = int(product_instance.most_transferred_products)
                 product['quantity'] = int(product_instance.most_transferred_products)
             else:
