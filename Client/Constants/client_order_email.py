@@ -47,7 +47,7 @@ def send_order_email(client, checkout_order, request):
 
 
         email = EmailMultiAlternatives(
-                'New Order',
+                'Exclusive Quick Sale Alert',
                 text_content,
                 settings.EMAIL_HOST_USER,
                 to = [client.email],
