@@ -2544,11 +2544,11 @@ def new_create_sale_order(request):
     serialized = CheckoutSerializer(checkout, context = {'request' : request, })
 
     
-    # if checkout.client:
-    #     """
-    #     Sending order details to client through 
-    #     """ 
-    #     send_order_email(checkout, request)
+    if client:
+        """
+        Sending order details to client through 
+        """ 
+        send_order_email(checkout, request)
 
     return Response(
             {
