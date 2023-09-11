@@ -10,7 +10,7 @@ from rest_framework import status
 from Appointment.models import Appointment, AppointmentCheckout, AppointmentService, AppointmentEmployeeTip
 from Business.models import AdminNotificationSetting, Business, StaffNotificationSetting, StockNotificationSetting
 from Client.models import Client, Membership, Vouchers, LoyaltyPoints, LoyaltyPointLogs, ClientLoyaltyPoint
-from Client.Constants import client_order_email
+from Client.Constants.client_order_email import send_order_email
 from Order.models import Checkout, MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
 from Sale.Constants.Custom_pag import CustomPagination
 from Utility.Constants.Data.months import MONTHS
@@ -2546,7 +2546,7 @@ def new_create_sale_order(request):
     """
     Sending order details to client through 
     """ 
-    client_order_email(client, checkout, request)
+    send_order_email(client, checkout, request)
 
     return Response(
             {
