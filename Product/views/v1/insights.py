@@ -249,13 +249,13 @@ class FilteredInsightProducts(APIView):
                 product['most_transferred_products'] = self.most_transferred
 
 
-            if self.low_stock_products :
-                if product_instance.sum_of_total_available_stock:
-                    product['sum_of_total_available_stock'] = int(product_instance.sum_of_total_available_stock)
-                if product_instance.sum_of_total_lowest_stock_amount:
-                    product['sum_of_total_lowest_stock_amount'] = int(product_instance.sum_of_total_lowest_stock_amount)
-                if product_instance.remaing_stock:
-                    product['lowest_stock'] = int(product_instance.remaing_stock)
+            # if self.low_stock_products :
+            #     if product_instance.sum_of_total_available_stock:
+            #         product['sum_of_total_available_stock'] = int(product_instance.sum_of_total_available_stock)
+            #     if product_instance.sum_of_total_lowest_stock_amount:
+            #         product['sum_of_total_lowest_stock_amount'] = int(product_instance.sum_of_total_lowest_stock_amount)
+            #     if product_instance.remaing_stock:
+            #         product['lowest_stock'] = int(product_instance.remaing_stock)
 
             # if self.out_of_stock_products:
             #     product['available_stock'] = int(product_instance.product_stock.all().available_quantity)
