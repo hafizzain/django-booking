@@ -30,7 +30,7 @@ def send_order_email(checkout, request):
                 sub_total += _item_total
 
             if key == 'tip':
-                total_tip += sum([tip_amount for tip_amount in order_data[key]])
+                total_tip += sum([tip_amount for tip_amount in value])
 
         total_amount = sub_total + total_tax + total_tip
 
