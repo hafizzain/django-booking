@@ -17,14 +17,14 @@ def send_order_email(checkout, request):
         order_data = dict(SaleOrders_CheckoutSerializer(checkout, context={'request':request}).data)
         
         #Summary
-        total_tax = order_data['gst'] + order_data['gst1']
+        total_tax = order_data['gst_price'] + order_data['gst_price1']
         created_at = order_data['created_at']
         location = order_data['location']['address_name']
         payment_method = order_data['payment_type']
 
         total_tip = 0
         sub_total = 0
-        
+
         for key, value in order_data.items():
 
             if key in ['product', 'membership', 'service']:
