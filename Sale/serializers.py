@@ -1559,12 +1559,6 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
             return obj.product.arabic_name
         
         return None
-
-    # def get_product_original_price(self, obj):
-    #     if obj.product:
-    #         return obj.product.cost_price
-        
-    #     return None
     
     def get_product_original_price(self, obj):
         price = PriceService.objects.filter(service = str(obj)).order_by('-created_at')
@@ -1575,9 +1569,7 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
         model = ProductOrder
         fields = [
             'id', 'product_name', 'product_arabic_name', 'product_original_price', 'quantity', 'product_price', 'price', 'selection_type']
-            # 'client','status', 'created_at',
-            #       'location', 'member', 'tip', 'total_price' , 'payment_type','price','name',
-            #       'gst', 'order_type', 'sold_quantity','product_details','total_product'
+
 
 class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
 
@@ -1601,7 +1593,6 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
         
         return None
     
-    #region debugging
     def get_price(self, obj):
         if obj.is_redeemed == True:
             return obj.redeemed_price
@@ -1609,15 +1600,12 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
             return obj.discount_price
         else:
             return obj.current_price
-    #endregion
 
     class Meta:
         model = ServiceOrder
         fields = ['id', 'price', 'service_original_price', 'quantity', 'service', 'selection_type',
                   'discount_price']
-            # 'client','created_at' ,'user',
-            #       'duration', 'location', 'member', 'total_price',
-            #       'payment_type','tip','gst', 'order_type','created_at'
+
 
 class SaleOrder_VoucherSerializer(serializers.ModelSerializer):
     voucher_price = serializers.SerializerMethodField()
@@ -1636,9 +1624,6 @@ class SaleOrder_VoucherSerializer(serializers.ModelSerializer):
     class Meta:
         model = VoucherOrder
         fields =[ 'id', 'voucher', 'voucher_arabic_name', 'quantity', 'voucher_price' ]
-            # 'client', 'location' , 
-            #      'member' ,'start_date', 'end_date','status',
-            #      'total_price', 'payment_type' , 'order_type','price', 'name','created_at','discount_percentage'
     
 
 class SaleOrder_MemberShipSerializer(serializers.ModelSerializer):
@@ -1666,8 +1651,7 @@ class SaleOrder_MemberShipSerializer(serializers.ModelSerializer):
     class Meta:
         model = MemberShipOrder
         fields =['id', 'membership', 'membership_arabic_name', 'quantity', 'price', 'membership_price', 'selection_type' ]
-            # 'order_type' ,'client','member', 'location' ,'start_date', 'end_date','status', 'total_price', 'name',
-            #      'payment_type','created_at'
+
 
 class CheckoutTipsSerializer(serializers.ModelSerializer):
     member_name = serializers.SerializerMethodField(read_only=True)
