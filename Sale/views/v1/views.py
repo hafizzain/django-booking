@@ -2543,10 +2543,12 @@ def new_create_sale_order(request):
     invoice.save() # Do not remove this
     serialized = CheckoutSerializer(checkout, context = {'request' : request, })
 
-    """
-    Sending order details to client through 
-    """ 
-    send_order_email(client, checkout, request)
+    
+    if checkout.client:
+        """
+        Sending order details to client through 
+        """ 
+        send_order_email(checkout, request)
 
     return Response(
             {

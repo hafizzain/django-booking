@@ -10,7 +10,7 @@ from Sale.serializers import SaleOrders_CheckoutSerializer
 
 
 
-def send_order_email(client, checkout_order, request):
+def send_order_email(checkout, request):
     
     with tenant_context(request.tenant):
 
@@ -21,13 +21,16 @@ def send_order_email(client, checkout_order, request):
         created_at = order_data['created_at']
         location = order_data['location']['address_name']
         payment_method = order_data['payment_type']
-        total_tip = order_data['invoice']['tip']
 
+        total_tip = 0
         sub_total = 0
         for key, value in order_data.items():
             if key in ['product', 'membership', 'voucher', 'service']:
                 _item_total = sum([a['price'] * a['quantity'] for a in value])
                 sub_total += _item_total
+
+            if key == 'tip':
+                total_tip += sum([tip_amount for tip_amount in order_data[key]])
 
         total_amount = sub_total + total_tax + total_tip
 
@@ -35,7 +38,7 @@ def send_order_email(client, checkout_order, request):
                                     {
                                         'created_at': created_at,
                                         'location': location,
-                                        'client_name': client.full_name,
+                                        'client_name': checkout.client.full_name,
                                         'payment_method': payment_method,
                                         'total_tax': total_tax,
                                         'total_tip': total_tip,
@@ -50,7 +53,7 @@ def send_order_email(client, checkout_order, request):
                 'Exclusive Quick Sale Alert',
                 text_content,
                 settings.EMAIL_HOST_USER,
-                to = [client.email],
+                to = [checkout.client.email],
             )
         
         email.attach_alternative(html_file, "text/html")
