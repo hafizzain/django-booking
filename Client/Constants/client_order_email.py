@@ -17,7 +17,7 @@ def send_order_email(checkout, request):
         order_data = dict(SaleOrders_CheckoutSerializer(checkout, context={'request':request}).data)
         
         #Summary
-        total_tax = order_data['gst_price'] + order_data['gst_price1']
+        total_tax = float(order_data['gst_price']) + float(order_data['gst_price1'])
         created_at = order_data['created_at']
         location = order_data['location']['address_name']
         payment_method = order_data['payment_type']
