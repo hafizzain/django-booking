@@ -2376,7 +2376,7 @@ def new_create_sale_order(request):
         Sending order details to client through 
         """
         if is_membership_sale:
-            send_membership_order_email(membership_order, request)
+            send_membership_order_email(membership_order, business_address, request)
         else:
             send_order_email(checkout, request)
 

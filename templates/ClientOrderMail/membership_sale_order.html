@@ -183,11 +183,11 @@
                         </tr>
                       </thead>
                       <tbody><tr>
-                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ membership_order.location }}</td>
+                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ membership_order.location.name }}</td>
                           <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ membership_order.client.full_name }}</td>
                           <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ membership_order.membership.name }}</td>
                           <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ membership_order.membership.discount }}</td>
-                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ membership_order.membership.membership_currenypricemembership.first.currency.}}</td>
+                          <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ membership_currency.currency.price }} {{membership_currency.currency.code}}</td>
                           <td style="font-size:11px;padding:7px 5px;border-right:1px solid #ffffff;border-bottom:1px solid #ffffff;border-top:1px solid #ffffff">{{ membership_order.membership.valid_for }}</td>
                         </tr></tbody>
                     </table>
