@@ -24,9 +24,15 @@ def send_order_email(checkout, request):
 
         total_tip = 0
         sub_total = 0
+        
         for key, value in order_data.items():
-            if key in ['product', 'membership', 'voucher', 'service']:
+
+            if key in ['product', 'membership', 'service']:
                 _item_total = sum([a['price'] * a['quantity'] for a in value])
+                sub_total += _item_total
+
+            if key == 'voucher':
+                _item_total = sum([a['voucher_price'] * a['quantity'] for a in value])
                 sub_total += _item_total
 
             if key == 'tip':
