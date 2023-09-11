@@ -32,17 +32,17 @@ class FilteredInsightProducts(APIView):
 
     def retreive_top_sold_query(self, request):
         self.top_sold = request.GET.get('top_sold', None)
-        TOP_SOLD_CHOICES = {'TOP_SOLD_PRODUCTS' : lambda : None, 'LAST_7_DAYS' : self.days_before_7 , 'LAST_30_DAYS' : self.days_before_30 }
+        TOP_SOLD_CHOICES = {'TOP_SOLD_PRODUCTS' : self.beggining_date, 'LAST_7_DAYS' : self.days_before_7 , 'LAST_30_DAYS' : self.days_before_30 }
 
         if self.top_sold :
             self.queries['order_by'].append('-top_sold_orders')
             self.queries['annotate']['top_sold_orders'] = Sum('product_orders__quantity')
             if self.top_sold in TOP_SOLD_CHOICES or re.match(DATE_REGEX, self.top_sold):
-                if self.top_sold != 'TOP_SOLD_PRODUCTS':
-                    value = self.top_sold
-                    if value in ['LAST_7_DAYS', 'LAST_30_DAYS']:
-                        value = TOP_SOLD_CHOICES.get(value)
-                    self.queries['filter']['product_orders__created_at__range'] = (value, self.today_date_format)
+                # if self.top_sold != 'TOP_SOLD_PRODUCTS':
+                value = self.top_sold
+                if value in ['LAST_7_DAYS', 'LAST_30_DAYS', 'TOP_SOLD_PRODUCTS']:
+                    value = TOP_SOLD_CHOICES.get(value)
+                self.queries['filter']['product_orders__created_at__range'] = (value, self.today_date_format)
             else:
                 return Response(
                     {
@@ -68,12 +68,6 @@ class FilteredInsightProducts(APIView):
                 value = self.most_consumed
                 if value in ['LAST_7_DAYS', 'LAST_30_DAYS', 'MOST_COMSUMED_PRODUCTS']:
                     value = MOST_CONSUMED_CHOICES.get(value)
-                else:
-                    self.queries['error'] = []
-                    self.queries['error'].append('value not in list')
-
-                self.queries['value'] = value
-
                 self.queries['filter']['consumptions__created_at__range'] = (value, self.today_date_format)
             else:
 
@@ -94,15 +88,15 @@ class FilteredInsightProducts(APIView):
 
 
         if self.most_ordered :
-            MOST_ORDERED_CHOICES = {'MOST_ORDERED_PRODUCTS' : None, 'LAST_7_DAYS' : self.days_before_7 , 'LAST_30_DAYS' : self.days_before_30 }
+            MOST_ORDERED_CHOICES = {'MOST_ORDERED_PRODUCTS' : self.beggining_date, 'LAST_7_DAYS' : self.days_before_7 , 'LAST_30_DAYS' : self.days_before_30 }
             self.queries['order_by'].append('-most_ordered_products')
             self.queries['annotate']['most_ordered_products'] = Sum('product_order_stock__rec_quantity')
             if self.most_ordered in MOST_ORDERED_CHOICES or re.match(DATE_REGEX, self.most_ordered):
-                if self.most_ordered != 'MOST_ORDERED_PRODUCTS':
-                    value = self.most_ordered
-                    if value in ['LAST_7_DAYS', 'LAST_30_DAYS']:
-                        value = MOST_ORDERED_CHOICES.get(value)
-                    self.queries['filter']['product_order_stock__order__created_at__range'] = (value, self.today_date_format)
+                # if self.most_ordered != 'MOST_ORDERED_PRODUCTS':
+                value = self.most_ordered
+                if value in ['LAST_7_DAYS', 'LAST_30_DAYS', 'MOST_ORDERED_PRODUCTS']:
+                    value = MOST_ORDERED_CHOICES.get(value)
+                self.queries['filter']['product_order_stock__order__created_at__range'] = (value, self.today_date_format)
             else:
                 return Response(
                     {
@@ -121,15 +115,15 @@ class FilteredInsightProducts(APIView):
 
 
         if self.most_transferred :
-            MOST_TRANSFERRED_CHOICES = {'MOST_TRANSFERRED_PRODUCTS' : None, 'LAST_7_DAYS' : self.days_before_7 , 'LAST_30_DAYS' : self.days_before_30 }
+            MOST_TRANSFERRED_CHOICES = {'MOST_TRANSFERRED_PRODUCTS' : self.beggining_date, 'LAST_7_DAYS' : self.days_before_7 , 'LAST_30_DAYS' : self.days_before_30 }
             self.queries['order_by'].append('-most_transferred_products')
             self.queries['annotate']['most_transferred_products'] = Sum('products_stock_transfers__quantity')
             if self.most_transferred in MOST_TRANSFERRED_CHOICES or re.match(DATE_REGEX, self.most_transferred):
-                if self.most_transferred != 'MOST_TRANSFERRED_PRODUCTS':
-                    value = self.most_transferred
-                    if value in ['LAST_7_DAYS', 'LAST_30_DAYS']:
-                        value = MOST_TRANSFERRED_CHOICES.get(value)
-                    self.queries['filter']['products_stock_transfers__created_at__range'] = (value, self.today_date_format)
+                # if self.most_transferred != 'MOST_TRANSFERRED_PRODUCTS':
+                value = self.most_transferred
+                if value in ['LAST_7_DAYS', 'LAST_30_DAYS', 'MOST_TRANSFERRED_PRODUCTS']:
+                    value = MOST_TRANSFERRED_CHOICES.get(value)
+                self.queries['filter']['products_stock_transfers__created_at__range'] = (value, self.today_date_format)
             else:
                 return Response(
                     {
