@@ -196,13 +196,13 @@
                   </td>
                 </tr>
   
-                {% if client is not None and client == False %}
+                {% comment %} {% if client is not None and client == False %}
                 <tr>
                   <td bgcolor="#ffffff" align="left" style="padding: 0px 30px 0px 30px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 25px;">
                     <h2 style="font-size: 20px; font-weight: 400; margin: 0;">Client Details:</h2>
                   </td>
                 </tr>
-  <tr>
+                <tr>
                   <td bgcolor="#ffffff" align="left" style="padding: 20px 30px;border-radius: 0px 0px 4px 4px;color: #666666;font-family: 'Lato', Helvetica, Arial, sans-serif;font-size: 16px;font-weight: 400;line-height: 25px;">
                     
                     <table style="border-spacing:0;table-layout:fixed;margin:0 auto;width:100%;text-align:left;vertical-align:top;color:black;border:1px solid #ffffff;font-family:'Axiforma Book','Lato',Helvetica,Arial,sans-serif;border-collapse:collapse">
@@ -226,7 +226,7 @@
   
                 <!-- COPY -->
                 <tr></tr>
-                {% endif %}
+                {% endif %} {% endcomment %}
               </tbody>
             </table>
   
