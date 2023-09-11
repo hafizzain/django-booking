@@ -72,6 +72,8 @@ class FilteredInsightProducts(APIView):
                     self.queries['error'] = []
                     self.queries['error'].append('value not in list')
 
+                self.queries['value'] = value
+
                 self.queries['filter']['consumptions__created_at__range'] = (value, self.today_date_format)
             else:
                 return Response(
