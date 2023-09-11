@@ -212,16 +212,28 @@ class FilteredInsightProducts(APIView):
             if self.top_sold and product_instance.top_sold_orders:
                 product['top_sold_orders'] = int(product_instance.top_sold_orders)
                 product['quantity'] = int(product_instance.top_sold_orders)
+            else:
+                product['top_sold_orders'] = self.top_sold
+
 
             if self.most_consumed and product_instance.most_consumed_products:
                 product['most_consumed_products'] = int(product_instance.most_consumed_products)
                 product['quantity'] = int(product_instance.most_consumed_products)
+            else:
+                product['most_consumed_products'] = self.most_consumed
+
             if self.most_ordered and product_instance.most_ordered_products:
                 product['most_ordered_products'] = int(product_instance.most_ordered_products)
                 product['quantity'] = int(product_instance.most_ordered_products)
+            else:
+                product['most_ordered_products'] = self.most_ordered
+
             if self.most_transferred and product_instance.most_transferred_products:
                 product['most_transferred_products'] = int(product_instance.most_transferred_products)
                 product['quantity'] = int(product_instance.most_transferred_products)
+            else:
+                product['most_transferred_products'] = self.most_transferred
+
 
             if self.low_stock_products :
                 if product_instance.sum_of_total_available_stock:
