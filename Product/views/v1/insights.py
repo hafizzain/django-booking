@@ -188,12 +188,12 @@ class FilteredInsightProducts(APIView):
         self.retreive_low_stock_products_query(request)
         self.retreive_out_of_stock_products_query(request)
 
-        filtered_products = Product.objects.annotate(
-            **self.queries['annotate'],
-        ).filter(
+        filtered_products = Product.objects.filter(
             is_deleted = False,
             product_stock__location__id = location_id,
             **self.queries['filter'],
+        ).annotate(
+            **self.queries['annotate'],
         ).distinct().order_by(*self.queries['order_by'])
 
         # serialized = ProductInsightSerializer(filtered_products, many=True)
