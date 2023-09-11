@@ -10,6 +10,7 @@ from rest_framework import status
 from Appointment.models import Appointment, AppointmentCheckout, AppointmentService, AppointmentEmployeeTip
 from Business.models import AdminNotificationSetting, Business, StaffNotificationSetting, StockNotificationSetting
 from Client.models import Client, Membership, Vouchers, LoyaltyPoints, LoyaltyPointLogs, ClientLoyaltyPoint
+from Client.Constants.client_order_email import send_order_email
 from Order.models import Checkout, MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
 from Sale.Constants.Custom_pag import CustomPagination
 from Utility.Constants.Data.months import MONTHS
@@ -1881,14 +1882,7 @@ def create_sale_order(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-    
-    # try:
-    #     thrd = Thread(target=StaffSaleEmail, args=[], kwargs={'ids' : ids, 'location': business_address.address_name ,'tenant' : request.tenant, 'member': member, 'invoice': checkout.id, 'client': client})
-    #     thrd.start()
-    # except Exception as err:
-    #     ExceptionRecord.objects.create(
-    #             text = f' error in email sale{str(err)}'
-    #         )
+            
     try:
         thrd = Thread(target=StaffSaleEmail, args=[], kwargs={'ids' : ids,'location': business_address.address_name ,'tenant' : request.tenant, 'member': member, 'invoice': checkout.id, 'client': client})
         thrd.start()
@@ -2548,7 +2542,12 @@ def new_create_sale_order(request):
 
     invoice.save() # Do not remove this
     serialized = CheckoutSerializer(checkout, context = {'request' : request, })
-    
+
+    """
+    Sending order details to client through 
+    """ 
+    send_order_email(client, checkout, request)
+
     return Response(
             {
                 'status' : True,
