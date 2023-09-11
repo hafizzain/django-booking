@@ -72,7 +72,9 @@ def send_membership_order_email(membership_order, request):
 
         
 
-        html_file = render_to_string('ClientOrderMail/membership_sale_order.html', membership_order)
+        html_file = render_to_string('ClientOrderMail/membership_sale_order.html',
+                                     {'membership_order':membership_order}
+                                    )
         text_content = strip_tags(html_file)
 
 
