@@ -58,7 +58,7 @@ class FilteredInsightProducts(APIView):
             
     def retreive_most_consumed_query(self, request):
         self.most_consumed = request.GET.get('most_consumed', None)
-        MOST_CONSUMED_CHOICES = {'MOST_CONSUMED_PRODUCTS' : self.beggining_date, 'LAST_7_DAYS' : self.days_before_7 , 'LAST_30_DAYS' : self.days_before_30 }
+        MOST_CONSUMED_CHOICES = {'MOST_COMSUMED_PRODUCTS' : self.beggining_date, 'LAST_7_DAYS' : self.days_before_7 , 'LAST_30_DAYS' : self.days_before_30 }
 
         if self.most_consumed :
             self.queries['order_by'].append('-most_consumed_products')
@@ -66,7 +66,7 @@ class FilteredInsightProducts(APIView):
             if self.most_consumed in MOST_CONSUMED_CHOICES or re.match(DATE_REGEX, self.most_consumed):
                 # if self.most_consumed != 'MOST_CONSUMED_PRODUCTS':
                 value = self.most_consumed
-                if value in ['LAST_7_DAYS', 'LAST_30_DAYS', 'MOST_CONSUMED_PRODUCTS']:
+                if value in ['LAST_7_DAYS', 'LAST_30_DAYS', 'MOST_COMSUMED_PRODUCTS']:
                     value = MOST_CONSUMED_CHOICES.get(value)
                 else:
                     self.queries['error'] = []
@@ -76,6 +76,7 @@ class FilteredInsightProducts(APIView):
 
                 self.queries['filter']['consumptions__created_at__range'] = (value, self.today_date_format)
             else:
+
                 return Response(
                     {
                         'status' : False,
