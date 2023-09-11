@@ -19,8 +19,7 @@ def send_order_email(client, checkout_order, request):
         #Summary
         total_tax = order_data['gst'] + order_data['gst1']
         created_at = order_data['created_at']
-        locatiion = order_data['location']['address_name']
-        client_name = order_data['client']['full_name']
+        location = order_data['location']['address_name']
         payment_method = order_data['payment_type']
         total_tip = order_data['invoice']['tip']
 
@@ -35,8 +34,8 @@ def send_order_email(client, checkout_order, request):
         html_file = render_to_string('ClientOrderMail/client_order_email.html',
                                     {
                                         'created_at': created_at,
-                                        'locatiion': locatiion,
-                                        'client_name': client_name,
+                                        'location': location,
+                                        'client_name': client.full_name,
                                         'payment_method': payment_method,
                                         'total_tax': total_tax,
                                         'total_tip': total_tip,
