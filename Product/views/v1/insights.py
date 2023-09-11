@@ -183,12 +183,24 @@ class FilteredInsightProducts(APIView):
                 status=status.HTTP_200_OK
             )
 
-        self.retreive_top_sold_query(request)
-        self.retreive_most_consumed_query(request)
-        self.retreive_most_ordered_query(request)
-        self.retreive_most_transferred_query(request)
-        self.retreive_low_stock_products_query(request)
-        self.retreive_out_of_stock_products_query(request)
+        response = self.retreive_top_sold_query(request)
+        if response is not None:
+            return response
+        response = self.retreive_most_consumed_query(request)
+        if response is not None:
+            return response
+        response = self.retreive_most_ordered_query(request)
+        if response is not None:
+            return response
+        response = self.retreive_most_transferred_query(request)
+        if response is not None:
+            return response
+        # response = self.retreive_low_stock_products_query(request)
+        # if response is not None:
+        #     return response
+        # response = self.retreive_out_of_stock_products_query(request)
+        # if response is not None:
+        #     return response
 
         filtered_products = Product.objects.filter(
             is_deleted = False,
