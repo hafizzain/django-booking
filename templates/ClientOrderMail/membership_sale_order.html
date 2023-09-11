@@ -197,13 +197,16 @@
                   <td bgcolor="#ffffff" align="left" style="padding: 0px 30px 0px 30px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 25px;">
                     <h2 style="font-size: 20px; font-weight: 400; margin: 0;">Membership Details:</h2>
                   </td>
-                </tr>
-                <tr>
-                  {% for item in membership_order.membership.membership_discountmembership.all %}
+                  <td>
+                    {% for item in membership_order.membership.membership_discountmembership.all %}
                       <p> Get :{{item.percentage}}off on {% if item.service %}service {{item.service.name}}{% endif %}{{else}}product{{item.product.name}}</p>
-                  {% endfor %}
-                {% if client is not None and client == False %}
-                <tr>
+                    {% endfor %}
+                </td>
+                </tr>
+                  
+                  {% if client is not None and client == False %}
+
+
                   <td bgcolor="#ffffff" align="left" style="padding: 0px 30px 0px 30px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 25px;">
                     <h2 style="font-size: 20px; font-weight: 400; margin: 0;">Client Details:</h2>
                   </td>
