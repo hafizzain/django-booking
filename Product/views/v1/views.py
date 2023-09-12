@@ -279,11 +279,17 @@ def import_category(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_categories(request):
-    all_categories = Category.objects.all().order_by('-created_at')
+    search_text = request.query_params.get('search_text', None)
+    no_pagination = request.query_params.get('no_pagination', None)
+
+    all_categories = Category.objects.all()
+    if search_text:
+        all_categories = all_categories.filter(name__icontains=search_text)
+
     serialized = list(CategorySerializer(all_categories, many=True).data)
 
     paginator = CustomPagination()
-    paginator.page_size = 10
+    paginator.page_size = 100000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(serialized, request)
     response = paginator.get_paginated_response(paginated_data, 'categories')
 
