@@ -1664,7 +1664,7 @@ def get_orderstock(request):
     .order_by('-created_at').distinct()
     
     if search_text:
-        order_stocks = order_stocks.filter(vendor_name__icontains=search_text)
+        order_stocks = order_stocks.filter(id__icontains=search_text)
         
     serialized = list(OrderSerializer(order_stocks, many=True, context={'request' : request}).data)
 
