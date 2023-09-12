@@ -20,6 +20,7 @@ class FilteredInsightProducts(APIView):
     permission_classes = [AllowAny]
 
     def __init__(self):
+        self.location = None
         self.beggining_date = '2000-01-01'
         self.today_date = datetime.now()
         self.today_date_format = (self.today_date + timedelta(days=1)).strftime('%Y-%m-%d')
@@ -43,6 +44,7 @@ class FilteredInsightProducts(APIView):
                 if value in ['LAST_7_DAYS', 'LAST_30_DAYS', 'TOP_SOLD_PRODUCTS']:
                     value = TOP_SOLD_CHOICES.get(value)
                 self.queries['filter']['product_orders__created_at__range'] = (value, self.today_date_format)
+                self.queries['filter']['product_orders__location__id'] = self.location
             else:
                 return Response(
                     {
@@ -69,6 +71,7 @@ class FilteredInsightProducts(APIView):
                 if value in ['LAST_7_DAYS', 'LAST_30_DAYS', 'MOST_COMSUMED_PRODUCTS']:
                     value = MOST_CONSUMED_CHOICES.get(value)
                 self.queries['filter']['consumptions__created_at__range'] = (value, self.today_date_format)
+                self.queries['filter']['consumptions__location__id'] = self.location
             else:
 
                 return Response(
@@ -97,6 +100,7 @@ class FilteredInsightProducts(APIView):
                 if value in ['LAST_7_DAYS', 'LAST_30_DAYS', 'MOST_ORDERED_PRODUCTS']:
                     value = MOST_ORDERED_CHOICES.get(value)
                 self.queries['filter']['product_order_stock__order__created_at__range'] = (value, self.today_date_format)
+                self.queries['filter']['product_order_stock__order__from_location__id'] = self.location
             else:
                 return Response(
                     {
@@ -124,6 +128,7 @@ class FilteredInsightProducts(APIView):
                 if value in ['LAST_7_DAYS', 'LAST_30_DAYS', 'MOST_TRANSFERRED_PRODUCTS']:
                     value = MOST_TRANSFERRED_CHOICES.get(value)
                 self.queries['filter']['products_stock_transfers__created_at__range'] = (value, self.today_date_format)
+                self.queries['filter']['products_stock_transfers__from_location__id'] = self.location
             else:
                 return Response(
                     {
@@ -182,6 +187,8 @@ class FilteredInsightProducts(APIView):
                 },
                 status=status.HTTP_200_OK
             )
+        
+        self.location = location_id
 
         response = self.retreive_top_sold_query(request)
         if response is not None:
