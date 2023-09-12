@@ -1215,7 +1215,7 @@ def get_products(request):
     location_id = request.GET.get('location_id', None)
     search_text = request.query_params.get('search_text', None)
     
-    location = BusinessAddress.objects.get(id=str(location_id))
+    
     all_products = Product.objects.prefetch_related(
         'location',
         'product_currencyretailprice',
@@ -1226,6 +1226,7 @@ def get_products(request):
     ).filter(is_deleted=False).order_by('-created_at')
 
     if location_id:
+        location = BusinessAddress.objects.get(id=str(location_id))
         all_products = all_products.filter(location=location)
 
     if search_text:
