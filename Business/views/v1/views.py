@@ -2981,7 +2981,7 @@ def get_business_vendors(request):
         # query
         query = Q(vendor_name__icontains=search_text)
         query |= Q(mobile_number__icontains=search_text)
-        query |= Q(business_address__name__icontains=search_text)
+        query |= Q(address__icontains=search_text)
         query |= Q(user__email__icontains=search_text)
         all_vendors = all_vendors.filter(query)
         
