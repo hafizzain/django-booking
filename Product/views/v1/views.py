@@ -474,7 +474,7 @@ def get_brands(request):
     paginator = CustomPagination()
     paginator.page_size = 100000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(serialized, request)
-    response = paginator.get_paginated_response(paginated_data, 'categories')
+    response = paginator.get_paginated_response(paginated_data, 'brands')
     return response
 
 
