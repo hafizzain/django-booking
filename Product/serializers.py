@@ -290,7 +290,6 @@ class ProductSerializer(serializers.ModelSerializer):
         try:
             all_location = obj.location.all()
             return LocationSerializer(all_location, many = True).data
-            # return EmployeeServiceSerializer(obj.services).data
         except Exception as err:
             print(err)
             None
@@ -357,8 +356,6 @@ class ProductSerializer(serializers.ModelSerializer):
             'size',
             'product_type',
             'cost_price',
-            #'full_price',
-            #'sell_price',
             'tax_rate',
             'short_description',
             'description',

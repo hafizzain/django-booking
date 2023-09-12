@@ -1212,9 +1212,10 @@ def update_product(request):
 @permission_classes([AllowAny])
 def get_products(request):
     start_time = datetime.datetime.now()
-    location = request.GET.get('location_id', None)
+    location_id = request.GET.get('location_id', None)
     search_text = request.query_params.get('search_text', None)
     
+    location = BusinessAddress.objects.get(id=str(location_id))
     all_products = Product.objects.prefetch_related(
         'location',
         'product_currencyretailprice',
@@ -1224,9 +1225,9 @@ def get_products(request):
         'product_stock',
     ).filter(is_deleted=False).order_by('-created_at')
 
-    if location:
-        all_products = all_products.filter(location__id=location)
-        
+    if location_id:
+        all_products = all_products.filter(location=location)
+
     if search_text:
         #query building
         query = Q(name__icontains=search_text)
