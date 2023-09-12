@@ -1252,6 +1252,7 @@ def update_product(request):
 def get_products(request):
     start_time = datetime.datetime.now()
     location = request.GET.get('location_id', None)
+    search_text = request.query_params.get('search_text', None)
     
     all_products = Product.objects.prefetch_related(
         'location',
@@ -1261,6 +1262,15 @@ def get_products(request):
         'product_medias',
         'product_stock',
     ).filter(is_deleted=False).order_by('-created_at')
+
+    if search_text:
+        #query building
+        query = Q(name__icontains=search_text)
+        query |= Q(category__name__icontains=search_text)
+        query |= Q(brand__name__icontains=search_text)
+        query |= Q(product_type__icontains=search_text)
+
+        all_products = all_products.filter(query)
     
     all_products_count = all_products.count()
     
