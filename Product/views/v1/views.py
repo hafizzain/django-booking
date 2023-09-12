@@ -1653,7 +1653,7 @@ def create_orderstock(request):
 def get_orderstock(request):
     search_text = request.query_params.get('search_text', None)
     no_pagination = request.query_params.get('no_pagination', None)
-    business_address_id = request.query_params.get('locatiion_id', None)
+    business_address_id = request.query_params.get('location_id', None)
     
     business_addr = BusinessAddress.objects.get(id=str(business_address_id))
     order_stocks = OrderStock.objects \
