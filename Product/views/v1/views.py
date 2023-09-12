@@ -280,11 +280,14 @@ def import_category(request):
 @permission_classes([AllowAny])
 def get_categories(request):
     all_categories = Category.objects.all().order_by('-created_at')
-    serialized = CategorySerializer(all_categories, many=True)
+    serialized = list(CategorySerializer(all_categories, many=True).data)
+
     paginator = CustomPagination()
     paginator.page_size = 10
     paginated_data = paginator.paginate_queryset(serialized, request)
-    return paginated_data
+    response = paginator.get_paginated_response(paginated_data, 'sales')
+
+    return response
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
