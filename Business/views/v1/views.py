@@ -2980,7 +2980,7 @@ def get_business_vendors(request):
     if search_text:
         all_vendors = all_vendors.filter(vendor_name__icontains=search_text)
         
-    serialized = BusinessVendorSerializer(all_vendors, many=True)
+    serialized = list(BusinessVendorSerializer(all_vendors, many=True))
 
     paginator = CustomPagination()
     paginator.page_size = 100000 if no_pagination else 10
