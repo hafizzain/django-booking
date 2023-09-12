@@ -462,20 +462,20 @@ def delete_category(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_brands(request):
+    search_text = request.query_params.get('search_text', None)
+    no_pagination = request.query_params.get('no_pagination', None)
+
     all_brands = Brand.objects.all()
-    serialized = BrandSerializer(all_brands, many=True, context={'request' : request})
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Brands',
-                'error_message' : None,
-                'brands' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    if search_text:
+        all_brands = all_brands.filter(name__icontains=search_text)
+        
+    serialized = list(BrandSerializer(all_brands, many=True, context={'request' : request}).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'categories')
+    return response
 
 
 @api_view(['POST'])
