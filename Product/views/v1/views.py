@@ -10,6 +10,7 @@ from rest_framework import status
 from django.db.models import Q
 import json
 import csv
+from Sale.Constants.Custom_pag import CustomPagination
 import datetime
 from rest_framework.views import APIView
 from rest_framework.settings import api_settings
@@ -280,18 +281,10 @@ def import_category(request):
 def get_categories(request):
     all_categories = Category.objects.all().order_by('-created_at')
     serialized = CategorySerializer(all_categories, many=True)
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Categories',
-                'error_message' : None,
-                'categories' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    paginator = CustomPagination()
+    paginator.page_size = 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    return paginated_data
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
