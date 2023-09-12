@@ -1544,15 +1544,10 @@ def search_brand(request):
 def create_orderstock(request):
     user = request.user
     business = request.data.get('business', None)
-    
     vendor = request.data.get('vendor', None)
-    #from_location = request.data.get('from_location',None)
     to_location = request.data.get('to_location',None)
     orstock_status = request.data.get('status',None)
-    rec_quantity = request.data.get('rec_quantity',None)
-    
     products = request.data.get('products', [])
-    #quantity = request.data.get('quantity',None)
     
     
     if not all([business, orstock_status, vendor, to_location]):
@@ -1620,10 +1615,8 @@ def create_orderstock(request):
         user=user,
         business=business_id, 
         vendor = vendor_id,
-        #from_location= from_location,
         to_location= to_location,
         status =orstock_status,
-        #rec_quantity= rec_quantity
     )
     if type(products) == str:
         products = products.replace("'" , '"')
@@ -1660,11 +1653,14 @@ def create_orderstock(request):
 def get_orderstock(request):
     search_text = request.query_params.get('search_text', None)
     no_pagination = request.query_params.get('no_pagination', None)
-
+    business_address_id = request.query_params.get('locatiion_id', None)
+    
+    business_addr = BusinessAddress.objects.get(id=str(business_address_id))
     order_stocks = OrderStock.objects \
     .filter(
         is_deleted = False,                                      
-        order_stock__product__is_deleted=False) \
+        order_stock__product__is_deleted=False,
+        to_location=business_addr) \
     .order_by('-created_at').distinct()
     
     if search_text:
