@@ -765,7 +765,8 @@ def create_appointment(request):
     serialized = AppoinmentSerializer(appointment)
     
     try:
-        thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
+        thrd = Thread(target=Add_appointment, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant,
+                                                               'user': request.user})
         thrd.start()
     except Exception as err:
         pass

@@ -2,7 +2,7 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
 from Appointment.models import Appointment, AppointmentService
-from Business.models import ClientNotificationSetting, StaffNotificationSetting
+from Business.models import ClientNotificationSetting, StaffNotificationSetting, AdminNotificationSetting
 
 from django_tenants.utils import tenant_context
 from django.conf import settings
@@ -11,8 +11,9 @@ from datetime import datetime,date
 from Utility.models import ExceptionRecord
 
 
-def Add_appointment(appointment=None, tenant=None, client=None):
+def Add_appointment(appointment=None, tenant=None, user=None, client=None):
 
+    client_admin = []
     if appointment is None or tenant is None:
         ExceptionRecord.objects.create(
             text='Appointment, Tenant Is None'
@@ -24,8 +25,9 @@ def Add_appointment(appointment=None, tenant=None, client=None):
             
             for appo in appointment:
                 try:
-                    staff_email = StaffNotificationSetting.objects.get(business = str(appo.appointment.business))
-                    client_email = ClientNotificationSetting.objects.get(business = str(appo.appointment.business))
+                    staff_email = StaffNotificationSetting.objects.get(business=str(appo.appointment.business))
+                    client_email = ClientNotificationSetting.objects.get(business=str(appo.appointment.business))
+                    admin_email = AdminNotificationSetting.objects.get(business=str(appo.appointment.business))
                 except:
                     pass 
                 
@@ -52,7 +54,7 @@ def Add_appointment(appointment=None, tenant=None, client=None):
                     
                     try:   
                         html_file = render_to_string("AppointmentEmail/appointment_staff_new.html", {
-                            'staff': True, #'name': name_c,'client_type': client_type , 'client': False,
+                            'staff': True,
                             't_name':mem_name , 'ser_name':ser_name ,'client': client,
                             'date':dat, 'mem_id':mem_id, 
                             'location':location, 'duration': duration,
@@ -75,15 +77,20 @@ def Add_appointment(appointment=None, tenant=None, client=None):
                     )
         
             if client_email.sms_appoinment == True and client is not None :
+                client_admin.append(email_c)
+                if admin_email.email_notify_on_appoinment:
+                    client_admin.append(user.email)
                 try:
-                    html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'client': True, 'appointment' : appointment,'staff': False,'t_name':name_c ,'time': current_time,} )
+                    html_file = render_to_string("AppointmentEmail/new_appointment_n.html",{'client': True, 'appointment' : appointment,
+                                                                                            'staff': False,'t_name':name_c ,
+                                                                                            'time': current_time,} )
                     text_content = strip_tags(html_file)
                     
                     email = EmailMultiAlternatives(
                         'Appointment Booked',
                         text_content,
                         settings.EMAIL_HOST_USER,
-                        to = [email_c],
+                        to = client_admin,
                     )
                         
                     email.attach_alternative(html_file, "text/html")
@@ -93,7 +100,7 @@ def Add_appointment(appointment=None, tenant=None, client=None):
                     ExceptionRecord.objects.create(
                         text = f'Error on creating email client;;; {str(err)}'
                     )
-    
+                
         except Exception as err:
             ExceptionRecord.objects.create(
                 text = f'create email line 78 on create app {str(err)} '

@@ -6,6 +6,8 @@ from django.conf import settings
 
 from django_tenants.utils import tenant_context
 
+from Business.models import AdminNotificationSetting, ClientNotificationSetting
+
 from Sale.serializers import SaleOrders_CheckoutSerializer
 
 
@@ -13,7 +15,16 @@ from Sale.serializers import SaleOrders_CheckoutSerializer
 def send_order_email(checkout, request):
     
     with tenant_context(request.tenant):
+        
+        emails = []
+        client_email = ClientNotificationSetting.objects.get(business=str(checkout.business_address.business))
+        admin_email = AdminNotificationSetting.objects.get(business=str(checkout.business_address.business))
 
+        if admin_email.email_notify_on_appoinment:
+            emails.append(request.user.email)
+
+        if client_email.sms_appoinment:
+            emails.append(checkout.client.email)
         order_data = dict(SaleOrders_CheckoutSerializer(checkout, context={'request':request}).data)
         
         #Summary
@@ -59,7 +70,7 @@ def send_order_email(checkout, request):
                 'Exclusive Quick Sale Alert',
                 text_content,
                 settings.EMAIL_HOST_USER,
-                to = [checkout.client.email],
+                to = emails,
             )
         
         email.attach_alternative(html_file, "text/html")
