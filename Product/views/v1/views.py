@@ -1098,24 +1098,6 @@ def update_product(request):
         
         for retail in currency_retail_price:
             currency_id = retail['currency']
-            id = retail.get('id', None)
-            price = retail['retail_price']
-            
-            # if id is not None:
-            #     try:
-            #         currency_retail = CurrencyRetailPrice.objects.get(id=retail['id'])
-            #         is_deleted = retail.get('is_deleted', None)
-            #         if bool(is_deleted) == True:
-            #             currency_retail.delete()
-            #             continue
-            #         currency_id= Currency.objects.get(id=retail['currency'])
-            #         currency_retail.currency = currency_id
-            #         currency_retail.retail_price = retail['retail_price']
-            #         currency_retail.save()
-            #     except Exception as err:
-            #         error.append(str(err))
-            #         print(err)
-            # else:
             currency_id= Currency.objects.get(id=retail['currency'])
             
             CurrencyRetailPrice.objects.create(
@@ -1187,21 +1169,6 @@ def update_product(request):
                 product_stock.available_quantity = int(current_stock)
                 product_stock.low_stock = int(low_stock)
                 product_stock.save()
-                
-                
-                # else:
-                #     product_stock = ProductStock.objects.create(
-                #         user = request.user,
-                #         business = product.business,
-                #         product = product,
-                #         location = loc,
-                #         available_quantity = current_stock,
-                #         low_stock = low_stock, 
-                #         reorder_quantity = reorder_quantity,
-                #         alert_when_stock_becomes_lowest = True,
-                #         is_active = True
-                #     )
-                #     ExceptionRecord.objects.create(is_resolved = True, text ='Created')
 
             else:
                 ExceptionRecord.objects.create(text=f'fields not all {location_id}, {current_stock}, {low_stock}, {reorder_quantity}')
@@ -1209,12 +1176,6 @@ def update_product(request):
     else:
         ExceptionRecord.objects.create(text='No Location Quantities Find')
     
-    # serialized= ProductStockSerializer(stock, data=request.data, partial=True)
-    # if serialized.is_valid():
-    #     serialized.save()
-    #     data.update(serialized.data)
-
-        
     
     serialized = ProductSerializer(product, data=request.data, partial=True, context={'request':request, 'location': None})
     if serialized.is_valid():
@@ -1714,7 +1675,7 @@ def get_orderstock(request):
     paginator = CustomPagination()
     paginator.page_size = 100000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(serialized, request)
-    response = paginator.get_paginated_response(paginated_data, 'vendors')
+    response = paginator.get_paginated_response(paginated_data, 'stocks')
     return response
 
  
