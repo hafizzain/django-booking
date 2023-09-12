@@ -1250,7 +1250,7 @@ def get_products(request):
 
     serialized = ProductSerializer(products, many=True, 
                                    context={'request' : request,
-                                            'location': location,
+                                            'location': location_id,
                                             })
     data = serialized.data
     end_time = datetime.datetime.now()
