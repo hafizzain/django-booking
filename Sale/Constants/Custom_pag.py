@@ -34,9 +34,7 @@ class CustomPagination(PageNumberPagination):
                 'error_message' : None,
                 pramas_data : data
             },
-            
-            #pramas_data: data
-            #'results': data
+
         })
 
 
