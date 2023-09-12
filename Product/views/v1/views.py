@@ -1687,20 +1687,26 @@ def create_orderstock(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_orderstock(request):
-    order_stocks = OrderStock.objects.filter(is_deleted = False, order_stock__product__is_deleted=False).order_by('-created_at').distinct()
-    serialized = OrderSerializer(order_stocks, many=True, context={'request' : request})
-    return Response(
-        {
-            'status' : True,
-            'status_code' : 200,
-            'response' : {
-                'message' : 'All Order stocks!',
-                'error_message' : None,
-                'stocks' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    search_text = request.query_params.get('search_text', None)
+    no_pagination = request.query_params.get('no_pagination', None)
+
+    order_stocks = OrderStock.objects \
+    .filter(
+        is_deleted = False,                                      
+        order_stock__product__is_deleted=False) \
+    .order_by('-created_at').distinct()
+    
+    if search_text:
+        order_stocks = order_stocks.filter(vendor_name__icontains=search_text)
+        
+    serialized = list(OrderSerializer(order_stocks, many=True, context={'request' : request}).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'vendors')
+    return response
+
  
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])

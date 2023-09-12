@@ -2978,7 +2978,12 @@ def get_business_vendors(request):
 
     all_vendors = BusinessVendor.objects.filter(is_deleted=False, is_closed=False)
     if search_text:
-        all_vendors = all_vendors.filter(vendor_name__icontains=search_text)
+        # query
+        query = Q(vendor_name__icontains=search_text)
+        query |= Q(mobile_number__icontains=search_text)
+        query |= Q(business_address__name__icontains=search_text)
+        query |= Q(user__email__icontains=search_text)
+        all_vendors = all_vendors.filter(query)
         
     serialized = list(BusinessVendorSerializer(all_vendors, many=True).data)
 
