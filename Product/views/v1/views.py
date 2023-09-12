@@ -1224,6 +1224,9 @@ def get_products(request):
         'product_stock',
     ).filter(is_deleted=False).order_by('-created_at')
 
+    if location:
+        all_products = all_products.filter(location__id=location)
+        
     if search_text:
         #query building
         query = Q(name__icontains=search_text)
