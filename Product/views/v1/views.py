@@ -2625,15 +2625,14 @@ def get_product_stock_report(request):
     if report_type:
         filter_queries['product_stock_report__report_choice'] = report_type
 
-    search_query = Q(name__icontains=query)
-
     products = Product.objects.prefetch_related(
         'product_stock'
     ).filter(
         product_stock__location = location,
         is_deleted = False,
+        name__icontains=query,
         **filter_queries
-    ).filter(search_query).distinct()
+    ).distinct()
     
     serialized = list(ProductStockReportSerializer(
         products, 
