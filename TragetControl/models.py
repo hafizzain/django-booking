@@ -32,7 +32,7 @@ class StaffTarget(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_stafftarget')
     
     month = models.CharField(choices=MONTH_CHOICE, max_length=100, default='January')
-    year = models.DateTimeField( null = True, blank =True)
+    year = models.DateTimeField(null=True, blank=True)
 
     
     service_target = models.FloatField(default=0)
