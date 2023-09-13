@@ -2278,13 +2278,19 @@ def delete_product_consumptions(request):
 def get_product_consumptions(request):
     search_text = request.query_params.get('search_text', None)
     no_pagination = request.query_params.get('no_pagination', None)
+    location_id = request.query_params.get('location_id', None)
     
     product_consumptions = ProductConsumption.objects.filter(is_deleted=False)
+
+    if location_id:
+        location = BusinessAddress.objects.get(id=str(location_id))
+        product_consumptions = product_consumptions.filter(location=location)
+    
     if search_text:
         product_consumptions = product_consumptions.filter(name__icontains=search_text)
+   
     serialized = list(ProductConsumptionSerializer(product_consumptions, many=True).data)
-
-
+    
     paginator = CustomPagination()
     paginator.page_size = 100000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(serialized, request)
