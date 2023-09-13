@@ -1,35 +1,33 @@
-from cmath import cos
+import datetime
+import json
+import csv
 from threading import Thread
+
 from django.http import HttpResponse
 from django.db.models.functions import Cast
 from django.db.models import CharField
-from Product.Constants.Add_Product import add_product_remaing
-from Utility.models import Currency, NstyleFile, ExceptionRecord
+from django.core.paginator import Paginator
+from django.db.models import Q
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from django.db.models import Q
-import json
-import csv
-from Sale.Constants.Custom_pag import CustomPagination
-import datetime
-from rest_framework.views import APIView
-from rest_framework.settings import api_settings
-
 
 from NStyle.Constants import StatusCodes
-
+from Product.models import ProductTranslations
+from Utility.models import Language
+from Sale.Constants.Custom_pag import CustomPagination
+from Product.Constants.Add_Product import add_product_remaing
+from Utility.models import Currency, NstyleFile, ExceptionRecord
+from Business.models import Business, BusinessAddress, BusinessVendor
 from Product.models import ( Category, Brand, CurrencyRetailPrice , Product, ProductMedia, ProductOrderStockReport, ProductStock
                             , OrderStock, OrderStockProduct, ProductConsumption, ProductStockTransfer
                            )
-from Business.models import Business, BusinessAddress, BusinessVendor
-from Product.serializers import (CategorySerializer, BrandSerializer, ProductOrderStockReportSerializer, ProductSerializer, ProductStockSerializer, ProductWithStockSerializer
-                                 ,OrderSerializer , OrderProductSerializer, ProductConsumptionSerializer, ProductStockTransferSerializer, ProductOrderSerializer, ProductStockReportSerializer
+from Product.serializers import (CategorySerializer, BrandSerializer, ProductSerializer, ProductWithStockSerializer
+                                 ,OrderSerializer , OrderProductSerializer, ProductConsumptionSerializer,
+                                 ProductStockTransferSerializer, ProductStockReportSerializer
                                  )
-from django.core.paginator import Paginator
-from Product.models import ProductTranslations
-from Utility.models import Language
+
 
 
 
@@ -71,7 +69,6 @@ def get_test_api(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def export_csv(request):
-        #product = ProductStock.objects.all()
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="ProductStock.csv"'
 
@@ -111,13 +108,10 @@ def import_brand(request):
             website =  row[1].strip('"')
             status =  row[2].strip('"')
             description =  row[3].strip('"')
-            #image =  row[4].strip('"')
             brand = Brand.objects.create(
-                #user = user,
                 name=name,
                 description=description,
                 website=website,
-                #image=image,
             )
             if status == 'Active':
                 brand.is_active = True
@@ -139,7 +133,6 @@ def import_product(request):
         file = product_csv
     )           
     
-    #print(file.file.path)
     with open( file.file.path , 'r', encoding='utf-8') as imp_file:
         for index, row in enumerate(imp_file):
             if index == 0:
@@ -193,7 +186,6 @@ def import_product(request):
                         }
                     }
                 )
-                # Q(name__icontains=brand) | Q(is_active__icontains= True) | Q(website__isnull=True)
             else:
                 return Response(
                 {
@@ -223,12 +215,6 @@ def import_product(request):
                     }
             )
             
-            
-            # Category.objects.create(
-            #     product=product, 
-                
-            # )
-            
             ProductStock.objects.create(
                 user=user,
                 product=product,
@@ -245,7 +231,6 @@ def import_product(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def import_category(request): 
-    user = request.user
     category_csv = request.data.get('file', None)
 
 
@@ -266,7 +251,6 @@ def import_category(request):
             
             category = Category.objects.create(
                 name = name,
-                #is_active=active,
             )  
             if active == 'Active':
                category.active = True
@@ -501,7 +485,6 @@ def add_brand(request):
                     'fields' : [
                         'name',
                         'is_active',
-                        # 'image',
                     ]
                 }
             },
@@ -956,7 +939,6 @@ def update_product(request):
                     'error_message' : 'All fields are required.',
                     'fields' : [
                         'product',
-                        # 'vendor',
                         'category',
                         'brand',
                     ]
@@ -1040,10 +1022,6 @@ def update_product(request):
             product.location.add(address)
         except Exception as err:
             print(err)
-            
-    # all_stocks = ProductStock.objects.filter(product=product)
-    # for stk in all_stocks:
-    #     stk.delete()
     
     if currency_retail_price is not None:
         if check == True:
@@ -1107,9 +1085,7 @@ def update_product(request):
     location_quantities = request.data.get('location_quantities', None)
     if location_quantities is not None:
         if type(location_quantities) == str:
-            #ExceptionRecord.objects.create(is_resolved = True, text='Location Quantities was string and gonna convert')
             location_quantities = json.loads(location_quantities)
-            #ExceptionRecord.objects.create(is_resolved = True, text='Converted')
         
         for loc_quan in location_quantities:
             location_id = loc_quan.get('id', None)
@@ -1267,7 +1243,6 @@ def delete_product(request):
         )
     try:
         product = Product.objects.get(id=product_id, is_deleted=False)
-        #product_stock = ProductStock.objects.get(product = product , is_deleted=False )
     except Exception as err:
         return Response(
             {
@@ -1283,9 +1258,7 @@ def delete_product(request):
         )
 
     product.is_deleted = True
-    #product_stock.is_deleted = True
     product.save()
-    # product.delete()
     return Response(
         {
             'status' : True,
@@ -1352,7 +1325,6 @@ def search_product(request):
 def get_stocks(request):
     all_stocks = Product.objects.filter(is_active=True, is_deleted=False, product_stock__gt=0 ).order_by('-created_at').distinct()
     serialized = ProductWithStockSerializer(all_stocks, many=True, context={'request' : request}).data
-    # serialized_data = sorted(serialized, key=lambda x:x ['stock'][0]['sold_quantity'], reverse=True)
     return Response(
         {
             'status' : True,
@@ -1434,8 +1406,6 @@ def filter_stock(request):
         'low_stock' : lambda product, value : True if int(product.product_stock.quantity) <= int(value) else False,
         'high_stock' : lambda product, value : True if int(product.product_stock.quantity) > int(value) else False,
         'top_sellable_items' : lambda product, value : True,
-        # 'start_date' : lambda product, value : True if product.created_at > value else False,
-        # 'end_date' : lambda product, value : True if product.created_at < value else False,
     }
 
     result = []
@@ -1569,7 +1539,6 @@ def create_orderstock(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
     try:
-        #from_location = BusinessAddress.objects.get(id=from_location)
         to_location = BusinessAddress.objects.get(id=to_location)
     except Exception as err:
             return Response(
@@ -2045,7 +2014,6 @@ def add_product_consumption(request):
             report_choice = 'Consumed',
             product = product,
             user = request.user,
-            #location = product_location,
             consumed_location = location,
             quantity = int(quantity), 
             before_quantity = consumed.available_quantity     
@@ -2053,7 +2021,6 @@ def add_product_consumption(request):
             sold = consumed.available_quantity - int(quantity)
             consumed.available_quantity = sold
             consumed.consumed_quantity +=  int(quantity)
-            #consumed.sold_quantity += int(quantity)
             consumed.save()
             stock_cunsumed.after_quantity = sold
             stock_cunsumed.save()
@@ -2355,7 +2322,6 @@ def add_product_stock_transfer(request):
     try:
         from_location = BusinessAddress.objects.get(id=from_location_id)
         to_location = BusinessAddress.objects.get(id=to_location_id)
-        #product_location = BusinessAddress.objects.get(id=product.location.id)
     except Exception as err:
         return Response(
             {
@@ -2385,14 +2351,12 @@ def add_product_stock_transfer(request):
             report_choice = 'Transfer_from',
             product = product,
             user = request.user,
-            #location = product_location,
             from_location = from_location,
             quantity = int(quantity), 
             before_quantity = transfer.available_quantity      
             )
             sold = transfer.available_quantity - int(quantity)
             transfer.available_quantity = sold
-            #transfer.sold_quantity += int(quantity)
             transfer.save()
             stock_transfer.after_quantity = sold
             stock_transfer.save()
@@ -2403,7 +2367,6 @@ def add_product_stock_transfer(request):
             report_choice = 'Transfer_to',
             product = product,
             user = request.user,
-            #location = product_location,
             to_location = to_location,
             quantity = int(quantity), 
             before_quantity = transfer.available_quantity      
