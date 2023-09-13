@@ -2626,7 +2626,6 @@ def get_product_stock_report(request):
         filter_queries['product_stock_report__report_choice'] = report_type
 
     search_query = Q(name__icontains=query)
-    search_query |= Q(brand__name__iconttains=query)
 
     products = Product.objects.prefetch_related(
         'product_stock'
