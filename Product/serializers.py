@@ -1,15 +1,12 @@
-
-
+from django.db.models import Q
 from rest_framework import serializers
+
 from Product.Constants.index import tenant_media_base_url
 from Product.models import (Category, Brand, CurrencyRetailPrice, Product, ProductMedia, ProductOrderStockReport, 
                             ProductStock, OrderStock , OrderStockProduct, ProductConsumption, ProductStockTransfer)
 from Business.models import BusinessAddress, BusinessVendor
-from django.conf import settings
 from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer
 
-from Utility.models import  ExceptionRecord
-from django.db.models import Avg, Count, Min, Sum, Q
 from Utility.models import Language
 from Product.models import ProductTranslations
 
@@ -427,7 +424,6 @@ class ProductOrderStockReportSerializer(serializers.ModelSerializer):
     consumed_location = BusiessAddressAppointmentSerializer()
     vendor_name = serializers.SerializerMethodField(read_only=True)
     product = ProductOrderSerializer()
-    # stocks = serializers.SerializerMethodField(read_only=True)
     
     def get_vendor_name(self, obj):
         try:
@@ -496,11 +492,6 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
             return obj.brand.name
         except Exception as err:
             return None
-    
-    # def get_avaiable(self, obj):
-    #         quantity = ProductStock.objects.filter(product = obj)
-    #         return ProductStockSerializer(quantity, many = True).data
-
             
     def get_retail_price(self, obj):
         currency_id = self.context.get('location_currency_id')

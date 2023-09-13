@@ -2574,6 +2574,9 @@ def update_product_stock_transfer(request):
 @permission_classes([AllowAny])
 def get_product_stock_report(request):
 
+    brand_id = request.GET.get('brand_id', None)
+    query = request.GET.get('search_text', '')
+    report_type = request.GET.get('report_type', None)
     location_id = request.GET.get('location_id', None)
 
     if not all([location_id]):
@@ -2612,9 +2615,6 @@ def get_product_stock_report(request):
         )
 
     
-    brand_id = request.GET.get('brand_id', None)
-    query = request.GET.get('query', '')
-    report_type = request.GET.get('report_type', None)
 
 
     filter_queries = {}
@@ -2625,14 +2625,16 @@ def get_product_stock_report(request):
     if report_type:
         filter_queries['product_stock_report__report_choice'] = report_type
 
+    search_query = Q(name__icontains=query)
+    search_query |= Q(brand__name__iconttains=query)
+
     products = Product.objects.prefetch_related(
         'product_stock'
     ).filter(
         product_stock__location = location,
         is_deleted = False,
-        name__icontains = query,
         **filter_queries
-    ).distinct()
+    ).filter(search_query).distinct()
     
     serialized = ProductStockReportSerializer(
         products, 
@@ -2643,17 +2645,9 @@ def get_product_stock_report(request):
             'location_currency_id' : location.currency.id if location.currency else None,
         }
     )
-    data = serialized.data
-
-    return Response(
-        {
-            'status' : True,
-            'status_code' : 200,
-            'response' : {
-                'message' : 'Product Stock Reports',
-                'error_message' : None,
-                'product_stock_report' : data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    
+    paginator = CustomPagination()
+    paginator.page_size = 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'brands')
+    return response
