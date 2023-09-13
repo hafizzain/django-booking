@@ -2635,7 +2635,7 @@ def get_product_stock_report(request):
         **filter_queries
     ).filter(search_query).distinct()
     
-    serialized = ProductStockReportSerializer(
+    serialized = list(ProductStockReportSerializer(
         products, 
         many = True,
         context = {
@@ -2643,7 +2643,7 @@ def get_product_stock_report(request):
             'report_type' : report_type,
             'location_currency_id' : location.currency.id if location.currency else None,
         }
-    )
+    ).data)
     
     paginator = CustomPagination()
     paginator.page_size = 10
