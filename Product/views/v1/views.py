@@ -658,13 +658,10 @@ def add_product(request):
     vendor_id = request.data.get('vendor', None)
     category_id = request.data.get('category', None)
     product_size = request.data.get('size', None)
-    #image = request.data.getlist('image', None)
     brand_id = request.data.get('brand', None)
     product_type = request.data.get('product_type', 'Sellable')
     name = request.data.get('name', None)
     cost_price = request.data.get('cost_price', None)
-    full_price = request.data.get('full_price', None)
-    sell_price = request.data.get('sell_price', None)
     tax_rate = request.data.get('tax_rate', None)
     short_description = request.data.get('short_description', None)
     description = request.data.get('description', None)
@@ -675,20 +672,7 @@ def add_product(request):
     
     #RetailPrice
     currency_retail_price = request.data.get('currency_retail_price', None)
-    
-    # location = request.data.get('location', None)
-
-    # Product Stock Details 
-    # quantity = request.data.get('quantity', None)
-    # sellable_quantity = request.data.get('sellable_quantity', None)
-    # consumable_quantity = request.data.get('consumable_quantity',None)
-    # unit = request.data.get('unit', None)
-    # product_unit = request.data.get('product_unit', None)
-    # amount = request.data.get('amount', None)
-    stock_status = request.data.get('stock_status', True)
-
-    #turnover = request.data.get('turnover', None)
-   
+    stock_status = request.data.get('stock_status', True)   
     alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', None)
     invoices = request.data.get('invoices', None)
 
@@ -807,8 +791,6 @@ def add_product(request):
         product_type = product_type,
         name = name,
         cost_price = cost_price,
-        #full_price = full_price,
-        #sell_price = sell_price,
         product_size=product_size,
         tax_rate = tax_rate,
         short_description = short_description,
@@ -837,8 +819,6 @@ def add_product(request):
             pass
         
         for retail in currency_retail_price:
-            #currency_id = retail['currency']
-            #price = retail['retail_price']
             
             try:
                 currency_id= Currency.objects.get(id=retail['currency'])
@@ -852,15 +832,12 @@ def add_product(request):
             )
             except Exception as err:
                 print(str(err))
-                #ExceptionRecord.objects.create(is_resolved = False, text=f'currency not found product line 866  ' )
             
                     
     location_quantities = request.data.get('location_quantities', None)
     if location_quantities is not None:
         if type(location_quantities) == str:
-            #ExceptionRecord.objects.create(is_resolved = True, text='Location Quantities was string and gonna convert')
             location_quantities = json.loads(location_quantities)
-            #ExceptionRecord.objects.create(is_resolved = True, text='Converted')
         
         for loc_quan in location_quantities:
             location_id = loc_quan.get('id', None)
@@ -868,35 +845,28 @@ def add_product(request):
             low_stock = loc_quan.get('low_stock', None)
             reorder_quantity = loc_quan.get('reorder_quantity', None)
 
-            #if all([location_id, current_stock, low_stock, reorder_quantity]):
             try:
                 loc = BusinessAddress.objects.get(id = location_id)
-                #ExceptionRecord.objects.create(text=loc)
                 location_ids.append(str(loc))
             except Exception as err:
                 ExceptionRecord.objects.create(text=str(err))
                 pass
             
             else:
-                #ExceptionRecord.objects.create(text=f'{current_stock} {low_stock}  reorder_quantity{reorder_quantity}')
                 product_stock = ProductStock.objects.create(
                     user = user,
                     business = business,
                     product = product,
                     location = loc,
                     available_quantity = current_stock,
-                    #order_quantity = current_stock,
                     low_stock = low_stock, 
                     reorder_quantity = reorder_quantity,
                     alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
                     is_active = stock_status,
                 )
 
-            # else:
-            #     ExceptionRecord.objects.create(text=f'fields not all {location_id}, {current_stock}, {low_stock}, {reorder_quantity}')
-                
         try:
-            location_remaing = BusinessAddress.objects.filter(is_deleted = False).exclude(id__in = location_ids)
+            location_remaing = BusinessAddress.objects.filter(is_deleted=False).exclude(id__in=location_ids)
             for i, location_id in enumerate(location_remaing):
                 ProductStock.objects.create(
                         user = user,
@@ -909,13 +879,7 @@ def add_product(request):
                         alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
                         is_active = stock_status,
                     )
-        #         try:
-        #             thrd = Thread(target=add_product_remaing, args=[], kwargs={'product' : product, 'business' : business, 'location': location_id})
-        #             thrd.start()
-        #         except Exception as err:
-        #             ExceptionRecord.objects.create(
-        #                 text=str(err)
-        # )
+
         except Exception as err:
             product_error.append(str(err))
 
@@ -1225,9 +1189,11 @@ def get_products(request):
         'product_stock',
     ).filter(is_deleted=False).order_by('-created_at')
 
-    if location_id:
-        location = BusinessAddress.objects.get(id=str(location_id))
-        all_products = all_products.filter(location=location)
+    # region temporary commented
+    # if location_id:
+    #     location = BusinessAddress.objects.get(id=str(location_id))
+    #     all_products = all_products.filter(product_stock__location=location_id)
+    # endregion
 
     if search_text:
         #query building
@@ -1240,11 +1206,11 @@ def get_products(request):
     
     all_products_count = all_products.count()
     
-    page_count = all_products_count / 20
+    page_count = all_products_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_products, 20)
+    paginator = Paginator(all_products, 10)
     page_number = request.GET.get("page") 
     products = paginator.get_page(page_number)
 
@@ -2632,25 +2598,6 @@ def update_product_stock_transfer(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_product_stock_report(request):
-    # stock_report = ProductOrderStockReport.objects.filter(is_deleted=False).order_by('-created_at').distinct()
-    
-    # grouped_reports = {}
-    # for report in stock_report:
-    #     product_id = report.product.id
-    #     if product_id not in grouped_reports:
-    #         grouped_reports[product_id] = []
-    #     grouped_reports[product_id].append(report)
-    
-    # serialized_data = []
-    
-    # # Serialize the grouped data
-    # for product_id, reports in grouped_reports.items():
-    #     product = reports[0].product
-    #     serialized_reports = ProductOrderStockReportSerializer(reports, many=True).data
-    #     serialized_data.append({
-    #         'product': ProductOrderSerializer(product).data,
-    #         'reports': serialized_reports
-    #     })
 
     location_id = request.GET.get('location_id', None)
 

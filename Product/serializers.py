@@ -118,22 +118,13 @@ class ProductStockSerializer(serializers.ModelSerializer):
         try:
             print(obj.location)
             loc = BusinessAddress.objects.get(id = str(obj.location), is_deleted=False )
-            #loc = obj.location.all()
             return LocationSerializer(loc).data
-            # return EmployeeServiceSerializer(obj.services).data
         except Exception as err:
             print(err)
             None
 
     def get_current_stock(self, obj):
         return obj.available_quantity
-        # try:
-        #     return obj.available_quantity - obj.sold_quantity
-        # except Exception as err:
-        #     ExceptionRecord.objects.create(
-        #     is_resolved = True, 
-        #     text= f'{str(err)}'
-        # )
 
     class Meta:
         model = ProductStock
@@ -156,16 +147,6 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
             comsumption = ProductConsumption.objects.filter(product = obj)
             return ProductConsumptionSerializer( comsumption, many = True).data
     
-    #transfer_quantity = serializers.SerializerMethodField(read_only=True)
-    
-    # def get_transfer_quantity(self, obj):
-    #     try:
-    #         return Sum(ProductStockTransfer.objects.filter(product = obj.product).values_list('quantity'))
-    #     except Exception as err:
-    #         ExceptionRecord.objects.create(
-    #             text = f"Product quantity issue {str(err)}"
-    #         ) 
-    
     def get_currency_retail_price(self, obj):
             currency_retail = CurrencyRetailPrice.objects.filter(product = obj)
             return CurrencyRetailPriceSerializer( currency_retail, many = True).data
@@ -182,52 +163,12 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
         stock = ProductStock.objects.filter(product=obj, is_deleted=False)#[0]
         return ProductStockSerializer(stock, many = True).data
         
-        # total_qant = 0
-        # try:
-        #     if stock.product.product_type == 'SELABLE':
-        #         total_qant = stock.sellable_quantity 
-        #     elif stock.product.product_type == 'COMSUME' :
-        #         total_qant = stock.consumable_quantity
-        #     else:
-        #         total_qant = int(stock.sellable_quantity) + int(stock.consumable_quantity)
-
-            
-        # except Exception as err:
-        #     print(err)
-        # #print(type(available_quantity))
-        # #print(int(available_quantity[0]))
-        # available_quantity = total_qant -  stock.sold_quantity,
-        # return {            
-        #     'id' : stock.id,
-        #     'available_stock' : int(available_quantity[0]),
-        #     'quantity' : stock.sellable_quantity,
-        #     'sold_stock' : stock.sold_quantity,
-        #     'price' : stock.product.sell_price,
-        #     'usage' : (int(total_qant) // int(stock.sold_quantity)) * 100 if stock.sold_quantity > 0 else 100,
-        #     'status' : True if int(available_quantity[0]) > 0 else False,
-        #     'status_text' : 'In Stock' if int(available_quantity[0]) > 0 else 'Out of stock',
-        #     'sale_status' : 'High',
-        #     'turnover' : 'Highest' if int(available_quantity[0]) > 0 else 'Lowest' ,
-        # }
-        
 
     class Meta:
         model = Product
-        fields = [
-            'id', 
-            'name', 
-            'arabic_name', 
-            'cost_price',
-            'category', 
-            'brand', 
-            'vendor',
-            'stock',
-            'stocktransfer',
-            'location',
-            'consumed',
-            'currency_retail_price',
-            
-        ]
+        fields = ['id', 'name', 'arabic_name', 'cost_price','category', 'brand', 'vendor',
+                  'stock','stocktransfer','location','consumed','currency_retail_price'
+                  ]
         read_only_fields = ['id']
         
 
