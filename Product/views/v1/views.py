@@ -2408,20 +2408,20 @@ def add_product_stock_transfer(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_product_stock_transfers(request):
+    search_text = request.query_params.get('search_text', None)
+    no_pagination = request.query_params.get('no_pagination', None)
+
     stock_tranfers = ProductStockTransfer.objects.filter(is_deleted=False).order_by('-created_at').distinct()
-    serialized = ProductStockTransferSerializer(stock_tranfers, many=True)
-    return Response(
-        {
-            'status' : True,
-            'status_code' : 200,
-            'response' : {
-                'message' : 'Product Stock Transfers',
-                'error_message' : None,
-                'product_stock_transfers' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    if search_text:
+        stock_tranfers = stock_tranfers.filter(name__icontains=search_text)
+
+    serialized = list(ProductStockTransferSerializer(stock_tranfers, many=True).data)
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'product_stock_transfers')
+    return response 
+
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
