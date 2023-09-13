@@ -2575,7 +2575,7 @@ def update_product_stock_transfer(request):
 def get_product_stock_report(request):
 
     brand_id = request.GET.get('brand_id', None)
-    query = request.GET.get('search_text', '')
+    query = request.GET.get('query', '')
     report_type = request.GET.get('report_type', None)
     location_id = request.GET.get('location_id', None)
 
