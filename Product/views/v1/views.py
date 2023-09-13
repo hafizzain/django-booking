@@ -2413,7 +2413,7 @@ def get_product_stock_transfers(request):
 
     stock_tranfers = ProductStockTransfer.objects.filter(is_deleted=False).order_by('-created_at').distinct()
     if search_text:
-        stock_tranfers = stock_tranfers.filter(name__icontains=search_text)
+        stock_tranfers = stock_tranfers.filter(product__name__icontains=search_text)
 
     serialized = list(ProductStockTransferSerializer(stock_tranfers, many=True).data)
     paginator = CustomPagination()
