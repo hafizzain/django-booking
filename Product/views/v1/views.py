@@ -2276,22 +2276,21 @@ def delete_product_consumptions(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_product_consumptions(request):
+    search_text = request.query_params.get('search_text', None)
+    no_pagination = request.query_params.get('no_pagination', None)
     
     product_consumptions = ProductConsumption.objects.filter(is_deleted=False)
-    serialized = ProductConsumptionSerializer(product_consumptions, many=True)
+    if search_text:
+        product_consumptions = product_consumptions.filter(name__icontains=search_text)
+    serialized = list(ProductConsumptionSerializer(product_consumptions, many=True).data)
 
-    return Response(
-        {
-            'status' : True,
-            'status_code' : 200,
-            'response' : {
-                'message' : 'Product Consumption Created successfully',
-                'error_message' : None,
-                'product_consumptions' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'product_consumptions')
+    return response
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
