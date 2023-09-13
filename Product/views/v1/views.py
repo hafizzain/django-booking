@@ -1,6 +1,8 @@
 from cmath import cos
 from threading import Thread
 from django.http import HttpResponse
+from django.db.models.functions import Cast
+from django.db.models import CharField
 from Product.Constants.Add_Product import add_product_remaing
 from Utility.models import Currency, NstyleFile, ExceptionRecord
 from rest_framework.decorators import api_view, permission_classes
@@ -2287,10 +2289,15 @@ def get_product_consumptions(request):
         product_consumptions = product_consumptions.filter(location=location)
     
     if search_text:
-        product_consumptions = product_consumptions.filter(name__icontains=search_text)
+        query = Q(product__name__icontains=search_text)
+        query |= Q(location__address_name__icontains=search_text)
+        query |= Q(quantity_s__icontains=search_text)
+        product_consumptions = product_consumptions.annotate(
+            quantity_s=Cast('quantity', CharField())
+        ).filter(query)
    
     serialized = list(ProductConsumptionSerializer(product_consumptions, many=True).data)
-    
+
     paginator = CustomPagination()
     paginator.page_size = 100000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(serialized, request)

@@ -416,15 +416,6 @@ class ProductStockTransferSerializer(serializers.ModelSerializer):
     from_location = BusiessAddressAppointmentSerializer()
     to_location = BusiessAddressAppointmentSerializer()
     
-    # transfer_quantity = serializers.SerializerMethodField(read_only=True)
-    
-    # def get_transfer_quantity(self, obj):
-    #     try:
-    #         return Sum(ProductStockTransfer.objects.filter(product = obj.product).values_list('quantity'))
-    #     except Exception as err:
-    #         ExceptionRecord.objects.create(
-    #             text = f"Product quantity issue {str(err)}"
-    #         ) 
     class Meta:
         model = ProductStockTransfer
         fields = ['id', 'from_location', 'to_location', 'product', 'quantity','note']
@@ -444,18 +435,8 @@ class ProductOrderStockReportSerializer(serializers.ModelSerializer):
         except Exception as err:
             return None
     
-    # def get_stocks(self, obj):
-    #     location = self.context.get('location')
-    #     if location is not None:
-    #         all_stocks = ProductStock.objects.filter(product=obj, is_deleted=False, location__id=location).order_by('-created_at')
-    #     else:
-    #         all_stocks = ProductStock.objects.filter(product=obj, is_deleted=False).order_by('-created_at')
-    #     return ProductStockSerializer(all_stocks, many=True).data
-    
-
     class Meta:
         model = ProductOrderStockReport
-        #fields = '__all__'#['id', 'from_location', 'to_location', 'product', 'quantity','note']
         exclude = ('is_active','is_deleted', 'user')
     
 
@@ -467,8 +448,6 @@ class ProductStockReport_OrderStockReportsSerializer(serializers.ModelSerializer
     location = BusiessAddressAppointmentSerializer()
     consumed_location = BusiessAddressAppointmentSerializer()
     vendor_name = serializers.SerializerMethodField(read_only=True)
-    # product = ProductOrderSerializer()
-    # stocks = serializers.SerializerMethodField(read_only=True)
     created_at = serializers.SerializerMethodField()
     short_id = serializers.SerializerMethodField()
 
@@ -485,35 +464,13 @@ class ProductStockReport_OrderStockReportsSerializer(serializers.ModelSerializer
         except Exception as err:
             return None
     
-    # def get_stocks(self, obj):
-    #     location = self.context.get('location')
-    #     if location is not None:
-    #         all_stocks = ProductStock.objects.filter(product=obj, is_deleted=False, location__id=location).order_by('-created_at')
-    #     else:
-    #         all_stocks = ProductStock.objects.filter(product=obj, is_deleted=False).order_by('-created_at')
-    #     return ProductStockSerializer(all_stocks, many=True).data
-    
 
     class Meta:
         model = ProductOrderStockReport
-        fields = [
-            'id', 
-            'from_location', 
-            'to_location', 
-            'quantity', 
-            'short_id', 
-            'location', 
-            'consumed_location', 
-            'vendor_name', 
-            'report_choice', 
-            'quantity', 
-            'before_quantity', 
-            'after_quantity', 
-            'reorder_quantity', 
-            'created_at', 
-            'vendor', 
-        ]
-        # exclude = ('is_active','is_deleted', 'user')
+        fields = ['id', 'from_location', 'to_location', 'quantity', 'short_id', 'location', 
+                  'consumed_location', 'vendor_name', 'report_choice', 'quantity', 
+                  'before_quantity', 'after_quantity', 'reorder_quantity', 'created_at', 'vendor'
+                  ]
     
 
 
