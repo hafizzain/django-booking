@@ -2648,5 +2648,5 @@ def get_product_stock_report(request):
     paginator = CustomPagination()
     paginator.page_size = 10
     paginated_data = paginator.paginate_queryset(serialized, request)
-    response = paginator.get_paginated_response(paginated_data, 'brands')
+    response = paginator.get_paginated_response(paginated_data, 'product_stock_report')
     return response
