@@ -1259,7 +1259,7 @@ def get_retailtarget(request):
 
 
     if search_text:
-        retail_target = retail_target.filter(brand__name=search_text)
+        retail_target = retail_target.filter(brand__name__icontains=search_text)
 
     serialized = list(RetailTargetSerializers(retail_target, many = True,context={'request' : request}).data)
 
