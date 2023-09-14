@@ -92,21 +92,20 @@ def get_commission_reports_by_staff(request):
 def get_store_target_report(request):
     month = request.GET.get('month', None)
     year = request.GET.get('year', None)
-    
+    no_pagination = request.GET.get('no_pagination', None)
+        
     address = BusinessAddress.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = BusinesAddressReportSerializer(address, many=True, context={'request' : request, 'month': month, 'year': year})
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Business Address Report',
-                'error_message' : None,
-                'address' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    serialized = list(BusinesAddressReportSerializer(address, 
+                                                     many=True, 
+                                                     context={'request' : request,
+                                                              'month': month, 
+                                                              'year': year}).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'address')
+    return response
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
