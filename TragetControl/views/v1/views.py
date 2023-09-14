@@ -27,10 +27,10 @@ def get_stafftarget(request):
     search_text = request.query_params.get('search_text', None)
     no_pagination = request.query_params.get('no_pagination', None)
     location_id = request.query_params.get('location_id', None)
-    year = request.query_params.get('date', None)
+    year = request.query_params.get('year', None)
     month = request.query_params.get('month', None)
     
-    
+
     staff_target = StaffTarget.objects.all().order_by('-created_at')
 
     if year:
@@ -44,7 +44,7 @@ def get_stafftarget(request):
         staff_target = staff_target.filter(employee__location=location)
 
     if search_text:
-        query = Q(employee__full_name=search_text)
+        query = Q(employee__full_name__icontains=search_text)
         query |= Q(service_target_str__icontains=search_text)
         query |= Q(retail_target_str__icontains=search_text)
 
