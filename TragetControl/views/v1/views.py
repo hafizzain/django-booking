@@ -31,7 +31,7 @@ def get_stafftarget(request):
     month = request.query_params.get('month', None)
     
 
-    staff_target = StaffTarget.objects.all().order_by('year', 'month')
+    staff_target = StaffTarget.objects.all().order_by('-year', '-month')
 
     if year:
         staff_target = staff_target.filter(year__year=year)
