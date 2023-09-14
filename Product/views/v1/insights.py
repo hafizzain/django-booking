@@ -43,7 +43,10 @@ class FilteredInsightProducts(APIView):
                 value = self.top_sold
                 if value in ['LAST_7_DAYS', 'LAST_30_DAYS', 'TOP_SOLD_PRODUCTS']:
                     value = TOP_SOLD_CHOICES.get(value)
-                self.queries['filter']['product_orders__created_at__range'] = (value, self.today_date_format)
+                    self.queries['filter']['product_orders__created_at__range'] = (value, self.today_date_format)
+                else:
+                    self.queries['filter']['product_orders__created_at'] = value
+
                 self.queries['filter']['product_orders__location__id'] = self.location
             else:
                 return Response(
@@ -70,7 +73,10 @@ class FilteredInsightProducts(APIView):
                 value = self.most_consumed
                 if value in ['LAST_7_DAYS', 'LAST_30_DAYS', 'MOST_COMSUMED_PRODUCTS']:
                     value = MOST_CONSUMED_CHOICES.get(value)
-                self.queries['filter']['consumptions__created_at__range'] = (value, self.today_date_format)
+                    self.queries['filter']['consumptions__created_at__range'] = (value, self.today_date_format)
+                else:
+                    self.queries['filter']['consumptions__created_at'] = value
+
                 self.queries['filter']['consumptions__location__id'] = self.location
             else:
 
@@ -99,7 +105,10 @@ class FilteredInsightProducts(APIView):
                 value = self.most_ordered
                 if value in ['LAST_7_DAYS', 'LAST_30_DAYS', 'MOST_ORDERED_PRODUCTS']:
                     value = MOST_ORDERED_CHOICES.get(value)
-                self.queries['filter']['product_order_stock__order__created_at__range'] = (value, self.today_date_format)
+                    self.queries['filter']['product_order_stock__order__created_at__range'] = (value, self.today_date_format)
+                else:
+                    self.queries['filter']['product_order_stock__order__created_at'] = value
+
                 self.queries['filter']['product_order_stock__order__to_location__id'] = self.location
             else:
                 return Response(
@@ -127,7 +136,10 @@ class FilteredInsightProducts(APIView):
                 value = self.most_transferred
                 if value in ['LAST_7_DAYS', 'LAST_30_DAYS', 'MOST_TRANSFERRED_PRODUCTS']:
                     value = MOST_TRANSFERRED_CHOICES.get(value)
-                self.queries['filter']['products_stock_transfers__created_at__range'] = (value, self.today_date_format)
+                    self.queries['filter']['products_stock_transfers__created_at__range'] = (value, self.today_date_format)
+                else:
+                    self.queries['filter']['products_stock_transfers__created_at'] = value
+                    
                 self.queries['filter']['products_stock_transfers__from_location__id'] = self.location
             else:
                 return Response(
