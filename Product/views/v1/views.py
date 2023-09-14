@@ -1212,7 +1212,7 @@ def get_products(request):
                 'message' : 'All business Products!',
                 'count':all_products_count,
                 'pages':page_count,
-                'per_page_result':20,
+                'per_page_result':10,
                 'error_message' : None,
                 'products' : data
             }

@@ -399,21 +399,33 @@ def copy_stafftarget(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_storetarget(request):
-    store_target = StoreTarget.objects.all().order_by('-created_at').distinct()
-    serializer = GETStoreTargetSerializers(store_target, many = True,context={'request' : request})
+
+    no_pagination = request.query_params.get('no_pagination', None)
+    location_id = request.query_params.get('location_id', None)
+    year = request.query_params.get('year', None)
+    month = request.query_params.get('month', None)
     
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Store Target',
-                'error_message' : None,
-                'storetarget' : serializer.data
-            }
-        },
-        status=status.HTTP_200_OK
-    ) 
+    store_target = StoreTarget.objects.all().order_by('-created_at').distinct()
+    
+    if year:
+        store_target = store_target.filter(storetarget_address__year__year=year)
+
+    if month:
+        store_target = store_target.filter(storetarget_address__month=month)
+
+    if location_id:
+        location = BusinessAddress.objects.get(id=str(location_id))
+        store_target = store_target.filter(location=location)
+
+
+    serialized = list(GETStoreTargetSerializers(store_target, many = True,context={'request' : request}).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'storetarget')
+    return response
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
