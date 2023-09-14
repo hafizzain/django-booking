@@ -44,7 +44,7 @@ def get_reports_staff_target(request):
 
     
     employee = Employee.objects.filter(is_deleted=False).order_by('-created_at')
-    
+
     if employee_id:
         employee = employee.filter(id=str(employee_id))
 
@@ -95,8 +95,14 @@ def get_store_target_report(request):
     month = request.GET.get('month', None)
     year = request.GET.get('year', None)
     no_pagination = request.GET.get('no_pagination', None)
+    location_id = request.GET.get('location_id', None)
+
 
     address = BusinessAddress.objects.filter(is_deleted=False).order_by('-created_at')
+
+    if location_id:
+        address = address.filter(id=str(location_id))
+
     serialized = list(BusinesAddressReportSerializer(address, 
                                                      many=True, 
                                                      context={'request' : request,
