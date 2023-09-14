@@ -210,7 +210,7 @@ def get_commission_reports_by_commission_details_updated(request):
     paginator = CustomPagination()
     paginator.page_size = 100000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(serialized, request)
-    response = paginator.get_paginated_response(paginated_data, 'brands')
+    response = paginator.get_paginated_response(paginated_data, 'sales')
     return response
 
 
