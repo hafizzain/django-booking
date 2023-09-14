@@ -168,62 +168,31 @@ def get_retail_target_report(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_commission_reports_by_commission_details_updated(request):
+    no_pagination = request.GET.get('no_pagination', None)
     range_start = request.GET.get('range_start', None) # 2023-02-23
-    year = request.GET.get('year', None) # non used
     range_end = request.GET.get('range_end', None) # 2023-02-25
+    location_id = request.GET.get('location_id', None)
+    order_type = request.GET.get('order_type', None)
+    employee_id = request.GET.get('employee_id', None)
+
+
     if range_end is not None:
         range_end = dt.strptime(range_end, '%Y-%m-%d').date()
         range_end = range_end + timedelta(days=1)
         range_end = str(range_end)
-
-    print( range_start, range_end)
     
-    data = []
-    
-    # if range_start:
-    #     range_start = datetime.strptime(range_start, "%Y-%m-%d")
-    #     range_end = datetime.strptime(range_end, "%Y-%m-%d") + timedelta(days=1) - timedelta(seconds=1)
-
-    #     checkout_order = Checkout.objects.filter(
-    #         is_deleted=False,
-    #         is_promotion = False,
-    #         created_at__gte =  range_start ,
-    #         created_at__lte = range_end
-    #     ).order_by('-created_at')
-
-    #     serialized = CheckoutCommissionSerializer(checkout_order,  many=True, context={
-    #         'request' : request, 
-    #         })
-    #     data.extend(serialized.data)
-            
-    #     appointment_checkout = AppointmentService.objects.filter(
-    #         appointment_status = 'Done', #appointment_service__
-    #         created_at__gte =  range_start ,
-    #         created_at__lte = range_end
-    #         )
-    #     serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True, context={
-    #         'request' : request, 
-    #         })
-    #     data.extend(serialized.data)
-    #     sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
-    # else:
-    #     checkout_order = Checkout.objects.filter(
-    #         is_deleted=False,
-    #         is_promotion = False,
-    #         ).order_by('-created_at')
-    #     serialized = CheckoutCommissionSerializer(checkout_order,  many=True, context={
-    #         'request' : request, 
-    #         })
-    #     data.extend(serialized.data)
-        
-    #     appointment_checkout = AppointmentService.objects.filter(appointment_status = 'Done')
-    #     serialized = AppointmentCheckout_ReportsSerializer(appointment_checkout, many = True,context={
-    #         'request' : request, 
-    #         })
-    #     data.extend(serialized.data)
-    #     sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
-
     query = {}
+
+    if location_id:
+        query['location_id'] = location_id
+    
+    if order_type:
+        query['commission_category'] = order_type
+
+    if employee_id:
+        query['employee_id'] = employee_id
+
+
     if range_start and range_end:
         query['created_at__range'] = (range_start, range_end)
 
@@ -232,40 +201,17 @@ def get_commission_reports_by_commission_details_updated(request):
         'location',
     ).filter(
         is_active = True,
-        # created_at__gte = range_start,
-        # created_at__lte = range_end,
         **query
     ).order_by(
         '-created_at'
     )
 
-
-    # 'location', 'order_type', 'employee', 'commission', 'commission_rate', 'sale', 'created_at'
-
-    serialized = EmployeeCommissionReportsSerializer(employee_commissions, many=True, context={'request' : request})
-    data = serialized.data
-
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Sale Orders',
-                'error_message' : None,
-                'sales' : data,
-                # 'sales' : [
-                #     {
-                #         'employee' : {},
-                #         'location' : {},
-                #         'commission' : 00,
-                #         'commission_rate' : 00,
-                #         'sale' : {},
-                #     }
-                # ]
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    serialized = list(EmployeeCommissionReportsSerializer(employee_commissions, many=True, context={'request' : request}).data)
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'brands')
+    return response
 
 
 @api_view(['GET'])

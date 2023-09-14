@@ -1136,7 +1136,6 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
             "id": f'{commission_instance.id}',
             "quantity": commission_instance.quantity,
             "name": commission_instance.item_name,
-            # "price": commission_instance.total_price,
             "price": commission_instance.sale_value,
             "order_type": commission_instance.commission_category,
             "payment_type": "Cash",
@@ -1146,20 +1145,12 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
     
     
     def get_invoice(self, obj):
-        # try:
-        #     checkoutt = Checkout.objects.get(id__icontains=obj.sale_id)
-        # except:
-        #     checkoutt = AppointmentCheckout.objects.get(id=obj.sale_id)
-        
-        # if checkoutt:
         try:
             invoice = SaleInvoice.objects.get(checkout__icontains = obj.sale_id)
             serializer = SaleInvoiceSerializer(invoice, context=self.context)
             return serializer.data
         except Exception as e:
             return str(e)
-        # else:
-        #     return 'invoice not found'
 
     
     def get_tip(self, commission_instance):
@@ -1181,8 +1172,8 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EmployeeCommission
-        fields = ['id', 'location', 'employee', 'order_type', 'commission_rate', 'commission', 'created_at', 'sale', 'sale_id', 'tip', 'invoice']
-        #  'location', 'commission_rate',
+        fields = ['id', 'location', 'employee', 'order_type', 'commission_rate', 'commission', 
+                  'created_at', 'sale', 'sale_id', 'tip', 'invoice']
 
 
 class DiscountPromotion_SaleInvoiceSerializer(serializers.ModelSerializer):
