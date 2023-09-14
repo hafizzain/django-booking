@@ -38,21 +38,17 @@ from datetime import datetime as dt
 def get_reports_staff_target(request):
     month = request.GET.get('month', None)
     year = request.GET.get('year', None)
+    no_pagination = request.GET.get('no_pagination', None)
+
     
     employee = Employee.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = ReportsEmployeSerializer(employee,  many=True, context={'request' : request, 'month': month, 'year': year})
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Employee Orders',
-                'error_message' : None,
-                'staff_report' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    serialized = list(ReportsEmployeSerializer(employee,  many=True, context={'request' : request, 'month': month, 'year': year}).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'staff_report')
+    return response
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -93,7 +89,7 @@ def get_store_target_report(request):
     month = request.GET.get('month', None)
     year = request.GET.get('year', None)
     no_pagination = request.GET.get('no_pagination', None)
-        
+
     address = BusinessAddress.objects.filter(is_deleted=False).order_by('-created_at')
     serialized = list(BusinesAddressReportSerializer(address, 
                                                      many=True, 
