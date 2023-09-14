@@ -39,9 +39,15 @@ def get_reports_staff_target(request):
     month = request.GET.get('month', None)
     year = request.GET.get('year', None)
     no_pagination = request.GET.get('no_pagination', None)
+    employee_id = request.GET.get('employee_id', None)
+
 
     
     employee = Employee.objects.filter(is_deleted=False).order_by('-created_at')
+    
+    if employee_id:
+        employee = employee.filter(id=str(employee_id))
+
     serialized = list(ReportsEmployeSerializer(employee,  many=True, context={'request' : request, 'month': month, 'year': year}).data)
 
     paginator = CustomPagination()
