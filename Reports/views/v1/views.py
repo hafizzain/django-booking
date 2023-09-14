@@ -190,7 +190,8 @@ def get_commission_reports_by_commission_details_updated(request):
         query['commission_category'] = order_type
 
     if employee_id:
-        query['employee_id'] = employee_id
+        employee = Employee.objects.get(id=str(employee_id))
+        query['employee'] = employee
 
 
     if range_start and range_end:
