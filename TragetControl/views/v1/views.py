@@ -827,21 +827,36 @@ def create_servicetarget(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_servicetarget(request):
+    search_text = request.query_params.get('search_text', None)
+    no_pagination = request.query_params.get('no_pagination', None)
+    month = request.query_params.get('month', None)
+    year = request.query_params.get('year', None)
+    location_id = request.query_params.get('location_id', None)
+
     service_target = ServiceTarget.objects.all().order_by('-created_at').distinct()
-    serializer = ServiceTargetSerializers(service_target, many = True,context={'request' : request})
-    
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Service Target',
-                'error_message' : None,
-                'servicetarget' : serializer.data
-            }
-        },
-        status=status.HTTP_200_OK
-    ) 
+
+    if location_id:
+        location = BusinessAddress.objects.get(id=str(location_id))
+        service_target = service_target.filter(location=location)
+
+    if year:
+        service_target = service_target.filter(year__year=year)
+
+    if month:
+        service_target = service_target.filter(month=month)
+
+
+    if search_text:
+        service_target = service_target.filter(service_group__name=search_text)
+
+    serialized = list(ServiceTargetSerializers(service_target, many = True,context={'request' : request}).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'servicetarget')
+    return response
+
     
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])

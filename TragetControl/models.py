@@ -7,8 +7,7 @@ from Authentication.models import User
 from Business.models import Business, BusinessAddress
 from Employee.models import Employee
 from Product.models import Brand
-from Utility.models import Country, State, City
-from Service.models  import Service, ServiceGroup
+from Service.models  import ServiceGroup
 
 class StaffTarget(models.Model):
     MONTH_CHOICE =[
