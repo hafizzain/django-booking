@@ -118,31 +118,30 @@ def get_store_target_report(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_service_target_report(request):
+    no_pagination = request.GET.get('no_pagination', None)
     month = request.GET.get('month', None)
     year = request.GET.get('year', None)
-    location = request.GET.get('location', None)
-    
-    address = ServiceGroup.objects.filter(
+    location_id = request.GET.get('location_id', None)
+    service_group_id = request.GET.get('service_group_id', None)
+
+    service_groups = ServiceGroup.objects.filter(
         is_deleted = False,
     ).order_by('-created_at')
-    serialized = ServiceGroupReport(address, many=True, context={'request' : request, 
-                    'month': month,
-                    'location': location,
-                    'year': year
-                    })
 
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Business Address Report',
-                'error_message' : None,
-                'address' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    if service_group_id:
+        service_groups = service_groups.filter(id=str(service_group_id))
+
+    serialized = list(ServiceGroupReport(service_groups, many=True, context={'request' : request, 
+                    'month': month,
+                    'location': location_id,
+                    'year': year
+                    }).data)
+    
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'servicegroups')
+    return response
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
