@@ -78,7 +78,6 @@ def get_service(request):
 
     
     service= Service.objects.filter(
-        name__icontains = title,
         is_deleted = False, 
         is_blocked = False, 
         **query
