@@ -19,8 +19,9 @@ from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPr
 from Client.serializers import ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer, ClientLoyaltyPointSerializer, CustomerLoyaltyPointsLogsSerializer, CustomerDetailedLoyaltyPointsLogsSerializer, ClientVouchersSerializer, ClientMembershipsSerializer
 from Utility.models import NstyleFile
 
+from Sale.Constants.Custom_pag import CustomPagination
+
 import json
-from django.core import serializers
 from NStyle.Constants import StatusCodes
 from django.core.paginator import Paginator
 
@@ -3030,7 +3031,7 @@ def get_client_package(request):
 def get_customers_loyalty_points_logs(request):
     location_id = request.GET.get('location_id', None)
     customer_id = request.GET.get('customer_id',None)
-
+    no_pagination = request.GET.get('no_pagination',None)
     start_date = request.GET.get('start_date', '2020-01-01')
     end_date = request.GET.get('end_date', datetime.now().strftime('%Y-%m-%d'))
 
@@ -3064,36 +3065,26 @@ def get_customers_loyalty_points_logs(request):
         **queries
     ).order_by('-created_at')
 
-    data = CustomerLoyaltyPointsLogsSerializer(customers_points, many=True).data
+    serialized = list(CustomerLoyaltyPointsLogsSerializer(customers_points, many=True).data)
 
-    return Response(
-        {
-            'status' : True,
-            'status_code' : 200,
-            'status_code_text' : '200',
-            'response' : {
-                'message' : 'Loyalty Points Logs',
-                'error_message' : None,
-                'data' : data,
-                'start_date' : start_date,
-                'end_date' : end_date,
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'loyaltycustomer')
+    return response
+    
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_customer_detailed_loyalty_points(request):
     location_id = request.GET.get('location_id', None)
     client_id = request.GET.get('customer_id', None)
-
+    no_pagination = request.GET.get('no_pagination',None)
     start_date = request.GET.get('start_date', '2020-01-01')
     end_date = request.GET.get('end_date', datetime.now().strftime('%Y-%m-%d'))
 
 
     if not all([location_id]):
-        # client_id
         return Response(
             {
                 'status' : False,
@@ -3111,10 +3102,7 @@ def get_customer_detailed_loyalty_points(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    
-    
     queries = {}
-    clients_list = []
     if client_id is not None:
         queries['client_id'] = client_id
 
@@ -3123,7 +3111,6 @@ def get_customer_detailed_loyalty_points(request):
         'client',
         'loyalty',
     ).filter(
-        # client__id__in = clients_list,
         location__id = location_id,
         created_at__date__range = (start_date, end_date),
         is_active = True,
@@ -3133,11 +3120,12 @@ def get_customer_detailed_loyalty_points(request):
 
     all_loyality_logs_count= customers_points.count()
 
-    page_count = all_loyality_logs_count / 20
+    page_count = all_loyality_logs_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(customers_points, 20)
+    results_per_page = 10000 if no_pagination else 10
+    paginator = Paginator(customers_points, results_per_page)
     page_number = request.GET.get("page") 
     customers_points = paginator.get_page(page_number)
 
@@ -3152,7 +3140,7 @@ def get_customer_detailed_loyalty_points(request):
                 'message' : 'Loyalty Points Logs',
                 'count':all_loyality_logs_count,
                 'pages':page_count,
-                'per_page_result':20,
+                'per_page_result':results_per_page,
                 'error_message' : None,
                 'data' : data
             }
