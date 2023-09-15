@@ -47,11 +47,16 @@ def get_service(request):
     title = request.GET.get('title', '')
     location = request.GET.get('location_id', None)
     is_mobile = request.GET.get('is_mobile', None)
+    search_text = request.GET.get('search_text', None)
+    no_pagination = request.GET.get('no_pagination', None)
 
     query = {}
     location_instance = None
     currency_code = None
     errors = []
+    
+    if search_text:
+        query['name__icontains'] = search_text
 
     if location:
         query['location__id'] = location
@@ -80,11 +85,11 @@ def get_service(request):
     ).order_by('-created_at').distinct()
     service_count= service.count()
 
-    page_count = service_count / 20
+    page_count = service_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
-
-    paginator = Paginator(service, 20)
+    per_page_results = 100000 if no_pagination else 10
+    paginator = Paginator(service, per_page_results)
     page_number = request.GET.get("page") 
     services = paginator.get_page(page_number)
 
@@ -670,20 +675,22 @@ def create_servicegroup(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_servicegroup(request):
-    service_group = ServiceGroup.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = ServiceGroupSerializer(service_group,  many=True, context={'request' : request})
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Service Group',
-                'error_message' : None,
-                'sales' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    no_pagination = request.GET.get('no_pagination', None)
+    search_text = request.GET.get('search_text', None)
+
+    query = Q(is_deleted=False)
+    if search_text:
+        query |= Q(name__icontains=search_text)
+
+
+    service_group = ServiceGroup.objects.filter(query).order_by('-created_at')
+    serialized = list(ServiceGroupSerializer(service_group,  many=True, context={'request' : request}).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'sales')
+    return response
      
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
