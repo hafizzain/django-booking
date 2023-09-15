@@ -250,6 +250,7 @@ def get_promotions_and_discounts_sales(request):
     
     if search_text:
         query = Q(invoice_id_str__icontains=search_text)
+        query |= Q(promotion_name__icontains=search_text)
 
     if start_date and end_date:
         queries['created_at__range'] = (start_date, end_date)
