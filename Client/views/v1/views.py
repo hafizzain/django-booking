@@ -584,14 +584,22 @@ def delete_client(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_client_group(request):
+    no_pagination = request.GET.get('no_pagination', None)
+    search_text = request.GET.get('search_text', None)
+
     all_client_group= ClientGroup.objects.all().order_by('-created_at')
+
+    if search_text:
+        all_client_group.filter(name__icontains=search_text)
+
     all_client_group_count= all_client_group.count()
 
     page_count = all_client_group_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_client_group, 10)
+    page_per_results = 10000 if no_pagination else 10
+    paginator = Paginator(all_client_group, page_per_results)
     page_number = request.GET.get("page") 
     all_client_group = paginator.get_page(page_number)
 
@@ -604,7 +612,7 @@ def get_client_group(request):
                 'message' : 'All Client Group',
                 'count':all_client_group_count,
                 'pages':page_count,
-                'per_page_result':20,
+                'per_page_result':page_per_results,
                 'error_message' : None,
                 'clientsgroup' : serialized.data
             }
