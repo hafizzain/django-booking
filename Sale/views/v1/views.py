@@ -679,7 +679,7 @@ def get_servicegroup(request):
 
     query = Q(is_deleted=False)
     if search_text:
-        query |= Q(name__icontains=search_text)
+        query &= Q(name__icontains=search_text)
 
 
     service_group = ServiceGroup.objects.filter(query).order_by('-created_at')
