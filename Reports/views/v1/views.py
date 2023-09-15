@@ -146,29 +146,27 @@ def get_service_target_report(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_retail_target_report(request):
-    
+    no_pagination = request.GET.get('no_pagination', None)
     month = request.GET.get('month', None)
     year = request.GET.get('year', None)
-    location = request.GET.get('location', None)
+    location_id = request.GET.get('location_id', None)
+    brand_id = request.GET.get('brand_id', None)
     
-    brand = Brand.objects.filter(is_active=True).order_by('-created_at')
-    serialized = ReportBrandSerializer(brand, many=True, context={'request' : request, 
+    brands = Brand.objects.filter(is_active=True).order_by('-created_at')
+
+    if brand_id:
+        brands = brands.filter(id=str(brand_id))
+
+    serialized = list(ReportBrandSerializer(brands, many=True, context={'request' : request, 
                                             'month': month,
                                             'year': year,
-                                            'location': location,
-                                            })
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Brand Sale Report',
-                'error_message' : None,
-                'sale' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+                                            'location': location_id,
+                                            }).data)
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'sale')
+    return response
 
 
 @api_view(['GET'])
