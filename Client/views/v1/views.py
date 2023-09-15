@@ -167,7 +167,7 @@ def get_single_client(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_client(request):
-
+    no_pagination = request.GET.get('no_pagination', None)
     search_text = request.GET.get('search_text', None)
     all_client = Client.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at').distinct()
 
@@ -180,7 +180,8 @@ def get_client(request):
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_client, 10)
+    results_per_page = 10000 if no_pagination else 10
+    paginator = Paginator(all_client, results_per_page)
     page_number = request.GET.get("page") 
     all_client = paginator.get_page(page_number)
     serialized = ClientSerializer(all_client, many=True,  context={'request' : request})
@@ -586,11 +587,11 @@ def get_client_group(request):
     all_client_group= ClientGroup.objects.all().order_by('-created_at')
     all_client_group_count= all_client_group.count()
 
-    page_count = all_client_group_count / 20
+    page_count = all_client_group_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_client_group, 20)
+    paginator = Paginator(all_client_group, 10)
     page_number = request.GET.get("page") 
     all_client_group = paginator.get_page(page_number)
 
