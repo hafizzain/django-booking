@@ -218,7 +218,7 @@ def get_commission_reports_by_commission_details_updated(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_promotions_and_discounts_sales(request):
-    location_id = request.GET.get('location', None)
+    location_id = request.GET.get('location_id', None)
     search_text = request.GET.get('search_text', None)
     start_date =  request.GET.get('start_date', None)
     end_date = request.GET.get('end_date', None)
