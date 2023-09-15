@@ -1,36 +1,32 @@
 
-from datetime import datetime, timedelta
-from django.shortcuts import render
+from datetime import timedelta
+from datetime import datetime as dt
 
+
+from django.db.models import CharField, Q
+from django.db.models.functions import Cast
 
 from rest_framework import status
-from Appointment.models import Appointment, AppointmentCheckout, AppointmentService
-from Business.models import Business
-from Client.models import Client, Membership, Vouchers
-from Order.models import Checkout, MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
-from Reports.serializers import BusinesAddressReportSerializer, ComissionReportsEmployeSerializer, ReportBrandSerializer, ReportsEmployeSerializer, ServiceGroupReport, StaffCommissionReport, EmployeeCommissionReportsSerializer
+from Reports.serializers import (BusinesAddressReportSerializer, ComissionReportsEmployeSerializer, 
+                                ReportBrandSerializer, ReportsEmployeSerializer, ServiceGroupReport,
+                                EmployeeCommissionReportsSerializer)
 from Sale.Constants.Custom_pag import CustomPagination
 from Utility.Constants.Data.months import MONTHS
-from Utility.models import Country, Currency, ExceptionRecord, State, City
-from Authentication.models import User
 from NStyle.Constants import StatusCodes
-import json
 
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from Employee.models import Employee, EmployeeSelectedService, EmployeeCommission
+from Employee.models import Employee, EmployeeCommission
 from Business.models import BusinessAddress
-from Service.models import PriceService, Service, ServiceGroup
+from Service.models import ServiceGroup
+from Product.models import Brand
 
-from Product.models import Brand, Product, ProductOrderStockReport, ProductStock
-from django.db.models import Avg, Count, Min, Sum, F, FloatField, Q
 
+from Reports.serializers import DiscountPromotionSalesReport_serializer
 from Reports.models import DiscountPromotionSalesReport
 from Reports.serializers import DiscountPromotionSalesReport_serializer
-from Sale.serializers import AppointmentCheckout_ReportsSerializer, PromotionNDiscount_AppointmentCheckoutSerializer, PromotionNDiscount_CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer, CheckoutCommissionSerializer
-from datetime import datetime as dt
 
 
 @api_view(['GET'])
@@ -223,6 +219,7 @@ def get_commission_reports_by_commission_details_updated(request):
 @permission_classes([AllowAny])
 def get_promotions_and_discounts_sales(request):
     location_id = request.GET.get('location', None)
+    search_text = request.GET.get('search_text', None)
     start_date =  request.GET.get('start_date', None)
     end_date = request.GET.get('end_date', None)
 
@@ -249,15 +246,26 @@ def get_promotions_and_discounts_sales(request):
 
     queries = {}
 
+    if search_text:
+        query = Q(invoice_id_str__icontains=search_text)
+
     if start_date and end_date:
         queries['created_at__range'] = (start_date, end_date)
 
-    sales = DiscountPromotionSalesReport.objects.filter(
+    sales = DiscountPromotionSalesReport.objects \
+    .filter(
         is_deleted = False,
         is_active = True,
         location__id = location_id,
         **queries
-    ).order_by('-created_at')
+    ) \
+    .annotate(
+        invoice_id_str=Cast('invoice__id', CharField())
+    ) \
+    .filter(
+        query
+    ) \
+    .order_by('-created_at')
     data = DiscountPromotionSalesReport_serializer(sales, many=True, context={'request' : request}).data
     
     paginated_data = paginator.paginate_queryset(data, request)
