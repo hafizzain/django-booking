@@ -193,7 +193,7 @@ def get_client(request):
                 'message' : 'All Client',
                 'count':all_client_count,
                 'pages':page_count,
-                'per_page_result':20,
+                'per_page_result':results_per_page,
                 'error_message' : None,
                 'client' : serialized.data
             }
