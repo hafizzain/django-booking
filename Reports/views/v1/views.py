@@ -246,6 +246,8 @@ def get_promotions_and_discounts_sales(request):
 
     queries = {}
 
+    query = Q()
+    
     if search_text:
         query = Q(invoice_id_str__icontains=search_text)
 
