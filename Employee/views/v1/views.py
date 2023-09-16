@@ -1568,7 +1568,10 @@ def get_staff_group(request):
 
     if search_text:
         query &= Q(name__icontains=search_text)
-    all_staff_group= StaffGroup.objects.filter(query).order_by('-created_at').distinct()
+    all_staff_group= StaffGroup.objects \
+                    .filter(query) \
+                    .prefetch_related('employees') \
+                    .order_by('-created_at').distinct()
     all_staff_group_count= all_staff_group.count()
 
     page_count = all_staff_group_count / 10
