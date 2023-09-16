@@ -1560,37 +1560,29 @@ def create_staff_group(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_staff_group(request):
-    all_staff_group= StaffGroup.objects.filter(employees__is_deleted=False).order_by('-created_at').distinct()
+
+    search_text = request.GET.get('search_text', None)
+    no_pagination = request.GET.get('no_pagination', None)
+
+    query = Q(employee__is_deleted=False)
+
+    if search_text:
+        query &= Q(name__icontains=search_text)
+    all_staff_group= StaffGroup.objects.filter(query).order_by('-created_at').distinct()
     all_staff_group_count= all_staff_group.count()
 
-    page_count = all_staff_group_count / 20
+    page_count = all_staff_group_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_staff_group, 20)
+    per_page_results = 10000 if no_pagination else 10
+    paginator = Paginator(all_staff_group, per_page_results)
     page_number = request.GET.get("page") 
     all_staff_group = paginator.get_page(page_number)
 
     serialized = StaffGroupSerializers(all_staff_group, many=True, context={'request' : request})
     
-    data = serialized.data
-    # new_data = []
-    # for row in data:
-    #     let_obj = {}
-    #     let_obj.update(row)
-    #     let_obj.update(row['staff_permission'])
-    #     del let_obj['staff_permission']
-    #     new_data.append(let_obj)
-    
-    # data = {}
-    # data.update(serialized.data)
-    
-    # try:
-    #     data.update(data['staff_permission'])
-    #     del data['staff_permission']
-    # except Exception as err:
-    #     print(f'dict {err}')
-    #     None   
+    data = serialized.data 
          
     return Response(
         {
@@ -1600,7 +1592,7 @@ def get_staff_group(request):
                 'message' : 'All Staff Group',
                 'count':all_staff_group_count,
                 'pages':page_count,
-                'per_page_result':20,
+                'per_page_result':per_page_results,
                 'error_message' : None,
                 'staff_group' : data
             }
