@@ -327,6 +327,10 @@ def get_Employees(request):
 
     if search_text:
         query &= Q(full_name__icontains=search_text)
+
+    if location_id:
+        location = BusinessAddress.objects.get(id=str(location_id))
+        query &= Q(location=location)
      
 
     all_employe= Employee.objects.filter(query).order_by('-created_at')
