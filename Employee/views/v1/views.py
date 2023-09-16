@@ -1564,7 +1564,7 @@ def get_staff_group(request):
     search_text = request.GET.get('search_text', None)
     no_pagination = request.GET.get('no_pagination', None)
 
-    query = Q(employee__is_deleted=False)
+    query = Q(employees__is_deleted=False)
 
     if search_text:
         query &= Q(name__icontains=search_text)
