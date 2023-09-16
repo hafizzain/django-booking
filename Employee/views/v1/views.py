@@ -1790,26 +1790,34 @@ def update_staff_group(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_attendence(request):
-    # all_attendence= Attendance.objects.all()
-    # serialized = AttendanceSerializers(all_attendence, many=True, context={'request' : request})
 
-    location = request.GET.get('location', None)
+    location_id = request.GET.get('location_id', None)
+    search_text = request.GET.get('search_text', None)
+    no_pagination = request.GET.get('no_pagination', None)
+    employee_id = request.GET.get('employee_id', None)
+
     start_date = request.GET.get('start_date', None)
     end_date = request.GET.get('end_date', None)
+
+    query = Q(is_deleted=False)
+    query &= Q(is_blocked=False)
+    query &= Q(location__id=location_id)
+
+    if employee_id:
+        query &= Q(id=str(employee_id))
     
-    
-    all_employe= Employee.objects.filter(
-        is_deleted=False, 
-        is_blocked=False,
-        location__id = location
-    ).order_by('-created_at')
+    if search_text:
+        query &= Q(full_name__icontains=search_text)
+
+    all_employe= Employee.objects.filter(query).order_by('-created_at')
     all_employe_count= all_employe.count()
 
     page_count = all_employe_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_employe, 10)
+    per_page_results = 10000 if no_pagination else 10
+    paginator = Paginator(all_employe, per_page_results)
     page_number = request.GET.get("page") 
     all_employe = paginator.get_page(page_number)
 
@@ -1824,7 +1832,7 @@ def get_attendence(request):
                 'message' : 'All Attendance',
                 'count':all_employe_count,
                 'pages':page_count,
-                'per_page_result':10,
+                'per_page_result':per_page_results,
                 'error_message' : None,
                 'attendance' : serialized.data
             }
