@@ -326,7 +326,7 @@ def get_Employees(request):
     query &= Q(is_blocked=False)
 
     if search_text:
-        query &= Q(name__icontains=search_text)
+        query &= Q(full_name__icontains=search_text)
      
 
     all_employe= Employee.objects.filter(query).order_by('-created_at')
