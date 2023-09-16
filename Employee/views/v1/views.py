@@ -2248,6 +2248,8 @@ def get_payrol_working(request):
     employee_id = request.GET.get('employee_id', None)
     start_date = request.GET.get('start_date', None) # '2023-07-01'
     end_date = request.GET.get('end_date', None)
+    no_pagination = request.GET.get('no_pagination', None)
+
 
     queries = {}
 
@@ -2265,11 +2267,12 @@ def get_payrol_working(request):
     # .order_by('employee_employedailyschedule__date')
     all_employe_count= all_employe.count()
 
+    results_per_page = 10000 if no_pagination else 10
     page_count = all_employe_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_employe, 10)
+    paginator = Paginator(all_employe, results_per_page)
     page_number = request.GET.get("page") 
     all_employe = paginator.get_page(page_number)
 
@@ -2284,7 +2287,7 @@ def get_payrol_working(request):
                 'message' : 'All Employee',
                 'count':all_employe_count,
                 'pages':page_count,
-                'per_page_result':10,
+                'per_page_result':results_per_page,
                 'error_message' : None,
                 'employees' : serialized.data
             }
