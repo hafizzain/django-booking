@@ -317,18 +317,27 @@ def search_employee(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_Employees(request):
-    # total_sale = ?
-    all_employe= Employee.objects.filter(
-        is_deleted=False, 
-        is_blocked=False
-    ).order_by('-created_at')
+    no_pagination = request.GET.get('no_pagination', None)
+    search_text = request.GET.get('search_text', None)
+    location_id = request.GET.get('location_id', None)
+
+
+    query = Q(is_deleted=False)
+    query &= Q(is_blocked=False)
+
+    if search_text:
+        query &= Q(name__icontains=search_text)
+     
+
+    all_employe= Employee.objects.filter(query).order_by('-created_at')
     all_employee_count = all_employe.count()
     
-    page_count = all_employee_count / 20
+    page_count = all_employee_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_employe, 20)
+    results_per_page = 10000 if no_pagination else 10
+    paginator = Paginator(all_employe, results_per_page)
     page_number = request.GET.get("page", None)
 
     if page_number is not None: 
@@ -345,7 +354,7 @@ def get_Employees(request):
                     'message' : f'Page {page_number} Employee',
                     'count':all_employee_count,
                     'pages':page_count,
-                    'per_page_result':20,
+                    'per_page_result':results_per_page,
                     'error_message' : None,
                     'employees' : data
                 }
