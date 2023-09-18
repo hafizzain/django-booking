@@ -147,6 +147,12 @@ class ExceptionRecord(models.Model):
     is_resolved = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
 
+
+    @property
+    def get_tenant_name(self):
+        if self.tenant:
+            return self.tenant.schema_name
+
     def save(self, *args, **kwargs):
         if self.text:
             text = f'{self.text}'.replace('\\n', '<br/>')
