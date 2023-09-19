@@ -334,13 +334,13 @@ def get_Employees(request):
         query &= Q(full_name__icontains=search_text)
 
     if employee_id:
-        Q(id=str(employee_id))
+        query &= Q(id=str(employee_id))
 
     if designation:
-        Q(employee_professional_details__designation=designation)
+        query &= Q(employee_professional_details__designation=designation)
 
     if income_type:
-        Q(employee_professional_details__income_type=income_type)
+        query &= Q(employee_professional_details__income_type=income_type)
 
     if location_id:
         location = BusinessAddress.objects.get(id=str(location_id))
