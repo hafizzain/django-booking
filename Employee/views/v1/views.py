@@ -2612,55 +2612,30 @@ def create_commission(request):
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_commission(request): 
-    # business = request.GET.get('business', None)
-    # if business is None:
-    #    return Response(
-    #         {
-    #             'status' : False,
-    #             'status_code' : StatusCodes.MISSING_FIELDS_4001,
-    #             'status_code_text' : 'MISSING_FIELDS_4001',
-    #             'response' : {
-    #                 'message' : 'Invalid Data!',
-    #                 'error_message' : 'fields are required.',
-    #                 'fields' : [
-    #                     'business',
-    #                 ]
-    #             }
-    #         },
-    #         status=status.HTTP_400_BAD_REQUEST
-    #     )
-       
-    # try:
-    #     business=Business.objects.get(id=business)
-    # except Exception as err:
-    #     return Response(
-    #         {
-    #                 'status' : False,
-    #                 'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
-    #                 'response' : {
-    #                 'message' : 'Business not found',
-    #                 'error_message' : str(err),
-    #             }
-    #         }
-    #     )
-       
-    # commission , created =  CommissionSchemeSetting.objects.get_or_create(
-    #     business=business,
-    #     user=business.user,
-    #     )
-    commission = CommissionSchemeSetting.objects.all().order_by('-created_at') 
+def get_commission(request):
+    no_pagination = request.GET.get('no_pagination')
+    search_text = request.GET.get('search_text')
+
+    query = Q()
+
+    if search_text:
+        query &= Q(employee__full_name__icontains=search_text)
+
+    commission = CommissionSchemeSetting.objects.filter(
+        query
+    ).order_by('-created_at') 
     commission_count = commission.count()  
     
-    page_count = commission_count / 20
+    page_count = commission_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(commission, 20)
+    per_page_results = 10000 if no_pagination else 10
+    paginator = Paginator(commission, per_page_results)
     page_number = request.GET.get("page", None)
     print(page_number, '********************')
 
-    if page_number is not None: 
+    if page_number is not None:
         commission = paginator.get_page(page_number)
     
         serializer = CommissionSerializer(commission, many = True, context={'request' : request})
@@ -2673,7 +2648,7 @@ def get_commission(request):
                     'message' : f'Page {page_number} Commission',
                     'count':commission_count,
                     'pages':page_count,
-                    'per_page_result':20,
+                    'per_page_result':per_page_results,
                     'error_message' : None,
                     'commission' : serializer.data
                 }
