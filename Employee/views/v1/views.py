@@ -2633,7 +2633,6 @@ def get_commission(request):
     per_page_results = 10000 if no_pagination else 10
     paginator = Paginator(commission, per_page_results)
     page_number = request.GET.get("page", None)
-    print(page_number, '********************')
 
     if page_number is not None:
         commission = paginator.get_page(page_number)
