@@ -320,6 +320,11 @@ def get_Employees(request):
     no_pagination = request.GET.get('no_pagination', None)
     search_text = request.GET.get('search_text', None)
     location_id = request.GET.get('location_id', None)
+    employee_id = request.GET.get('employee_id', None)
+    designation = request.GET.get('designation', None)
+    income_type = request.GET.get('income_type', None)
+
+
 
 
     query = Q(is_deleted=False)
@@ -327,6 +332,15 @@ def get_Employees(request):
 
     if search_text:
         query &= Q(full_name__icontains=search_text)
+
+    if employee_id:
+        Q(id=str(employee_id))
+
+    if designation:
+        Q(employee_professional_details__designation=designation)
+
+    if income_type:
+        Q(employee_professional_details__income_type=income_type)
 
     if location_id:
         location = BusinessAddress.objects.get(id=str(location_id))
@@ -349,7 +363,6 @@ def get_Employees(request):
 
         serialized = singleEmployeeSerializer(all_employe,  many=True, context={'request' : request} )
         data = serialized.data
-        # sorted_data = sorted(data, key=lambda x: x['totoal_sale'], reverse=True)
         return Response(
             {
                 'status' : 200,
@@ -368,7 +381,6 @@ def get_Employees(request):
     else:
         serialized = singleEmployeeSerializer(all_employe,  many=True, context={'request' : request} )
         data = serialized.data
-        # sorted_data = sorted(data, key=lambda x: x['total_sale'], reverse=True)
         return Response(
             {
                 'status' : 200,
