@@ -3937,30 +3937,15 @@ def create_workingschedule(request):
             status=status.HTTP_201_CREATED
         ) 
 
-# @api_view(['GET'])
-# @permission_classes([AllowAny])
-# def get_workingschedule(request):
-#     all_employe= EmployeDailySchedule.objects.all().order_by('created_at')
-#     serialized = NewScheduleSerializer(all_employe, many=True, context={'request' : request})
-#     return Response(
-#         {
-#             'status' : 200,
-#             'status_code' : '200',
-#             'response' : {
-#                 'message' : 'All Schedule',
-#                 'error_message' : None,
-#                 'schedule' : serialized.data
-#             }
-#         },
-#         status=status.HTTP_200_OK
-#     )
-
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_vacations(request):
-    employee_id = request.GET.get('employee', None)
-    location = request.GET.get('location', None)
+    employee_id = request.GET.get('employee_id', None)
+    location = request.GET.get('location_id', None)
+    search_text = request.GET.get('search_text', None)
+    no_paginnation = request.GET.get('no_paginnation', None)
+
 
     if not all([location]):
         return Response(
@@ -3978,22 +3963,7 @@ def get_vacations(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    
-    # try: 
-    #     employee = Employee.objects.get(id=employee_id, is_deleted=False)
-    # except Exception as err:
-    #     return Response(
-    #             {
-    #                 'status' : False,
-    #                 'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
-    #                 'status_code_text' : 'INVALID_EMPLOYEE_4025',
-    #                 'response' : {
-    #                     'message' : 'Employee Not Found',
-    #                     'error_message' : str(err),
-    #                 }
-    #             },
-    #             status=status.HTTP_404_NOT_FOUND
-    #         )
+
     try:
         location =  BusinessAddress.objects.get(id =location)
     except Exception as err:
@@ -4010,13 +3980,16 @@ def get_vacations(request):
                 status=status.HTTP_404_NOT_FOUND
         )
     
-    # employee= Employee.objects.get(id = employee_id.id, is_deleted=False, is_blocked=False)
 
     queries = {}
+
+    if search_text:
+        queries['employee__full_name__icontains'] = search_text
+
     if employee_id:
         queries['employee__id'] = employee_id
+
     allvacations = Vacation.objects.filter(
-        # employee = employee, 
         employee__location = location,
         holiday_type = 'Vacation',
         is_active = True,  
@@ -4029,7 +4002,8 @@ def get_vacations(request):
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(allvacations, 10)
+    per_page_results = 10000 if no_paginnation else 10
+    paginator = Paginator(allvacations, per_page_results)
     page_number = request.GET.get("page", None)
     if page_number is not None: 
         allvacations = paginator.get_page(page_number)
@@ -4044,7 +4018,7 @@ def get_vacations(request):
                     'message' : f'Page {page_number} Schedule',
                     'count':allvacations_count,
                     'pages':page_count,
-                    'per_page_result':10,
+                    'per_page_result':per_page_results,
                     'error_message' : None,
                     'vacations' : serialized.data
                 }
@@ -4074,8 +4048,12 @@ def get_vacations(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_absence(request):
-    location = request.GET.get('location', None)
-    employee_id = request.GET.get('employee', None)
+    location = request.GET.get('location_id', None)
+    employee_id = request.GET.get('employee_id', None)
+    search_text = request.GET.get('search_text', None)
+    no_pagination = request.GET.get('no_pagination', None)
+
+
 
     if not all([location]):
         return Response(
@@ -4094,21 +4072,6 @@ def get_absence(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    # try: 
-    #     employee = Employee.objects.get(id=employee_id, is_deleted=False)
-    # except Exception as err:
-    #     return Response(
-    #             {
-    #                 'status' : False,
-    #                 'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
-    #                 'status_code_text' : 'INVALID_EMPLOYEE_4025',
-    #                 'response' : {
-    #                     'message' : 'Employee Not Found',
-    #                     'error_message' : str(err),
-    #                 }
-    #             },
-    #             status=status.HTTP_404_NOT_FOUND
-    #         )
     try:
         location =  BusinessAddress.objects.get(id =location)
     except Exception as err:
@@ -4125,14 +4088,16 @@ def get_absence(request):
                 status=status.HTTP_404_NOT_FOUND
         )
     
-    # employee= Employee.objects.get(id = employee_id.id, is_deleted=False, is_blocked=False)
 
     queries = {}
+
+    if search_text:
+        queries['employee__full_name__icontains'] = search_text
+
     if employee_id:
         queries['employee__id'] = employee_id
 
     allvacations = Vacation.objects.filter(
-        # employee = employee, 
         employee__location = location,
         holiday_type ='Absence',
         is_active = True, 
@@ -4145,7 +4110,8 @@ def get_absence(request):
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(allvacations, 10)
+    per_page_results = 10000 if no_pagination else 10
+    paginator = Paginator(allvacations, per_page_results)
     page_number = request.GET.get("page", None)
     if page_number is not None: 
         allvacations = paginator.get_page(page_number)
@@ -4159,7 +4125,7 @@ def get_absence(request):
                     'message' : f'Page {page_number} Schedule',
                     'count':allvacations_count,
                     'pages':page_count,
-                    'per_page_result':10,
+                    'per_page_result':per_page_results,
                     'error_message' : None,
                     'absences' : serialized.data
                 }
