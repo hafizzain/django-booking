@@ -2409,7 +2409,9 @@ def get_client_sale(request):
                     'voucher' : voucher_membership,
                     'appointment' : appointment.data,
                     'appointments_count':appointment_checkout_all.count(),
-                    'total_sales':total_sale
+                    'total_sales':total_sale,
+                    'quick_sale_count':len(product.data) + len(services_data.data),
+                    'voucher_count': len(voucher_membership)
                 }
             },
             status=status.HTTP_201_CREATED
