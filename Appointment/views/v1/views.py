@@ -2336,24 +2336,24 @@ def get_client_sale(request):
     product_order = ProductOrder.objects \
                         .filter(checkout__client = client) \
                         .select_related('product', 'member') \
-                        .annotate(total_price=Sum('price')) \
+                        .annotate(total_sale=Sum('price')) \
                         .order_by('-created_at')
     product = POSerializerForClientSale(product_order[:5],  many=True,  context={'request' : request, })
     
     service_orders = ServiceOrder.objects \
                         .filter(checkout__client = client) \
-                        .annotate(total_price=Sum('price')) \
+                        .annotate(total_sale=Sum('price')) \
                         .order_by('-created_at')
     services_data = ServiceOrderSerializer(service_orders[:5],  many=True,  context={'request' : request, })
     
     voucher_order = VoucherOrder.objects \
                         .filter(checkout__client = client) \
-                        .annotate(total_price=Sum('price')) \
+                        .annotate(total_sale=Sum('price')) \
                         .order_by('-created_at')
     
     membership_order = MemberShipOrder.objects \
                             .filter(checkout__client = client) \
-                            .annotate(total_price=Sum('price')) \
+                            .annotate(total_sale=Sum('price')) \
                             .order_by('-created_at')
     voucher = VoucherOrderSerializer(voucher_order[:5],  many=True,  context={'request' : request, })
     membership = MemberShipOrderSerializer(membership_order[:5],  many=True,  context={'request' : request, })
@@ -2368,17 +2368,17 @@ def get_client_sale(request):
                                 appointment_status__in = ['Done', 'Paid']
                             ) \
                             .select_related('member', 'user', 'service') \
-                            .annotate(total_price=Sum('price')) \
+                            .annotate(total_sale=Sum('price')) \
                             .order_by('-created_at')
     
     
     appointment = ServiceClientSaleSerializer(appointment_checkout[:5], many = True)
     
-    total_sales = product_order[0].total_price + \
-                  service_orders[0].total_price + \
-                  voucher_order[0].total_price + \
-                  membership_order[0].total_price + \
-                  appointment_checkout[0].total_price
+    total_sales = product_order[0].total_sale + \
+                  service_orders[0].total_sale + \
+                  voucher_order[0].total_sale + \
+                  membership_order[0].total_sale + \
+                  appointment_checkout[0].total_sale
     
     return Response(
             {
