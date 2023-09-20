@@ -406,7 +406,7 @@ class POSerializerForClientSale(serializers.ModelSerializer):
     product_name  = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
     product_details  = serializers.SerializerMethodField(read_only=True)
-    product_price  = serializers.SerializerMethodField(read_only=True)
+    # product_price  = serializers.SerializerMethodField(read_only=True)
     price  = serializers.SerializerMethodField(read_only=True)
     name  = serializers.SerializerMethodField(read_only=True)
 
