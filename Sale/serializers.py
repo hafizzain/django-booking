@@ -469,9 +469,9 @@ class POSerializerForClientSale(serializers.ModelSerializer):
     
     class Meta:
         model = ProductOrder
-        fields = ['id', 'client','quantity','status','created_at',
-                  'location', 'member', 'tip', 'total_price' , 'payment_type', 'price','name',
-                  'product_name', 'gst', 'order_type', 'sold_quantity','product_details' ]
+        fields = ['quantity','status','created_at', 'member', 'tip',
+                  'total_price' , 'payment_type', 'price', 'name', 'product_name',
+                  'gst', 'order_type', 'product_details' ]
 
 
 class ProductOrderSerializer(serializers.ModelSerializer):
