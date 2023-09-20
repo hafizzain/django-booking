@@ -2350,7 +2350,7 @@ def get_client_sale(request):
     # Service Orders----------------------
     service_orders = ServiceOrder.objects \
                         .filter(checkout__client = client) \
-                        .select_related('usere', 'service', 'member') \
+                        .select_related('service', 'user', 'member') \
                         .order_by('-created_at')
     total_sale += service_orders.aggregate(total_sale=Sum('price'))['total_sale']
     if service_orders.count() > 5:
@@ -2364,6 +2364,7 @@ def get_client_sale(request):
                         .order_by('-created_at')[:5]
     membership_order = MemberShipOrder.objects \
                             .filter(checkout__client = client) \
+                            .select_related('membership', 'user', 'member') \
                             .order_by('-created_at')[:5]
     
     total_sale += voucher_order.aggregate(total_sale=Sum('price'))['total_sale']
