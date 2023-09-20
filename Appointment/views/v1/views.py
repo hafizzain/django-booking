@@ -2334,7 +2334,7 @@ def get_client_sale(request):
         
     product_order = ProductOrder.objects \
                         .filter(checkout__client = client) \
-                        .select_related('product', 'member', '') \
+                        .select_related('product', 'member') \
                         .order_by('-created_at')
     product = POSerializerForClientSale(product_order,  many=True,  context={'request' : request, })
     
