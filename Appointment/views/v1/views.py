@@ -2314,6 +2314,7 @@ def get_employees_for_selected_service(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_client_sale(request):
+    total_sale = 0
     client = request.GET.get('client', None)
     voucher_membership = []
     if client is None :
@@ -2332,53 +2333,64 @@ def get_client_sale(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-        
+    
+    # Product Order---------------------
     product_order = ProductOrder.objects \
                         .filter(checkout__client = client) \
                         .select_related('product', 'member') \
-                        .annotate(total_sale=Sum('price')) \
                         .order_by('-created_at')
-    product = POSerializerForClientSale(product_order[:5],  many=True,  context={'request' : request, })
+    total_sale += product_order.aggregate(total_sale=Sum('price'))['total_sale']
+    if product_order.count() > 5:
+        product_order = product_order[:5]
+    product = POSerializerForClientSale(product_order,  many=True,  context={'request' : request, })
     
+
+    # Service Orders----------------------
     service_orders = ServiceOrder.objects \
                         .filter(checkout__client = client) \
-                        .annotate(total_sale=Sum('price')) \
                         .order_by('-created_at')
-    services_data = ServiceOrderSerializer(service_orders[:5],  many=True,  context={'request' : request, })
-    
+    total_sale += service_orders.aggregate(total_sale=Sum('price'))['total_sale']
+    if service_orders.count() > 5:
+        service_orders = service_orders[:5]
+    services_data = ServiceOrderSerializer(service_orders,  many=True,  context={'request' : request, })
+
+    # Voucher & Membership Orders -----------------------
     voucher_order = VoucherOrder.objects \
                         .filter(checkout__client = client) \
-                        .annotate(total_sale=Sum('price')) \
-                        .order_by('-created_at')
-    
+                        .order_by('-created_at')[:5]
     membership_order = MemberShipOrder.objects \
                             .filter(checkout__client = client) \
-                            .annotate(total_sale=Sum('price')) \
-                            .order_by('-created_at')
-    voucher = VoucherOrderSerializer(voucher_order[:5],  many=True,  context={'request' : request, })
+                            .order_by('-created_at')[:5]
+    
+    total_sale += voucher_order.aggregate(total_sale=Sum('price'))['total_sale']
+    if voucher_order.count() > 5:
+        voucher_order = voucher_order[:5]
+
+    total_sale += membership_order.aggregate(total_sale=Sum('price'))['total_sale']
+    if membership_order.count() > 5:
+        membership_order = membership_order[:5]
+
+    voucher = VoucherOrderSerializer(voucher_order,  many=True,  context={'request' : request, })
     membership = MemberShipOrderSerializer(membership_order[:5],  many=True,  context={'request' : request, })
 
     voucher_membership.extend(voucher.data)
     voucher_membership.extend(membership.data)
 
-    
-    appointment_checkout = AppointmentService.objects \
+    # Appointment Orders ------------------------------
+    appointment_checkout_all = AppointmentService.objects \
                             .filter(
                                 appointment__client = client,
                                 appointment_status__in = ['Done', 'Paid']
                             ) \
                             .select_related('member', 'user', 'service') \
-                            .annotate(total_sale=Sum('price')) \
                             .order_by('-created_at')
+    appointment_checkout_5 = appointment_checkout_all
+    total_sale += appointment_checkout_all.aggregate(total_sale=Sum('price'))['total_sale']
+    if appointment_checkout_all.count() > 5:
+        appointment_checkout_5 = appointment_checkout_all[:5]
     
-    
-    appointment = ServiceClientSaleSerializer(appointment_checkout[:5], many = True)
-    
-    total_sales = product_order[0].total_sale + \
-                  service_orders[0].total_sale + \
-                  voucher_order[0].total_sale + \
-                  membership_order[0].total_sale + \
-                  appointment_checkout[0].total_sale
+    appointment = ServiceClientSaleSerializer(appointment_checkout_5[:5], many = True)
+
     
     return Response(
             {
@@ -2391,8 +2403,8 @@ def get_client_sale(request):
                     'service' : services_data.data,
                     'voucher' : voucher_membership,
                     'appointment' : appointment.data,
-                    'appointments_count':appointment_checkout.count(),
-                    'total_sales':total_sales
+                    'appointments_count':appointment_checkout_all.count(),
+                    'total_sales':total_sale
                 }
             },
             status=status.HTTP_201_CREATED
