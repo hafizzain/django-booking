@@ -909,7 +909,7 @@ class ServiceClientSaleSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = AppointmentService
-        fields = ['service', 'created_at','booked_by','duration','location',
+        fields = ['service', 'created_at','booked_by','duration',
                   'price','appointment_status','member', 'is_favourite']
 
 
