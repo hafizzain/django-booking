@@ -406,72 +406,33 @@ class POSerializerForClientSale(serializers.ModelSerializer):
     product_name  = serializers.SerializerMethodField(read_only=True)
     order_type  = serializers.SerializerMethodField(read_only=True)
     product_details  = serializers.SerializerMethodField(read_only=True)
-    # product_price  = serializers.SerializerMethodField(read_only=True)
     price  = serializers.SerializerMethodField(read_only=True)
     name  = serializers.SerializerMethodField(read_only=True)
-
-    # location = serializers.SerializerMethodField(read_only=True)
-    # client = serializers.SerializerMethodField(read_only=True)
-    # total_product  = serializers.SerializerMethodField(read_only=True)
     
     def get_name(self, obj):
         return obj.product.name if obj.product.name else None
         
-    # def get_total_product(self, obj):
-    #     try:
-    #         return obj.checkout.total_product_price
-    #     except:
-    #         return 0
         
     def get_price(self, obj):
         return obj.current_price
 
-    #item_sold = serializers.SerializerMethodField(read_only=True)
-    
-    # def get_item_sold(self, obj):
-    #     try:
-    #         product_stck =ProductStock.objects.get(product = obj)
-    #         return product_stck.sold_quantity
-    #     except Exception as err:
-    #         print(err)
     def get_product_details(self, obj):
         return obj.product.description if obj.product.description else None
-        
-    # def get_product_price(self, obj):
-    #     try:
-    #         return obj.current_price
-    #     except Exception as err:
-    #         return None
+
     
     def get_order_type(self, obj):
         return 'Product'
     
     def get_product_name(self, obj):
         return obj.product.name
-
-    
-    # def get_location(self, obj):
-    #     try:
-    #         serializers = LocationSerializer(obj.location).data
-    #         return serializers
-    #     except Exception as err:
-    #         return None
     
     def get_member(self, obj):
         return obj.member.full_name
-        
-    # def get_client(self, obj):
-    #     try:
-    #         serializers = ClientSerializer(obj.client).data
-    #         return serializers
-    #     except Exception as err:
-    #         return None
     
     class Meta:
         model = ProductOrder
-        fields = ['quantity','status','created_at', 'member', 'tip',
-                  'total_price' , 'payment_type', 'price', 'name', 'product_name',
-                  'gst', 'order_type', 'product_details' ]
+        fields = ['quantity','status','created_at', 'member', 'tip','payment_type', 'price',
+                  'name', 'product_name', 'gst', 'order_type', 'product_details' ]
 
 
 class ProductOrderSerializer(serializers.ModelSerializer):

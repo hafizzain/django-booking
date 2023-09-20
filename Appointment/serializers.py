@@ -878,34 +878,15 @@ class ServiceClientSaleSerializer(serializers.ModelSerializer):
     service = serializers.SerializerMethodField(read_only=True)
     booked_by = serializers.SerializerMethodField(read_only=True)
     member = serializers.SerializerMethodField(read_only=True)
-    # location = serializers.SerializerMethodField(read_only=True)
-    
-    # def get_location(self, obj):
-    #     try:
-    #         app_location = BusinessAddress.objects.get(id=obj.business_address.id)
-    #         return BusiessAddressAppointmentSerializer(app_location).data
-    #     except Exception as err:
-    #         None
         
     def get_member(self, obj):
         return obj.member.full_name
-        # try:
-        #     emp = Employee.objects.get(id  = obj.member.id)
-        #     return MemberSaleSerializer(emp).data
-        # except Exception as err:
-        #     print(err)
     
     def get_booked_by(self, obj):
         return f'{obj.user.first_name} {obj.user.last_name}'
     
     def get_service(self, obj):
         return obj.service.name
-        # try:
-        #     price = Service.objects.get(id  = obj.service.id)
-        #     return price.name
-        #     #return ServiceSaleSerializer(price).data
-        # except Exception as err:
-        #     print(err)
     
     class Meta:
         model = AppointmentService

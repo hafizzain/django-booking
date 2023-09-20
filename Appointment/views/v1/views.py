@@ -45,6 +45,7 @@ from Employee.serializers import EmplooyeeAppointmentInsightsSerializer
 
 from Notification.notification_processor import NotificationProcessor
 from Analytics.models import EmployeeBookingDailyInsights
+from django.db.models import Sum
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -2314,7 +2315,7 @@ def get_employees_for_selected_service(request):
 @permission_classes([AllowAny])
 def get_client_sale(request):
     client = request.GET.get('client', None)
-    data = []
+    voucher_membership = []
     if client is None :
         return Response(
             {
@@ -2335,25 +2336,49 @@ def get_client_sale(request):
     product_order = ProductOrder.objects \
                         .filter(checkout__client = client) \
                         .select_related('product', 'member') \
+                        .annotate(total_price=Sum('price')) \
                         .order_by('-created_at')
-    product = POSerializerForClientSale(product_order,  many=True,  context={'request' : request, })
+    product = POSerializerForClientSale(product_order[:5],  many=True,  context={'request' : request, })
     
-    service_orders = ServiceOrder.objects.filter(checkout__client = client).order_by('-created_at')
-    services_data = ServiceOrderSerializer(service_orders,  many=True,  context={'request' : request, })
+    service_orders = ServiceOrder.objects \
+                        .filter(checkout__client = client) \
+                        .annotate(total_price=Sum('price')) \
+                        .order_by('-created_at')
+    services_data = ServiceOrderSerializer(service_orders[:5],  many=True,  context={'request' : request, })
     
-    voucher_order = VoucherOrder.objects.filter(checkout__client = client).order_by('-created_at')
-    voucher = VoucherOrderSerializer(voucher_order,  many=True,  context={'request' : request, })
-    data.extend(voucher.data)
+    voucher_order = VoucherOrder.objects \
+                        .filter(checkout__client = client) \
+                        .annotate(total_price=Sum('price')) \
+                        .order_by('-created_at')
     
-    membership_order = MemberShipOrder.objects.filter(checkout__client = client).order_by('-created_at')
-    membership = MemberShipOrderSerializer(membership_order,  many=True,  context={'request' : request, })
-    data.extend(membership.data)
+    membership_order = MemberShipOrder.objects \
+                            .filter(checkout__client = client) \
+                            .annotate(total_price=Sum('price')) \
+                            .order_by('-created_at')
+    voucher = VoucherOrderSerializer(voucher_order[:5],  many=True,  context={'request' : request, })
+    membership = MemberShipOrderSerializer(membership_order[:5],  many=True,  context={'request' : request, })
+
+    voucher_membership.extend(voucher.data)
+    voucher_membership.extend(membership.data)
+
     
-    appointment_checkout = AppointmentService.objects.filter(
-        appointment__client = client,
-        appointment_status__in = ['Done', 'Paid']
-    ).select_related('member', 'user', 'service').order_by('-created_at')
-    serialized = ServiceClientSaleSerializer(appointment_checkout, many = True)
+    appointment_checkout = AppointmentService.objects \
+                            .filter(
+                                appointment__client = client,
+                                appointment_status__in = ['Done', 'Paid']
+                            ) \
+                            .select_related('member', 'user', 'service') \
+                            .annotate(total_price=Sum('price')) \
+                            .order_by('-created_at')
+    
+    
+    appointment = ServiceClientSaleSerializer(appointment_checkout[:5], many = True)
+    
+    total_sales = product_order[0].total_price + \
+                  service_orders[0].total_price + \
+                  voucher_order[0].total_price + \
+                  membership_order[0].total_price + \
+                  appointment_checkout[0].total_price
     
     return Response(
             {
@@ -2364,8 +2389,10 @@ def get_client_sale(request):
                     'error_message' : None,
                     'product' : product.data,
                     'service' : services_data.data,
-                    'voucher' : data,
-                    'appointment' : serialized.data
+                    'voucher' : voucher_membership,
+                    'appointment' : appointment.data,
+                    'appointments_count':appointment_checkout.count(),
+                    'total_sales':total_sales
                 }
             },
             status=status.HTTP_201_CREATED
