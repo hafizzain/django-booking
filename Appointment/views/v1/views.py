@@ -321,6 +321,8 @@ def get_employee_appointment_insights(request):
 def get_all_appointments(request):
     location_id = request.GET.get('location', None)
     appointment_status = request.GET.get('appointment_status', None)
+    search_text = request.GET.get('search_text', None)
+
 
     paginator = CustomPagination()
     paginator.page_size = 10
@@ -333,6 +335,9 @@ def get_all_appointments(request):
             queries['appointment_status__in'] = ['Done', 'Paid']
         elif appointment_status == 'Cancelled':
             queries['appointment_status__in'] = ['Cancel']
+
+    if search_text:
+        queries['member__full_name__icontains'] = search_text
         
     if location_id is not None:
         queries['business_address__id'] = location_id
