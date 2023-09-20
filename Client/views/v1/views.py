@@ -19,8 +19,9 @@ from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPr
 from Client.serializers import ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer, ClientLoyaltyPointSerializer, CustomerLoyaltyPointsLogsSerializer, CustomerDetailedLoyaltyPointsLogsSerializer, ClientVouchersSerializer, ClientMembershipsSerializer
 from Utility.models import NstyleFile
 
+from Sale.Constants.Custom_pag import CustomPagination
+
 import json
-from django.core import serializers
 from NStyle.Constants import StatusCodes
 from django.core.paginator import Paginator
 
@@ -167,14 +168,21 @@ def get_single_client(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_client(request):
-    all_client=Client.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at').distinct()
+    no_pagination = request.GET.get('no_pagination', None)
+    search_text = request.GET.get('search_text', None)
+    all_client = Client.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at').distinct()
+
+    if search_text:
+        all_client = all_client.filter(full_name__icontains=search_text)
+
     all_client_count=all_client.count()
 
-    page_count = all_client_count / 20
+    page_count = all_client_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_client, 20)
+    results_per_page = 10000 if no_pagination else 10
+    paginator = Paginator(all_client, results_per_page)
     page_number = request.GET.get("page") 
     all_client = paginator.get_page(page_number)
     serialized = ClientSerializer(all_client, many=True,  context={'request' : request})
@@ -186,7 +194,7 @@ def get_client(request):
                 'message' : 'All Client',
                 'count':all_client_count,
                 'pages':page_count,
-                'per_page_result':20,
+                'per_page_result':results_per_page,
                 'error_message' : None,
                 'client' : serialized.data
             }
@@ -577,14 +585,22 @@ def delete_client(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_client_group(request):
+    no_pagination = request.GET.get('no_pagination', None)
+    search_text = request.GET.get('search_text', None)
+
     all_client_group= ClientGroup.objects.all().order_by('-created_at')
+
+    if search_text:
+        all_client_group.filter(name__icontains=search_text)
+
     all_client_group_count= all_client_group.count()
 
-    page_count = all_client_group_count / 20
+    page_count = all_client_group_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_client_group, 20)
+    page_per_results = 10000 if no_pagination else 10
+    paginator = Paginator(all_client_group, page_per_results)
     page_number = request.GET.get("page") 
     all_client_group = paginator.get_page(page_number)
 
@@ -597,7 +613,7 @@ def get_client_group(request):
                 'message' : 'All Client Group',
                 'count':all_client_group_count,
                 'pages':page_count,
-                'per_page_result':20,
+                'per_page_result':page_per_results,
                 'error_message' : None,
                 'clientsgroup' : serialized.data
             }
@@ -3025,7 +3041,7 @@ def get_client_package(request):
 def get_customers_loyalty_points_logs(request):
     location_id = request.GET.get('location_id', None)
     customer_id = request.GET.get('customer_id',None)
-
+    no_pagination = request.GET.get('no_pagination',None)
     start_date = request.GET.get('start_date', '2020-01-01')
     end_date = request.GET.get('end_date', datetime.now().strftime('%Y-%m-%d'))
 
@@ -3059,36 +3075,26 @@ def get_customers_loyalty_points_logs(request):
         **queries
     ).order_by('-created_at')
 
-    data = CustomerLoyaltyPointsLogsSerializer(customers_points, many=True).data
+    serialized = list(CustomerLoyaltyPointsLogsSerializer(customers_points, many=True).data)
 
-    return Response(
-        {
-            'status' : True,
-            'status_code' : 200,
-            'status_code_text' : '200',
-            'response' : {
-                'message' : 'Loyalty Points Logs',
-                'error_message' : None,
-                'data' : data,
-                'start_date' : start_date,
-                'end_date' : end_date,
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'loyaltycustomer')
+    return response
+    
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_customer_detailed_loyalty_points(request):
     location_id = request.GET.get('location_id', None)
     client_id = request.GET.get('customer_id', None)
-
+    no_pagination = request.GET.get('no_pagination',None)
     start_date = request.GET.get('start_date', '2020-01-01')
     end_date = request.GET.get('end_date', datetime.now().strftime('%Y-%m-%d'))
 
 
     if not all([location_id]):
-        # client_id
         return Response(
             {
                 'status' : False,
@@ -3106,10 +3112,7 @@ def get_customer_detailed_loyalty_points(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    
-    
     queries = {}
-    clients_list = []
     if client_id is not None:
         queries['client_id'] = client_id
 
@@ -3118,7 +3121,6 @@ def get_customer_detailed_loyalty_points(request):
         'client',
         'loyalty',
     ).filter(
-        # client__id__in = clients_list,
         location__id = location_id,
         created_at__date__range = (start_date, end_date),
         is_active = True,
@@ -3128,11 +3130,12 @@ def get_customer_detailed_loyalty_points(request):
 
     all_loyality_logs_count= customers_points.count()
 
-    page_count = all_loyality_logs_count / 20
+    page_count = all_loyality_logs_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(customers_points, 20)
+    results_per_page = 10000 if no_pagination else 10
+    paginator = Paginator(customers_points, results_per_page)
     page_number = request.GET.get("page") 
     customers_points = paginator.get_page(page_number)
 
@@ -3147,7 +3150,7 @@ def get_customer_detailed_loyalty_points(request):
                 'message' : 'Loyalty Points Logs',
                 'count':all_loyality_logs_count,
                 'pages':page_count,
-                'per_page_result':20,
+                'per_page_result':results_per_page,
                 'error_message' : None,
                 'data' : data
             }

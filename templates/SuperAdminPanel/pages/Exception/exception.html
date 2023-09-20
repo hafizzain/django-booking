@@ -10,6 +10,7 @@
         class="inline-grid xl:grid grid-cols-[repeat(6,minmax(195px,1fr))] px-12 py-3 bg-[#FBFCFF] text-sm font-semibold min-w-full w-fit"
       >
         <p>Status Code</p>
+        <p>Tenant</p>
         <p>Error Content</p>
         <p>Path</p>
         <p>Method</p>
@@ -20,6 +21,7 @@
 
         <div class="px-12 py-3 inline-grid xl:grid grid-cols-[repeat(6,minmax(200px,1fr))]">
           <div class="flex items-center"><p class="text-sm">{% if exception.status_code%}{{exception.status_code}}{% else %} 400 {% endif %}</p></div>
+          <div class="flex items-center"><p class="text-sm">{% if exception.get_tenant_name %}{{exception.get_tenant_name}}{% else %} Public {% endif %}</p></div>
           <div class="flex items-center"><p class="text-sm">{{exception.text|truncatechars:20}}</p></div>
           <div class="flex items-center"><p class="text-sm">{% if exception.path%}{{exception.path|truncatechars:20}}{% else %}No Path {% endif %}</p></div>
           <div class="flex items-center"><p class="text-sm">{% if exception.method %}{{exception.method}}{% else %} None {% endif %}</p></div>

@@ -39,6 +39,7 @@ import json
 from django.db.models import Q, F
 from threading import Thread
 from django_tenants.utils import tenant_context
+from Sale.Constants.Custom_pag import CustomPagination
 from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, EmployeeBusinessSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
 
 
@@ -2971,21 +2972,26 @@ def import_business_vendor(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_business_vendors(request):
+
+    search_text = request.query_params.get('search_text', None)
+    no_pagination = request.query_params.get('no_pagination', None)
+
     all_vendors = BusinessVendor.objects.filter(is_deleted=False, is_closed=False)
-    serialized = BusinessVendorSerializer(all_vendors, many=True)
-    return Response(
-            {
-                'status' : True,
-                'status_code' : 200,
-                'status_code_text' : '200',
-                'response' : {
-                    'message' : 'All available business vendors!',
-                    'error_message' : None,
-                    'vendors' : serialized.data
-                }
-            },
-            status=status.HTTP_200_OK
-        )
+    if search_text:
+        # query
+        query = Q(vendor_name__icontains=search_text)
+        query |= Q(mobile_number__icontains=search_text)
+        query |= Q(address__icontains=search_text)
+        query |= Q(user__email__icontains=search_text)
+        all_vendors = all_vendors.filter(query)
+        
+    serialized = list(BusinessVendorSerializer(all_vendors, many=True).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'vendors')
+    return response
 
 @api_view(['POST'])
 @permission_classes([AllowAny])

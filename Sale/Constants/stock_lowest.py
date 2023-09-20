@@ -1,15 +1,12 @@
-from urllib import response
+from datetime import date
+
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
-from django.utils.html import strip_tags
-from Product.models import Product, ProductOrderStockReport
-
 from django_tenants.utils import tenant_context
+from django.utils.html import strip_tags
 from django.conf import settings
-from django.db.models import Sum
-from datetime import datetime,date
 
-from Utility.models import ExceptionRecord, TurnOverProductRecord
+from Product.models import Product
 from Business.models import BusinessAddress
 
 

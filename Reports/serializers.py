@@ -922,22 +922,9 @@ class StaffCommissionReport(serializers.ModelSerializer):
                    ]
         
 class ServiceGroupReport(serializers.ModelSerializer):
-    # service_sale_price = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
     service_target = serializers.SerializerMethodField(read_only=True)
     total_service_sales = serializers.SerializerMethodField(read_only=True)
-    # services_sales = serializers.SerializerMethodField(read_only=True)
-    # appointment_sales = serializers.SerializerMethodField(read_only=True)
-    # total_service_sales = serializers.SerializerMethodField(read_only=True)
-
-    # def get_appointment_sales(self, obj):
-    #     return obj.appointment_sales
-    
-    # def get_total_service_sales(self, obj):
-    #     return obj.appointment_sales + obj.services_sales
-    
-    # def get_services_sales(self, obj):
-    #     return obj.services_sales
     
     def get_service(self, obj):
         ser = obj.services.all()
@@ -973,9 +960,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
             month = self.context["month"]
             location = self.context["location"]
             ser_target = 0
-                        
             services_ids = obj.services.all().values_list('id', flat=True)
-
             services_orders = ServiceOrder.objects.filter(
                 service__id__in = services_ids,
                 created_at__year = year,
@@ -993,7 +978,6 @@ class ServiceGroupReport(serializers.ModelSerializer):
                 ser_target += float(price) * float(order.quantity)
             
             appointment_services = AppointmentService.objects.filter(
-                # appointment_service__appointment_status = 'Done',
                 Q(appointment_status = 'Done') |
                 Q(appointment_status = 'Paid'),
                 service__id__in = services_ids,
@@ -1136,7 +1120,6 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
             "id": f'{commission_instance.id}',
             "quantity": commission_instance.quantity,
             "name": commission_instance.item_name,
-            # "price": commission_instance.total_price,
             "price": commission_instance.sale_value,
             "order_type": commission_instance.commission_category,
             "payment_type": "Cash",
@@ -1146,20 +1129,12 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
     
     
     def get_invoice(self, obj):
-        # try:
-        #     checkoutt = Checkout.objects.get(id__icontains=obj.sale_id)
-        # except:
-        #     checkoutt = AppointmentCheckout.objects.get(id=obj.sale_id)
-        
-        # if checkoutt:
         try:
             invoice = SaleInvoice.objects.get(checkout__icontains = obj.sale_id)
             serializer = SaleInvoiceSerializer(invoice, context=self.context)
             return serializer.data
         except Exception as e:
             return str(e)
-        # else:
-        #     return 'invoice not found'
 
     
     def get_tip(self, commission_instance):
@@ -1181,8 +1156,8 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EmployeeCommission
-        fields = ['id', 'location', 'employee', 'order_type', 'commission_rate', 'commission', 'created_at', 'sale', 'sale_id', 'tip', 'invoice']
-        #  'location', 'commission_rate',
+        fields = ['id', 'location', 'employee', 'order_type', 'commission_rate', 'commission', 
+                  'created_at', 'sale', 'sale_id', 'tip', 'invoice']
 
 
 class DiscountPromotion_SaleInvoiceSerializer(serializers.ModelSerializer):

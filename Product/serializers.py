@@ -1,15 +1,12 @@
-
-
+from django.db.models import Q
 from rest_framework import serializers
+
 from Product.Constants.index import tenant_media_base_url
 from Product.models import (Category, Brand, CurrencyRetailPrice, Product, ProductMedia, ProductOrderStockReport, 
                             ProductStock, OrderStock , OrderStockProduct, ProductConsumption, ProductStockTransfer)
 from Business.models import BusinessAddress, BusinessVendor
-from django.conf import settings
 from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer
 
-from Utility.models import  ExceptionRecord
-from django.db.models import Avg, Count, Min, Sum, Q
 from Utility.models import Language
 from Product.models import ProductTranslations
 
@@ -118,22 +115,13 @@ class ProductStockSerializer(serializers.ModelSerializer):
         try:
             print(obj.location)
             loc = BusinessAddress.objects.get(id = str(obj.location), is_deleted=False )
-            #loc = obj.location.all()
             return LocationSerializer(loc).data
-            # return EmployeeServiceSerializer(obj.services).data
         except Exception as err:
             print(err)
             None
 
     def get_current_stock(self, obj):
         return obj.available_quantity
-        # try:
-        #     return obj.available_quantity - obj.sold_quantity
-        # except Exception as err:
-        #     ExceptionRecord.objects.create(
-        #     is_resolved = True, 
-        #     text= f'{str(err)}'
-        # )
 
     class Meta:
         model = ProductStock
@@ -156,16 +144,6 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
             comsumption = ProductConsumption.objects.filter(product = obj)
             return ProductConsumptionSerializer( comsumption, many = True).data
     
-    #transfer_quantity = serializers.SerializerMethodField(read_only=True)
-    
-    # def get_transfer_quantity(self, obj):
-    #     try:
-    #         return Sum(ProductStockTransfer.objects.filter(product = obj.product).values_list('quantity'))
-    #     except Exception as err:
-    #         ExceptionRecord.objects.create(
-    #             text = f"Product quantity issue {str(err)}"
-    #         ) 
-    
     def get_currency_retail_price(self, obj):
             currency_retail = CurrencyRetailPrice.objects.filter(product = obj)
             return CurrencyRetailPriceSerializer( currency_retail, many = True).data
@@ -182,52 +160,12 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
         stock = ProductStock.objects.filter(product=obj, is_deleted=False)#[0]
         return ProductStockSerializer(stock, many = True).data
         
-        # total_qant = 0
-        # try:
-        #     if stock.product.product_type == 'SELABLE':
-        #         total_qant = stock.sellable_quantity 
-        #     elif stock.product.product_type == 'COMSUME' :
-        #         total_qant = stock.consumable_quantity
-        #     else:
-        #         total_qant = int(stock.sellable_quantity) + int(stock.consumable_quantity)
-
-            
-        # except Exception as err:
-        #     print(err)
-        # #print(type(available_quantity))
-        # #print(int(available_quantity[0]))
-        # available_quantity = total_qant -  stock.sold_quantity,
-        # return {            
-        #     'id' : stock.id,
-        #     'available_stock' : int(available_quantity[0]),
-        #     'quantity' : stock.sellable_quantity,
-        #     'sold_stock' : stock.sold_quantity,
-        #     'price' : stock.product.sell_price,
-        #     'usage' : (int(total_qant) // int(stock.sold_quantity)) * 100 if stock.sold_quantity > 0 else 100,
-        #     'status' : True if int(available_quantity[0]) > 0 else False,
-        #     'status_text' : 'In Stock' if int(available_quantity[0]) > 0 else 'Out of stock',
-        #     'sale_status' : 'High',
-        #     'turnover' : 'Highest' if int(available_quantity[0]) > 0 else 'Lowest' ,
-        # }
-        
 
     class Meta:
         model = Product
-        fields = [
-            'id', 
-            'name', 
-            'arabic_name', 
-            'cost_price',
-            'category', 
-            'brand', 
-            'vendor',
-            'stock',
-            'stocktransfer',
-            'location',
-            'consumed',
-            'currency_retail_price',
-            
-        ]
+        fields = ['id', 'name', 'arabic_name', 'cost_price','category', 'brand', 'vendor',
+                  'stock','stocktransfer','location','consumed','currency_retail_price'
+                  ]
         read_only_fields = ['id']
         
 
@@ -290,7 +228,6 @@ class ProductSerializer(serializers.ModelSerializer):
         try:
             all_location = obj.location.all()
             return LocationSerializer(all_location, many = True).data
-            # return EmployeeServiceSerializer(obj.services).data
         except Exception as err:
             print(err)
             None
@@ -357,8 +294,6 @@ class ProductSerializer(serializers.ModelSerializer):
             'size',
             'product_type',
             'cost_price',
-            #'full_price',
-            #'sell_price',
             'tax_rate',
             'short_description',
             'description',
@@ -478,15 +413,6 @@ class ProductStockTransferSerializer(serializers.ModelSerializer):
     from_location = BusiessAddressAppointmentSerializer()
     to_location = BusiessAddressAppointmentSerializer()
     
-    # transfer_quantity = serializers.SerializerMethodField(read_only=True)
-    
-    # def get_transfer_quantity(self, obj):
-    #     try:
-    #         return Sum(ProductStockTransfer.objects.filter(product = obj.product).values_list('quantity'))
-    #     except Exception as err:
-    #         ExceptionRecord.objects.create(
-    #             text = f"Product quantity issue {str(err)}"
-    #         ) 
     class Meta:
         model = ProductStockTransfer
         fields = ['id', 'from_location', 'to_location', 'product', 'quantity','note']
@@ -498,7 +424,6 @@ class ProductOrderStockReportSerializer(serializers.ModelSerializer):
     consumed_location = BusiessAddressAppointmentSerializer()
     vendor_name = serializers.SerializerMethodField(read_only=True)
     product = ProductOrderSerializer()
-    # stocks = serializers.SerializerMethodField(read_only=True)
     
     def get_vendor_name(self, obj):
         try:
@@ -506,18 +431,8 @@ class ProductOrderStockReportSerializer(serializers.ModelSerializer):
         except Exception as err:
             return None
     
-    # def get_stocks(self, obj):
-    #     location = self.context.get('location')
-    #     if location is not None:
-    #         all_stocks = ProductStock.objects.filter(product=obj, is_deleted=False, location__id=location).order_by('-created_at')
-    #     else:
-    #         all_stocks = ProductStock.objects.filter(product=obj, is_deleted=False).order_by('-created_at')
-    #     return ProductStockSerializer(all_stocks, many=True).data
-    
-
     class Meta:
         model = ProductOrderStockReport
-        #fields = '__all__'#['id', 'from_location', 'to_location', 'product', 'quantity','note']
         exclude = ('is_active','is_deleted', 'user')
     
 
@@ -529,8 +444,6 @@ class ProductStockReport_OrderStockReportsSerializer(serializers.ModelSerializer
     location = BusiessAddressAppointmentSerializer()
     consumed_location = BusiessAddressAppointmentSerializer()
     vendor_name = serializers.SerializerMethodField(read_only=True)
-    # product = ProductOrderSerializer()
-    # stocks = serializers.SerializerMethodField(read_only=True)
     created_at = serializers.SerializerMethodField()
     short_id = serializers.SerializerMethodField()
 
@@ -547,35 +460,13 @@ class ProductStockReport_OrderStockReportsSerializer(serializers.ModelSerializer
         except Exception as err:
             return None
     
-    # def get_stocks(self, obj):
-    #     location = self.context.get('location')
-    #     if location is not None:
-    #         all_stocks = ProductStock.objects.filter(product=obj, is_deleted=False, location__id=location).order_by('-created_at')
-    #     else:
-    #         all_stocks = ProductStock.objects.filter(product=obj, is_deleted=False).order_by('-created_at')
-    #     return ProductStockSerializer(all_stocks, many=True).data
-    
 
     class Meta:
         model = ProductOrderStockReport
-        fields = [
-            'id', 
-            'from_location', 
-            'to_location', 
-            'quantity', 
-            'short_id', 
-            'location', 
-            'consumed_location', 
-            'vendor_name', 
-            'report_choice', 
-            'quantity', 
-            'before_quantity', 
-            'after_quantity', 
-            'reorder_quantity', 
-            'created_at', 
-            'vendor', 
-        ]
-        # exclude = ('is_active','is_deleted', 'user')
+        fields = ['id', 'from_location', 'to_location', 'quantity', 'short_id', 'location', 
+                  'consumed_location', 'vendor_name', 'report_choice', 'quantity', 
+                  'before_quantity', 'after_quantity', 'reorder_quantity', 'created_at', 'vendor'
+                  ]
     
 
 
@@ -601,11 +492,6 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
             return obj.brand.name
         except Exception as err:
             return None
-    
-    # def get_avaiable(self, obj):
-    #         quantity = ProductStock.objects.filter(product = obj)
-    #         return ProductStockSerializer(quantity, many = True).data
-
             
     def get_retail_price(self, obj):
         currency_id = self.context.get('location_currency_id')
