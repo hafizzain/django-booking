@@ -18,7 +18,7 @@ from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Business.models import Business , BusinessAddress
 from datetime import datetime
 from Order.models import MemberShipOrder, ProductOrder, VoucherOrder, ServiceOrder
-from Sale.serializers import MemberShipOrderSerializer, ProductOrderSerializer, VoucherOrderSerializer, ServiceOrderSerializer
+from Sale.serializers import MemberShipOrderSerializer, POSerializerForClientSale, VoucherOrderSerializer, ServiceOrderSerializer
 
 #from Service.models import Service
 from Service.models import Service
@@ -2332,8 +2332,11 @@ def get_client_sale(request):
             status=status.HTTP_400_BAD_REQUEST
         )
         
-    product_order = ProductOrder.objects.filter(checkout__client = client).order_by('-created_at')
-    product = ProductOrderSerializer(product_order,  many=True,  context={'request' : request, })
+    product_order = ProductOrder.objects \
+                        .filter(checkout__client = client) \
+                        .select_related('product', 'member', '') \
+                        .order_by('-created_at')
+    product = POSerializerForClientSale(product_order,  many=True,  context={'request' : request, })
     
     service_orders = ServiceOrder.objects.filter(checkout__client = client).order_by('-created_at')
     services_data = ServiceOrderSerializer(service_orders,  many=True,  context={'request' : request, })
