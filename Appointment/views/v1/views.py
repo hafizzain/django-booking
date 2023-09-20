@@ -18,7 +18,9 @@ from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Business.models import Business , BusinessAddress
 from datetime import datetime
 from Order.models import MemberShipOrder, ProductOrder, VoucherOrder, ServiceOrder
-from Sale.serializers import MemberShipOrderSerializer, POSerializerForClientSale, VoucherOrderSerializer, ServiceOrderSerializer
+from Sale.serializers import (MemberShipOrderSerializer, POSerializerForClientSale, 
+                              MOrderSerializerForSale, VOSerializerForClientSale,
+                              SOSerializerForClientSale)
 
 #from Service.models import Service
 from Service.models import Service
@@ -2348,15 +2350,17 @@ def get_client_sale(request):
     # Service Orders----------------------
     service_orders = ServiceOrder.objects \
                         .filter(checkout__client = client) \
+                        .select_related('usere', 'service', 'member') \
                         .order_by('-created_at')
     total_sale += service_orders.aggregate(total_sale=Sum('price'))['total_sale']
     if service_orders.count() > 5:
         service_orders = service_orders[:5]
-    services_data = ServiceOrderSerializer(service_orders,  many=True,  context={'request' : request, })
+    services_data = SOSerializerForClientSale(service_orders,  many=True,  context={'request' : request, })
 
     # Voucher & Membership Orders -----------------------
     voucher_order = VoucherOrder.objects \
                         .filter(checkout__client = client) \
+                        .select_related('voucher', 'member', 'user') \
                         .order_by('-created_at')[:5]
     membership_order = MemberShipOrder.objects \
                             .filter(checkout__client = client) \
@@ -2370,8 +2374,8 @@ def get_client_sale(request):
     if membership_order.count() > 5:
         membership_order = membership_order[:5]
 
-    voucher = VoucherOrderSerializer(voucher_order,  many=True,  context={'request' : request, })
-    membership = MemberShipOrderSerializer(membership_order[:5],  many=True,  context={'request' : request, })
+    voucher = VOSerializerForClientSale(voucher_order,  many=True,  context={'request' : request, })
+    membership = MOrderSerializerForSale(membership_order[:5],  many=True,  context={'request' : request, })
 
     voucher_membership.extend(voucher.data)
     voucher_membership.extend(membership.data)

@@ -521,7 +521,7 @@ class ProductOrderSerializer(serializers.ModelSerializer):
         fields = ['id', 'client','quantity','status','created_at',
                   'location', 'member', 'tip', 'total_price' , 'payment_type','product_price','price','name',
                   'product_name', 'gst', 'order_type', 'sold_quantity','product_details','total_product' ]
-          
+        
 class ServiceOrderSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
@@ -588,7 +588,57 @@ class ServiceOrderSerializer(serializers.ModelSerializer):
                   'duration', 'location', 'member', 'total_price','name','price',
                   'payment_type','tip','gst', 'order_type','created_at'
                   ]
+          
+class SOSerializerForClientSale(serializers.ModelSerializer):
+    service = serializers.SerializerMethodField(read_only=True)
+    member  = serializers.SerializerMethodField(read_only=True)
+    user  = serializers.SerializerMethodField(read_only=True)
+    order_type  = serializers.SerializerMethodField(read_only=True)
+    price  = serializers.SerializerMethodField(read_only=True)
+    
+    def get_order_type(self, obj):
+        return 'Service'
+    
+    def get_service(self, obj):
+        return obj.service.name
+    
+    def get_member(self, obj):
+        return obj.member.full_name
         
+    def get_user(self, obj):
+        return obj.user.full_name
+        
+    def get_price(self, obj):
+        return obj.current_price
+    
+    class Meta:
+        model = ServiceOrder
+        fields = ['quantity', 'service','created_at' ,'user',
+                  'duration', 'member', 'price',
+                  'payment_type','tip','gst', 'order_type','created_at'
+                  ]
+
+class MOrderSerializerForSale(serializers.ModelSerializer):
+    member  = serializers.SerializerMethodField(read_only=True)
+    membership  = serializers.SerializerMethodField(read_only=True)
+    order_type  = serializers.SerializerMethodField(read_only=True)    
+    price  = serializers.SerializerMethodField(read_only=True)
+    
+    def get_order_type(self, obj):
+        return 'Membership'
+    
+    def get_member(self, obj):
+        return obj.member.full_name
+        
+    def get_membership(self, obj):
+        return obj.membership.name
+    
+    def get_price(self, obj):
+        return obj.current_price
+    
+    class Meta:
+        model = MemberShipOrder
+        fields =['membership','order_type' ,'member','quantity', 'price', 'created_at' ]
 class MemberShipOrderSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
     member  = serializers.SerializerMethodField(read_only=True)
@@ -731,6 +781,32 @@ class VoucherOrderSerializer(serializers.ModelSerializer):
         fields =['id', 'voucher', 'client' , 'location' , 
                  'member' ,'start_date', 'end_date','status','quantity',
                  'total_price', 'payment_type' , 'order_type','voucher_price','price', 'name','created_at','discount_percentage', ]
+    
+
+class VOSerializerForClientSale(serializers.ModelSerializer):
+    # client = serializers.SerializerMethodField(read_only=True)
+    member  = serializers.SerializerMethodField(read_only=True)
+    voucher = serializers.SerializerMethodField(read_only=True)
+    order_type  = serializers.SerializerMethodField(read_only=True)
+    price  = serializers.SerializerMethodField(read_only=True)
+    
+    
+    def get_order_type(self, obj):
+        return 'Voucher'
+    
+    def get_member(self, obj):
+        return obj.member.full_name
+    
+    def get_voucher(self, obj):
+        return obj.voucher.name
+
+    def get_price(self, obj):
+        return obj.current_price
+    
+    
+    class Meta:
+        model = VoucherOrder
+        fields =['voucher', 'member', 'quantity', 'order_type', 'price', 'created_at',]
     
 
         
