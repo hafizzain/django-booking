@@ -4,7 +4,7 @@ from django.db.models import F, Sum, FloatField
 from django.db.models.functions import Coalesce
 
 def total_sale_employee(employee_id):
-    total_price = 50.00
+    total_price = 0
     employee_id = str(employee_id)
     
 
@@ -43,4 +43,7 @@ def total_sale_employee(employee_id):
 
     if non_discounted_orders:
         total_price += float(non_discounted_orders)
+
+
+    return total_price
 
