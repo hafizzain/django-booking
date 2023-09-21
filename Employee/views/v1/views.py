@@ -1799,7 +1799,7 @@ def update_staff_group(request):
 @permission_classes([AllowAny])
 def get_attendence(request):
 
-    location_id = request.GET.get('location_id', None)
+    location_id = request.GET.get('location', None)
     search_text = request.GET.get('search_text', None)
     no_pagination = request.GET.get('no_pagination', None)
     employee_id = request.GET.get('employee_id', None)
@@ -1817,7 +1817,7 @@ def get_attendence(request):
     if search_text:
         query &= Q(full_name__icontains=search_text)
 
-    all_employe= Employee.objects.filter(query).order_by('-created_at')
+    all_employe = Employee.objects.filter(query).order_by('-created_at')
     all_employe_count= all_employe.count()
 
     page_count = all_employe_count / 10

@@ -999,9 +999,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     income_type = serializers.SerializerMethodField(read_only=True)
     salary = serializers.SerializerMethodField(read_only=True)
-    total_earning = serializers.SerializerMethodField(read_only=True)
-    #employe_id = serializers.SerializerMethodField(read_only=True)
-    
+    total_earning = serializers.SerializerMethodField(read_only=True)    
     location = serializers.SerializerMethodField(read_only=True)
     sallaryslip = serializers.SerializerMethodField(read_only=True)
     total_hours = serializers.SerializerMethodField(read_only=True)
@@ -1072,13 +1070,6 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
                 total_earning += (total_hours * salary)
 
             return total_earning
-            # Hourly_Rate
-            # Daily_Income
-            # Monthly_Salary
-
-            # is_leave
-            # is_off
-            # is_vacation
 
     def get_salary(self, obj):        
         try:
@@ -1135,6 +1126,8 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         model = Employee
         fields = ['id', 'employee_id','is_active','full_name','image','location','sallaryslip',
                   'schedule','created_at', 'income_type', 'salary', 'total_earning', 'total_hours']
+        
+
 class Payroll_Working_device_attendence_ScheduleSerializer(serializers.ModelSerializer):    
     schedule =  serializers.SerializerMethodField(read_only=True)    
     
