@@ -12,7 +12,7 @@ def total_sale_employee(employee_id):
     appointment_checkout = AppointmentService.objects.filter(
         appointment_status = 'Done',
         member = employee_id,
-        ).aggregate(appointment_sum=Coalesce(Sum('total_price'), 0))['appointment_sum']
+        ).aggregate(appointment_sum=Sum('total_price'))['appointment_sum']
     
     total_price += appointment_checkout
 
