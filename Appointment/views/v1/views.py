@@ -2344,7 +2344,8 @@ def get_client_sale(request):
                         .filter(checkout__client = client) \
                         .select_related('product', 'member') \
                         .order_by('-created_at')
-    total_sale += product_order.aggregate(total_sale=Sum('price'))['total_sale']
+    product_total = product_order.aggregate(total_sale=Sum('price'))['total_sale']
+    total_sale += product_order if product_order else 0
     if product_order.count() > 5:
         product_order = product_order[:5]
     product = POSerializerForClientSale(product_order,  many=True,  context={'request' : request, })
@@ -2355,7 +2356,8 @@ def get_client_sale(request):
                         .filter(checkout__client = client) \
                         .select_related('service', 'user', 'member') \
                         .order_by('-created_at')
-    total_sale += service_orders.aggregate(total_sale=Sum('price'))['total_sale']
+    service_total = service_orders.aggregate(total_sale=Sum('price'))['total_sale']
+    total_sale += service_total if service_total else 0
     if service_orders.count() > 5:
         service_orders = service_orders[:5]
     services_data = SOSerializerForClientSale(service_orders,  many=True,  context={'request' : request, })
@@ -2369,12 +2371,13 @@ def get_client_sale(request):
                             .filter(checkout__client = client) \
                             .select_related('membership', 'user', 'member') \
                             .order_by('-created_at')[:5]
-    
-    total_sale += voucher_order.aggregate(total_sale=Sum('price'))['total_sale']
+    voucheer_total = voucher_order.aggregate(total_sale=Sum('price'))['total_sale']
+    total_sale += voucheer_total if voucheer_total else 0
     if voucher_order.count() > 5:
         voucher_order = voucher_order[:5]
 
-    total_sale += membership_order.aggregate(total_sale=Sum('price'))['total_sale']
+    membership_total = membership_order.aggregate(total_sale=Sum('price'))['total_sale']
+    total_sale += membership_total if membership_total else 0
     if membership_order.count() > 5:
         membership_order = membership_order[:5]
 
@@ -2393,7 +2396,8 @@ def get_client_sale(request):
                             .select_related('member', 'user', 'service') \
                             .order_by('-created_at')
     appointment_checkout_5 = appointment_checkout_all
-    total_sale += appointment_checkout_all.aggregate(total_sale=Sum('price'))['total_sale']
+    appointment_total = appointment_checkout_all.aggregate(total_sale=Sum('price'))['total_sale']
+    total_sale += appointment_total if appointment_total else 0
     if appointment_checkout_all.count() > 5:
         appointment_checkout_5 = appointment_checkout_all[:5]
     
