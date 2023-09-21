@@ -62,10 +62,6 @@ class LocationSerializer(serializers.ModelSerializer):
      
         
 class EmployeInformationsSerializer(serializers.ModelSerializer):
-    # services = serializers.SerializerMethodField(read_only=True)
-    
-    # def get_services(self, obj):
-    #     return ServicesEmployeeSerializer(obj.services, many = True).data
     
     class Meta:
         model = EmployeeProfessionalInfo
@@ -589,6 +585,12 @@ class PayrollSerializers(serializers.ModelSerializer):
             #'employee',
             'employee'
             ]
+        
+class LocationSerializerOP(serializers.ModelSerializer):
+
+    class Meta:
+        model = BusinessAddress
+        fields = ['id']
 
 class singleEmployeeSerializer(serializers.ModelSerializer):
     salary = serializers.SerializerMethodField(read_only=True)
@@ -600,33 +602,25 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
     
     country_name = serializers.SerializerMethodField(read_only=True)
     state_name = serializers.SerializerMethodField(read_only=True)
-    city_name = serializers.SerializerMethodField(read_only=True)   
+    city_name = serializers.SerializerMethodField(read_only=True)
     services = serializers.SerializerMethodField(read_only=True)
         
     location = serializers.SerializerMethodField()
     total_sale = serializers.SerializerMethodField()
     
     def get_total_sale(self,obj):
-        try:
-            sale = total_sale_employee(obj)
-            return sale
-        except Exception as err:
-            return str(err)
+        return total_sale_employee(obj)
+
     
     def get_location(self, obj):
-        try:
-            all_location = obj.location.all()
-            return LocationSerializer(all_location, many = True).data
-            # return EmployeeServiceSerializer(obj.services).data
-        except Exception as err:
-            print(err)
-            None
+        all_location = obj.location.all()
+        return LocationSerializerOP(all_location, many = True).data
+
 
     def get_services(self, obj):
         try:
             service = EmployeeSelectedService.objects.filter(employee=obj)
             return EmployeeServiceSerializer(service, many = True).data
-            # return EmployeeServiceSerializer(obj.services).data
         except Exception as err:
             print(err)
             None
@@ -698,6 +692,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
         model =Employee
         fields = [
             'id',
+            'total_sale',
             'image',
             'salary',
             'email',
@@ -716,8 +711,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'services',
             'created_at' ,
             'location', 
-            'total_sale',
-            'is_active',  
+            'is_active',
             ]   
 
 class CategoryCommissionSerializer(serializers.ModelSerializer):

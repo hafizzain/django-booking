@@ -324,9 +324,6 @@ def get_Employees(request):
     designation = request.GET.get('designation', None)
     income_type = request.GET.get('income_type', None)
 
-
-
-
     query = Q(is_deleted=False)
     query &= Q(is_blocked=False)
 
@@ -347,7 +344,11 @@ def get_Employees(request):
         query &= Q(location=location)
      
 
-    all_employe= Employee.objects.filter(query).order_by('-created_at')
+    all_employe= Employee.objects \
+                    .filter(query) \
+                    .select_related('country', 'state', 'city', 'location__currency') \
+                    .prefetch_related('location') \
+                    .order_by('-created_at')
     all_employee_count = all_employe.count()
     
     page_count = all_employee_count / 10

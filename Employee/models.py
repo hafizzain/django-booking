@@ -1,6 +1,7 @@
 from uuid import uuid4
 from django.db import models
-from django.db.models import Q, Count, Case, When, Value, F, CharField
+from django.db.models import Q, Count, Case, When, Value, F, CharField, Sum, FloatField
+from django.db.models.functions import Coalesce
 from django.utils.timezone import now
 
 
@@ -37,6 +38,32 @@ class EmployeeManager(models.QuerySet):
             afternoon_count = Count('employee_daily_insights', filter=afternoon_filter),
             evening_count = Count('employee_daily_insights', filter=evening_filter),
         )
+
+
+    """
+    TODO: Do Not Remove Below Commented Code
+    
+    """
+
+    # def with_total_sale(self):
+    #     appointment_filter = Q(appointment_status='Done')
+    #     order_filter = Q(checkout__is_deleted=False)
+
+    #     return self.annotate(
+    #          appointment_sale=Coalesce(
+    #              Sum('member_appointments__total_price', filter=appointment_filter),
+    #              0
+    #          ),
+    #          price=Case(
+    #              When(member_orders__discount_price__isnull=True, then="member_orders__total_price", filter=order_filter),
+    #              When(member_orders__discount_price__isnull=False, then="member_orders__discount_price", filter=order_filter),
+    #             output_field=FloatField(),
+    #             default=Value(0.00)
+    #          ),
+    #          quantity = F('member_orders__quantity', filter=order_filter)
+    #     ).annotate(
+    #         order_sale = F('price') * F('quantity')
+    #     )
 
 class Employee(models.Model):
     GENDER_CHOICES = [
