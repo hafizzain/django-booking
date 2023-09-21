@@ -8,7 +8,7 @@ from Business.models import (Business, BusinessAddress, BusinessOpeningHour, Bus
                              StockNotificationSetting)
 from Profile.models import Profile
 from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSIONS_MODEL_FIELDS
-from Utility.Constants.add_data_db import add_business_types, add_countries, add_software_types, add_states, add_cities, add_currencies, add_languages
+from Utility.Constants.add_data_db import add_countries, add_states, add_cities, add_currencies, add_languages
 from Utility.models import Country, Currency, ExceptionRecord, Language
 from Utility.models import GlobalPermissionChoices
 
