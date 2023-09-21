@@ -1,14 +1,17 @@
+import json
 from Authentication.Constants.Domain import ssl_sub_domain
 from Client.models import Client
 from Employee.Constants.Add_Employe import add_employee
 from Employee.models import EmployeDailySchedule, Employee, EmployeeProfessionalInfo, EmployeeSelectedService
+from Permissions.models import EmployePermission
 from Tenants.models import Tenant, Domain
-from Business.models import (Business, BusinessAddress, BusinessOpeningHour, BusinessPaymentMethod, BusinessType,
-                             StaffNotificationSetting, ClientNotificationSetting, AdminNotificationSetting,
-                             StockNotificationSetting)
+from Business.models import (Business, BusinessAddress, BusinessOpeningHour,
+                             ClientNotificationSetting, AdminNotificationSetting,
+                             StockNotificationSetting, StaffNotificationSetting,
+                             BusinessPaymentMethod, BusinessType)
 from Profile.models import Profile
 from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSIONS_MODEL_FIELDS
-from Utility.Constants.add_data_db import add_countries, add_states, add_cities, add_currencies, add_languages
+from Utility.Constants.add_data_db import add_business_types, add_countries, add_software_types, add_states, add_cities, add_currencies, add_languages
 from Utility.models import Country, Currency, ExceptionRecord, Language
 from Utility.models import GlobalPermissionChoices
 
@@ -16,7 +19,8 @@ from rest_framework.authtoken.models import Token
 from django.conf import  settings
 
 from django_tenants.utils import tenant_context
-from Authentication.models import AccountType, User
+from Authentication.models import AccountType, User, NewsLetterDetail
+from Authentication.Constants import AuthTokenConstants
 from threading import Thread
 from Service.models import PriceService, Service, ServiceGroup
 from datetime import date, timedelta
