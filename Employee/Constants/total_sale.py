@@ -1,6 +1,6 @@
 from Order.models import Checkout, Order
 from Appointment.models import AppointmentCheckout, AppointmentService
-from django.db.models import F, Sum
+from django.db.models import F, Sum, FloatField
 from django.db.models.functions import Coalesce
 
 def total_sale_employee(employee_id):
@@ -12,7 +12,7 @@ def total_sale_employee(employee_id):
     appointment_checkout = AppointmentService.objects.filter(
         appointment_status = 'Done',
         member = employee_id,
-        ).aggregate(appointment_sum=Sum('total_price'))['appointment_sum']
+        ).aggregate(appointment_sum=Coalesce(Sum('total_price'), output_field=FloatField()))['appointment_sum']
     
     if appointment_checkout:
         total_price += appointment_checkout
@@ -24,8 +24,8 @@ def total_sale_employee(employee_id):
         member__id = employee_id,
         discount_price__isnull=False
     ).annotate(
-        total = F('discount_price') * F('quantity')
-    ).aggregate(total_sum=Sum('total'))['total_sum']
+        total = Coalesce(F('discount_price') * F('quantity'), output_field=FloatField())
+    ).aggregate(total_sum=Coalesce(Sum('total'), output_field=FloatField()))['total_sum']
 
     if discounted_orders:
         total_price += discounted_orders
@@ -38,8 +38,8 @@ def total_sale_employee(employee_id):
         member__id = employee_id,
         discount_price__isnull=True
     ).annotate(
-        total = F('total_price') * F('quantity')
-    ).aggregate(total_sum=Sum('total'))['total_sum']
+        total = Coalesce(F('total_price') * F('quantity'), output_field=FloatField())
+    ).aggregate(total_sum=Coalesce(Sum('total'), output_field=FloatField()))['total_sum']
 
     if non_discounted_orders:
         total_price += non_discounted_orders
