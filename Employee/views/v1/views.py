@@ -3490,22 +3490,16 @@ def update_vacation(request):
 def create_vacation_emp(request):
     user = request.user
     business_id = request.data.get('business', None)
-    
     employee = request.data.get('employee', None)
     day = request.data.get('day', None)
-    
     start_time = request.data.get('start_time', None)
     end_time = request.data.get('end_time', None)
-    
     start_time_shift = request.data.get('start_time_shift', None)
     end_time_shift = request.data.get('end_time_shift', None)
-    
     from_date = request.data.get('from_date', None)
     to_date = request.data.get('to_date', from_date)
     note = request.data.get('note', None)
-
     is_vacation = request.data.get('is_vacation', None)
-    
     is_leave = request.data.get('is_leave', None)
     is_off = request.data.get('is_off', None)
     
@@ -3568,6 +3562,27 @@ def create_vacation_emp(request):
     working_sch = None
     days = int(diff.days)
 
+    is_vacation_exist = Vacation.objects.filter(
+        business = business,
+        employee = employee_id,
+        from_date = from_date,
+        to_date = to_date,
+        note = note
+    ).first()
+
+    if is_vacation_exist:
+        return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Employee Vacation Already Exist',
+                'error_message' : None,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
     empl_vacation = Vacation.objects.create(
         business = business,
         employee = employee_id,
@@ -3596,7 +3611,6 @@ def create_vacation_emp(request):
             working_sch.vacation = empl_vacation
             working_sch.from_date = from_date
             working_sch.save()
-            working_sch = None
             
         else:   
             working_schedule = EmployeDailySchedule.objects.create(
@@ -3647,21 +3661,6 @@ def create_vacation_emp(request):
         },
         status=status.HTTP_200_OK
     )
-        
-    # serializers= ScheduleSerializer(working_schedule, context={'request' : request})
-    
-    # return Response(
-    #         {
-    #             'status' : True,
-    #             'status_code' : 201,
-    #             'response' : {
-    #                 'message' : 'Working Schedule Created Successfully!',
-    #                 'error_message' : None,
-    #                 'schedule' : serializers.data,
-    #             }
-    #         },
-    #         status=status.HTTP_201_CREATED
-    #     ) 
 
 
 
