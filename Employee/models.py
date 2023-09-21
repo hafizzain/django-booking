@@ -11,7 +11,7 @@ from Service.models  import Service
 from NStyle.choices import EmployeeDailyInsightChoices
 
 
-class EmployeeManager(models.Manager):
+class EmployeeManager(models.QuerySet):
     
     def with_completed_appointments(self, employee_ids, date, business_address):
         """
@@ -36,7 +36,7 @@ class EmployeeManager(models.Manager):
             morning_count = Count('employee_daily_insights', filter=morning_filter),
             afternoon_count = Count('employee_daily_insights', filter=afternoon_filter),
             evening_count = Count('employee_daily_insights', filter=evening_filter),
-        ) 
+        )
 
 class Employee(models.Model):
     GENDER_CHOICES = [
@@ -82,7 +82,7 @@ class Employee(models.Model):
     updated_at = models.DateTimeField(null=True, blank=True)
 
 
-    objects = EmployeeManager()
+    objects = EmployeeManager.as_manager()
 
     
     def save(self, *args, **kwargs):
