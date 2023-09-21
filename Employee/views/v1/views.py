@@ -346,7 +346,7 @@ def get_Employees(request):
 
     all_employe= Employee.objects \
                     .filter(query) \
-                    .select_related('country', 'state', 'city', 'location__currency') \
+                    .select_related('user', 'business','country', 'state', 'city', 'employee_permissions') \
                     .prefetch_related('location') \
                     .order_by('-created_at')
     all_employee_count = all_employe.count()
