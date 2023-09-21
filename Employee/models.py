@@ -20,7 +20,7 @@ class EmployeeManager(models.QuerySet):
         appointment_filter = Q(member_appointments__appointment_date=date) \
                             & Q(member_appointments__business_address=business_address)
         
-        return self.get_queryset().filter(id__in=employee_ids).annotate(
+        return self.filter(id__in=employee_ids).annotate(
             appointments_done = Count('member_appointments', filter=appointment_filter)
         )
     
@@ -30,7 +30,7 @@ class EmployeeManager(models.QuerySet):
         afternoon_filter = insight_filter & Q(employee_daily_insights__day_time_choice=EmployeeDailyInsightChoices.AFTERNOON)
         evening_filter = insight_filter & Q(employee_daily_insights__day_time_choice=EmployeeDailyInsightChoices.EVENING)
 
-        return self.get_queryset().filter(
+        return self.filter(
             id__in=employee_ids
         ).annotate(
             morning_count = Count('employee_daily_insights', filter=morning_filter),
