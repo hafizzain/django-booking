@@ -40,6 +40,8 @@ from Reports.models import DiscountPromotionSalesReport
 from Service.models import ServiceTranlations
 from Utility.models import Language
 
+from django.db.models import Subquery, OuterRef
+
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -912,6 +914,8 @@ def get_all_sale_orders_pagination(request):
 
     if search_text:
         sale_queries['client__full_name__icontains'] = search_text
+        sale_queries['invoice_id__icontains'] = search_text
+        
         app_queries['appointment__client__full_name__icontains'] = search_text
 
 
@@ -927,6 +931,8 @@ def get_all_sale_orders_pagination(request):
         'checkout_orders__member',
         'checkout_orders__location',
         'checkout_orders__location__currency',
+    ).annotate(
+        invoice_id=Subquery(SaleInvoice.objects.filter(checkout__icontains=OuterRef('id')).values('checkout'))
     ).filter(
         is_deleted=False,
         location__id=location_id,
@@ -940,7 +946,6 @@ def get_all_sale_orders_pagination(request):
             'appointment__client',
             'service',
         ).filter(
-            # appointment_service__appointment_status = 'Done',
             business_address__id = location_id,
             **queries,
             **app_queries
