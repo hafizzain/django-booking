@@ -28,7 +28,7 @@ from Business.models import BusinessAddress
 from Service.models import PriceService, Service, ServiceGroup
 
 from Product.models import Product, ProductOrderStockReport, ProductStock
-from django.db.models import Avg, Count, Min, Sum, Q
+from django.db.models import Avg, Count, Min, Sum, Q, F
 
 
 from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer, SaleOrders_CheckoutSerializer, SaleOrders_AppointmentCheckoutSerializer
@@ -914,10 +914,10 @@ def get_all_sale_orders_pagination(request):
 
     if search_text:
         sale_queries['client__full_name__icontains'] = search_text
-        sale_queries['invoice__id__icontains'] = search_text
-        
+        sale_queries['invoice_id__icontains'] = search_text
+
         app_queries['appointment__client__full_name__icontains'] = search_text
-        app_queries['invoice__id__icontains'] = search_text
+        app_queries['invoice_id__icontains'] = search_text
 
 
     checkout_order = Checkout.objects.select_related(
@@ -932,7 +932,7 @@ def get_all_sale_orders_pagination(request):
         'checkout_orders__member',
         'checkout_orders__location',
         'checkout_orders__location__currency',
-    ).filter(
+    ).annotate(invoice_id=F('invoice__id')).filter(
         is_deleted=False,
         location__id=location_id,
         **queries,
