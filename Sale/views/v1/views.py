@@ -1002,6 +1002,67 @@ def get_all_sale_orders_pagination(request):
     response['total_seconds'] = f'{(end_time - start_time).total_seconds()} s'
     return response
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_recent_five_sales(request):
+    location_id = request.GET.get('location', None)
+
+
+    queries = {}
+    app_queries = {}
+    sale_queries = {}
+
+    checkout_order = Checkout.objects.select_related(
+        'location',
+        'location__currency',
+        'client',
+        'member'
+    ).prefetch_related(
+        'checkout_orders',
+        'checkout_orders__user',
+        'checkout_orders__client',
+        'checkout_orders__member',
+        'checkout_orders__location',
+        'checkout_orders__location__currency',
+    ).filter(
+        is_deleted=False,
+        location__id=location_id,
+        **queries,
+        **sale_queries
+    ).distinct()
+
+    appointment_checkout = AppointmentCheckout.objects.select_related(
+            'appointment_service',
+            'business_address',
+            'appointment',
+            'appointment__client',
+            'service',
+        ).filter(
+            business_address__id = location_id,
+            **queries,
+            **app_queries
+        ).distinct()
+
+    checkout_data = list(SaleOrders_CheckoutSerializer(checkout_order, many=True, context={'request': request}).data)
+    appointment_data = list(SaleOrders_AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
+
+    data_total = checkout_data + appointment_data
+    data_total = data_total[:5]
+    sorted_data = sorted(data_total, key=lambda x: x['created_at'], reverse=True)
+
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Last 5 Orders',
+                'error_message' : None,
+                'orders' : sorted_data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
