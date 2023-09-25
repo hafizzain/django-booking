@@ -919,7 +919,7 @@ def get_all_sale_orders_pagination(request):
         app_queries['appointment__client__full_name__icontains'] = search_text
         app_queries['invoice_id__icontains'] = search_text
 
-    subquery = Subquery(SaleInvoice.objects.filter(checkout=OuterRef('id')).values('id')[0])
+    subquery = SaleInvoice.objects.filter(checkout=OuterRef('id')).values('id')[0]
     checkout_order = Checkout.objects.select_related(
         'location',
         'location__currency',
@@ -932,7 +932,7 @@ def get_all_sale_orders_pagination(request):
         'checkout_orders__member',
         'checkout_orders__location',
         'checkout_orders__location__currency',
-    ).annotate(invoice_id=subquery).filter(
+    ).annotate(invoice_id=Subquery(subquery)).filter(
         is_deleted=False,
         location__id=location_id,
         **queries,
@@ -945,7 +945,7 @@ def get_all_sale_orders_pagination(request):
             'appointment',
             'appointment__client',
             'service',
-        ).annotate(invoice_id=subquery).filter(
+        ).annotate(invoice_id=Subquery(subquery)).filter(
             business_address__id = location_id,
             **queries,
             **app_queries
