@@ -919,7 +919,7 @@ def get_all_sale_orders_pagination(request):
         app_queries['appointment__client__full_name__icontains'] = search_text
         app_queries['invoice_id__icontains'] = search_text
 
-    subquery = SaleInvoice.objects.filter(checkout=OuterRef('id')).values('id')[0]
+    subquery = SaleInvoice.objects.filter(checkout_obj=OuterRef('id')).values('id')[0]
     checkout_order = Checkout.objects.select_related(
         'location',
         'location__currency',
