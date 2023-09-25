@@ -989,11 +989,11 @@ def get_all_sale_orders_pagination(request):
     appointment_data = list(SaleOrders_AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
 
     data_total = checkout_data + appointment_data
-    if recent_five_sales:
-        data_total = data_total[:5]
-                 
     sorted_data = sorted(data_total, key=lambda x: x['created_at'], reverse=True)
 
+
+    if recent_five_sales:
+        data_total = data_total[:5]
 
     paginator = CustomPagination()
     paginator.page_size = 100000 if no_pagination else 10

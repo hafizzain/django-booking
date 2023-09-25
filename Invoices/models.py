@@ -142,7 +142,9 @@ class SaleInvoice(models.Model):
                 'name' : f'{order.name}',
                 'arabic_name' : f'{order.arabic_name}',
                 'price' : round(total_price, 2),
-                'quantity' : order.quantity
+                'quantity' : order.quantity,
+                'discount_percentage':order.discount_percentage,
+                'discount_price':order.discount_price
             }
             ordersData.append(data)
 
