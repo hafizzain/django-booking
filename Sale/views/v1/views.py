@@ -923,7 +923,6 @@ def get_all_sale_orders_pagination(request):
 
         invoice = SaleInvoice.objects.filter(id__icontains=search_text).first()
         if invoice:
-            debug_1 = True
             invoice_checkout = Checkout.objects.select_related(
                 'location',
                 'location__currency',
@@ -977,6 +976,7 @@ def get_all_sale_orders_pagination(request):
     ).distinct()
 
     if invoice_checkout:
+        debug_1 = True
         combine_checkouts = invoice_checkout | checkout_order
     else:
         combine_checkouts = checkout_order
