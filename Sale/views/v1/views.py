@@ -993,7 +993,7 @@ def get_all_sale_orders_pagination(request):
 
 
     if recent_five_sales:
-        data_total = data_total[:5]
+        sorted_data = sorted_data[:5]
 
     paginator = CustomPagination()
     paginator.page_size = 100000 if no_pagination else 10
