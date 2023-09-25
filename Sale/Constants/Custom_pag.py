@@ -17,7 +17,7 @@ from rest_framework.response import Response
 #         })
 
 class CustomPagination(PageNumberPagination):
-    def get_paginated_response(self, data, pramas_data):
+    def get_paginated_response(self, data, pramas_data, debug=None):
         base_url = self.request.build_absolute_uri().split('?')[0] + '?'
         count = self.page.paginator.count
         per_page_result = self.page_size
@@ -32,6 +32,7 @@ class CustomPagination(PageNumberPagination):
             'response' : {
                 'message' : f'All {pramas_data}',
                 'error_message' : None,
+                'debug': debug,
                 pramas_data : data
             },
 
