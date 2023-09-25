@@ -889,6 +889,9 @@ def get_all_sale_orders_pagination(request):
     client_id = request.GET.get('client', None)
     service_id = request.GET.get('service', None)
 
+    sale_checkouts = None
+    appointment_checkouts = None
+    
     if range_end is not None:
         range_end = dt.strptime(range_end, '%Y-%m-%d').date()
         range_end = range_end + timedelta(days=1)
@@ -898,10 +901,7 @@ def get_all_sale_orders_pagination(request):
     app_queries = {}
     sale_queries = {}
 
-    invoice_checkout_ids = SaleInvoice.objects.filter(id__icontains=search_text).values_list('checkout', flat=True)
-    sale_checkouts = Checkout.objects.filter(id__in=invoice_checkout_ids)
-
-    appointment_checkouts = AppointmentCheckout.objects.filter(id__in=invoice_checkout_ids)
+    
 
     if range_start:
         queries['created_at__range'] = (range_start, range_end)
@@ -921,6 +921,10 @@ def get_all_sale_orders_pagination(request):
     if search_text:
         sale_queries['client__full_name__icontains'] = search_tex
         app_queries['appointment__client__full_name__icontains'] = search_text
+        invoice_checkout_ids = SaleInvoice.objects.filter(id__icontains=search_text).values_list('checkout', flat=True)
+        sale_checkouts = Checkout.objects.filter(id__in=invoice_checkout_ids)
+
+        appointment_checkouts = AppointmentCheckout.objects.filter(id__in=invoice_checkout_ids)
 
     checkout_order = Checkout.objects.select_related(
         'location',
@@ -955,8 +959,6 @@ def get_all_sale_orders_pagination(request):
     
     if sale_checkouts:
         checkout_order = checkout_order | sale_checkouts
-    else:
-        pass
 
 
     if appointment_checkout:
