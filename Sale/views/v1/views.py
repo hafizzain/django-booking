@@ -913,11 +913,42 @@ def get_all_sale_orders_pagination(request):
         app_queries['appointment__appointment_services__service__id'] = service_id
 
     if search_text:
-        sale_queries['client__full_name__icontains'] = search_text
-        # sale_queries['invoice_id__icontains'] = search_text
-        
+        sale_queries['client__full_name__icontains'] = search_text        
         app_queries['appointment__client__full_name__icontains'] = search_text
 
+        invoice = SaleInvoice.objects.filter(id__icontains=search_text).first()
+        if invoice:
+            invoice_checkout = Checkout.objects.select_related(
+                'location',
+                'location__currency',
+                'client',
+                'member'
+            ).prefetch_related(
+                'checkout_orders',
+                'checkout_orders__user',
+                'checkout_orders__client',
+                'checkout_orders__member',
+                'checkout_orders__location',
+                'checkout_orders__location__currency',
+            ).filter(
+                id=invoice.checkout,
+                is_deleted=False,
+                location__id=location_id,
+                **queries,
+                **sale_queries
+            ).distinct()
+
+            invoice_appointments = AppointmentCheckout.objects.select_related(
+                'appointment_service', 
+                'business_address',
+                'appointment',
+                'appointment__client',
+                'service',
+            ).filter(
+                business_address__id = location_id,
+                **queries,
+                **app_queries
+            ).distinct()
 
     checkout_order = Checkout.objects.select_related(
         'location',
@@ -937,8 +968,10 @@ def get_all_sale_orders_pagination(request):
         **queries,
         **sale_queries
     ).distinct()
+
+    combine_checkouts = invoice_checkout & checkout_order
     appointment_checkout = AppointmentCheckout.objects.select_related(
-            'appointment_service', 
+            'appointment_service',
             'business_address',
             'appointment',
             'appointment__client',
@@ -949,8 +982,10 @@ def get_all_sale_orders_pagination(request):
             **app_queries
         ).distinct()
 
-    checkout_data = list(SaleOrders_CheckoutSerializer(checkout_order, many=True, context={'request': request}).data)
-    appointment_data = list(SaleOrders_AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
+    combine_appointments = appointment_checkout & invoice_appointments
+
+    checkout_data = list(SaleOrders_CheckoutSerializer(combine_checkouts, many=True, context={'request': request}).data)
+    appointment_data = list(SaleOrders_AppointmentCheckoutSerializer(combine_appointments, many=True, context={'request': request}).data)
 
     data_total = checkout_data + appointment_data
                  
