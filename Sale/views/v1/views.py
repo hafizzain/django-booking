@@ -979,10 +979,10 @@ def get_all_sale_orders_pagination(request):
         ).distinct()
     
     if sale_checkouts:
-        checkout_order = checkout_order.union(sale_checkouts)
+        checkout_order = checkout_order | sale_checkouts
 
     if appointment_checkouts:
-        appointment_checkout = appointment_checkout.union(appointment_checkouts)
+        appointment_checkout = appointment_checkout | appointment_checkouts
 
     checkout_data = list(SaleOrders_CheckoutSerializer(checkout_order, many=True, context={'request': request}).data)
     appointment_data = list(SaleOrders_AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
