@@ -897,6 +897,12 @@ def get_all_sale_orders_pagination(request):
     queries = {}
     app_queries = {}
     sale_queries = {}
+
+    invoice_checkout_ids = SaleInvoice.objects.filter(id__icontains=search_text).values_list('checkout', flat=True)
+    sale_checkouts = Checkout.objects.filter(id__in=invoice_checkout_ids)
+
+    appointment_checkouts = AppointmentCheckout.objects.filter(id__in=invoice_checkout_ids)
+
     if range_start:
         queries['created_at__range'] = (range_start, range_end)
     
@@ -913,13 +919,9 @@ def get_all_sale_orders_pagination(request):
         app_queries['appointment__appointment_services__service__id'] = service_id
 
     if search_text:
-        sale_queries['client__full_name__icontains'] = search_text
-        sale_queries['invoice_id__icontains'] = search_text
-
+        sale_queries['client__full_name__icontains'] = search_tex
         app_queries['appointment__client__full_name__icontains'] = search_text
-        app_queries['invoice_id__icontains'] = search_text
 
-    subquery = SaleInvoice.objects.filter(checkout_obj=OuterRef('id')).values('id')
     checkout_order = Checkout.objects.select_related(
         'location',
         'location__currency',
@@ -932,7 +934,7 @@ def get_all_sale_orders_pagination(request):
         'checkout_orders__member',
         'checkout_orders__location',
         'checkout_orders__location__currency',
-    ).annotate(invoice_id=Subquery(subquery[0])).filter(
+    ).filter(
         is_deleted=False,
         location__id=location_id,
         **queries,
@@ -945,11 +947,20 @@ def get_all_sale_orders_pagination(request):
             'appointment',
             'appointment__client',
             'service',
-        ).annotate(invoice_id=Subquery(subquery[0])).filter(
+        ).filter(
             business_address__id = location_id,
             **queries,
             **app_queries
         ).distinct()
+    
+    if sale_checkouts:
+        checkout_order = checkout_order | sale_checkouts
+    else:
+        pass
+
+
+    if appointment_checkout:
+        appointment_checkout = appointment_checkout | appointment_checkouts
 
     checkout_data = list(SaleOrders_CheckoutSerializer(checkout_order, many=True, context={'request': request}).data)
     appointment_data = list(SaleOrders_AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
