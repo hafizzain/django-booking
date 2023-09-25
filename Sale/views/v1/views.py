@@ -891,7 +891,7 @@ def get_all_sale_orders_pagination(request):
 
     sale_checkouts = None
     appointment_checkouts = None
-    
+
     if range_end is not None:
         range_end = dt.strptime(range_end, '%Y-%m-%d').date()
         range_end = range_end + timedelta(days=1)
@@ -919,11 +919,12 @@ def get_all_sale_orders_pagination(request):
         app_queries['appointment__appointment_services__service__id'] = service_id
 
     if search_text:
-        sale_queries['client__full_name__icontains'] = search_tex
+        sale_queries['client__full_name__icontains'] = search_text
         app_queries['appointment__client__full_name__icontains'] = search_text
-        invoice_checkout_ids = SaleInvoice.objects.filter(id__icontains=search_text).values_list('checkout', flat=True)
-        sale_checkouts = Checkout.objects.filter(id__in=invoice_checkout_ids)
 
+        invoice_checkout_ids = SaleInvoice.objects.filter(id__icontains=search_text).values_list('checkout', flat=True)
+
+        sale_checkouts = Checkout.objects.filter(id__in=invoice_checkout_ids)
         appointment_checkouts = AppointmentCheckout.objects.filter(id__in=invoice_checkout_ids)
 
     checkout_order = Checkout.objects.select_related(
@@ -958,11 +959,10 @@ def get_all_sale_orders_pagination(request):
         ).distinct()
     
     if sale_checkouts:
-        checkout_order = checkout_order | sale_checkouts
+        checkout_order = checkout_order.union(sale_checkouts)
 
-
-    if appointment_checkout:
-        appointment_checkout = appointment_checkout | appointment_checkouts
+    if appointment_checkouts:
+        appointment_checkout = appointment_checkout.union(appointment_checkouts)
 
     checkout_data = list(SaleOrders_CheckoutSerializer(checkout_order, many=True, context={'request': request}).data)
     appointment_data = list(SaleOrders_AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
