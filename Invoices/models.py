@@ -78,6 +78,7 @@ class SaleInvoice(models.Model):
     service_price = models.FloatField(default=0, null=True, blank=True)
     total_price = models.FloatField(default=0, null=True, blank=True)
     checkout = models.CharField(max_length=128, null=True, blank=True)
+    checkout_obj = models.OneToOneField(Checkout, null=True, blank=True, on_delete=models.CASCADE, related_name='invoice')
 
     file = models.FileField(upload_to='invoicesFiles/', null=True, blank=True)
 

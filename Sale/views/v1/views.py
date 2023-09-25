@@ -913,8 +913,11 @@ def get_all_sale_orders_pagination(request):
         app_queries['appointment__appointment_services__service__id'] = service_id
 
     if search_text:
-        sale_queries['client__full_name__icontains'] = search_text        
+        sale_queries['client__full_name__icontains'] = search_text
+        sale_queries['invoice__id__icontains'] = search_text
+        
         app_queries['appointment__client__full_name__icontains'] = search_text
+        app_queries['invoice__id__icontains'] = search_text
 
 
     checkout_order = Checkout.objects.select_related(
@@ -1442,7 +1445,8 @@ def create_sale_order(request):
         service_commission_type = service_commission_type,
         product_commission_type = product_commission_type,
         voucher_commission_type = voucher_commission_type,
-        checkout = f'{checkout.id}'
+        checkout = f'{checkout.id}',
+        checkout_obj=checkout
     )
     invoice.save()
     
@@ -1875,7 +1879,8 @@ def new_create_sale_order(request):
         service_commission_type = service_commission_type,
         product_commission_type = product_commission_type,
         voucher_commission_type = voucher_commission_type,  
-        checkout = f'{checkout.id}'
+        checkout = f'{checkout.id}',
+        checkout_obj=checkout
     )
     invoice.save()
 
