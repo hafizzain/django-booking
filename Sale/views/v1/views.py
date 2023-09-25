@@ -936,7 +936,7 @@ def get_all_sale_orders_pagination(request):
                 'checkout_orders__location',
                 'checkout_orders__location__currency',
             ).filter(
-                id=invoice.checkout,
+                id__icontains=invoice.checkout,
                 is_deleted=False,
                 location__id=location_id,
                 **queries,
@@ -944,13 +944,13 @@ def get_all_sale_orders_pagination(request):
             ).distinct()
 
             invoice_appointments = AppointmentCheckout.objects.select_related(
-                'appointment_service', 
+                'appointment_service',
                 'business_address',
                 'appointment',
                 'appointment__client',
                 'service',
             ).filter(
-                id=invoice.checkout,
+                id__icontains=invoice.checkout,
                 business_address__id = location_id,
                 **queries,
                 **app_queries
