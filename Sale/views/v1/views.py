@@ -889,6 +889,9 @@ def get_all_sale_orders_pagination(request):
     client_id = request.GET.get('client', None)
     service_id = request.GET.get('service', None)
 
+    invoice_checkout = None
+    invoice_appointments = None
+
     if range_end is not None:
         range_end = dt.strptime(range_end, '%Y-%m-%d').date()
         range_end = range_end + timedelta(days=1)
@@ -970,7 +973,10 @@ def get_all_sale_orders_pagination(request):
         **sale_queries
     ).distinct()
 
-    combine_checkouts = invoice_checkout & checkout_order
+    if invoice_checkout:
+        combine_checkouts = invoice_checkout & checkout_order
+    else:
+        combine_checkouts = checkout_order
     appointment_checkout = AppointmentCheckout.objects.select_related(
             'appointment_service',
             'business_address',
@@ -983,7 +989,10 @@ def get_all_sale_orders_pagination(request):
             **app_queries
         ).distinct()
 
-    combine_appointments = appointment_checkout & invoice_appointments
+    if invoice_appointments:
+        combine_appointments = appointment_checkout & invoice_appointments
+    else:
+        combine_appointments = appointment_checkout
 
     checkout_data = list(SaleOrders_CheckoutSerializer(combine_checkouts, many=True, context={'request': request}).data)
     appointment_data = list(SaleOrders_AppointmentCheckoutSerializer(combine_appointments, many=True, context={'request': request}).data)
