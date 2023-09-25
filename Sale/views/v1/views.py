@@ -923,8 +923,29 @@ def get_all_sale_orders_pagination(request):
         app_queries['appointment__client__full_name__icontains'] = search_text
 
         invoice_checkout_ids = SaleInvoice.objects.filter(id__icontains=search_text).values_list('checkout', flat=True)
-        sale_checkouts = Checkout.objects.filter(id__in=invoice_checkout_ids)
-        appointment_checkouts = AppointmentCheckout.objects.filter(id__in=invoice_checkout_ids)
+        sale_checkouts = Checkout.objects.select_related(
+                            'location',
+                            'location__currency',
+                            'client',
+                            'member'
+                        ).prefetch_related(
+                            'checkout_orders',
+                            'checkout_orders__user',
+                            'checkout_orders__client',
+                            'checkout_orders__member',
+                            'checkout_orders__location',
+                            'checkout_orders__location__currency',
+                        ).filter(id__in=invoice_checkout_ids) \
+                        .distinct()
+        appointment_checkouts = AppointmentCheckout.objects.select_related(
+                                'appointment_service',
+                                'business_address',
+                                'appointment',
+                                'appointment__client',
+                                'service',
+                            ).filter(
+                                id__in=invoice_checkout_ids
+                            ).distinct()
 
     checkout_order = Checkout.objects.select_related(
         'location',
