@@ -118,7 +118,6 @@ class SaleInvoice(models.Model):
         orders.extend(VoucherOrder.objects.filter(checkout = checkout).annotate(name = F('voucher__name'), arabic_name=F('voucher__arabic_name')))
         orders.extend(MemberShipOrder.objects.filter(checkout = checkout).annotate(name = F('membership__name'), arabic_name=F('membership__arabic_name')))
 
-        # .values('name', 'arabic_name', 'quantity', 'current_price', 'total_price', 'discount_price', 'price')
         ordersData = []
         for order in orders:
             # pricing order for invoice PDF
@@ -144,7 +143,6 @@ class SaleInvoice(models.Model):
                 'price' : round(total_price, 2),
                 'quantity' : order.quantity,
                 'discount_percentage':order.discount_percentage,
-                'discount_price':order.discount_price
             }
             ordersData.append(data)
 

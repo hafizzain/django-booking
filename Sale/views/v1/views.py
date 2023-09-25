@@ -2001,6 +2001,8 @@ def new_create_sale_order(request):
         price = id['price']  
         employee_id = id['employee_id']      
         discount_price = id.get('discount_price', None)
+        discount_percentage = id.get('discount_percentage', None)
+
         
 
         is_membership_redeemed = id.get('is_membership_redeemed', None)
@@ -2044,12 +2046,11 @@ def new_create_sale_order(request):
                 test = False
         
         original_price = float(price)
-        discount_percentage = 0
         order_discount_price = None
         
         if discount_price is not None:
             order_discount_price = float(discount_price)
-            discount_percentage = (float(discount_price) / original_price) * 100
+            discount_percentage = float(discount_percentage)
 
         order_instance = None
         if sale_type == 'PRODUCT':
@@ -2128,19 +2129,17 @@ def new_create_sale_order(request):
                 product = product,
                 checkout = checkout,
                 location = business_address,
-                # total_price = total_price, 
                 total_price = float(original_price), 
                 payment_type= payment_type,
                 client_type = client_type,
                 quantity = quantity,
                 current_price = float(price),
-                discount_percentage = float(discount_percentage),
+                discount_percentage = discount_percentage,
                 discount_price = order_discount_price,
             )
             product_order.sold_quantity += 1 # product_stock.sold_quantity
             product_order.save()
             order_instance = product_order
-            
 
         elif sale_type == 'SERVICE':
             try:
@@ -2162,16 +2161,14 @@ def new_create_sale_order(request):
                     service = service,
                     duration= dur,
                     checkout = checkout,
-                    
                     client = client,
                     location = business_address,
-                    # total_price = total_price, 
                     total_price = float(original_price), 
                     payment_type=payment_type,
                     client_type = client_type,
                     quantity = quantity,
                     current_price = float(price),
-                    discount_percentage = float(discount_percentage),
+                    discount_percentage = discount_percentage,
                     discount_price = order_discount_price,
                 )
 
@@ -2212,7 +2209,7 @@ def new_create_sale_order(request):
                     quantity = quantity,
                     location = business_address,
                     current_price = float(price),
-                    discount_percentage = float(discount_percentage),
+                    discount_percentage = discount_percentage,
                     discount_price = order_discount_price,
                 )
             except Exception as err:
@@ -2234,7 +2231,6 @@ def new_create_sale_order(request):
             
         elif sale_type == 'VOUCHER':  
               
-            #for vouchers in ids:  
             try:
                 days = 0
                 voucher = Vouchers.objects.get(id = service_id)#str(vouchers))
