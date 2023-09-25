@@ -222,7 +222,12 @@
                     class="flex items-center justify-between text-primary text-sm font-semibold"
                   >
                     <div>
-                      <p class="text-left">{{order.name}} {{ order.discount_percentage}} {{order.discount_price}}</p>
+                      <p class="text-left">
+                        {{order.name}}
+                        {% if order.discount_percentage %}
+                        (Discount {{ order.discount_percentage}})
+                        {% endif %}
+                      </p>
                       <p class="arabic">{{order.arabic_name}}</p>
                     </div>
                     <p class="text-[#7B7B7B]">
@@ -235,9 +240,16 @@
               </div>
             </div>
             <div class="text-left flex flex-col gap-1">
-              <div
-                class="flex items-center justify-between text-primary text-sm font-bold"
-              >
+              {% if order.is_redeemed %}
+              <div class="flex items-center justify-between text-primary text-sm font-bold">
+                <div>
+                  <p>Redeemed Type : {{ order.redeemed_type }}</p>
+                </div>
+                <p>Total Discount : {{order.total_discount}}</p>
+              </div>
+              {% endif %}
+
+              <div class="flex items-center justify-between text-primary text-sm font-bold">
                 <div>
                   <p>Subtotal</p>
                   <p class="arabic">{{subtotal_trans}}</p>
@@ -245,9 +257,7 @@
                 <p>{{sub_total}} {{currency_code}}</p>
               </div>
               {% for tip in tips %}
-              <div
-                class="flex items-center justify-between text-[#7B7B7B] text-sm"
-              >
+              <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
                 <div>
                   <p>Tip for {{tip.employee_name}}</p>
                   <p>
