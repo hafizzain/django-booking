@@ -974,7 +974,7 @@ def get_all_sale_orders_pagination(request):
     ).distinct()
 
     if invoice_checkout:
-        combine_checkouts = invoice_checkout & checkout_order
+        combine_checkouts = invoice_checkout | checkout_order
     else:
         combine_checkouts = checkout_order
     appointment_checkout = AppointmentCheckout.objects.select_related(
@@ -990,7 +990,7 @@ def get_all_sale_orders_pagination(request):
         ).distinct()
 
     if invoice_appointments:
-        combine_appointments = appointment_checkout & invoice_appointments
+        combine_appointments = appointment_checkout | invoice_appointments
     else:
         combine_appointments = appointment_checkout
 
