@@ -240,7 +240,7 @@
               </div>
             </div>
             <div class="text-left flex flex-col gap-1">
-              {% if order.is_redeemed %}
+              {% if order.is_redeemed == True %}
               <div class="flex items-center justify-between text-primary text-sm font-bold">
                 <div>
                   <p>Redeemed Type : {{ order.redeemed_type }}</p>
