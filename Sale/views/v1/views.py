@@ -892,6 +892,8 @@ def get_all_sale_orders_pagination(request):
     invoice_checkout = None
     invoice_appointments = None
 
+    debug_1 = False
+
     if range_end is not None:
         range_end = dt.strptime(range_end, '%Y-%m-%d').date()
         range_end = range_end + timedelta(days=1)
@@ -921,6 +923,7 @@ def get_all_sale_orders_pagination(request):
 
         invoice = SaleInvoice.objects.filter(id__icontains=search_text).first()
         if invoice:
+            debug_1 = True
             invoice_checkout = Checkout.objects.select_related(
                 'location',
                 'location__currency',
@@ -1010,6 +1013,7 @@ def get_all_sale_orders_pagination(request):
     end_time = datetime.datetime.now()
     response['seconds'] = f'{(end_time - start_time).seconds} s'
     response['total_seconds'] = f'{(end_time - start_time).total_seconds()} s'
+    response['debug'] = debug_1
     return response
 
 
