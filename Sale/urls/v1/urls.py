@@ -18,7 +18,7 @@ urlpatterns = [
     path('get_voucher_orders/', views.get_voucher_orders),
     
     path('get_all_sale_orders/', views.get_all_sale_orders_pagination),
-    path('get_recent_five_sales/', views.get_recent_five_sales),
+    path('get_recent_five_sales/', views.get_recent_five_sales), # deprecated
 
     
     path('get_total_revenue/', views.get_total_revenue),

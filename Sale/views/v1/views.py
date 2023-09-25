@@ -883,6 +883,7 @@ def get_all_sale_orders_pagination(request):
     range_start =  request.GET.get('range_start', None)
     range_end = request.GET.get('range_end', None)
     no_pagination = request.GET.get('no_pagination', None)
+    recent_five_sales = request.GET.get('recent_five_sales', False)
 
 
     search_text = request.GET.get('search_text', None)
@@ -988,6 +989,8 @@ def get_all_sale_orders_pagination(request):
     appointment_data = list(SaleOrders_AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
 
     data_total = checkout_data + appointment_data
+    if recent_five_sales:
+        data_total = data_total[:5]
                  
     sorted_data = sorted(data_total, key=lambda x: x['created_at'], reverse=True)
 
