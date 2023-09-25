@@ -889,11 +889,6 @@ def get_all_sale_orders_pagination(request):
     client_id = request.GET.get('client', None)
     service_id = request.GET.get('service', None)
 
-    invoice_checkout = None
-    invoice_appointments = None
-
-    debug_1 = False
-
     if range_end is not None:
         range_end = dt.strptime(range_end, '%Y-%m-%d').date()
         range_end = range_end + timedelta(days=1)
@@ -921,40 +916,6 @@ def get_all_sale_orders_pagination(request):
         sale_queries['client__full_name__icontains'] = search_text        
         app_queries['appointment__client__full_name__icontains'] = search_text
 
-        invoice = SaleInvoice.objects.filter(id__icontains=search_text).first()
-        if invoice:
-            invoice_checkout = Checkout.objects.select_related(
-                'location',
-                'location__currency',
-                'client',
-                'member'
-            ).prefetch_related(
-                'checkout_orders',
-                'checkout_orders__user',
-                'checkout_orders__client',
-                'checkout_orders__member',
-                'checkout_orders__location',
-                'checkout_orders__location__currency',
-            ).filter(
-                id__icontains=invoice.checkout,
-                is_deleted=False,
-                location__id=location_id,
-                **queries,
-                **sale_queries
-            ).distinct()
-
-            invoice_appointments = AppointmentCheckout.objects.select_related(
-                'appointment_service',
-                'business_address',
-                'appointment',
-                'appointment__client',
-                'service',
-            ).filter(
-                id__icontains=invoice.checkout,
-                business_address__id = location_id,
-                **queries,
-                **app_queries
-            ).distinct()
 
     checkout_order = Checkout.objects.select_related(
         'location',
@@ -975,11 +936,6 @@ def get_all_sale_orders_pagination(request):
         **sale_queries
     ).distinct()
 
-    if invoice_checkout:
-        debug_1 = True
-        combine_checkouts = invoice_checkout | checkout_order
-    else:
-        combine_checkouts = checkout_order
     appointment_checkout = AppointmentCheckout.objects.select_related(
             'appointment_service',
             'business_address',
@@ -992,13 +948,8 @@ def get_all_sale_orders_pagination(request):
             **app_queries
         ).distinct()
 
-    if invoice_appointments:
-        combine_appointments = appointment_checkout | invoice_appointments
-    else:
-        combine_appointments = appointment_checkout
-
-    checkout_data = list(SaleOrders_CheckoutSerializer(combine_checkouts, many=True, context={'request': request}).data)
-    appointment_data = list(SaleOrders_AppointmentCheckoutSerializer(combine_appointments, many=True, context={'request': request}).data)
+    checkout_data = list(SaleOrders_CheckoutSerializer(checkout_order, many=True, context={'request': request}).data)
+    appointment_data = list(SaleOrders_AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
 
     data_total = checkout_data + appointment_data
                  
@@ -1008,12 +959,11 @@ def get_all_sale_orders_pagination(request):
     paginator = CustomPagination()
     paginator.page_size = 100000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(sorted_data, request)
-    response = paginator.get_paginated_response(paginated_data, 'sales', debug_1)
+    response = paginator.get_paginated_response(paginated_data, 'sales')
     
     end_time = datetime.datetime.now()
     response['seconds'] = f'{(end_time - start_time).seconds} s'
     response['total_seconds'] = f'{(end_time - start_time).total_seconds()} s'
-    response['debug'] = debug_1
     return response
 
 
