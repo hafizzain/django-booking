@@ -923,7 +923,6 @@ def get_all_sale_orders_pagination(request):
         app_queries['appointment__client__full_name__icontains'] = search_text
 
         invoice_checkout_ids = SaleInvoice.objects.filter(id__icontains=search_text).values_list('checkout', flat=True)
-        invoice_checkout_ids = [int(x) for x in invoice_checkout_ids]
         sale_checkouts = Checkout.objects.filter(id__in=invoice_checkout_ids)
         appointment_checkouts = AppointmentCheckout.objects.filter(id__in=invoice_checkout_ids)
 
