@@ -1890,6 +1890,7 @@ def new_create_sale_order(request):
     is_loyalty_points_redeemed = request.data.get('is_redeemed', None)
     loyalty_points_redeemed_id = request.data.get('redeemed_id', None)
     loyalty_points_redeemed = request.data.get('redeemed_points', None)
+    total_discount_value = request.data.get('discount_value', None)
     tip = request.data.get('tip', [])
     total_price = request.data.get('total_price', None)
     minus_price = 0
@@ -2300,6 +2301,7 @@ def new_create_sale_order(request):
             order_instance.redeemed_type = 'Membership' if is_membership_redeemed else 'Voucher' if is_voucher_redeemed  else ''
             order_instance.redeemed_price = float(redeemed_price)
             order_instance.redeemed_instance_id = redeemed_membership_id
+            order_instance.total_discount = float(total_discount_value) if total_discount_value else None
             order_instance.save()
 
         if sale_type in ['PRODUCT', 'SERVICE', 'VOUCHER']:
