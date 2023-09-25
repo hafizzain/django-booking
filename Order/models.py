@@ -155,6 +155,7 @@ class Order(models.Model):
     
     discount_percentage = models.FloatField(default= 0)
     discount_price = models.FloatField(default=None, null=True, blank=True)
+    total_discount = models.FloatField(default=None, null=True, blank=True)
     price = models.FloatField(default= 0)
 
     is_redeemed = models.BooleanField(default=False)

@@ -142,8 +142,11 @@ class SaleInvoice(models.Model):
                 'arabic_name' : f'{order.arabic_name}',
                 'price' : round(total_price, 2),
                 'quantity' : order.quantity,
-                'discount_percentage':order.discount_percentage,
+                'discount_percentage': int(order.discount_percentage),
+                'is_redeemed': order.is_redeemed,
+                'redeemed_type':order.redeemed_type
             }
+
             ordersData.append(data)
 
         return ordersData
