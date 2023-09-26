@@ -900,8 +900,6 @@ def get_all_sale_orders_pagination(request):
     app_queries = {}
     sale_queries = {}
 
-    # removing # for better search
-    search_text = search_text.replace('#', '')
 
     if range_start:
         queries['created_at__range'] = (range_start, range_end)
@@ -919,6 +917,8 @@ def get_all_sale_orders_pagination(request):
         app_queries['appointment__appointment_services__service__id'] = service_id
 
     if search_text:
+        # removing # for better search
+        search_text = search_text.replace('#', '')
         sale_queries['client__full_name__icontains'] = search_text
         app_queries['appointment__client__full_name__icontains'] = search_text
 
