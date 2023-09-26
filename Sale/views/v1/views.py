@@ -884,7 +884,7 @@ def get_all_sale_orders_pagination(request):
     range_end = request.GET.get('range_end', None)
     no_pagination = request.GET.get('no_pagination', None)
     recent_five_sales = request.GET.get('recent_five_sales', False)
-    search_text = str(request.GET.get('search_text', None))
+    search_text = request.GET.get('search_text', None)
     client_id = request.GET.get('client', None)
     service_id = request.GET.get('service', None)
 
