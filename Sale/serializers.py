@@ -1678,7 +1678,8 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
         model = ProductOrder
         fields = [
             'id', 'product_name', 'product_arabic_name', 'product_original_price', 
-            'quantity', 'product_price', 'price', 'selection_type', 'discount_percentage']
+            'quantity', 'product_price', 'price', 'selection_type', 'discount_percentage',
+            'total_discount']
 
 
 class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
@@ -1714,7 +1715,7 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceOrder
         fields = ['id', 'price', 'service_original_price', 'quantity', 'service', 'selection_type',
-                  'discount_price', 'discount_percentage']
+                  'discount_price', 'discount_percentage', 'total_discount']
 
 
 class SaleOrder_VoucherSerializer(serializers.ModelSerializer):
