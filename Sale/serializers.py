@@ -1936,7 +1936,8 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             'product', 'service', 'membership', 'voucher', 'client', 'location', 'gst','gst1','gst_price','gst_price1',
             'created_at', 'payment_type', 'tip', 'service_commission', 'voucher_commission', 'product_commission',
             'service_commission_type', 'product_commission_type', 'voucher_commission_type', 'ids', 'membership_product',
-            'membership_service', 'membership_type', 'invoice', 'tax_name', 'tax_name1', 'total_discount'
+            'membership_service', 'membership_type', 'invoice', 'tax_name', 'tax_name1', 'total_discount',
+            'voucher_redeem_percentage', 'redeem_option'
         ]
 
         # Remove Member from get all sale orders

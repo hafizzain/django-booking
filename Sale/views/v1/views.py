@@ -1859,7 +1859,7 @@ def create_sale_order(request):
 
 
 
-    
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def new_create_sale_order(request):
@@ -1882,6 +1882,8 @@ def new_create_sale_order(request):
     service_total_price = request.data.get('service_total_price', None)
     product_total_price = request.data.get('product_total_price', None)
     voucher_total_price = request.data.get('voucher_total_price', None)
+    voucher_redeem_percentage = request.data.get('voucher_redeem_percentage', None)
+    redeem_option = request.data.get('redeem_option', None)
     service_commission_type = request.data.get('service_commission_type', '')
     product_commission_type = request.data.get('product_commission_type', '')
     voucher_commission_type = request.data.get('voucher_commission_type', '')
@@ -1943,6 +1945,9 @@ def new_create_sale_order(request):
         location = business_address,
         client_type = client_type,
         payment_type = payment_type,
+
+        voucher_redeem_percentage=voucher_redeem_percentage,
+        redeem_option=redeem_option,
         
         
         total_voucher_price = voucher_total_price,
