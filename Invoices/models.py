@@ -261,15 +261,18 @@ class SaleInvoice(models.Model):
 
     def get_checkout_redeemed_data(self):
 
+        data = dict()
+
         checkout = Checkout.objects.get(
             id=self.checkout
         )
 
-        return {
-            'redeem_option':checkout.redeem_option,
-            'total_discount':checkout.total_discount,
-            'voucher_redeem_percentage':checkout.voucher_redeem_percentage,
-        }
+        if checkout:
+            data['redeem_option'] = checkout.redeem_option
+            data['total_discount'] = checkout.total_discount
+            data['voucher_redeem_percentage'] = checkout.voucher_redeem_percentage
+
+        return data
 
     def get_invoice_translations(self):
         """
