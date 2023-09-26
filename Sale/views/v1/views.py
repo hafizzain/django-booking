@@ -1542,7 +1542,6 @@ def create_sale_order(request):
         product_commission_type = product_commission_type,
         voucher_commission_type = voucher_commission_type,
         checkout = f'{checkout.id}',
-        checkout_obj=checkout
     )
     invoice.save()
     
@@ -1983,7 +1982,6 @@ def new_create_sale_order(request):
         product_commission_type = product_commission_type,
         voucher_commission_type = voucher_commission_type,  
         checkout = f'{checkout.id}',
-        checkout_obj=checkout
     )
     invoice.save()
 

@@ -1879,7 +1879,6 @@ def create_checkout(request):
         service_commission = float(service_commission),
         service_commission_type = service_commission_type,      
         checkout = f'{checkout.id}',
-        checkout_obj=checkout
     )
     invoice.save()
 
@@ -2155,7 +2154,6 @@ def create_checkout_device(request):
         service_price = service_price,
         total_price = total_price,
         checkout = f'{checkout.id}',
-        checkout_obj=checkout
     )
 
     employee_tip = AppointmentEmployeeTip.objects.create(
