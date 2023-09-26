@@ -263,9 +263,9 @@ class SaleInvoice(models.Model):
 
         data = dict()
 
-        checkout = Checkout.objects.get(
+        checkout = Checkout.objects.filter(
             id=self.checkout
-        )
+        ).first()
 
         if checkout:
             data['redeem_option'] = checkout.redeem_option
