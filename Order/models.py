@@ -39,7 +39,6 @@ class Checkout(models.Model):
     member = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='member_checkout_orders', null=True)
     client_type = models.CharField(choices = CLIENT_TYPE, max_length=50 , default = '' )
     payment_type = models.CharField(choices = PAYMENT_TYPE, max_length=50 , default = '' )
-    total_discount = models.FloatField(default=None, null=True, blank=True)
     
     tip = models.FloatField(default = 0) # Not in Use
 
@@ -50,8 +49,11 @@ class Checkout(models.Model):
     tax_name = models.CharField(max_length=250, default='')
     tax_name1 = models.CharField(max_length=250, default='')
 
+    # region New Fields Added
+    total_discount = models.FloatField(default=None, null=True, blank=True)
     voucher_redeem_percentage = models.FloatField(default=None, null=True, blank=True)
     redeem_option = models.CharField(max_length=250, default=None, null=True, blank=True)
+    # endregion
     
     total_service_price = models.FloatField(default = 0 , null=True, blank=True) # Not in Use
     total_product_price = models.FloatField(default = 0 , null=True, blank=True) # Not in Use
