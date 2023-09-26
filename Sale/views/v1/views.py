@@ -1951,13 +1951,14 @@ def new_create_sale_order(request):
         
         service_commission_type = service_commission_type,
         product_commission_type = product_commission_type,
-        voucher_commission_type = voucher_commission_type ,  
+        voucher_commission_type = voucher_commission_type,
         tax_amount = tax_amount,
         tax_amount1 = tax_amount1,
         tax_applied = tax_applied,
         tax_applied1 = tax_applied1,
         tax_name=tax_name,
-        tax_name1=tax_name1
+        tax_name1=tax_name1,
+        total_discount=total_discount_value
     )
 
     checkout.save()
@@ -2001,7 +2002,7 @@ def new_create_sale_order(request):
         price = id['price']  
         employee_id = id['employee_id']      
         discount_price = id.get('discount_price', None)
-        discount_percentage = id.get('discount_percentage', 0)
+        discount_percentage = id.get('discount_percentage', None)
         is_membership_redeemed = id.get('is_membership_redeemed', None)
         is_voucher_redeemed = id.get('is_voucher_redeemed', None)
         redeemed_price = id.get('redeemed_price', None)
