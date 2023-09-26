@@ -2001,10 +2001,7 @@ def new_create_sale_order(request):
         price = id['price']  
         employee_id = id['employee_id']      
         discount_price = id.get('discount_price', None)
-        discount_percentage = id.get('discount_percentage', None)
-
-        
-
+        discount_percentage = id.get('discount_percentage', 0)
         is_membership_redeemed = id.get('is_membership_redeemed', None)
         is_voucher_redeemed = id.get('is_voucher_redeemed', None)
         redeemed_price = id.get('redeemed_price', None)
