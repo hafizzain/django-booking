@@ -143,9 +143,6 @@ class SaleInvoice(models.Model):
                 'price' : round(total_price, 2),
                 'quantity' : order.quantity,
                 'discount_percentage': int(order.discount_percentage) if order.discount_percentage else None,
-                'total_discount': order.total_discount,
-                'is_redeemed': order.is_redeemed,
-                'redeemed_type':order.redeemed_type
             }
 
             ordersData.append(data)
@@ -217,6 +214,8 @@ class SaleInvoice(models.Model):
                 sub_total = sum([order['price'] for order in order_items])
                 tips_total = sum([t['tip'] for t in order_tips])
 
+                checkout_redeem_data = self.get_checkout_redeemed_data()
+
                 context = {
                     'client': self.client,
                     'invoice_by' : self.user.user_full_name if self.user else '',
@@ -237,6 +236,7 @@ class SaleInvoice(models.Model):
                     'payment_type_trans': invoice_trans['payment_method'] if invoice_trans else '',
                     'payment_type': self.payment_type,
                     **tax_details,
+                    **checkout_redeem_data,
                 }
                 schema_name = connection.schema_name
                 schema_dir = f'{settings.BASE_DIR}/media/{schema_name}'
@@ -259,6 +259,18 @@ class SaleInvoice(models.Model):
                 self.file = no_media_path
 
         super(SaleInvoice, self).save(*args, **kwargs)
+
+    def get_checkout_redeemed_data(self):
+
+        checkout = Checkout.objects.get(
+            id=self.checkout
+        )
+
+        return {
+            'redeem_option':checkout.redeem_option,
+            'total_discount':checkout.total_discount,
+            'voucher_redeem_percentage':checkout.voucher_redeem_percentage,
+        }
 
     def get_invoice_translations(self):
         """
