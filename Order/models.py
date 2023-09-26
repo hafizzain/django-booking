@@ -39,6 +39,7 @@ class Checkout(models.Model):
     member = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='member_checkout_orders', null=True)
     client_type = models.CharField(choices = CLIENT_TYPE, max_length=50 , default = '' )
     payment_type = models.CharField(choices = PAYMENT_TYPE, max_length=50 , default = '' )
+    total_discount = models.FloatField(default=None, null=True, blank=True)
     
     tip = models.FloatField(default = 0) # Not in Use
 
@@ -153,7 +154,7 @@ class Order(models.Model):
     total_price = models.DecimalField(default = 0 , max_digits=10, decimal_places=5)
     sold_quantity = models.PositiveBigIntegerField(default = 0)
     
-    discount_percentage = models.FloatField(default= 0)
+    discount_percentage = models.FloatField(default=None, null=True, blank=True)
     discount_price = models.FloatField(default=None, null=True, blank=True)
     total_discount = models.FloatField(default=None, null=True, blank=True)
     price = models.FloatField(default= 0)

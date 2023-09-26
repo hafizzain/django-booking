@@ -109,7 +109,7 @@ class BusinessAddress(models.Model):
     address_name = models.CharField(max_length=500, default='')
     address = models.TextField(default='')
     
-    service_avaiable = models.CharField(choices = SERVICE_CHOICE , default = 'Male' , max_length = 100)  
+    service_avaiable = models.CharField(choices = SERVICE_CHOICE , default = 'Everyone' , max_length = 100)  
     location_name = models.CharField(max_length=500, default='')
     
     latitude = models.CharField(default='', max_length=200, null=True, blank=True)
