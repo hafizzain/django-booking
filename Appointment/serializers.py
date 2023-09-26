@@ -968,7 +968,12 @@ class AppointmenttLogSerializer(serializers.ModelSerializer):
 
     
     def get_logged_by(self, obj):
-        return obj.member.full_name
+        if obj.member:
+            return obj.member.full_name
+    
+        if obj.user :
+            return f'{obj.user.first_name} {obj.user.last_name if obj.user.last_name else ""}'
+        return ''
     
     def get_log_details(self, obj):
         log_details = LogDetails.objects.filter(
