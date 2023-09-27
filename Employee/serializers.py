@@ -389,7 +389,7 @@ class EmployeeNameSerializer(serializers.ModelSerializer):
                 'location',
         ]
 
-class EmployeeSerializerWithoutID(serializers.ModelSerializer):
+class EmployeeNameSerializer1(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
     designation = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
@@ -762,7 +762,7 @@ class CommissionSerializer(serializers.ModelSerializer):
     def get_employee(self,obj):
         try:
             emp = Employee.objects.get(id = str(obj.employee))
-            return EmployeeNameSerializer(emp, context=self.context).data
+            return EmployeeNameSerializer1(emp, context=self.context).data
         except Exception as err:
             print(err)
             
