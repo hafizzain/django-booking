@@ -389,6 +389,11 @@ class EmployeeNameSerializer(serializers.ModelSerializer):
                 'location',
         ]
 
+class EmployeeSerializerWithoutID(EmployeeNameSerializer):
+
+    class Meta:
+        fields = ['id', 'full_name', 'image', 'designation', 'location']
+
 class StaffGroupSerializers(serializers.ModelSerializer):
 
     staff_permission = serializers.SerializerMethodField()
@@ -727,7 +732,7 @@ class CommissionSerializer(serializers.ModelSerializer):
     def get_employee(self,obj):
         try:
             emp = Employee.objects.get(id = str(obj.employee))
-            return EmployeeNameSerializer(emp, context=self.context).data
+            return EmployeeSerializerWithoutID(emp, context=self.context).data
         except Exception as err:
             print(err)
             
