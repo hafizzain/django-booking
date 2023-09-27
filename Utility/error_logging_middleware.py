@@ -31,11 +31,11 @@ class ServerErrorLoggingMiddleware:
 
             try:
                 pub_tenant = Tenant.objects.get(schema_name = 'public')
-            except:
-                ExceptionRecord.objects.create(text=str(response.content), status_code=str(response.status_code), method=str(request.method), path=str(request.path))
+            except Exception as err:
+                ExceptionRecord.objects.create(text=f'{err} Error :: {response.content}', status_code=str(response.status_code), method=str(request.method), path=str(request.path))
             else:
                 with tenant_context(pub_tenant):
-                    err_instance = ExceptionRecord.objects.create(text=str(response.content), status_code=str(response.status_code), method=str(request.method), path=str(request.path))
+                    err_instance = ExceptionRecord.objects.create(text=f'{tenant_id} -- {response.content}', status_code=str(response.status_code), method=str(request.method), path=str(request.path))
                     if tenant_id:
                         try:
                             user_tenant = Tenant.objects.get(id = tenant_id)

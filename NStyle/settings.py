@@ -313,17 +313,20 @@ GEOIP_PATH =os.path.join('geoip')
 
 # FCM_DJANGO CONFIGURATION
 fcm_credentials = env('GOOGLE_APPLICATION_CREDENTIALS')
-with open(fcm_credentials, 'r') as cred:
-    json_data = json.loads(cred.read())
-
-cred = credentials.Certificate(json_data)
-FIREBASE_APP = initialize_app(cred)
-FCM_DJANGO_SETTINGS = {
-    "DEFAULT_FIREBASE_APP": FIREBASE_APP,
-    "APP_VERBOSE_NAME": "FCM Devices",
-    "ONE_DEVICE_PER_USER": True,
-    "DELETE_INACTIVE_DEVICES": False,
-}
+try:
+    with open(fcm_credentials, 'r') as cred:
+        json_data = json.loads(cred.read())
+except:
+    pass
+else:
+    cred = credentials.Certificate(json_data)
+    FIREBASE_APP = initialize_app(cred)
+    FCM_DJANGO_SETTINGS = {
+        "DEFAULT_FIREBASE_APP": FIREBASE_APP,
+        "APP_VERBOSE_NAME": "FCM Devices",
+        "ONE_DEVICE_PER_USER": True,
+        "DELETE_INACTIVE_DEVICES": False,
+    }
 
 
 AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')

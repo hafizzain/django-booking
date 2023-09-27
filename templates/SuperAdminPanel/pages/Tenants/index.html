@@ -24,8 +24,26 @@
       <h3 class="font-semibold text-center">Creating</h3>
       <p class="text-center">{{creating_tenants|length}}</p>
     </div>
-
   </div>
+  <form class="flex items-center justify-end gap-3" action="{% url 'TenantsListingPage' %}" method="get">
+    <div>
+      <input type="text" class="border rounded-lg px-3 py-2 text-gray-700" name="user" value="{{request.GET.user}}" placeholder="Seach User/Username">
+    </div>
+    <div>
+      <input type="text" class="border rounded-lg px-3 py-2 text-gray-700" name="domain" value="{{request.GET.domain}}" placeholder="Seach Domain">
+    </div>
+    <div>
+      <select name="status" class="px-4 py-2 border rounded-lg text-gray-700">
+        <option value="ALL">All</option>
+        <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+        <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+      </select>
+    </div>
+    {% if request.GET %}
+      <a href="{% url 'TenantsListingPage' %}" class="px-5 py-2 cursor-pointer rounded-full flex items-center gap-3 bg-[#5679ff] text-white">Clear</a>
+    {% endif %}
+    <button class="px-5 py-2 active_sidebar cursor-pointer rounded-full flex items-center gap-3 active_sidebar_active">Apply</button>
+  </form>
   <div class="border rounded-lg">
     <div class="overflow-x-auto">
       <div

@@ -11,7 +11,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from threading import Thread
 from Utility.Constants.Tenant.create_dummy_tenants import CreateDummyTenants
 
-
+status_codes = [
+    100, 101, 200, 201, 202, 203, 204, 205, 206, 207, 208, 226, 300, 301, 302, 303, 304, 305, 306, 307, 308, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 418, 422, 423, 424, 426, 428, 429, 431, 451, 500, 501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511,
+]
 
 @login_required(login_url='/super-admin/super-login/')
 def DashboardPage(request):
@@ -19,18 +21,63 @@ def DashboardPage(request):
 
 @login_required(login_url='/super-admin/super-login/')
 def ExceptionPage(request):
-    exceptions = ExceptionRecord.objects.all().order_by('-created_at')
+    status_code = request.GET.get('status_code', None)
+    business_name = request.GET.get('business_name', None)
+    request_method = request.GET.get('request_method', None)
+    selected_date = request.GET.get('date', None)
+
+
+    query = {}
+    if status_code:
+        query['status_code__icontains'] = status_code
+    
+    if business_name:
+        query['tenant__domain__icontains'] = business_name
+    
+    if request_method:
+        query['method__icontains'] = request_method
+    
+    if selected_date:
+        query['created_at__date'] = selected_date
+
+    exceptions = ExceptionRecord.objects.filter(**query).order_by('-created_at')
     context={}
     context['exceptions'] = exceptions
+    context['status_codes'] = status_codes
     return render(request, 'SuperAdminPanel/pages/Exception/exception.html', context)
 
 @login_required(login_url='/super-admin/super-login/')
 def TenantsListingPage(request):
-    tenants = Tenant.objects.all()
+    user = request.GET.get('user', None)
+    domain = request.GET.get('domain', None)
+    status = request.GET.get('status', None)
+    query = {}
+    if user:
+        query['user__username__icontains'] = user
+    
+    if domain:
+        query['domain__icontains'] = domain
+    
+    if status:
+        ST_TYPES = {
+            'ALL' : {},
+            'active' : {
+                'is_active' : True,
+            },
+            'inactive' : {
+                'is_active' : False
+            },
+        }
+        s_type = ST_TYPES.get(status, '')
+        if s_type:
+            query.update(s_type)
+
+
+    tenants = Tenant.objects.filter(**query)
     context={}
     context['tenants'] = tenants
-    context['free_tenants'] = tenants.filter(is_ready = True, is_active = False)
-    context['creating_tenants'] = tenants.filter(is_ready = False, is_active = False)
+    context['free_tenants'] = Tenant.objects.filter(is_ready = True, is_active = False)
+    context['creating_tenants'] = Tenant.objects.filter(is_ready = False, is_active = False)
     return render(request, 'SuperAdminPanel/pages/Tenants/index.html', context)
 
 @login_required(login_url='/super-admin/super-login/')

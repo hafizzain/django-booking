@@ -38,7 +38,7 @@ class LanguageAdmin(admin.ModelAdmin):
 
 @admin.register(ExceptionRecord)
 class ExceptionRecordAdmin(admin.ModelAdmin):
-    list_display = ['id', 'short_text', 'is_resolved', 'created_at']
+    list_display = ['id', 'short_text', 'is_resolved', 'tenant', 'created_at']
     search_fields = ['text']
 
     def short_text(self, obj):
