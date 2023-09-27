@@ -240,8 +240,8 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated'
     ],
 
-    'DATE_FORMAT': "%d-%m-%Y",
-    'DATETIME_FORMAT': "%d-%m-%Y %H:%M:%S",
+    # 'DATE_FORMAT': "%d-%m-%Y",
+    # 'DATETIME_FORMAT': "%d-%m-%Y %H:%M:%S",
 
     
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
