@@ -243,7 +243,7 @@
               {% if redeem_option %}
               <div class="flex items-center justify-between text-primary text-sm font-bold">
                 <div>
-                  <p>Paid from {{ redeem_option }} {{ voucher_redeem_percentage }} %</p>
+                  <p>Paid from {{ redeem_option }} {% if voucher_redeem_percentage %}{{ voucher_redeem_percentage }} % {% endif %}</p>
                 </div>
                 <p>{{ total_discount }} {{ currency_code }}</p>
               </div>
