@@ -141,7 +141,10 @@ class SaleInvoice(models.Model):
                 'arabic_name' : f'{order.arabic_name}',
                 'price' : round(total_price, 2),
                 'quantity' : order.quantity,
+                
+                # below two fields have same data storing aat two different models
                 'discount_percentage': int(order.discount_percentage) if order.discount_percentage else None,
+                'checkout_discount_percentage':checkout.total_discount if checkout.total_discount else None
             }
 
             ordersData.append(data)
