@@ -271,7 +271,6 @@ class SaleInvoice(models.Model):
             data['redeem_option'] = checkout.redeem_option
             data['total_discount'] = checkout.total_discount
             data['voucher_redeem_percentage'] = checkout.voucher_redeem_percentage
-            data['checkout_discount_percentage'] = checkout.checkout_discount_percentage
 
         return data
 
