@@ -389,10 +389,40 @@ class EmployeeNameSerializer(serializers.ModelSerializer):
                 'location',
         ]
 
-class EmployeeSerializerWithoutID(EmployeeNameSerializer):
-
+class EmployeeSerializerWithoutID(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField(read_only=True)
+    designation = serializers.SerializerMethodField(read_only=True)
+    location = serializers.SerializerMethodField(read_only=True)
+    
+    def get_location(self, obj):
+        loc = obj.location.all()
+        return LocationSerializer(loc, many =True ).data
+    
+    def get_designation(self, obj):        
+        try:
+            designation = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return designation.designation 
+        except: 
+            return None
+    
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
+                return f'{url}{obj.image}'
+            except:
+                return obj.image
+        return None
     class Meta:
-        fields = ['id', 'full_name', 'image', 'designation', 'location']
+        model = Employee
+        fields = [
+                'id', 
+                'full_name',
+                'image',
+                'designation',
+                'location',
+        ]
 
 class StaffGroupSerializers(serializers.ModelSerializer):
 
