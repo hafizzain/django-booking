@@ -1,28 +1,23 @@
-from dataclasses import field
-from pyexpat import model
 from Appointment.serializers import UpdateAppointmentSerializer
-from Business.serializers.v1_serializers import AppointmentServiceSerializer
 from rest_framework import serializers
-from Appointment.models import Appointment, AppointmentCheckout, AppointmentService,AppointmentEmployeeTip
+from Appointment.models import AppointmentCheckout, AppointmentService,AppointmentEmployeeTip
 from Client.models import Client, Membership
 
 from Employee.models import Employee, EmployeeProfessionalInfo, EmployeeSelectedService
 from Business.models import BusinessAddress, BusinessTax
 from Order.models import Checkout, MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
-from django_tenants.utils import tenant_context
 from Utility.models import Currency, ExceptionRecord
 from Sale.Constants.Promotion import get_promotions
-from Product.models import ProductStock
 
 from Service.models import PriceService, Service, ServiceGroup
 from Invoices.models import SaleInvoice
-from django.db.models import Sum, F
+from django.db.models import F
 from Product.models import Product
 from Service.models import Service, ServiceTranlations
 from Utility.models import Language
 
-
+from mixins.serializers import CreatedAtFormat
 
 
 class PriceServiceSerializers(serializers.ModelSerializer):
@@ -1788,7 +1783,7 @@ class AppointmentTipsSerializer(serializers.ModelSerializer):
         model = AppointmentEmployeeTip
         fields = ['id','member','tip', 'member_name']
        
-class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
+class SaleOrders_CheckoutSerializer(CreatedAtFormat, serializers.ModelSerializer):
     product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
     service  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
     membership  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
