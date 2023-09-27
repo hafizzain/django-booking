@@ -357,6 +357,35 @@ def get_all_appointments(request):
     
     return paginator.get_paginated_response(serialize.data, 'appointments' )
 
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_recent_ten_appointments(request):
+    location_id = request.GET.get('location_id', None)
+
+
+    completed_flags = ['Done', 'Paid']
+    query = Q(is_blocked=False)
+    query &= Q(appointment_status__in=completed_flags)
+    query &= Q(business_address__id=location_id)
+
+    recent_ten_appointments = AppointmentService.objects.filter(query).order_by('-created_at')[:10]
+
+    serialized = AllAppoinmentSerializer(recent_ten_appointments, many=True)
+    
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Recent 10 Appointments',
+                'error_message' : None,
+                'appointments' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
