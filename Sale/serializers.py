@@ -17,8 +17,6 @@ from Product.models import Product
 from Service.models import Service, ServiceTranlations
 from Utility.models import Language
 
-from mixins.serializers import CreatedAtFormat
-
 
 class PriceServiceSerializers(serializers.ModelSerializer):
     currency_name = serializers.SerializerMethodField(read_only=True)
@@ -1783,7 +1781,7 @@ class AppointmentTipsSerializer(serializers.ModelSerializer):
         model = AppointmentEmployeeTip
         fields = ['id','member','tip', 'member_name']
        
-class SaleOrders_CheckoutSerializer(CreatedAtFormat, serializers.ModelSerializer):
+class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
     service  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
     membership  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
