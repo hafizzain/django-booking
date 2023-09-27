@@ -389,40 +389,6 @@ class EmployeeNameSerializer(serializers.ModelSerializer):
                 'location',
         ]
 
-class EmployeeNameSerializer1(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField(read_only=True)
-    designation = serializers.SerializerMethodField(read_only=True)
-    location = serializers.SerializerMethodField(read_only=True)
-    
-    def get_location(self, obj):
-        loc = obj.location.all()
-        return LocationSerializer(loc, many =True ).data
-    
-    def get_designation(self, obj):        
-        try:
-            designation = EmployeeProfessionalInfo.objects.get(employee=obj)
-            return designation.designation 
-        except: 
-            return None
-    
-    def get_image(self, obj):
-        if obj.image:
-            try:
-                request = self.context["request"]
-                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
-                return f'{url}{obj.image}'
-            except:
-                return obj.image
-        return None
-    class Meta:
-        model = Employee
-        fields = [
-                'id', 
-                'full_name',
-                'image',
-                'designation',
-                'location',
-        ]
 
 class StaffGroupSerializers(serializers.ModelSerializer):
 
@@ -762,7 +728,7 @@ class CommissionSerializer(serializers.ModelSerializer):
     def get_employee(self,obj):
         try:
             emp = Employee.objects.get(id = str(obj.employee))
-            return EmployeeNameSerializer1(emp, context=self.context).data
+            return EmployeeNameSerializer(emp, context=self.context).data
         except Exception as err:
             print(err)
             
