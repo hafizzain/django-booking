@@ -762,7 +762,7 @@ class CommissionSerializer(serializers.ModelSerializer):
     def get_employee(self,obj):
         try:
             emp = Employee.objects.get(id = str(obj.employee))
-            return EmployeeSerializerWithoutID(emp, context=self.context).data
+            return EmployeeNameSerializer(emp, context=self.context).data
         except Exception as err:
             print(err)
             
