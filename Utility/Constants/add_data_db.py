@@ -48,7 +48,7 @@ def add_countries(tenant=None):
         tenant = Tenant.objects.get(schema_name='public')
 
     with tenant_context(tenant):
-        with open('Utility/Files/countries_new.csv', 'r') as inp_file:
+        with open('Utility/Files/countries.csv', 'r') as inp_file:
             csv_file = csv.DictReader(inp_file, delimiter=',')
             countries_objs = []
             for row in csv_file:
