@@ -52,7 +52,6 @@ def add_countries(tenant=None):
             csv_file = csv.DictReader(inp_file, delimiter=',')
             countries_objs = []
             for row in csv_file:
-                print('===>', row)
                 country_instance = Country(
                     name = row['name'],
                     code = row['iso3'],
@@ -73,7 +72,6 @@ def add_states(tenant=None):
             csv_reader = csv.DictReader(inp_file, delimiter=',')
             states_objects = []
             for row in csv_reader:
-                print('====>', row)
                 country = Country.objects.get(name=row['country_name'])
                 state_instance = State(
                     country = country,
@@ -91,21 +89,29 @@ def add_cities(tenant=None):
         tenant = Tenant.objects.get(schema_name='public')
 
     with tenant_context(tenant):
+        """
+        There might be some issues with cities due to a bug in 
+        states file.
+        e.g : state_code does not match between state.csv and cities.csv
+
+        see the below condition:
+        >>>>    if state:
+                    ...
+        """
         with open('Utility/Files/cities.csv', 'r') as inp_file:
             csv_reader = csv.DictReader(inp_file, delimiter=',')
             cities_objects = []
             for row in csv_reader:
-                print('====>', row)
                 state = State.objects \
                             .filter(unique_code=row['state_code']) \
                             .select_related('country').first()
-                
-                city_instance = City(
-                    country = state.country,
-                    state = state,
-                    name = row['name'],
-                )
-                cities_objects.append(city_instance)
+                if state:
+                    city_instance = City(
+                        country = state.country,
+                        state = state,
+                        name = row['name'],
+                    )
+                    cities_objects.append(city_instance)
             City.objects.bulk_create(cities_objects)
 
     print('Cities Created')
