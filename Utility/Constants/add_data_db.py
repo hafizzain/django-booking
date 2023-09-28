@@ -72,6 +72,7 @@ def add_states(tenant=None):
             csv_reader = csv.DictReader(inp_file, delimiter='r')
             states_objects = []
             for row in csv_reader:
+                print('====>', row)
                 country = Country.objects.get(name=row['country_name'])
                 state_instance = State(
                     country = country,
@@ -93,6 +94,7 @@ def add_cities(tenant=None):
             csv_reader = csv.DictReader(inp_file, delimiter=',')
             cities_objects = []
             for row in csv_reader:
+                print('====>', row)
                 state = State.objects \
                             .filter(unique_code=row['state_code']) \
                             .select_related('country').first()
