@@ -52,6 +52,7 @@ def add_countries(tenant=None):
             csv_file = csv.DictReader(inp_file, delimiter=',')
             countries_objs = []
             for row in csv_file:
+                print('===>', row)
                 country_instance = Country(
                     name = row['name'],
                     code = row['iso3'],
@@ -69,7 +70,7 @@ def add_states(tenant=None):
 
     with tenant_context(tenant):
         with open('Utility/Files/states.csv', 'r') as inp_file:
-            csv_reader = csv.DictReader(inp_file, delimiter='r')
+            csv_reader = csv.DictReader(inp_file, delimiter=',')
             states_objects = []
             for row in csv_reader:
                 print('====>', row)
