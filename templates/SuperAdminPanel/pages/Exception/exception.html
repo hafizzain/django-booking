@@ -4,6 +4,35 @@
 </script>
 <div class="flex flex-col gap-6">
   <h1 class="font-semibold text-2xl">Exception Records</h1>
+  <form class="flex items-center justify-end gap-3" action="{% url 'ExceptionPage' %}">
+    <div>
+      <select name="status_code" class="px-4 py-2 border rounded-lg text-gray-700">
+        <option value="">All</option>
+        {% for code in status_codes %}
+          <option value="{{code}}" {% if request.GET.status_code == '{{code}}' %}selected{% endif %}>{{code}}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <input type="text" name="business_name" value="{{request.GET.business_name}}" class="border rounded-lg px-3 py-2 text-gray-700" placeholder="Business/Tenant Name">
+    </div>
+    <div>
+      <select name="request_method" class="px-4 py-2 border rounded-lg text-gray-700">
+        <option value="">All</option>
+        <option value="GET" {% if request.GET.request_method == 'GET' %}selected{% endif %} >GET</option>
+        <option value="POST" {% if request.GET.request_method == 'POST' %}selected{% endif %} >POST</option>
+        <option value="PUT" {% if request.GET.request_method == 'PUT' %}selected{% endif %} >PUT/Update</option>
+        <option value="DELETE" {% if request.GET.request_method == 'DELETE' %}selected{% endif %} >DELETE</option>
+      </select>
+    </div>
+    <div>
+      <input type="date" value="{{request.GET.date}}" class="border rounded-lg px-3 py-2 text-gray-700" name="date">
+    </div>
+    {% if request.GET %}
+      <a href="{% url 'ExceptionPage' %}" class="px-5 py-2 cursor-pointer rounded-full flex items-center gap-3 bg-[#5679ff] text-white">Clear</a>
+    {% endif %}
+    <button class="px-5 py-2 active_sidebar cursor-pointer rounded-full flex items-center gap-3 active_sidebar_active">Apply</button>
+  </form>
   <div class="border rounded-lg">
     <div class="overflow-x-auto">
       <div
