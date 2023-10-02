@@ -64,6 +64,7 @@ class State(models.Model):
     flag = models.ImageField(upload_to='Utility/country/', null=True, blank=True)
     is_flag_uploaded_s3 = models.BooleanField(default=False)
 
+    unique_id = models.CharField(max_length=256, null=True, blank=True)
     country_unique_id = models.CharField(max_length=256, null=True, blank=True)
 
     code = models.CharField(default='', max_length=20, null=True, blank=True)
