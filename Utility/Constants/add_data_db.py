@@ -1,5 +1,4 @@
-
-
+from itertools import islice
 import csv, json
 from Business.models import BusinessType
 from Tenants.models import Tenant
@@ -91,18 +90,27 @@ def add_cities(tenant=None):
 
     with tenant_context(tenant):
 
+        item_count = 0
+        batch_size = 1000
         with open('Utility/Files/cities.csv', 'r') as inp_file:
             csv_reader = csv.DictReader(inp_file, delimiter=',')
             cities_objects = []
             for row in csv_reader:
-                print(row)
                 city_instance = City(
                     country_unique_id = row['country_id'],
                     state_unique_id = row['state_id'],
                     name = row['name'],
                 )
                 cities_objects.append(city_instance)
-            City.objects.bulk_create(cities_objects)
+                item_count += 1
+                print('=========>', item_count)
+            
+            while True:
+                batch = list(islice(cities_objects, batch_size))
+                if not batch:
+                    break
+                City.objects.bulk_create(cities_objects)
+                print('=======> batch completed ', batch_size)
 
     print('Cities Created')
 
