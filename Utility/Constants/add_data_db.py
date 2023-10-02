@@ -103,15 +103,11 @@ def add_cities(tenant=None):
                 )
                 cities_objects.append(city_instance)
                 item_count += 1
-                print('=========>', item_count)
-            
-            while True:
-                batch = list(islice(cities_objects, batch_size))
-                if not batch:
-                    break
-                City.objects.bulk_create(cities_objects)
-                print('=======> batch completed ', batch_size)
 
+            print('===> Objects Created')
+            City.objects.bulk_create(cities_objects)
+            print('Database created')
+                
     print('Cities Created')
 
 
