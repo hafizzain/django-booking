@@ -38,7 +38,7 @@
           <div id="bar"></div>
         </div> -->
         <div class="box">
-          <div id="donut"></div>
+          <div id="country_wise_data_graph"></div>
         </div>
       </div>
 
@@ -61,6 +61,7 @@
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
 <script>
+  let get_country_users_url = '{{get_country_users_url}}'
   var data = {
     prices: [
       7114.25, 7126.6, 7116.95, 7203.7, 7233.75, 7451.0, 7381.15, 7348.95,
@@ -721,7 +722,7 @@
 
   var chartBar = new ApexCharts(document.querySelector("#bar"), optionsBar);
   chartBar.render();
-
+  
   var optionDonut = {
     chart: {
       type: "donut",
@@ -745,7 +746,7 @@
     },
     colors: colorPalette,
     title: {
-      text: "Department Sales",
+      text: "Top Country Clients",
       style: {
         fontSize: "18px",
       },
@@ -764,8 +765,22 @@
     },
   };
 
-  var donut = new ApexCharts(document.querySelector("#donut"), optionDonut);
-  donut.render();
+  
+  fetch(get_country_users_url)
+  .then(response =>{
+    return response.json()
+  })
+  .then(result =>{
+    let country_labels = result.country_labels
+    let country_values = result.country_values
+
+
+    optionDonut.labels = country_labels
+    optionDonut.series = country_values
+    console.log(optionDonut)
+    var donut = new ApexCharts(document.querySelector("#country_wise_data_graph"), optionDonut);
+    donut.render();
+  })
 
   function trigoSeries(cnt, strength) {
     var data = [];
@@ -778,6 +793,7 @@
 
     return data;
   }
+  
 
   var optionsLine = {
     chart: {

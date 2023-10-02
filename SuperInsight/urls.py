@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', insightViews.DashboardPage, name='DashboardPage'),
+    path('admin/get_country_wise_clients/', insightViews.GetCountryClients, name='GetCountryClients'),
     path('exception/', insightViews.ExceptionPage, name='ExceptionPage'),
     path('exception-detail/', insightViews.ExceptionDetailPage, name='ExceptionDetailPage'),
 
