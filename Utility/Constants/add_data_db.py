@@ -95,6 +95,7 @@ def add_cities(tenant=None):
             csv_reader = csv.DictReader(inp_file, delimiter=',')
             cities_objects = []
             for row in csv_reader:
+                print(row)
                 city_instance = City(
                     country_unique_id = row['country_id'],
                     state_unique_id = row['state_id'],
