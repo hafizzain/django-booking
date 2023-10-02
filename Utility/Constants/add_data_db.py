@@ -55,7 +55,8 @@ def add_countries(tenant=None):
                 country_instance = Country(
                     name = row['name'],
                     code = row['iso3'],
-                    unique_code = row['numeric_code']
+                    unique_code = row['numeric_code'],
+                    unique_id = row['id']
                 )
                 countries_objs.append(country_instance)
             
@@ -72,11 +73,11 @@ def add_states(tenant=None):
             csv_reader = csv.DictReader(inp_file, delimiter=',')
             states_objects = []
             for row in csv_reader:
-                country = Country.objects.get(name=row['country_name'])
                 state_instance = State(
-                    country = country,
                     name = row['name'],
                     unique_code = row['state_code'],
+                    unique_id = row['id'],
+                    country_unique_id = row['country_id']
                 )
                 states_objects.append(state_instance)
             State.objects.bulk_create(states_objects)
@@ -89,24 +90,15 @@ def add_cities(tenant=None):
         tenant = Tenant.objects.get(schema_name='public')
 
     with tenant_context(tenant):
-        """
-        There might be some issues with cities due to a bug in 
-        states file.
-        e.g : state_code does not match between state.csv and cities.csv
 
-        see the below condition:
-        >>>>    if state:
-                    ...
-        """
         with open('Utility/Files/cities.csv', 'r') as inp_file:
             csv_reader = csv.DictReader(inp_file, delimiter=',')
             cities_objects = []
-            states = State.objects.select_related('country')
             for row in csv_reader:
-                state = states.filter(unique_code=row['state_code']).first()
+                print(row)
                 city_instance = City(
-                    country = state.country,
-                    state = state,
+                    country_unique_id = row['country_id'],
+                    state_unique_id = row['state_id'],
                     name = row['name'],
                 )
                 cities_objects.append(city_instance)
