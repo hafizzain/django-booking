@@ -103,7 +103,7 @@ def add_cities(tenant=None):
             cities_objects = []
             states = State.objects.select_related('country')
             for row in csv_reader:
-                state = states.filter(unique_code=row['state_code'])
+                state = states.filter(unique_code=row['state_code']).first()
                 city_instance = City(
                     country = state.country,
                     state = state,
