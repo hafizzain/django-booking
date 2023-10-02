@@ -242,7 +242,7 @@ def add_invoiceTranslation(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_invoiceTranslation(request):
-    allInvoicTrans = InvoiceTranslation.objects.filter(status ='active')
+    allInvoicTrans = InvoiceTranslation.objects.all()
     
     if allInvoicTrans:
         translation_data = InvoiceTransSerializer(allInvoicTrans, many=True).data

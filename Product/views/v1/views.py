@@ -1167,12 +1167,6 @@ def get_products(request):
         'product_stock',
     ).filter(is_deleted=False).order_by('-created_at')
 
-    # region temporary commented
-    # if location_id:
-    #     location = BusinessAddress.objects.get(id=str(location_id))
-    #     all_products = all_products.filter(product_stock__location=location_id)
-    # endregion
-
     if search_text:
         #query building
         query = Q(name__icontains=search_text)

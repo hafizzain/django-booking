@@ -49,18 +49,15 @@ def add_countries(tenant=None):
 
     with tenant_context(tenant):
         with open('Utility/Files/countries.csv', 'r') as inp_file:
+            csv_file = csv.DictReader(inp_file, delimiter=',')
             countries_objs = []
-            for row in inp_file:
-                unique_code = row.split(',')[0]
-                code = row.split(',')[1]
-                name = row.split(',')[2].replace('\n', '').strip()
+            for row in csv_file:
                 country_instance = Country(
-                    name = name,
-                    code = code,
-                    unique_code = unique_code
+                    name = row['name'],
+                    code = row['iso3'],
+                    unique_code = row['numeric_code']
                 )
                 countries_objs.append(country_instance)
-                print(f'Added Country {name} ...')
             
             Country.objects.bulk_create(countries_objs)
     print('Countries Created')
@@ -72,24 +69,16 @@ def add_states(tenant=None):
 
     with tenant_context(tenant):
         with open('Utility/Files/states.csv', 'r') as inp_file:
+            csv_reader = csv.DictReader(inp_file, delimiter=',')
             states_objects = []
-            for row in inp_file:
-                row = row.split(',')
-                unique_code = row[0]
-                name = row[1]
-                country_unique_code = row[2].replace('\n', '').strip()
-                country = Country.objects.get(
-                    unique_code=country_unique_code
-                )
-
+            for row in csv_reader:
+                country = Country.objects.get(name=row['country_name'])
                 state_instance = State(
                     country = country,
-                    name = name,
-                    unique_code = unique_code,
+                    name = row['name'],
+                    unique_code = row['state_code'],
                 )
                 states_objects.append(state_instance)
-                print(f'Added State {name} ...')
-            
             State.objects.bulk_create(states_objects)
 
     print('States Created')
@@ -100,25 +89,27 @@ def add_cities(tenant=None):
         tenant = Tenant.objects.get(schema_name='public')
 
     with tenant_context(tenant):
-        with open('Utility/Files/cities.csv', 'r') as inp_file:
-            cities_objects = []
-            for index, row in enumerate(inp_file):
-                unique_code = row.split(',')[0]
-                name = row.split(',')[1]
-                state_unique_code = row.split(',')[2].replace('\n', '').strip()
+        """
+        There might be some issues with cities due to a bug in 
+        states file.
+        e.g : state_code does not match between state.csv and cities.csv
 
-                state = State.objects.get(
-                    unique_code=state_unique_code
-                )
+        see the below condition:
+        >>>>    if state:
+                    ...
+        """
+        with open('Utility/Files/cities.csv', 'r') as inp_file:
+            csv_reader = csv.DictReader(inp_file, delimiter=',')
+            cities_objects = []
+            states = State.objects.select_related('country')
+            for row in csv_reader:
+                state = states.filter(unique_code=row['state_code']).first()
                 city_instance = City(
                     country = state.country,
                     state = state,
-                    name = name,
-                    unique_code = unique_code
+                    name = row['name'],
                 )
                 cities_objects.append(city_instance)
-                print(f'Added City {index} ...')
-            
             City.objects.bulk_create(cities_objects)
 
     print('Cities Created')

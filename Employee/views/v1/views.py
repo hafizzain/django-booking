@@ -324,9 +324,6 @@ def get_Employees(request):
     designation = request.GET.get('designation', None)
     income_type = request.GET.get('income_type', None)
 
-
-
-
     query = Q(is_deleted=False)
     query &= Q(is_blocked=False)
 
@@ -347,7 +344,11 @@ def get_Employees(request):
         query &= Q(location=location)
      
 
-    all_employe= Employee.objects.filter(query).order_by('-created_at')
+    all_employe= Employee.objects \
+                    .filter(query) \
+                    .select_related('user', 'business','country', 'state', 'city', 'employee_permissions') \
+                    .prefetch_related('location') \
+                    .order_by('-created_at')
     all_employee_count = all_employe.count()
     
     page_count = all_employee_count / 10
@@ -1798,7 +1799,7 @@ def update_staff_group(request):
 @permission_classes([AllowAny])
 def get_attendence(request):
 
-    location_id = request.GET.get('location_id', None)
+    location_id = request.GET.get('location', None)
     search_text = request.GET.get('search_text', None)
     no_pagination = request.GET.get('no_pagination', None)
     employee_id = request.GET.get('employee_id', None)
@@ -1816,7 +1817,7 @@ def get_attendence(request):
     if search_text:
         query &= Q(full_name__icontains=search_text)
 
-    all_employe= Employee.objects.filter(query).order_by('-created_at')
+    all_employe = Employee.objects.filter(query).order_by('-created_at')
     all_employe_count= all_employe.count()
 
     page_count = all_employe_count / 10
@@ -3489,22 +3490,16 @@ def update_vacation(request):
 def create_vacation_emp(request):
     user = request.user
     business_id = request.data.get('business', None)
-    
     employee = request.data.get('employee', None)
     day = request.data.get('day', None)
-    
     start_time = request.data.get('start_time', None)
     end_time = request.data.get('end_time', None)
-    
     start_time_shift = request.data.get('start_time_shift', None)
     end_time_shift = request.data.get('end_time_shift', None)
-    
     from_date = request.data.get('from_date', None)
     to_date = request.data.get('to_date', from_date)
     note = request.data.get('note', None)
-
     is_vacation = request.data.get('is_vacation', None)
-    
     is_leave = request.data.get('is_leave', None)
     is_off = request.data.get('is_off', None)
     
@@ -3563,9 +3558,27 @@ def create_vacation_emp(request):
     from_date = datetime.strptime(from_date, "%Y-%m-%d")
     to_date = datetime.strptime(to_date, "%Y-%m-%d")
     diff = to_date - from_date 
-    #print(diff.days)
     working_sch = None
     days = int(diff.days)
+
+    is_vacation_exist = Vacation.objects.filter(
+        business = business,
+        employee = employee_id,
+        from_date = from_date,
+    ).first()
+
+    if is_vacation_exist:
+        return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Employee Vacation Already Exist',
+                'error_message' : None,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
     empl_vacation = Vacation.objects.create(
         business = business,
@@ -3595,7 +3608,6 @@ def create_vacation_emp(request):
             working_sch.vacation = empl_vacation
             working_sch.from_date = from_date
             working_sch.save()
-            working_sch = None
             
         else:   
             working_schedule = EmployeDailySchedule.objects.create(
@@ -3646,21 +3658,6 @@ def create_vacation_emp(request):
         },
         status=status.HTTP_200_OK
     )
-        
-    # serializers= ScheduleSerializer(working_schedule, context={'request' : request})
-    
-    # return Response(
-    #         {
-    #             'status' : True,
-    #             'status_code' : 201,
-    #             'response' : {
-    #                 'message' : 'Working Schedule Created Successfully!',
-    #                 'error_message' : None,
-    #                 'schedule' : serializers.data,
-    #             }
-    #         },
-    #         status=status.HTTP_201_CREATED
-    #     ) 
 
 
 

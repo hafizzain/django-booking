@@ -412,10 +412,11 @@ class ProductStockTransferSerializer(serializers.ModelSerializer):
     product = ProductOrderSerializer()
     from_location = BusiessAddressAppointmentSerializer()
     to_location = BusiessAddressAppointmentSerializer()
+    created_at = serializers.DateTimeField(format="%d-%m-%Y")
     
     class Meta:
         model = ProductStockTransfer
-        fields = ['id', 'from_location', 'to_location', 'product', 'quantity','note']
+        fields = ['id', 'from_location', 'to_location', 'product', 'quantity','note', 'created_at']
 class ProductOrderStockReportSerializer(serializers.ModelSerializer):
     
     from_location = BusiessAddressAppointmentSerializer()

@@ -117,7 +117,6 @@ class SaleInvoice(models.Model):
         orders.extend(VoucherOrder.objects.filter(checkout = checkout).annotate(name = F('voucher__name'), arabic_name=F('voucher__arabic_name')))
         orders.extend(MemberShipOrder.objects.filter(checkout = checkout).annotate(name = F('membership__name'), arabic_name=F('membership__arabic_name')))
 
-        # .values('name', 'arabic_name', 'quantity', 'current_price', 'total_price', 'discount_price', 'price')
         ordersData = []
         for order in orders:
             # pricing order for invoice PDF
@@ -141,8 +140,10 @@ class SaleInvoice(models.Model):
                 'name' : f'{order.name}',
                 'arabic_name' : f'{order.arabic_name}',
                 'price' : round(total_price, 2),
-                'quantity' : order.quantity
+                'quantity' : order.quantity,
+                'discount_percentage': int(order.discount_percentage) if order.discount_percentage else None,
             }
+
             ordersData.append(data)
 
         return ordersData
@@ -212,6 +213,8 @@ class SaleInvoice(models.Model):
                 sub_total = sum([order['price'] for order in order_items])
                 tips_total = sum([t['tip'] for t in order_tips])
 
+                checkout_redeem_data = self.get_checkout_redeemed_data()
+
                 context = {
                     'client': self.client,
                     'invoice_by' : self.user.user_full_name if self.user else '',
@@ -231,7 +234,9 @@ class SaleInvoice(models.Model):
                     'total_trans': invoice_trans['total'] if invoice_trans else '',
                     'payment_type_trans': invoice_trans['payment_method'] if invoice_trans else '',
                     'payment_type': self.payment_type,
+                    'location':self.location.address_name,
                     **tax_details,
+                    **checkout_redeem_data,
                 }
                 schema_name = connection.schema_name
                 schema_dir = f'{settings.BASE_DIR}/media/{schema_name}'
@@ -254,6 +259,21 @@ class SaleInvoice(models.Model):
                 self.file = no_media_path
 
         super(SaleInvoice, self).save(*args, **kwargs)
+
+    def get_checkout_redeemed_data(self):
+
+        data = dict()
+
+        checkout = Checkout.objects.filter(
+            id=self.checkout
+        ).first()
+
+        if checkout:
+            data['redeem_option'] = checkout.redeem_option
+            data['total_discount'] = checkout.total_discount
+            data['voucher_redeem_percentage'] = checkout.voucher_redeem_percentage
+
+        return data
 
     def get_invoice_translations(self):
         """

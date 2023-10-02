@@ -62,10 +62,6 @@ class LocationSerializer(serializers.ModelSerializer):
      
         
 class EmployeInformationsSerializer(serializers.ModelSerializer):
-    # services = serializers.SerializerMethodField(read_only=True)
-    
-    # def get_services(self, obj):
-    #     return ServicesEmployeeSerializer(obj.services, many = True).data
     
     class Meta:
         model = EmployeeProfessionalInfo
@@ -393,6 +389,7 @@ class EmployeeNameSerializer(serializers.ModelSerializer):
                 'location',
         ]
 
+
 class StaffGroupSerializers(serializers.ModelSerializer):
 
     staff_permission = serializers.SerializerMethodField()
@@ -589,6 +586,12 @@ class PayrollSerializers(serializers.ModelSerializer):
             #'employee',
             'employee'
             ]
+        
+class LocationSerializerOP(serializers.ModelSerializer):
+
+    class Meta:
+        model = BusinessAddress
+        fields = ['id']
 
 class singleEmployeeSerializer(serializers.ModelSerializer):
     salary = serializers.SerializerMethodField(read_only=True)
@@ -600,33 +603,25 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
     
     country_name = serializers.SerializerMethodField(read_only=True)
     state_name = serializers.SerializerMethodField(read_only=True)
-    city_name = serializers.SerializerMethodField(read_only=True)   
+    city_name = serializers.SerializerMethodField(read_only=True)
     services = serializers.SerializerMethodField(read_only=True)
         
     location = serializers.SerializerMethodField()
     total_sale = serializers.SerializerMethodField()
     
     def get_total_sale(self,obj):
-        try:
-            sale = total_sale_employee(obj)
-            return sale
-        except Exception as err:
-            return str(err)
+        return total_sale_employee(obj)
+
     
     def get_location(self, obj):
-        try:
-            all_location = obj.location.all()
-            return LocationSerializer(all_location, many = True).data
-            # return EmployeeServiceSerializer(obj.services).data
-        except Exception as err:
-            print(err)
-            None
+        all_location = obj.location.all()
+        return LocationSerializerOP(all_location, many = True).data
+
 
     def get_services(self, obj):
         try:
             service = EmployeeSelectedService.objects.filter(employee=obj)
             return EmployeeServiceSerializer(service, many = True).data
-            # return EmployeeServiceSerializer(obj.services).data
         except Exception as err:
             print(err)
             None
@@ -698,6 +693,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
         model =Employee
         fields = [
             'id',
+            'total_sale',
             'image',
             'salary',
             'email',
@@ -716,8 +712,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'services',
             'created_at' ,
             'location', 
-            'total_sale',
-            'is_active',  
+            'is_active',
             ]   
 
 class CategoryCommissionSerializer(serializers.ModelSerializer):
@@ -1005,9 +1000,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     income_type = serializers.SerializerMethodField(read_only=True)
     salary = serializers.SerializerMethodField(read_only=True)
-    total_earning = serializers.SerializerMethodField(read_only=True)
-    #employe_id = serializers.SerializerMethodField(read_only=True)
-    
+    total_earning = serializers.SerializerMethodField(read_only=True)    
     location = serializers.SerializerMethodField(read_only=True)
     sallaryslip = serializers.SerializerMethodField(read_only=True)
     total_hours = serializers.SerializerMethodField(read_only=True)
@@ -1078,13 +1071,6 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
                 total_earning += (total_hours * salary)
 
             return total_earning
-            # Hourly_Rate
-            # Daily_Income
-            # Monthly_Salary
-
-            # is_leave
-            # is_off
-            # is_vacation
 
     def get_salary(self, obj):        
         try:
@@ -1141,6 +1127,8 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         model = Employee
         fields = ['id', 'employee_id','is_active','full_name','image','location','sallaryslip',
                   'schedule','created_at', 'income_type', 'salary', 'total_earning', 'total_hours']
+        
+
 class Payroll_Working_device_attendence_ScheduleSerializer(serializers.ModelSerializer):    
     schedule =  serializers.SerializerMethodField(read_only=True)    
     

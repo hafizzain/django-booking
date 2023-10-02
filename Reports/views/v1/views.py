@@ -32,18 +32,20 @@ from Reports.serializers import DiscountPromotionSalesReport_serializer
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_reports_staff_target(request):
+    location_id = request.GET.get('location_id', None)
+    employee_id = request.GET.get('employee_id', None)
+    no_pagination = request.GET.get('no_pagination', None)
     month = request.GET.get('month', None)
     year = request.GET.get('year', None)
-    no_pagination = request.GET.get('no_pagination', None)
-    employee_id = request.GET.get('employee_id', None)
 
 
-    
-    employee = Employee.objects.filter(is_deleted=False).order_by('-created_at')
+    query = Q(is_deleted=False)
+    query &= Q(location__id=location_id)
 
     if employee_id:
-        employee = employee.filter(id=str(employee_id))
+        query &= Q(id=str(employee_id))
 
+    employee = Employee.objects.filter(query).order_by('-created_at')
     serialized = list(ReportsEmployeSerializer(employee,  many=True, context={'request' : request, 'month': month, 'year': year}).data)
 
     paginator = CustomPagination()

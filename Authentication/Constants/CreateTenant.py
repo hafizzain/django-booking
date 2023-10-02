@@ -1,6 +1,3 @@
-
-
-
 import json
 from Authentication.Constants.Domain import ssl_sub_domain
 from Client.models import Client
@@ -8,7 +5,10 @@ from Employee.Constants.Add_Employe import add_employee
 from Employee.models import EmployeDailySchedule, Employee, EmployeeProfessionalInfo, EmployeeSelectedService
 from Permissions.models import EmployePermission
 from Tenants.models import Tenant, Domain
-from Business.models import Business, BusinessAddress, BusinessOpeningHour, BusinessPaymentMethod, BusinessType
+from Business.models import (Business, BusinessAddress, BusinessOpeningHour,
+                             ClientNotificationSetting, AdminNotificationSetting,
+                             StockNotificationSetting, StaffNotificationSetting,
+                             BusinessPaymentMethod, BusinessType)
 from Profile.models import Profile
 from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSIONS_MODEL_FIELDS
 from Utility.Constants.add_data_db import add_business_types, add_countries, add_software_types, add_states, add_cities, add_currencies, add_languages
@@ -66,7 +66,6 @@ def create_tenant_user(tenant=None, data=None):
         user.save()
         return user
 
-
 def create_tenant_profile(tenant_user=None, data=None, tenant=None):
     if tenant_user is None or tenant is None:
         return None
@@ -90,7 +89,6 @@ def create_tenant_profile(tenant_user=None, data=None, tenant=None):
         )
         return user_profile
 
-
 def create_tenant_business(tenant_user=None, tenant_profile=None, tenant=None, data=None):
     if tenant_user is None or tenant is None or tenant_profile is None:
         return None
@@ -103,7 +101,6 @@ def create_tenant_business(tenant_user=None, tenant_profile=None, tenant=None, d
         )
         return user_business
 
-
 def create_tenant_user_token(tenant_user=None, tenant=None):
     print(tenant_user, tenant)
     if tenant_user is None or tenant is None :
@@ -114,8 +111,7 @@ def create_tenant_user_token(tenant_user=None, tenant=None):
             user=tenant_user,
         )
         user_token.save()
-        return user_token
-        
+        return user_token    
 
 def create_tenant_account_type(tenant_user=None, tenant=None, account_type='Business'):
     if tenant_user is None or tenant is None :
@@ -239,23 +235,6 @@ def create_employee(tenant=None, user = None, business=None):
                 except Exception as err:
                     pass
                 auto_generate_email = f'{email_check}@gmail.com'
-                
-                # empl_permission = EmployePermission.objects.create(employee=employee)
-                # for permit in ALL_PERMISSIONS:
-                
-                #     value = request.data.get(permit, None)
-                #     #employees_error.append(value)
-                #     if value is not None:
-                #         if type(value) == str:
-                #             value = json.loads(value)
-                #         for opt in value:
-                #             try:
-                #                 option = GlobalPermissionChoices.objects.get(text=opt)
-                #                 PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
-                #             except Exception as err:
-                #                 pass
-                #                 #employees_error.append(str(value))
-                # empl_permission.save()
                 
                 user = User.objects.create(
                     first_name = user.full_name,
@@ -446,50 +425,16 @@ def default_payment_method(tenant=None, user = None, business=None):
                     method_type = pay,
                    
                 )
-                
 
-# def create_service_user(tenant=None, user = None, business=None):
-#     if tenant is not None and user is not None and business is not None:
-#         with tenant_context(tenant):
-
-#             service_list = [
-#                 {
-#                     'name' : 'Car wash',
-#                     'price' : 355
-#                 },
-#                 {
-#                     'name' : 'Haircolor',
-#                     'price' : 123
-#                 },
-#                 {
-#                     'name' : 'Bridal Makeup',
-#                     'price' : 87
-#                 },
-#                 {
-#                     'name' : 'Menicure',
-#                     'price' : 1997
-#                 },
-#                 {
-#                     'name' : 'Pedicure',
-#                     'price' : 9886
-#                 },
-#                 {
-#                     'name' : 'Bike Service',
-#                     'price' : 1223
-#                 },
-#                 {
-#                     'name' : 'Bike Wash',
-#                     'price' : 1124
-#                 },
-#             ]
-
-#             for service in service_list :
-#                 test = Service.objects.create(
-#                         user = user, 
-#                         name=service['name'],
-#                         price= service['price']
-#                     )  
-
+def create_busines_notification_settings(tenant=None, business=None):
+    if tenant is None:
+        return
+    
+    with tenant_context(tenant):
+        StaffNotificationSetting.objects.create(business=business, user=business.user, is_active=True)
+        ClientNotificationSetting.objects.create(business=business, user=business.user, is_active=True)
+        AdminNotificationSetting.objects.create(business=business, user=business.user, is_active=True)
+        StockNotificationSetting.objects.create(business=business, user=business.user, is_active=True)
         
 def add_data_to_tenant_thread(tenant=None):
     if tenant is None:
@@ -619,12 +564,18 @@ def create_tenant(request=None, user=None, data=None):
                 payment_thrd.start()
             except:
                 pass
-            
-            try:
-                service_thrd = Thread(target=create_client, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
-                service_thrd.start()
-            except:
-                pass
+
+
+            """
+                            Comment Reason : 
+                            Now we don't want to create client on tenant creation
+                            (Discussed in meeting - 22 Sep, 2023)
+            """
+            # try:
+            #     service_thrd = Thread(target=create_client, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
+            #     service_thrd.start()
+            # except:
+            #     pass
             
             try:
                 service_thrd = Thread(target=create_ServiceGroup, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
@@ -634,6 +585,12 @@ def create_tenant(request=None, user=None, data=None):
             try:
                 service_thrd = Thread(target=create_emp_schedule, kwargs={'tenant' :user_tenant , 'user' : t_user, 'business': t_business})
                 service_thrd.start()
+            except Exception as err:
+                pass
+
+            try:
+                notification_thread = Thread(target=create_busines_notification_settings, kwargs={'tenant': user_tenant, 'business':t_business})
+                notification_thread.start()
             except Exception as err:
                 pass
             

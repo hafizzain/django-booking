@@ -1863,14 +1863,19 @@ def create_memberships(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_memberships(request):
+    search_text = request.GET.get('search_text')
     all_memberships= Membership.objects.all().order_by('-created_at')
     all_memberships_count = all_memberships.count()
+
+    if search_text:
+        all_memberships = all_memberships.filter(name__icontains=search_text)
     
-    page_count = all_memberships_count / 20
+    per_pege_results = 10
+    page_count = all_memberships_count / per_pege_results
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_memberships, 20)
+    paginator = Paginator(all_memberships, per_pege_results)
     page_number = request.GET.get("page") 
     all_memberships = paginator.get_page(page_number)
 
@@ -1883,7 +1888,7 @@ def get_memberships(request):
                 'message' : 'All Membership',
                 'count':all_memberships_count,
                 'pages':page_count,
-                'per_page_result':20,
+                'per_page_result':per_pege_results,
                 'error_message' : None,
                 'membership' : serialized.data
             }
@@ -2286,14 +2291,19 @@ def create_vouchers(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_vouchers(request):
+    search_text = request.GET.get('search_text')
     all_voucher= Vouchers.objects.all().order_by('-created_at')
     all_voucher_count= all_voucher.count()
 
-    page_count = all_voucher_count / 20
+    if search_text:
+        all_voucher = all_voucher.filter(name__icontains=search_text)
+
+    per_page_results = 10
+    page_count = all_voucher_count / per_page_results
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_voucher, 20)
+    paginator = Paginator(all_voucher, per_page_results)
     page_number = request.GET.get("page") 
     all_voucher = paginator.get_page(page_number)
 
@@ -2306,7 +2316,7 @@ def get_vouchers(request):
                 'message' : 'All Voucher',
                 'count':all_voucher_count,
                 'pages':page_count,
-                'per_page_result':20,
+                'per_page_result':per_page_results,
                 'error_message' : None,
                 'vouchers' : serialized.data
             }
