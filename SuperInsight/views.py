@@ -10,6 +10,8 @@ from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from threading import Thread
 from Utility.Constants.Tenant.create_dummy_tenants import CreateDummyTenants
+from django_tenants.utils import tenant_context
+from Client.models import Client
 
 status_codes = [
     100, 101, 200, 201, 202, 203, 204, 205, 206, 207, 208, 226, 300, 301, 302, 303, 304, 305, 306, 307, 308, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 418, 422, 423, 424, 426, 428, 429, 431, 451, 500, 501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511,
@@ -17,7 +19,25 @@ status_codes = [
 
 @login_required(login_url='/super-admin/super-login/')
 def DashboardPage(request):
-    return render(request, 'SuperAdminPanel/pages/dashboard/dashboard.html')
+    tenants = Tenant.objects.filter(
+        is_active = True,
+        is_ready = True,
+        is_blocked = False,
+        is_deleted = False,
+    )
+    clients = 0
+    for tenant in tenants:
+        with tenant_context(tenant):
+            tenant_clients = Client.objects.filter(
+                is_deleted = False,
+                is_active = True,
+                is_blocked = False,
+            )
+            clients += tenant_clients.count()
+    context = {
+        'total_clients' : clients
+    }
+    return render(request, 'SuperAdminPanel/pages/dashboard/dashboard.html', context)
 
 @login_required(login_url='/super-admin/super-login/')
 def ExceptionPage(request):
