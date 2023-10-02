@@ -32,7 +32,7 @@ class EmployeeNameSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -97,7 +97,7 @@ class GETStoreTargetSerializers(serializers.ModelSerializer):
     
     def get_tier(self,obj):
         try:
-            tier = TierStoreTarget.objects.filter(storetarget = obj, )#is_primary = True )
+            tier = TierStoreTarget.objects.filter(storetarget = obj, )
             return TierStoreTargetSerializers(tier, many = True ,context=self.context).data
         except Exception as err:
             print(err)

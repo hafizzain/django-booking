@@ -10,7 +10,7 @@ from Product.Constants.index import tenant_media_base_url
 from django.db.models import Sum, Q
 from django.db.models.functions import Coalesce
 
-from Order.models import MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder
+from Order.models import MemberShipOrder, ProductOrder, ServiceOrder, VoucherOrder, Order
 from Sale.serializers import ProductOrderSerializer, SaleOrder_ProductSerializer, SaleOrder_ServiceSerializer, CheckoutTipsSerializer, SaleOrder_MemberShipSerializer, SaleOrder_VoucherSerializer, ClientSerializer
 from Service.models import Service, ServiceGroup
 from TragetControl.models import RetailTarget, ServiceTarget, StaffTarget, StoreTarget, TierStoreTarget
@@ -18,7 +18,7 @@ from TragetControl.serializers import RetailTargetSerializers, StaffTargetSerial
 from Utility.Constants.Data.months import MONTH_DICT
 from .models import DiscountPromotionSalesReport
 from Invoices.models import SaleInvoice
-from Sale.serializers import SaleInvoiceSerializer
+from Sale.serializers import SaleInvoiceSerializer, CheckoutSerializer
 
 class ServiceOrderSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
@@ -197,7 +197,7 @@ class ReportsEmployeSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -257,11 +257,11 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
                 vouchers_commissions += full_commission
 
         data = {
-            'product_sale_price': total_product_price,
-            'commission_total': commission_total,
-            'service_commission': service_commissions,
-            'product_commission': product_commission,
-            'voucher_commission': vouchers_commissions,
+            'product_sale_price': round(total_product_price, 2),
+            'commission_total': round(commission_total, 2),
+            'service_commission': round(service_commissions, 2),
+            'product_commission': round(product_commission, 2),
+            'voucher_commission': round(vouchers_commissions, 2)
         }
         return data
         
@@ -468,7 +468,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -910,7 +910,7 @@ class StaffCommissionReport(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -922,22 +922,9 @@ class StaffCommissionReport(serializers.ModelSerializer):
                    ]
         
 class ServiceGroupReport(serializers.ModelSerializer):
-    # service_sale_price = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
     service_target = serializers.SerializerMethodField(read_only=True)
     total_service_sales = serializers.SerializerMethodField(read_only=True)
-    # services_sales = serializers.SerializerMethodField(read_only=True)
-    # appointment_sales = serializers.SerializerMethodField(read_only=True)
-    # total_service_sales = serializers.SerializerMethodField(read_only=True)
-
-    # def get_appointment_sales(self, obj):
-    #     return obj.appointment_sales
-    
-    # def get_total_service_sales(self, obj):
-    #     return obj.appointment_sales + obj.services_sales
-    
-    # def get_services_sales(self, obj):
-    #     return obj.services_sales
     
     def get_service(self, obj):
         ser = obj.services.all()
@@ -962,7 +949,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
                 created_date = ord.year.date() 
                 if created_date.month == date_obj.month and created_date.year == date_obj.year:
                     ser_target += float(ord.service_target)            
-            return ser_target
+            return round(ser_target, 2)
             
         except Exception as err:
             return str(err)        
@@ -973,9 +960,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
             month = self.context["month"]
             location = self.context["location"]
             ser_target = 0
-                        
             services_ids = obj.services.all().values_list('id', flat=True)
-
             services_orders = ServiceOrder.objects.filter(
                 service__id__in = services_ids,
                 created_at__year = year,
@@ -993,7 +978,6 @@ class ServiceGroupReport(serializers.ModelSerializer):
                 ser_target += float(price) * float(order.quantity)
             
             appointment_services = AppointmentService.objects.filter(
-                # appointment_service__appointment_status = 'Done',
                 Q(appointment_status = 'Done') |
                 Q(appointment_status = 'Paid'),
                 service__id__in = services_ids,
@@ -1007,7 +991,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
                 ser_target += float(price)
 
 
-            return ser_target
+            return round(ser_target, 2)
         except Exception as err:
             return str(err)
     class Meta:
@@ -1136,7 +1120,6 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
             "id": f'{commission_instance.id}',
             "quantity": commission_instance.quantity,
             "name": commission_instance.item_name,
-            # "price": commission_instance.total_price,
             "price": commission_instance.sale_value,
             "order_type": commission_instance.commission_category,
             "payment_type": "Cash",
@@ -1146,20 +1129,12 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
     
     
     def get_invoice(self, obj):
-        # try:
-        #     checkoutt = Checkout.objects.get(id__icontains=obj.sale_id)
-        # except:
-        #     checkoutt = AppointmentCheckout.objects.get(id=obj.sale_id)
-        
-        # if checkoutt:
         try:
             invoice = SaleInvoice.objects.get(checkout__icontains = obj.sale_id)
             serializer = SaleInvoiceSerializer(invoice, context=self.context)
             return serializer.data
         except Exception as e:
             return str(e)
-        # else:
-        #     return 'invoice not found'
 
     
     def get_tip(self, commission_instance):
@@ -1181,8 +1156,8 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EmployeeCommission
-        fields = ['id', 'location', 'employee', 'order_type', 'commission_rate', 'commission', 'created_at', 'sale', 'sale_id', 'tip', 'invoice']
-        #  'location', 'commission_rate',
+        fields = ['id', 'location', 'employee', 'order_type', 'commission_rate', 'commission', 
+                  'created_at', 'sale', 'sale_id', 'tip', 'invoice']
 
 
 class DiscountPromotion_SaleInvoiceSerializer(serializers.ModelSerializer):
@@ -1192,7 +1167,7 @@ class DiscountPromotion_SaleInvoiceSerializer(serializers.ModelSerializer):
         if obj.file:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=False)
                 return f'{url}{obj.file}'
             except:
                 return f'{obj.file}'
@@ -1219,6 +1194,12 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
     membership_service = serializers.SerializerMethodField(read_only=True)
     
     tip = serializers.SerializerMethodField(read_only=True)
+    checkout = serializers.SerializerMethodField(read_only=True)
+
+    def get_checkout(self, obj):
+        checkout = Checkout.objects.filter(id=obj.checkout_id).first()
+        return CheckoutSerializer(checkout).data
+    
         
     def get_membership(self, obj):
         
@@ -1341,7 +1322,8 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
     class Meta:
         model = DiscountPromotionSalesReport
         fields = [
-            'id', 
+            'id',
+            'checkout_id',
             'checkout_type', 
             'promotion', 
             'invoice', 
@@ -1357,8 +1339,8 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
             'ids', 
             'membership_product', 
             'membership_service', 
-            'tip'
-            
+            'tip',
+            'checkout',
         ]
 
         

@@ -1,10 +1,7 @@
-
-
-
 from Tenants.models import Tenant
 
 from django.conf import settings
-from Authentication.Constants.CreateTenant import add_business_types, add_software_types, add_data_to_tenant_thread
+from Authentication.Constants.CreateTenant import add_business_types, add_software_types
 from Utility.Constants.add_data_db import add_business_types, add_countries, add_software_types, add_states, add_cities, add_currencies, add_languages
 
 

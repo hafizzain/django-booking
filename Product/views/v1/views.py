@@ -1,32 +1,33 @@
-from cmath import cos
+import datetime
+import json
+import csv
 from threading import Thread
+
 from django.http import HttpResponse
-from Product.Constants.Add_Product import add_product_remaing
-from Utility.models import Currency, NstyleFile, ExceptionRecord
+from django.db.models.functions import Cast
+from django.db.models import CharField
+from django.core.paginator import Paginator
+from django.db.models import Q
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from django.db.models import Q
-import json
-import csv
-import datetime
-from rest_framework.views import APIView
-from rest_framework.settings import api_settings
-
 
 from NStyle.Constants import StatusCodes
-
+from Product.models import ProductTranslations
+from Utility.models import Language
+from Sale.Constants.Custom_pag import CustomPagination
+from Product.Constants.Add_Product import add_product_remaing
+from Utility.models import Currency, NstyleFile, ExceptionRecord
+from Business.models import Business, BusinessAddress, BusinessVendor
 from Product.models import ( Category, Brand, CurrencyRetailPrice , Product, ProductMedia, ProductOrderStockReport, ProductStock
                             , OrderStock, OrderStockProduct, ProductConsumption, ProductStockTransfer
                            )
-from Business.models import Business, BusinessAddress, BusinessVendor
-from Product.serializers import (CategorySerializer, BrandSerializer, ProductOrderStockReportSerializer, ProductSerializer, ProductStockSerializer, ProductWithStockSerializer
-                                 ,OrderSerializer , OrderProductSerializer, ProductConsumptionSerializer, ProductStockTransferSerializer, ProductOrderSerializer, ProductStockReportSerializer
+from Product.serializers import (CategorySerializer, BrandSerializer, ProductSerializer, ProductWithStockSerializer
+                                 ,OrderSerializer , OrderProductSerializer, ProductConsumptionSerializer,
+                                 ProductStockTransferSerializer, ProductStockReportSerializer
                                  )
-from django.core.paginator import Paginator
-from Product.models import ProductTranslations
-from Utility.models import Language
+
 
 
 
@@ -68,7 +69,6 @@ def get_test_api(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def export_csv(request):
-        #product = ProductStock.objects.all()
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="ProductStock.csv"'
 
@@ -108,13 +108,10 @@ def import_brand(request):
             website =  row[1].strip('"')
             status =  row[2].strip('"')
             description =  row[3].strip('"')
-            #image =  row[4].strip('"')
             brand = Brand.objects.create(
-                #user = user,
                 name=name,
                 description=description,
                 website=website,
-                #image=image,
             )
             if status == 'Active':
                 brand.is_active = True
@@ -136,7 +133,6 @@ def import_product(request):
         file = product_csv
     )           
     
-    #print(file.file.path)
     with open( file.file.path , 'r', encoding='utf-8') as imp_file:
         for index, row in enumerate(imp_file):
             if index == 0:
@@ -190,7 +186,6 @@ def import_product(request):
                         }
                     }
                 )
-                # Q(name__icontains=brand) | Q(is_active__icontains= True) | Q(website__isnull=True)
             else:
                 return Response(
                 {
@@ -220,12 +215,6 @@ def import_product(request):
                     }
             )
             
-            
-            # Category.objects.create(
-            #     product=product, 
-                
-            # )
-            
             ProductStock.objects.create(
                 user=user,
                 product=product,
@@ -242,7 +231,6 @@ def import_product(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def import_category(request): 
-    user = request.user
     category_csv = request.data.get('file', None)
 
 
@@ -263,7 +251,6 @@ def import_category(request):
             
             category = Category.objects.create(
                 name = name,
-                #is_active=active,
             )  
             if active == 'Active':
                category.active = True
@@ -278,20 +265,21 @@ def import_category(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_categories(request):
-    all_categories = Category.objects.all().order_by('-created_at')
-    serialized = CategorySerializer(all_categories, many=True)
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Categories',
-                'error_message' : None,
-                'categories' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    search_text = request.query_params.get('search_text', None)
+    no_pagination = request.query_params.get('no_pagination', None)
+
+    all_categories = Category.objects.all()
+    if search_text:
+        all_categories = all_categories.filter(name__icontains=search_text)
+
+    serialized = list(CategorySerializer(all_categories, many=True).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'categories')
+
+    return response
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -460,20 +448,20 @@ def delete_category(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_brands(request):
+    search_text = request.query_params.get('search_text', None)
+    no_pagination = request.query_params.get('no_pagination', None)
+
     all_brands = Brand.objects.all()
-    serialized = BrandSerializer(all_brands, many=True, context={'request' : request})
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Brands',
-                'error_message' : None,
-                'brands' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    if search_text:
+        all_brands = all_brands.filter(name__icontains=search_text)
+        
+    serialized = list(BrandSerializer(all_brands, many=True, context={'request' : request}).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'brands')
+    return response
 
 
 @api_view(['POST'])
@@ -497,7 +485,6 @@ def add_brand(request):
                     'fields' : [
                         'name',
                         'is_active',
-                        # 'image',
                     ]
                 }
             },
@@ -656,13 +643,10 @@ def add_product(request):
     vendor_id = request.data.get('vendor', None)
     category_id = request.data.get('category', None)
     product_size = request.data.get('size', None)
-    #image = request.data.getlist('image', None)
     brand_id = request.data.get('brand', None)
     product_type = request.data.get('product_type', 'Sellable')
     name = request.data.get('name', None)
     cost_price = request.data.get('cost_price', None)
-    full_price = request.data.get('full_price', None)
-    sell_price = request.data.get('sell_price', None)
     tax_rate = request.data.get('tax_rate', None)
     short_description = request.data.get('short_description', None)
     description = request.data.get('description', None)
@@ -673,20 +657,7 @@ def add_product(request):
     
     #RetailPrice
     currency_retail_price = request.data.get('currency_retail_price', None)
-    
-    # location = request.data.get('location', None)
-
-    # Product Stock Details 
-    # quantity = request.data.get('quantity', None)
-    # sellable_quantity = request.data.get('sellable_quantity', None)
-    # consumable_quantity = request.data.get('consumable_quantity',None)
-    # unit = request.data.get('unit', None)
-    # product_unit = request.data.get('product_unit', None)
-    # amount = request.data.get('amount', None)
-    stock_status = request.data.get('stock_status', True)
-
-    #turnover = request.data.get('turnover', None)
-   
+    stock_status = request.data.get('stock_status', True)   
     alert_when_stock_becomes_lowest = request.data.get('alert_when_stock_becomes_lowest', None)
     invoices = request.data.get('invoices', None)
 
@@ -805,8 +776,6 @@ def add_product(request):
         product_type = product_type,
         name = name,
         cost_price = cost_price,
-        #full_price = full_price,
-        #sell_price = sell_price,
         product_size=product_size,
         tax_rate = tax_rate,
         short_description = short_description,
@@ -835,8 +804,6 @@ def add_product(request):
             pass
         
         for retail in currency_retail_price:
-            #currency_id = retail['currency']
-            #price = retail['retail_price']
             
             try:
                 currency_id= Currency.objects.get(id=retail['currency'])
@@ -850,15 +817,12 @@ def add_product(request):
             )
             except Exception as err:
                 print(str(err))
-                #ExceptionRecord.objects.create(is_resolved = False, text=f'currency not found product line 866  ' )
             
                     
     location_quantities = request.data.get('location_quantities', None)
     if location_quantities is not None:
         if type(location_quantities) == str:
-            #ExceptionRecord.objects.create(is_resolved = True, text='Location Quantities was string and gonna convert')
             location_quantities = json.loads(location_quantities)
-            #ExceptionRecord.objects.create(is_resolved = True, text='Converted')
         
         for loc_quan in location_quantities:
             location_id = loc_quan.get('id', None)
@@ -866,35 +830,28 @@ def add_product(request):
             low_stock = loc_quan.get('low_stock', None)
             reorder_quantity = loc_quan.get('reorder_quantity', None)
 
-            #if all([location_id, current_stock, low_stock, reorder_quantity]):
             try:
                 loc = BusinessAddress.objects.get(id = location_id)
-                #ExceptionRecord.objects.create(text=loc)
                 location_ids.append(str(loc))
             except Exception as err:
                 ExceptionRecord.objects.create(text=str(err))
                 pass
             
             else:
-                #ExceptionRecord.objects.create(text=f'{current_stock} {low_stock}  reorder_quantity{reorder_quantity}')
                 product_stock = ProductStock.objects.create(
                     user = user,
                     business = business,
                     product = product,
                     location = loc,
                     available_quantity = current_stock,
-                    #order_quantity = current_stock,
                     low_stock = low_stock, 
                     reorder_quantity = reorder_quantity,
                     alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
                     is_active = stock_status,
                 )
 
-            # else:
-            #     ExceptionRecord.objects.create(text=f'fields not all {location_id}, {current_stock}, {low_stock}, {reorder_quantity}')
-                
         try:
-            location_remaing = BusinessAddress.objects.filter(is_deleted = False).exclude(id__in = location_ids)
+            location_remaing = BusinessAddress.objects.filter(is_deleted=False).exclude(id__in=location_ids)
             for i, location_id in enumerate(location_remaing):
                 ProductStock.objects.create(
                         user = user,
@@ -907,13 +864,7 @@ def add_product(request):
                         alert_when_stock_becomes_lowest = alert_when_stock_becomes_lowest,
                         is_active = stock_status,
                     )
-        #         try:
-        #             thrd = Thread(target=add_product_remaing, args=[], kwargs={'product' : product, 'business' : business, 'location': location_id})
-        #             thrd.start()
-        #         except Exception as err:
-        #             ExceptionRecord.objects.create(
-        #                 text=str(err)
-        # )
+
         except Exception as err:
             product_error.append(str(err))
 
@@ -988,7 +939,6 @@ def update_product(request):
                     'error_message' : 'All fields are required.',
                     'fields' : [
                         'product',
-                        # 'vendor',
                         'category',
                         'brand',
                     ]
@@ -1072,10 +1022,6 @@ def update_product(request):
             product.location.add(address)
         except Exception as err:
             print(err)
-            
-    # all_stocks = ProductStock.objects.filter(product=product)
-    # for stk in all_stocks:
-    #     stk.delete()
     
     if currency_retail_price is not None:
         if check == True:
@@ -1096,24 +1042,6 @@ def update_product(request):
         
         for retail in currency_retail_price:
             currency_id = retail['currency']
-            id = retail.get('id', None)
-            price = retail['retail_price']
-            
-            # if id is not None:
-            #     try:
-            #         currency_retail = CurrencyRetailPrice.objects.get(id=retail['id'])
-            #         is_deleted = retail.get('is_deleted', None)
-            #         if bool(is_deleted) == True:
-            #             currency_retail.delete()
-            #             continue
-            #         currency_id= Currency.objects.get(id=retail['currency'])
-            #         currency_retail.currency = currency_id
-            #         currency_retail.retail_price = retail['retail_price']
-            #         currency_retail.save()
-            #     except Exception as err:
-            #         error.append(str(err))
-            #         print(err)
-            # else:
             currency_id= Currency.objects.get(id=retail['currency'])
             
             CurrencyRetailPrice.objects.create(
@@ -1157,9 +1085,7 @@ def update_product(request):
     location_quantities = request.data.get('location_quantities', None)
     if location_quantities is not None:
         if type(location_quantities) == str:
-            #ExceptionRecord.objects.create(is_resolved = True, text='Location Quantities was string and gonna convert')
             location_quantities = json.loads(location_quantities)
-            #ExceptionRecord.objects.create(is_resolved = True, text='Converted')
         
         for loc_quan in location_quantities:
             location_id = loc_quan.get('id', None)
@@ -1185,21 +1111,6 @@ def update_product(request):
                 product_stock.available_quantity = int(current_stock)
                 product_stock.low_stock = int(low_stock)
                 product_stock.save()
-                
-                
-                # else:
-                #     product_stock = ProductStock.objects.create(
-                #         user = request.user,
-                #         business = product.business,
-                #         product = product,
-                #         location = loc,
-                #         available_quantity = current_stock,
-                #         low_stock = low_stock, 
-                #         reorder_quantity = reorder_quantity,
-                #         alert_when_stock_becomes_lowest = True,
-                #         is_active = True
-                #     )
-                #     ExceptionRecord.objects.create(is_resolved = True, text ='Created')
 
             else:
                 ExceptionRecord.objects.create(text=f'fields not all {location_id}, {current_stock}, {low_stock}, {reorder_quantity}')
@@ -1207,12 +1118,6 @@ def update_product(request):
     else:
         ExceptionRecord.objects.create(text='No Location Quantities Find')
     
-    # serialized= ProductStockSerializer(stock, data=request.data, partial=True)
-    # if serialized.is_valid():
-    #     serialized.save()
-    #     data.update(serialized.data)
-
-        
     
     serialized = ProductSerializer(product, data=request.data, partial=True, context={'request':request, 'location': None})
     if serialized.is_valid():
@@ -1249,7 +1154,9 @@ def update_product(request):
 @permission_classes([AllowAny])
 def get_products(request):
     start_time = datetime.datetime.now()
-    location = request.GET.get('location_id', None)
+    location_id = request.GET.get('location_id', None)
+    search_text = request.query_params.get('search_text', None)
+    
     
     all_products = Product.objects.prefetch_related(
         'location',
@@ -1258,21 +1165,36 @@ def get_products(request):
         'consumptions',
         'product_medias',
         'product_stock',
-    ).filter(is_deleted=False, is_active=True).order_by('-created_at')
+    ).filter(is_deleted=False).order_by('-created_at')
+
+    # region temporary commented
+    # if location_id:
+    #     location = BusinessAddress.objects.get(id=str(location_id))
+    #     all_products = all_products.filter(product_stock__location=location_id)
+    # endregion
+
+    if search_text:
+        #query building
+        query = Q(name__icontains=search_text)
+        query |= Q(category__name__icontains=search_text)
+        query |= Q(brand__name__icontains=search_text)
+        query |= Q(product_type__icontains=search_text)
+
+        all_products = all_products.filter(query)
     
     all_products_count = all_products.count()
     
-    page_count = all_products_count / 20
+    page_count = all_products_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_products, 20)
+    paginator = Paginator(all_products, 10)
     page_number = request.GET.get("page") 
     products = paginator.get_page(page_number)
 
     serialized = ProductSerializer(products, many=True, 
                                    context={'request' : request,
-                                            'location': location,
+                                            'location': location_id,
                                             })
     data = serialized.data
     end_time = datetime.datetime.now()
@@ -1290,7 +1212,7 @@ def get_products(request):
                 'message' : 'All business Products!',
                 'count':all_products_count,
                 'pages':page_count,
-                'per_page_result':20,
+                'per_page_result':10,
                 'error_message' : None,
                 'products' : data
             }
@@ -1321,7 +1243,6 @@ def delete_product(request):
         )
     try:
         product = Product.objects.get(id=product_id, is_deleted=False)
-        #product_stock = ProductStock.objects.get(product = product , is_deleted=False )
     except Exception as err:
         return Response(
             {
@@ -1337,9 +1258,7 @@ def delete_product(request):
         )
 
     product.is_deleted = True
-    #product_stock.is_deleted = True
     product.save()
-    # product.delete()
     return Response(
         {
             'status' : True,
@@ -1406,7 +1325,6 @@ def search_product(request):
 def get_stocks(request):
     all_stocks = Product.objects.filter(is_active=True, is_deleted=False, product_stock__gt=0 ).order_by('-created_at').distinct()
     serialized = ProductWithStockSerializer(all_stocks, many=True, context={'request' : request}).data
-    # serialized_data = sorted(serialized, key=lambda x:x ['stock'][0]['sold_quantity'], reverse=True)
     return Response(
         {
             'status' : True,
@@ -1488,8 +1406,6 @@ def filter_stock(request):
         'low_stock' : lambda product, value : True if int(product.product_stock.quantity) <= int(value) else False,
         'high_stock' : lambda product, value : True if int(product.product_stock.quantity) > int(value) else False,
         'top_sellable_items' : lambda product, value : True,
-        # 'start_date' : lambda product, value : True if product.created_at > value else False,
-        # 'end_date' : lambda product, value : True if product.created_at < value else False,
     }
 
     result = []
@@ -1571,15 +1487,10 @@ def search_brand(request):
 def create_orderstock(request):
     user = request.user
     business = request.data.get('business', None)
-    
     vendor = request.data.get('vendor', None)
-    #from_location = request.data.get('from_location',None)
     to_location = request.data.get('to_location',None)
     orstock_status = request.data.get('status',None)
-    rec_quantity = request.data.get('rec_quantity',None)
-    
     products = request.data.get('products', [])
-    #quantity = request.data.get('quantity',None)
     
     
     if not all([business, orstock_status, vendor, to_location]):
@@ -1628,7 +1539,6 @@ def create_orderstock(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
     try:
-        #from_location = BusinessAddress.objects.get(id=from_location)
         to_location = BusinessAddress.objects.get(id=to_location)
     except Exception as err:
             return Response(
@@ -1647,10 +1557,8 @@ def create_orderstock(request):
         user=user,
         business=business_id, 
         vendor = vendor_id,
-        #from_location= from_location,
         to_location= to_location,
         status =orstock_status,
-        #rec_quantity= rec_quantity
     )
     if type(products) == str:
         products = products.replace("'" , '"')
@@ -1685,20 +1593,29 @@ def create_orderstock(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_orderstock(request):
-    order_stocks = OrderStock.objects.filter(is_deleted = False, order_stock__product__is_deleted=False).order_by('-created_at').distinct()
-    serialized = OrderSerializer(order_stocks, many=True, context={'request' : request})
-    return Response(
-        {
-            'status' : True,
-            'status_code' : 200,
-            'response' : {
-                'message' : 'All Order stocks!',
-                'error_message' : None,
-                'stocks' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    search_text = request.query_params.get('search_text', None)
+    no_pagination = request.query_params.get('no_pagination', None)
+    business_address_id = request.query_params.get('location_id', None)
+    
+    business_addr = BusinessAddress.objects.get(id=str(business_address_id))
+    order_stocks = OrderStock.objects \
+    .filter(
+        is_deleted = False,                                      
+        order_stock__product__is_deleted=False,
+        to_location=business_addr) \
+    .order_by('-created_at').distinct()
+    
+    if search_text:
+        order_stocks = order_stocks.filter(id__icontains=search_text)
+        
+    serialized = list(OrderSerializer(order_stocks, many=True, context={'request' : request}).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'stocks')
+    return response
+
  
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -2097,7 +2014,6 @@ def add_product_consumption(request):
             report_choice = 'Consumed',
             product = product,
             user = request.user,
-            #location = product_location,
             consumed_location = location,
             quantity = int(quantity), 
             before_quantity = consumed.available_quantity     
@@ -2105,7 +2021,6 @@ def add_product_consumption(request):
             sold = consumed.available_quantity - int(quantity)
             consumed.available_quantity = sold
             consumed.consumed_quantity +=  int(quantity)
-            #consumed.sold_quantity += int(quantity)
             consumed.save()
             stock_cunsumed.after_quantity = sold
             stock_cunsumed.save()
@@ -2330,22 +2245,32 @@ def delete_product_consumptions(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_product_consumptions(request):
+    search_text = request.query_params.get('search_text', None)
+    no_pagination = request.query_params.get('no_pagination', None)
+    location_id = request.query_params.get('location_id', None)
     
     product_consumptions = ProductConsumption.objects.filter(is_deleted=False)
-    serialized = ProductConsumptionSerializer(product_consumptions, many=True)
 
-    return Response(
-        {
-            'status' : True,
-            'status_code' : 200,
-            'response' : {
-                'message' : 'Product Consumption Created successfully',
-                'error_message' : None,
-                'product_consumptions' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    if location_id:
+        location = BusinessAddress.objects.get(id=str(location_id))
+        product_consumptions = product_consumptions.filter(location=location)
+    
+    if search_text:
+        query = Q(product__name__icontains=search_text)
+        query |= Q(location__address_name__icontains=search_text)
+        query |= Q(quantity_s__icontains=search_text)
+        product_consumptions = product_consumptions.annotate(
+            quantity_s=Cast('quantity', CharField())
+        ).filter(query)
+   
+    serialized = list(ProductConsumptionSerializer(product_consumptions, many=True).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'product_consumptions')
+    return response
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -2397,7 +2322,6 @@ def add_product_stock_transfer(request):
     try:
         from_location = BusinessAddress.objects.get(id=from_location_id)
         to_location = BusinessAddress.objects.get(id=to_location_id)
-        #product_location = BusinessAddress.objects.get(id=product.location.id)
     except Exception as err:
         return Response(
             {
@@ -2427,14 +2351,12 @@ def add_product_stock_transfer(request):
             report_choice = 'Transfer_from',
             product = product,
             user = request.user,
-            #location = product_location,
             from_location = from_location,
             quantity = int(quantity), 
             before_quantity = transfer.available_quantity      
             )
             sold = transfer.available_quantity - int(quantity)
             transfer.available_quantity = sold
-            #transfer.sold_quantity += int(quantity)
             transfer.save()
             stock_transfer.after_quantity = sold
             stock_transfer.save()
@@ -2445,7 +2367,6 @@ def add_product_stock_transfer(request):
             report_choice = 'Transfer_to',
             product = product,
             user = request.user,
-            #location = product_location,
             to_location = to_location,
             quantity = int(quantity), 
             before_quantity = transfer.available_quantity      
@@ -2487,20 +2408,20 @@ def add_product_stock_transfer(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_product_stock_transfers(request):
+    search_text = request.query_params.get('search_text', None)
+    no_pagination = request.query_params.get('no_pagination', None)
+
     stock_tranfers = ProductStockTransfer.objects.filter(is_deleted=False).order_by('-created_at').distinct()
-    serialized = ProductStockTransferSerializer(stock_tranfers, many=True)
-    return Response(
-        {
-            'status' : True,
-            'status_code' : 200,
-            'response' : {
-                'message' : 'Product Stock Transfers',
-                'error_message' : None,
-                'product_stock_transfers' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    if search_text:
+        stock_tranfers = stock_tranfers.filter(product__name__icontains=search_text)
+
+    serialized = list(ProductStockTransferSerializer(stock_tranfers, many=True).data)
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'product_stock_transfers')
+    return response 
+
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
@@ -2652,26 +2573,10 @@ def update_product_stock_transfer(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_product_stock_report(request):
-    # stock_report = ProductOrderStockReport.objects.filter(is_deleted=False).order_by('-created_at').distinct()
-    
-    # grouped_reports = {}
-    # for report in stock_report:
-    #     product_id = report.product.id
-    #     if product_id not in grouped_reports:
-    #         grouped_reports[product_id] = []
-    #     grouped_reports[product_id].append(report)
-    
-    # serialized_data = []
-    
-    # # Serialize the grouped data
-    # for product_id, reports in grouped_reports.items():
-    #     product = reports[0].product
-    #     serialized_reports = ProductOrderStockReportSerializer(reports, many=True).data
-    #     serialized_data.append({
-    #         'product': ProductOrderSerializer(product).data,
-    #         'reports': serialized_reports
-    #     })
 
+    brand_id = request.GET.get('brand_id', None)
+    query = request.GET.get('query', '')
+    report_type = request.GET.get('report_type', None)
     location_id = request.GET.get('location_id', None)
 
     if not all([location_id]):
@@ -2710,9 +2615,6 @@ def get_product_stock_report(request):
         )
 
     
-    brand_id = request.GET.get('brand_id', None)
-    query = request.GET.get('query', '')
-    report_type = request.GET.get('report_type', None)
 
 
     filter_queries = {}
@@ -2728,11 +2630,11 @@ def get_product_stock_report(request):
     ).filter(
         product_stock__location = location,
         is_deleted = False,
-        name__icontains = query,
+        name__icontains=query,
         **filter_queries
     ).distinct()
     
-    serialized = ProductStockReportSerializer(
+    serialized = list(ProductStockReportSerializer(
         products, 
         many = True,
         context = {
@@ -2740,18 +2642,10 @@ def get_product_stock_report(request):
             'report_type' : report_type,
             'location_currency_id' : location.currency.id if location.currency else None,
         }
-    )
-    data = serialized.data
-
-    return Response(
-        {
-            'status' : True,
-            'status_code' : 200,
-            'response' : {
-                'message' : 'Product Stock Reports',
-                'error_message' : None,
-                'product_stock_report' : data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    ).data)
+    
+    paginator = CustomPagination()
+    paginator.page_size = 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'product_stock_report')
+    return response

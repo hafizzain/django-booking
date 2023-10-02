@@ -143,7 +143,7 @@ class MemberSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return f'{obj.image}'
@@ -200,7 +200,7 @@ class EmployeeSelectedServiceSerializer(serializers.ModelSerializer):
             img = Employee.objects.get(id = obj.employee.id)
             if img.image:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=img.is_image_uploaded_s3)
                 return f'{url}{img.image}'
             else:
                 return None
@@ -241,8 +241,8 @@ class EmployeeSelected_TenantServiceSerializer(serializers.ModelSerializer):
     def get_image(self, obj):
         try:
             tenant = self.context["tenant"]
-            url = tenant_media_domain(tenant)
             img = Employee.objects.get(id = obj.employee.id)
+            url = tenant_media_domain(tenant, is_s3_url=img.is_image_uploaded_s3)
             return f'{url}{img.image}'
         except Exception as err:
             print(str(err))
@@ -276,26 +276,11 @@ class Employee_TenantServiceSerializer(serializers.ModelSerializer):
     def get_image(self, obj):
         try:
             request = self.context["request"]
-            url = tenant_media_base_url(request)
             img = Employee.objects.get(id = obj.employee.id)
+            url = tenant_media_base_url(request, is_s3_url=img.is_image_uploaded_s3)
             return f'{url}{img.image}'
         except Exception as err:
             print(str(err))
-        # try:    
-        #     print(obj.employee.image)
-        #     if obj.employee.image:
-        #         try:
-        #             print('test')
-        #             request = self.context["request"]
-        #             url = tenant_media_base_url(request)
-        #             return f'{url}{obj.employee.image}'
-        #         except Exception as err:
-        #             print(err)
-        #             return obj.employee.image
-                    
-        #     return None
-        # except Exception as err:
-        #     print(err)
     
     class Meta:
         model = EmployeeSelectedService
@@ -719,7 +704,7 @@ class VoucherOrderSerializer(serializers.ModelSerializer):
 class CheckoutSerializer(serializers.ModelSerializer):
     gst = serializers.FloatField(source='tax_applied')
     gst1 = serializers.FloatField(source='tax_applied1')
-    gst_price = serializers.FloatField(source='tax_amount')
+    gst_price = serializers.SerializerMethodField()
     gst_price1 = serializers.FloatField(source='tax_amount1')
 
     product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
@@ -831,7 +816,13 @@ class CheckoutSerializer(serializers.ModelSerializer):
             return ids_data
         except Exception as err:
             print(str(err))
-    
+
+    def get_gst_price(self, obj):
+        try:
+            return obj.tax_amount
+        except:
+            return 0
+
     
     class Meta:
         model = Checkout
@@ -1065,7 +1056,7 @@ class OrderSerializer(serializers.ModelSerializer):
 class CheckoutCommissionSerializer(serializers.ModelSerializer):
     gst = serializers.FloatField(source='tax_applied')
     gst1 = serializers.FloatField(source='tax_applied1')
-    gst_price = serializers.FloatField(source='tax_amount')
+    gst_price = serializers.SerializerMethodField()
     gst_price1 = serializers.FloatField(source='tax_amount1')
 
     employee = serializers.SerializerMethodField()
@@ -1187,6 +1178,12 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
             'id' : str(checkout.id),
             **sale_item
         }
+    
+    def get_gst_price(self, obj):
+        try:
+            return obj.tax_amount
+        except:
+            return 0
 
     class Meta:
         """
@@ -1211,7 +1208,7 @@ class CheckoutCommissionSerializer(serializers.ModelSerializer):
 class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
     gst = serializers.FloatField(source='tax_applied')
     gst1 = serializers.FloatField(source='tax_applied1')
-    gst_price = serializers.FloatField(source='tax_amount')
+    gst_price = serializers.SerializerMethodField()
     gst_price1 = serializers.FloatField(source='tax_amount1')
 
     promotion = serializers.SerializerMethodField(read_only=True)
@@ -1375,6 +1372,12 @@ class PromotionNDiscount_CheckoutSerializer(serializers.ModelSerializer):
             checkout = obj
         ).values_list('discount_price', flat=True)
         return sum(list(chk_orders))
+    
+    def get_gst_price(self, obj):
+        try:
+            return obj.tax_amount
+        except:
+            return 0
         
     class Meta:
         model = Checkout
@@ -1556,12 +1559,6 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
             return obj.product.arabic_name
         
         return None
-
-    # def get_product_original_price(self, obj):
-    #     if obj.product:
-    #         return obj.product.cost_price
-        
-    #     return None
     
     def get_product_original_price(self, obj):
         price = PriceService.objects.filter(service = str(obj)).order_by('-created_at')
@@ -1572,9 +1569,7 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
         model = ProductOrder
         fields = [
             'id', 'product_name', 'product_arabic_name', 'product_original_price', 'quantity', 'product_price', 'price', 'selection_type']
-            # 'client','status', 'created_at',
-            #       'location', 'member', 'tip', 'total_price' , 'payment_type','price','name',
-            #       'gst', 'order_type', 'sold_quantity','product_details','total_product'
+
 
 class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
 
@@ -1601,17 +1596,16 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
     def get_price(self, obj):
         if obj.is_redeemed == True:
             return obj.redeemed_price
-        elif obj.discount_price:
+        elif obj.discount_price is not None:
             return obj.discount_price
         else:
             return obj.current_price
 
     class Meta:
         model = ServiceOrder
-        fields = ['id', 'price', 'service_original_price', 'quantity', 'service', 'selection_type' ]
-            # 'client','created_at' ,'user',
-            #       'duration', 'location', 'member', 'total_price',
-            #       'payment_type','tip','gst', 'order_type','created_at'
+        fields = ['id', 'price', 'service_original_price', 'quantity', 'service', 'selection_type',
+                  'discount_price']
+
 
 class SaleOrder_VoucherSerializer(serializers.ModelSerializer):
     voucher_price = serializers.SerializerMethodField()
@@ -1630,9 +1624,6 @@ class SaleOrder_VoucherSerializer(serializers.ModelSerializer):
     class Meta:
         model = VoucherOrder
         fields =[ 'id', 'voucher', 'voucher_arabic_name', 'quantity', 'voucher_price' ]
-            # 'client', 'location' , 
-            #      'member' ,'start_date', 'end_date','status',
-            #      'total_price', 'payment_type' , 'order_type','price', 'name','created_at','discount_percentage'
     
 
 class SaleOrder_MemberShipSerializer(serializers.ModelSerializer):
@@ -1660,8 +1651,7 @@ class SaleOrder_MemberShipSerializer(serializers.ModelSerializer):
     class Meta:
         model = MemberShipOrder
         fields =['id', 'membership', 'membership_arabic_name', 'quantity', 'price', 'membership_price', 'selection_type' ]
-            # 'order_type' ,'client','member', 'location' ,'start_date', 'end_date','status', 'total_price', 'name',
-            #      'payment_type','created_at'
+
 
 class CheckoutTipsSerializer(serializers.ModelSerializer):
     member_name = serializers.SerializerMethodField(read_only=True)
@@ -1704,7 +1694,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
 
     gst = serializers.FloatField(source='tax_applied')
     gst1 = serializers.FloatField(source='tax_applied1')
-    gst_price = serializers.FloatField(source='tax_amount')
+    gst_price = serializers.SerializerMethodField()
     gst_price1 = serializers.FloatField(source='tax_amount1')
     
     tip = serializers.SerializerMethodField(read_only=True)
@@ -1821,6 +1811,12 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             return serializer.data
         except Exception as e:
             return str(e)
+        
+    def get_gst_price(self, obj):
+        try:
+            return obj.tax_amount
+        except:
+            return 0
     
     class Meta:
         model = Checkout
@@ -1848,7 +1844,7 @@ class SaleInvoiceSerializer(serializers.ModelSerializer):
         if obj.file:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=False)
                 return f'{url}{obj.file}'
             except:
                 return f'{obj.file}'

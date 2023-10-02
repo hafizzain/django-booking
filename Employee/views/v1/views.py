@@ -48,7 +48,9 @@ from django.utils.html import strip_tags
 from django.conf import settings
 from django.core.paginator import Paginator
 
-
+from Notification.models import CustomFCMDevice
+from Notification.serializers import FCMDeviceSerializer
+from Notification.notification_processor import NotificationProcessor
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -315,18 +317,45 @@ def search_employee(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_Employees(request):
-    # total_sale = ?
-    all_employe= Employee.objects.filter(
-        is_deleted=False, 
-        is_blocked=False
-    ).order_by('-created_at')
+    no_pagination = request.GET.get('no_pagination', None)
+    search_text = request.GET.get('search_text', None)
+    location_id = request.GET.get('location_id', None)
+    employee_id = request.GET.get('employee_id', None)
+    designation = request.GET.get('designation', None)
+    income_type = request.GET.get('income_type', None)
+
+
+
+
+    query = Q(is_deleted=False)
+    query &= Q(is_blocked=False)
+
+    if search_text:
+        query &= Q(full_name__icontains=search_text)
+
+    if employee_id:
+        query &= Q(id=str(employee_id))
+
+    if designation:
+        query &= Q(employee_professional_details__designation=designation)
+
+    if income_type:
+        query &= Q(employee_professional_details__income_type=income_type)
+
+    if location_id:
+        location = BusinessAddress.objects.get(id=str(location_id))
+        query &= Q(location=location)
+     
+
+    all_employe= Employee.objects.filter(query).order_by('-created_at')
     all_employee_count = all_employe.count()
     
-    page_count = all_employee_count / 20
+    page_count = all_employee_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_employe, 20)
+    results_per_page = 10000 if no_pagination else 10
+    paginator = Paginator(all_employe, results_per_page)
     page_number = request.GET.get("page", None)
 
     if page_number is not None: 
@@ -334,7 +363,6 @@ def get_Employees(request):
 
         serialized = singleEmployeeSerializer(all_employe,  many=True, context={'request' : request} )
         data = serialized.data
-        # sorted_data = sorted(data, key=lambda x: x['totoal_sale'], reverse=True)
         return Response(
             {
                 'status' : 200,
@@ -343,7 +371,7 @@ def get_Employees(request):
                     'message' : f'Page {page_number} Employee',
                     'count':all_employee_count,
                     'pages':page_count,
-                    'per_page_result':20,
+                    'per_page_result':results_per_page,
                     'error_message' : None,
                     'employees' : data
                 }
@@ -353,7 +381,6 @@ def get_Employees(request):
     else:
         serialized = singleEmployeeSerializer(all_employe,  many=True, context={'request' : request} )
         data = serialized.data
-        # sorted_data = sorted(data, key=lambda x: x['total_sale'], reverse=True)
         return Response(
             {
                 'status' : 200,
@@ -1192,7 +1219,7 @@ def update_employee(request):
                 else:
                     for opt in value:
                         try:
-                            option = GlobalPermissionChoices.objects.get(text=opt)
+                            option = GlobalPermissionChoices.objects.filter(text=opt).first()
                             PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
                         except GlobalPermissionChoices.DoesNotExist:
                             pass
@@ -1545,37 +1572,32 @@ def create_staff_group(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_staff_group(request):
-    all_staff_group= StaffGroup.objects.filter(employees__is_deleted=False).order_by('-created_at').distinct()
+
+    search_text = request.GET.get('search_text', None)
+    no_pagination = request.GET.get('no_pagination', None)
+
+    query = Q(employees__is_deleted=False)
+
+    if search_text:
+        query &= Q(name__icontains=search_text)
+    all_staff_group= StaffGroup.objects \
+                    .filter(query) \
+                    .prefetch_related('employees') \
+                    .order_by('-created_at').distinct()
     all_staff_group_count= all_staff_group.count()
 
-    page_count = all_staff_group_count / 20
+    page_count = all_staff_group_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_staff_group, 20)
+    per_page_results = 10000 if no_pagination else 10
+    paginator = Paginator(all_staff_group, per_page_results)
     page_number = request.GET.get("page") 
     all_staff_group = paginator.get_page(page_number)
 
     serialized = StaffGroupSerializers(all_staff_group, many=True, context={'request' : request})
     
-    data = serialized.data
-    # new_data = []
-    # for row in data:
-    #     let_obj = {}
-    #     let_obj.update(row)
-    #     let_obj.update(row['staff_permission'])
-    #     del let_obj['staff_permission']
-    #     new_data.append(let_obj)
-    
-    # data = {}
-    # data.update(serialized.data)
-    
-    # try:
-    #     data.update(data['staff_permission'])
-    #     del data['staff_permission']
-    # except Exception as err:
-    #     print(f'dict {err}')
-    #     None   
+    data = serialized.data 
          
     return Response(
         {
@@ -1585,7 +1607,7 @@ def get_staff_group(request):
                 'message' : 'All Staff Group',
                 'count':all_staff_group_count,
                 'pages':page_count,
-                'per_page_result':20,
+                'per_page_result':per_page_results,
                 'error_message' : None,
                 'staff_group' : data
             }
@@ -1775,26 +1797,34 @@ def update_staff_group(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_attendence(request):
-    # all_attendence= Attendance.objects.all()
-    # serialized = AttendanceSerializers(all_attendence, many=True, context={'request' : request})
 
-    location = request.GET.get('location', None)
+    location_id = request.GET.get('location_id', None)
+    search_text = request.GET.get('search_text', None)
+    no_pagination = request.GET.get('no_pagination', None)
+    employee_id = request.GET.get('employee_id', None)
+
     start_date = request.GET.get('start_date', None)
     end_date = request.GET.get('end_date', None)
+
+    query = Q(is_deleted=False)
+    query &= Q(is_blocked=False)
+    query &= Q(location__id=location_id)
+
+    if employee_id:
+        query &= Q(id=str(employee_id))
     
-    
-    all_employe= Employee.objects.filter(
-        is_deleted=False, 
-        is_blocked=False,
-        location__id = location
-    ).order_by('-created_at')
+    if search_text:
+        query &= Q(full_name__icontains=search_text)
+
+    all_employe= Employee.objects.filter(query).order_by('-created_at')
     all_employe_count= all_employe.count()
 
     page_count = all_employe_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_employe, 10)
+    per_page_results = 10000 if no_pagination else 10
+    paginator = Paginator(all_employe, per_page_results)
     page_number = request.GET.get("page") 
     all_employe = paginator.get_page(page_number)
 
@@ -1809,7 +1839,7 @@ def get_attendence(request):
                 'message' : 'All Attendance',
                 'count':all_employe_count,
                 'pages':page_count,
-                'per_page_result':10,
+                'per_page_result':per_page_results,
                 'error_message' : None,
                 'attendance' : serialized.data
             }
@@ -2233,6 +2263,8 @@ def get_payrol_working(request):
     employee_id = request.GET.get('employee_id', None)
     start_date = request.GET.get('start_date', None) # '2023-07-01'
     end_date = request.GET.get('end_date', None)
+    no_pagination = request.GET.get('no_pagination', None)
+
 
     queries = {}
 
@@ -2250,11 +2282,12 @@ def get_payrol_working(request):
     # .order_by('employee_employedailyschedule__date')
     all_employe_count= all_employe.count()
 
+    results_per_page = 10000 if no_pagination else 10
     page_count = all_employe_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_employe, 10)
+    paginator = Paginator(all_employe, results_per_page)
     page_number = request.GET.get("page") 
     all_employe = paginator.get_page(page_number)
 
@@ -2269,7 +2302,7 @@ def get_payrol_working(request):
                 'message' : 'All Employee',
                 'count':all_employe_count,
                 'pages':page_count,
-                'per_page_result':10,
+                'per_page_result':results_per_page,
                 'error_message' : None,
                 'employees' : serialized.data
             }
@@ -2554,9 +2587,15 @@ def create_commission(request):
                 ExceptionRecord.objects.create(
                     text = f'Both data {str(err)}'
                 )
-            
+
+    # Send Notification to Employee
+    user = User.objects.filter(email__icontains=employee_id.email).first()
+    title = 'Commission'
+    body = 'Admin Assigns New Commission'
+    NotificationProcessor.send_notifications_to_users(user, title, body)
+
+
     serializers= CommissionSerializer(commission_setting, context={'request' : request})
-    
     return Response(
             {
                 'status' : True,
@@ -2573,55 +2612,29 @@ def create_commission(request):
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_commission(request): 
-    # business = request.GET.get('business', None)
-    # if business is None:
-    #    return Response(
-    #         {
-    #             'status' : False,
-    #             'status_code' : StatusCodes.MISSING_FIELDS_4001,
-    #             'status_code_text' : 'MISSING_FIELDS_4001',
-    #             'response' : {
-    #                 'message' : 'Invalid Data!',
-    #                 'error_message' : 'fields are required.',
-    #                 'fields' : [
-    #                     'business',
-    #                 ]
-    #             }
-    #         },
-    #         status=status.HTTP_400_BAD_REQUEST
-    #     )
-       
-    # try:
-    #     business=Business.objects.get(id=business)
-    # except Exception as err:
-    #     return Response(
-    #         {
-    #                 'status' : False,
-    #                 'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
-    #                 'response' : {
-    #                 'message' : 'Business not found',
-    #                 'error_message' : str(err),
-    #             }
-    #         }
-    #     )
-       
-    # commission , created =  CommissionSchemeSetting.objects.get_or_create(
-    #     business=business,
-    #     user=business.user,
-    #     )
-    commission = CommissionSchemeSetting.objects.all().order_by('-created_at') 
+def get_commission(request):
+    no_pagination = request.GET.get('no_pagination')
+    search_text = request.GET.get('search_text')
+
+    query = Q()
+
+    if search_text:
+        query &= Q(employee__full_name__icontains=search_text)
+
+    commission = CommissionSchemeSetting.objects.filter(
+        query
+    ).order_by('-created_at') 
     commission_count = commission.count()  
     
-    page_count = commission_count / 20
+    page_count = commission_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(commission, 20)
+    per_page_results = 10000 if no_pagination else 10
+    paginator = Paginator(commission, per_page_results)
     page_number = request.GET.get("page", None)
-    print(page_number, '********************')
 
-    if page_number is not None: 
+    if page_number is not None:
         commission = paginator.get_page(page_number)
     
         serializer = CommissionSerializer(commission, many = True, context={'request' : request})
@@ -2634,7 +2647,7 @@ def get_commission(request):
                     'message' : f'Page {page_number} Commission',
                     'count':commission_count,
                     'pages':page_count,
-                    'per_page_result':20,
+                    'per_page_result':per_page_results,
                     'error_message' : None,
                     'commission' : serializer.data
                 }
@@ -3924,30 +3937,15 @@ def create_workingschedule(request):
             status=status.HTTP_201_CREATED
         ) 
 
-# @api_view(['GET'])
-# @permission_classes([AllowAny])
-# def get_workingschedule(request):
-#     all_employe= EmployeDailySchedule.objects.all().order_by('created_at')
-#     serialized = NewScheduleSerializer(all_employe, many=True, context={'request' : request})
-#     return Response(
-#         {
-#             'status' : 200,
-#             'status_code' : '200',
-#             'response' : {
-#                 'message' : 'All Schedule',
-#                 'error_message' : None,
-#                 'schedule' : serialized.data
-#             }
-#         },
-#         status=status.HTTP_200_OK
-#     )
-
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_vacations(request):
-    employee_id = request.GET.get('employee', None)
-    location = request.GET.get('location', None)
+    employee_id = request.GET.get('employee_id', None)
+    location = request.GET.get('location_id', None)
+    search_text = request.GET.get('search_text', None)
+    no_paginnation = request.GET.get('no_paginnation', None)
+
 
     if not all([location]):
         return Response(
@@ -3965,22 +3963,7 @@ def get_vacations(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    
-    # try: 
-    #     employee = Employee.objects.get(id=employee_id, is_deleted=False)
-    # except Exception as err:
-    #     return Response(
-    #             {
-    #                 'status' : False,
-    #                 'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
-    #                 'status_code_text' : 'INVALID_EMPLOYEE_4025',
-    #                 'response' : {
-    #                     'message' : 'Employee Not Found',
-    #                     'error_message' : str(err),
-    #                 }
-    #             },
-    #             status=status.HTTP_404_NOT_FOUND
-    #         )
+
     try:
         location =  BusinessAddress.objects.get(id =location)
     except Exception as err:
@@ -3997,13 +3980,16 @@ def get_vacations(request):
                 status=status.HTTP_404_NOT_FOUND
         )
     
-    # employee= Employee.objects.get(id = employee_id.id, is_deleted=False, is_blocked=False)
 
     queries = {}
+
+    if search_text:
+        queries['employee__full_name__icontains'] = search_text
+
     if employee_id:
         queries['employee__id'] = employee_id
+
     allvacations = Vacation.objects.filter(
-        # employee = employee, 
         employee__location = location,
         holiday_type = 'Vacation',
         is_active = True,  
@@ -4016,7 +4002,8 @@ def get_vacations(request):
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(allvacations, 10)
+    per_page_results = 10000 if no_paginnation else 10
+    paginator = Paginator(allvacations, per_page_results)
     page_number = request.GET.get("page", None)
     if page_number is not None: 
         allvacations = paginator.get_page(page_number)
@@ -4031,7 +4018,7 @@ def get_vacations(request):
                     'message' : f'Page {page_number} Schedule',
                     'count':allvacations_count,
                     'pages':page_count,
-                    'per_page_result':10,
+                    'per_page_result':per_page_results,
                     'error_message' : None,
                     'vacations' : serialized.data
                 }
@@ -4061,8 +4048,12 @@ def get_vacations(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_absence(request):
-    location = request.GET.get('location', None)
-    employee_id = request.GET.get('employee', None)
+    location = request.GET.get('location_id', None)
+    employee_id = request.GET.get('employee_id', None)
+    search_text = request.GET.get('search_text', None)
+    no_pagination = request.GET.get('no_pagination', None)
+
+
 
     if not all([location]):
         return Response(
@@ -4081,21 +4072,6 @@ def get_absence(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    # try: 
-    #     employee = Employee.objects.get(id=employee_id, is_deleted=False)
-    # except Exception as err:
-    #     return Response(
-    #             {
-    #                 'status' : False,
-    #                 'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
-    #                 'status_code_text' : 'INVALID_EMPLOYEE_4025',
-    #                 'response' : {
-    #                     'message' : 'Employee Not Found',
-    #                     'error_message' : str(err),
-    #                 }
-    #             },
-    #             status=status.HTTP_404_NOT_FOUND
-    #         )
     try:
         location =  BusinessAddress.objects.get(id =location)
     except Exception as err:
@@ -4112,14 +4088,16 @@ def get_absence(request):
                 status=status.HTTP_404_NOT_FOUND
         )
     
-    # employee= Employee.objects.get(id = employee_id.id, is_deleted=False, is_blocked=False)
 
     queries = {}
+
+    if search_text:
+        queries['employee__full_name__icontains'] = search_text
+
     if employee_id:
         queries['employee__id'] = employee_id
 
     allvacations = Vacation.objects.filter(
-        # employee = employee, 
         employee__location = location,
         holiday_type ='Absence',
         is_active = True, 
@@ -4132,7 +4110,8 @@ def get_absence(request):
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(allvacations, 10)
+    per_page_results = 10000 if no_pagination else 10
+    paginator = Paginator(allvacations, per_page_results)
     page_number = request.GET.get("page", None)
     if page_number is not None: 
         allvacations = paginator.get_page(page_number)
@@ -4146,7 +4125,7 @@ def get_absence(request):
                     'message' : f'Page {page_number} Schedule',
                     'count':allvacations_count,
                     'pages':page_count,
-                    'per_page_result':10,
+                    'per_page_result':per_page_results,
                     'error_message' : None,
                     'absences' : serialized.data
                 }
@@ -4578,9 +4557,8 @@ def create_employe_account(request):
 @permission_classes([AllowAny])
 def employee_login(request):
     email = request.data.get('email', None)
-    username = request.data.get('username', None)
     password = request.data.get('password', None)
-    tenant_id = request.data.get('tenant_id', None)
+    device_token = request.data.get('device_token', None)
     
     data = []
     
@@ -4609,7 +4587,7 @@ def employee_login(request):
             is_deleted=False,
             user_account_type__account_type = 'Employee'
         )
-        
+
     except Exception as err:
         return Response(
             {
@@ -4670,6 +4648,21 @@ def employee_login(request):
                 email__icontains = user.email,
                 is_deleted = False
             )
+
+            # registering device token for employee
+            # for mobile to send push notifications
+            employee_device = CustomFCMDevice.objects.filter(
+                user = user_id
+            ).first()
+            if not employee_device:
+                employee_device = CustomFCMDevice.objects.create(
+                    user=user_id,
+                    registration_id=device_token
+                )
+            else:
+                employee_device.registration_id = device_token
+                employee_device.save()
+            device_serialized = FCMDeviceSerializer(employee_device)
         except:
             return Response(
                 {
@@ -4678,6 +4671,8 @@ def employee_login(request):
                     'status_code_text' : 'EMPLOYEEE_IS_DELETED',
                     'response' : {
                         'message' : 'User Does not exist',
+                        'device_token':device_token,
+                        'device_serializer':device_serialized
                     }
                 },
                 status=status.HTTP_404_NOT_FOUND
@@ -4704,11 +4699,74 @@ def employee_login(request):
                 'status_code' : 200,
                 'response' : {
                     'message' : 'Authenticated',
-                    'data' : serialized.data
+                    'data' : serialized.data,
+                    'device_data':device_serialized.data
                 }
             },
             status=status.HTTP_200_OK
         )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def employee_logout(request):
+    email = request.query_params.get('email', None)
+
+    try:
+        user = User.objects.filter(
+            email__icontains=email,
+            is_deleted=False,
+        ).first()
+
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
+                'status_code_text' : 'INVALID_CREDENTIALS_4013',
+                'response' : {
+                    'message' : 'User does not exist with this email',
+                    'error_message' : str(err),
+                    'fields' : ['email']
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    try:
+        employee_tenant = EmployeeTenantDetail.objects.get(user__username = user)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Authenticated',
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
+    with tenant_context(employee_tenant.tenant):
+
+        user_id = User.objects.get(
+            email=email,
+            is_deleted=False,
+        )
+        # deleting device token for employee
+        # for mobile to not send push notifications
+        # when it is logout
+        device = CustomFCMDevice.objects.filter(
+            user = user_id
+        ).first()
+
+        if device:
+            device.delete()
+
+    return Response({
+        'status' : True,
+        'status_code': 200,
+        'message': 'Device Unlinked'
+    }, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 @permission_classes([AllowAny])

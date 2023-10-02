@@ -300,7 +300,6 @@ def create_client(tenant=None, user = None, business=None):
                 business = business,
                 user = user,
                 full_name = user.first_name, # 'ABCD',
-                mobile_number = user.mobile_number,
                 gender = 'Male',
                 language = language_id,
                 client_id = client_unique_id,
@@ -325,34 +324,41 @@ def create_ServiceGroup(tenant=None, user = None, business=None):
                     name = 'Hair Care',
                     is_active = True                
                 )
-                for ser in range(2):
-                    if int(ser) == 0:
-                        ser_name = 'Hair color'
-                    else:
-                        ser_name = 'Hair cut'
-                    service = Service.objects.create(
-                        user = user,
-                        business =business,
-                        name = ser_name,
-                        description = f'{ser_name} description',
-                        service_availible = 'Everyone',    
-                        is_default = True,      
-                    )
-                    service.location.add(location)
-                    service.save()
-                    service_grp.services.add(service)
-                    service_grp.save()
-                    
-                    employe_service = EmployeeSelectedService.objects.create(
-                        service = service,
-                        employee = emp
-                        )
-                    price_service = PriceService.objects.create(
-                        service = service,
-                        currency = currency,
-                        duration = '30Min',
-                        price = 500,
-                    )
+                # while verifying OTP, it created 2 services each time.
+                # we are counting if services are 0 then create 2 services
+                services_count= Service.objects.all().count()
+                if services_count == 0:
+                    for ser in range(2):
+                        
+                            if int(ser) == 0:
+                                ser_name = 'Hair color'
+                            else:
+                                ser_name = 'Hair cut'
+                            service = Service.objects.create(
+                                user = user,
+                                business =business,
+                                name = ser_name,
+                                description = f'{ser_name} description',
+                                service_availible = 'Everyone',    
+                                is_default = True,      
+                            )
+                            service.location.add(location)
+                            service.save()
+                            service_grp.services.add(service)
+                            service_grp.save()
+                            
+                            employe_service = EmployeeSelectedService.objects.create(
+                                service = service,
+                                employee = emp
+                                )
+                            price_service = PriceService.objects.create(
+                                service = service,
+                                currency = currency,
+                                duration = '30Min',
+                                price = 500,
+                            )
+                else:
+                    pass
         except Exception as err:
             ExceptionRecord.objects.create(
                 text = f'Service creating error occur {str(err)} {location}'

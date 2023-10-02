@@ -1,5 +1,6 @@
 from datetime import timezone
 from datetime import datetime
+import pytz
 
 from itertools import count
 from django.db import models
@@ -15,6 +16,7 @@ from Product.models import Product
 from Service.models import Service
 import uuid
 from googletrans import Translator
+from dateutil.relativedelta import relativedelta
 
 
 class Client(models.Model):
@@ -44,6 +46,8 @@ class Client(models.Model):
 
     full_name = models.CharField(max_length=300, default='')
     image = models.ImageField(upload_to='client/client_images/', null=True, blank=True)
+    is_image_uploaded_s3 = models.BooleanField(default=False)
+
     client_id = models.CharField(max_length=50, default='')
     email = models.EmailField(default='')
     mobile_number = models.CharField(max_length=30, null=True, blank=True)
@@ -78,7 +82,11 @@ class Client(models.Model):
     def __str__(self):
         return str(self.id)
 
+
     def save(self, *args, **kwargs):
+        if self.image:
+            self.is_image_uploaded_s3 = True
+            
         if not self.client_id:
             tenant = connection.get_tenant()
 
@@ -367,6 +375,32 @@ class Membership(models.Model):
 
         super(Membership, self).save(*args, **kwargs)
 
+    def is_expired(self):
+        """
+        This functions is used to check tthe expiration of Membership
+        based on the valid_for attribute.
+        """
+        
+        split_them = self.valid_for.split(" ")
+        utc = pytz.UTC
+        duration = int(split_them[0])
+        term = split_them[1]
+        validity_time = None
+
+        if term == 'Days':
+            validity_time = self.created_at + relativedelta(months=duration)
+        elif term == 'Months':
+            validity_time = self.created_at + relativedelta(months=duration)
+        elif term == 'years':
+            validity_time = self.created_at + relativedelta(years=duration)
+
+        if validity_time:
+            current_time = datetime.now(tz=pytz.UTC)
+            if validity_time >= current_time:
+                return True
+            else:
+                return False
+        
     def __str__(self):
         return str(self.id)
     

@@ -224,7 +224,7 @@ class EmployeSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -377,7 +377,7 @@ class EmployeeNameSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -653,7 +653,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -766,7 +766,7 @@ class AssetdocmemtSerializer(serializers.ModelSerializer):
     def get_document(self, obj):
         try:
             request = self.context["request"]
-            url = tenant_media_base_url(request)
+            url = tenant_media_base_url(request, is_s3_url=False)
             return f'{url}{obj.document}'
         except Exception as err:
             print(err)
@@ -921,7 +921,7 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -973,7 +973,7 @@ class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -990,7 +990,7 @@ class EmployeeInformationSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 tenant = self.context["tenant"]
-                url = tenant_media_domain(tenant.schema_name)
+                url = tenant_media_domain(tenant.schema_name, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -1130,7 +1130,7 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -1263,7 +1263,7 @@ class Payroll_Working_deviceScheduleSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -1363,3 +1363,33 @@ class NewAbsenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vacation
         fields = ('id', 'employee', 'from_date', 'to_date', 'absence_details','holiday_type')
+
+
+class EmplooyeeAppointmentInsightsSerializer(serializers.ModelSerializer):
+    appointments_done = serializers.IntegerField() #annotated field from manager
+    class Meta:
+        model = Employee
+        fields = ['id', 'full_name', 'appointments_done']
+
+
+class EmployeeDailyInsightSerializer(serializers.ModelSerializer):
+
+    # annotated fields
+    morning_count = serializers.IntegerField()
+    afternoon_count = serializers.IntegerField()
+    evening_count = serializers.IntegerField()
+    image = serializers.SerializerMethodField()
+
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
+                return f'{url}{obj.image}'
+            except:
+                return obj.image
+        return None
+
+    class Meta:
+        model = Employee
+        fields = ['id', 'full_name', 'image', 'morning_count', 'afternoon_count', 'evening_count']

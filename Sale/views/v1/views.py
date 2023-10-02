@@ -10,6 +10,7 @@ from rest_framework import status
 from Appointment.models import Appointment, AppointmentCheckout, AppointmentService, AppointmentEmployeeTip
 from Business.models import AdminNotificationSetting, Business, StaffNotificationSetting, StockNotificationSetting
 from Client.models import Client, Membership, Vouchers, LoyaltyPoints, LoyaltyPointLogs, ClientLoyaltyPoint
+from Client.Constants.client_order_email import send_order_email, send_membership_order_email
 from Order.models import Checkout, MemberShipOrder, Order, ProductOrder, ServiceOrder, VoucherOrder
 from Sale.Constants.Custom_pag import CustomPagination
 from Utility.Constants.Data.months import MONTHS
@@ -39,24 +40,6 @@ from Reports.models import DiscountPromotionSalesReport
 from Service.models import ServiceTranlations
 from Utility.models import Language
 
-
-# @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-# def get_my_apply_on_jobs(request):
-#     try:
-#         profile = Profile.objects.get(user=request.user, is_deleted=False, user__is_active=True)
-#     except Exception as e:
-#         return Response({"success": False, 'response': {'message': str(e)}},
-#                         status=status.HTTP_404_NOT_FOUND)
-
-#     apply_jobs = list(JobApply.objects.filter(profile=profile, is_deleted=False).values_list('job__id', flat=True))
-
-#     jobapply = Job.objects.filter(id__in=apply_jobs, is_deleted=False)
-#     paginator = CustomPagination()
-#     paginator.page_size = 10
-#     result_page = paginator.paginate_queryset(jobapply, request)
-#     serializer = GetJobSerializer(result_page, many=True)
-#     return paginator.get_paginated_response(serializer.data)
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -64,16 +47,16 @@ def get_service(request):
     title = request.GET.get('title', '')
     location = request.GET.get('location_id', None)
     is_mobile = request.GET.get('is_mobile', None)
-    # SORTED_OPTIONS = {
-    #     'default' : '-created_at',
-    #     'title': title
-    # }
-    # sorted_value = SORTED_OPTIONS.get(title, '-created_at')
+    search_text = request.GET.get('search_text', None)
+    no_pagination = request.GET.get('no_pagination', None)
 
     query = {}
     location_instance = None
     currency_code = None
     errors = []
+    
+    if search_text:
+        query['name__icontains'] = search_text
 
     if location:
         query['location__id'] = location
@@ -95,18 +78,17 @@ def get_service(request):
 
     
     service= Service.objects.filter(
-        name__icontains = title,
         is_deleted = False, 
         is_blocked = False, 
         **query
     ).order_by('-created_at').distinct()
     service_count= service.count()
 
-    page_count = service_count / 20
+    page_count = service_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
-
-    paginator = Paginator(service, 20)
+    per_page_results = 100000 if no_pagination else 10
+    paginator = Paginator(service, per_page_results)
     page_number = request.GET.get("page") 
     services = paginator.get_page(page_number)
 
@@ -192,19 +174,6 @@ def create_service(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
     
-    # try:
-    #     location=BusinessAddress.objects.get(id=location_id)
-    # except Exception as err:
-    #         return Response(
-    #             {
-    #                 'status' : False,
-    #                 'status_code' : StatusCodes.LOCATION_NOT_FOUND_4017,
-    #                 'response' : {
-    #                 'message' : 'Location not found',
-    #                 'error_message' : str(err),
-    #             }
-    #             }
-    #         )
     
     
     service_obj = Service.objects.create(
@@ -213,14 +182,10 @@ def create_service(request):
         name = name,
         description = description,
         service_availible = service_availible,
-        #location=location,
-        #service_type = treatment_type,
         controls_time_slot=controls_time_slot,
         initial_deposit=initial_deposit,
         client_can_book=client_can_book,
         slot_availible_for_online=slot_availible_for_online,
-        
-        #enable_team_comissions =enable_team_comissions,
         enable_vouchers=enable_vouchers,
         
     )
@@ -234,7 +199,6 @@ def create_service(request):
     employees_error = []
     if is_package is not None:
         service_obj.is_package = True
-        #service_obj.service_type = treatment_type
         service_obj.save()
         if service is None:
             pass
@@ -268,7 +232,6 @@ def create_service(request):
                 service = service_obj,
                 employee = employe
                 )
-            #service_obj.employee.add(employe)
         except:
             employees_error.append(str(err))
             pass
@@ -553,27 +516,6 @@ def update_service(request):
             except Exception as err:
                 pass
                 
-            # if s_service_id is not None:
-            #     try: 
-            #         price_service = PriceService.objects.get(id=ser['id'])
-                    
-            #         if bool(is_deleted) == True:
-            #             price_service.delete()
-            #             continue
-            #         servic = Service.objects.get(id=ser['service'])
-            #         price_service.service = servic
-            #         price_service.duration = ser['duration']
-            #         price_service.price = ser['price']
-            #         price_service.currency = currency_id
-            #         price_service.save()
-                    
-            #     except Exception as err:
-            #         error.append(str(err))
-            #         print(err)
-            # else:
-            #     if bool(is_deleted) == True:
-            #         pass
-            #     else:
             ser = Service.objects.get(id=id)
             PriceService.objects.create(
                 service=ser,
@@ -732,20 +674,22 @@ def create_servicegroup(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_servicegroup(request):
-    service_group = ServiceGroup.objects.filter(is_deleted=False).order_by('-created_at')
-    serialized = ServiceGroupSerializer(service_group,  many=True, context={'request' : request})
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Service Group',
-                'error_message' : None,
-                'sales' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    no_pagination = request.GET.get('no_pagination', None)
+    search_text = request.GET.get('search_text', None)
+
+    query = Q(is_deleted=False)
+    if search_text:
+        query &= Q(name__icontains=search_text)
+
+
+    service_group = ServiceGroup.objects.filter(query).order_by('-created_at')
+    serialized = list(ServiceGroupSerializer(service_group,  many=True, context={'request' : request}).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'sales')
+    return response
      
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
@@ -895,12 +839,6 @@ def update_servicegroup(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-    # #pagination
-    
-    # paginator = CustomPagination()
-    # paginator.page_size = 1
-    # result_page = paginator.paginate_queryset(product_order, request)
-    # serialized = ProductOrderSerializer(result_page,  many=True)
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -1019,10 +957,9 @@ def get_all_sale_orders_pagination(request):
     paginator = CustomPagination()
     paginator.page_size = 100000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(sorted_data, request)
-
     response = paginator.get_paginated_response(paginated_data, 'sales')
+    
     end_time = datetime.datetime.now()
-
     response['seconds'] = f'{(end_time - start_time).seconds} s'
     response['total_seconds'] = f'{(end_time - start_time).total_seconds()} s'
     return response
@@ -1272,23 +1209,6 @@ def get_total_revenue(request):
             data['sale_dec'] +=1
             MONTHS[11]['sales'] = data['sale_dec']
         
-            
-            # if value.total_price is not None:
-            #     print('test')
-            #     total += value.total_price
-            # MONTHS[10]['price'] = total
-            
-        
-        # data[ind] = {}
-        # data[ind]['value'] = value
-
-        # for app in appointment:
-        
-        #     create_at = str(app.created_at)
-        #     if (create_at.split(" ")[0] == date ):
-        #         appointments_count +=1
-        #         if app.total_price is not None:
-        #             total_revenue += app.total_price
     total = 0
     appointmemnt_sale = 0
     order_sale = 0
@@ -1297,14 +1217,12 @@ def get_total_revenue(request):
         order_sale += 1
         if order.total_price is not  None:
             total += float(order.total_price)
-    #orders_price = Order.objects.aggregate(Total= Sum('total_price'))
     
     appointment_checkouts = AppointmentCheckout.objects.filter(
         Q(appointment_service__appointment_status = 'Paid') |
         Q(appointment_service__appointment_status = 'Done')
     ).distinct()
-    # appointment_service__appointment_status = 'Done')
-    # appointment_service__appointment_status = 'Paid', 
+
     for checkout_instance in appointment_checkouts:
         appointmemnt_sale +=1
         if checkout_instance.total_price is not None:
@@ -1429,17 +1347,10 @@ def create_sale_order(request):
     
     is_promotion_availed = request.data.get('is_promotion_availed', None)
     is_promotion = request.data.get('is_promotion', False)
-    duration = request.data.get('duration', None)
-    
-    start_date = request.data.get('start_date', None)
-    end_date = request.data.get('end_date', None)
      
     tip = request.data.get('tip', 0)
     total_price = request.data.get('total_price', None)
     minus_price = 0
-
-    # required_fields = [ids,client_type, location_id, total_price ]
-    # return_fields = ['ids','client_type', 'location_id','total_price']
     
     errors = []
     
@@ -1494,35 +1405,6 @@ def create_sale_order(request):
     elif type(ids) == list:
             pass
         
-    # if type(tip) == str:
-    #     tip = json.loads(tip)
-
-    # elif type(tip) == list:
-    #     pass
-
-    #     for t in tip:
-    #         member_id = t.get('employee', None)
-    #         checkout_tip = t.get('tip', None)
-    #         # checkout_tip = int(checkout_tip)
-    #         try:
-    #             member_tips_id = Employee.objects.get(id=member_id)
-                
-    #             create_tip = AppointmentEmployeeTip.objects.create(
-    #                 member = member_tips_id,
-    #                 tip = checkout_tip,
-    #                 # id = id,
-    #                 business_address = business_address,
-    #                 # appointment = appointment,
-    #                 # gst = gst,
-    #                 # gst_price = gst_price,
-    #                 # service_price = service_price,
-    #                 # total_price = total_price,
-    #             )        
-    #         except Exception as err:
-    #             pass
-    # service_total_price = int(float(service_total_price))
-    # product_total_price = int(float(product_total_price))
-    # voucher_total_price = int(float(voucher_total_price))
     
     checkout = Checkout.objects.create(
         user = user,
@@ -1532,10 +1414,6 @@ def create_sale_order(request):
         member = member ,
         client_type = client_type,
         payment_type = payment_type,
-        
-        # service_commission = service_commission,
-        # product_commission = product_commission,
-        # voucher_commission = voucher_commission,   
         
         total_voucher_price = voucher_total_price,
         total_service_price = service_total_price,
@@ -1564,6 +1442,7 @@ def create_sale_order(request):
         voucher_commission_type = voucher_commission_type,
         checkout = f'{checkout.id}'
     )
+    invoice.save()
     
 
     if bool(is_promotion) == True:
@@ -1572,17 +1451,12 @@ def create_sale_order(request):
         invoice.is_promotion = True
         invoice.save()
 
-        
-    # ExceptionRecord.objects.create(
-    #             text = f' is_promotion condition {bool(is_promotion) == True} is_promotion {is_promotion}'
-    #         )
     test = True
     
     if bool(is_promotion_availed) == True:
         for item in ids:
             price = item["price"]
             minus_price +=(price)
-            #print(price)
     
     for id in ids:  
            
@@ -1596,13 +1470,8 @@ def create_sale_order(request):
         
         
         if discount_price is not None:
-            price = int(discount_price) #* int(quantity)
+            price = int(discount_price)
         
-        # if price > 0 and bool(is_promotion_availed) == True:
-        #     minus_price += price
-        #     ExceptionRecord.objects.create(
-        #         text = f'price {price > 0} minus_price {minus_price}'
-        #     )
         
         if price == 0 and bool(is_promotion_availed) == True:
             number = int(float(total_price))
@@ -1625,20 +1494,14 @@ def create_sale_order(request):
         for t in tip:
             member_id = t.get('employee', None)
             checkout_tip = t.get('tip', None)
-            # checkout_tip = int(checkout_tip)
             try:
                 member_tips_id = Employee.objects.get(id=member_id)
                 
                 create_tip = AppointmentEmployeeTip.objects.create(
                     member = member_tips_id,
                     tip = checkout_tip,
-                    # id = id,
                     business_address = business_address,
-                    # appointment = appointment,
-                    # gst = gst,
-                    # gst_price = gst_price,
-                    # service_price = service_price,
-                    # total_price = total_price,
+
                 )        
             except Exception as err:
                 pass
@@ -1668,7 +1531,6 @@ def create_sale_order(request):
                     product = product,
                     user = request.user,
                     location = business_address,
-                    #quantity = int(quantity), 
                     before_quantity = transfer.available_quantity      
                     )                    
                     sold = transfer.available_quantity - int(quantity)
@@ -1715,11 +1577,9 @@ def create_sale_order(request):
                 user = user,
                 client = client,
                 product = product,
-                #status = sale_status,
                 checkout = checkout,
                 member = member,
                 location = business_address,
-                # tip = tip,
                 total_price = total_price, 
                 payment_type= payment_type,
                 client_type = client_type,
@@ -1739,20 +1599,16 @@ def create_sale_order(request):
                 service = Service.objects.get(id = service_id)
                 service_price = PriceService.objects.filter(service = service_id).order_by('-created_at').first()
                 dur = service_price.duration
-                # ExceptionRecord.objects.create(
-                #     text = f'price {price} discount_price {discount_price}'
-                # )
+
                 
                 service_order = ServiceOrder.objects.create(
                     user = user,
                     service = service,
                     duration= dur,
                     checkout = checkout,
-                    
                     client = client,
                     member = member,
                     location = business_address,
-                    # tip = tip,
                     total_price = total_price, 
                     payment_type=payment_type,
                     client_type = client_type,
@@ -1791,11 +1647,9 @@ def create_sale_order(request):
                     membership = membership,
                     start_date = start_date_cal,
                     end_date = end_date_cal,
-                    #status = sale_status,
                     checkout = checkout,
                     client = client,
                     member = member,
-                    # tip = tip,
                     total_price = total_price, 
                     payment_type =payment_type,
                     client_type = client_type,
@@ -1819,10 +1673,9 @@ def create_sale_order(request):
             
         elif sale_type == 'VOUCHER':  
               
-            #for vouchers in ids:  
             try:
                 days = 0
-                voucher = Vouchers.objects.get(id = service_id)#str(vouchers))
+                voucher = Vouchers.objects.get(id = service_id)
                 test = voucher.validity.split(" ")[1]
                 
                 if test == 'Days':
@@ -1850,11 +1703,9 @@ def create_sale_order(request):
                     voucher = voucher,
                     start_date = start_date_cal,
                     end_date = end_date_cal,
-                    #status = sale_status,
                     checkout = checkout,
                     client = client,
                     member = member,
-                    # tip = tip,
                     total_price = total_price, 
                     payment_type =payment_type,
                     client_type = client_type,
@@ -1880,14 +1731,7 @@ def create_sale_order(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-    
-    # try:
-    #     thrd = Thread(target=StaffSaleEmail, args=[], kwargs={'ids' : ids, 'location': business_address.address_name ,'tenant' : request.tenant, 'member': member, 'invoice': checkout.id, 'client': client})
-    #     thrd.start()
-    # except Exception as err:
-    #     ExceptionRecord.objects.create(
-    #             text = f' error in email sale{str(err)}'
-    #         )
+            
     try:
         thrd = Thread(target=StaffSaleEmail, args=[], kwargs={'ids' : ids,'location': business_address.address_name ,'tenant' : request.tenant, 'member': member, 'invoice': checkout.id, 'client': client})
         thrd.start()
@@ -1926,48 +1770,32 @@ def new_create_sale_order(request):
     tax_applied = request.data.get('tax_applied', 0)
     tax_applied1 = request.data.get('tax_applied1', 0)
     tax_name = request.data.get('tax_name', '')
-    tax_name1 = request.data.get('tax_name1', '')
-
-    # sale_status = request.data.get('status', None)
-    
+    tax_name1 = request.data.get('tax_name1', '')    
     location_id = request.data.get('location', None)
     payment_type = request.data.get('payment_type', None)
     client_type = request.data.get('client_type', None)
     ids = request.data.get('ids', None)
     redeemed_membership_id = request.data.get('redeemed_membership_id', False)
-    # membership_product = request.data.get('membership_product', None)
-    # membership_service = request.data.get('membership_service', None)
-    
     free_services_quantity = request.data.get('free_services_quantity', None)
-    
     service_total_price = request.data.get('service_total_price', None)
     product_total_price = request.data.get('product_total_price', None)
     voucher_total_price = request.data.get('voucher_total_price', None)
-    
-    # service_commission = request.data.get('service_commission', None)
-    # product_commission = request.data.get('product_commission', None)
-    # voucher_commission = request.data.get('voucher_commission', None)
-    
     service_commission_type = request.data.get('service_commission_type', '')
     product_commission_type = request.data.get('product_commission_type', '')
     voucher_commission_type = request.data.get('voucher_commission_type', '')
-    
     is_promotion_availed = request.data.get('is_promotion_availed', None)
-    # is_promotion = request.data.get('is_promotion', False)
-    # duration = request.data.get('duration', None)
-    
-    # start_date = request.data.get('start_date', None)
-    # end_date = request.data.get('end_date', None)
-
     is_loyalty_points_redeemed = request.data.get('is_redeemed', None)
     loyalty_points_redeemed_id = request.data.get('redeemed_id', None)
     loyalty_points_redeemed = request.data.get('redeemed_points', None)
-     
     tip = request.data.get('tip', [])
     total_price = request.data.get('total_price', None)
     minus_price = 0
     
     errors = []
+
+    # using this flag to email membership sale only if its membership sale
+    # same for rest of other three sales email
+    is_membership_sale = False
     
     if not all([ client_type, location_id]):
         return Response(
@@ -2047,6 +1875,7 @@ def new_create_sale_order(request):
         voucher_commission_type = voucher_commission_type,  
         checkout = f'{checkout.id}'
     )
+    invoice.save()
 
     test = True
     
@@ -2068,6 +1897,7 @@ def new_create_sale_order(request):
         price = id['price']  
         employee_id = id['employee_id']      
         discount_price = id.get('discount_price', None)
+        
 
         is_membership_redeemed = id.get('is_membership_redeemed', None)
         is_voucher_redeemed = id.get('is_voucher_redeemed', None)
@@ -2111,26 +1941,11 @@ def new_create_sale_order(request):
         
         original_price = float(price)
         discount_percentage = 0
-        order_discount_price = 0
+        order_discount_price = None
         
         if discount_price is not None:
             order_discount_price = float(discount_price)
             discount_percentage = (float(discount_price) / original_price) * 100
-            # price = int(discount_price)
-
-        
-        # discounted_price
-        # discounted_percentage 
-        # original_price
-
-
-        # commission
-        # from_value
-
-        # to_value
-        # commission_rate
-        # category_comission
-        # symbol
 
         order_instance = None
         if sale_type == 'PRODUCT':
@@ -2216,7 +2031,7 @@ def new_create_sale_order(request):
                 quantity = quantity,
                 current_price = float(price),
                 discount_percentage = float(discount_percentage),
-                discount_price = float(order_discount_price),
+                discount_price = order_discount_price,
             )
             product_order.sold_quantity += 1 # product_stock.sold_quantity
             product_order.save()
@@ -2253,7 +2068,7 @@ def new_create_sale_order(request):
                     quantity = quantity,
                     current_price = float(price),
                     discount_percentage = float(discount_percentage),
-                    discount_price = float(order_discount_price),
+                    discount_price = order_discount_price,
                 )
 
                 order_instance = service_order
@@ -2287,8 +2102,6 @@ def new_create_sale_order(request):
                     end_date = end_date_cal,
                     checkout = checkout,
                     client = client,
-
-                    # total_price = total_price, 
                     total_price = float(original_price), 
                     payment_type =payment_type,
                     client_type = client_type,
@@ -2296,7 +2109,7 @@ def new_create_sale_order(request):
                     location = business_address,
                     current_price = float(price),
                     discount_percentage = float(discount_percentage),
-                    discount_price = float(order_discount_price),
+                    discount_price = order_discount_price,
                 )
             except Exception as err:
                 ExceptionRecord.objects.create(
@@ -2313,6 +2126,7 @@ def new_create_sale_order(request):
                 },status=status.HTTP_400_BAD_REQUEST)
             else:
                 order_instance = membership_order
+            is_membership_sale = True
             
         elif sale_type == 'VOUCHER':  
               
@@ -2360,7 +2174,7 @@ def new_create_sale_order(request):
                     quantity = quantity,
                     location = business_address,
                     current_price = float(price),
-                    discount_price = float(order_discount_price),
+                    discount_price = order_discount_price,
 
                 )
                 
@@ -2560,7 +2374,17 @@ def new_create_sale_order(request):
 
     invoice.save() # Do not remove this
     serialized = CheckoutSerializer(checkout, context = {'request' : request, })
+
     
+    if client:
+        """
+        Sending order details to client through 
+        """
+        if is_membership_sale:
+            send_membership_order_email(membership_order, business_address, request)
+        else:
+            send_order_email(checkout, request)
+
     return Response(
             {
                 'status' : True,

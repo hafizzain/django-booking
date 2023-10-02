@@ -9,7 +9,21 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ['id', 'arabic_id', 'name', 'arabic_name', 'is_active']
 
     
-admin.site.register(ProductMedia)
+@admin.register(ProductMedia)
+class ProductMediaAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'image_path',
+        'image_name'
+    ]
+
+    def image_name(self, obj):
+        if obj.image:
+            return obj.image.name
+
+    def image_path(self, obj):
+        if obj.image:
+            return obj.image.path
 #admin.site.register(ProductStock)
 admin.site.register(OrderStock)
 admin.site.register(OrderStockProduct)

@@ -3,6 +3,10 @@ import json
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+
+from django.db.models import Q, CharField
+from django.db.models.functions import Cast
+
 from Employee.models import Employee, StaffGroup
 from NStyle.Constants import StatusCodes
 from rest_framework import status
@@ -12,26 +16,52 @@ from Service.models import ServiceGroup
 from TragetControl.models import RetailTarget, ServiceTarget, StaffTarget, StoreTarget, TierStoreTarget
 from TragetControl.serializers import GETStoreTargetSerializers, RetailTargetSerializers, ServiceTargetSerializers, StaffTargetSerializers, StoreTargetSerializers
 from Utility.models import ExceptionRecord
+from Authentication.models import User
+from Notification.notification_processor import NotificationProcessor
 
+from Sale.Constants.Custom_pag import CustomPagination
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_stafftarget(request):
-    staff_target = StaffTarget.objects.all().order_by('-created_at')   
-    serializer = StaffTargetSerializers(staff_target, many = True,context={'request' : request})
+    search_text = request.query_params.get('search_text', None)
+    no_pagination = request.query_params.get('no_pagination', None)
+    location_id = request.query_params.get('location_id', None)
+    year = request.query_params.get('year', None)
+    month = request.query_params.get('month', None)
     
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Staff Target',
-                'error_message' : None,
-                'stafftarget' : serializer.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+
+    staff_target = StaffTarget.objects.all().order_by('-created_at')
+
+    if year:
+        staff_target = staff_target.filter(year__year=year)
+
+    if month:
+        staff_target = staff_target.filter(month=month)
+
+    if location_id:
+        location = BusinessAddress.objects.get(id=str(location_id))
+        staff_target = staff_target.filter(employee__location=location)
+
+    if search_text:
+        query = Q(employee__full_name__icontains=search_text)
+        query |= Q(service_target_str__icontains=search_text)
+        query |= Q(retail_target_str__icontains=search_text)
+
+        staff_target = staff_target \
+        .annotate(
+            service_target_str=Cast('service_target', CharField()),
+            retail_target_str=Cast('retail_target', CharField())
+        ).filter(query)
+    
+    serialized = list(StaffTargetSerializers(staff_target, many = True,context={'request' : request}).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'stafftarget')
+    return response
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -107,6 +137,12 @@ def create_stafftarget(request):
     c_year = datetime.strptime(date_string, '%Y %B %d')
     staff_target.year = c_year
     staff_target.save()
+
+    # Send Notification to Employee
+    user = User.objects.filter(email__icontains=employee_id.email).first()
+    title = 'Target'
+    body = 'New Sales Target Assigned'
+    NotificationProcessor.send_notifications_to_users(user, title, body)
     
     
     serializers= StaffTargetSerializers(staff_target, context={'request' : request})
@@ -363,21 +399,33 @@ def copy_stafftarget(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_storetarget(request):
-    store_target = StoreTarget.objects.all().order_by('-created_at').distinct()
-    serializer = GETStoreTargetSerializers(store_target, many = True,context={'request' : request})
+
+    no_pagination = request.query_params.get('no_pagination', None)
+    location_id = request.query_params.get('location_id', None)
+    year = request.query_params.get('year', None)
+    month = request.query_params.get('month', None)
     
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Store Target',
-                'error_message' : None,
-                'storetarget' : serializer.data
-            }
-        },
-        status=status.HTTP_200_OK
-    ) 
+    store_target = StoreTarget.objects.all().order_by('-created_at').distinct()
+    
+    if year:
+        store_target = store_target.filter(storetarget_address__year__year=year)
+
+    if month:
+        store_target = store_target.filter(storetarget_address__month=month)
+
+    if location_id:
+        location = BusinessAddress.objects.get(id=str(location_id))
+        store_target = store_target.filter(location=location)
+
+
+    serialized = list(GETStoreTargetSerializers(store_target, many = True,context={'request' : request}).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'storetarget')
+    return response
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -791,21 +839,36 @@ def create_servicetarget(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_servicetarget(request):
+    search_text = request.query_params.get('search_text', None)
+    no_pagination = request.query_params.get('no_pagination', None)
+    month = request.query_params.get('month', None)
+    year = request.query_params.get('year', None)
+    location_id = request.query_params.get('location_id', None)
+
     service_target = ServiceTarget.objects.all().order_by('-created_at').distinct()
-    serializer = ServiceTargetSerializers(service_target, many = True,context={'request' : request})
-    
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Service Target',
-                'error_message' : None,
-                'servicetarget' : serializer.data
-            }
-        },
-        status=status.HTTP_200_OK
-    ) 
+
+    if location_id:
+        location = BusinessAddress.objects.get(id=str(location_id))
+        service_target = service_target.filter(location=location)
+
+    if year:
+        service_target = service_target.filter(year__year=year)
+
+    if month:
+        service_target = service_target.filter(month=month)
+
+
+    if search_text:
+        service_target = service_target.filter(service_group__name=search_text)
+
+    serialized = list(ServiceTargetSerializers(service_target, many = True,context={'request' : request}).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'servicetarget')
+    return response
+
     
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
@@ -1188,21 +1251,36 @@ def create_retailtarget(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_retailtarget(request):
+    search_text = request.query_params.get('search_text', None)
+    no_pagination = request.query_params.get('no_pagination', None)
+    month = request.query_params.get('month', None)
+    year = request.query_params.get('year', None)
+    location_id = request.query_params.get('location_id', None)
+
     retail_target = RetailTarget.objects.all().order_by('-created_at').distinct()
-    serializer = RetailTargetSerializers(retail_target, many = True,context={'request' : request})
-    
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Service Target',
-                'error_message' : None,
-                'retailtarget' : serializer.data
-            }
-        },
-        status=status.HTTP_200_OK
-    ) 
+
+    if location_id:
+        location = BusinessAddress.objects.get(id=str(location_id))
+        retail_target = retail_target.filter(location=location)
+
+    if year:
+        retail_target = retail_target.filter(year__year=year)
+
+    if month:
+        retail_target = retail_target.filter(month=month)
+
+
+    if search_text:
+        retail_target = retail_target.filter(brand__name__icontains=search_text)
+
+    serialized = list(RetailTargetSerializers(retail_target, many = True,context={'request' : request}).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'retailtarget')
+    return response
+
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])

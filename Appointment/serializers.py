@@ -47,6 +47,11 @@ class ServiceSaleSerializer(serializers.ModelSerializer):
 class UpdateAppointmentSerializer(serializers.ModelSerializer):
     service_name  = serializers.SerializerMethodField(read_only=True)
     service_arabic_name  = serializers.SerializerMethodField(read_only=True)
+    final_price = serializers.SerializerMethodField(read_only=True)
+
+
+    def get_final_price(self, obj: AppointmentService):
+        return obj.get_final_price()
     
     def get_service_name(self, obj):
         try:
@@ -86,7 +91,7 @@ class EmployeAppoinmentSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -815,10 +820,10 @@ class NoteSerializer(serializers.ModelSerializer):
 class SingleNoteSerializer(serializers.ModelSerializer):
     
     notes = serializers.SerializerMethodField(read_only=True)
-    client = ClientSerializer()
     customer_note = serializers.SerializerMethodField(read_only=True)
     appointmnet_service = serializers.SerializerMethodField(read_only=True)
     appointment_tips = serializers.SerializerMethodField(read_only=True)
+    client = serializers.SerializerMethodField(read_only=True)
 
     def get_appointment_tips(self, obj):
         tips = AppointmentEmployeeTip.objects.filter(
@@ -847,10 +852,22 @@ class SingleNoteSerializer(serializers.ModelSerializer):
     def get_appointmnet_service(self, obj):
             note = AppointmentService.objects.filter(appointment=obj)
             return AllAppoinment_EmployeeSerializer(note, many = True).data
-            #return serializers
+    
+    def get_client(self, obj):
+        """
+        If is_mobile is true send complete client 
+        object, otherwise just send client ID.
+        """
+        is_mobile = self.context.get('is_mobile', False)
+        if is_mobile:
+            return ClientSerializer(obj.client).data if obj.client else None
+        else:
+            return obj.client.id if obj.client else None
+        
     class Meta:
         model = Appointment
-        fields = ['id', 'client', 'appointment_tips', 'notes', 'business_address','client_type','appointmnet_service', 'customer_note']
+        fields = ['id', 'client', 'appointment_tips', 'notes', 'business_address',
+                  'client_type','appointmnet_service', 'customer_note']
   
 class AppointmentServiceSeriailzer(serializers.ModelSerializer):
     class Meta:
@@ -861,35 +878,38 @@ class ServiceClientSaleSerializer(serializers.ModelSerializer):
     service = serializers.SerializerMethodField(read_only=True)
     booked_by = serializers.SerializerMethodField(read_only=True)
     member = serializers.SerializerMethodField(read_only=True)
-    location = serializers.SerializerMethodField(read_only=True)
+    # location = serializers.SerializerMethodField(read_only=True)
     
-    def get_location(self, obj):
-        try:
-            app_location = BusinessAddress.objects.get(id=obj.business_address.id)
-            return BusiessAddressAppointmentSerializer(app_location).data
-        except Exception as err:
-            None
+    # def get_location(self, obj):
+    #     try:
+    #         app_location = BusinessAddress.objects.get(id=obj.business_address.id)
+    #         return BusiessAddressAppointmentSerializer(app_location).data
+    #     except Exception as err:
+    #         None
         
     def get_member(self, obj):
-        try:
-            emp = Employee.objects.get(id  = obj.member.id)
-            return MemberSaleSerializer(emp).data
-        except Exception as err:
-            print(err)
+        return obj.member.full_name
+        # try:
+        #     emp = Employee.objects.get(id  = obj.member.id)
+        #     return MemberSaleSerializer(emp).data
+        # except Exception as err:
+        #     print(err)
     
     def get_booked_by(self, obj):
         return f'{obj.user.first_name} {obj.user.last_name}'
     
     def get_service(self, obj):
-        try:
-            price = Service.objects.get(id  = obj.service.id)
-            return price.name
-            #return ServiceSaleSerializer(price).data
-        except Exception as err:
-            print(err)
+        return obj.service.name
+        # try:
+        #     price = Service.objects.get(id  = obj.service.id)
+        #     return price.name
+        #     #return ServiceSaleSerializer(price).data
+        # except Exception as err:
+        #     print(err)
+    
     class Meta:
         model = AppointmentService
-        fields = ['id','service', 'created_at','booked_by','duration','location',
+        fields = ['service', 'created_at','booked_by','duration',
                   'price','appointment_status','member', 'is_favourite']
 
 
@@ -902,8 +922,8 @@ class CheckoutSerializer(serializers.ModelSerializer):
     
     def get_service(self, obj):
         try:
-            price = Service.objects.get(id  = obj.service.id)
-            return ServiceSaleSerializer(price).data
+            service = Service.objects.get(id  = obj.service.id)
+            return ServiceSaleSerializer(service).data
         except Exception as err:
             print(err)
             

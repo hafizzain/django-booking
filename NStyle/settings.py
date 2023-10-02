@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 import environ
 import os
+import json
+
+from firebase_admin import initialize_app, credentials
 
 env = environ.Env()
 environ.Env.read_env()
@@ -71,6 +74,8 @@ NSTYLE_APPS = [
     'Help.apps.HelpConfig',
     'MultiLanguage.apps.MultilanguageConfig',
     'SuperInsight.apps.SuperinsightConfig',
+    'Notification.apps.NotificationConfig',
+    'Analytics.apps.AnalyticsConfig'
 ]
 
 
@@ -89,6 +94,7 @@ SHARED_APPS = [
     'geoip2',
     'django_crontab',
     'debug_toolbar',
+    'fcm_django',
     
 
     'Tenants.apps.TenantsConfig',
@@ -143,11 +149,13 @@ MIDDLEWARE = [
     'Utility.error_logging_middleware.ServerErrorLoggingMiddleware',
     'MultiLanguage.error_logging_middleware.ServerErrorLoggingMiddleware',
     'Help.error_logging_middleware.ServerErrorLoggingMiddleware',
+    'Analytics.error_logging_middleware.ServerErrorLoggingMiddleware'
     
 ]
 
 BACKEND_DOMAIN_NAME=env('BACKEND_DOMAIN_NAME')
 BACKEND_HOST=env('BACKEND_HOST')
+CLOUD_FRONT_S3_BUCKET_URL=env('CLOUD_FRONT_S3_BUCKET_URL')
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
@@ -254,7 +262,8 @@ USE_TZ = True
 
 CRONJOBS = [
     ('* * * * *', 'Apponitment.Constants.today_appointment.today_appointment'),
-    ('* * * * *', 'Product.Constants.Product_automation.ReorderQunatity')
+    ('* * * * *', 'Product.Constants.Product_automation.ReorderQunatity'),
+    # ('* * * * *', 'Tenants.Constants.tenant_constants.createFreeAvailableTenants'),
 ]
 
 
@@ -300,3 +309,37 @@ EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 
 GEOIP_PATH =os.path.join('geoip')
+
+
+# FCM_DJANGO CONFIGURATION
+fcm_credentials = env('GOOGLE_APPLICATION_CREDENTIALS')
+try:
+    with open(fcm_credentials, 'r') as cred:
+        json_data = json.loads(cred.read())
+except:
+    pass
+else:
+    cred = credentials.Certificate(json_data)
+    FIREBASE_APP = initialize_app(cred)
+    FCM_DJANGO_SETTINGS = {
+        "DEFAULT_FIREBASE_APP": FIREBASE_APP,
+        "APP_VERBOSE_NAME": "FCM Devices",
+        "ONE_DEVICE_PER_USER": True,
+        "DELETE_INACTIVE_DEVICES": False,
+    }
+
+
+AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
+# AWS_S3_SIGNATURE_VERSION = 's3v4'
+# AWS_S3_REGION_NAME = 'ap-southeast-1'
+# AWS_S3_FILE_OVERWRITE = env('AWS_S3_FILE_OVERWRITE')
+AWS_S3_FILE_OVERWRITE = False
+# AWS_DEFAULT_ACL = env('AWS_DEFAULT_ACL')
+AWS_DEFAULT_ACL = None
+# AWS_S3_VERIFY = env('AWS_S3_VERIFY')
+AWS_S3_VERIFY = True
+# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+CLOUD_FRONT_S3_BUCKET_URL = env('CLOUD_FRONT_S3_BUCKET_URL')

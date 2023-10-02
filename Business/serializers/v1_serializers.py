@@ -146,7 +146,7 @@ class Business_GetSerializer(serializers.ModelSerializer):
         if obj.logo :
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_logo_uploaded_s3)
                 return f'{url}{obj.logo}'
             except:
                 obj.logo
@@ -181,6 +181,7 @@ class Business_GetSerializer(serializers.ModelSerializer):
             'id',
             'business_name',
             'logo',
+            'is_logo_uploaded_s3',
             'banner',
             'postal_code',
             'week_start',
@@ -216,7 +217,7 @@ class BusinessAddressMediaSerializer(serializers.ModelSerializer):
         if obj.image:
             try:
                 request = self.context["request"]
-                url = tenant_media_base_url(request)
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
                 return f'{url}{obj.image}'
             except:
                 return obj.image
@@ -310,7 +311,7 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
             if image.image:
                 try:
                     request = self.context["request"]
-                    url = tenant_media_base_url(request)
+                    url = tenant_media_base_url(request, is_s3_url=image.is_image_uploaded_s3)
                     return f'{url}{image.image}'
                 except:
                     return image.image
@@ -417,7 +418,7 @@ class BusinessAddress_CustomerSerializer(serializers.ModelSerializer):
             if image.image:
                 try:
                     tenant = self.context["tenant"]
-                    url = tenant_media_domain(tenant)
+                    url = tenant_media_domain(tenant, is_s3_url=image.is_image_uploaded_s3)
                     return f'{url}{image.image}'
                 except:
                     return image.image

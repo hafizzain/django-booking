@@ -1,7 +1,7 @@
 from uuid import uuid4
 from django.db import models
 from django.utils.timezone import now
-
+from Tenants.models import Tenant
 #from Employee.models import Employee
 
 
@@ -40,6 +40,8 @@ class Country(models.Model):
 
     name = models.CharField(default='', max_length=200)
     flag = models.ImageField(upload_to='Utility/country/', null=True, blank=True)
+    is_flag_uploaded_s3 = models.BooleanField(default=False)
+
     dial_code = models.CharField(max_length=50, default='')
     code = models.CharField(default='', max_length=20)
     key = models.CharField(default='', max_length=20)
@@ -58,6 +60,8 @@ class State(models.Model):
 
     name = models.CharField(default='', max_length=200)
     flag = models.ImageField(upload_to='Utility/country/', null=True, blank=True)
+    is_flag_uploaded_s3 = models.BooleanField(default=False)
+
     code = models.CharField(default='', max_length=20, null=True, blank=True)
     key = models.CharField(default='', max_length=20, null=True, blank=True)
     unique_code = models.CharField(max_length=1000, default='', null=True, blank=True)
@@ -76,6 +80,8 @@ class City(models.Model):
 
     name = models.CharField(default='', max_length=200)
     flag = models.ImageField(upload_to='Utility/country/', null=True, blank=True)
+    is_flag_uploaded_s3 = models.BooleanField(default=False)
+
     code = models.CharField(default='', max_length=20, null=True, blank=True)
     key = models.CharField(default='', max_length=20, null=True, blank=True)
     unique_code = models.CharField(max_length=1000, default='', null=True, blank=True)
@@ -92,6 +98,8 @@ class Software(models.Model):
 
     name = models.CharField(default='', max_length=200)
     image = models.ImageField(upload_to='Utility/softwares/', null=True, blank=True)
+    is_image_uploaded_s3 = models.BooleanField(default=False)
+
     image_path = models.CharField(default='', max_length=2000, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
@@ -133,9 +141,17 @@ class ExceptionRecord(models.Model):
     text = models.TextField()    
     path = models.TextField(null=True, blank=True)
     method = models.TextField(null=True, blank=True)
+
+    tenant = models.ForeignKey(Tenant, null=True, on_delete=models.SET_NULL, related_name='tenant_exceptions')
     
     is_resolved = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
+
+
+    @property
+    def get_tenant_name(self):
+        if self.tenant:
+            return self.tenant.schema_name
 
     def save(self, *args, **kwargs):
         if self.text:

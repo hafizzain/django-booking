@@ -141,6 +141,11 @@ class AppointmentService(models.Model):
         ('Cancel', 'Cancel'),
     ]
 
+    REDEEMED_TYPES = [
+        ('Voucher', 'Voucher'),
+        ('Membership', 'Membership')
+    ]
+
     
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     
@@ -169,10 +174,17 @@ class AppointmentService(models.Model):
     service_commission = models.FloatField(default = 0 , null=True, blank=True)    
     service_commission_type = models.CharField( max_length=50 , default = '')
     
-    discount_price = models.FloatField(default = 0 , null=True, blank=True)    
+    discount_price = models.FloatField(default=None, null=True, blank=True)    
     discount_percentage = models.FloatField(default = 0 , null=True, blank=True)
-        
-    total_price = models.FloatField(default = 0 , null=True, blank=True)    
+
+    total_price = models.FloatField(default = 0 , null=True, blank=True)
+
+    # redeemed attributes
+    is_redeemed = models.BooleanField(default=False)
+    redeemed_type = models.CharField(default='', max_length=300)
+    redeemed_price = models.FloatField(default=0)
+    redeemed_instance_id = models.CharField(default='', max_length=800)
+    
     
     end_time = models.TimeField(null=True, blank=True)
     details = models.CharField(max_length=255, null=True, blank=True)
@@ -181,6 +193,25 @@ class AppointmentService(models.Model):
     is_deleted = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
+
+    def get_final_price(self):
+        """
+        Only slight changes to reflect the Non None values
+        a real meaning.
+        """
+        if self.is_redeemed == True:
+            return round(self.redeemed_price, 2)
+        elif self.discount_price is not None:
+            price = self.discount_price
+            return round(price, 2)
+        elif self.price:
+            price = self.price
+            return round(price, 2)
+        else:
+            price = self.total_price
+            return round(price, 2)
+
+        
     
     def member_name(self):
         try:

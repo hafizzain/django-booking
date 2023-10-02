@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.db import models
 from django.utils.timezone import now
 from Authentication.models import User
@@ -15,6 +16,8 @@ from django.db.models import F, Q
 from Order.models import Order, Checkout, ProductOrder, ServiceOrder, VoucherOrder, MemberShipOrder
 from Appointment.models import Appointment, AppointmentCheckout, AppointmentService, AppointmentEmployeeTip
 from Utility.models import ExceptionRecord
+from MultiLanguage.models import InvoiceTranslation
+from MultiLanguage.serializers import InvoiceTransSerializer
 
 
 class SaleInvoice(models.Model):
@@ -96,7 +99,7 @@ class SaleInvoice(models.Model):
         )
         ordersData = []
         for order in services:
-            price = order.discount_price or order.total_price
+            price = order.get_final_price()
             data = {
                 'name' : f'{order.service.name}',
                 'arabic_name' : f'{order.service.arabic_name}',
@@ -117,8 +120,23 @@ class SaleInvoice(models.Model):
         # .values('name', 'arabic_name', 'quantity', 'current_price', 'total_price', 'discount_price', 'price')
         ordersData = []
         for order in orders:
-            price = order.discount_price or order.total_price
+            # pricing order for invoice PDF
+
+            #region debugging
+            price = None
+            if order.is_redeemed == True:
+                price = order.redeemed_price
+            elif order.discount_price is not None:
+                price = order.discount_price
+            else:
+                price = order.current_price
+            
+            # will remove this code after debugging
+            # price = order.redeemed_price or order.discount_price or order.total_price
+            
             total_price = float(price) * float(order.quantity)
+            #endregion
+
             data = {
                 'name' : f'{order.name}',
                 'arabic_name' : f'{order.arabic_name}',
@@ -189,24 +207,38 @@ class SaleInvoice(models.Model):
     def save(self, *args, **kwargs):
         if not self.file and self.checkout:
             order_items, order_tips, tax_details = self.get_invoice_order_items()
+            invoice_trans = self.get_invoice_translations()
             if len(order_items) > 0:
                 sub_total = sum([order['price'] for order in order_items])
                 tips_total = sum([t['tip'] for t in order_tips])
-    
+
                 context = {
+                    'client': self.client,
                     'invoice_by' : self.user.user_full_name if self.user else '',
                     'invoice_by_arabic_name' : self.user.user_full_name if self.user else '',
                     'invoice_id' : self.short_id,
                     'order_items' : order_items,
-                    'currency_code' : 'AED',
+                    'currency_code' : self.location.currency.code,
                     'sub_total' : round(sub_total, 2),
                     'tips' : order_tips,
                     'total' : round((float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)) + float(tax_details.get('tax_amount1', 0))), 2),
-                    'created_at' : self.created_at.strftime('%Y-%m-%d') if self.created_at else '',
+                    'created_at' : datetime.now().strftime('%Y-%m-%d'),
                     'BACKEND_HOST' : settings.BACKEND_HOST,
+                    'invoice_trans': invoice_trans['invoice'] if invoice_trans else '',
+                    'items_trans': invoice_trans['items'] if invoice_trans else '',
+                    'amount_trans': invoice_trans['amount'] if invoice_trans else '',
+                    'subtotal_trans': invoice_trans['subtotal'] if invoice_trans else '',
+                    'total_trans': invoice_trans['total'] if invoice_trans else '',
+                    'payment_type_trans': invoice_trans['payment_method'] if invoice_trans else '',
+                    'payment_type': self.payment_type,
                     **tax_details,
                 }
                 schema_name = connection.schema_name
+                schema_dir = f'{settings.BASE_DIR}/media/{schema_name}'
+                is_schema_dir_exist = os.path.isdir(schema_dir)
+                if not is_schema_dir_exist:
+                    os.mkdir(schema_dir)
+
                 output_dir = f'{settings.BASE_DIR}/media/{schema_name}/invoicesFiles'
                 is_exist = os.path.isdir(output_dir)
                 if not is_exist:
@@ -216,9 +248,27 @@ class SaleInvoice(models.Model):
                 output_path = f'{output_dir}/{file_name}'
                 no_media_path = f'invoicesFiles/{file_name}'
                 # template = get_template(f'{settings.BASE_DIR}/templates/Sales/invoice.html')
-                template = get_template(f'{settings.BASE_DIR}/templates/Sales/invoice_2.html') # New Design for Invoice file
+                template = get_template(f'{settings.BASE_DIR}/templates/Sales/invoice_3.html') # New Design for Invoice file
                 html_string = template.render(context)
                 pdfkit.from_string(html_string, os.path.join(output_path))
                 self.file = no_media_path
 
         super(SaleInvoice, self).save(*args, **kwargs)
+
+    def get_invoice_translations(self):
+        """
+        This function will return the invoice translation object
+        based on the invoice business address / location. That 
+        translation will then embed into invoice template.
+        """
+        if self.location:
+            invoice_trans = InvoiceTranslation.objects.filter(
+                status= 'active',
+                location=self.location
+            ).first()
+
+            translation_data = InvoiceTransSerializer(invoice_trans).data
+            return dict(translation_data)
+        else:
+            return None
+

@@ -9,7 +9,7 @@ from Tenants.models import Tenant, Domain
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    search_fields = ['email']
+    search_fields = ['email', 'username']
     list_display = [
         'id', 
         'email', 
