@@ -63,6 +63,7 @@ def GetCountryClients(request):
                 is_deleted = False,
                 is_active = True,
                 is_blocked = False,
+                country__isnull = False
             ).values_list('country__name', flat=True)
             countries.extend(list(client_countries))
     
