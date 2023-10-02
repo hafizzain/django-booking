@@ -101,18 +101,15 @@ def add_cities(tenant=None):
         with open('Utility/Files/cities.csv', 'r') as inp_file:
             csv_reader = csv.DictReader(inp_file, delimiter=',')
             cities_objects = []
+            states = State.objects.select_related('country')
             for row in csv_reader:
-                print(row)
-                state = State.objects \
-                            .filter(unique_code=row['state_code']) \
-                            .select_related('country').first()
-                if state:
-                    city_instance = City(
-                        country = state.country,
-                        state = state,
-                        name = row['name'],
-                    )
-                    cities_objects.append(city_instance)
+                state = states.filter(unique_code=row['state_code'])
+                city_instance = City(
+                    country = state.country,
+                    state = state,
+                    name = row['name'],
+                )
+                cities_objects.append(city_instance)
             City.objects.bulk_create(cities_objects)
 
     print('Cities Created')
