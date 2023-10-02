@@ -12,6 +12,7 @@ from threading import Thread
 from Utility.Constants.Tenant.create_dummy_tenants import CreateDummyTenants
 from django_tenants.utils import tenant_context
 from Client.models import Client
+<<<<<<< HEAD
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -22,6 +23,9 @@ from django.db.models import Count, F, Sum
 from Appointment.models import AppointmentService
 from Service.models import Service
 
+=======
+
+>>>>>>> 1d0335f1 (server changes)
 status_codes = [
     100, 101, 200, 201, 202, 203, 204, 205, 206, 207, 208, 226, 300, 301, 302, 303, 304, 305, 306, 307, 308, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 418, 422, 423, 424, 426, 428, 429, 431, 451, 500, 501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511,
 ]
@@ -35,7 +39,10 @@ def DashboardPage(request):
         is_deleted = False,
     )
     clients = 0
+<<<<<<< HEAD
 
+=======
+>>>>>>> 1d0335f1 (server changes)
     for tenant in tenants:
         with tenant_context(tenant):
             tenant_clients = Client.objects.filter(
@@ -44,6 +51,7 @@ def DashboardPage(request):
                 is_blocked = False,
             )
             clients += tenant_clients.count()
+<<<<<<< HEAD
 
     context = {
         'total_clients' : clients,
@@ -129,6 +137,12 @@ def GetTotalSaleCount(request):
         'services_values' : services_values,
         'tenants_services' : ten_services
     })
+=======
+    context = {
+        'total_clients' : clients
+    }
+    return render(request, 'SuperAdminPanel/pages/dashboard/dashboard.html', context)
+>>>>>>> 1d0335f1 (server changes)
 
 @login_required(login_url='/super-admin/super-login/')
 def ExceptionPage(request):
@@ -136,7 +150,10 @@ def ExceptionPage(request):
     business_name = request.GET.get('business_name', None)
     request_method = request.GET.get('request_method', None)
     selected_date = request.GET.get('date', None)
+<<<<<<< HEAD
     page_ = request.GET.get('page', 1)
+=======
+>>>>>>> 1d0335f1 (server changes)
 
 
     query = {}
@@ -151,6 +168,7 @@ def ExceptionPage(request):
     
     if selected_date:
         query['created_at__date'] = selected_date
+<<<<<<< HEAD
     
 
     all_exceptions = ExceptionRecord.objects.filter(**query).order_by('-created_at')
@@ -169,6 +187,12 @@ def ExceptionPage(request):
     context['total_pages'] = int((all_exceptions.count() / 100)) + (1 if (all_exceptions.count() % 100) > 0 else 0 )
     context['selected_page'] = page_
     context['page_obj'] = page_obj
+=======
+
+    exceptions = ExceptionRecord.objects.filter(**query).order_by('-created_at')
+    context={}
+    context['exceptions'] = exceptions
+>>>>>>> 1d0335f1 (server changes)
     context['status_codes'] = status_codes
     return render(request, 'SuperAdminPanel/pages/Exception/exception.html', context)
 
