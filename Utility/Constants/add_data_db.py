@@ -90,8 +90,7 @@ def add_cities(tenant=None):
 
     with tenant_context(tenant):
 
-        item_count = 0
-        batch_size = 1000
+
         with open('Utility/Files/cities.csv', 'r') as inp_file:
             csv_reader = csv.DictReader(inp_file, delimiter=',')
             cities_objects = []
@@ -102,7 +101,6 @@ def add_cities(tenant=None):
                     name = row['name'],
                 )
                 cities_objects.append(city_instance)
-                item_count += 1
 
             print('===> Objects Created')
             City.objects.bulk_create(cities_objects)
