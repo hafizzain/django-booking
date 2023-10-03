@@ -53,7 +53,7 @@ class SingleClientSerializer(serializers.ModelSerializer):
         return CountrySerializer(obj.country).data if obj.country else None
     
     def get_state(self, obj):
-        return StateSerializer(obj.country).data if obj.country else None
+        return StateSerializer(obj.state).data if obj.state else None
     
 
     def get_city(self, obj):
