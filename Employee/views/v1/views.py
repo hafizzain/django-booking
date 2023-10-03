@@ -763,7 +763,7 @@ def create_employee(request):
 
         
     try:
-        country = Country.objects.get_or_create(name=this_schema_country.name,
+        country, created = Country.objects.get_or_create(name=this_schema_country.name,
                                                 unique_id=this_schema_country.unique_id)
     except Exception as err:
         return Response(
