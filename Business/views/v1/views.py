@@ -41,7 +41,7 @@ from threading import Thread
 from django_tenants.utils import tenant_context
 from Sale.Constants.Custom_pag import CustomPagination
 from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, EmployeeBusinessSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
-
+from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -1059,9 +1059,9 @@ def add_business_location(request):
     user = request.user
     address = request.data.get('address', None)
     address_name = request.data.get('address_name', None)
-    country = request.data.get('country', None)
-    state = request.data.get('state', None)
-    city = request.data.get('city', None)
+    country_unique_id = request.data.get('country', None)
+    state_unique_id = request.data.get('state', None)
+    city_name = request.data.get('city', None)
     postal_code = request.data.get('postal_code', None)
     
     email= request.data.get('email',None)
@@ -1070,9 +1070,6 @@ def add_business_location(request):
     banking = request.data.get('banking',None)
     currency = request.data.get('currency',None)
     
-    start_time = request.data.get('start_time', None)
-    close_time = request.data.get('close_time', None)
-
     if not all([business_id, address, email, mobile_number, address_name]):
         return Response(
             {
@@ -1132,12 +1129,24 @@ def add_business_location(request):
     try:
         if currency is not None:
             currency_id = Currency.objects.get( id = currency, is_deleted=False, is_active=True )
-        if country is not None:
-            country = Country.objects.get( id=country, is_deleted=False, is_active=True )
-        if state is not None:
-            state = State.objects.get( id=state, is_deleted=False, is_active=True )
-        if city is not None:
-            city = City.objects.get( id=city, is_deleted=False, is_active=True )
+        if country_unique_id is not None:
+            public_country = get_country_from_public(country_unique_id)
+            country, created = Country.objects.get_or_create(
+                name=public_country.name,
+                unique_id = public_country.unique_id
+            )
+        if state_unique_id is not None:
+            public_state = get_state_from_public(state_unique_id)
+            state, created= State.objects.get_or_create(
+                name=public_state.name,
+                unique_id=public_state.unique_id
+            )
+        if city_name is not None:
+            city, created= City.objects.get_or_create(name=city_name,
+                                                  country=country,
+                                                  state=state,
+                                                  country_unique_id=country_unique_id,
+                                                  state_unique_id=state_unique_id)
     except Exception as err:
         return Response(
             {
@@ -1159,10 +1168,10 @@ def add_business_location(request):
         address_name = address_name,
         email= email,
         mobile_number=mobile_number,
-        country=country,
         currency = currency_id,
-        state=state,
-        city=city,
+        country=country if country_unique_id else None,
+        state=state if state_unique_id else None,
+        city=city if city_name else None,
         banking = banking,
         is_primary = False,
         is_active = True,
@@ -1177,19 +1186,8 @@ def add_business_location(request):
     if type(opening_day) == str:
         opening_day = json.loads(opening_day)
     else:
-        pass  
+        pass
 
-    # data={}
-    # if start_time or close_time is not None:
-    #     days = [
-    #         'Monday',
-    #         'Tuesday',
-    #         'Wednesday',
-    #         'Thursday',
-    #         'Friday',
-    #         'Saturday',
-    #         'Sunday',
-    #     ]
     days = [
         'monday',
         'tuesday',
