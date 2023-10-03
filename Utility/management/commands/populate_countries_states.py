@@ -9,6 +9,9 @@ class Command(BaseCommand):
     # Handle method to handle out the process of creating the admin user
     def handle(self, *args, **options):
         try:
+            self.stdout.write(self.style.SUCCESS(
+                'STARTED ADDING COUNTRIES, STATES DATA TO PUBLIC SCHEMA'
+            ))
             tenant = Tenant.objects.get(schema_name='public')
             with tenant_context(tenant):
                 add_countries()
