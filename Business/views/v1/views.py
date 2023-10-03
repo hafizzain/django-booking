@@ -3051,9 +3051,9 @@ def add_business_vendor(request):
     mobile_number = request.data.get('mobile_number', None)
 
     email = request.data.get('email', None)
-    country = request.data.get('country', None)
-    state = request.data.get('state', None)
-    city = request.data.get('city', None)
+    country_unique_id = request.data.get('country', None)
+    state_unique_id = request.data.get('state', None)
+    city_name = request.data.get('city', None)
     gstin = request.data.get('gstin', None)
     website = request.data.get('website', None)
     is_active = request.data.get('is_active', None)
@@ -3076,12 +3076,25 @@ def add_business_vendor(request):
         )
 
     try:
-        if country is not None:
-            country = Country.objects.get( id=country, is_deleted=False, is_active=True )
-        if state is not None:
-            state = State.objects.get( id=state, is_deleted=False, is_active=True )
-        if city is not None:
-            city = City.objects.get( id=city, is_deleted=False, is_active=True )
+        if country_unique_id is not None:
+            public_country = get_country_from_public(country_unique_id)
+            country, created = Country.objects.get_or_create(
+                name=public_country.name,
+                unique_id = public_country.unique_id
+            )
+        if state_unique_id is not None:
+            public_state = get_state_from_public(state_unique_id)
+            state, created= State.objects.get_or_create(
+                name=public_state.name,
+                unique_id=public_state.unique_id
+            )
+        if city_name is not None:
+            city, created= City.objects.get_or_create(name=city_name,
+                                                  country=country,
+                                                  state=state,
+                                                  country_unique_id=country_unique_id,
+                                                  state_unique_id=state_unique_id
+                                                  )
     except Exception as err:
         return Response(
             {
@@ -3120,9 +3133,9 @@ def add_business_vendor(request):
         vendor = BusinessVendor.objects.create(
             user = user,
             business = business,
-            country = country,
-            state = state,
-            city = city,
+            country = country if country_unique_id else None,
+            state = state if state_unique_id else None,
+            city = city if city_name else None,
             vendor_name = vendor_name,
             address = address,
             gstin = gstin,

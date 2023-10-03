@@ -19,6 +19,7 @@ from Authentication.serializers import UserSerializer
 from django.conf import settings
 
 from Product.Constants.index  import tenant_media_base_url, tenant_media_domain
+from Utility.serializers import CountrySerializer, StateSerializer, CitySerializer
 
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
@@ -591,6 +592,10 @@ class BusinessTaxSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'parent_tax',
                   'tax_rate', 'location', 'tax_type', 'is_active']
 class BusinessVendorSerializer(serializers.ModelSerializer):
+
+    country = CountrySerializer()
+    state = StateSerializer()
+    city = CitySerializer()
     class Meta:
         model = BusinessVendor
         fields = [ 
