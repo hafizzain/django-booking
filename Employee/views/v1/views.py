@@ -1111,7 +1111,7 @@ def update_employee(request):
     
     if country is not None:
         try:
-            country= Country.objects.get(id=country)
+            country= Country.objects.get(unique_id=country)
             employee.country = country
             employee.save()
         except:
@@ -1119,7 +1119,7 @@ def update_employee(request):
             
     if state is not None:
         try:
-            state= State.objects.get(id=state)
+            state= State.objects.get(unique_id=state)
             employee.state = state
             employee.save()
         except:
@@ -1127,7 +1127,7 @@ def update_employee(request):
             
     if city is not None:
         try:
-            city= City.objects.get(id=city)
+            city= City.objects.get(name=city)
             employee.city = city
             employee.save()
         except:
