@@ -413,7 +413,7 @@ def create_client(request):
         gender= gender,
         country= country,
         state = state,
-        city = city,
+        city = city if city_name else None,
         postal_code= postal_code,
         card_number= card_number,
         is_active = is_active,
