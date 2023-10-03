@@ -1029,8 +1029,8 @@ def update_employee(request):
     location = request.data.get('location', None) 
     
     country = request.data.get('country', None) 
-    city = request.data.get('city', None) 
     state = request.data.get('state', None) 
+    city = request.data.get('city', None) 
     
     working_days = []
     
@@ -1110,28 +1110,20 @@ def update_employee(request):
     employee.save()
     
     if country is not None:
-        try:
-            country= Country.objects.get(unique_id=country)
-            employee.country = country
-            employee.save()
-        except:
-            country = None
+        country= Country.objects.get(unique_id=country)
+        employee.country = country
+        employee.save()
             
     if state is not None:
-        try:
-            state= State.objects.get(unique_id=state)
-            employee.state = state
-            employee.save()
-        except:
-            state = None
+        state= State.objects.get(unique_id=state)
+        employee.state = state
+        employee.save()
             
     if city is not None:
-        try:
-            city= City.objects.get(name=city)
-            employee.city = city
-            employee.save()
-        except:
-            city = None
+        city= City.objects.get(name=city)
+        employee.city = city
+        employee.save()
+ 
 
     Employe_Informations= EmployeeProfessionalInfo.objects.get(employee=employee)
     
