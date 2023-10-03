@@ -99,8 +99,8 @@ def get_countries(request):
     with tenant_context(tenant):
         all_countries = Country.objects.filter(
             is_active=True,
-            is_deleted=False
-        )
+            is_deleted=False,
+        ).exclude(unique_id__isnull=False)
         serialized = CountrySerializer(all_countries, many=True)
         return Response(
             {
