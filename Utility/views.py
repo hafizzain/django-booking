@@ -95,7 +95,7 @@ def get_softwares(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_countries(request):
-    with tenant_context('public]'):
+    with tenant_context('public'):
         all_countries = Country.objects.filter(
             is_active=True,
             is_deleted=False
@@ -117,7 +117,7 @@ def get_countries(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_states(request):
-    with tenant_context('public]'):
+    with tenant_context('public'):
         country = request.GET.get('country' , None)
         if country is None:
             return Response(
