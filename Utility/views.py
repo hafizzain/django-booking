@@ -100,7 +100,7 @@ def get_countries(request):
         all_countries = Country.objects.filter(
             is_active=True,
             is_deleted=False,
-        ).exclude(unique_id__isnull=False)
+        ).exclude(unique_id__isnull=True)
         serialized = CountrySerializer(all_countries, many=True)
         return Response(
             {
