@@ -670,9 +670,9 @@ def create_employee(request):
     services_id = request.data.get('services', None)   
      
     location = request.data.get('location', None)
-    country = request.data.get('country', None)   
-    state = request.data.get('state', None)         
-    city = request.data.get('city', None)
+    country_unique_id = request.data.get('country', None)   
+    state_unique_id = request.data.get('state', None)         
+    city_name = request.data.get('city', None)
     
 
 
@@ -753,7 +753,7 @@ def create_employee(request):
     
         
     try:
-        country = Country.objects.get(id=country)
+        country = Country.objects.get(unique_id=country_unique_id)
     except Exception as err:
         return Response(
             {
@@ -769,11 +769,13 @@ def create_employee(request):
         )
         
     try:
-        state= State.objects.get(id=state)
+        state= State.objects.get(unique_id=state_unique_id)
     except:
         state = None
     try:
-        city= City.objects.get(id=city)
+        city, created= City.objects.get_or_create(name=city_name,
+                                                  country_unique_id=country_unique_id,
+                                                  state_unique_id=state_unique_id)
     except:
         city = None
     try:
