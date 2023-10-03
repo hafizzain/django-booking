@@ -57,7 +57,7 @@ class SingleClientSerializer(serializers.ModelSerializer):
     
 
     def get_city(self, obj):
-        return CitySerializer(obj.country).data if obj.country else None
+        return CitySerializer(obj.city).data if obj.city else None
 
 
     def get_total_done_appointments(self, obj):
