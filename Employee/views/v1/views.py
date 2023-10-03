@@ -674,6 +674,8 @@ def create_employee(request):
     state_unique_id = request.data.get('state', None)         
     city_name = request.data.get('city', None)
     
+    this_schema_country = None
+    this_schema_state = None
 
 
     if not all([
@@ -751,9 +753,18 @@ def create_employee(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
+    public_tenant = Tenant.objects.get(schema_name='public')
+    with tenant_context(public_tenant):
+        public_country = Country.objects.get(unique_id=country_unique_id)
+        public_state = State.objects.get(unique_id=state_unique_id)
+        this_schema_country = public_country
+        this_schema_state = public_state
+
+
         
     try:
-        country = Country.objects.get(unique_id=country_unique_id)
+        country = Country.objects.get_or_create(name=this_schema_country.name,
+                                                unique_id=this_schema_country.unique_id)
     except Exception as err:
         return Response(
             {
@@ -769,7 +780,7 @@ def create_employee(request):
         )
         
     try:
-        state= State.objects.get(unique_id=state_unique_id)
+        state, created= State.objects.get_or_create(unique_id=this_schema_state.unique_id)
     except:
         state = None
     try:
