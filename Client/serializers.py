@@ -11,6 +11,7 @@ from Client.models import Client, ClientGroup, CurrencyPriceMembership, Discount
 from Invoices.models import SaleInvoice
 from Appointment.models import AppointmentCheckout, AppointmentEmployeeTip, AppointmentService
 from Order.models import Checkout, Order
+from Utility.serializers import StateSerializer, CitySerializer
 
 
 class LocationSerializerLoyalty(serializers.ModelSerializer):
@@ -44,6 +45,20 @@ class ClientSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     total_done_appointments = serializers.SerializerMethodField(read_only=True)
     total_sales = serializers.SerializerMethodField(read_only=True)
+    # country = serializers.SerializerMethodField()
+    # state = serializers.SerializerMethodField()
+    # city = serializers.SerializerMethodField()
+
+    # def get_country(self, obj):
+    #     return CountrySerializer(obj.country).data if obj.country else None
+    
+    # def get_state(self, obj):
+    #     return StateSerializer(obj.country).data if obj.country else None
+    
+
+    # def get_city(self, obj):
+    #     return CitySerializer(obj.country).data if obj.country else None
+
 
     def get_total_done_appointments(self, obj):
         return AppointmentService.objects.filter(
@@ -89,6 +104,7 @@ class ClientSerializer(serializers.ModelSerializer):
             except:
                 return f'{obj.image}'
         return None
+    
     class Meta:
         model = Client
         fields =['id','full_name','image','client_id','email','mobile_number','dob','postal_code','address','gender','card_number',

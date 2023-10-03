@@ -24,6 +24,7 @@ from Sale.Constants.Custom_pag import CustomPagination
 import json
 from NStyle.Constants import StatusCodes
 from django.core.paginator import Paginator
+from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -268,9 +269,9 @@ def create_client(request):
     card_number= request.data.get('card_number' , None)
     is_active = True if request.data.get('is_active', None) is not None else False
     
-    city= request.data.get('city', None)
-    state= request.data.get('state', None)
-    country= request.data.get('country', None)
+    city_name = request.data.get('city', None)
+    state_unique_id = request.data.get('state', None)
+    country_unique_id = request.data.get('country', None)
     languages= request.data.get('language', None)
     errors = []
     
@@ -313,11 +314,23 @@ def create_client(request):
     
     try:
         if country is not None:
-            country = Country.objects.get(id=country)
+            public_country = get_country_from_public(country_unique_id)
+            country, created = Country.objects.get_or_create(
+                name=public_country.name,
+                unique_id = public_country.unique_id
+            )
         if state is not None:
-            state= State.objects.get(id=state)
-        if city is not None:
-            city = City.objects.get(id=city)
+            public_state = get_state_from_public(state_unique_id)
+            state, created= State.objects.get_or_create(
+                name=public_state.name,
+                unique_id=public_state.unique_id
+            )
+        if city_name is not None:
+            city, created= City.objects.get_or_create(name=city_name,
+                                                  country=country,
+                                                  state=state,
+                                                  country_unique_id=country_unique_id,
+                                                  state_unique_id=state_unique_id)
     except Exception as err:
         return Response(
             {

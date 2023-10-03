@@ -52,6 +52,8 @@ from Notification.models import CustomFCMDevice
 from Notification.serializers import FCMDeviceSerializer
 from Notification.notification_processor import NotificationProcessor
 
+from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def import_employee(request):
@@ -673,9 +675,6 @@ def create_employee(request):
     country_unique_id = request.data.get('country', None)   
     state_unique_id = request.data.get('state', None)         
     city_name = request.data.get('city', None)
-    
-    this_schema_country = None
-    this_schema_state = None
 
 
     if not all([
@@ -753,18 +752,14 @@ def create_employee(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-    public_tenant = Tenant.objects.get(schema_name='public')
-    with tenant_context(public_tenant):
-        public_country = Country.objects.get(unique_id=country_unique_id)
-        public_state = State.objects.get(unique_id=state_unique_id)
-        this_schema_country = public_country
-        this_schema_state = public_state
-
-
+    public_country = get_country_from_public(country_unique_id)
+    public_state = get_state_from_public(state_unique_id)
         
     try:
-        country, created = Country.objects.get_or_create(name=this_schema_country.name,
-                                                unique_id=this_schema_country.unique_id)
+        country, created = Country.objects.get_or_create(
+            name=public_country.name,
+            unique_id=public_country.unique_id
+        )
     except Exception as err:
         return Response(
             {
@@ -780,11 +775,16 @@ def create_employee(request):
         )
         
     try:
-        state, created= State.objects.get_or_create(unique_id=this_schema_state.unique_id)
+        state, created= State.objects.get_or_create(
+            name=public_state.name,
+            unique_id=public_state.unique_id
+        )
     except:
         state = None
     try:
         city, created= City.objects.get_or_create(name=city_name,
+                                                  country=country,
+                                                  state=state,
                                                   country_unique_id=country_unique_id,
                                                   state_unique_id=state_unique_id)
     except:
