@@ -270,8 +270,8 @@ def create_client(request):
     is_active = True if request.data.get('is_active', None) is not None else False
     
     city_name = request.data.get('city', None)
-    state_unique_id = request.data.get('state', None)
     country_unique_id = request.data.get('country', None)
+    state_unique_id = request.data.get('state', None)
     languages= request.data.get('language', None)
     errors = []
     
@@ -313,13 +313,13 @@ def create_client(request):
         )
     
     try:
-        if country is not None:
+        if country_unique_id is not None:
             public_country = get_country_from_public(country_unique_id)
             country, created = Country.objects.get_or_create(
                 name=public_country.name,
                 unique_id = public_country.unique_id
             )
-        if state is not None:
+        if state_unique_id is not None:
             public_state = get_state_from_public(state_unique_id)
             state, created= State.objects.get_or_create(
                 name=public_state.name,
