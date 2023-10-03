@@ -16,7 +16,7 @@ from Business.models import Business, BusinessAddress
 from Product.models import Product
 from Utility.models import Country, Currency, ExceptionRecord, Language, State, City
 from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs,VoucherCurrencyPrice
-from Client.serializers import ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer, ClientLoyaltyPointSerializer, CustomerLoyaltyPointsLogsSerializer, CustomerDetailedLoyaltyPointsLogsSerializer, ClientVouchersSerializer, ClientMembershipsSerializer
+from Client.serializers import SingleClientSerializer, ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer, ClientLoyaltyPointSerializer, CustomerLoyaltyPointsLogsSerializer, CustomerDetailedLoyaltyPointsLogsSerializer, ClientVouchersSerializer, ClientMembershipsSerializer
 from Utility.models import NstyleFile
 
 from Sale.Constants.Custom_pag import CustomPagination
@@ -151,7 +151,7 @@ def get_single_client(request):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-    seralized = ClientSerializer(client, context={'request' : request})
+    seralized = SingleClientSerializer(client, context={'request' : request})
     return Response(
         {
             'status' : 200,
@@ -411,8 +411,8 @@ def create_client(request):
         mobile_number=mobile_number,
         dob=dob,
         gender= gender,
-        country= country,
-        state = state,
+        country= country if country_unique_id else None,
+        state = state if state_unique_id else None,
         city = city if city_name else None,
         postal_code= postal_code,
         card_number= card_number,
