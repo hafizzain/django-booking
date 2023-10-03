@@ -103,9 +103,9 @@ def import_employee(request):
                 status=status.HTTP_404_NOT_FOUND
             )
             try:
-                country = Country.objects.get(name__icontains=country)
-                state= State.objects.get(name__icontains=state)
-                city = City.objects.get(name__icontains=city)
+                country, created = Country.objects.get_or_create(name__icontains=country)
+                state, created= State.objects.get_or_create(name__icontains=state)
+                city, created = City.objects.get_or_create(name__icontains=city)
             except Exception as err:
                 return Response(
                     {
