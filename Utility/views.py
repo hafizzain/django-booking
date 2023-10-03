@@ -120,8 +120,8 @@ def get_countries(request):
 def get_states(request):
     tenant = Tenant.objects.get(schema_name='public')
     with tenant_context(tenant):
-        country = request.GET.get('country' , None)
-        if country is None:
+        country_unique_id = request.GET.get('country_unique_id' , None)
+        if country_unique_id is None:
             return Response(
                 {
                     'status' : False,
@@ -138,7 +138,7 @@ def get_states(request):
             all_states = State.objects.filter(
                 is_active=True,
                 is_deleted=False,
-                country__id=country
+                country_unique_id=country_unique_id
             )
         except Exception as err:
             return Response(

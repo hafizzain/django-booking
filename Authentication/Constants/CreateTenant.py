@@ -446,9 +446,6 @@ def add_data_to_tenant_thread(tenant=None):
         print('gonna create DB data')
         add_currencies(tenant=tenant)
         add_languages(tenant=tenant)
-        add_countries(tenant=tenant)
-        add_states(tenant=tenant)
-        add_cities(tenant=tenant)
     
     except Exception as err:
         print(err)
