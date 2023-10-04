@@ -44,7 +44,7 @@ def DashboardPage(request):
                 is_blocked = False,
             )
             clients += tenant_clients.count()
-            
+
     context = {
         'total_clients' : clients,
         'get_country_users_url' : reverse('GetCountryClients'),
@@ -95,6 +95,7 @@ def GetTotalSaleCount(request):
         is_deleted = False,
     )
     tenants_services = []
+    tenants_iter = 0
     for tenant in tenants:
         with tenant_context(tenant):
             services = Service.objects.filter(
@@ -105,6 +106,7 @@ def GetTotalSaleCount(request):
                 total_count = Count(F('serivce_appointments'))
             ).values_list('name', flat=True)
             tenants_services.extend(list(services))
+            tenants_iter = tenants_iter + 1
 
     
     services_labels = set(tenants_services)
