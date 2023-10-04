@@ -103,7 +103,7 @@ def GetTotalSaleCount(request):
                 # is_blocked = False,
                 serivce_appointments__isnull = False
             ).annotate(
-                total_count = Sum(F('serivce_appointments'))
+                total_count = Count(F('serivce_appointments'))
             ).order_by('total_count').values_list('name', 'total_count')
             tenants_services.extend(list(services))
 
