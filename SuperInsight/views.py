@@ -48,6 +48,7 @@ def DashboardPage(request):
     context = {
         'total_clients' : clients,
         'get_country_users_url' : reverse('GetCountryClients'),
+        'get_service_wise_sale_data_url' : reverse('GetTotalSaleCount'),
     }
     return render(request, 'SuperAdminPanel/pages/dashboard/dashboard.html', context)
 
