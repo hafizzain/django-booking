@@ -118,13 +118,15 @@ def GetTotalSaleCount(request):
     services_labels = []
     services_values = []
 
-    # for s_name in tenants_services:
-    #     services_values.append(tenants_services.count(s_name))
+    ten_services = tenants_services[:10]
+    for s_name in ten_services:
+        services_labels.append(s_name[0])
+        services_values.append(s_name[1])
         
     return Response({
         'services_labels' : services_labels,
         'services_values' : services_values,
-        'tenants_services' : tenants_services
+        'tenants_services' : ten_services
     })
 
 @login_required(login_url='/super-admin/super-login/')
