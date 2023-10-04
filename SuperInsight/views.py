@@ -95,7 +95,6 @@ def GetTotalSaleCount(request):
         is_deleted = False,
     )
     tenants_services = []
-    tenants_iter = 0
     for tenant in tenants:
         with tenant_context(tenant):
             services = Service.objects.filter(
@@ -104,20 +103,21 @@ def GetTotalSaleCount(request):
                 # is_blocked = False,
             ).annotate(
                 total_count = Count(F('serivce_appointments'))
-            ).values_list('name', flat=True)
+            ).order_by('total_count').values_list('name', 'total_count')
             tenants_services.extend(list(services))
-            tenants_iter = tenants_iter + 1
 
     
-    services_labels = set(tenants_services)
+    # services_labels = set(tenants_services)
+    services_labels = []
     services_values = []
 
-    for s_name in tenants_services:
-        services_values.append(tenants_services.count(s_name))
+    # for s_name in tenants_services:
+    #     services_values.append(tenants_services.count(s_name))
         
     return Response({
         'services_labels' : services_labels,
         'services_values' : services_values,
+        'tenants_services' : tenants_services
     })
 
 @login_required(login_url='/super-admin/super-login/')
