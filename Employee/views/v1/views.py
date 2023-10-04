@@ -1232,7 +1232,23 @@ def update_employee(request):
             Errors.append(err)
             print(err)
 
-    serializer = EmployeSerializer(employee, context={'request' : request,})
+    serializer = EmployeSerializer(employee, data=request.data, partial=True, context={'request' : request,})
+    if serializer.is_valid():
+        serializer.save()
+    else:
+        return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : ' Employee updated successfully',
+                    'error_message' : 'Error in saving Employee',
+                    'Employee' : data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
     data.update(serializer.data)
 
     return Response(
@@ -1245,7 +1261,8 @@ def update_employee(request):
                 'Employee' : data
             }
         },
-        status=status.HTTP_200_OK)
+        status=status.HTTP_200_OK
+    )
     
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
