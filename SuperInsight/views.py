@@ -101,6 +101,7 @@ def GetTotalSaleCount(request):
                 is_deleted = False,
                 # is_active = True,
                 # is_blocked = False,
+                serivce_appointments__isnull = False
             ).annotate(
                 total_count = Count(F('serivce_appointments'))
             ).order_by('total_count').values_list('name', 'total_count')
