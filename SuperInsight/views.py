@@ -100,8 +100,8 @@ def GetTotalSaleCount(request):
         with tenant_context(tenant):
             services = Service.objects.filter(
                 is_deleted = False,
-                is_active = True,
-                is_blocked = False,
+                # is_active = True,
+                # is_blocked = False,
             ).annotate(
                 total_count = Count(F('serivce_appointments'))
             ).values_list('name', flat=True)
