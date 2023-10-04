@@ -593,9 +593,9 @@ class BusinessTaxSerializer(serializers.ModelSerializer):
                   'tax_rate', 'location', 'tax_type', 'is_active']
 class BusinessVendorSerializer(serializers.ModelSerializer):
 
-    country = CountrySerializer()
-    state = StateSerializer()
-    city = CitySerializer()
+    country = CountrySerializer(read_only=True)
+    state = StateSerializer(read_only=True)
+    city = CitySerializer(read_only=True)
     class Meta:
         model = BusinessVendor
         fields = [ 

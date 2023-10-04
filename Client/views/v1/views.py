@@ -457,84 +457,113 @@ def create_client(request):
 @permission_classes([IsAuthenticated])
 def update_client(request): 
     # sourcery skip: avoid-builtin-shadow
-        id = request.data.get('id', None)
-        if id is None:
-            return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.MISSING_FIELDS_4001,
-                'status_code_text' : 'MISSING_FIELDS_4001',
-                'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : 'Client ID is required',
-                    'fields' : [
-                        'id',
-                    ]
-                }
-            },
-             status=status.HTTP_400_BAD_REQUEST
-           )
-        try:
-            client = Client.objects.get(id=id)
-        except Exception as err:
-              return Response(
-             {
-                    'status' : False,
-                    'status_code' : StatusCodes.INVALID_CLIENT_4032,
-                    'status_code_text' : 'INVALID_CLIENT_4032',
-                    'response' : {
-                        'message' : 'Client Not Found',
-                        'error_message' : str(err),
-                    }
-                },
-                   status=status.HTTP_404_NOT_FOUND
-              )
-        image=request.data.get('image',None)
-        phone_number=request.data.get('mobile_number',None)
-        if phone_number is not None:
-            client.mobile_number = phone_number
-        else :
-            client.mobile_number = None
-        
-        client.is_active = True  if request.data.get('image',None) is not None else False
 
-        if image is not None:
-            client.image=image
-        
-        postal_code = request.data.get('postal_code' , None)
-        if postal_code is None:
-            client.postal_code = ''
+    country_unique_id = request.data.get('country', None)
+    state_unique_id = request.data.get('state', None)
+    city_name = request.data.get('city', None)
 
-        client.save()
-        
-        serialized= ClientSerializer(client, data=request.data, partial=True, context={'request' : request})
-        if serialized.is_valid():
-            serialized.save()
-            
+    id = request.data.get('id', None)
+    if id is None:
+        return Response(
+        {
+            'status' : False,
+            'status_code' : StatusCodes.MISSING_FIELDS_4001,
+            'status_code_text' : 'MISSING_FIELDS_4001',
+            'response' : {
+                'message' : 'Invalid Data!',
+                'error_message' : 'Client ID is required',
+                'fields' : [
+                    'id',
+                ]
+            }
+        },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        client = Client.objects.get(id=id)
+    except Exception as err:
             return Response(
-            {
-                'status' : True,
-                'status_code' : 200,
-                'response' : {
-                    'message' : 'Client Updated Successfully!',
-                    'error_message' : None,
-                    'client' : serialized.data
-                }
-            },
-            status=status.HTTP_200_OK
-           )
-        else:
-              return Response(
             {
                 'status' : False,
                 'status_code' : StatusCodes.INVALID_CLIENT_4032,
+                'status_code_text' : 'INVALID_CLIENT_4032',
                 'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : str(serialized.errors),
+                    'message' : 'Client Not Found',
+                    'error_message' : str(err),
                 }
             },
-            status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_404_NOT_FOUND
+            )
+    image=request.data.get('image',None)
+    phone_number=request.data.get('mobile_number',None)
+    if phone_number is not None:
+        client.mobile_number = phone_number
+    else :
+        client.mobile_number = None
+    
+    client.is_active = True  if request.data.get('image',None) is not None else False
+
+    if image is not None:
+        client.image=image
+    
+    postal_code = request.data.get('postal_code' , None)
+    if postal_code is None:
+        client.postal_code = ''
+
+    if country_unique_id is not None:
+        public_country = get_country_from_public(country_unique_id)
+        country, created = Country.objects.get_or_create(
+            name=public_country.name,
+            unique_id = public_country.unique_id
         )
+        client.country = country
+            
+    if state_unique_id is not None:
+        public_state = get_state_from_public(state_unique_id)
+        state, created= State.objects.get_or_create(
+            name=public_state.name,
+            unique_id=public_state.unique_id
+        )
+        client.state = state
+            
+    if city_name is not None:
+        city, created= City.objects.get_or_create(name=city_name,
+                                                country=country,
+                                                state=state,
+                                                country_unique_id=country_unique_id,
+                                                state_unique_id=state_unique_id)
+        client.city = city
+    
+    client.save()
+    
+    serialized= ClientSerializer(client, data=request.data, partial=True, context={'request' : request})
+    if serialized.is_valid():
+        serialized.save()
+        
+        return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Client Updated Successfully!',
+                'error_message' : None,
+                'client' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+        )
+    else:
+            return Response(
+        {
+            'status' : False,
+            'status_code' : StatusCodes.INVALID_CLIENT_4032,
+            'response' : {
+                'message' : 'Invalid Data!',
+                'error_message' : str(serialized.errors),
+            }
+        },
+        status=status.HTTP_400_BAD_REQUEST
+    )
         
         
         
