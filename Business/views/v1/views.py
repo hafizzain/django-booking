@@ -3184,6 +3184,9 @@ def add_business_vendor(request):
 @permission_classes([IsAuthenticated])
 def update_business_vendor(request):
     vendor_id = request.data.get('vendor', True)
+    country_unique_id = request.data.get('country', None) 
+    state_unique_id = request.data.get('state', None) 
+    city_name = request.data.get('city', None) 
 
     if not all([vendor_id]):
         return Response(
@@ -3226,6 +3229,31 @@ def update_business_vendor(request):
         vendor.mobile_number = phone_number
     else :
         vendor.mobile_number = None
+    vendor.save()
+    if country_unique_id is not None:
+        public_country = get_country_from_public(country_unique_id)
+        country, created = Country.objects.get_or_create(
+            name=public_country.name,
+            unique_id = public_country.unique_id
+        )
+        vendor.country = country
+            
+    if state_unique_id is not None:
+        public_state = get_state_from_public(state_unique_id)
+        state, created= State.objects.get_or_create(
+            name=public_state.name,
+            unique_id=public_state.unique_id
+        )
+        vendor.state = state
+            
+    if city_name is not None:
+        city, created= City.objects.get_or_create(name=city_name,
+                                                country=country,
+                                                state=state,
+                                                country_unique_id=country_unique_id,
+                                                state_unique_id=state_unique_id)
+        vendor.city = city
+    
     vendor.save()
     serialized = BusinessVendorSerializer(vendor, data=request.data)
     if serialized.is_valid():
