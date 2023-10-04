@@ -1401,9 +1401,9 @@ def update_location(request):
     business_address.location_name= request.data.get('location_name', business_address.location_name)
     business_address.description= request.data.get('description', business_address.description)
             
-    country = request.data.get('country', None)
-    state = request.data.get('state', None)
-    city = request.data.get('city', None)
+    country_unique_id = request.data.get('country', None)
+    state_unique_id = request.data.get('state', None)
+    city_name = request.data.get('city', None)
     currency = request.data.get('currency', None)
     images = request.data.get('images', None)
     is_publish = request.data.get('is_publish', None)
@@ -1428,23 +1428,31 @@ def update_location(request):
         )
 
     try:
-        if currency is not None:
-            currency_id = Currency.objects.get( id = currency, is_deleted=False, is_active=True )
-            business_address.currency = currency_id
-            business_address.save()
-            
-        if country is not None:
-            country = Country.objects.get( id=country, is_deleted=False, is_active=True )
+        if country_unique_id is not None:
+            public_country = get_country_from_public(country_unique_id)
+            country, created = Country.objects.get_or_create(
+                name=public_country.name,
+                unique_id = public_country.unique_id
+            )
             business_address.country = country
-            business_address.save()
-        if state is not None:
-            state = State.objects.get( id=state, is_deleted=False, is_active=True )
+            
+        if state_unique_id is not None:
+            public_state = get_state_from_public(state_unique_id)
+            state, created= State.objects.get_or_create(
+                name=public_state.name,
+                unique_id=public_state.unique_id
+            )
             business_address.state = state
-            business_address.save()
-        if city is not None:
-            city = City.objects.get( id=city, is_deleted=False, is_active=True )
+                
+        if city_name is not None:
+            city, created= City.objects.get_or_create(name=city_name,
+                                                    country=country,
+                                                    state=state,
+                                                    country_unique_id=country_unique_id,
+                                                    state_unique_id=state_unique_id)
             business_address.city = city
-            business_address.save()
+        
+        business_address.save()
     except Exception as err:
         return Response(
             {
