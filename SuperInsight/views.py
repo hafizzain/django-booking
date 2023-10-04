@@ -105,7 +105,7 @@ def GetTotalSaleCount(request):
             ).annotate(
                 total_service_sale_count = Count(F('serivce_appointments'))
             ).order_by('-total_service_sale_count').values_list('name', 'total_service_sale_count')
-            tenants_services.extend(list(services))
+            tenants_services.extend(services)
 
     
     # services_labels = set(tenants_services)
