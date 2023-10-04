@@ -1028,9 +1028,9 @@ def update_employee(request):
     staff_id = request.data.get('staff_group', None) 
     location = request.data.get('location', None) 
     
-    country = request.data.get('country', None) 
-    state = request.data.get('state', None) 
-    city = request.data.get('city', None) 
+    country_unique_id = request.data.get('country', None) 
+    state_unique_id = request.data.get('state', None) 
+    city_name = request.data.get('city', None) 
     
     working_days = []
     
@@ -1109,20 +1109,31 @@ def update_employee(request):
         employee.is_active = False 
     employee.save()
     
-    if country is not None:
-        country= Country.objects.get(unique_id=country)
+    if country_unique_id is not None:
+        public_country = get_country_from_public(country_unique_id)
+        country, created = Country.objects.get_or_create(
+            name=public_country.name,
+            unique_id = public_country.unique_id
+        )
         employee.country = country
-        employee.save()
             
-    if state is not None:
-        state= State.objects.get(unique_id=state)
+    if state_unique_id is not None:
+        public_state = get_state_from_public(state_unique_id)
+        state, created= State.objects.get_or_create(
+            name=public_state.name,
+            unique_id=public_state.unique_id
+        )
         employee.state = state
-        employee.save()
             
-    if city is not None:
-        city= City.objects.get(name=city)
+    if city_name is not None:
+        city, created= City.objects.get_or_create(name=city_name,
+                                                country=country,
+                                                state=state,
+                                                country_unique_id=country_unique_id,
+                                                state_unique_id=state_unique_id)
         employee.city = city
-        employee.save()
+    
+    employee.save()
  
 
     Employe_Informations= EmployeeProfessionalInfo.objects.get(employee=employee)
@@ -1187,28 +1198,6 @@ def update_employee(request):
         },
         status=status.HTTP_404_NOT_FOUND
     )
-    # try:
-    #     empl_permission = EmployePermission.objects.get(employee=employee)
-        
-    #     for permit in ALL_PERMISSIONS:
-              
-    #         value = request.data.get(permit, None)
-    #         PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
-            
-    #         if value is not None:
-    #             if type(value) == str:
-    #                 value = json.loads(value)
-    #                 for opt in value:
-    #                     try:
-    #                         option = GlobalPermissionChoices.objects.get(text=opt)
-    #                         PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
-    #                     except:
-    #                         pass
-
-    #     empl_permission.save()
-    
-    # except Exception as err:
-    #     Errors.append(err)
     
     try:
         empl_permission, created = EmployePermission.objects.get_or_create(employee=employee)
@@ -1230,7 +1219,6 @@ def update_employee(request):
                         except GlobalPermissionChoices.DoesNotExist:
                             pass
                         
-        #empl_permission.save()
         
     except (TypeError, json.JSONDecodeError, AttributeError) as err: #Exception as err:
         Errors.append(err)
@@ -1244,22 +1232,9 @@ def update_employee(request):
             Errors.append(err)
             print(err)
 
-    serializer = EmployeSerializer(employee, data=request.data, partial=True, context={'request' : request,})
-    if serializer.is_valid():
-        serializer.save()
-        data.update(serializer.data)
-    else: 
-        return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
-                'response' : {
-                    'message' : 'Invialid Data',
-                    'error_message' : str(serializer.errors),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
+    serializer = EmployeSerializer(employee, context={'request' : request,})
+    data.update(serializer.data)
+
     return Response(
         {
             'status' : True,
