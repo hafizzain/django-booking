@@ -17,7 +17,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from Authentication.models import User
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import Count, F
+from django.db.models import Count, F, Sum
 
 from Appointment.models import AppointmentService
 from Service.models import Service
@@ -103,7 +103,7 @@ def GetTotalSaleCount(request):
                 # is_blocked = False,
                 serivce_appointments__isnull = False
             ).annotate(
-                total_count = Count(F('serivce_appointments'))
+                total_count = Sum(F('serivce_appointments'))
             ).order_by('total_count').values_list('name', 'total_count')
             tenants_services.extend(list(services))
 
