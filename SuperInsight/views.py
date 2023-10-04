@@ -85,6 +85,9 @@ def GetCountryClients(request):
         'country_values' : country_values,
     })
 
+def get_service(sevice):
+    return sevice[1]
+
 @api_view(['GET',])
 @permission_classes([AllowAny])
 def GetTotalSaleCount(request):
@@ -104,8 +107,11 @@ def GetTotalSaleCount(request):
                 serivce_appointments__isnull = False
             ).annotate(
                 total_service_sale_count = Count(F('serivce_appointments'))
-            ).order_by('-total_service_sale_count').values_list('name', 'total_service_sale_count')
+            ).values_list('name', 'total_service_sale_count')
             tenants_services.extend(services)
+    
+
+    sorted_services = tenants_services.sort(key=get_service )
 
     
     # services_labels = set(tenants_services)
