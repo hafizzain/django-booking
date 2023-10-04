@@ -207,6 +207,7 @@ class MemberShipOrder(Order):
 class VoucherOrder(Order):
     voucher = models.ForeignKey(Vouchers, on_delete=models.CASCADE, related_name='voucher_orders')
     
+    max_sales = models.IntegerField(default=0)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     

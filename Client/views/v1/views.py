@@ -2237,26 +2237,15 @@ def create_vouchers(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-    
-    # if valid_for.lower() == 'days':
-    #     days= days
-    # else:
-    #     months = months
         
     voucher = Vouchers.objects.create(
         user = user,
         business = business, 
         name = name,
-        #value = value,
         validity=validity,
         voucher_type=voucher_type,
-        #valid_for = valid_for,
         sales = sales,
         discount_percentage = discount_percentage,
-        # price = price,  
-        # 
-        # discount = discount,  
-        
     )
     if currency_voucher_price is not None:
         if type(currency_voucher_price) == str:
@@ -2286,35 +2275,7 @@ def create_vouchers(request):
                 currency = currency_id,
                 price = price,
             )
-            # voucher_obj.save()
-    # voucher.days = days
-    # voucher.months = months
-    # voucher.save()
-    # if voucher_type is not None:
-    #     if type(voucher_type) == str:
-    #         voucher_type = voucher_type.replace("'" , '"')
-    #         voucher_type = json.loads(voucher_type)
-    #     else:
-    #         pass
-    #     for ser in voucher_type:
-    #         percentage = ser.get('percentage', 0)
-    #         try:
-    #             voucher_type=Vouchers.objects.get(id=voucher_type)
-    #         except Exception as err:
-    #             return Response(
-    #                 {
-    #                     'status' : False,
-    #                     'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
-    #                     'response' : {
-    #                     'message' : 'percentage not found',
-    #                     'error_message' : str(err),
-    #                     }
-    #                 },
-    #                 status=status.HTTP_400_BAD_REQUEST
-    #             )
-    #         percentage_obj = DiscountMembership.objects.create(
-    #             percentage =percentage
-    #         )
+            
     serialized = VoucherSerializer(voucher)
        
     return Response(
@@ -2497,33 +2458,6 @@ def update_vouchers(request):
                         price = price,
                     )
 
-            # try:
-            #     voucher_id = Vouchers.objects.get(id=voucher)
-            # except Exception as err:
-            #     expt = ExceptionRecord.objects.create(text= 'voucher found ' + str(err))
-            #     expt.save()
-            #     pass
-            
-            # # if id is not None:
-            # #     try:
-            # #         currency_price = VoucherCurrencyPrice.objects.get(id=id)
-            # #     except Exception as err:
-            # #         pass
-                
-            # #     currency_price.price = price
-            # #     currency_price.save()
-            
-            # if currency_id is not None: 
-            #     if id is not None:
-            #         currency_price = VoucherCurrencyPrice.objects.get(currency=currency_id, voucher = voucher_id)
-            #         currency_price.price = price
-            #         currency_price.save()
-            #     else:
-            #         services_obj = VoucherCurrencyPrice.objects.create(
-            #             voucher = vouchers,
-            #             currency = currency_id,
-            #             price = price,
-            #         )
     serializer = VoucherSerializer(vouchers, data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(

@@ -2253,7 +2253,6 @@ def new_create_sale_order(request):
                     day = voucher.validity.split(" ")[0]
                     day = int(day)
                     days = day * 360
-                print(days)
                 end_date_cal = voucher.created_at +  timedelta(days=days)
                 start_date_cal = voucher.created_at
                 
@@ -2268,7 +2267,6 @@ def new_create_sale_order(request):
                     checkout = checkout,
                     client = client,
                     discount_percentage = float(discount_percentage),
-                    # total_price = total_price, 
                     total_price = float(original_price), 
                     payment_type =payment_type,
                     client_type = client_type,
