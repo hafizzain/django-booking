@@ -111,7 +111,7 @@ def GetTotalSaleCount(request):
             tenants_services.extend(services)
     
 
-    sorted_services = tenants_services.sort(key=get_service )
+    sorted_services = tenants_services.sort(key=get_service, reverse=True)
 
     
     # services_labels = set(tenants_services)
