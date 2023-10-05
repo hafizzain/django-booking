@@ -2743,10 +2743,7 @@ def delete_business_payment_methods(request):
         )
 
     try:
-        payment_method = BusinessPaymentMethod.objects.get(
-            id=method_id,
-            is_active=True
-        )
+        payment_method = BusinessPaymentMethod.objects.get(id=method_id)
     except Exception as err:
         return Response(
             {
