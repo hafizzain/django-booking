@@ -2,7 +2,7 @@ from datetime import date, datetime
 from threading import Thread
 
 from Order.models import VoucherOrder, Vouchers, MemberShipOrder, Membership
-
+from django.utils import timezone
 from Client.Constants.Add_Employe import add_client
 from Employee.Constants.Add_Employe import add_employee
 from Promotions.models import ServiceDurationForSpecificTime
@@ -2670,8 +2670,8 @@ def get_client_all_vouchers(request):
         client_vouchers = VoucherOrder.objects.filter(
             # location__id = location_id,
             client__id = client_id,
-        ).exclude(max_sales=F('voucher__sales'),
-                  end_date__lt=datetime.now()
+            max_sales__lt=F('voucher__sales'),
+            end_date__gte=timezone.now()
         )
         
     except Exception as error:
