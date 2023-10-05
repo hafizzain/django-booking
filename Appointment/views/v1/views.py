@@ -1790,6 +1790,11 @@ def create_checkout(request):
                 service_appointment.is_redeemed = True
                 service_appointment.redeemed_type = AppointmentService.REDEEMED_TYPES[1][0]
             elif is_voucher_redeemed:
+                # incrementing voucher max sale 
+                if is_voucher_redeemed:
+                    client_voucher = VoucherOrder.objects.get(id=redeemed_voucher_id)
+                    client_voucher.max_sales += 1
+                    client_voucher.save()
                 service_appointment.redeemed_price = redeemed_price
                 service_appointment.redeemed_instance_id = redeemed_voucher_id
                 service_appointment.is_redeemed = True
