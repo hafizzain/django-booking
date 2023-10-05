@@ -2371,6 +2371,7 @@ def update_payment_method(request):
 @permission_classes([AllowAny])
 def get_business_payment_methods(request):
     business_id = request.GET.get('business', None)
+    get_all = request.GET.get('get_all', None)
 
     if not all([business_id]):
         return Response(
@@ -2405,11 +2406,12 @@ def get_business_payment_methods(request):
                 status=status.HTTP_404_NOT_FOUND
             )
 
+    query = Q(business=business)
 
-    payment_methods = BusinessPaymentMethod.objects.filter(
-        business=business,
-        is_active=True
-    )
+    if not get_all:
+        query &= Q(is_active=True)
+
+    payment_methods = BusinessPaymentMethod.objects.filter(query)
     serialized = PaymentMethodSerializer(payment_methods, many=True)
 
     return Response(
@@ -2506,7 +2508,7 @@ def add_business_tax(request):
                             'status_code' : StatusCodes.LOCATION_NOT_FOUND_4017,
                             'status_code_text' : 'BUSINESSS_TAX_NOT_FOUND',
                             'response' : {
-                                'message' : 'Business Tax Not Found',
+                                'message' : 'Business tax not found',
                                 'error_message' : str(err),
                             }
                         },
@@ -2555,7 +2557,7 @@ def add_business_tax(request):
                 'status_code' : 201,
                 'status_code_text' : '201',
                 'response' : {
-                    'message' : 'Business Tax added!',
+                    'message' : 'Business tax added!',
                     'error_message' : None,
                     'tax' : serialized.data,
                     'errors' : json.dumps(all_errors)
@@ -2643,7 +2645,7 @@ def update_business_tax(request):
                             'status_code' : StatusCodes.LOCATION_NOT_FOUND_4017,
                             'status_code_text' : 'BUSINESSS_TAX_NOT_FOUND',
                             'response' : {
-                                'message' : 'Business Tax Not Found',
+                                'message' : 'Business tax not found',
                                 'error_message' : str(err),
                             }
                         },
@@ -2666,7 +2668,7 @@ def update_business_tax(request):
                     'status_code' : 404,
                     'status_code_text' : '404',
                     'response' : {
-                        'message' : 'Business Tax Not Found',
+                        'message' : 'Business tax Not found',
                         'error_message' : str(err),
                     }
                 },
@@ -2709,7 +2711,7 @@ def update_business_tax(request):
                 'status_code' : 200,
                 'status_code_text' : '200',
                 'response' : {
-                    'message' : 'Business Tax updated!',
+                    'message' : 'Business tax updated!',
                     'error_message' : None,
                     'tax' : serialized.data
                 }
@@ -2780,7 +2782,7 @@ def delete_business_payment_methods(request):
                 'status_code' : 200,
                 'status_code_text' : '200',
                 'response' : {
-                    'message' : 'Business payment method Deleted!',
+                    'message' : 'Business payment method deleted!',
                     'error_message' : None,
                 }
             },
@@ -2885,7 +2887,7 @@ def delete_business_tax(request):
                 'status_code' : 200,
                 'status_code_text' : '200',
                 'response' : {
-                    'message' : 'Business Tax Deleted!',
+                    'message' : 'Business tax deleted!',
                     'error_message' : None,
                 }
             },

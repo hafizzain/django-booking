@@ -311,7 +311,7 @@ def add_category(request):
                 'status' : True,
                 'status_code' : 201,
                 'response' : {
-                    'message' : 'Category Added!',
+                    'message' : 'Category added!',
                     'error_message' : None,
                     'categories' : serialized.data
                 }
