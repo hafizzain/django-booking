@@ -16,7 +16,7 @@ from django.db.models import F
 from Product.models import Product
 from Service.models import Service, ServiceTranlations
 from Utility.models import Language
-
+from Product.serializers import ProductTranlationsSerializer
 
 class PriceServiceSerializers(serializers.ModelSerializer):
     currency_name = serializers.SerializerMethodField(read_only=True)
@@ -1625,6 +1625,12 @@ class PromotionNDiscount_AppointmentCheckoutSerializer(serializers.ModelSerializ
                   'tip', 'gst', 'gst1', 'gst_price', 'gst_price1', 'tax_name', 'tax_name1']
 
 
+class ProductTranslationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+
+        model = Product
+
 
 class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     product_name  = serializers.SerializerMethodField(read_only=True)
@@ -1633,6 +1639,13 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     price  = serializers.SerializerMethodField(read_only=True)
     selection_type  = serializers.SerializerMethodField(read_only=True)
     product_original_price = serializers.SerializerMethodField(read_only=True)
+    product_translations = serializers.SerializerMethodField(read_only=True)
+
+    def get_product_translations(self, obj):
+        product_translations = obj.product.producttranslations_set.all()
+        return ProductTranlationsSerializer(product_translations).data
+        
+
 
     def get_selection_type(self, obj):
         return 'PRODUCT'
