@@ -1685,7 +1685,7 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'product_name', 'product_arabic_name', 'product_original_price', 
             'quantity', 'product_price', 'price', 'selection_type', 'discount_percentage',
-            'redeemed_type']
+            'redeemed_type', 'product_translations']
 
 
 class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
