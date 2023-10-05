@@ -10,7 +10,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from django.db.models import Q
+from django.db.models import Q, F
 from Service.models import Service
 from Business.models import Business, BusinessAddress
 from Product.models import Product
@@ -2670,7 +2670,9 @@ def get_client_all_vouchers(request):
         client_vouchers = VoucherOrder.objects.filter(
             # location__id = location_id,
             client__id = client_id,
-        )
+        ).exclude(max_sales=F('voucher__sales'),
+                  end_date__lt=datetime.now())
+        
     except Exception as error:
         return Response(
             {
