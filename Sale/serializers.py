@@ -16,7 +16,7 @@ from django.db.models import F
 from Product.models import Product
 from Service.models import Service, ServiceTranlations
 from Utility.models import Language
-from Product.serializers import ProductTranlationsSerializer
+from Product.serializers import ProductTranlationsSerializerNew
 
 class PriceServiceSerializers(serializers.ModelSerializer):
     currency_name = serializers.SerializerMethodField(read_only=True)
@@ -1643,7 +1643,7 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
 
     def get_product_translations(self, obj):
         product_translations = obj.product.producttranslations_set.all()
-        return ProductTranlationsSerializer(product_translations).data
+        return ProductTranlationsSerializerNew(product_translations, many=True).data
         
 
 

@@ -317,6 +317,17 @@ class ProductSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['slug', 'id']
 
+class ProductTranlationsSerializerNew(serializers.ModelSerializer):
+    
+    class Meta:
+        model = ProductTranslations
+        fields = [
+            'id', 
+            'product', 
+            'product_name',
+            'language'
+            ]
+
 class ProductTranlationsSerializer(serializers.ModelSerializer):
     invoiceLanguage = serializers.SerializerMethodField(read_only=True)
     def get_invoiceLanguage(self, obj):
