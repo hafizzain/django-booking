@@ -410,6 +410,7 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
             return {
                 'voucher_type' : obj.voucher.voucher_type,
                 'name' : obj.voucher.name,
+                'sales': obj.voucher.sales,
                 'start_date' : f'{obj.start_date}',
                 'end_date' : f'{obj.end_date}',
             }
@@ -427,7 +428,7 @@ class ClientVouchersSerializer(serializers.ModelSerializer):
         fields = ['id', 'voucher', 'client' , 'location' , 
                   'status','quantity', 'checkout','employee','start_date', 'end_date',
                   'total_price', 'payment_type' , 'order_type','price',
-                  'name','created_at','discount_percentage', 'voucher_price' ]
+                  'name','created_at','discount_percentage', 'voucher_price', 'max_sales']
 
 class ClientMembershipsSerializer(serializers.ModelSerializer):
     # membership = serializers.SerializerMethodField(read_only=True)

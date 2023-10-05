@@ -2671,7 +2671,8 @@ def get_client_all_vouchers(request):
             # location__id = location_id,
             client__id = client_id,
         ).exclude(max_sales=F('voucher__sales'),
-                  end_date__lt=datetime.now())
+                  end_date__lt=datetime.now()
+        )
         
     except Exception as error:
         return Response(
