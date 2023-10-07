@@ -2670,8 +2670,8 @@ def get_client_all_vouchers(request):
         client_vouchers = VoucherOrder.objects.filter(
             # location__id = location_id,
             client__id = client_id,
-            max_sales__lt=F('voucher__sales'),
-            end_date__gte=timezone.now()
+            # max_sales__lt=F('voucher__sales'),
+            # end_date__gte=timezone.now()
         )
         
     except Exception as error:
