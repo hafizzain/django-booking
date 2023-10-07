@@ -2295,13 +2295,7 @@ def new_create_sale_order(request):
             else:
                 order_instance = voucher_order
         
-        if order_instance is not None and is_redeemed:
-            # incrementing voucher max sale 
-            if is_voucher_redeemed:
-                client_voucher = VoucherOrder.objects.get(id=redeemed_voucher_id)
-                client_voucher.max_sales += 1
-                client_voucher.save()
-                
+        if order_instance is not None and is_redeemed:                
             order_instance.is_redeemed = True
             order_instance.redeemed_type = 'Membership' if is_membership_redeemed else 'Voucher' if is_voucher_redeemed  else ''
             order_instance.redeemed_price = float(redeemed_price)
