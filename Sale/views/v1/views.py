@@ -2358,6 +2358,12 @@ def new_create_sale_order(request):
                 employee_commission.save()
             
 
+    if order_instance is not None and is_redeemed:
+        # incrementing voucher max sale 
+        if is_voucher_redeemed:
+            client_voucher = VoucherOrder.objects.get(id=redeemed_voucher_id)
+            client_voucher.max_sales += 1
+            client_voucher.save()
     
     if type(tip) == str:
         tip = json.loads(tip)
