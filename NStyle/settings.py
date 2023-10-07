@@ -234,9 +234,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
 
-    'DEFAULT_RENDERER_CLASSES': [
-        'Utility.customizations.renderers.CustomRenderer',
-    ],
+    # 'DEFAULT_RENDERER_CLASSES': [
+    #     'Utility.customizations.renderers.CustomRenderer',
+    # ],
 
     'DEFAULT_AUTHENTICATION_CLASSES' : [
         'rest_framework.authentication.TokenAuthentication'
