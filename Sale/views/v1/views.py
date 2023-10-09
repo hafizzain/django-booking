@@ -2242,6 +2242,13 @@ def new_create_sale_order(request):
                 voucher = Vouchers.objects.get(id = service_id)#str(vouchers))
                 item_name = voucher.name
                 test = voucher.validity.split(" ")[1]
+
+
+                # TODO: remove this Min Condition
+                if test == 'Min':
+                    minutes = voucher.validity.split(" ")[0]
+                    minute = int(minutes)
+                    days = minute
                 
                 if test == 'Days':
                     day = voucher.validity.split(" ")[0]
@@ -2258,7 +2265,9 @@ def new_create_sale_order(request):
                     day = voucher.validity.split(" ")[0]
                     day = int(day)
                     days = day * 360
-                end_date_cal = voucher.created_at +  timedelta(days=days)
+                
+
+                end_date_cal = voucher.created_at +  timedelta(minutes=days)
                 start_date_cal = voucher.created_at
                 
                 discount_percentage = voucher.discount_percentage
@@ -2356,14 +2365,14 @@ def new_create_sale_order(request):
                 employee_commission.save()
             
 
-   
+    # This code should be removed as its not required now.
     # incrementing voucher max sale 
-    if is_voucher_redeemed_global:
-        client_voucher = VoucherOrder.objects.get(id=redeemed_voucher_id)
-        debug_before = client_voucher.max_sales
-        client_voucher.max_sales += 1
-        client_voucher.save()
-        debug_after = client_voucher.max_sales
+    # if is_voucher_redeemed_global:
+    #     client_voucher = VoucherOrder.objects.get(id=redeemed_voucher_id)
+    #     debug_before = client_voucher.max_sales
+    #     client_voucher.max_sales += 1
+    #     client_voucher.save()
+    #     debug_after = client_voucher.max_sales
     
     if type(tip) == str:
         tip = json.loads(tip)
