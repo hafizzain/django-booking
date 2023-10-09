@@ -2032,7 +2032,7 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
         return serialized_tips
     
     def get_total_tip(self, obj):
-        tips = AppointmentEmployeeTip.objects.filter(checkout=obj).aggregate(
+        tips = AppointmentEmployeeTip.objects.filter(appointment=obj.appointment).aggregate(
             total_tip=Sum('tip')
         )
         return tips['total_tip']
