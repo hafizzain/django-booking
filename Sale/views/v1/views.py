@@ -2267,8 +2267,8 @@ def new_create_sale_order(request):
                     days = day * 360
                 
 
-                end_date_cal = voucher.created_at +  timedelta(minutes=days)
-                start_date_cal = voucher.created_at
+                end_date_cal = datetime.datetime.now() +  timedelta(minutes=days)
+                start_date_cal = datetime.datetime.now()
                 
                 discount_percentage = voucher.discount_percentage
                 

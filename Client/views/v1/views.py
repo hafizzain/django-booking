@@ -2672,7 +2672,6 @@ def get_client_all_vouchers(request):
     try:
         client_vouchers = VoucherOrder.objects.filter(
             client__id = client_id,
-            created_at__lt=F('end_date')
         )
         
     except Exception as error:
