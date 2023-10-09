@@ -256,17 +256,13 @@
                 </div>
                 <p>{{sub_total}} {{currency_code}}</p>
               </div>
-              {% for tip in tips %}
+
               <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
                 <div>
-                  <p>Tip for {{tip.employee_name}}</p>
-                  <p>
-                    {{tip.employee_name}} <span class="arabic">نصيحة ل</span>
-                  </p>
-                </div>
-                <p>{{tip.tip}} {{currency_code}}</p>
+                  <p>Total Tip: {{ total_tip }}{{currency_code}}</p>
               </div>
-              {% endfor %} {% if tax_applied %}
+              
+              {% if tax_applied %}
               <div
                 class="flex items-center justify-between text-[#7B7B7B] text-sm"
               >
@@ -276,7 +272,9 @@
                 </div>
                 <p>{{tax_amount}} {{currency_code}}</p>
               </div>
-              {% endif %} {% if tax_applied1 %}
+              {% endif %} 
+              
+              {% if tax_applied1 %}
               <div
                 class="flex items-center justify-between text-[#7B7B7B] text-sm"
               >

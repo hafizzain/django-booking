@@ -224,6 +224,7 @@ class SaleInvoice(models.Model):
                     'currency_code' : self.location.currency.code,
                     'sub_total' : round(sub_total, 2),
                     'tips' : order_tips,
+                    'total_tip':tips_total,
                     'total' : round((float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)) + float(tax_details.get('tax_amount1', 0))), 2),
                     'created_at' : datetime.now().strftime('%Y-%m-%d'),
                     'BACKEND_HOST' : settings.BACKEND_HOST,
