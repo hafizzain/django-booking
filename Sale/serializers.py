@@ -10,6 +10,7 @@ from Product.Constants.index import tenant_media_base_url, tenant_media_domain
 from Utility.models import Currency, ExceptionRecord
 from Sale.Constants.Promotion import get_promotions
 
+from django.db.models import Sum
 from Service.models import PriceService, Service, ServiceGroup
 from Invoices.models import SaleInvoice
 from django.db.models import F
@@ -1815,6 +1816,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     gst_price1 = serializers.FloatField(source='tax_amount1')
     
     tip = serializers.SerializerMethodField(read_only=True)
+    total_tip = serializers.SerializerMethodField(read_only=True)
 
     def get_client(self, obj):
         if obj.client:
@@ -1920,6 +1922,13 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
         tips = AppointmentEmployeeTip.objects.filter(checkout=obj)
         serialized_tips = CheckoutTipsSerializer(tips, many=True).data
         return serialized_tips
+
+    def get_total_tip(self, obj):
+        tips = AppointmentEmployeeTip.objects.filter(checkout=obj).aggregate(
+            total_tip=Sum('tip')
+        )
+        return tips['total_tip']
+
     
     def get_invoice(self, obj):
         try:
@@ -1943,7 +1952,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             'created_at', 'payment_type', 'tip', 'service_commission', 'voucher_commission', 'product_commission',
             'service_commission_type', 'product_commission_type', 'voucher_commission_type', 'ids', 'membership_product',
             'membership_service', 'membership_type', 'invoice', 'tax_name', 'tax_name1', 'total_discount',
-            'voucher_redeem_percentage', 'redeem_option'
+            'voucher_redeem_percentage', 'redeem_option', 'total_tip'
         ]
 
         # Remove Member from get all sale orders
@@ -1975,6 +1984,7 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
     
     tip = serializers.SerializerMethodField(read_only=True)
     invoice = serializers.SerializerMethodField(read_only=True)
+    total_tip = serializers.SerializerMethodField(read_only=True)
     
 
     def get_promotion_name(self, obj):
@@ -2021,6 +2031,12 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
         serialized_tips = AppointmentTipsSerializer(tips, many=True).data
         return serialized_tips
     
+    def get_total_tip(self, obj):
+        tips = AppointmentEmployeeTip.objects.filter(checkout=obj).aggregate(
+            total_tip=Sum('tip')
+        )
+        return tips['total_tip']
+    
     def get_invoice(self, obj):
         try:
             invoice = SaleInvoice.objects.get(checkout__icontains = obj)
@@ -2036,5 +2052,5 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
                  'membership', 'rewards', 'tip', 'gst', 'gst1', 'gst_price', 'gst_price1', 'service_price',
                  'total_price', 'service_commission', 'service_commission_type', 'voucher_discount_percentage',
                  'created_at', 'order_type', 'client', 'location', 'price', 'promotion_name', 'invoice',
-                 'tax_name', 'tax_name1']
+                 'tax_name', 'tax_name1', 'total_tip']
         
