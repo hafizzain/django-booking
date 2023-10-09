@@ -2356,7 +2356,7 @@ def new_create_sale_order(request):
     # incrementing voucher max sale 
     if is_voucher_redeemed:
         client_voucher = VoucherOrder.objects.get(id=redeemed_voucher_id)
-        client_voucher.max_sales = F('max_sales') + 1
+        client_voucher.max_sales += 1
         client_voucher.save()
     
     if type(tip) == str:
