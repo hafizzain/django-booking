@@ -2712,7 +2712,7 @@ def get_client_all_memberships(request):
     today_date = today_date.strftime('%Y-%m-%d')
     client_membership = MemberShipOrder.objects.filter(
         # location__id = location_id,
-
+        created_at__lt = F('end_date'),
         end_date__gte = today_date,
         client__id = client_id,
     )
