@@ -2669,6 +2669,7 @@ def get_client_all_vouchers(request):
     try:
         client_vouchers = VoucherOrder.objects.filter(
             # location__id = location_id,
+            max_sales__lte=F('voucher__sales'),
             client__id = client_id,
             created_at__lt=F('end_date')
         )
