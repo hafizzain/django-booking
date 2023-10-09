@@ -1876,6 +1876,7 @@ def new_create_sale_order(request):
     payment_type = request.data.get('payment_type', None)
     client_type = request.data.get('client_type', None)
     ids = request.data.get('ids', None)
+    is_voucher_redeemed_global = request.data.get('is_voucher_redeemed', None)
     redeemed_membership_id = request.data.get('redeemed_membership_id', False)
     redeemed_voucher_id = request.data.get('redeemed_voucher_id', None)
     free_services_quantity = request.data.get('free_services_quantity', None)
@@ -2357,7 +2358,7 @@ def new_create_sale_order(request):
 
    
     # incrementing voucher max sale 
-    if is_voucher_redeemed:
+    if is_voucher_redeemed_global:
         client_voucher = VoucherOrder.objects.get(id=redeemed_voucher_id)
         debug_before = client_voucher.max_sales
         client_voucher.max_sales += 1
