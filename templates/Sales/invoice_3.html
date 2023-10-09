@@ -257,9 +257,12 @@
                 <p>{{sub_total}} {{currency_code}}</p>
               </div>
 
-              <div class="flex items-center justify-between text-[#7B7B7B] text-sm">
+              <div class="flex items-center justify-between text-primary text-sm font-bold">
                 <div>
-                  <p>Total Tip: {{ total_tip }} {{currency_code}}</p>
+                  <p>Total Tip</p>
+                  <p class="arabic">{{subtotal_trans}}</p>
+                </div>
+                <p>{{ total_tip }} {{currency_code}}</p></p>
               </div>
               
               {% if tax_applied %}
