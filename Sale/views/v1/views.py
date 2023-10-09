@@ -1895,6 +1895,9 @@ def new_create_sale_order(request):
     tip = request.data.get('tip', [])
     total_price = request.data.get('total_price', None)
     minus_price = 0
+    debug_before = None
+    debug_after = None
+
     
     errors = []
 
@@ -2356,8 +2359,10 @@ def new_create_sale_order(request):
     # incrementing voucher max sale 
     if is_voucher_redeemed:
         client_voucher = VoucherOrder.objects.get(id=redeemed_voucher_id)
+        debug_before = client_voucher.max_sales
         client_voucher.max_sales += 1
         client_voucher.save()
+        debug_after = client_voucher.max_sales
     
     if type(tip) == str:
         tip = json.loads(tip)
@@ -2500,6 +2505,8 @@ def new_create_sale_order(request):
                     'message' : 'Product Order Sale Created!',
                     'error_message' : errors,
                     'sale' : serialized.data,
+                    'before': debug_before,
+                    'after': debug_after
                 }
             },
             status=status.HTTP_201_CREATED
