@@ -2672,7 +2672,7 @@ def get_client_all_vouchers(request):
             created_at__lt=F('end_date')
         ).annotate(
             sales_int = Cast('voucher__sales', IntegerField())
-        ).filter(max_sales__lte=F('sales_int'))
+        ).filter(max_sales__gte=F('sales_int'))
         
     except Exception as error:
         return Response(
