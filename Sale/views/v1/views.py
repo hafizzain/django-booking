@@ -2291,9 +2291,7 @@ def new_create_sale_order(request):
 
                 )
 
-                # incrementing voucher sales
-                voucher.sales -= 1
-                voucher.save()
+                
                 
             except Exception as err:
                 ExceptionRecord.objects.create(
