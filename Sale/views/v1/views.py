@@ -2245,10 +2245,10 @@ def new_create_sale_order(request):
 
 
                 # TODO: remove this Min Condition
-                # if test == 'Min':
-                #     minutes = voucher.validity.split(" ")[0]
-                #     minute = int(minutes)
-                #     days = minute
+                if test == 'Min':
+                    minutes = voucher.validity.split(" ")[0]
+                    minute = int(minutes)
+                    days = minute
                 
                 if test == 'Days':
                     day = voucher.validity.split(" ")[0]
@@ -2268,7 +2268,7 @@ def new_create_sale_order(request):
                 
 
                 start_date_cal = datetime.datetime.now()
-                end_date_cal = datetime.datetime.now() +  timedelta(days=days)
+                end_date_cal = datetime.datetime.now() +  timedelta(minutes=days)
                 
                 discount_percentage = voucher.discount_percentage
                 
