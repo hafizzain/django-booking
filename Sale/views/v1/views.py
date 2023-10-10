@@ -2056,7 +2056,7 @@ def new_create_sale_order(request):
         
         if discount_price is not None:
             order_discount_price = float(discount_price)
-            discount_percentage = float(discount_percentage)
+            discount_percentage = float(discount_percentage) if discount_percentage else None
 
         order_instance = None
         if sale_type == 'PRODUCT':
