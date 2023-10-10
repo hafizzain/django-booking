@@ -2245,10 +2245,10 @@ def new_create_sale_order(request):
 
 
                 # TODO: remove this Min Condition
-                if test == 'Min':
-                    minutes = voucher.validity.split(" ")[0]
-                    minute = int(minutes)
-                    days = minute
+                # if test == 'Min':
+                #     minutes = voucher.validity.split(" ")[0]
+                #     minute = int(minutes)
+                #     days = minute
                 
                 if test == 'Days':
                     day = voucher.validity.split(" ")[0]
@@ -2267,8 +2267,8 @@ def new_create_sale_order(request):
                     days = day * 360
                 
 
-                end_date_cal = datetime.datetime.now() +  timedelta(minutes=days)
                 start_date_cal = datetime.datetime.now()
+                end_date_cal = datetime.datetime.now() +  timedelta(days=days)
                 
                 discount_percentage = voucher.discount_percentage
                 
@@ -2290,6 +2290,10 @@ def new_create_sale_order(request):
                     discount_price = order_discount_price,
 
                 )
+
+                # incrementing voucher sales
+                voucher.sales -= 1
+                voucher.save()
                 
             except Exception as err:
                 ExceptionRecord.objects.create(

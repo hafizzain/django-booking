@@ -2193,10 +2193,7 @@ def create_vouchers(request):
     
     #valid_for = request.data.get('valid_for', None)
 
-    # TODO: reverse this
-    # validity= request.data.get('validity', None)
-    validity = '5 Min'
-    
+    validity = request.data.get('validity', None)
     sales = request.data.get('sales', None)
     price = request.data.get('price', None)
 
@@ -2671,7 +2668,8 @@ def get_client_all_vouchers(request):
 
     try:
         client_vouchers = VoucherOrder.objects.filter(
-            client__id = client_id,
+            client__id=client_id,
+            end_date__gt=datetime.now()
         )
         
     except Exception as error:
