@@ -2193,8 +2193,8 @@ def create_vouchers(request):
     
     #valid_for = request.data.get('valid_for', None)
 
-    # validity = request.data.get('validity', None)
-    validity = "5 Min"
+    validity = request.data.get('validity', None)
+    # validity = "5 Min"
 
     sales = request.data.get('sales', None)
     price = request.data.get('price', None)
