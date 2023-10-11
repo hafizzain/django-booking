@@ -3647,8 +3647,8 @@ def create_vacation_emp(request):
         {
             'status' : 200,
             'status_code' : '200',
-            'response' : {
-                'message' : 'All Schedule',
+            'response' : { 
+                'message' : 'All schedule',
                 'error_message' : None,
                 'schedule' : serialized.data
             }
@@ -4133,7 +4133,7 @@ def get_absence(request):
                 'status' : 200,
                 'status_code' : '200',
                 'response' : {
-                    'message' : 'All Absence Schedule',
+                    'message' : 'All absence schedule',
                     'count':allvacations_count,
                     'error_message' : None,
                     'absences' : serialized.data
