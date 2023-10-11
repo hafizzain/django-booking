@@ -161,10 +161,20 @@ class ExceptionRecord(models.Model):
     def get_tenant_name(self):
         if self.tenant:
             return self.tenant.schema_name
+    
+
+    @property
+    def html_text(self, ):
+        text = self.text
+        return text
 
     def save(self, *args, **kwargs):
         if self.text:
-            text = f'{self.text}'.replace('\\n', '<br/>')
+            text = f'{self.text}'
+            if text[0] == "b":
+                text = text[2:-2]
+            text = text.replace('\\n', '')
+            text = text.replace('<!DOCTYPE html>', '')
             self.text = text
         super(ExceptionRecord, self).save(*args, **kwargs)
 
