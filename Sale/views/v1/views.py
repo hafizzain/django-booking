@@ -2056,7 +2056,7 @@ def new_create_sale_order(request):
         
         if discount_price is not None:
             order_discount_price = float(discount_price)
-            discount_percentage = float(discount_percentage)
+            discount_percentage = float(discount_percentage) if discount_percentage else None
 
         order_instance = None
         if sale_type == 'PRODUCT':
@@ -2239,7 +2239,7 @@ def new_create_sale_order(request):
               
             try:
                 days = 0
-                voucher = Vouchers.objects.get(id = service_id)#str(vouchers))
+                voucher = Vouchers.objects.get(id = service_id)
                 item_name = voucher.name
                 test = voucher.validity.split(" ")[1]
 
@@ -2268,7 +2268,7 @@ def new_create_sale_order(request):
                 
 
                 start_date_cal = datetime.datetime.now()
-                end_date_cal = datetime.datetime.now() +  timedelta(minutes=days)
+                end_date_cal = datetime.datetime.now() +  timedelta(days=days)
                 
                 discount_percentage = voucher.discount_percentage
                 
