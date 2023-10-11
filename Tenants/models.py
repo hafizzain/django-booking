@@ -20,6 +20,9 @@ class Tenant(TenantMixin):
     is_ready = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
+
+    last_active = models.DateTimeField(default=now)
+
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(auto_now_add=now, null=True, blank=True)
 
