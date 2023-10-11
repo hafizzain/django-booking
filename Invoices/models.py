@@ -236,6 +236,7 @@ class SaleInvoice(models.Model):
                     'payment_type_trans': invoice_trans['payment_method'] if invoice_trans else '',
                     'payment_type': self.payment_type,
                     'location':self.location.address_name,
+                    'business_address':self.business_address
                     **tax_details,
                     **checkout_redeem_data,
                 }

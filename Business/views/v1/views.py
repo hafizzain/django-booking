@@ -42,6 +42,7 @@ from django_tenants.utils import tenant_context
 from Sale.Constants.Custom_pag import CustomPagination
 from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, EmployeeBusinessSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
 from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
+from MultiLanguage.models import InvoiceTranslation
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -1063,6 +1064,9 @@ def add_business_location(request):
     state_unique_id = request.data.get('state', None)
     city_name = request.data.get('city', None)
     postal_code = request.data.get('postal_code', None)
+    primary_language_id = request.data.get('primary_language_id')
+    secondary_language_id = request.data.get('secondary_language_id')
+
     
     email= request.data.get('email',None)
     mobile_number = request.data.get('mobile_number', None)
@@ -1161,6 +1165,10 @@ def add_business_location(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+    primary_invoice_trans = InvoiceTranslation.objects.get(id=primary_language_id)
+    secondary_invoice_trans = InvoiceTranslation.objects.get(id=secondary_language_id)    
+
+
     business_address = BusinessAddress(
         business = business,
         user = user,
@@ -1173,6 +1181,8 @@ def add_business_location(request):
         state=state if state_unique_id else None,
         city=city if city_name else None,
         banking = banking,
+        primary_translation=primary_invoice_trans,
+        secondary_translation=secondary_invoice_trans,
         is_primary = False,
         is_active = True,
         is_deleted = False,
@@ -1346,6 +1356,11 @@ def delete_location(request):
 @permission_classes([IsAuthenticated])
 def update_location(request):
     location_id = request.data.get('location', None)
+    primary_language_id = request.data.get('primary_language_id')
+    secondary_language_id = request.data.get('secondary_language_id')
+
+    primary_invoice_trans = InvoiceTranslation.objects.get(language__id=primary_language_id)
+    secondary_invoice_trans = InvoiceTranslation.objects.get(language__id=secondary_language_id) 
 
     if location_id is None:
         return Response(
@@ -1407,6 +1422,14 @@ def update_location(request):
     currency = request.data.get('currency', None)
     images = request.data.get('images', None)
     is_publish = request.data.get('is_publish', None)
+
+    if primary_invoice_trans:
+        business_address.primary_translation = primary_invoice_trans
+
+    if secondary_invoice_trans:
+        business_address.secondary_translation = secondary_invoice_trans
+
+    business_address.save()
     
     if is_publish is not None:
         business_address.is_publish = True
@@ -1513,20 +1536,6 @@ def update_location(request):
             },
             status=status.HTTP_200_OK
         )
-    
-    # else:
-    #     return Response(
-    #         {
-    #             'status' : False,
-    #             'status_code' : StatusCodes.USER_HAS_NO_PERMISSION_1001,
-    #             'status_code_text' : 'USER_HAS_NO_PERMISSION_1001',
-    #             'response' : {
-    #                 'message' : 'You don"t have permission to edit this location',
-    #                 'error_message' : 'User don"t have permission to edit this Business Address, user must be Business Owner or Location creator',
-    #             }
-    #         },
-    #         status=status.HTTP_403_FORBIDDEN
-    #     )
 
 
 @api_view(['GET'])
