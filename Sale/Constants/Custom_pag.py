@@ -33,9 +33,9 @@ class CustomPagination(PageNumberPagination):
             'response' : {
                 'message' : f'All {pramas_data}',
                 'error_message' : None,
-                pramas_data : data
-            },
-            'invoice_translations': invoice_translations
+                pramas_data : data,
+                'invoice_translations': invoice_translations
+            }
 
         })
 
