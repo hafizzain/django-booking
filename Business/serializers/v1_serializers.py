@@ -383,6 +383,8 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
             'is_deleted',
             'is_publish',
             'description',
+            'primary_translation',
+            'secondary_translation'
         ]
 class BusinessAddress_CustomerSerializer(serializers.ModelSerializer):
     #opening_hours= OpeningHoursSerializer(read_only=True)
