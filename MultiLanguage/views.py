@@ -153,7 +153,6 @@ def add_translation_forms(request):
 @permission_classes([IsAuthenticated])
 def add_invoiceTranslation(request):
     if request.method == 'POST':
-        location = request.POST.get('location')
         language = request.POST.get('language')
         invoice = request.POST.get('invoice')
         items = request.POST.get('items')
@@ -164,11 +163,6 @@ def add_invoiceTranslation(request):
         total = request.POST.get('total')
         payment_method = request.POST.get('payment_method')
         statuss = request.POST.get('status')
-
-        user = request.user
-
-
-        loc = location
 
         invoiceTranslation = InvoiceTranslation(
             invoice = invoice,
@@ -181,27 +175,8 @@ def add_invoiceTranslation(request):
             payment_method = payment_method,
             status = statuss
         )
-        invoiceTranslation.user = user
+        invoiceTranslation.user = request.user
         invoiceTranslation.save()
-        try:
-            location = BusinessAddress.objects.get(id__icontains = str(location))
-            invoiceTranslation.location = location
-        except Exception as e:
-            return Response(
-            {
-                'success':False,
-                'status_code':204,
-                'status_code_text' : '204',
-                'response':
-                {
-                    'message':'Location Not Founf',
-                    'data': str(e),
-                    'location':loc,
-                    'tips':tips
-                }
-            },
-            status=status.HTTP_201_CREATED
-            )
 
 
         language = AllLanguages.objects.get(id__icontains = str(language))        
