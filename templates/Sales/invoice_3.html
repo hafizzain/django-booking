@@ -260,6 +260,7 @@
               <div class="flex items-center justify-between text-primary text-sm font-bold">
                 <div>
                   <p>{{ business_address.primary_translation.tips }}</p>
+                  {% if business_address.secondary_translation.tips %}<p class="arabic">{{ business_address.secondary_translation.tips}} {% endif %}</p>
                 </div>
                 <p>{{ total_tip }} {{ currency_code }}</p>
               </div>
