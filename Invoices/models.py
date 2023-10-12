@@ -229,7 +229,7 @@ class SaleInvoice(models.Model):
                     'BACKEND_HOST' : settings.BACKEND_HOST,
                     'payment_type': self.payment_type,
                     'location':self.location.address_name,
-                    'business_address':self.location
+                    'business_address':self.location,
                     **tax_details,
                     **checkout_redeem_data,
                 }
