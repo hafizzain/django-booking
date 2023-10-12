@@ -208,7 +208,6 @@ class SaleInvoice(models.Model):
     def save(self, *args, **kwargs):
         if not self.file and self.checkout:
             order_items, order_tips, tax_details = self.get_invoice_order_items()
-            invoice_trans = self.get_invoice_translations()
             if len(order_items) > 0:
                 sub_total = sum([order['price'] for order in order_items])
                 tips_total = sum([t['tip'] for t in order_tips])
@@ -228,12 +227,6 @@ class SaleInvoice(models.Model):
                     'total' : round((float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)) + float(tax_details.get('tax_amount1', 0))), 2),
                     'created_at' : datetime.now().strftime('%Y-%m-%d'),
                     'BACKEND_HOST' : settings.BACKEND_HOST,
-                    'invoice_trans': invoice_trans['invoice'] if invoice_trans else '',
-                    'items_trans': invoice_trans['items'] if invoice_trans else '',
-                    'amount_trans': invoice_trans['amount'] if invoice_trans else '',
-                    'subtotal_trans': invoice_trans['subtotal'] if invoice_trans else '',
-                    'total_trans': invoice_trans['total'] if invoice_trans else '',
-                    'payment_type_trans': invoice_trans['payment_method'] if invoice_trans else '',
                     'payment_type': self.payment_type,
                     'location':self.location.address_name,
                     'business_address':self.location
@@ -276,21 +269,4 @@ class SaleInvoice(models.Model):
             data['voucher_redeem_percentage'] = checkout.voucher_redeem_percentage
 
         return data
-
-    def get_invoice_translations(self):
-        """
-        This function will return the invoice translation object
-        based on the invoice business address / location. That 
-        translation will then embed into invoice template.
-        """
-        if self.location:
-            invoice_trans = InvoiceTranslation.objects.filter(
-                status= 'active',
-                location=self.location
-            ).first()
-
-            translation_data = InvoiceTransSerializer(invoice_trans).data
-            return dict(translation_data)
-        else:
-            return None
 
