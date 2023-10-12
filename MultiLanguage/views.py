@@ -255,7 +255,6 @@ def get_invoiceTranslation(request):
 @permission_classes([IsAuthenticated])
 def update_invoiceTranslation(request):
     id = request.POST.get('id', None)
-    location = request.POST.get('location')
     language = request.POST.get('language')
     invoice = request.POST.get('invoice')
     items = request.POST.get('items')
@@ -296,9 +295,6 @@ def update_invoiceTranslation(request):
         invoice_data.total = total
         invoice_data.payment_method = payment_method
         invoice_data.status = statuss
-
-        location = BusinessAddress.objects.get(id__icontains = str(location))
-        invoice_data.location = location
 
         language = AllLanguages.objects.get(id__icontains = str(language))        
         invoice_data.language = language
