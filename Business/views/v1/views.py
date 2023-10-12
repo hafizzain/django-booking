@@ -1166,7 +1166,6 @@ def add_business_location(request):
         )
 
     primary_invoice_trans = InvoiceTranslation.objects.get(id=primary_translation_id)
-    secondary_invoice_trans = InvoiceTranslation.objects.get(id=secondary_translation_id)    
 
 
     business_address = BusinessAddress(
@@ -1182,12 +1181,16 @@ def add_business_location(request):
         city=city if city_name else None,
         banking = banking,
         primary_translation=primary_invoice_trans,
-        secondary_translation=secondary_invoice_trans,
         is_primary = False,
         is_active = True,
         is_deleted = False,
         is_closed = False,
     )
+
+    if secondary_translation_id:
+        secondary_invoice_trans = InvoiceTranslation.objects.get(id=secondary_translation_id)
+        business_address.secondary_translation = secondary_invoice_trans
+
     if postal_code is not None:
         business_address.postal_code = postal_code
     business_address.save()
@@ -1359,8 +1362,6 @@ def update_location(request):
     primary_translation_id = request.data.get('primary_translation_id')
     secondary_translation_id = request.data.get('secondary_translation_id')
 
-    primary_invoice_trans = InvoiceTranslation.objects.get(id=primary_translation_id)
-    secondary_invoice_trans = InvoiceTranslation.objects.get(id=secondary_translation_id) 
 
     if location_id is None:
         return Response(
@@ -1423,10 +1424,12 @@ def update_location(request):
     images = request.data.get('images', None)
     is_publish = request.data.get('is_publish', None)
 
-    if primary_invoice_trans:
+    if primary_translation_id:
+        primary_invoice_trans = InvoiceTranslation.objects.get(id=primary_translation_id)
         business_address.primary_translation = primary_invoice_trans
 
-    if secondary_invoice_trans:
+    if secondary_translation_id:
+        secondary_invoice_trans = InvoiceTranslation.objects.get(id=secondary_translation_id) 
         business_address.secondary_translation = secondary_invoice_trans
 
     business_address.save()
