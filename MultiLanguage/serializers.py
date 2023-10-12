@@ -23,9 +23,6 @@ class InvoiceTransSerializer(serializers.ModelSerializer):
         lang = Language.objects.get(id__icontains = str(obj.language))
         return LanguageSerializer(lang).data
     
-    def get_location_data(self, obj):
-        loc = BusinessAddress.objects.get(id__icontains = str(obj.location))
-        return BusinessAddressSerializers(loc).data
 
 
     class Meta:
