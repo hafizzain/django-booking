@@ -1064,8 +1064,8 @@ def add_business_location(request):
     state_unique_id = request.data.get('state', None)
     city_name = request.data.get('city', None)
     postal_code = request.data.get('postal_code', None)
-    primary_translation_id = request.data.get('primary_translation_id')
-    secondary_translation_id = request.data.get('secondary_translation_id')
+    primary_translation_id = request.data.get('primary_translation_id', None)
+    secondary_translation_id = request.data.get('secondary_translation_id', None)
 
     
     email= request.data.get('email',None)
@@ -1359,8 +1359,8 @@ def delete_location(request):
 @permission_classes([IsAuthenticated])
 def update_location(request):
     location_id = request.data.get('location', None)
-    primary_translation_id = request.data.get('primary_translation_id')
-    secondary_translation_id = request.data.get('secondary_translation_id')
+    primary_translation_id = request.data.get('primary_translation_id', None)
+    secondary_translation_id = request.data.get('secondary_translation_id', None)
 
 
     if location_id is None:
