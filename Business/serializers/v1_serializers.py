@@ -20,6 +20,7 @@ from django.conf import settings
 
 from Product.Constants.index  import tenant_media_base_url, tenant_media_domain
 from Utility.serializers import CountrySerializer, StateSerializer, CitySerializer
+from MultiLanguage.serializers import InvoiceTransSerializer
 
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
@@ -694,3 +695,14 @@ class BusinessTaxSettingSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessTaxSetting
         fields = '__all__'
+
+
+class BusinessAddressSerilaizer(serializers.ModelSerializer):
+
+    primary_translation = InvoiceTransSerializer(read_only=True)
+    secondary_translation = InvoiceTransSerializer(read_only=True)
+
+
+    class Meta:
+        model = BusinessAddress
+        fields = ['primary_translation', 'secondary_translation']

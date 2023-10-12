@@ -39,6 +39,7 @@ from datetime import datetime as dt
 from Reports.models import DiscountPromotionSalesReport
 from Service.models import ServiceTranlations
 from Utility.models import Language
+from Business.serializers.v1_serializers import BusinessAddressSerilaizer
 
 from django.db.models import Subquery, OuterRef
 
@@ -1002,6 +1003,11 @@ def get_all_sale_orders_pagination(request):
     end_time = datetime.datetime.now()
     response['seconds'] = f'{(end_time - start_time).seconds} s'
     response['total_seconds'] = f'{(end_time - start_time).total_seconds()} s'
+
+    # invoicce translation data
+    business_address = BusinessAddress.objects.get(id=location_id)
+    invoice_translations = BusinessAddressSerilaizer(business_address).data
+    response['translations'] = invoice_translations
     return response
 
 @api_view(['GET'])
