@@ -1696,6 +1696,7 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField()
     selection_type  = serializers.SerializerMethodField(read_only=True)
     service_original_price  = serializers.SerializerMethodField(read_only=True)
+    service_translations = serializers.SerializerMethodField(read_only=True)
 
     def get_service_translations(self, obj):
         translations = obj.service.servicetranlations_set.all()
@@ -1728,7 +1729,7 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceOrder
         fields = ['id', 'price', 'service_original_price', 'quantity', 'service', 'selection_type',
-                  'discount_price', 'discount_percentage', 'redeemed_type']
+                  'discount_price', 'discount_percentage', 'redeemed_type', 'service_translations']
 
 
 class SaleOrder_VoucherSerializer(serializers.ModelSerializer):
