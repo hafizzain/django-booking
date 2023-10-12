@@ -126,8 +126,8 @@ class BusinessAddress(models.Model):
     description =  models.CharField(max_length=300, null=True, blank=True)
     banking = models.CharField(choices = BANKING_CHOICE , default = 'Disable' , max_length = 50)
 
-    primary_translation = models.OneToOneField('MultiLanguage.InvoiceTranslation', related_name='primary', on_delete=models.SET_NULL, null=True)
-    secondary_translation = models.OneToOneField('MultiLanguage.InvoiceTranslation', related_name='secondary', on_delete=models.SET_NULL, null=True)
+    primary_translation = models.ForeignKey('MultiLanguage.InvoiceTranslation', related_name='primary', on_delete=models.SET_NULL, null=True)
+    secondary_translation = models.ForeignKey('MultiLanguage.InvoiceTranslation', related_name='secondary', on_delete=models.SET_NULL, null=True)
 
     is_default = models.BooleanField(default=False)
     
