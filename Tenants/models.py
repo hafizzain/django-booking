@@ -33,7 +33,12 @@ class Tenant(TenantMixin):
     @property
     def active_days_ago(self):
         if self.last_active:
-            return (now() - self.last_active).days >= 0 or 0
+            today_date = now() - self.last_active
+            days = today_date.days
+            if days >= 0:
+                return days
+                
+            return 0
         return 'Invalid last_active'
 
     def __str__(self):
