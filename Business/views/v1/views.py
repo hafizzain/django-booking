@@ -1064,8 +1064,8 @@ def add_business_location(request):
     state_unique_id = request.data.get('state', None)
     city_name = request.data.get('city', None)
     postal_code = request.data.get('postal_code', None)
-    primary_language_id = request.data.get('primary_language_id')
-    secondary_language_id = request.data.get('secondary_language_id')
+    primary_translation_id = request.data.get('primary_translation_id')
+    secondary_translation_id = request.data.get('secondary_translation_id')
 
     
     email= request.data.get('email',None)
@@ -1165,8 +1165,8 @@ def add_business_location(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    primary_invoice_trans = InvoiceTranslation.objects.get(id=primary_language_id)
-    secondary_invoice_trans = InvoiceTranslation.objects.get(id=secondary_language_id)    
+    primary_invoice_trans = InvoiceTranslation.objects.get(id=primary_translation_id)
+    secondary_invoice_trans = InvoiceTranslation.objects.get(id=secondary_translation_id)    
 
 
     business_address = BusinessAddress(
@@ -1356,11 +1356,11 @@ def delete_location(request):
 @permission_classes([IsAuthenticated])
 def update_location(request):
     location_id = request.data.get('location', None)
-    primary_language_id = request.data.get('primary_language_id')
-    secondary_language_id = request.data.get('secondary_language_id')
+    primary_translation_id = request.data.get('primary_translation_id')
+    secondary_translation_id = request.data.get('secondary_translation_id')
 
-    primary_invoice_trans = InvoiceTranslation.objects.get(language__id=primary_language_id)
-    secondary_invoice_trans = InvoiceTranslation.objects.get(language__id=secondary_language_id) 
+    primary_invoice_trans = InvoiceTranslation.objects.get(id=primary_translation_id)
+    secondary_invoice_trans = InvoiceTranslation.objects.get(id=secondary_translation_id) 
 
     if location_id is None:
         return Response(
