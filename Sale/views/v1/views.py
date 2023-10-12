@@ -995,19 +995,15 @@ def get_all_sale_orders_pagination(request):
     if recent_five_sales:
         sorted_data = sorted_data[:5]
 
-    paginator = CustomPagination()
-    paginator.page_size = 100000 if no_pagination else 10
-    paginated_data = paginator.paginate_queryset(sorted_data, request)
-    response = paginator.get_paginated_response(paginated_data, 'sales')
-    response = dict(response)
-    end_time = datetime.datetime.now()
-    response['seconds'] = f'{(end_time - start_time).seconds} s'
-    response['total_seconds'] = f'{(end_time - start_time).total_seconds()} s'
-
     # invoicce translation data
     business_address = BusinessAddress.objects.get(id=location_id)
     invoice_translations = BusinessAddressSerilaizer(business_address).data
-    response['translations'] = invoice_translations
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(sorted_data, request)
+    response = paginator.get_paginated_response(paginated_data, 'sales', invoice_translations)
+
     return response
 
 @api_view(['GET'])
