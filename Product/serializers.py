@@ -329,6 +329,7 @@ class ProductTranlationsSerializerNew(serializers.ModelSerializer):
             ]
 
 class ProductTranlationsSerializer(serializers.ModelSerializer):
+    
     invoiceLanguage = serializers.SerializerMethodField(read_only=True)
     def get_invoiceLanguage(self, obj):
         language = Language.objects.get(id__icontains = obj.language)

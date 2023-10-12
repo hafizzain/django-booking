@@ -879,7 +879,6 @@ def get_all_sale_orders(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_all_sale_orders_pagination(request):
-    start_time = datetime.datetime.now()
     location_id = request.GET.get('location', None)
     range_start =  request.GET.get('range_start', None)
     range_end = request.GET.get('range_end', None)
