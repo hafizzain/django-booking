@@ -1645,9 +1645,12 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     product_translations = serializers.SerializerMethodField(read_only=True)
 
     def get_product_translations(self, obj):
-        product_translations = obj.product.producttranslations_set.all()
-        return ProductTranlationsSerializerNew(product_translations, many=True).data
-        
+        if obj.location.secondary_translation:
+            secondary_invoice_traslation = InvoiceTranslation.objects.filter(id=obj.location.secondary_translation.id).first()
+            product_translations = obj.product.producttranslations_set.get(language__id=secondary_invoice_traslation)
+            return ProductTranlationsSerializerNew(product_translations, many=True).data
+        else:
+            return ''
 
 
     def get_selection_type(self, obj):
