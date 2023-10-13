@@ -343,3 +343,9 @@ AWS_S3_VERIFY = True
 # DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 CLOUD_FRONT_S3_BUCKET_URL = env('CLOUD_FRONT_S3_BUCKET_URL')
+
+try:
+    USE_WILDCARD_FOR_SSL = env('USE_WILDCARD_FOR_SSL')
+    USE_WILDCARD_FOR_SSL = True
+except:
+    USE_WILDCARD_FOR_SSL = False
