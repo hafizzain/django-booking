@@ -18,6 +18,6 @@ def get_translation(order_id):
     if product_order and product_order.location.secondary_translation:
         secondary_invoice_traslation = InvoiceTranslation.objects.filter(id=product_order.location.secondary_translation.id).first()
         translation = product_order.product.producttranslations_set.get(language__id=secondary_invoice_traslation.language.id)
-        return translation.service_name
+        return translation.product_name
     
     return ''
