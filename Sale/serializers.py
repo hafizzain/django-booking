@@ -1701,7 +1701,7 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
 
     def get_service_translations(self, obj):
         secondary_invoice_traslation = InvoiceTranslation.objects.get(id=obj.location.secondary_translation.id)
-        translations = obj.service.servicetranlations_set.filter(language__id=secondary_invoice_traslation.location.id)
+        translations = obj.service.servicetranlations_set.filter(language__id=secondary_invoice_traslation.language.id)
         translations_data = ServiceTranslationsSerializer(translations, many=True).data
         return translations_data
 
