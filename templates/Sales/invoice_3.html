@@ -1,3 +1,4 @@
+{% load custom_tags %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -228,7 +229,7 @@
                         (Discount {{ order.discount_percentage}} %)
                         {% endif %}
                       </p>
-                      <p class="arabic">{{order.arabic_name}}</p>
+                      <p class="arabic">{% get_translation order.id %}</p>
                     </div>
                     <p class="text-[#7B7B7B]">
                       <span>{{order.quantity}} x </span>{{order.price}}

@@ -137,6 +137,7 @@ class SaleInvoice(models.Model):
             #endregion
 
             data = {
+                'id': order.id,
                 'name' : f'{order.name}',
                 'arabic_name' : f'{order.arabic_name}',
                 'price' : round(total_price, 2),
