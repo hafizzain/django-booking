@@ -13,4 +13,4 @@ def get_translation(order_id):
         translation = service_order.service.servicetranlations_set.get(language__id=secondary_invoice_traslation.language.id)
         return translation.service_name
     else:
-        return None
+        return ''
