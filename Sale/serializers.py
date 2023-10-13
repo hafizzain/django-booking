@@ -19,6 +19,7 @@ from Service.models import Service, ServiceTranlations
 from Utility.models import Language
 from Product.serializers import ProductTranlationsSerializerNew
 from Service.serializers import ServiceTranslationsSerializer
+from MultiLanguage.models import InvoiceTranslation
 
 class PriceServiceSerializers(serializers.ModelSerializer):
     currency_name = serializers.SerializerMethodField(read_only=True)
@@ -1699,7 +1700,8 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
     service_translations = serializers.SerializerMethodField(read_only=True)
 
     def get_service_translations(self, obj):
-        translations = obj.service.servicetranlations_set.all()
+        secondary_invoice_traslation = InvoiceTranslation.objects.get(id=obj.service.business_address.secondary_translation.id)
+        translations = obj.service.servicetranlations_set.filter(id=secondary_invoice_traslation.id)
         translations_data = ServiceTranslationsSerializer(translations, many=True).data
         return translations_data
 
