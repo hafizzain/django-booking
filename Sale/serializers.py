@@ -1647,7 +1647,7 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     def get_product_translations(self, obj):
         if obj.location.secondary_translation:
             secondary_invoice_traslation = InvoiceTranslation.objects.filter(id=obj.location.secondary_translation.id).first()
-            product_translations = obj.product.producttranslations_set.get(language__id=secondary_invoice_traslation.language.id)
+            product_translations = obj.product.producttranslations_set.filter(language__id=secondary_invoice_traslation.language.id)
             return ProductTranlationsSerializerNew(product_translations, many=True).data
         else:
             return ''
