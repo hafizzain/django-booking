@@ -1644,21 +1644,6 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     product_original_price = serializers.SerializerMethodField(read_only=True)
     primary_product_translation = serializers.SerializerMethodField(read_only=True)
     secondary_product_translation = serializers.SerializerMethodField(read_only=True)
-    product_translations = serializers.SerializerMethodField(read_only=True)
-
-    def get_product_translations(self, obj):
-
-        if obj.location.primary_translation:
-            primary_invoice_traslation = InvoiceTranslation.objects.filter(id=obj.location.primary_translation.id).first()
-            primary_product_translations = obj.product.producttranslations_set.filter(language__id=primary_invoice_traslation.language.id).first()
-
-        if obj.location.secondary_translation:
-            secondary_invoice_traslation = InvoiceTranslation.objects.filter(id=obj.location.secondary_translation.id).first()
-            secondary_product_translations = obj.product.producttranslations_set.filter(language__id=secondary_invoice_traslation.language.id).first()
-        
-        translations = primary_product_translations | secondary_product_translations
-        return ProductTranlationsSerializerNew(translations, many=True).data
-
 
     def get_primary_product_translation(self, obj):
         if obj.location.primary_translation:
@@ -1667,7 +1652,6 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
             return ProductTranlationsSerializerNew(primary_product_translations).data
         else:
             return None
-       
 
     def get_secondary_product_translation(self, obj):
 
@@ -1718,7 +1702,7 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'product_name', 'product_arabic_name', 'product_original_price', 
             'quantity', 'product_price', 'price', 'selection_type', 'discount_percentage',
-            'redeemed_type', 'primary_product_translation', 'secondary_product_translation', 'product_translations']
+            'redeemed_type', 'primary_product_translation', 'secondary_product_translation']
 
 
 class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
