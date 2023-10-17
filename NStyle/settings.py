@@ -234,9 +234,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
 
-    # 'DEFAULT_RENDERER_CLASSES': [
-    #     'Utility.customizations.renderers.CustomRenderer',
-    # ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'Utility.customizations.renderers.CustomRenderer',
+    ],
 
     'DEFAULT_AUTHENTICATION_CLASSES' : [
         'rest_framework.authentication.TokenAuthentication'
@@ -246,12 +246,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated'
     ],
 
-    # 'DATE_FORMAT': "%d-%m-%Y",
-    # 'DATETIME_FORMAT': "%d-%m-%Y %H:%M:%S",
-
-    
-    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    # 'PAGE_SIZE': 2,
 }
 
 # Internationalization

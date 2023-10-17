@@ -1,11 +1,8 @@
-from rest_framework.renderers import BaseRenderer
-import json
+from rest_framework.renderers import JSONRenderer
 
-class CustomRenderer(BaseRenderer):
-    media_type = 'application/json'
-    format = 'json'
+class CustomRenderer(JSONRenderer):
 
-    def render(self, data, media_type=None, renderer_context=None):
+    def render(self, data, accepted_media_type=None, renderer_context=None):
         # Implement your custom rendering logic here
         # You can return the JSON representation of your data
         response = data.get('response', None)
@@ -14,4 +11,4 @@ class CustomRenderer(BaseRenderer):
             if message:
                 message = message.capitalize()
                 data['response']['message'] = message
-        return json.dumps(data, ensure_ascii=False).encode('utf-8')
+        return super().render(data, accepted_media_type, renderer_context)
