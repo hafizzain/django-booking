@@ -224,12 +224,12 @@
                   >
                     <div>
                       <p class="text-left">
-                        {{order.name}}
+                        {% get_primary_translation order.id %}
                         {% if order.discount_percentage %}
                         (Discount {{ order.discount_percentage}} %)
                         {% endif %}
                       </p>
-                      <p class="arabic">{% get_translation order.id %}</p>
+                      <p class="arabic">{% get_secondary_translation order.id %}</p>
                     </div>
                     <p class="text-[#7B7B7B]">
                       <span>{{order.quantity}} x </span>{{order.price}}
