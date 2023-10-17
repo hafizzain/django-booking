@@ -1649,8 +1649,8 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     def get_primary_product_translation(self, obj):
         if obj.location.primary_translation:
             primary_invoice_traslation = InvoiceTranslation.objects.filter(id=obj.location.primary_translation.id).first()
-            primary_product_translations = obj.product.producttranslations_set.filter(language__id=primary_invoice_traslation.language.id)
-            return ProductTranlationsSerializerNew(primary_product_translations, many=True).data
+            primary_product_translations = obj.product.producttranslations_set.filter(language__id=primary_invoice_traslation.language.id).first()
+            return ProductTranlationsSerializerNew(primary_product_translations).data
         else:
             return None
        
@@ -1659,8 +1659,8 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
 
         if obj.location.secondary_translation:
             secondary_invoice_traslation = InvoiceTranslation.objects.filter(id=obj.location.secondary_translation.id).first()
-            secondary_product_translations = obj.product.producttranslations_set.filter(language__id=secondary_invoice_traslation.language.id)
-            return ProductTranlationsSerializerNew(secondary_product_translations, many=True).data
+            secondary_product_translations = obj.product.producttranslations_set.filter(language__id=secondary_invoice_traslation.language.id).first()
+            return ProductTranlationsSerializerNew(secondary_product_translations).data
         else:
             return None
         
