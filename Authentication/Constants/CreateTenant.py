@@ -2,7 +2,7 @@
 
 
 import json
-from Authentication.Constants.Domain import ssl_sub_domain
+from Authentication.Constants.Domain import ssl_sub_domain, create_aws_domain_record
 from Client.models import Client
 from Employee.Constants.Add_Employe import add_employee
 from Employee.models import EmployeDailySchedule, Employee, EmployeeProfessionalInfo, EmployeeSelectedService
@@ -569,14 +569,21 @@ def create_tenant(request=None, user=None, data=None):
 
 
     with tenant_context(user_tenant):
-
-        try:
-            thrd = Thread(target=ssl_sub_domain, args=[td_name])
-            thrd.start()
-        except Exception as err:
-            ExceptionRecord.objects.create(
-                text = f'SSL ERROR . {str(err)}'
-            )
+        if not settings.USE_WILDCARD_FOR_SSL:
+            try:
+                thrd = Thread(target=ssl_sub_domain, args=[td_name])
+                thrd.start()
+            except Exception as err:
+                ExceptionRecord.objects.create(
+                    text = f'SSL ERROR . {str(err)}'
+                )
+        else:
+            ExceptionRecord.objects.create(text = f'Using Wildcard for SSL {td_name}')
+            try:
+                thrd = Thread(target=create_aws_domain_record, args=[td_name])
+                thrd.start()
+            except Exception as err:
+                ExceptionRecord.objects.create(text = f'AWS HOSTED ERROR . {str(err)}')
         
         t_user = create_tenant_user(tenant=user_tenant, data=data)
         
