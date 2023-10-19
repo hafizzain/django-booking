@@ -347,5 +347,18 @@ CLOUD_FRONT_S3_BUCKET_URL = env('CLOUD_FRONT_S3_BUCKET_URL')
 try:
     USE_WILDCARD_FOR_SSL = env('USE_WILDCARD_FOR_SSL')
     USE_WILDCARD_FOR_SSL = True
-except:
+    AWS_API_KEY = env('AWS_API_KEY')
+    AWS_SECRET_KEY = env('AWS_SECRET_KEY')
+    AWS_MY_ZONE_ID = env('AWS_MY_ZONE_ID')
+    AWS_REGION_ZONE_ID = env('AWS_REGION_ZONE_ID')
+    AWS_DNS_NAME = env('AWS_DNS_NAME')
+except Exception as err:
+    print(err)
     USE_WILDCARD_FOR_SSL = False
+    AWS_API_KEY = None
+    AWS_SECRET_KEY = None
+    AWS_MY_ZONE_ID = None
+    AWS_REGION_ZONE_ID = None
+    AWS_DNS_NAME = None
+
+
