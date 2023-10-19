@@ -5,18 +5,6 @@ import subprocess
 
 from Utility.models import ExceptionRecord
 from django.conf import settings
-import route53
-import aws_cdk.aws_apigateway as apigw
-
-from route53.resource_record_set import AResourceRecordSet
-
-
-api_key = 'AKIAWFYNXTJRSQWQAI4R'
-secret_key = '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'
-my_zone_id = 'Z064377638Y3H4LDQPEU5'
-region_zone_id = 'ZP97RAFLXTNZK'
-dns_name = 'dualstack.pos-nstyle-production-1779321222.ap-south-1.elb.amazonaws.com.'
-
 
 def ssl_sub_domain(domain):
     time_start = datetime.datetime.now()
