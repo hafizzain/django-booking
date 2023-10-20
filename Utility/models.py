@@ -42,6 +42,8 @@ class Country(models.Model):
     flag = models.ImageField(upload_to='Utility/country/', null=True, blank=True)
     is_flag_uploaded_s3 = models.BooleanField(default=False)
 
+    unique_id = models.CharField(max_length=256, null=True, blank=True)
+
     dial_code = models.CharField(max_length=50, default='')
     code = models.CharField(default='', max_length=20)
     key = models.CharField(default='', max_length=20)
@@ -56,11 +58,14 @@ class Country(models.Model):
 
 class State(models.Model):
     id = models.UUIDField(default=uuid4, editable=False, unique=True, primary_key=True)
-    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='country_states')
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='country_states', null=True)
 
     name = models.CharField(default='', max_length=200)
     flag = models.ImageField(upload_to='Utility/country/', null=True, blank=True)
     is_flag_uploaded_s3 = models.BooleanField(default=False)
+
+    unique_id = models.CharField(max_length=256, null=True, blank=True)
+    country_unique_id = models.CharField(max_length=256, null=True, blank=True)
 
     code = models.CharField(default='', max_length=20, null=True, blank=True)
     key = models.CharField(default='', max_length=20, null=True, blank=True)
@@ -75,8 +80,12 @@ class State(models.Model):
 
 class City(models.Model):
     id = models.UUIDField(default=uuid4, editable=False, unique=True, primary_key=True)
-    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='country_cities')
-    state = models.ForeignKey(State, on_delete=models.CASCADE, related_name='state_cities')
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='country_cities', null=True)
+    state = models.ForeignKey(State, on_delete=models.CASCADE, related_name='state_cities', null=True)
+
+    country_unique_id = models.CharField(max_length=256, null=True, blank=True)
+    state_unique_id = models.CharField(max_length=256, null=True, blank=True)
+
 
     name = models.CharField(default='', max_length=200)
     flag = models.ImageField(upload_to='Utility/country/', null=True, blank=True)
@@ -152,10 +161,20 @@ class ExceptionRecord(models.Model):
     def get_tenant_name(self):
         if self.tenant:
             return self.tenant.schema_name
+    
+
+    @property
+    def html_text(self, ):
+        text = self.text
+        return text
 
     def save(self, *args, **kwargs):
         if self.text:
-            text = f'{self.text}'.replace('\\n', '<br/>')
+            text = f'{self.text}'
+            if text[0] == "b":
+                text = text[2:-2]
+            text = text.replace('\\n', '')
+            text = text.replace('<!DOCTYPE html>', '')
             self.text = text
         super(ExceptionRecord, self).save(*args, **kwargs)
 

@@ -52,6 +52,8 @@ from Notification.models import CustomFCMDevice
 from Notification.serializers import FCMDeviceSerializer
 from Notification.notification_processor import NotificationProcessor
 
+from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def import_employee(request):
@@ -103,9 +105,9 @@ def import_employee(request):
                 status=status.HTTP_404_NOT_FOUND
             )
             try:
-                country = Country.objects.get(name__icontains=country)
-                state= State.objects.get(name__icontains=state)
-                city = City.objects.get(name__icontains=city)
+                country, created = Country.objects.get_or_create(name__icontains=country)
+                state, created= State.objects.get_or_create(name__icontains=state)
+                city, created = City.objects.get_or_create(name__icontains=city)
             except Exception as err:
                 return Response(
                     {
@@ -324,9 +326,6 @@ def get_Employees(request):
     designation = request.GET.get('designation', None)
     income_type = request.GET.get('income_type', None)
 
-
-
-
     query = Q(is_deleted=False)
     query &= Q(is_blocked=False)
 
@@ -347,7 +346,11 @@ def get_Employees(request):
         query &= Q(location=location)
      
 
-    all_employe= Employee.objects.filter(query).order_by('-created_at')
+    all_employe= Employee.objects \
+                    .filter(query) \
+                    .select_related('user', 'business','country', 'state', 'city', 'employee_permissions') \
+                    .prefetch_related('location') \
+                    .order_by('-created_at')
     all_employee_count = all_employe.count()
     
     page_count = all_employee_count / 10
@@ -669,14 +672,13 @@ def create_employee(request):
     services_id = request.data.get('services', None)   
      
     location = request.data.get('location', None)
-    country = request.data.get('country', None)   
-    state = request.data.get('state', None)         
-    city = request.data.get('city', None)
-    
+    country_unique_id = request.data.get('country', None)   
+    state_unique_id = request.data.get('state', None)         
+    city_name = request.data.get('city', None)
 
 
     if not all([
-         business_id, full_name ,employee_id, country, gender  ,address , designation, income_type, salary ]): #or ( not to_present and ending_date is None):
+         business_id, full_name ,employee_id, country_unique_id, gender  ,address , designation, income_type, salary ]): #or ( not to_present and ending_date is None):
        return Response(
             {
                 'status' : False,
@@ -750,9 +752,14 @@ def create_employee(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
+    public_country = get_country_from_public(country_unique_id)
+    public_state = get_state_from_public(state_unique_id)
         
     try:
-        country = Country.objects.get(id=country)
+        country, created = Country.objects.get_or_create(
+            name=public_country.name,
+            unique_id=public_country.unique_id
+        )
     except Exception as err:
         return Response(
             {
@@ -768,11 +775,18 @@ def create_employee(request):
         )
         
     try:
-        state= State.objects.get(id=state)
+        state, created= State.objects.get_or_create(
+            name=public_state.name,
+            unique_id=public_state.unique_id
+        )
     except:
         state = None
     try:
-        city= City.objects.get(id=city)
+        city, created= City.objects.get_or_create(name=city_name,
+                                                  country=country,
+                                                  state=state,
+                                                  country_unique_id=country_unique_id,
+                                                  state_unique_id=state_unique_id)
     except:
         city = None
     try:
@@ -1014,9 +1028,9 @@ def update_employee(request):
     staff_id = request.data.get('staff_group', None) 
     location = request.data.get('location', None) 
     
-    country = request.data.get('country', None) 
-    city = request.data.get('city', None) 
-    state = request.data.get('state', None) 
+    country_unique_id = request.data.get('country', None) 
+    state_unique_id = request.data.get('state', None) 
+    city_name = request.data.get('city', None) 
     
     working_days = []
     
@@ -1095,29 +1109,32 @@ def update_employee(request):
         employee.is_active = False 
     employee.save()
     
-    if country is not None:
-        try:
-            country= Country.objects.get(id=country)
-            employee.country = country
-            employee.save()
-        except:
-            country = None
+    if country_unique_id is not None:
+        public_country = get_country_from_public(country_unique_id)
+        country, created = Country.objects.get_or_create(
+            name=public_country.name,
+            unique_id = public_country.unique_id
+        )
+        employee.country = country
             
-    if state is not None:
-        try:
-            state= State.objects.get(id=state)
-            employee.state = state
-            employee.save()
-        except:
-            state = None
+    if state_unique_id is not None:
+        public_state = get_state_from_public(state_unique_id)
+        state, created= State.objects.get_or_create(
+            name=public_state.name,
+            unique_id=public_state.unique_id
+        )
+        employee.state = state
             
-    if city is not None:
-        try:
-            city= City.objects.get(id=city)
-            employee.city = city
-            employee.save()
-        except:
-            city = None
+    if city_name is not None:
+        city, created= City.objects.get_or_create(name=city_name,
+                                                country=country,
+                                                state=state,
+                                                country_unique_id=country_unique_id,
+                                                state_unique_id=state_unique_id)
+        employee.city = city
+    
+    employee.save()
+ 
 
     Employe_Informations= EmployeeProfessionalInfo.objects.get(employee=employee)
     
@@ -1181,28 +1198,6 @@ def update_employee(request):
         },
         status=status.HTTP_404_NOT_FOUND
     )
-    # try:
-    #     empl_permission = EmployePermission.objects.get(employee=employee)
-        
-    #     for permit in ALL_PERMISSIONS:
-              
-    #         value = request.data.get(permit, None)
-    #         PERMISSIONS_MODEL_FIELDS[permit](empl_permission).clear()
-            
-    #         if value is not None:
-    #             if type(value) == str:
-    #                 value = json.loads(value)
-    #                 for opt in value:
-    #                     try:
-    #                         option = GlobalPermissionChoices.objects.get(text=opt)
-    #                         PERMISSIONS_MODEL_FIELDS[permit](empl_permission).add(option)
-    #                     except:
-    #                         pass
-
-    #     empl_permission.save()
-    
-    # except Exception as err:
-    #     Errors.append(err)
     
     try:
         empl_permission, created = EmployePermission.objects.get_or_create(employee=employee)
@@ -1224,7 +1219,6 @@ def update_employee(request):
                         except GlobalPermissionChoices.DoesNotExist:
                             pass
                         
-        #empl_permission.save()
         
     except (TypeError, json.JSONDecodeError, AttributeError) as err: #Exception as err:
         Errors.append(err)
@@ -1241,19 +1235,22 @@ def update_employee(request):
     serializer = EmployeSerializer(employee, data=request.data, partial=True, context={'request' : request,})
     if serializer.is_valid():
         serializer.save()
-        data.update(serializer.data)
-    else: 
+    else:
         return Response(
             {
-                'status' : False,
-                'status_code' : StatusCodes.INVALID_EMPLOYEE_4025,
+                'status' : True,
+                'status_code' : 200,
                 'response' : {
-                    'message' : 'Invialid Data',
-                    'error_message' : str(serializer.errors),
+                    'message' : ' Employee updated successfully',
+                    'error_message' : 'Error in saving Employee',
+                    'Employee' : data
                 }
             },
-            status=status.HTTP_404_NOT_FOUND
+            status=status.HTTP_200_OK
         )
+
+    data.update(serializer.data)
+
     return Response(
         {
             'status' : True,
@@ -1264,7 +1261,8 @@ def update_employee(request):
                 'Employee' : data
             }
         },
-        status=status.HTTP_200_OK)
+        status=status.HTTP_200_OK
+    )
     
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -1798,7 +1796,7 @@ def update_staff_group(request):
 @permission_classes([AllowAny])
 def get_attendence(request):
 
-    location_id = request.GET.get('location_id', None)
+    location_id = request.GET.get('location', None)
     search_text = request.GET.get('search_text', None)
     no_pagination = request.GET.get('no_pagination', None)
     employee_id = request.GET.get('employee_id', None)
@@ -1816,7 +1814,7 @@ def get_attendence(request):
     if search_text:
         query &= Q(full_name__icontains=search_text)
 
-    all_employe= Employee.objects.filter(query).order_by('-created_at')
+    all_employe = Employee.objects.filter(query).order_by('-created_at')
     all_employe_count= all_employe.count()
 
     page_count = all_employe_count / 10
@@ -3489,22 +3487,16 @@ def update_vacation(request):
 def create_vacation_emp(request):
     user = request.user
     business_id = request.data.get('business', None)
-    
     employee = request.data.get('employee', None)
     day = request.data.get('day', None)
-    
     start_time = request.data.get('start_time', None)
     end_time = request.data.get('end_time', None)
-    
     start_time_shift = request.data.get('start_time_shift', None)
     end_time_shift = request.data.get('end_time_shift', None)
-    
     from_date = request.data.get('from_date', None)
     to_date = request.data.get('to_date', from_date)
     note = request.data.get('note', None)
-
     is_vacation = request.data.get('is_vacation', None)
-    
     is_leave = request.data.get('is_leave', None)
     is_off = request.data.get('is_off', None)
     
@@ -3563,9 +3555,27 @@ def create_vacation_emp(request):
     from_date = datetime.strptime(from_date, "%Y-%m-%d")
     to_date = datetime.strptime(to_date, "%Y-%m-%d")
     diff = to_date - from_date 
-    #print(diff.days)
     working_sch = None
     days = int(diff.days)
+
+    is_vacation_exist = Vacation.objects.filter(
+        business = business,
+        employee = employee_id,
+        from_date = from_date,
+    ).first()
+
+    if is_vacation_exist:
+        return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Employee Vacation Already Exist',
+                'error_message' : None,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
     empl_vacation = Vacation.objects.create(
         business = business,
@@ -3595,7 +3605,6 @@ def create_vacation_emp(request):
             working_sch.vacation = empl_vacation
             working_sch.from_date = from_date
             working_sch.save()
-            working_sch = None
             
         else:   
             working_schedule = EmployeDailySchedule.objects.create(
@@ -3638,29 +3647,14 @@ def create_vacation_emp(request):
         {
             'status' : 200,
             'status_code' : '200',
-            'response' : {
-                'message' : 'All Schedule',
+            'response' : { 
+                'message' : 'All schedule',
                 'error_message' : None,
                 'schedule' : serialized.data
             }
         },
         status=status.HTTP_200_OK
     )
-        
-    # serializers= ScheduleSerializer(working_schedule, context={'request' : request})
-    
-    # return Response(
-    #         {
-    #             'status' : True,
-    #             'status_code' : 201,
-    #             'response' : {
-    #                 'message' : 'Working Schedule Created Successfully!',
-    #                 'error_message' : None,
-    #                 'schedule' : serializers.data,
-    #             }
-    #         },
-    #         status=status.HTTP_201_CREATED
-    #     ) 
 
 
 
@@ -4139,7 +4133,7 @@ def get_absence(request):
                 'status' : 200,
                 'status_code' : '200',
                 'response' : {
-                    'message' : 'All Absence Schedule',
+                    'message' : 'All absence schedule',
                     'count':allvacations_count,
                     'error_message' : None,
                     'absences' : serialized.data

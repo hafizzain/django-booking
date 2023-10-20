@@ -21,7 +21,7 @@
       </div>
     </div>
     <div class="main">
-      <div class="gap-5 grid md:grid-cols-3 mt-4 mb-4">
+      <!-- <div class="gap-5 grid md:grid-cols-3 mt-4 mb-4">
         <div class="box box1 !pb-0 !px-0">
           <div id="spark1"></div>
         </div>
@@ -31,14 +31,17 @@
         <div class="box box3 !pb-0 !px-0">
           <div id="spark3"></div>
         </div>
-      </div>
+      </div> -->
 
       <div class="gap-5 grid md:grid-cols-2 mt-5 mb-4">
         <!-- <div class="box">
           <div id="bar"></div>
         </div> -->
         <div class="box">
-          <div id="donut"></div>
+          <div id="country_wise_data_graph"></div>
+        </div>
+        <div class="box">
+          <div id="top_sales_graph_data"></div>
         </div>
       </div>
 
@@ -61,6 +64,8 @@
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
 <script>
+  let get_country_users_url = '{{get_country_users_url}}'
+  let get_service_wise_sale_data_url = '{{get_service_wise_sale_data_url}}'
   var data = {
     prices: [
       7114.25, 7126.6, 7116.95, 7203.7, 7233.75, 7451.0, 7381.15, 7348.95,
@@ -721,51 +726,116 @@
 
   var chartBar = new ApexCharts(document.querySelector("#bar"), optionsBar);
   chartBar.render();
+  
+  
 
-  var optionDonut = {
-    chart: {
-      type: "donut",
-      width: "100%",
-      height: 340,
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    plotOptions: {
-      pie: {
-        customScale: 0.8,
-        donut: {
-          size: "75%",
+  
+  fetch(get_country_users_url)
+  .then(response =>{
+    return response.json()
+  })
+  .then(result =>{
+    let country_labels = result.country_labels
+    let country_values = result.country_values
+    var optionDonut = {
+      chart: {
+        type: "donut",
+        width: "100%",
+        height: 340,
+      },
+      dataLabels: {
+        enabled: false,
+      },
+      plotOptions: {
+        pie: {
+          customScale: 0.8,
+          donut: {
+            size: "75%",
+          },
+          offsetY: 20,
         },
-        offsetY: 20,
+        stroke: {
+          colors: undefined,
+        },
       },
-      stroke: {
-        colors: undefined,
+      colors: colorPalette,
+      title: {
+        text: "Top Country Clients",
+        style: {
+          fontSize: "18px",
+        },
       },
-    },
-    colors: colorPalette,
-    title: {
-      text: "Department Sales",
-      style: {
-        fontSize: "18px",
+      series: result.country_values,
+      labels: result.country_labels,
+      // labels: [
+      //   "Clothing",
+      //   "Food Products",
+      //   "Electronics",
+      //   "Kitchen Utility",
+      //   "Gardening",
+      // ],
+      legend: {
+        position: "left",
+        offsetY: 80,
       },
-    },
-    series: [21, 23, 19, 14, 6],
-    labels: [
-      "Clothing",
-      "Food Products",
-      "Electronics",
-      "Kitchen Utility",
-      "Gardening",
-    ],
-    legend: {
-      position: "left",
-      offsetY: 80,
-    },
-  };
+    };
 
-  var donut = new ApexCharts(document.querySelector("#donut"), optionDonut);
-  donut.render();
+    var donut = new ApexCharts(document.querySelector("#country_wise_data_graph"), optionDonut);
+    donut.render();
+  })
+
+  fetch(get_service_wise_sale_data_url)
+  // fetch('https://us-telecoms.com/super-admin/admin/get_service_wise_sale_data/')
+  .then(response =>{
+    return response.json()
+  })
+  .then(result =>{
+    var optionDonut = {
+      chart: {
+        type: "donut",
+        width: "100%",
+        height: 340,
+      },
+      dataLabels: {
+        enabled: false,
+      },
+      plotOptions: {
+        pie: {
+          customScale: 0.8,
+          donut: {
+            size: "75%",
+          },
+          offsetY: 20,
+        },
+        stroke: {
+          colors: undefined,
+        },
+      },
+      colors: colorPalette,
+      title: {
+        text: "Top Sale Services",
+        style: {
+          fontSize: "18px",
+        },
+      },
+      series: result.services_values,
+      labels: result.services_labels,
+      // labels: [
+      //   "Clothing",
+      //   "Food Products",
+      //   "Electronics",
+      //   "Kitchen Utility",
+      //   "Gardening",
+      // ],
+      legend: {
+        position: "left",
+        offsetY: 80,
+      },
+    };
+
+    var donut = new ApexCharts(document.querySelector("#top_sales_graph_data"), optionDonut);
+    donut.render();
+  })
 
   function trigoSeries(cnt, strength) {
     var data = [];
@@ -778,6 +848,7 @@
 
     return data;
   }
+  
 
   var optionsLine = {
     chart: {

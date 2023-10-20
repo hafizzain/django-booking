@@ -1,3 +1,4 @@
+{% load custom_tags %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -186,7 +187,7 @@
             class="p-[1.2rem] overflow-y-auto overflow-x-hidden scroll-hidden text-center flex flex-col gap-5"
           >
             <h1 class="font-bold text-xl normal-case">
-              <p>Invoice <span class="arabic">{{invoice_trans}}</span></p>
+              <p>{{ business_address.primary_translation.invoice }} {% if business_address.secondary_translation.invoice %} <span class="arabic">{{ business_address.secondary_translation.invoice }} {% endif %}</span></p>
               #{{invoice_id}}
             </h1>
 
@@ -213,17 +214,22 @@
                     class="flex items-center justify-between text-sm font-semibold"
                   >
                     <p class="text-left">
-                      Item <span class="arabic">{{items_trans}}</span>
+                      {{ business_address.primary_translation.items}} {% if business_address.secondary_translation.items %}<span class="arabic">{{ business_address.secondary_translation.items }} {% endif %}</span>
                     </p>
-                    <p>Amount <span class="arabic">{{amount_trans}}</span></p>
+                    <p>{{ business_address.primary_translation.amount}} {% if business_address.secondary_translation.amount %}<span class="arabic">{{ business_address.secondary_translation.amount}} {% endif %}</span></p>
                   </div>
                   {% for order in order_items %}
                   <div
                     class="flex items-center justify-between text-primary text-sm font-semibold"
                   >
                     <div>
-                      <p class="text-left">{{order.name}}</p>
-                      <p class="arabic">{{order.arabic_name}}</p>
+                      <p class="text-left">
+                        {% get_primary_translation order.id %}
+                        {% if order.discount_percentage %}
+                        (Discount {{ order.discount_percentage}} %)
+                        {% endif %}
+                      </p>
+                      <p class="arabic">{% get_secondary_translation order.id %}</p>
                     </div>
                     <p class="text-[#7B7B7B]">
                       <span>{{order.quantity}} x </span>{{order.price}}
@@ -235,44 +241,50 @@
               </div>
             </div>
             <div class="text-left flex flex-col gap-1">
-              <div
-                class="flex items-center justify-between text-primary text-sm font-bold"
-              >
+              {% if redeem_option %}
+              <div class="flex items-center justify-between text-primary text-sm font-bold">
                 <div>
-                  <p>Subtotal</p>
-                  <p class="arabic">{{subtotal_trans}}</p>
+                  <p>Paid from {{ redeem_option }} {% if voucher_redeem_percentage %}{{ voucher_redeem_percentage }} % {% endif %}</p>
+                </div>
+                <p>{{ total_discount }} {{ currency_code }}</p>
+              </div>
+              {% endif %}
+
+              <div class="flex items-center justify-between text-primary text-sm font-bold">
+                <div>
+                  <p>{{ business_address.primary_translation.subtotal}}</p>
+                  {% if business_address.secondary_translation.subtotal %}<p class="arabic">{{ business_address.secondary_translation.subtotal}} {% endif %}</p>
                 </div>
                 <p>{{sub_total}} {{currency_code}}</p>
               </div>
-              {% for tip in tips %}
-              <div
-                class="flex items-center justify-between text-[#7B7B7B] text-sm"
-              >
+
+              <div class="flex items-center justify-between text-primary text-sm font-bold">
                 <div>
-                  <p>Tip for {{tip.employee_name}}</p>
-                  <p>
-                    {{tip.employee_name}} <span class="arabic">نصيحة ل</span>
-                  </p>
+                  <p>{{ business_address.primary_translation.tips }}</p>
+                  {% if business_address.secondary_translation.tips %}<p class="arabic">{{ business_address.secondary_translation.tips}} {% endif %}</p>
                 </div>
-                <p>{{tip.tip}} {{currency_code}}</p>
+                <p>{{ total_tip }} {{ currency_code }}</p>
               </div>
-              {% endfor %} {% if tax_applied %}
+              
+              {% if tax_applied %}
               <div
                 class="flex items-center justify-between text-[#7B7B7B] text-sm"
               >
                 <div class="font-semibold text-black">
                   <p>{{tax_name}} ({{tax_applied}}%)</p>
-                  <p class="arabic">الضرائب</p>
+                  <p class="arabic"></p>
                 </div>
                 <p>{{tax_amount}} {{currency_code}}</p>
               </div>
-              {% endif %} {% if tax_applied1 %}
+              {% endif %} 
+              
+              {% if tax_applied1 %}
               <div
                 class="flex items-center justify-between text-[#7B7B7B] text-sm"
               >
                 <div class="font-semibold text-black">
                   <p>{{tax_name1}} ({{tax_applied1}}%)</p>
-                  <p class="arabic">الضرائب</p>
+                  <p class="arabic"></p>
                 </div>
                 <p>{{tax_amount1}} {{currency_code}}</p>
               </div>
@@ -282,8 +294,8 @@
               class="flex items-center justify-between text-primary text-sm font-bold"
             >
               <div>
-                <p class="text-left">Total</p>
-                <p class="arabic">{{total_trans}}</p>
+                <p class="text-left">{{ business_address.primary_translation.total}}</p>
+                {% if business_address.secondary_translation.total %}<p class="arabic">{{ business_address.secondary_translation.total }} {% endif %}</p>
               </div>
               <p class="text-sm">{{total}} {{currency_code}}</p>
             </div>
@@ -292,15 +304,25 @@
               <div
                 class="flex items-center justify-between text-primary text-sm font-bold"
               >
+              <div
+                class="flex items-center justify-between text-primary text-sm w-full"
+              >
                 <div>
-                  <p>Payment Method</p>
-                  <p class="arabic">{{payment_type_trans}}</p>
+                  <p>{{ business_address.primary_translation.payment_method}}</p>
+                  <p class="text-[#7B7B7B]">{{payment_type}} on {{created_at}} </p>
+                  {% if business_address.secondary_translation.payment_method %}<p class="arabic">{{ business_address.secondary_translation.payment_method}}</p>{% endif %}
+                </div>
+                <div>
+                  <div class="">
+                    <p class="text-left">
+                      Location: 
+                    </p>
+                    <p>
+                      {{location}}
+                    </p>
+                 </div>
                 </div>
               </div>
-              <div
-                class="flex items-center justify-between text-primary text-sm"
-              >
-                <p class="text-[#7B7B7B]">{{payment_type}} on {{created_at}} </p>
               </div>
             </div>
           </div>
@@ -326,10 +348,6 @@
           <div
             class="p-[1.2rem] overflow-y-auto overflow-hidden scroll-hidden text-center flex flex-col gap-5"
           >
-            {% comment %} <div class="text-left text-sm">
-              <p>Cashier: {{invoice_by}}</p>
-              <p class="arabic">{{invoice_by_arabic_name}} : أمين الصندوق</p>
-            </div> {% endcomment %}
             <hr class="border" />
 
             <div class="leading-1 text-center font-semibold">

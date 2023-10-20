@@ -117,7 +117,6 @@ class SaleInvoice(models.Model):
         orders.extend(VoucherOrder.objects.filter(checkout = checkout).annotate(name = F('voucher__name'), arabic_name=F('voucher__arabic_name')))
         orders.extend(MemberShipOrder.objects.filter(checkout = checkout).annotate(name = F('membership__name'), arabic_name=F('membership__arabic_name')))
 
-        # .values('name', 'arabic_name', 'quantity', 'current_price', 'total_price', 'discount_price', 'price')
         ordersData = []
         for order in orders:
             # pricing order for invoice PDF
@@ -138,11 +137,14 @@ class SaleInvoice(models.Model):
             #endregion
 
             data = {
+                'id': order.id,
                 'name' : f'{order.name}',
                 'arabic_name' : f'{order.arabic_name}',
                 'price' : round(total_price, 2),
-                'quantity' : order.quantity
+                'quantity' : order.quantity,
+                'discount_percentage': int(order.discount_percentage) if order.discount_percentage else None,
             }
+
             ordersData.append(data)
 
         return ordersData
@@ -207,10 +209,11 @@ class SaleInvoice(models.Model):
     def save(self, *args, **kwargs):
         if not self.file and self.checkout:
             order_items, order_tips, tax_details = self.get_invoice_order_items()
-            invoice_trans = self.get_invoice_translations()
             if len(order_items) > 0:
                 sub_total = sum([order['price'] for order in order_items])
                 tips_total = sum([t['tip'] for t in order_tips])
+
+                checkout_redeem_data = self.get_checkout_redeemed_data()
 
                 context = {
                     'client': self.client,
@@ -221,17 +224,15 @@ class SaleInvoice(models.Model):
                     'currency_code' : self.location.currency.code,
                     'sub_total' : round(sub_total, 2),
                     'tips' : order_tips,
+                    'total_tip':tips_total,
                     'total' : round((float(tips_total) + float(sub_total) + float(tax_details.get('tax_amount', 0)) + float(tax_details.get('tax_amount1', 0))), 2),
                     'created_at' : datetime.now().strftime('%Y-%m-%d'),
                     'BACKEND_HOST' : settings.BACKEND_HOST,
-                    'invoice_trans': invoice_trans['invoice'] if invoice_trans else '',
-                    'items_trans': invoice_trans['items'] if invoice_trans else '',
-                    'amount_trans': invoice_trans['amount'] if invoice_trans else '',
-                    'subtotal_trans': invoice_trans['subtotal'] if invoice_trans else '',
-                    'total_trans': invoice_trans['total'] if invoice_trans else '',
-                    'payment_type_trans': invoice_trans['payment_method'] if invoice_trans else '',
                     'payment_type': self.payment_type,
+                    'location':self.location.address_name,
+                    'business_address':self.location,
                     **tax_details,
+                    **checkout_redeem_data,
                 }
                 schema_name = connection.schema_name
                 schema_dir = f'{settings.BASE_DIR}/media/{schema_name}'
@@ -255,20 +256,18 @@ class SaleInvoice(models.Model):
 
         super(SaleInvoice, self).save(*args, **kwargs)
 
-    def get_invoice_translations(self):
-        """
-        This function will return the invoice translation object
-        based on the invoice business address / location. That 
-        translation will then embed into invoice template.
-        """
-        if self.location:
-            invoice_trans = InvoiceTranslation.objects.filter(
-                status= 'active',
-                location=self.location
-            ).first()
+    def get_checkout_redeemed_data(self):
 
-            translation_data = InvoiceTransSerializer(invoice_trans).data
-            return dict(translation_data)
-        else:
-            return None
+        data = dict()
+
+        checkout = Checkout.objects.filter(
+            id=self.checkout
+        ).first()
+
+        if checkout:
+            data['redeem_option'] = checkout.redeem_option
+            data['total_discount'] = checkout.total_discount
+            data['voucher_redeem_percentage'] = checkout.voucher_redeem_percentage
+
+        return data
 

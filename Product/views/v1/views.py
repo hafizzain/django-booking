@@ -311,7 +311,7 @@ def add_category(request):
                 'status' : True,
                 'status_code' : 201,
                 'response' : {
-                    'message' : 'Category Added!',
+                    'message' : 'Category added!',
                     'error_message' : None,
                     'categories' : serialized.data
                 }
@@ -892,8 +892,15 @@ def add_product(request):
                 productTranslation.language = language
                 productTranslation.save()
 
+        # Hard coding the creation of english language translation
+        # to keep the dynamic invoicingnlanguage in place.
+        english_language = Language.objects.filter(name='English').first()
+        ProductTranslations.objects.create(
+            product=product,
+            product_name=name,
+            language=english_language
+        )
 
-    
 
     serialized = ProductSerializer(product, context={'request' : request, 'location': None})
     return Response(
@@ -1079,8 +1086,17 @@ def update_product(request):
                 language = Language.objects.get(id__icontains = str(language))
                 productTranslation.language = language
                 productTranslation.save()
-        
-                
+
+    
+    # Hard coding the creation of english language translation
+    # to keep the dynamic invoicingnlanguage in place.
+    old_product_name = request.data.get('name', None)
+    english_language = Language.objects.filter(name='English').first()
+    ProductTranslations.objects.create(
+        product=product,
+        product_name=old_product_name,
+        language=english_language
+    )
 
     location_quantities = request.data.get('location_quantities', None)
     if location_quantities is not None:
@@ -1166,12 +1182,6 @@ def get_products(request):
         'product_medias',
         'product_stock',
     ).filter(is_deleted=False).order_by('-created_at')
-
-    # region temporary commented
-    # if location_id:
-    #     location = BusinessAddress.objects.get(id=str(location_id))
-    #     all_products = all_products.filter(product_stock__location=location_id)
-    # endregion
 
     if search_text:
         #query building

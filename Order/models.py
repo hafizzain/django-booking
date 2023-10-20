@@ -48,6 +48,12 @@ class Checkout(models.Model):
     tax_amount1 = models.FloatField(default=0, verbose_name='Second Tax total amount')
     tax_name = models.CharField(max_length=250, default='')
     tax_name1 = models.CharField(max_length=250, default='')
+
+    # region New Fields Added
+    total_discount = models.FloatField(default=None, null=True, blank=True)
+    voucher_redeem_percentage = models.FloatField(default=None, null=True, blank=True)
+    redeem_option = models.CharField(max_length=250, default=None, null=True, blank=True)
+    # endregion
     
     total_service_price = models.FloatField(default = 0 , null=True, blank=True) # Not in Use
     total_product_price = models.FloatField(default = 0 , null=True, blank=True) # Not in Use
@@ -153,8 +159,9 @@ class Order(models.Model):
     total_price = models.DecimalField(default = 0 , max_digits=10, decimal_places=5)
     sold_quantity = models.PositiveBigIntegerField(default = 0)
     
-    discount_percentage = models.FloatField(default= 0)
+    discount_percentage = models.FloatField(default=None, null=True, blank=True)
     discount_price = models.FloatField(default=None, null=True, blank=True)
+    total_discount = models.FloatField(default=None, null=True, blank=True)
     price = models.FloatField(default= 0)
 
     is_redeemed = models.BooleanField(default=False)
@@ -200,6 +207,7 @@ class MemberShipOrder(Order):
 class VoucherOrder(Order):
     voucher = models.ForeignKey(Vouchers, on_delete=models.CASCADE, related_name='voucher_orders')
     
+    max_sales = models.IntegerField(default=0)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     

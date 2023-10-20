@@ -95,74 +95,78 @@ def get_softwares(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_countries(request):
-    all_countries = Country.objects.filter(
-        is_active=True,
-        is_deleted=False
-    )
-    serialized = CountrySerializer(all_countries, many=True)
-    return Response(
-        {
-            'status' : True,
-            'status_code' : 200,
-            'response' : {
-                'message' : 'All Available Active Countries',
-                'error_message' : None,
-                'data' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    tenant = Tenant.objects.get(schema_name='public')
+    with tenant_context(tenant):
+        all_countries = Country.objects.filter(
+            is_active=True,
+            is_deleted=False,
+        ).exclude(unique_id__isnull=True)
+        serialized = CountrySerializer(all_countries, many=True)
+        return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'All Available Active Countries',
+                    'error_message' : None,
+                    'data' : serialized.data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_states(request):
-    country = request.GET.get('country' , None)
-    if country is None:
+    tenant = Tenant.objects.get(schema_name='public')
+    with tenant_context(tenant):
+        country_unique_id = request.GET.get('country_unique_id' , None)
+        if country_unique_id is None:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 400,
+                    'response' : {
+                        'message' : 'Invalid Data!',
+                        'error_message' : 'Country ID is missing',
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            all_states = State.objects.filter(
+                is_active=True,
+                is_deleted=False,
+                country_unique_id=country_unique_id
+            )
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 400,
+                    'response' : {
+                        'message' : 'Invalid Data!',
+                        'error_message' : 'Invalid Country ID',
+                        'messages' : [i for i in err],
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serialized = StateSerializer(all_states, many=True)
         return Response(
             {
-                'status' : False,
-                'status_code' : 400,
+                'status' : True,
+                'status_code' : 200,
                 'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : 'Country ID is missing',
+                    'message' : 'All Available Active States',
+                    'error_message' : None,
+                    'data' : serialized.data
                 }
             },
-            status=status.HTTP_400_BAD_REQUEST
+            status=status.HTTP_200_OK
         )
-
-    try:
-        all_states = State.objects.filter(
-            is_active=True,
-            is_deleted=False,
-            country__id=country
-        )
-    except Exception as err:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : 400,
-                'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : 'Invalid Country ID',
-                    'messages' : [i for i in err],
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-    serialized = StateSerializer(all_states, many=True)
-    return Response(
-        {
-            'status' : True,
-            'status_code' : 200,
-            'response' : {
-                'message' : 'All Available Active States',
-                'error_message' : None,
-                'data' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
 
 @api_view(['GET'])
 @permission_classes([AllowAny])

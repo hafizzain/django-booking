@@ -28,7 +28,7 @@ from Business.models import BusinessAddress
 from Service.models import PriceService, Service, ServiceGroup
 
 from Product.models import Product, ProductOrderStockReport, ProductStock
-from django.db.models import Avg, Count, Min, Sum, Q
+from django.db.models import Avg, Count, Min, Sum, Q, F
 
 
 from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer, SaleOrders_CheckoutSerializer, SaleOrders_AppointmentCheckoutSerializer
@@ -39,6 +39,9 @@ from datetime import datetime as dt
 from Reports.models import DiscountPromotionSalesReport
 from Service.models import ServiceTranlations
 from Utility.models import Language
+from Business.serializers.v1_serializers import BusinessAddressSerilaizer
+
+from django.db.models import Subquery, OuterRef
 
     
 @api_view(['GET'])
@@ -876,16 +879,17 @@ def get_all_sale_orders(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_all_sale_orders_pagination(request):
-    start_time = datetime.datetime.now()
     location_id = request.GET.get('location', None)
     range_start =  request.GET.get('range_start', None)
     range_end = request.GET.get('range_end', None)
     no_pagination = request.GET.get('no_pagination', None)
-
-
+    recent_five_sales = request.GET.get('recent_five_sales', False)
     search_text = request.GET.get('search_text', None)
     client_id = request.GET.get('client', None)
     service_id = request.GET.get('service', None)
+
+    sale_checkouts = None
+    appointment_checkouts = None
 
     if range_end is not None:
         range_end = dt.strptime(range_end, '%Y-%m-%d').date()
@@ -895,6 +899,8 @@ def get_all_sale_orders_pagination(request):
     queries = {}
     app_queries = {}
     sale_queries = {}
+
+
     if range_start:
         queries['created_at__range'] = (range_start, range_end)
     
@@ -911,9 +917,35 @@ def get_all_sale_orders_pagination(request):
         app_queries['appointment__appointment_services__service__id'] = service_id
 
     if search_text:
+        # removing # for better search
+        search_text = search_text.replace('#', '')
         sale_queries['client__full_name__icontains'] = search_text
         app_queries['appointment__client__full_name__icontains'] = search_text
 
+        invoice_checkout_ids = list(SaleInvoice.objects.filter(id__icontains=search_text).values_list('checkout', flat=True))
+        sale_checkouts = Checkout.objects.select_related(
+                            'location',
+                            'location__currency',
+                            'client',
+                            'member'
+                        ).prefetch_related(
+                            'checkout_orders',
+                            'checkout_orders__user',
+                            'checkout_orders__client',
+                            'checkout_orders__member',
+                            'checkout_orders__location',
+                            'checkout_orders__location__currency',
+                        ).filter(id__in=invoice_checkout_ids) \
+                        .distinct()
+        appointment_checkouts = AppointmentCheckout.objects.select_related(
+                                'appointment_service',
+                                'business_address',
+                                'appointment',
+                                'appointment__client',
+                                'service',
+                            ).filter(
+                                id__in=invoice_checkout_ids
+                            ).distinct()
 
     checkout_order = Checkout.objects.select_related(
         'location',
@@ -933,14 +965,82 @@ def get_all_sale_orders_pagination(request):
         **queries,
         **sale_queries
     ).distinct()
+
     appointment_checkout = AppointmentCheckout.objects.select_related(
-            'appointment_service', 
+            'appointment_service',
             'business_address',
             'appointment',
             'appointment__client',
             'service',
         ).filter(
-            # appointment_service__appointment_status = 'Done',
+            business_address__id = location_id,
+            **queries,
+            **app_queries
+        ).distinct()
+    
+    if sale_checkouts:
+        checkout_order = checkout_order | sale_checkouts
+
+    if appointment_checkouts:
+        appointment_checkout = appointment_checkout | appointment_checkouts
+
+    checkout_data = list(SaleOrders_CheckoutSerializer(checkout_order, many=True, context={'request': request}).data)
+    appointment_data = list(SaleOrders_AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
+
+    data_total = checkout_data + appointment_data
+    sorted_data = sorted(data_total, key=lambda x: x['created_at'], reverse=True)
+
+
+    if recent_five_sales:
+        sorted_data = sorted_data[:5]
+
+    # invoicce translation data
+    business_address = BusinessAddress.objects.get(id=location_id)
+    invoice_translations = BusinessAddressSerilaizer(business_address).data
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(sorted_data, request)
+    response = paginator.get_paginated_response(paginated_data, 'sales', invoice_translations)
+
+    return response
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_recent_five_sales(request):
+    location_id = request.GET.get('location', None)
+
+
+    queries = {}
+    app_queries = {}
+    sale_queries = {}
+
+    checkout_order = Checkout.objects.select_related(
+        'location',
+        'location__currency',
+        'client',
+        'member'
+    ).prefetch_related(
+        'checkout_orders',
+        'checkout_orders__user',
+        'checkout_orders__client',
+        'checkout_orders__member',
+        'checkout_orders__location',
+        'checkout_orders__location__currency',
+    ).filter(
+        is_deleted=False,
+        location__id=location_id,
+        **queries,
+        **sale_queries
+    ).distinct()
+
+    appointment_checkout = AppointmentCheckout.objects.select_related(
+            'appointment_service',
+            'business_address',
+            'appointment',
+            'appointment__client',
+            'service',
+        ).filter(
             business_address__id = location_id,
             **queries,
             **app_queries
@@ -950,19 +1050,21 @@ def get_all_sale_orders_pagination(request):
     appointment_data = list(SaleOrders_AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
 
     data_total = checkout_data + appointment_data
-                 
+    data_total = data_total[:5]
     sorted_data = sorted(data_total, key=lambda x: x['created_at'], reverse=True)
 
-
-    paginator = CustomPagination()
-    paginator.page_size = 100000 if no_pagination else 10
-    paginated_data = paginator.paginate_queryset(sorted_data, request)
-    response = paginator.get_paginated_response(paginated_data, 'sales')
-    
-    end_time = datetime.datetime.now()
-    response['seconds'] = f'{(end_time - start_time).seconds} s'
-    response['total_seconds'] = f'{(end_time - start_time).total_seconds()} s'
-    return response
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Last 5 Orders',
+                'error_message' : None,
+                'orders' : sorted_data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
 
 @api_view(['GET'])
@@ -1440,7 +1542,7 @@ def create_sale_order(request):
         service_commission_type = service_commission_type,
         product_commission_type = product_commission_type,
         voucher_commission_type = voucher_commission_type,
-        checkout = f'{checkout.id}'
+        checkout = f'{checkout.id}',
     )
     invoice.save()
     
@@ -1757,7 +1859,7 @@ def create_sale_order(request):
 
 
 
-    
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def new_create_sale_order(request):
@@ -1775,11 +1877,15 @@ def new_create_sale_order(request):
     payment_type = request.data.get('payment_type', None)
     client_type = request.data.get('client_type', None)
     ids = request.data.get('ids', None)
+    is_voucher_redeemed_global = request.data.get('is_voucher_redeemed', None)
     redeemed_membership_id = request.data.get('redeemed_membership_id', False)
+    redeemed_voucher_id = request.data.get('redeemed_voucher_id', None)
     free_services_quantity = request.data.get('free_services_quantity', None)
     service_total_price = request.data.get('service_total_price', None)
     product_total_price = request.data.get('product_total_price', None)
     voucher_total_price = request.data.get('voucher_total_price', None)
+    voucher_redeem_percentage = request.data.get('voucher_redeem_percentage', None)
+    redeem_option = request.data.get('redeem_option', None)
     service_commission_type = request.data.get('service_commission_type', '')
     product_commission_type = request.data.get('product_commission_type', '')
     voucher_commission_type = request.data.get('voucher_commission_type', '')
@@ -1787,9 +1893,13 @@ def new_create_sale_order(request):
     is_loyalty_points_redeemed = request.data.get('is_redeemed', None)
     loyalty_points_redeemed_id = request.data.get('redeemed_id', None)
     loyalty_points_redeemed = request.data.get('redeemed_points', None)
+    total_discount_value = request.data.get('discount_value', None)
     tip = request.data.get('tip', [])
     total_price = request.data.get('total_price', None)
     minus_price = 0
+    debug_before = None
+    debug_after = None
+
     
     errors = []
 
@@ -1840,6 +1950,9 @@ def new_create_sale_order(request):
         location = business_address,
         client_type = client_type,
         payment_type = payment_type,
+
+        voucher_redeem_percentage=voucher_redeem_percentage,
+        redeem_option=redeem_option,
         
         
         total_voucher_price = voucher_total_price,
@@ -1848,13 +1961,14 @@ def new_create_sale_order(request):
         
         service_commission_type = service_commission_type,
         product_commission_type = product_commission_type,
-        voucher_commission_type = voucher_commission_type ,  
+        voucher_commission_type = voucher_commission_type,
         tax_amount = tax_amount,
         tax_amount1 = tax_amount1,
         tax_applied = tax_applied,
         tax_applied1 = tax_applied1,
         tax_name=tax_name,
-        tax_name1=tax_name1
+        tax_name1=tax_name1,
+        total_discount=total_discount_value
     )
 
     checkout.save()
@@ -1873,7 +1987,7 @@ def new_create_sale_order(request):
         service_commission_type = service_commission_type,
         product_commission_type = product_commission_type,
         voucher_commission_type = voucher_commission_type,  
-        checkout = f'{checkout.id}'
+        checkout = f'{checkout.id}',
     )
     invoice.save()
 
@@ -1897,8 +2011,7 @@ def new_create_sale_order(request):
         price = id['price']  
         employee_id = id['employee_id']      
         discount_price = id.get('discount_price', None)
-        
-
+        discount_percentage = id.get('discount_percentage', None)
         is_membership_redeemed = id.get('is_membership_redeemed', None)
         is_voucher_redeemed = id.get('is_voucher_redeemed', None)
         redeemed_price = id.get('redeemed_price', None)
@@ -1940,12 +2053,11 @@ def new_create_sale_order(request):
                 test = False
         
         original_price = float(price)
-        discount_percentage = 0
         order_discount_price = None
         
         if discount_price is not None:
             order_discount_price = float(discount_price)
-            discount_percentage = (float(discount_price) / original_price) * 100
+            discount_percentage = float(discount_percentage) if discount_percentage else None
 
         order_instance = None
         if sale_type == 'PRODUCT':
@@ -2024,19 +2136,17 @@ def new_create_sale_order(request):
                 product = product,
                 checkout = checkout,
                 location = business_address,
-                # total_price = total_price, 
                 total_price = float(original_price), 
                 payment_type= payment_type,
                 client_type = client_type,
                 quantity = quantity,
                 current_price = float(price),
-                discount_percentage = float(discount_percentage),
+                discount_percentage = discount_percentage,
                 discount_price = order_discount_price,
             )
             product_order.sold_quantity += 1 # product_stock.sold_quantity
             product_order.save()
             order_instance = product_order
-            
 
         elif sale_type == 'SERVICE':
             try:
@@ -2058,16 +2168,14 @@ def new_create_sale_order(request):
                     service = service,
                     duration= dur,
                     checkout = checkout,
-                    
                     client = client,
                     location = business_address,
-                    # total_price = total_price, 
                     total_price = float(original_price), 
                     payment_type=payment_type,
                     client_type = client_type,
                     quantity = quantity,
                     current_price = float(price),
-                    discount_percentage = float(discount_percentage),
+                    discount_percentage = discount_percentage,
                     discount_price = order_discount_price,
                 )
 
@@ -2108,7 +2216,7 @@ def new_create_sale_order(request):
                     quantity = quantity,
                     location = business_address,
                     current_price = float(price),
-                    discount_percentage = float(discount_percentage),
+                    discount_percentage = discount_percentage,
                     discount_price = order_discount_price,
                 )
             except Exception as err:
@@ -2130,12 +2238,18 @@ def new_create_sale_order(request):
             
         elif sale_type == 'VOUCHER':  
               
-            #for vouchers in ids:  
             try:
                 days = 0
-                voucher = Vouchers.objects.get(id = service_id)#str(vouchers))
+                voucher = Vouchers.objects.get(id = service_id)
                 item_name = voucher.name
                 test = voucher.validity.split(" ")[1]
+
+
+                # TODO: remove this Min Condition
+                if test == 'Min':
+                    minutes = voucher.validity.split(" ")[0]
+                    minute = int(minutes)
+                    days = minute
                 
                 if test == 'Days':
                     day = voucher.validity.split(" ")[0]
@@ -2152,9 +2266,10 @@ def new_create_sale_order(request):
                     day = voucher.validity.split(" ")[0]
                     day = int(day)
                     days = day * 360
-                print(days)
-                end_date_cal = voucher.created_at +  timedelta(days=days)
-                start_date_cal = voucher.created_at
+                
+
+                start_date_cal = datetime.datetime.now()
+                end_date_cal = datetime.datetime.now() +  timedelta(days=days)
                 
                 discount_percentage = voucher.discount_percentage
                 
@@ -2167,7 +2282,6 @@ def new_create_sale_order(request):
                     checkout = checkout,
                     client = client,
                     discount_percentage = float(discount_percentage),
-                    # total_price = total_price, 
                     total_price = float(original_price), 
                     payment_type =payment_type,
                     client_type = client_type,
@@ -2177,6 +2291,8 @@ def new_create_sale_order(request):
                     discount_price = order_discount_price,
 
                 )
+
+                
                 
             except Exception as err:
                 ExceptionRecord.objects.create(
@@ -2195,11 +2311,12 @@ def new_create_sale_order(request):
             else:
                 order_instance = voucher_order
         
-        if order_instance is not None and is_redeemed:
+        if order_instance is not None and is_redeemed:                
             order_instance.is_redeemed = True
             order_instance.redeemed_type = 'Membership' if is_membership_redeemed else 'Voucher' if is_voucher_redeemed  else ''
             order_instance.redeemed_price = float(redeemed_price)
             order_instance.redeemed_instance_id = redeemed_membership_id
+            order_instance.total_discount = float(total_discount_value) if total_discount_value else None
             order_instance.save()
 
         if sale_type in ['PRODUCT', 'SERVICE', 'VOUCHER']:
@@ -2251,6 +2368,14 @@ def new_create_sale_order(request):
                 employee_commission.save()
             
 
+    # This code should be removed as its not required now.
+    # incrementing voucher max sale 
+    # if is_voucher_redeemed_global:
+    #     client_voucher = VoucherOrder.objects.get(id=redeemed_voucher_id)
+    #     debug_before = client_voucher.max_sales
+    #     client_voucher.max_sales += 1
+    #     client_voucher.save()
+    #     debug_after = client_voucher.max_sales
     
     if type(tip) == str:
         tip = json.loads(tip)
@@ -2393,6 +2518,8 @@ def new_create_sale_order(request):
                     'message' : 'Product Order Sale Created!',
                     'error_message' : errors,
                     'sale' : serialized.data,
+                    'before': debug_before,
+                    'after': debug_after
                 }
             },
             status=status.HTTP_201_CREATED

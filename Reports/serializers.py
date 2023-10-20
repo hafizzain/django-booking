@@ -508,38 +508,6 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
         except Exception as err:
             return str(err)
     
-    # def get_service_sale_price(self, obj):
-    #     try:
-    #         month = self.context["month"]
-    #         year = self.context["year"]
-    #         total = 0
-            
-    #         app   = AppointmentService.objects.filter(
-    #             business_address = obj,
-    #             appointment_status = 'Done',
-    #         )
-    #         service_orders = ServiceOrder.objects.filter(is_deleted=False,
-    #                     location = obj,
-    #                     created_at__icontains = year
-    #                     )
-            
-    #         for ord  in app:
-    #             create = str(ord.created_at)
-    #             match = int(create.split(" ")[0].split("-")[1])
-    #             if int(month) == match:
-    #                 total += int(ord.price)
-            
-    #         for ord  in service_orders:
-    #             create = str(ord.created_at)
-    #             match = int(create.split(" ")[0].split("-")[1])
-    #             if int(month) == match:
-    #                 total += int(ord.checkout.total_service_price)
-                                
-    #         return total         
-            
-    #     except Exception as err:
-    #         return str(err)
-    
     def get_service_sale_price(self, obj):
         try:
             month = self.context["month"]
@@ -563,10 +531,6 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
                     total += int(ord.price) if ord.price is not None else 0
 
             for ord in service_orders:
-                # create = str(ord.created_at)
-                # match = int(create.split(" ")[0].split("-")[1])
-                # if int(month) == match:
-                #     total += int(ord.checkout.total_service_price) if ord.checkout.total_service_price is not None else 0
                 price = 0
                 if ord.discount_price:
                     price = ord.discount_price
@@ -578,50 +542,6 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
 
         except Exception as err:
             return str(err)
-    
-    # def get_product_sale_price(self, obj):
-    #     try:
-    #         month = self.context["month"]
-    #         year = self.context["year"]
-    #         total = 0
-
-    #         service_orders = ProductOrder.objects.filter(
-    #             is_deleted=False, 
-    #             location = obj,
-    #             created_at__icontains = year
-    #             )
-    #         for ord  in service_orders:
-    #             create = str(ord.created_at)
-    #             match = int(create.split(" ")[0].split("-")[1])
-    #             if int(month) == match:
-    #                 total += int(ord.checkout.total_product_price)
-            
-    #         return total
-                
-    #     except Exception as err:
-    #         return str(err)
-        
-    # def get_product_sale_price(self, obj):
-    #     try:
-    #         month = self.context["month"]
-    #         year = self.context["year"]
-    #         total = 0
-
-    #         service_orders = ProductOrder.objects.filter(
-    #             is_deleted=False, 
-    #             location=obj,
-    #             created_at__icontains=year
-    #         )
-    #         for ord in service_orders:
-    #             create = str(ord.created_at)
-    #             match = int(create.split(" ")[0].split("-")[1])
-    #             if int(month) == match:
-    #                 total += int(ord.checkout.total_product_price) or 0  # Use 0 as default value if None
-                
-    #         return total
-
-    #     except Exception as err:
-    #         return str(err)
 
     def get_product_sale_price(self, obj):
         try:
@@ -636,10 +556,6 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
                 created_at__month = month,
             )
             for ord in service_orders:
-                # create = str(ord.created_at)
-                # match = int(create.split(" ")[0].split("-")[1])
-                # if int(month) == match:
-                #     total += int(ord.checkout.total_product_price) if ord.checkout.total_product_price is not None else 0
                 price = 0
                 if ord.discount_price:
                     price = ord.discount_price
@@ -651,29 +567,6 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
 
         except Exception as err:
             return str(err)
-    
-
-    # def get_voucher_sale_price(self, obj):
-    #     try:
-    #         month = self.context["month"]
-    #         year = self.context["year"]
-    #         total = 0
-
-    #         service_orders = VoucherOrder.objects.filter(
-    #             is_deleted=False, 
-    #             location = obj,
-    #             created_at__icontains = year,
-    #             )
-    #         for ord  in service_orders:
-    #             create = str(ord.created_at)
-    #             match = int(create.split(" ")[0].split("-")[1])
-    #             if int(month) == match:
-    #                 total += int(ord.checkout.total_voucher_price)
-            
-    #         return total
-                
-    #     except Exception as err:
-    #         return str(err)
 
     def get_voucher_sale_price(self, obj):
         try:
@@ -688,10 +581,6 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
                 created_at__month = month,
             )
             for ord in service_orders:
-                # create = str(ord.created_at)
-                # match = int(create.split(" ")[0].split("-")[1])
-                # if int(month) == match:
-                    # total += int(ord.checkout.total_voucher_price) if ord.checkout.total_voucher_price is not None else 0
                 price = 0
                 if ord.discount_price:
                     price = ord.discount_price
@@ -717,10 +606,6 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
                 created_at__month = month,
             )
             for ord  in service_orders:
-                # create = str(ord.created_at)
-                # match = int(create.split(" ")[0].split("-")[1])
-                # if int(month) == match:
-                #     total += int(ord.checkout.total_membership_price)
                 price = 0
                 if ord.discount_price:
                     price = ord.discount_price

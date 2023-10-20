@@ -60,6 +60,23 @@
       </div>
     </div>
   </div>
+  <div class="flex items-center gap-4 mx-4 justify-end my-5">
+    {% if page_obj.has_previous %}
+      <a class="bg-[#3b82f6] px-4 py-2 rounded-lg text-white" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+    <div class="flex gap-2">
+      {% for i in page_obj.paginator.page_range %}
+        {% if page_obj.number == i %}
+          <a href="{% url 'ExceptionPage' %}?page={{i}}" class="w-[30px] h-[30px] bg-[#101928] text-white rounded-md flex items-center justify-center">{{ i }} </a>
+        {% else %}
+          <a class="w-[30px] h-[30px] bg-gray-100 rounded-md flex items-center justify-center" href="{% url 'ExceptionPage' %}?page={{i}}">{{ i }}</a>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% if page_obj.has_next %}
+      <a class="bg-[#3b82f6] px-4 py-2 rounded-lg text-white" href="?page={{ page_obj.next_page_number }}">Next</a>
+    {% endif %}
+  </div>
 </div>
 
 {% endblock body %}
