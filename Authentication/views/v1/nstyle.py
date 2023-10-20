@@ -329,8 +329,8 @@ def verify_otp(request):
                 tnt_token = Token.objects.get(user__username=user.username)
                 s_data['id'] = str(tnt_token.user.id)
                 s_data['access_token'] = str(tnt_token.key)
-        except:
-            pass
+        except Exception as err:
+            s_data['errorrrrrr'] = str(err)
 
     try:
         thrd = Thread(target=send_welcome_email(user=otp.user))
