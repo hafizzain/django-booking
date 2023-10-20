@@ -157,7 +157,7 @@ def create_employee(tenant=None, user = None, business=None):
                     country = Country.objects.get(name__iexact = country_id)
                     currency = Currency.objects.get(name__iexact = currency_id)
                 except Exception as err:
-                    pass
+                    country = None
 
                 business_address = BusinessAddress.objects.create(
                     business = business,
