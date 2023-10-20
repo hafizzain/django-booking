@@ -35,7 +35,8 @@ DEBUG = True
 CSRF_TRUSTED_ORIGINS=[
     # 'https://*.YOUR_DOMAIN.COM',
     'https://hashedsystems.com',
-    'https://hashedsystem.co.uk'
+    'https://hashedsystem.co.uk',
+    'https://*.hashedsystem.co.uk',
                       ]
 ALLOWED_HOSTS = ['*']
 INTERNAL_IPS = [
