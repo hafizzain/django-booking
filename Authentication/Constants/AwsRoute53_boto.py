@@ -7,7 +7,7 @@ from django.conf import settings
 
 
 def create_route53_alias_record(domain_name):
-    ExceptionRecord.objects.create(text = f'Starting :: create_route53_alias_record')
+    ExceptionRecord.objects.create(text = f'Starting :: create_route53_alias_record {domain_name}')
     time_start = datetime.datetime.now()
     try:
         route53_client = boto3.client('route53', aws_access_key_id=settings.AWS_API_KEY, aws_secret_access_key=settings.AWS_SECRET_KEY)

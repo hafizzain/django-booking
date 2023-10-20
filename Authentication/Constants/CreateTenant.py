@@ -580,7 +580,7 @@ def create_tenant(request=None, user=None, data=None):
         else:
             ExceptionRecord.objects.create(text = f'Using Wildcard for SSL {td_name}')
             try:
-                thrd = Thread(target=create_aws_domain_record, args=[td_name])
+                thrd = Thread(target=create_aws_domain_record, args=[f'{td_name}.{settings.BACKEND_DOMAIN_NAME}'])
                 thrd.start()
             except Exception as err:
                 ExceptionRecord.objects.create(text = f'AWS HOSTED ERROR . {str(err)}')
