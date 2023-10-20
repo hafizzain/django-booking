@@ -153,7 +153,6 @@ def add_translation_forms(request):
 @permission_classes([IsAuthenticated])
 def add_invoiceTranslation(request):
     if request.method == 'POST':
-        location = request.POST.get('location')
         language = request.POST.get('language')
         invoice = request.POST.get('invoice')
         items = request.POST.get('items')
@@ -164,11 +163,6 @@ def add_invoiceTranslation(request):
         total = request.POST.get('total')
         payment_method = request.POST.get('payment_method')
         statuss = request.POST.get('status')
-
-        user = request.user
-
-
-        loc = location
 
         invoiceTranslation = InvoiceTranslation(
             invoice = invoice,
@@ -181,27 +175,8 @@ def add_invoiceTranslation(request):
             payment_method = payment_method,
             status = statuss
         )
-        invoiceTranslation.user = user
+        invoiceTranslation.user = request.user
         invoiceTranslation.save()
-        try:
-            location = BusinessAddress.objects.get(id__icontains = str(location))
-            invoiceTranslation.location = location
-        except Exception as e:
-            return Response(
-            {
-                'success':False,
-                'status_code':204,
-                'status_code_text' : '204',
-                'response':
-                {
-                    'message':'Location Not Founf',
-                    'data': str(e),
-                    'location':loc,
-                    'tips':tips
-                }
-            },
-            status=status.HTTP_201_CREATED
-            )
 
 
         language = AllLanguages.objects.get(id__icontains = str(language))        
@@ -242,7 +217,7 @@ def add_invoiceTranslation(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_invoiceTranslation(request):
-    allInvoicTrans = InvoiceTranslation.objects.filter(status ='active')
+    allInvoicTrans = InvoiceTranslation.objects.all()
     
     if allInvoicTrans:
         translation_data = InvoiceTransSerializer(allInvoicTrans, many=True).data
@@ -280,7 +255,6 @@ def get_invoiceTranslation(request):
 @permission_classes([IsAuthenticated])
 def update_invoiceTranslation(request):
     id = request.POST.get('id', None)
-    location = request.POST.get('location')
     language = request.POST.get('language')
     invoice = request.POST.get('invoice')
     items = request.POST.get('items')
@@ -321,9 +295,6 @@ def update_invoiceTranslation(request):
         invoice_data.total = total
         invoice_data.payment_method = payment_method
         invoice_data.status = statuss
-
-        location = BusinessAddress.objects.get(id__icontains = str(location))
-        invoice_data.location = location
 
         language = AllLanguages.objects.get(id__icontains = str(language))        
         invoice_data.language = language

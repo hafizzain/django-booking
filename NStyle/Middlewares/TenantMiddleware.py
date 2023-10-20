@@ -3,6 +3,7 @@ from django.db import connection
 from django.http import Http404
 from django.urls import set_urlconf
 from django.utils.deprecation import MiddlewareMixin
+import datetime
 
 from django_tenants.utils import remove_www, get_public_schema_name, get_tenant_types, \
     has_multi_type_tenants, get_tenant_domain_model, get_public_schema_urlconf
@@ -41,6 +42,7 @@ class CustomTanantMiddleware(MiddlewareMixin):
             return
 
         tenant.domain_url = hostname
+        tenant.last_active = datetime.datetime.now()
         request.tenant = tenant
         try:
             request.tenant_name = self.domain_name
@@ -48,7 +50,7 @@ class CustomTanantMiddleware(MiddlewareMixin):
         except:
             request.tenant_name = ''
             request.tenant_schema_name = ''
-
+        tenant.save()
         connection.set_tenant(request.tenant)
         self.setup_url_routing(request)
 

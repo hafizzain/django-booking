@@ -16,12 +16,12 @@ class CurrencySerializer(serializers.ModelSerializer):
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
-        fields = ['id', 'name']
+        fields = ['unique_id', 'name']
 
 class StateSerializer(serializers.ModelSerializer):
     class Meta:
         model = State
-        fields = ['id', 'name']
+        fields = ['unique_id', 'name']
 
 class CitySerializer(serializers.ModelSerializer):
     class Meta:

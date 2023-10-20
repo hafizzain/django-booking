@@ -2,7 +2,7 @@ from datetime import date, datetime
 from threading import Thread
 
 from Order.models import VoucherOrder, Vouchers, MemberShipOrder, Membership
-
+from django.db.models.functions import Cast
 from Client.Constants.Add_Employe import add_client
 from Employee.Constants.Add_Employe import add_employee
 from Promotions.models import ServiceDurationForSpecificTime
@@ -10,13 +10,13 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from django.db.models import Q
+from django.db.models import Q, F, IntegerField
 from Service.models import Service
 from Business.models import Business, BusinessAddress
 from Product.models import Product
 from Utility.models import Country, Currency, ExceptionRecord, Language, State, City
 from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs,VoucherCurrencyPrice
-from Client.serializers import ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer, ClientLoyaltyPointSerializer, CustomerLoyaltyPointsLogsSerializer, CustomerDetailedLoyaltyPointsLogsSerializer, ClientVouchersSerializer, ClientMembershipsSerializer
+from Client.serializers import SingleClientSerializer, ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer, ClientLoyaltyPointSerializer, CustomerLoyaltyPointsLogsSerializer, CustomerDetailedLoyaltyPointsLogsSerializer, ClientVouchersSerializer, ClientMembershipsSerializer
 from Utility.models import NstyleFile
 
 from Sale.Constants.Custom_pag import CustomPagination
@@ -24,6 +24,7 @@ from Sale.Constants.Custom_pag import CustomPagination
 import json
 from NStyle.Constants import StatusCodes
 from django.core.paginator import Paginator
+from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -150,7 +151,7 @@ def get_single_client(request):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-    seralized = ClientSerializer(client, context={'request' : request})
+    seralized = SingleClientSerializer(client, context={'request' : request})
     return Response(
         {
             'status' : 200,
@@ -268,9 +269,9 @@ def create_client(request):
     card_number= request.data.get('card_number' , None)
     is_active = True if request.data.get('is_active', None) is not None else False
     
-    city= request.data.get('city', None)
-    state= request.data.get('state', None)
-    country= request.data.get('country', None)
+    city_name = request.data.get('city', None)
+    country_unique_id = request.data.get('country', None)
+    state_unique_id = request.data.get('state', None)
     languages= request.data.get('language', None)
     errors = []
     
@@ -312,12 +313,24 @@ def create_client(request):
         )
     
     try:
-        if country is not None:
-            country = Country.objects.get(id=country)
-        if state is not None:
-            state= State.objects.get(id=state)
-        if city is not None:
-            city = City.objects.get(id=city)
+        if country_unique_id is not None:
+            public_country = get_country_from_public(country_unique_id)
+            country, created = Country.objects.get_or_create(
+                name=public_country.name,
+                unique_id = public_country.unique_id
+            )
+        if state_unique_id is not None:
+            public_state = get_state_from_public(state_unique_id)
+            state, created= State.objects.get_or_create(
+                name=public_state.name,
+                unique_id=public_state.unique_id
+            )
+        if city_name is not None:
+            city, created= City.objects.get_or_create(name=city_name,
+                                                  country=country,
+                                                  state=state,
+                                                  country_unique_id=country_unique_id,
+                                                  state_unique_id=state_unique_id)
     except Exception as err:
         return Response(
             {
@@ -398,9 +411,9 @@ def create_client(request):
         mobile_number=mobile_number,
         dob=dob,
         gender= gender,
-        country= country,
-        state = state,
-        city = city,
+        country= country if country_unique_id else None,
+        state = state if state_unique_id else None,
+        city = city if city_name else None,
         postal_code= postal_code,
         card_number= card_number,
         is_active = is_active,
@@ -444,84 +457,113 @@ def create_client(request):
 @permission_classes([IsAuthenticated])
 def update_client(request): 
     # sourcery skip: avoid-builtin-shadow
-        id = request.data.get('id', None)
-        if id is None:
-            return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.MISSING_FIELDS_4001,
-                'status_code_text' : 'MISSING_FIELDS_4001',
-                'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : 'Client ID is required',
-                    'fields' : [
-                        'id',
-                    ]
-                }
-            },
-             status=status.HTTP_400_BAD_REQUEST
-           )
-        try:
-            client = Client.objects.get(id=id)
-        except Exception as err:
-              return Response(
-             {
-                    'status' : False,
-                    'status_code' : StatusCodes.INVALID_CLIENT_4032,
-                    'status_code_text' : 'INVALID_CLIENT_4032',
-                    'response' : {
-                        'message' : 'Client Not Found',
-                        'error_message' : str(err),
-                    }
-                },
-                   status=status.HTTP_404_NOT_FOUND
-              )
-        image=request.data.get('image',None)
-        phone_number=request.data.get('mobile_number',None)
-        if phone_number is not None:
-            client.mobile_number = phone_number
-        else :
-            client.mobile_number = None
-        
-        client.is_active = True  if request.data.get('image',None) is not None else False
 
-        if image is not None:
-            client.image=image
-        
-        postal_code = request.data.get('postal_code' , None)
-        if postal_code is None:
-            client.postal_code = ''
+    country_unique_id = request.data.get('country', None)
+    state_unique_id = request.data.get('state', None)
+    city_name = request.data.get('city', None)
 
-        client.save()
-        
-        serialized= ClientSerializer(client, data=request.data, partial=True, context={'request' : request})
-        if serialized.is_valid():
-            serialized.save()
-            
+    id = request.data.get('id', None)
+    if id is None:
+        return Response(
+        {
+            'status' : False,
+            'status_code' : StatusCodes.MISSING_FIELDS_4001,
+            'status_code_text' : 'MISSING_FIELDS_4001',
+            'response' : {
+                'message' : 'Invalid Data!',
+                'error_message' : 'Client ID is required',
+                'fields' : [
+                    'id',
+                ]
+            }
+        },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        client = Client.objects.get(id=id)
+    except Exception as err:
             return Response(
-            {
-                'status' : True,
-                'status_code' : 200,
-                'response' : {
-                    'message' : 'Client Updated Successfully!',
-                    'error_message' : None,
-                    'client' : serialized.data
-                }
-            },
-            status=status.HTTP_200_OK
-           )
-        else:
-              return Response(
             {
                 'status' : False,
                 'status_code' : StatusCodes.INVALID_CLIENT_4032,
+                'status_code_text' : 'INVALID_CLIENT_4032',
                 'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : str(serialized.errors),
+                    'message' : 'Client Not Found',
+                    'error_message' : str(err),
                 }
             },
-            status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_404_NOT_FOUND
+            )
+    image=request.data.get('image',None)
+    phone_number=request.data.get('mobile_number',None)
+    if phone_number is not None:
+        client.mobile_number = phone_number
+    else :
+        client.mobile_number = None
+    
+    client.is_active = True  if request.data.get('image',None) is not None else False
+
+    if image is not None:
+        client.image=image
+    
+    postal_code = request.data.get('postal_code' , None)
+    if postal_code is None:
+        client.postal_code = ''
+
+    if country_unique_id is not None:
+        public_country = get_country_from_public(country_unique_id)
+        country, created = Country.objects.get_or_create(
+            name=public_country.name,
+            unique_id = public_country.unique_id
         )
+        client.country = country
+            
+    if state_unique_id is not None:
+        public_state = get_state_from_public(state_unique_id)
+        state, created= State.objects.get_or_create(
+            name=public_state.name,
+            unique_id=public_state.unique_id
+        )
+        client.state = state
+            
+    if city_name is not None:
+        city, created= City.objects.get_or_create(name=city_name,
+                                                country=country,
+                                                state=state,
+                                                country_unique_id=country_unique_id,
+                                                state_unique_id=state_unique_id)
+        client.city = city
+    
+    client.save()
+    
+    serialized= ClientSerializer(client, data=request.data, partial=True, context={'request' : request})
+    if serialized.is_valid():
+        serialized.save()
+        
+        return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Client Updated Successfully!',
+                'error_message' : None,
+                'client' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+        )
+    else:
+            return Response(
+        {
+            'status' : False,
+            'status_code' : StatusCodes.INVALID_CLIENT_4032,
+            'response' : {
+                'message' : 'Invalid Data!',
+                'error_message' : str(serialized.errors),
+            }
+        },
+        status=status.HTTP_400_BAD_REQUEST
+    )
         
         
         
@@ -1863,14 +1905,19 @@ def create_memberships(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_memberships(request):
+    search_text = request.GET.get('search_text')
     all_memberships= Membership.objects.all().order_by('-created_at')
     all_memberships_count = all_memberships.count()
+
+    if search_text:
+        all_memberships = all_memberships.filter(name__icontains=search_text)
     
-    page_count = all_memberships_count / 20
+    per_pege_results = 10
+    page_count = all_memberships_count / per_pege_results
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_memberships, 20)
+    paginator = Paginator(all_memberships, per_pege_results)
     page_number = request.GET.get("page") 
     all_memberships = paginator.get_page(page_number)
 
@@ -1883,7 +1930,7 @@ def get_memberships(request):
                 'message' : 'All Membership',
                 'count':all_memberships_count,
                 'pages':page_count,
-                'per_page_result':20,
+                'per_page_result':per_pege_results,
                 'error_message' : None,
                 'membership' : serialized.data
             }
@@ -2145,8 +2192,10 @@ def create_vouchers(request):
     voucher_type= request.data.get('voucher_type', None)
     
     #valid_for = request.data.get('valid_for', None)
-    validity= request.data.get('validity', None)
-    
+
+    validity = request.data.get('validity', None)
+    # validity = "5 Min"
+
     sales = request.data.get('sales', None)
     price = request.data.get('price', None)
 
@@ -2190,26 +2239,15 @@ def create_vouchers(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-    
-    # if valid_for.lower() == 'days':
-    #     days= days
-    # else:
-    #     months = months
         
     voucher = Vouchers.objects.create(
         user = user,
         business = business, 
         name = name,
-        #value = value,
         validity=validity,
         voucher_type=voucher_type,
-        #valid_for = valid_for,
         sales = sales,
         discount_percentage = discount_percentage,
-        # price = price,  
-        # 
-        # discount = discount,  
-        
     )
     if currency_voucher_price is not None:
         if type(currency_voucher_price) == str:
@@ -2239,35 +2277,7 @@ def create_vouchers(request):
                 currency = currency_id,
                 price = price,
             )
-            # voucher_obj.save()
-    # voucher.days = days
-    # voucher.months = months
-    # voucher.save()
-    # if voucher_type is not None:
-    #     if type(voucher_type) == str:
-    #         voucher_type = voucher_type.replace("'" , '"')
-    #         voucher_type = json.loads(voucher_type)
-    #     else:
-    #         pass
-    #     for ser in voucher_type:
-    #         percentage = ser.get('percentage', 0)
-    #         try:
-    #             voucher_type=Vouchers.objects.get(id=voucher_type)
-    #         except Exception as err:
-    #             return Response(
-    #                 {
-    #                     'status' : False,
-    #                     'status_code' : StatusCodes.SERVICE_NOT_FOUND_4035,
-    #                     'response' : {
-    #                     'message' : 'percentage not found',
-    #                     'error_message' : str(err),
-    #                     }
-    #                 },
-    #                 status=status.HTTP_400_BAD_REQUEST
-    #             )
-    #         percentage_obj = DiscountMembership.objects.create(
-    #             percentage =percentage
-    #         )
+            
     serialized = VoucherSerializer(voucher)
        
     return Response(
@@ -2286,14 +2296,19 @@ def create_vouchers(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_vouchers(request):
+    search_text = request.GET.get('search_text')
     all_voucher= Vouchers.objects.all().order_by('-created_at')
     all_voucher_count= all_voucher.count()
 
-    page_count = all_voucher_count / 20
+    if search_text:
+        all_voucher = all_voucher.filter(name__icontains=search_text)
+
+    per_page_results = 10
+    page_count = all_voucher_count / per_page_results
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_voucher, 20)
+    paginator = Paginator(all_voucher, per_page_results)
     page_number = request.GET.get("page") 
     all_voucher = paginator.get_page(page_number)
 
@@ -2306,7 +2321,7 @@ def get_vouchers(request):
                 'message' : 'All Voucher',
                 'count':all_voucher_count,
                 'pages':page_count,
-                'per_page_result':20,
+                'per_page_result':per_page_results,
                 'error_message' : None,
                 'vouchers' : serialized.data
             }
@@ -2445,33 +2460,6 @@ def update_vouchers(request):
                         price = price,
                     )
 
-            # try:
-            #     voucher_id = Vouchers.objects.get(id=voucher)
-            # except Exception as err:
-            #     expt = ExceptionRecord.objects.create(text= 'voucher found ' + str(err))
-            #     expt.save()
-            #     pass
-            
-            # # if id is not None:
-            # #     try:
-            # #         currency_price = VoucherCurrencyPrice.objects.get(id=id)
-            # #     except Exception as err:
-            # #         pass
-                
-            # #     currency_price.price = price
-            # #     currency_price.save()
-            
-            # if currency_id is not None: 
-            #     if id is not None:
-            #         currency_price = VoucherCurrencyPrice.objects.get(currency=currency_id, voucher = voucher_id)
-            #         currency_price.price = price
-            #         currency_price.save()
-            #     else:
-            #         services_obj = VoucherCurrencyPrice.objects.create(
-            #             voucher = vouchers,
-            #             currency = currency_id,
-            #             price = price,
-            #         )
     serializer = VoucherSerializer(vouchers, data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(
@@ -2682,9 +2670,10 @@ def get_client_all_vouchers(request):
 
     try:
         client_vouchers = VoucherOrder.objects.filter(
-            # location__id = location_id,
-            client__id = client_id,
+            client__id=client_id,
+            end_date__gt=datetime.now()
         )
+        
     except Exception as error:
         return Response(
             {
@@ -2724,7 +2713,7 @@ def get_client_all_memberships(request):
     today_date = today_date.strftime('%Y-%m-%d')
     client_membership = MemberShipOrder.objects.filter(
         # location__id = location_id,
-
+        created_at__lt = F('end_date'),
         end_date__gte = today_date,
         client__id = client_id,
     )

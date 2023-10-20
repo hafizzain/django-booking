@@ -248,19 +248,12 @@ class Vouchers(models.Model):
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_voucher', verbose_name='Creator ( User )')
     business = models.ForeignKey(Business, on_delete=models.SET_NULL, null=True, blank=True, related_name='business_voucher')
-    
     name = models.CharField(max_length=100, default='')
     arabic_name = models.CharField(max_length=999, default='')
-    
     voucher_type = models.CharField(choices= VOUCHER_CHOICES,default= 'Product', verbose_name = 'Voucher Type', max_length=20)
-    # service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='service_voucher')
-    # product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_voucher')
-    
-    #valid_for = models.CharField(choices=VALIDITY_CHOICE, default='Months' , verbose_name='Validity for Days or Months', max_length=20)
     discount_percentage = models.FloatField(default=0,blank= True, null=True)
     validity = models.CharField(choices=VALIDITY_DAY, default='7 Days' ,verbose_name='No of Days/Month', max_length = 100)
-    
-    
+
     sales = models.FloatField(default=0)
     price = models.FloatField(default=0)
     

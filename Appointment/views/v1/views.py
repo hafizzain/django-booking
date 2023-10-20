@@ -18,7 +18,9 @@ from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Business.models import Business , BusinessAddress
 from datetime import datetime
 from Order.models import MemberShipOrder, ProductOrder, VoucherOrder, ServiceOrder
-from Sale.serializers import MemberShipOrderSerializer, ProductOrderSerializer, VoucherOrderSerializer, ServiceOrderSerializer
+from Sale.serializers import (MemberShipOrderSerializer, POSerializerForClientSale, 
+                              MOrderSerializerForSale, VOSerializerForClientSale,
+                              SOSerializerForClientSale)
 
 #from Service.models import Service
 from Service.models import Service
@@ -45,6 +47,7 @@ from Employee.serializers import EmplooyeeAppointmentInsightsSerializer
 
 from Notification.notification_processor import NotificationProcessor
 from Analytics.models import EmployeeBookingDailyInsights
+from django.db.models import Sum
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -323,33 +326,65 @@ def get_all_appointments(request):
     appointment_status = request.GET.get('appointment_status', None)
     search_text = request.GET.get('search_text', None)
 
-
+    upcoming_flags = ['Appointment_Booked', 'Appointment Booked', 'Arrived', 'In Progress']
+    completed_flags = ['Done', 'Paid']
+    cancelled_flags = ['Cancel']
     paginator = CustomPagination()
     paginator.page_size = 10
-    queries = {}
+    
+    query = Q(is_blocked=False)
 
     if appointment_status is not None:
         if appointment_status == 'Upcomming':
-            queries['appointment_status__in'] = ['Appointment_Booked', 'Appointment Booked', 'Arrived', 'In Progress']
+            query &= Q(appointment_status__in=upcoming_flags)
         elif appointment_status == 'Completed':
-            queries['appointment_status__in'] = ['Done', 'Paid']
+            query &= Q(appointment_status__in=completed_flags)
         elif appointment_status == 'Cancelled':
-            queries['appointment_status__in'] = ['Cancel']
+            query &= Q(appointment_status__in=cancelled_flags)
 
     if search_text:
-        queries['member__full_name__icontains'] = search_text
+        or_query = Q(member__full_name__icontains=search_text) | \
+                   Q(appointment__client__full_name__icontains=search_text)
+        query &= or_query
         
     if location_id is not None:
-        queries['business_address__id'] = location_id
+        query &= Q(business_address__id=location_id)
 
-    test = AppointmentService.objects.filter(
-        is_blocked=False,
-        **queries
-    ).order_by('-created_at')
+    test = AppointmentService.objects.filter(query).order_by('-created_at')
+
     paginated_checkout_order = paginator.paginate_queryset(test, request)
     serialize = AllAppoinmentSerializer(paginated_checkout_order, many=True)
     
     return paginator.get_paginated_response(serialize.data, 'appointments' )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_recent_ten_appointments(request):
+    location_id = request.GET.get('location_id', None)
+
+
+    completed_flags = ['Done', 'Paid']
+    query = Q(is_blocked=False)
+    query &= Q(appointment_status__in=completed_flags)
+    query &= Q(business_address__id=location_id)
+
+    recent_ten_appointments = AppointmentService.objects.filter(query).order_by('-created_at')[:10]
+
+    serialized = AllAppoinmentSerializer(recent_ten_appointments, many=True)
+    
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'Recent 10 Appointments',
+                'error_message' : None,
+                'appointments' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
     
 @api_view(['GET'])
@@ -1755,6 +1790,11 @@ def create_checkout(request):
                 service_appointment.is_redeemed = True
                 service_appointment.redeemed_type = AppointmentService.REDEEMED_TYPES[1][0]
             elif is_voucher_redeemed:
+                # incrementing voucher max sale 
+                if is_voucher_redeemed:
+                    client_voucher = VoucherOrder.objects.get(id=redeemed_voucher_id)
+                    client_voucher.max_sales += 1
+                    client_voucher.save()
                 service_appointment.redeemed_price = redeemed_price
                 service_appointment.redeemed_instance_id = redeemed_voucher_id
                 service_appointment.is_redeemed = True
@@ -1872,7 +1912,7 @@ def create_checkout(request):
         total_price = total_price,
         service_commission = float(service_commission),
         service_commission_type = service_commission_type,      
-        checkout = f'{checkout.id}'
+        checkout = f'{checkout.id}',
     )
     invoice.save()
 
@@ -2313,8 +2353,9 @@ def get_employees_for_selected_service(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_client_sale(request):
+    total_sale = 0
     client = request.GET.get('client', None)
-    data = []
+    voucher_membership = []
     if client is None :
         return Response(
             {
@@ -2331,26 +2372,71 @@ def get_client_sale(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-        
-    product_order = ProductOrder.objects.filter(checkout__client = client).order_by('-created_at')
-    product = ProductOrderSerializer(product_order,  many=True,  context={'request' : request, })
     
-    service_orders = ServiceOrder.objects.filter(checkout__client = client).order_by('-created_at')
-    services_data = ServiceOrderSerializer(service_orders,  many=True,  context={'request' : request, })
+    # Product Order---------------------
+    product_order = ProductOrder.objects \
+                        .filter(checkout__client = client) \
+                        .select_related('product', 'member') \
+                        .order_by('-created_at')
+    product_total = product_order.aggregate(total_sale=Sum('price'))['total_sale']
+    total_sale += product_total if product_total else 0
+    if product_order.count() > 5:
+        product_order = product_order[:5]
+    product = POSerializerForClientSale(product_order,  many=True,  context={'request' : request, })
     
-    voucher_order = VoucherOrder.objects.filter(checkout__client = client).order_by('-created_at')
-    voucher = VoucherOrderSerializer(voucher_order,  many=True,  context={'request' : request, })
-    data.extend(voucher.data)
+
+    # Service Orders----------------------
+    service_orders = ServiceOrder.objects \
+                        .filter(checkout__client = client) \
+                        .select_related('service', 'user', 'member') \
+                        .order_by('-created_at')
+    service_total = service_orders.aggregate(total_sale=Sum('price'))['total_sale']
+    total_sale += service_total if service_total else 0
+    if service_orders.count() > 5:
+        service_orders = service_orders[:5]
+    services_data = SOSerializerForClientSale(service_orders,  many=True,  context={'request' : request, })
+
+    # Voucher & Membership Orders -----------------------
+    voucher_order = VoucherOrder.objects \
+                        .filter(checkout__client = client) \
+                        .select_related('voucher', 'member', 'user') \
+                        .order_by('-created_at')[:5]
+    membership_order = MemberShipOrder.objects \
+                            .filter(checkout__client = client) \
+                            .select_related('membership', 'user', 'member') \
+                            .order_by('-created_at')[:5]
+    voucher_total = voucher_order.aggregate(total_sale=Sum('price'))['total_sale']
+    total_sale += voucher_total if voucher_total else 0
+    if voucher_order.count() > 5:
+        voucher_order = voucher_order[:5]
+
+    membership_total = membership_order.aggregate(total_sale=Sum('price'))['total_sale']
+    total_sale += membership_total if membership_total else 0
+    if membership_order.count() > 5:
+        membership_order = membership_order[:5]
+
+    voucher = VOSerializerForClientSale(voucher_order,  many=True,  context={'request' : request, })
+    membership = MOrderSerializerForSale(membership_order[:5],  many=True,  context={'request' : request, })
+
+    voucher_membership.extend(voucher.data)
+    voucher_membership.extend(membership.data)
+
+    # Appointment Orders ------------------------------
+    appointment_checkout_all = AppointmentService.objects \
+                            .filter(
+                                appointment__client = client,
+                                appointment_status__in = ['Done', 'Paid']
+                            ) \
+                            .select_related('member', 'user', 'service') \
+                            .order_by('-created_at')
+    appointment_checkout_5 = appointment_checkout_all
+    appointment_total = appointment_checkout_all.aggregate(total_sale=Sum('price'))['total_sale']
+    total_sale += appointment_total if appointment_total else 0
+    if appointment_checkout_all.count() > 5:
+        appointment_checkout_5 = appointment_checkout_all[:5]
     
-    membership_order = MemberShipOrder.objects.filter(checkout__client = client).order_by('-created_at')
-    membership = MemberShipOrderSerializer(membership_order,  many=True,  context={'request' : request, })
-    data.extend(membership.data)
-    
-    appointment_checkout = AppointmentService.objects.filter(
-        appointment__client = client,
-        appointment_status__in = ['Done', 'Paid']
-    ).select_related('member', 'user', 'service').order_by('-created_at')
-    serialized = ServiceClientSaleSerializer(appointment_checkout, many = True)
+    appointment = ServiceClientSaleSerializer(appointment_checkout_5[:5], many = True)
+
     
     return Response(
             {
@@ -2361,8 +2447,12 @@ def get_client_sale(request):
                     'error_message' : None,
                     'product' : product.data,
                     'service' : services_data.data,
-                    'voucher' : data,
-                    'appointment' : serialized.data
+                    'voucher' : voucher_membership,
+                    'appointment' : appointment.data,
+                    'appointments_count':appointment_checkout_all.count(),
+                    'total_sales':total_sale,
+                    'quick_sale_count':len(product.data) + len(services_data.data),
+                    'voucher_count': len(voucher_membership)
                 }
             },
             status=status.HTTP_201_CREATED

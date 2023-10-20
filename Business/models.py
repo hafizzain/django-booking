@@ -109,7 +109,7 @@ class BusinessAddress(models.Model):
     address_name = models.CharField(max_length=500, default='')
     address = models.TextField(default='')
     
-    service_avaiable = models.CharField(choices = SERVICE_CHOICE , default = 'Male' , max_length = 100)  
+    service_avaiable = models.CharField(choices = SERVICE_CHOICE , default = 'Everyone' , max_length = 100)  
     location_name = models.CharField(max_length=500, default='')
     
     latitude = models.CharField(default='', max_length=200, null=True, blank=True)
@@ -125,6 +125,9 @@ class BusinessAddress(models.Model):
     
     description =  models.CharField(max_length=300, null=True, blank=True)
     banking = models.CharField(choices = BANKING_CHOICE , default = 'Disable' , max_length = 50)
+
+    primary_translation = models.ForeignKey('MultiLanguage.InvoiceTranslation', related_name='primary', on_delete=models.SET_NULL, null=True)
+    secondary_translation = models.ForeignKey('MultiLanguage.InvoiceTranslation', related_name='secondary', on_delete=models.SET_NULL, null=True)
 
     is_default = models.BooleanField(default=False)
     

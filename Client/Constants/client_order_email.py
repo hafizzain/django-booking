@@ -17,8 +17,8 @@ def send_order_email(checkout, request):
     with tenant_context(request.tenant):
         
         emails = []
-        client_email = ClientNotificationSetting.objects.get(business=str(checkout.business_address.business))
-        admin_email = AdminNotificationSetting.objects.get(business=str(checkout.business_address.business))
+        client_email = ClientNotificationSetting.objects.get(business=str(checkout.location.business))
+        admin_email = AdminNotificationSetting.objects.get(business=str(checkout.location.business))
 
         if admin_email.email_notify_on_appoinment or admin_email.sms_notify_on_quick_sale:
             emails.append(request.user.email)

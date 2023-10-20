@@ -2,7 +2,7 @@ from Tenants.models import Tenant
 
 from django.conf import settings
 from Authentication.Constants.CreateTenant import add_business_types, add_software_types
-from Utility.Constants.add_data_db import add_business_types, add_countries, add_software_types, add_states, add_cities, add_currencies, add_languages
+from Utility.Constants.add_data_db import add_business_types, add_software_types, add_currencies, add_languages
 
 
 from uuid import uuid4
@@ -32,9 +32,6 @@ def CreateDummyTenants():
             add_software_types(tenant = tenant)
             add_currencies(tenant=tenant)
             add_languages(tenant=tenant)
-            add_countries(tenant=tenant)
-            add_states(tenant=tenant)
-            add_cities(tenant=tenant)
 
         tenant.is_ready = True
         tenant.save()

@@ -1,38 +1,49 @@
 from Order.models import Checkout, Order
 from Appointment.models import AppointmentCheckout, AppointmentService
-from django.db.models import F
+from django.db.models import F, Sum, FloatField
 from django.db.models.functions import Coalesce
 
 def total_sale_employee(employee_id):
     total_price = 0
     employee_id = str(employee_id)
     
+
+    # Appointments Sale-------------------------------------
     appointment_checkout = AppointmentService.objects.filter(
         appointment_status = 'Done',
         member = employee_id,
-        ).values_list('total_price', flat=True)
-    total_price += sum(appointment_checkout)
+        ).aggregate(appointment_sum=Sum('total_price'))['appointment_sum']
     
-    orders = Order.objects.filter(
+    if appointment_checkout:
+        total_price += float(appointment_checkout)
+
+
+    # Discounted Orders Sale------------------
+    discounted_orders = Order.objects.filter(
         checkout__is_deleted = False, 
         member__id = employee_id,
-    )   
-    
-    apps_checkouts_total = AppointmentCheckout.objects.filter(
-        is_deleted=False, 
-        member__id=employee_id,
-    )
-    
-    for order in orders:
-        price = 0
-        if order.discount_price:
-            price = order.discount_price
-        elif order.total_price:
-            price = order.total_price
-        total_price += float(price) * float(order.quantity)
-    
-    # for price in apps_checkouts_total:
-    #     if price.total_price is not None:
-    #         total_price += float(price.total_price)
-        
+        discount_price__isnull=False,
+    ).annotate(
+        total = F('discount_price') * F('quantity')
+    ).aggregate(total_sum=Sum('total'))['total_sum']
+
+    if discounted_orders:
+        total_price += float(discounted_orders)
+
+
+
+    # Non Discounted Sale-----------------------
+    non_discounted_orders = Order.objects.filter(
+        checkout__is_deleted = False, 
+        member__id = employee_id,
+        discount_price__isnull=True
+    ).annotate(
+        total = F('total_price') * F('quantity')
+    ).aggregate(total_sum=Sum('total'))['total_sum']
+
+    if non_discounted_orders:
+        total_price += float(non_discounted_orders)
+
+
     return total_price
+

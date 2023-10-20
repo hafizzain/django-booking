@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 from django.http import HttpResponseRedirect
 from MultiLanguage.models import *
 from Utility.models import ExceptionRecord
@@ -12,6 +12,15 @@ from threading import Thread
 from Utility.Constants.Tenant.create_dummy_tenants import CreateDummyTenants
 from django_tenants.utils import tenant_context
 from Client.models import Client
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from Authentication.models import User
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Count, F, Sum
+
+from Appointment.models import AppointmentService
+from Service.models import Service
 
 status_codes = [
     100, 101, 200, 201, 202, 203, 204, 205, 206, 207, 208, 226, 300, 301, 302, 303, 304, 305, 306, 307, 308, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 418, 422, 423, 424, 426, 428, 429, 431, 451, 500, 501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511,
@@ -26,6 +35,7 @@ def DashboardPage(request):
         is_deleted = False,
     )
     clients = 0
+
     for tenant in tenants:
         with tenant_context(tenant):
             tenant_clients = Client.objects.filter(
@@ -34,10 +44,91 @@ def DashboardPage(request):
                 is_blocked = False,
             )
             clients += tenant_clients.count()
+
     context = {
-        'total_clients' : clients
+        'total_clients' : clients,
+        'get_country_users_url' : reverse('GetCountryClients'),
+        'get_service_wise_sale_data_url' : reverse('GetTotalSaleCount'),
     }
     return render(request, 'SuperAdminPanel/pages/dashboard/dashboard.html', context)
+
+
+@api_view(['GET',])
+@permission_classes([AllowAny])
+def GetCountryClients(request):
+    tenants = Tenant.objects.filter(
+        is_active = True,
+        is_ready = True,
+        is_blocked = False,
+        is_deleted = False,
+    )
+    clients = 0
+    countries = []
+    for tenant in tenants:
+        with tenant_context(tenant):
+            client_countries = Client.objects.filter(
+                is_deleted = False,
+                is_active = True,
+                is_blocked = False,
+                country__isnull = False
+            ).values_list('country__name', flat=True)
+            countries.extend(list(client_countries))
+    
+    country_labels = set(countries)
+    country_values = []
+
+    for c_name in country_labels:
+        country_values.append(countries.count(c_name))
+        
+
+    return Response({
+        'country_labels' : country_labels,
+        'country_values' : country_values,
+    })
+
+def get_service(sevice):
+    return sevice[1]
+
+@api_view(['GET',])
+@permission_classes([AllowAny])
+def GetTotalSaleCount(request):
+    tenants = Tenant.objects.filter(
+        is_active = True,
+        is_ready = True,
+        is_blocked = False,
+        is_deleted = False,
+    )
+    tenants_services = []
+    for tenant in tenants:
+        with tenant_context(tenant):
+            services = Service.objects.filter(
+                is_deleted = False,
+                # is_active = True,
+                # is_blocked = False,
+                serivce_appointments__isnull = False
+            ).annotate(
+                total_service_sale_count = Count(F('serivce_appointments'))
+            ).values_list('name', 'total_service_sale_count')
+            tenants_services.extend(services)
+    
+
+    sorted_services = tenants_services.sort(key=get_service, reverse=True)
+
+    
+    # services_labels = set(tenants_services)
+    services_labels = []
+    services_values = []
+
+    ten_services = tenants_services[:10]
+    for s_name in ten_services:
+        services_labels.append(s_name[0])
+        services_values.append(s_name[1])
+        
+    return Response({
+        'services_labels' : services_labels,
+        'services_values' : services_values,
+        'tenants_services' : ten_services
+    })
 
 @login_required(login_url='/super-admin/super-login/')
 def ExceptionPage(request):
@@ -45,6 +136,7 @@ def ExceptionPage(request):
     business_name = request.GET.get('business_name', None)
     request_method = request.GET.get('request_method', None)
     selected_date = request.GET.get('date', None)
+    page_ = request.GET.get('page', 1)
 
 
     query = {}
@@ -59,10 +151,24 @@ def ExceptionPage(request):
     
     if selected_date:
         query['created_at__date'] = selected_date
+    
 
-    exceptions = ExceptionRecord.objects.filter(**query).order_by('-created_at')
+    all_exceptions = ExceptionRecord.objects.filter(**query).order_by('-created_at')
+    paginator = Paginator(all_exceptions, 100)
+    try:
+        page_obj = paginator.page(int(page_))
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+
+    print(len(page_obj))
+
     context={}
-    context['exceptions'] = exceptions
+    context['exceptions'] = page_obj
+    context['total_pages'] = int((all_exceptions.count() / 100)) + (1 if (all_exceptions.count() % 100) > 0 else 0 )
+    context['selected_page'] = page_
+    context['page_obj'] = page_obj
     context['status_codes'] = status_codes
     return render(request, 'SuperAdminPanel/pages/Exception/exception.html', context)
 

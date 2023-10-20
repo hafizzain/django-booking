@@ -19,6 +19,8 @@ from Authentication.serializers import UserSerializer
 from django.conf import settings
 
 from Product.Constants.index  import tenant_media_base_url, tenant_media_domain
+from Utility.serializers import CountrySerializer, StateSerializer, CitySerializer
+from MultiLanguage.serializers import InvoiceTransSerializer
 
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
@@ -382,6 +384,8 @@ class BusinessAddress_GetSerializer(serializers.ModelSerializer):
             'is_deleted',
             'is_publish',
             'description',
+            'primary_translation',
+            'secondary_translation'
         ]
 class BusinessAddress_CustomerSerializer(serializers.ModelSerializer):
     #opening_hours= OpeningHoursSerializer(read_only=True)
@@ -591,6 +595,10 @@ class BusinessTaxSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'parent_tax',
                   'tax_rate', 'location', 'tax_type', 'is_active']
 class BusinessVendorSerializer(serializers.ModelSerializer):
+
+    country = CountrySerializer(read_only=True)
+    state = StateSerializer(read_only=True)
+    city = CitySerializer(read_only=True)
     class Meta:
         model = BusinessVendor
         fields = [ 
@@ -687,3 +695,14 @@ class BusinessTaxSettingSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessTaxSetting
         fields = '__all__'
+
+
+class BusinessAddressSerilaizer(serializers.ModelSerializer):
+
+    primary_translation = InvoiceTransSerializer(read_only=True)
+    secondary_translation = InvoiceTransSerializer(read_only=True)
+
+
+    class Meta:
+        model = BusinessAddress
+        fields = ['primary_translation', 'secondary_translation']

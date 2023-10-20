@@ -41,7 +41,8 @@ from threading import Thread
 from django_tenants.utils import tenant_context
 from Sale.Constants.Custom_pag import CustomPagination
 from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, EmployeeBusinessSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
-
+from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
+from MultiLanguage.models import InvoiceTranslation
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -1030,9 +1031,7 @@ def get_business_locations(request, business_id):
         is_closed=False,
         is_active=True
     ).order_by('-created_at').distinct()
-    # all_products = BusinessAddress.objects.filter(is_deleted=True)
-    # for i in all_products:
-    #     i.delete()
+
     data = []
     if len(business_addresses) > 0:
         serialized = BusinessAddress_GetSerializer(business_addresses, many=True,context={'request' : request})
@@ -1061,10 +1060,13 @@ def add_business_location(request):
     user = request.user
     address = request.data.get('address', None)
     address_name = request.data.get('address_name', None)
-    country = request.data.get('country', None)
-    state = request.data.get('state', None)
-    city = request.data.get('city', None)
+    country_unique_id = request.data.get('country', None)
+    state_unique_id = request.data.get('state', None)
+    city_name = request.data.get('city', None)
     postal_code = request.data.get('postal_code', None)
+    primary_translation_id = request.data.get('primary_translation_id', None)
+    secondary_translation_id = request.data.get('secondary_translation_id', None)
+
     
     email= request.data.get('email',None)
     mobile_number = request.data.get('mobile_number', None)
@@ -1072,9 +1074,6 @@ def add_business_location(request):
     banking = request.data.get('banking',None)
     currency = request.data.get('currency',None)
     
-    start_time = request.data.get('start_time', None)
-    close_time = request.data.get('close_time', None)
-
     if not all([business_id, address, email, mobile_number, address_name]):
         return Response(
             {
@@ -1134,12 +1133,24 @@ def add_business_location(request):
     try:
         if currency is not None:
             currency_id = Currency.objects.get( id = currency, is_deleted=False, is_active=True )
-        if country is not None:
-            country = Country.objects.get( id=country, is_deleted=False, is_active=True )
-        if state is not None:
-            state = State.objects.get( id=state, is_deleted=False, is_active=True )
-        if city is not None:
-            city = City.objects.get( id=city, is_deleted=False, is_active=True )
+        if country_unique_id is not None:
+            public_country = get_country_from_public(country_unique_id)
+            country, created = Country.objects.get_or_create(
+                name=public_country.name,
+                unique_id = public_country.unique_id
+            )
+        if state_unique_id is not None:
+            public_state = get_state_from_public(state_unique_id)
+            state, created= State.objects.get_or_create(
+                name=public_state.name,
+                unique_id=public_state.unique_id
+            )
+        if city_name is not None:
+            city, created= City.objects.get_or_create(name=city_name,
+                                                  country=country,
+                                                  state=state,
+                                                  country_unique_id=country_unique_id,
+                                                  state_unique_id=state_unique_id)
     except Exception as err:
         return Response(
             {
@@ -1154,6 +1165,9 @@ def add_business_location(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+    primary_invoice_trans = InvoiceTranslation.objects.get(id=primary_translation_id)
+
+
     business_address = BusinessAddress(
         business = business,
         user = user,
@@ -1161,16 +1175,22 @@ def add_business_location(request):
         address_name = address_name,
         email= email,
         mobile_number=mobile_number,
-        country=country,
         currency = currency_id,
-        state=state,
-        city=city,
+        country=country if country_unique_id else None,
+        state=state if state_unique_id else None,
+        city=city if city_name else None,
         banking = banking,
+        primary_translation=primary_invoice_trans,
         is_primary = False,
         is_active = True,
         is_deleted = False,
         is_closed = False,
     )
+
+    if secondary_translation_id:
+        secondary_invoice_trans = InvoiceTranslation.objects.get(id=secondary_translation_id)
+        business_address.secondary_translation = secondary_invoice_trans
+
     if postal_code is not None:
         business_address.postal_code = postal_code
     business_address.save()
@@ -1179,19 +1199,8 @@ def add_business_location(request):
     if type(opening_day) == str:
         opening_day = json.loads(opening_day)
     else:
-        pass  
+        pass
 
-    # data={}
-    # if start_time or close_time is not None:
-    #     days = [
-    #         'Monday',
-    #         'Tuesday',
-    #         'Wednesday',
-    #         'Thursday',
-    #         'Friday',
-    #         'Saturday',
-    #         'Sunday',
-    #     ]
     days = [
         'monday',
         'tuesday',
@@ -1350,6 +1359,9 @@ def delete_location(request):
 @permission_classes([IsAuthenticated])
 def update_location(request):
     location_id = request.data.get('location', None)
+    primary_translation_id = request.data.get('primary_translation_id', None)
+    secondary_translation_id = request.data.get('secondary_translation_id', None)
+
 
     if location_id is None:
         return Response(
@@ -1405,12 +1417,22 @@ def update_location(request):
     business_address.location_name= request.data.get('location_name', business_address.location_name)
     business_address.description= request.data.get('description', business_address.description)
             
-    country = request.data.get('country', None)
-    state = request.data.get('state', None)
-    city = request.data.get('city', None)
+    country_unique_id = request.data.get('country', None)
+    state_unique_id = request.data.get('state', None)
+    city_name = request.data.get('city', None)
     currency = request.data.get('currency', None)
     images = request.data.get('images', None)
     is_publish = request.data.get('is_publish', None)
+
+    if primary_translation_id:
+        primary_invoice_trans = InvoiceTranslation.objects.get(id=primary_translation_id)
+        business_address.primary_translation = primary_invoice_trans
+
+    if secondary_translation_id:
+        secondary_invoice_trans = InvoiceTranslation.objects.get(id=secondary_translation_id) 
+        business_address.secondary_translation = secondary_invoice_trans
+
+    business_address.save()
     
     if is_publish is not None:
         business_address.is_publish = True
@@ -1432,23 +1454,31 @@ def update_location(request):
         )
 
     try:
-        if currency is not None:
-            currency_id = Currency.objects.get( id = currency, is_deleted=False, is_active=True )
-            business_address.currency = currency_id
-            business_address.save()
-            
-        if country is not None:
-            country = Country.objects.get( id=country, is_deleted=False, is_active=True )
+        if country_unique_id is not None:
+            public_country = get_country_from_public(country_unique_id)
+            country, created = Country.objects.get_or_create(
+                name=public_country.name,
+                unique_id = public_country.unique_id
+            )
             business_address.country = country
-            business_address.save()
-        if state is not None:
-            state = State.objects.get( id=state, is_deleted=False, is_active=True )
+            
+        if state_unique_id is not None:
+            public_state = get_state_from_public(state_unique_id)
+            state, created= State.objects.get_or_create(
+                name=public_state.name,
+                unique_id=public_state.unique_id
+            )
             business_address.state = state
-            business_address.save()
-        if city is not None:
-            city = City.objects.get( id=city, is_deleted=False, is_active=True )
+                
+        if city_name is not None:
+            city, created= City.objects.get_or_create(name=city_name,
+                                                    country=country,
+                                                    state=state,
+                                                    country_unique_id=country_unique_id,
+                                                    state_unique_id=state_unique_id)
             business_address.city = city
-            business_address.save()
+        
+        business_address.save()
     except Exception as err:
         return Response(
             {
@@ -1509,20 +1539,6 @@ def update_location(request):
             },
             status=status.HTTP_200_OK
         )
-    
-    # else:
-    #     return Response(
-    #         {
-    #             'status' : False,
-    #             'status_code' : StatusCodes.USER_HAS_NO_PERMISSION_1001,
-    #             'status_code_text' : 'USER_HAS_NO_PERMISSION_1001',
-    #             'response' : {
-    #                 'message' : 'You don"t have permission to edit this location',
-    #                 'error_message' : 'User don"t have permission to edit this Business Address, user must be Business Owner or Location creator',
-    #             }
-    #         },
-    #         status=status.HTTP_403_FORBIDDEN
-    #     )
 
 
 @api_view(['GET'])
@@ -2367,6 +2383,7 @@ def update_payment_method(request):
 @permission_classes([AllowAny])
 def get_business_payment_methods(request):
     business_id = request.GET.get('business', None)
+    get_all = request.GET.get('get_all', None)
 
     if not all([business_id]):
         return Response(
@@ -2401,11 +2418,12 @@ def get_business_payment_methods(request):
                 status=status.HTTP_404_NOT_FOUND
             )
 
+    query = Q(business=business)
 
-    payment_methods = BusinessPaymentMethod.objects.filter(
-        business=business,
-        is_active=True
-    )
+    if not get_all:
+        query &= Q(is_active=True)
+
+    payment_methods = BusinessPaymentMethod.objects.filter(query)
     serialized = PaymentMethodSerializer(payment_methods, many=True)
 
     return Response(
@@ -2502,7 +2520,7 @@ def add_business_tax(request):
                             'status_code' : StatusCodes.LOCATION_NOT_FOUND_4017,
                             'status_code_text' : 'BUSINESSS_TAX_NOT_FOUND',
                             'response' : {
-                                'message' : 'Business Tax Not Found',
+                                'message' : 'Business tax not found',
                                 'error_message' : str(err),
                             }
                         },
@@ -2551,7 +2569,7 @@ def add_business_tax(request):
                 'status_code' : 201,
                 'status_code_text' : '201',
                 'response' : {
-                    'message' : 'Business Tax added!',
+                    'message' : 'Business tax added!',
                     'error_message' : None,
                     'tax' : serialized.data,
                     'errors' : json.dumps(all_errors)
@@ -2639,7 +2657,7 @@ def update_business_tax(request):
                             'status_code' : StatusCodes.LOCATION_NOT_FOUND_4017,
                             'status_code_text' : 'BUSINESSS_TAX_NOT_FOUND',
                             'response' : {
-                                'message' : 'Business Tax Not Found',
+                                'message' : 'Business tax not found',
                                 'error_message' : str(err),
                             }
                         },
@@ -2662,7 +2680,7 @@ def update_business_tax(request):
                     'status_code' : 404,
                     'status_code_text' : '404',
                     'response' : {
-                        'message' : 'Business Tax Not Found',
+                        'message' : 'Business tax Not found',
                         'error_message' : str(err),
                     }
                 },
@@ -2705,7 +2723,7 @@ def update_business_tax(request):
                 'status_code' : 200,
                 'status_code_text' : '200',
                 'response' : {
-                    'message' : 'Business Tax updated!',
+                    'message' : 'Business tax updated!',
                     'error_message' : None,
                     'tax' : serialized.data
                 }
@@ -2737,10 +2755,7 @@ def delete_business_payment_methods(request):
         )
 
     try:
-        payment_method = BusinessPaymentMethod.objects.get(
-            id=method_id,
-            is_active=True
-        )
+        payment_method = BusinessPaymentMethod.objects.get(id=method_id)
     except Exception as err:
         return Response(
             {
@@ -2776,7 +2791,7 @@ def delete_business_payment_methods(request):
                 'status_code' : 200,
                 'status_code_text' : '200',
                 'response' : {
-                    'message' : 'Business payment method Deleted!',
+                    'message' : 'Business payment method deleted!',
                     'error_message' : None,
                 }
             },
@@ -2881,7 +2896,7 @@ def delete_business_tax(request):
                 'status_code' : 200,
                 'status_code_text' : '200',
                 'response' : {
-                    'message' : 'Business Tax Deleted!',
+                    'message' : 'Business tax deleted!',
                     'error_message' : None,
                 }
             },
@@ -3055,9 +3070,9 @@ def add_business_vendor(request):
     mobile_number = request.data.get('mobile_number', None)
 
     email = request.data.get('email', None)
-    country = request.data.get('country', None)
-    state = request.data.get('state', None)
-    city = request.data.get('city', None)
+    country_unique_id = request.data.get('country', None)
+    state_unique_id = request.data.get('state', None)
+    city_name = request.data.get('city', None)
     gstin = request.data.get('gstin', None)
     website = request.data.get('website', None)
     is_active = request.data.get('is_active', None)
@@ -3080,12 +3095,25 @@ def add_business_vendor(request):
         )
 
     try:
-        if country is not None:
-            country = Country.objects.get( id=country, is_deleted=False, is_active=True )
-        if state is not None:
-            state = State.objects.get( id=state, is_deleted=False, is_active=True )
-        if city is not None:
-            city = City.objects.get( id=city, is_deleted=False, is_active=True )
+        if country_unique_id is not None:
+            public_country = get_country_from_public(country_unique_id)
+            country, created = Country.objects.get_or_create(
+                name=public_country.name,
+                unique_id = public_country.unique_id
+            )
+        if state_unique_id is not None:
+            public_state = get_state_from_public(state_unique_id)
+            state, created= State.objects.get_or_create(
+                name=public_state.name,
+                unique_id=public_state.unique_id
+            )
+        if city_name is not None:
+            city, created= City.objects.get_or_create(name=city_name,
+                                                  country=country,
+                                                  state=state,
+                                                  country_unique_id=country_unique_id,
+                                                  state_unique_id=state_unique_id
+                                                  )
     except Exception as err:
         return Response(
             {
@@ -3124,9 +3152,9 @@ def add_business_vendor(request):
         vendor = BusinessVendor.objects.create(
             user = user,
             business = business,
-            country = country,
-            state = state,
-            city = city,
+            country = country if country_unique_id else None,
+            state = state if state_unique_id else None,
+            city = city if city_name else None,
             vendor_name = vendor_name,
             address = address,
             gstin = gstin,
@@ -3167,6 +3195,9 @@ def add_business_vendor(request):
 @permission_classes([IsAuthenticated])
 def update_business_vendor(request):
     vendor_id = request.data.get('vendor', True)
+    country_unique_id = request.data.get('country', None) 
+    state_unique_id = request.data.get('state', None) 
+    city_name = request.data.get('city', None) 
 
     if not all([vendor_id]):
         return Response(
@@ -3209,6 +3240,31 @@ def update_business_vendor(request):
         vendor.mobile_number = phone_number
     else :
         vendor.mobile_number = None
+    vendor.save()
+    if country_unique_id is not None:
+        public_country = get_country_from_public(country_unique_id)
+        country, created = Country.objects.get_or_create(
+            name=public_country.name,
+            unique_id = public_country.unique_id
+        )
+        vendor.country = country
+            
+    if state_unique_id is not None:
+        public_state = get_state_from_public(state_unique_id)
+        state, created= State.objects.get_or_create(
+            name=public_state.name,
+            unique_id=public_state.unique_id
+        )
+        vendor.state = state
+            
+    if city_name is not None:
+        city, created= City.objects.get_or_create(name=city_name,
+                                                country=country,
+                                                state=state,
+                                                country_unique_id=country_unique_id,
+                                                state_unique_id=state_unique_id)
+        vendor.city = city
+    
     vendor.save()
     serialized = BusinessVendorSerializer(vendor, data=request.data)
     if serialized.is_valid():

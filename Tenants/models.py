@@ -5,6 +5,7 @@ from django.utils.timezone import now
 from uuid import uuid4
 # from django.contrib.auth.models import User
 from Authentication.models import User
+import datetime
 # Create your models here.
 
 class Tenant(TenantMixin):
@@ -20,11 +21,25 @@ class Tenant(TenantMixin):
     is_ready = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
+
+    last_active = models.DateTimeField(default=now)
+
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(auto_now_add=now, null=True, blank=True)
 
     auto_create_schema = True
     auto_drop_schema = True
+
+    @property
+    def active_days_ago(self):
+        if self.last_active:
+            today_date = now() - self.last_active
+            days = today_date.days
+            if days >= 0:
+                return days
+                
+            return 0
+        return 'Invalid last_active'
 
     def __str__(self):
         try:

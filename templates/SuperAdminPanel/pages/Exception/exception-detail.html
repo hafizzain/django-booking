@@ -14,7 +14,7 @@
     <p>Exception Detail</p>
   </h1>
   <div class="flex flex-col gap-3">
-    <p class="text-[#101928] text-sm">
+    <!-- <p class="text-[#101928] text-sm">
       Lorem ipsum dolor, sit amet consectetur adipisicing elit. Debitis enim
       dolorum obcaecati!
     </p>
@@ -51,10 +51,10 @@
         }
         
       </code></pre>
-    </div>
+    </div> -->
 
     <div>
-      <iframe style='width:100%;min-height:100vh' srcdoc="{{exception.text|linebreaksbr}}">
+      <iframe style='width:100%;min-height:100vh' srcdoc="{{exception.html_text|linebreaksbr}}">
         <p>Browser does not support iframes.</p>
      </iframe>
       
