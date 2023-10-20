@@ -326,7 +326,7 @@ def verify_otp(request):
         s_data['access_token'] = None
         try:
             with tenant_context(Tenant.objects.get(user=user)):
-                tnt_token = Token.objects.get(user__username=user.username)
+                tnt_token, created = Token.objects.get_or_create(user=user)
                 s_data['id'] = str(tnt_token.user.id)
                 s_data['access_token'] = str(tnt_token.key)
         except Exception as err:
