@@ -11,6 +11,7 @@ from Business.models import (Business, BusinessAddress, BusinessOpeningHour,
                              BusinessPaymentMethod, BusinessType)
 from Profile.models import Profile
 from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSIONS_MODEL_FIELDS
+from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
 from Utility.Constants.add_data_db import add_business_types, add_countries, add_software_types, add_states, add_cities, add_currencies, add_languages
 from Utility.models import Country, Currency, ExceptionRecord, Language
 from Utility.models import GlobalPermissionChoices
@@ -126,6 +127,7 @@ def create_tenant_account_type(tenant_user=None, tenant=None, account_type='Busi
 def create_employee(tenant=None, user = None, business=None):
      if tenant is not None and user is not None and business is not None:
         try:
+            # public_country = get_country_from_public(unique_id=231)
             with tenant_context(tenant):                
                 country_id = 'United Arab Emirates'
                 currency_id = 'Dirham'
@@ -154,7 +156,10 @@ def create_employee(tenant=None, user = None, business=None):
                     'sunday',
                 ]
                 try:
-                    country = Country.objects.get(name__iexact = country_id)
+                    # country, created = Country.objects.get_or_create(
+                    #     name=public_country.name,
+                    #     unique_id = public_country.unique_id
+                    # )
                     currency = Currency.objects.get(name__iexact = currency_id)
                 except Exception as err:
                     country = None
@@ -166,7 +171,7 @@ def create_employee(tenant=None, user = None, business=None):
                     address_name = 'Dubai',
                     email= user.email,
                     mobile_number= user.mobile_number,
-                    country=country,
+                    # country=country,
                     currency = currency,
                     is_primary = False,
                     is_active = True,
@@ -180,7 +185,7 @@ def create_employee(tenant=None, user = None, business=None):
                     business=business,
                     full_name = user.full_name,
                     email= user.email,
-                    country = country,
+                    # country = country,
                     address = 'Dubai Marina',
                     is_active =True,
                     employee_id = employe_id,
@@ -459,8 +464,6 @@ def add_data_to_tenant_thread(tenant=None):
         ExceptionRecord.objects.create(
             text = f'ADD DATA TO TENANT DB TIME DIFF . {total_seconds} Seconds'
         )
-            
-
 
 def create_tenant(request=None, user=None, data=None):
     
