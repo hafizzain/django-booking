@@ -183,7 +183,7 @@ def create_employee(tenant=None, user = None, business=None):
                     business=business,
                     full_name = user.full_name,
                     email= user.email,
-                    # country = country,
+                    country = country,
                     address = 'Dubai Marina',
                     is_active =True,
                     employee_id = employe_id,
