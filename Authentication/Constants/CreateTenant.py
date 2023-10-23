@@ -15,6 +15,7 @@ from Utility.Constants.get_from_public_schema import get_country_from_public, ge
 from Utility.Constants.add_data_db import add_business_types, add_countries, add_software_types, add_states, add_cities, add_currencies, add_languages
 from Utility.models import Country, Currency, ExceptionRecord, Language
 from Utility.models import GlobalPermissionChoices
+from MultiLanguage.models import InvoiceTranslation
 
 from rest_framework.authtoken.models import Token
 from django.conf import  settings
@@ -161,14 +162,31 @@ def create_employee(tenant=None, user = None, business=None, data=None):
                         unique_id = public_country.unique_id
                     )
                     currency = Currency.objects.get(name__iexact = currency_id)
+                    language = Language.objects.get(name__icontains='English')
+
                 except Exception as err:
                     country = None
+
+                if language:
+                    invoice_translation = InvoiceTranslation.objects.create(
+                        language=language,
+                        user=user,
+                        invoice = 'Invoice',
+                        items = 'Items',
+                        amount = 'Amount',
+                        subtotal = 'Subtotal',
+                        tips = 'Tips',
+                        taxes = 'Taxes',
+                        total = 'Total',
+                        payment_method = 'Payment Method',
+                        status = 'active'
+                    )
 
                 business_address = BusinessAddress.objects.create(
                     business = business,
                     user = user,
-                    address = 'Dubai - United Arab Emirates',
-                    address_name = 'Dubai',
+                    address = country.name,
+                    address_name = country.name,
                     email= user.email,
                     mobile_number= user.mobile_number,
                     country=country,
@@ -179,6 +197,10 @@ def create_employee(tenant=None, user = None, business=None, data=None):
                     is_closed = False,
                     is_default = True
                 )
+
+                if invoice_translation:
+                    business_address.primary_translation = invoice_translation
+                    business_address.save()
                 
                 employee = Employee.objects.create(
                     user=user,
