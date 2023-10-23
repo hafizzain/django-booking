@@ -127,9 +127,7 @@ def create_tenant_account_type(tenant_user=None, tenant=None, account_type='Busi
 def create_employee(tenant=None, user = None, business=None):
      if tenant is not None and user is not None and business is not None:
         try:
-            # public_country = get_country_from_public(unique_id=231)
             with tenant_context(tenant):                
-                country_id = 'United Arab Emirates'
                 currency_id = 'Dirham'
                 domain = tenant.domain
                 template = 'Employee'
@@ -156,10 +154,10 @@ def create_employee(tenant=None, user = None, business=None):
                     'sunday',
                 ]
                 try:
-                    # country, created = Country.objects.get_or_create(
-                    #     name=public_country.name,
-                    #     unique_id = public_country.unique_id
-                    # )
+                    country, created = Country.objects.get_or_create(
+                        name='United Arab Emirates',
+                        unique_id = 231
+                    )
                     currency = Currency.objects.get(name__iexact = currency_id)
                 except Exception as err:
                     country = None
@@ -171,7 +169,7 @@ def create_employee(tenant=None, user = None, business=None):
                     address_name = 'Dubai',
                     email= user.email,
                     mobile_number= user.mobile_number,
-                    # country=country,
+                    country=country,
                     currency = currency,
                     is_primary = False,
                     is_active = True,
