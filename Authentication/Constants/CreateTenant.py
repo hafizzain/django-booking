@@ -124,10 +124,12 @@ def create_tenant_account_type(tenant_user=None, tenant=None, account_type='Busi
             account_type= 'Business'#account_type
         )
 
-def create_employee(tenant=None, user = None, business=None):
-     if tenant is not None and user is not None and business is not None:
+def create_employee(tenant=None, user = None, business=None, data=None):
+     if tenant is not None and user is not None and business is not None and data is not None:
+        country_unique_id = data.get('country')
+        public_country = get_country_from_public(country_unique_id)
         try:
-            with tenant_context(tenant):                
+            with tenant_context(tenant):
                 currency_id = 'Dirham'
                 domain = tenant.domain
                 template = 'Employee'
@@ -155,8 +157,8 @@ def create_employee(tenant=None, user = None, business=None):
                 ]
                 try:
                     country, created = Country.objects.get_or_create(
-                        name='United Arab Emirates',
-                        unique_id = 231
+                        name=public_country.name,
+                        unique_id = public_country.unique_id
                     )
                     currency = Currency.objects.get(name__iexact = currency_id)
                 except Exception as err:
@@ -547,7 +549,7 @@ def create_tenant(request=None, user=None, data=None):
                 pass
             
             try:
-                create_employee(tenant = user_tenant , user = t_user, business = t_business)
+                create_employee(tenant = user_tenant , user = t_user, business = t_business, data=data)
             except:
                 ExceptionRecord.objects.create(
                     text = f'{str(err)}'
