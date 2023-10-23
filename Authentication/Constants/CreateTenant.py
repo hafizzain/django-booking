@@ -185,12 +185,11 @@ def create_employee(tenant=None, user = None, business=None, data=None):
                 business_address = BusinessAddress.objects.create(
                     business = business,
                     user = user,
-                    address = country.name,
-                    address_name = country.name,
+                    address = '',
+                    address_name = '',
                     email= user.email,
                     mobile_number= user.mobile_number,
                     country=country,
-                    currency = currency,
                     is_primary = False,
                     is_active = True,
                     is_deleted = False,
@@ -208,7 +207,7 @@ def create_employee(tenant=None, user = None, business=None, data=None):
                     full_name = user.full_name,
                     email= user.email,
                     country = country,
-                    address = 'Dubai Marina',
+                    address = '',
                     is_active =True,
                     employee_id = employe_id,
                     is_default = True
