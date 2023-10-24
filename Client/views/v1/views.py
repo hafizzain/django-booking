@@ -171,18 +171,18 @@ def get_single_client(request):
 def get_client(request):
     no_pagination = request.GET.get('no_pagination', None)
     search_text = request.GET.get('search_text', None)
-    status = request.GET.get('status', None)
+    client_status = request.GET.get('status', None)
     all_client = Client.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at').distinct()
 
     if search_text:
         all_client = all_client.filter(full_name__icontains=search_text)
 
-    if status is not None:
+    if client_status is not None:
 
-        if status is True:
+        if client_status is True:
             all_client = all_client.filter(is_active=True)
         
-        if status is False:
+        if client_status is False:
             all_client = all_client.filter(is_active=False)
 
     all_client_count=all_client.count()
