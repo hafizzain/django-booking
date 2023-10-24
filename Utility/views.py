@@ -139,7 +139,7 @@ def get_states(request):
                 is_active=True,
                 is_deleted=False,
                 country_unique_id=country_unique_id
-            )
+            ).distinct('name')
         except Exception as err:
             return Response(
                 {
