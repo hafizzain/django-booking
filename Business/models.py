@@ -431,7 +431,7 @@ class BusinessVendor(models.Model):
     postal_code = models.CharField(max_length=30, default='')
     gstin = models.CharField(default='', max_length=1000, null=True, blank=True)
     website = models.TextField(null=True, blank=True)
-    email = models.EmailField()
+    email = models.EmailField(null=True, blank=True)
     is_email_verified = models.BooleanField(default=False, null=True, blank=True)
 
     mobile_number = models.CharField(max_length=30, null=True, blank=True)

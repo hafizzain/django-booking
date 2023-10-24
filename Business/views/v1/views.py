@@ -3160,10 +3160,12 @@ def add_business_vendor(request):
             address = address,
             gstin = gstin,
             website = website,
-            email = email,
             mobile_number = mobile_number,
             is_active = is_active,
         )
+        if email:
+            vendor.email = email
+            vendor.save()
     except Exception as err:
         return Response(
             {
