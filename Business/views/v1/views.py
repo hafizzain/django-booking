@@ -83,7 +83,6 @@ def get_user_default_data(request):
             'name' : f'{location_instance.address_name}',
             'id' : f'{location_instance.id}',
             'business_address' : f'{location_instance.address}',
-            'currency' : f'{location_instance.currency.id}',
             'email' : f'{location_instance.email}',
             'type' : 'location',
         }

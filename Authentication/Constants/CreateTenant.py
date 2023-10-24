@@ -317,10 +317,10 @@ def create_ServiceGroup(tenant=None, user = None, business=None):
         try:
             with tenant_context(tenant):
                 try:
-                    currency_id = 'Dirham'
+                    # currency_id = 'Dirham'
                     location = BusinessAddress.objects.all()[0]
                     emp = Employee.objects.all()[0]
-                    currency = Currency.objects.get(name__iexact = currency_id)
+                    # currency = Currency.objects.get(name__iexact = currency_id)
                 except:
                     pass
                 service_grp = ServiceGroup.objects.create(
@@ -333,7 +333,7 @@ def create_ServiceGroup(tenant=None, user = None, business=None):
                 # we are counting if services are 0 then create 2 services
                 services_count= Service.objects.all().count()
                 if services_count == 0:
-                    for ser in range(2):
+                    for ser in range(1):
                         
                             if int(ser) == 0:
                                 ser_name = 'Hair color'
@@ -358,7 +358,7 @@ def create_ServiceGroup(tenant=None, user = None, business=None):
                                 )
                             price_service = PriceService.objects.create(
                                 service = service,
-                                currency = currency,
+                                # currency = currency,
                                 duration = '30Min',
                                 price = 500,
                             )
