@@ -3042,9 +3042,9 @@ def check_vendor_existance(request):
 
     fields = []
     for vendor in all_vendors:
-        if vendor.email == email:
+        if email and vendor.email == email:
             fields.append('EMAIL')
-        if vendor.mobile_number == mobile_number:
+        if mobile_number and vendor.mobile_number == mobile_number:
             fields.append('MOBILE_NUMBER')
     return Response(
             {
@@ -3078,7 +3078,7 @@ def add_business_vendor(request):
     website = request.data.get('website', None)
     is_active = request.data.get('is_active', None)
     
-    if not all([business_id,vendor_name, address, email, is_active]):
+    if not all([business_id,vendor_name, address, is_active]):
         return Response(
             {
                 'status' : False,
@@ -3088,7 +3088,7 @@ def add_business_vendor(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'Following fields are required',
                     'fields' : [
-                        'business', 'vendor_name', 'address', 'email', 'is_active'
+                        'business', 'vendor_name', 'address', 'is_active'
                     ]
                 }
             },
@@ -3200,7 +3200,9 @@ def update_business_vendor(request):
     vendor_id = request.data.get('vendor', True)
     country_unique_id = request.data.get('country', None) 
     state_unique_id = request.data.get('state', None) 
-    city_name = request.data.get('city', None) 
+    city_name = request.data.get('city', None)
+    email = request.data.get('email', None)
+
 
     if not all([vendor_id]):
         return Response(
