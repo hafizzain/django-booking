@@ -333,7 +333,7 @@ def create_ServiceGroup(tenant=None, user = None, business=None):
                 # we are counting if services are 0 then create 2 services
                 services_count= Service.objects.all().count()
                 if services_count == 0:
-                    for ser in range(1):
+                    for ser in range(2):
                         
                             if int(ser) == 0:
                                 ser_name = 'Hair color'
