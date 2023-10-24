@@ -173,17 +173,21 @@ def get_client(request):
     search_text = request.GET.get('search_text', None)
     is_active = request.GET.get('active', None)
     all_client = Client.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at').distinct()
+    coming_outer = None
+    value = None
 
     if search_text:
         all_client = all_client.filter(full_name__icontains=search_text)
 
     if is_active is not None:
-
+        coming_outer = 'True'
         if is_active == True:
             all_client = all_client.filter(is_active=True)
+            value = 'True'
         
         if is_active == False:
             all_client = all_client.filter(is_active=False)
+            value = 'False'
 
     all_client_count=all_client.count()
 
@@ -206,7 +210,9 @@ def get_client(request):
                 'pages':page_count,
                 'per_page_result':results_per_page,
                 'error_message' : None,
-                'client' : serialized.data
+                'client' : serialized.data,
+                'not_none': coming_outer,
+                'value': value,
             }
         },
         status=status.HTTP_200_OK
