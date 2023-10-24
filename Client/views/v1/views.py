@@ -179,10 +179,10 @@ def get_client(request):
 
     if client_status is not None:
 
-        if client_status is True:
+        if client_status == True:
             all_client = all_client.filter(is_active=True)
         
-        if client_status is False:
+        if client_status == False:
             all_client = all_client.filter(is_active=False)
 
     all_client_count=all_client.count()
