@@ -181,11 +181,11 @@ def get_client(request):
 
     if is_active is not None:
         coming_outer = 'True'
-        if is_active == 'True':
+        if is_active == 'true':
             all_client = all_client.filter(is_active=True)
             value = 'True'
         
-        if is_active == 'False':
+        if is_active == 'false':
             all_client = all_client.filter(is_active=False)
             value = 'False'
 
