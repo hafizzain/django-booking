@@ -112,6 +112,7 @@ class FilteredInsightProducts(APIView):
                 if value in ['LAST_7_DAYS', 'LAST_30_DAYS', 'MOST_ORDERED_PRODUCTS']:
                     value = MOST_ORDERED_CHOICES.get(value)
                     self.queries['filter']['product_order_stock__order__created_at__date__range'] = (value, self.today_date_format)
+                    
         elif self.is_date_most_ordered and self.start_date and self.end_date:
             self.queries['filter']['product_order_stock__order__created_at__date__range'] = (self.start_date, self.end_date)
         else:
@@ -267,11 +268,11 @@ class FilteredInsightProducts(APIView):
             else:
                 product['most_consumed_products'] = self.most_consumed
 
-            if self.most_ordered and (product_instance.most_ordered_products or product_instance.most_ordered_products == 0):
+            if (self.most_ordered or self.is_date_most_ordered) and (product_instance.most_ordered_products or product_instance.most_ordered_products == 0):
                 product['most_ordered_products'] = int(product_instance.most_ordered_products)
                 product['quantity'] = int(product_instance.most_ordered_products)
             else:
-                product['most_ordered_products'] = self.most_ordered
+                product['most_ordered_products'] = self.most_ordered or self.is_date_most_ordered
 
             if self.most_transferred and (product_instance.most_transferred_products or product_instance.most_transferred_products == 0):
                 product['most_transferred_products'] = int(product_instance.most_transferred_products)
