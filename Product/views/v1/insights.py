@@ -93,7 +93,7 @@ class FilteredInsightProducts(APIView):
                 )
             
     def retreive_most_ordered_query(self, request):
-        self.most_ordered = request.GET.get('most_ordered', None)
+        self.most_ordered = request.GET.get('is_date_most_ordered', None)
         self.start_date = request.GET.get('startDate', None)
         self.end_date = request.GET.get('endDate', None)
 
