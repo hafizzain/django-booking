@@ -340,14 +340,12 @@ def update_user_default_data(request):
 
     if client:
         client = json.loads(client)
-        id = client.get('id', None)
+        # id = client.get('id', None)
         name = client.get('name', None)
         email = client.get('email', None)
         phone_number = client.get('phone_number', None)
         try:
-            client_instance = Client.objects.get(
-                id = id
-            )
+            client_instance = Client()
         except:
             pass
         else:
