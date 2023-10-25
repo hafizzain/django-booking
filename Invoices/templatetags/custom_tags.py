@@ -23,7 +23,7 @@ def get_secondary_translation(order_id):
         return translation.product_name if translation else ''
     
     if appointment_order:
-        return appointment_order.name
+        return appointment_order.service.name
     
     return ''
 
@@ -44,7 +44,7 @@ def get_primary_translation(order_id):
         return translation.product_name if translation else ''
     
     if appointment_order:
-        return appointment_order.name
+        return appointment_order.service.name
 
     
     return ''
