@@ -93,39 +93,41 @@ class FilteredInsightProducts(APIView):
                 )
             
     def retreive_most_ordered_query(self, request):
-        self.most_ordered = request.GET.get('is_date_most_ordered', None)
+        # string mapping
+        self.most_ordered = request.GET.get('most_ordered', None) 
+
+        # date ranges
+        self.is_date_most_ordered = request.GET.get('is_date_most_ordered', None)
         self.start_date = request.GET.get('startDate', None)
         self.end_date = request.GET.get('endDate', None)
 
+        self.queries['order_by'].append('-most_ordered_products')
+        self.queries['annotate']['most_ordered_products'] = Sum('product_order_stock__rec_quantity')
+        self.queries['filter']['product_order_stock__order__to_location__id'] = self.location
 
         if self.most_ordered :
             MOST_ORDERED_CHOICES = {'MOST_ORDERED_PRODUCTS' : self.beggining_date, 'LAST_7_DAYS' : self.days_before_7 , 'LAST_30_DAYS' : self.days_before_30 }
-            self.queries['order_by'].append('-most_ordered_products')
-            self.queries['annotate']['most_ordered_products'] = Sum('product_order_stock__rec_quantity')
-            if self.start_date and self.end_date:
-
+            if self.most_ordered in MOST_ORDERED_CHOICES or re.match(DATE_REGEX, self.most_ordered):
                 value = self.most_ordered
                 if value in ['LAST_7_DAYS', 'LAST_30_DAYS', 'MOST_ORDERED_PRODUCTS']:
                     value = MOST_ORDERED_CHOICES.get(value)
                     self.queries['filter']['product_order_stock__order__created_at__range'] = (value, self.today_date_format)
-                else:
-                    start_date = self.get_time_object(self.start_date)
-                    end_date = self.get_time_object(self.end_date)
-                    self.queries['filter']['product_order_stock__order__created_at__range'] = (start_date, end_date)
-
-                self.queries['filter']['product_order_stock__order__to_location__id'] = self.location
-            else:
-                return Response(
-                    {
-                        'status' : False,
-                        'status_code' : 400,
-                        'response' : {
-                            'message' : 'Invalid Top Sold Query',
-                            'error_message' : None,
-                        }
-                    },
-                    status=status.HTTP_200_OK
-                )
+        elif self.is_date_most_ordered and self.start_date and self.end_date:
+            start_date = self.get_date_object(self.start_date)
+            end_date = self.get_date_object(self.end_date)
+            self.queries['filter']['product_order_stock__order__created_at__range'] = (start_date, end_date)
+        else:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 400,
+                    'response' : {
+                        'message' : 'Invalid Top Sold Query',
+                        'error_message' : None,
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
             
     def retreive_most_transferred_query(self, request):
         self.most_transferred = request.GET.get('most_transferred', None)
@@ -177,12 +179,12 @@ class FilteredInsightProducts(APIView):
             self.queries['filter']['product_stock__available_quantity__lte'] = 0
 
 
-    def get_time_object(self, string_time: str):
+    def get_date_object(self, string_date: str):
         """
         string_time: A date in string format to get the time object
         e.g: 2023-10-03
         """
-        return datetime.strptime(string_time, '%Y-%m-%d')
+        return datetime.strptime(string_date, '%Y-%m-%d')
 
 
 
