@@ -5,6 +5,7 @@ from django.shortcuts import render
 from Sale.Constants.StaffEmail import StaffSaleEmail
 from Sale.Constants.stock_lowest import stock_lowest
 from Sale.Constants.tunrover import ProductTurnover
+from django.db import transaction
 
 from rest_framework import status
 from Appointment.models import Appointment, AppointmentCheckout, AppointmentService, AppointmentEmployeeTip
@@ -1859,7 +1860,7 @@ def create_sale_order(request):
 
 
 
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def new_create_sale_order(request):

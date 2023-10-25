@@ -48,6 +48,7 @@ from Employee.serializers import EmplooyeeAppointmentInsightsSerializer
 from Notification.notification_processor import NotificationProcessor
 from Analytics.models import EmployeeBookingDailyInsights
 from django.db.models import Sum
+from django.db import transaction
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -443,7 +444,8 @@ def get_calendar_appointment(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_appointment(request):
