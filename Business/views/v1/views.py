@@ -342,7 +342,7 @@ def update_user_default_data(request):
         client = json.loads(client)
         # id = client.get('id', None)
         name = client.get('name', None)
-        email = client.get('email', None)
+        email = client.get('email', '')
         phone_number = client.get('phone_number', None)
         try:
             client_instance = Client()
