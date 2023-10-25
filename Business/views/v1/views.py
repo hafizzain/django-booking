@@ -352,6 +352,7 @@ def update_user_default_data(request):
             client_instance.full_name = name
             client_instance.email = email
             client_instance.mobile_number = phone_number
+            client_instance.business = location
             client_instance.save()
         
         if email is not None:
