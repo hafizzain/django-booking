@@ -146,7 +146,6 @@ def create_employee(tenant=None, user = None, business=None, data=None):
                             "wednesday":{"start_time":"09:00:00","end_time":"18:00:00"},
                             "thursday":{"start_time":"09:00:00","end_time":"18:00:00"},
                             "friday":{"start_time":"09:00:00","end_time":"18:00:00"},
-                            "saturday":{"start_time":"09:00:00","end_time":"18:00:00"},
                             }
                 days = [
                     'monday',
@@ -240,12 +239,11 @@ def create_employee(tenant=None, user = None, business=None, data=None):
                                             
                         bds_schedule.start_time = s_day['start_time']
                         bds_schedule.close_time = s_day['end_time']
-                        bds_schedule.save()
                         
                     else:
                         bds_schedule.is_closed = True
 
-                bds_schedule.save()
+                    bds_schedule.save()
                 
                 try:
                     username = user.email.split('@')[0]
