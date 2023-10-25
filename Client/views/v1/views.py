@@ -175,7 +175,7 @@ def get_client(request):
     all_client = Client.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at').distinct()
 
     if search_text:
-        all_client = all_client.filter(full_name__icontains=search_text)
+        all_client = all_client.filter(Q(full_name__icontains=search_text) | Q(mobile_number__icontains=search_text))
 
     if is_active is not None:
         if is_active == 'true':
