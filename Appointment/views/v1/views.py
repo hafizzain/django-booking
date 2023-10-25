@@ -1649,7 +1649,8 @@ def delete_appointment_employee_tip(request):
         },
         status=status.HTTP_200_OK
         )
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_checkout(request):
