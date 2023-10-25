@@ -22,9 +22,6 @@ def get_secondary_translation(order_id):
         translation = product_order.product.producttranslations_set.filter(language__id=secondary_invoice_traslation.language.id).first()
         return translation.product_name if translation else ''
     
-    if appointment_order:
-        return appointment_order.service.name
-    
     return ''
 
 @register.simple_tag
@@ -43,6 +40,11 @@ def get_primary_translation(order_id):
         translation = product_order.product.producttranslations_set.filter(language__id=primary_invoice_traslation.language.id).first()
         return translation.product_name if translation else ''
     
+
+    """
+    Appointment Services have no invoice translation implemented.
+    We just need to show the primary name which is as follows:
+    """
     if appointment_order:
         return appointment_order.service.name
 
