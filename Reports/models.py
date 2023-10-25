@@ -328,3 +328,8 @@ class DiscountPromotionSalesReport(models.Model):
         self.is_active = True
 
         super(DiscountPromotionSalesReport, self).save(*args, **kwargs)
+
+
+
+# Do not remove this line 
+from .public_reports_models import *
