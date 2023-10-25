@@ -102,7 +102,7 @@ class FilteredInsightProducts(APIView):
             MOST_ORDERED_CHOICES = {'MOST_ORDERED_PRODUCTS' : self.beggining_date, 'LAST_7_DAYS' : self.days_before_7 , 'LAST_30_DAYS' : self.days_before_30 }
             self.queries['order_by'].append('-most_ordered_products')
             self.queries['annotate']['most_ordered_products'] = Sum('product_order_stock__rec_quantity')
-            if self.most_ordered in MOST_ORDERED_CHOICES or re.match(DATE_REGEX, self.most_ordered):
+            if self.start_date and self.end_date:
 
                 value = self.most_ordered
                 if value in ['LAST_7_DAYS', 'LAST_30_DAYS', 'MOST_ORDERED_PRODUCTS']:
