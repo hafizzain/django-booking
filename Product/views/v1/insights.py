@@ -111,11 +111,9 @@ class FilteredInsightProducts(APIView):
                 value = self.most_ordered
                 if value in ['LAST_7_DAYS', 'LAST_30_DAYS', 'MOST_ORDERED_PRODUCTS']:
                     value = MOST_ORDERED_CHOICES.get(value)
-                    self.queries['filter']['product_order_stock__order__to_location__id'] = self.location
-
+                    self.queries['filter']['product_order_stock__order__created_at__range'] = (value, self.today_date_format)
         elif self.is_date_most_ordered and self.start_date and self.end_date:
             self.queries['filter']['product_order_stock__order__created_at__range'] = (self.start_date, self.end_date)
-            
         else:
             return Response(
                 {
