@@ -115,7 +115,7 @@ class FilteredInsightProducts(APIView):
         elif self.is_date_most_ordered and self.start_date and self.end_date:
             start_date = self.get_date_object(self.start_date)
             end_date = self.get_date_object(self.end_date)
-            self.queries['filter']['product_order_stock__order__created_at__range'] = (start_date, end_date)
+            self.queries['filter']['product_order_stock__order__created_at__range'] = (self.start_date, self.end_date)
         else:
             return Response(
                 {
