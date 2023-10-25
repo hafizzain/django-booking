@@ -101,6 +101,7 @@ class SaleInvoice(models.Model):
         for order in services:
             price = order.get_final_price()
             data = {
+                'id': order.id,
                 'name' : f'{order.service.name}',
                 'arabic_name' : f'{order.service.arabic_name}',
                 'price' : round(price, 2),
