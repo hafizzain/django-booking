@@ -101,9 +101,9 @@ class FilteredInsightProducts(APIView):
         self.start_date = request.GET.get('startDate', None)
         self.end_date = request.GET.get('endDate', None)
 
-        self.queries['order_by'].append('-most_ordered_products')
-        self.queries['annotate']['most_ordered_products'] = Sum('product_order_stock__rec_quantity')
-        self.queries['filter']['product_order_stock__order__to_location__id'] = self.location
+        # self.queries['order_by'].append('-most_ordered_products')
+        # self.queries['annotate']['most_ordered_products'] = Sum('product_order_stock__rec_quantity')
+        # self.queries['filter']['product_order_stock__order__to_location__id'] = self.location
 
         if self.most_ordered :
             MOST_ORDERED_CHOICES = {'MOST_ORDERED_PRODUCTS' : self.beggining_date, 'LAST_7_DAYS' : self.days_before_7 , 'LAST_30_DAYS' : self.days_before_30 }
@@ -112,9 +112,13 @@ class FilteredInsightProducts(APIView):
                 if value in ['LAST_7_DAYS', 'LAST_30_DAYS', 'MOST_ORDERED_PRODUCTS']:
                     value = MOST_ORDERED_CHOICES.get(value)
                     self.queries['filter']['product_order_stock__order__created_at__range'] = (value, self.today_date_format)
+                    self.queries['order_by'].append('-most_ordered_products')
+                    self.queries['annotate']['most_ordered_products'] = Sum('product_order_stock__rec_quantity')
+                    self.queries['filter']['product_order_stock__order__to_location__id'] = self.location
         elif self.is_date_most_ordered and self.start_date and self.end_date:
-            start_date = self.get_date_object(self.start_date)
-            end_date = self.get_date_object(self.end_date)
+            self.queries['order_by'].append('-most_ordered_products')
+            self.queries['annotate']['most_ordered_products'] = Sum('product_order_stock__rec_quantity')
+            self.queries['filter']['product_order_stock__order__to_location__id'] = self.location
             self.queries['filter']['product_order_stock__order__created_at__range'] = (self.start_date, self.end_date)
         else:
             return Response(
