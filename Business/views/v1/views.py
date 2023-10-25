@@ -83,7 +83,6 @@ def get_user_default_data(request):
             'name' : f'{location_instance.address_name}',
             'id' : f'{location_instance.id}',
             'business_address' : f'{location_instance.address}',
-            'currency' : f'{location_instance.currency.id}',
             'email' : f'{location_instance.email}',
             'type' : 'location',
         }
@@ -1943,10 +1942,12 @@ def delete_languages(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_all_languages(request):
-    only_english_arabic = ['English', 'Arabic']
+    preffered_languages = ['English', 'Arabic', 'Urdu', 'Spanish',
+                           'French', 'Hindi', 'Russian', 'Chinese',
+                           'Portuguese', 'Bengali']
     all_languages = Language.objects.filter(is_active=True,
                                             is_deleted=False,
-                                            name__in=only_english_arabic)
+                                            name__in=preffered_languages)
 
     serialized = LanguageSerializer(all_languages, many=True)
     return Response(
@@ -3041,9 +3042,9 @@ def check_vendor_existance(request):
 
     fields = []
     for vendor in all_vendors:
-        if vendor.email == email:
+        if email and vendor.email == email:
             fields.append('EMAIL')
-        if vendor.mobile_number == mobile_number:
+        if mobile_number and vendor.mobile_number == mobile_number:
             fields.append('MOBILE_NUMBER')
     return Response(
             {
@@ -3077,7 +3078,7 @@ def add_business_vendor(request):
     website = request.data.get('website', None)
     is_active = request.data.get('is_active', None)
     
-    if not all([business_id,vendor_name, address, email, is_active]):
+    if not all([business_id,vendor_name, address, is_active]):
         return Response(
             {
                 'status' : False,
@@ -3087,7 +3088,7 @@ def add_business_vendor(request):
                     'message' : 'Invalid Data!',
                     'error_message' : 'Following fields are required',
                     'fields' : [
-                        'business', 'vendor_name', 'address', 'email', 'is_active'
+                        'business', 'vendor_name', 'address', 'is_active'
                     ]
                 }
             },
@@ -3159,10 +3160,12 @@ def add_business_vendor(request):
             address = address,
             gstin = gstin,
             website = website,
-            email = email,
             mobile_number = mobile_number,
             is_active = is_active,
         )
+        if email:
+            vendor.email = email
+            vendor.save()
     except Exception as err:
         return Response(
             {
@@ -3197,7 +3200,9 @@ def update_business_vendor(request):
     vendor_id = request.data.get('vendor', True)
     country_unique_id = request.data.get('country', None) 
     state_unique_id = request.data.get('state', None) 
-    city_name = request.data.get('city', None) 
+    city_name = request.data.get('city', None)
+    email = request.data.get('email', None)
+
 
     if not all([vendor_id]):
         return Response(

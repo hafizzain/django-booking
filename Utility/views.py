@@ -100,7 +100,7 @@ def get_countries(request):
         all_countries = Country.objects.filter(
             is_active=True,
             is_deleted=False,
-        ).exclude(unique_id__isnull=True)
+        ).exclude(unique_id__isnull=True).distinct('name')
         serialized = CountrySerializer(all_countries, many=True)
         return Response(
             {
@@ -139,7 +139,7 @@ def get_states(request):
                 is_active=True,
                 is_deleted=False,
                 country_unique_id=country_unique_id
-            )
+            ).distinct('name')
         except Exception as err:
             return Response(
                 {

@@ -19,6 +19,7 @@ from Service.models import Service, ServiceTranlations
 from Utility.models import Language
 from Product.serializers import ProductTranlationsSerializerNew
 from Service.serializers import ServiceTranslationsSerializer
+from MultiLanguage.models import InvoiceTranslation
 
 class PriceServiceSerializers(serializers.ModelSerializer):
     currency_name = serializers.SerializerMethodField(read_only=True)
@@ -1641,11 +1642,25 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
     price  = serializers.SerializerMethodField(read_only=True)
     selection_type  = serializers.SerializerMethodField(read_only=True)
     product_original_price = serializers.SerializerMethodField(read_only=True)
-    product_translations = serializers.SerializerMethodField(read_only=True)
+    primary_product_translation = serializers.SerializerMethodField(read_only=True)
+    secondary_product_translation = serializers.SerializerMethodField(read_only=True)
 
-    def get_product_translations(self, obj):
-        product_translations = obj.product.producttranslations_set.all()
-        return ProductTranlationsSerializerNew(product_translations, many=True).data
+    def get_primary_product_translation(self, obj):
+        if obj.location.primary_translation:
+            primary_invoice_traslation = InvoiceTranslation.objects.filter(id=obj.location.primary_translation.id).first()
+            primary_product_translations = obj.product.producttranslations_set.filter(language__id=primary_invoice_traslation.language.id).first()
+            return ProductTranlationsSerializerNew(primary_product_translations).data
+        else:
+            return None
+
+    def get_secondary_product_translation(self, obj):
+
+        if obj.location.secondary_translation:
+            secondary_invoice_traslation = InvoiceTranslation.objects.filter(id=obj.location.secondary_translation.id).first()
+            secondary_product_translations = obj.product.producttranslations_set.filter(language__id=secondary_invoice_traslation.language.id).first()
+            return ProductTranlationsSerializerNew(secondary_product_translations).data
+        else:
+            return None
         
 
 
@@ -1687,7 +1702,7 @@ class SaleOrder_ProductSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'product_name', 'product_arabic_name', 'product_original_price', 
             'quantity', 'product_price', 'price', 'selection_type', 'discount_percentage',
-            'redeemed_type', 'product_translations']
+            'redeemed_type', 'primary_product_translation', 'secondary_product_translation']
 
 
 class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
@@ -1699,9 +1714,13 @@ class SaleOrder_ServiceSerializer(serializers.ModelSerializer):
     service_translations = serializers.SerializerMethodField(read_only=True)
 
     def get_service_translations(self, obj):
-        translations = obj.service.servicetranlations_set.all()
-        translations_data = ServiceTranslationsSerializer(translations, many=True).data
-        return translations_data
+        if obj.location.secondary_translation:
+            secondary_invoice_traslation = InvoiceTranslation.objects.filter(id=obj.location.secondary_translation.id).first()
+            translations = obj.service.servicetranlations_set.filter(language__id=secondary_invoice_traslation.language.id)
+            translations_data = ServiceTranslationsSerializer(translations, many=True).data
+            return translations_data
+        else:
+            return None
 
     def get_selection_type(self, obj):
         return 'SERVICE'

@@ -34,7 +34,9 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = True
 CSRF_TRUSTED_ORIGINS=[
     # 'https://*.YOUR_DOMAIN.COM',
-    'https://hashedsystems.com'
+    'https://hashedsystems.com',
+    'https://hashedsystem.co.uk',
+    'https://*.hashedsystem.co.uk',
                       ]
 ALLOWED_HOSTS = ['*']
 INTERNAL_IPS = [
@@ -234,9 +236,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
 
-    # 'DEFAULT_RENDERER_CLASSES': [
-    #     'Utility.customizations.renderers.CustomRenderer',
-    # ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'Utility.customizations.renderers.CustomRenderer',
+    ],
 
     'DEFAULT_AUTHENTICATION_CLASSES' : [
         'rest_framework.authentication.TokenAuthentication'
@@ -246,12 +248,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated'
     ],
 
-    # 'DATE_FORMAT': "%d-%m-%Y",
-    # 'DATETIME_FORMAT': "%d-%m-%Y %H:%M:%S",
-
-    
-    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    # 'PAGE_SIZE': 2,
 }
 
 # Internationalization
@@ -359,3 +355,19 @@ try:
     USE_WILDCARD_FOR_SSL = True
 except:
     USE_WILDCARD_FOR_SSL = False
+
+try:
+    AWS_API_KEY = env('AWS_API_KEY')
+    AWS_SECRET_KEY = env('AWS_SECRET_KEY')
+    AWS_MY_ZONE_ID = env('AWS_MY_ZONE_ID')
+    AWS_REGION_ZONE_ID = env('AWS_REGION_ZONE_ID')
+    AWS_DNS_NAME = env('AWS_DNS_NAME')
+except Exception as err:
+    print(err)
+    AWS_API_KEY = None
+    AWS_SECRET_KEY = None
+    AWS_MY_ZONE_ID = None
+    AWS_REGION_ZONE_ID = None
+    AWS_DNS_NAME = None
+
+

@@ -1,5 +1,5 @@
 import json
-from Authentication.Constants.Domain import ssl_sub_domain
+from Authentication.Constants.Domain import ssl_sub_domain, create_aws_domain_record
 from Client.models import Client
 from Employee.Constants.Add_Employe import add_employee
 from Employee.models import EmployeDailySchedule, Employee, EmployeeProfessionalInfo, EmployeeSelectedService
@@ -11,9 +11,11 @@ from Business.models import (Business, BusinessAddress, BusinessOpeningHour,
                              BusinessPaymentMethod, BusinessType)
 from Profile.models import Profile
 from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSIONS_MODEL_FIELDS
+from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
 from Utility.Constants.add_data_db import add_business_types, add_countries, add_software_types, add_states, add_cities, add_currencies, add_languages
 from Utility.models import Country, Currency, ExceptionRecord, Language
 from Utility.models import GlobalPermissionChoices
+from MultiLanguage.models import InvoiceTranslation
 
 from rest_framework.authtoken.models import Token
 from django.conf import  settings
@@ -123,11 +125,12 @@ def create_tenant_account_type(tenant_user=None, tenant=None, account_type='Busi
             account_type= 'Business'#account_type
         )
 
-def create_employee(tenant=None, user = None, business=None):
-     if tenant is not None and user is not None and business is not None:
+def create_employee(tenant=None, user = None, business=None, data=None):
+     if tenant is not None and user is not None and business is not None and data is not None:
+        country_unique_id = data.get('country')
+        public_country = get_country_from_public(country_unique_id)
         try:
-            with tenant_context(tenant):                
-                country_id = 'United Arab Emirates'
+            with tenant_context(tenant):
                 currency_id = 'Dirham'
                 domain = tenant.domain
                 template = 'Employee'
@@ -154,26 +157,49 @@ def create_employee(tenant=None, user = None, business=None):
                     'sunday',
                 ]
                 try:
-                    country = Country.objects.get(name__iexact = country_id)
+                    country, created = Country.objects.get_or_create(
+                        name=public_country.name,
+                        unique_id = public_country.unique_id
+                    )
                     currency = Currency.objects.get(name__iexact = currency_id)
+                    language = Language.objects.get(name__icontains='English')
+
                 except Exception as err:
-                    pass
+                    country = None
+
+                if language:
+                    invoice_translation = InvoiceTranslation.objects.create(
+                        language=language,
+                        user=user,
+                        invoice = 'Invoice',
+                        items = 'Items',
+                        amount = 'Amount',
+                        subtotal = 'Subtotal',
+                        tips = 'Tips',
+                        taxes = 'Taxes',
+                        total = 'Total',
+                        payment_method = 'Payment Method',
+                        status = 'active'
+                    )
 
                 business_address = BusinessAddress.objects.create(
                     business = business,
                     user = user,
-                    address = 'Dubai - United Arab Emirates',
-                    address_name = 'Dubai',
+                    address = '',
+                    address_name = '',
                     email= user.email,
                     mobile_number= user.mobile_number,
                     country=country,
-                    currency = currency,
                     is_primary = False,
                     is_active = True,
                     is_deleted = False,
                     is_closed = False,
                     is_default = True
                 )
+
+                if invoice_translation:
+                    business_address.primary_translation = invoice_translation
+                    business_address.save()
                 
                 employee = Employee.objects.create(
                     user=user,
@@ -181,7 +207,7 @@ def create_employee(tenant=None, user = None, business=None):
                     full_name = user.full_name,
                     email= user.email,
                     country = country,
-                    address = 'Dubai Marina',
+                    address = '',
                     is_active =True,
                     employee_id = employe_id,
                     is_default = True
@@ -291,10 +317,10 @@ def create_ServiceGroup(tenant=None, user = None, business=None):
         try:
             with tenant_context(tenant):
                 try:
-                    currency_id = 'Dirham'
+                    # currency_id = 'Dirham'
                     location = BusinessAddress.objects.all()[0]
                     emp = Employee.objects.all()[0]
-                    currency = Currency.objects.get(name__iexact = currency_id)
+                    # currency = Currency.objects.get(name__iexact = currency_id)
                 except:
                     pass
                 service_grp = ServiceGroup.objects.create(
@@ -332,7 +358,7 @@ def create_ServiceGroup(tenant=None, user = None, business=None):
                                 )
                             price_service = PriceService.objects.create(
                                 service = service,
-                                currency = currency,
+                                # currency = currency,
                                 duration = '30Min',
                                 price = 500,
                             )
@@ -459,8 +485,6 @@ def add_data_to_tenant_thread(tenant=None):
         ExceptionRecord.objects.create(
             text = f'ADD DATA TO TENANT DB TIME DIFF . {total_seconds} Seconds'
         )
-            
-
 
 def create_tenant(request=None, user=None, data=None):
     
@@ -511,14 +535,21 @@ def create_tenant(request=None, user=None, data=None):
 
 
     with tenant_context(user_tenant):
-
-        try:
-            thrd = Thread(target=ssl_sub_domain, args=[td_name])
-            thrd.start()
-        except Exception as err:
-            ExceptionRecord.objects.create(
-                text = f'SSL ERROR . {str(err)}'
-            )
+        if not settings.USE_WILDCARD_FOR_SSL:
+            try:
+                thrd = Thread(target=ssl_sub_domain, args=[td_name])
+                thrd.start()
+            except Exception as err:
+                ExceptionRecord.objects.create(
+                    text = f'SSL ERROR . {str(err)}'
+                )
+        else:
+            ExceptionRecord.objects.create(text = f'Using Wildcard for SSL {td_name}')
+            try:
+                thrd = Thread(target=create_aws_domain_record, args=[f'{td_name}.{settings.BACKEND_DOMAIN_NAME}'])
+                thrd.start()
+            except Exception as err:
+                ExceptionRecord.objects.create(text = f'AWS HOSTED ERROR . {str(err)}')
         
         t_user = create_tenant_user(tenant=user_tenant, data=data)
         
@@ -539,7 +570,7 @@ def create_tenant(request=None, user=None, data=None):
                 pass
             
             try:
-                create_employee(tenant = user_tenant , user = t_user, business = t_business)
+                create_employee(tenant = user_tenant , user = t_user, business = t_business, data=data)
             except:
                 ExceptionRecord.objects.create(
                     text = f'{str(err)}'

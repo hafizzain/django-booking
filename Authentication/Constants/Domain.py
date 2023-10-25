@@ -6,7 +6,6 @@ import subprocess
 from Utility.models import ExceptionRecord
 from django.conf import settings
 
-
 def ssl_sub_domain(domain):
     time_start = datetime.datetime.now()
 
@@ -21,4 +20,8 @@ def ssl_sub_domain(domain):
     ExceptionRecord.objects.create(
         text = f'SSL Certificate TIME DIFF {total_seconds} Seconds for {domain} ---- {command}'
     )
-            
+
+    
+def create_aws_domain_record(domain_name):
+    from .AwsRoute53_boto import create_route53_alias_record
+    create_route53_alias_record(domain_name)
