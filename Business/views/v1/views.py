@@ -221,7 +221,7 @@ def update_user_default_data(request):
     employee = request.data.get('employee', None)
     service_group = request.data.get('service_group', None)
 
-    if not all([location, client, services, employee]):
+    if not all([location, services, employee]):
         return Response(
             {
                 'status' : False,
@@ -341,26 +341,29 @@ def update_user_default_data(request):
     if client:
         client = json.loads(client)
         # id = client.get('id', None)
-        name = client.get('name', '')
+        name = client.get('name', None)
         email = client.get('email', '')
         phone_number = client.get('phone_number', None)
-        try:
-            client_instance = Client()
-        except:
-            pass
-        else:
-            client_instance.full_name = name
-            client_instance.email = email
-            client_instance.mobile_number = phone_number
-            client_instance.business = location.business
-            client_instance.save()
-        
-        if email is not None:
+
+        if not name in ['', None]:
+
             try:
-                thrd = Thread(target=add_client, args=[name, email , request.tenant_name, client_instance.business.business_name,])
-                thrd.start()
-            except Exception as err:
-                errors.append(str(err))
+                client_instance = Client()
+            except:
+                pass
+            else:
+                client_instance.full_name = name
+                client_instance.email = email
+                client_instance.mobile_number = phone_number
+                client_instance.business = location.business
+                client_instance.save()
+            
+            if email not in ['', None]:
+                try:
+                    thrd = Thread(target=add_client, args=[name, email , request.tenant_name, client_instance.business.business_name,])
+                    thrd.start()
+                except Exception as err:
+                    errors.append(str(err))
 
     if employee:
         employee = json.loads(employee)
