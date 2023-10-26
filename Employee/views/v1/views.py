@@ -1030,7 +1030,13 @@ def update_employee(request):
     
     country_unique_id = request.data.get('country', None) 
     state_unique_id = request.data.get('state', None) 
-    city_name = request.data.get('city', None) 
+    city_name = request.data.get('city', None)
+    email_changed = False
+
+    emp_email = request.data.get('email')
+    emp = Employee.objects.get(id=id)
+    if emp.email != emp_email:
+        email_changed = True
     
     working_days = []
     
@@ -1250,6 +1256,10 @@ def update_employee(request):
         )
 
     data.update(serializer.data)
+    if email_changed:
+        user = emp.user
+        user.email = emp_email
+        user.save()
 
     return Response(
         {
@@ -1258,7 +1268,8 @@ def update_employee(request):
             'response' : {
                 'message' : ' Employee updated successfully',
                 'error_message' : Errors,
-                'Employee' : data
+                'Employee' : data,
+                'email_changed': email_changed
             }
         },
         status=status.HTTP_200_OK
