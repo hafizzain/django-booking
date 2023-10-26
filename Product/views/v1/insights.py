@@ -32,65 +32,76 @@ class FilteredInsightProducts(APIView):
         }
 
     def retreive_top_sold_query(self, request):
+        #string mapping
         self.top_sold = request.GET.get('top_sold', None)
-        TOP_SOLD_CHOICES = {'TOP_SOLD_PRODUCTS' : self.beggining_date, 'LAST_7_DAYS' : self.days_before_7 , 'LAST_30_DAYS' : self.days_before_30 }
+
+        # date ranges
+        self.is_date_most_ordered = request.GET.get('is_date_most_ordered', None)
+        self.start_date = request.GET.get('startDate', None)
+        self.end_date = request.GET.get('endDate', None)
+
+        self.queries['order_by'].append('-top_sold_orders')
+        self.queries['annotate']['top_sold_orders'] = Sum('product_orders__quantity')
+        self.queries['filter']['product_orders__location__id'] = self.location
 
         if self.top_sold :
-            self.queries['order_by'].append('-top_sold_orders')
-            self.queries['annotate']['top_sold_orders'] = Sum('product_orders__quantity')
+            TOP_SOLD_CHOICES = {'TOP_SOLD_PRODUCTS' : self.beggining_date, 'LAST_7_DAYS' : self.days_before_7 , 'LAST_30_DAYS' : self.days_before_30 }
             if self.top_sold in TOP_SOLD_CHOICES or re.match(DATE_REGEX, self.top_sold):
-                # if self.top_sold != 'TOP_SOLD_PRODUCTS':
                 value = self.top_sold
                 if value in ['LAST_7_DAYS', 'LAST_30_DAYS', 'TOP_SOLD_PRODUCTS']:
                     value = TOP_SOLD_CHOICES.get(value)
-                    self.queries['filter']['product_orders__created_at__range'] = (value, self.today_date_format)
-                else:
-                    self.queries['filter']['product_orders__created_at__date'] = value
+                    self.queries['filter']['product_orders__created_at__date__range'] = (value, self.today_date_format)
 
-                self.queries['filter']['product_orders__location__id'] = self.location
-            else:
-                return Response(
-                    {
-                        'status' : False,
-                        'status_code' : 400,
-                        'response' : {
-                            'message' : 'Invalid Top Sold Query',
-                            'error_message' : None,
-                        }
-                    },
-                    status=status.HTTP_200_OK
-                )
+        elif self.is_date_most_ordered and self.start_date and self.end_date:
+            self.queries['filter']['product_orders__created_at__date__range'] = (self.start_date, self.end_date)
+        else:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 400,
+                    'response' : {
+                        'message' : 'Invalid Top Sold Query',
+                        'error_message' : None,
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
             
     def retreive_most_consumed_query(self, request):
+        #string mapping
         self.most_consumed = request.GET.get('most_consumed', None)
-        MOST_CONSUMED_CHOICES = {'MOST_COMSUMED_PRODUCTS' : self.beggining_date, 'LAST_7_DAYS' : self.days_before_7 , 'LAST_30_DAYS' : self.days_before_30 }
 
-        if self.most_consumed :
-            self.queries['order_by'].append('-most_consumed_products')
-            self.queries['annotate']['most_consumed_products'] = Sum('consumptions__quantity')
+        # date ranges
+        self.is_date_most_ordered = request.GET.get('is_date_most_ordered', None)
+        self.start_date = request.GET.get('startDate', None)
+        self.end_date = request.GET.get('endDate', None)
+
+        self.queries['order_by'].append('-most_consumed_products')
+        self.queries['annotate']['most_consumed_products'] = Sum('consumptions__quantity')
+        self.queries['filter']['consumptions__location__id'] = self.location
+
+        if self.most_consumed : 
+            MOST_CONSUMED_CHOICES = {'MOST_COMSUMED_PRODUCTS' : self.beggining_date, 'LAST_7_DAYS' : self.days_before_7 , 'LAST_30_DAYS' : self.days_before_30 }
             if self.most_consumed in MOST_CONSUMED_CHOICES or re.match(DATE_REGEX, self.most_consumed):
-                # if self.most_consumed != 'MOST_CONSUMED_PRODUCTS':
                 value = self.most_consumed
                 if value in ['LAST_7_DAYS', 'LAST_30_DAYS', 'MOST_COMSUMED_PRODUCTS']:
                     value = MOST_CONSUMED_CHOICES.get(value)
-                    self.queries['filter']['consumptions__created_at__range'] = (value, self.today_date_format)
-                else:
-                    self.queries['filter']['consumptions__created_at__date'] = value
+                    self.queries['filter']['consumptions__created_at__date__range'] = (value, self.today_date_format)
 
-                self.queries['filter']['consumptions__location__id'] = self.location
-            else:
-
-                return Response(
-                    {
-                        'status' : False,
-                        'status_code' : 400,
-                        'response' : {
-                            'message' : 'Invalid Top Sold Query',
-                            'error_message' : None,
-                        }
-                    },
-                    status=status.HTTP_200_OK
-                )
+        elif self.is_date_most_ordered and self.start_date and self.end_date:
+            self.queries['filter']['consumptions__created_at__date__date'] = (self.start_date, self.end_date)
+        else:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 400,
+                    'response' : {
+                        'message' : 'Invalid Top Sold Query',
+                        'error_message' : None,
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
             
     def retreive_most_ordered_query(self, request):
         # string mapping
@@ -129,35 +140,41 @@ class FilteredInsightProducts(APIView):
             )
             
     def retreive_most_transferred_query(self, request):
+        #string mapping
         self.most_transferred = request.GET.get('most_transferred', None)
+
+        # date ranges
+        self.is_date_most_ordered = request.GET.get('is_date_most_ordered', None)
+        self.start_date = request.GET.get('startDate', None)
+        self.end_date = request.GET.get('endDate', None)
+
+        self.queries['order_by'].append('-most_transferred_products')
+        self.queries['annotate']['most_transferred_products'] = Sum('products_stock_transfers__quantity')
+        self.queries['filter']['products_stock_transfers__from_location__id'] = self.location
 
 
         if self.most_transferred :
             MOST_TRANSFERRED_CHOICES = {'MOST_TRANSFERRED_PRODUCTS' : self.beggining_date, 'LAST_7_DAYS' : self.days_before_7 , 'LAST_30_DAYS' : self.days_before_30 }
-            self.queries['order_by'].append('-most_transferred_products')
-            self.queries['annotate']['most_transferred_products'] = Sum('products_stock_transfers__quantity')
             if self.most_transferred in MOST_TRANSFERRED_CHOICES or re.match(DATE_REGEX, self.most_transferred):
-                # if self.most_transferred != 'MOST_TRANSFERRED_PRODUCTS':
                 value = self.most_transferred
                 if value in ['LAST_7_DAYS', 'LAST_30_DAYS', 'MOST_TRANSFERRED_PRODUCTS']:
                     value = MOST_TRANSFERRED_CHOICES.get(value)
-                    self.queries['filter']['products_stock_transfers__created_at__range'] = (value, self.today_date_format)
-                else:
-                    self.queries['filter']['products_stock_transfers__created_at__date'] = value
+                    self.queries['filter']['products_stock_transfers__created_at__date__range'] = (value, self.today_date_format)
 
-                self.queries['filter']['products_stock_transfers__from_location__id'] = self.location
-            else:
-                return Response(
-                    {
-                        'status' : False,
-                        'status_code' : 400,
-                        'response' : {
-                            'message' : 'Invalid Top Sold Query',
-                            'error_message' : None,
-                        }
-                    },
-                    status=status.HTTP_200_OK
-                )
+        elif self.is_date_most_ordered and self.start_date and self.end_date:
+            self.queries['filter']['product_order_stock__order__created_at__date__range'] = (self.start_date, self.end_date)       
+        else:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 400,
+                    'response' : {
+                        'message' : 'Invalid Top Sold Query',
+                        'error_message' : None,
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
     
     def retreive_low_stock_products_query(self, request):
         self.low_stock_products = request.GET.get('low_stock_products', None)
@@ -255,14 +272,14 @@ class FilteredInsightProducts(APIView):
                 'category_name' : f'{product_instance.category.name}' if product_instance.category else '-------',
             }
 
-            if self.top_sold and (product_instance.top_sold_orders or product_instance.top_sold_orders == 0):
+            if (self.top_sold or self.is_date_most_ordered) and (product_instance.top_sold_orders or product_instance.top_sold_orders == 0):
                 product['top_sold_orders'] = int(product_instance.top_sold_orders)
                 product['quantity'] = int(product_instance.top_sold_orders)
             else:
                 product['top_sold_orders'] = self.top_sold
 
 
-            if self.most_consumed and (product_instance.most_consumed_products or product_instance.most_consumed_products == 0):
+            if (self.most_consumed or self.is_date_most_ordered)and (product_instance.most_consumed_products or product_instance.most_consumed_products == 0):
                 product['most_consumed_products'] = int(product_instance.most_consumed_products)
                 product['quantity'] = int(product_instance.most_consumed_products)
             else:
@@ -274,7 +291,7 @@ class FilteredInsightProducts(APIView):
             else:
                 product['most_ordered_products'] = self.most_ordered or self.is_date_most_ordered
 
-            if self.most_transferred and (product_instance.most_transferred_products or product_instance.most_transferred_products == 0):
+            if (self.most_transferred or self.is_date_most_ordered) and (product_instance.most_transferred_products or product_instance.most_transferred_products == 0):
                 product['most_transferred_products'] = int(product_instance.most_transferred_products)
                 product['quantity'] = int(product_instance.most_transferred_products)
             else:
