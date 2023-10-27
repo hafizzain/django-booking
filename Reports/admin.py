@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import DiscountPromotionSalesReport
+from .models import DiscountPromotionSalesReport, SaleReport
 # Register your models here.
 
 
@@ -21,4 +21,11 @@ class DiscountPromotionSalesReportAdmin(admin.ModelAdmin):
         'discount_price',
         'is_deleted',
         'is_active'
+    ]
+
+
+@admin.register(SaleReport)
+class SaleReportAdmin(admin.ModelAdmin):
+    list_display = [
+        'unique_id',
     ]
