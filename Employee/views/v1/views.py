@@ -1259,6 +1259,7 @@ def update_employee(request):
     data.update(serializer.data)
     if email_changed:
         user = emp.user
+        old_email = user.email
         user.email = emp_email
         user.save()
 
@@ -1266,7 +1267,7 @@ def update_employee(request):
         pub_tenant = Tenant.objects.get(schema_name='public')
         with tenant_context(pub_tenant):
             public_user = User.objects.filter(
-                email=emp.email,
+                email=old_email,
                 is_deleted=False,
                 user_account_type__account_type = 'Employee'
             ).first()
