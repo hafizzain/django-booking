@@ -22,6 +22,7 @@ class Command(BaseCommand):
                     appointment_status__in = ['Appointment_Booked', 'Arrived', 'In Progress', 'Done', 'Paid'],
                     is_active = True,
                     is_deleted = False,
+                    service__isnull = False
                 )
                 for app in apps:
                     apps_data.append({
