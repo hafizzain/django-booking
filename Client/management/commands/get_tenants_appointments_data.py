@@ -3,7 +3,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from Tenants.models import Tenant
 from django_tenants.utils import tenant_context
-
+from Reports.models import SaleReport
 from Appointment.models import AppointmentService
 
 class Command(BaseCommand):
@@ -15,7 +15,7 @@ class Command(BaseCommand):
             is_ready = True,
             is_deleted = False
         ).exclude(schema_name='public')
-        apps_data = []
+        apps_data = {}
         for t in tenants:
             with tenant_context(t):
                 apps = AppointmentService.objects.filter(
@@ -25,12 +25,25 @@ class Command(BaseCommand):
                     service__isnull = False
                 )
                 for app in apps:
-                    apps_data.append({
-                        'id' : app.service.id,
-                        'name' : app.service.name,
-                        'sale_type' : 'Service'
-                    })
+
+                    service = apps_data.get(app.service.name)
+                    if not service:
+                        service = {}
+                        service['id'] = app.service.id
+                        service['total_count'] = 1
+                    else:
+                        service['total_count'] = service['total_count'] + 1
+
+                    apps_data[app.service.name] = service
         
+        apps_instances = []
+        for key, val in apps_data.items():
+            apps_instances.append(SaleReport(
+                instance_id = val['id'],
+                sale_type = 'Service',
+                name = key,
+                total_count = val['total_count'],
+            ))
         print(apps_data)
         
         self.stdout.write(self.style.SUCCESS(
