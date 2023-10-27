@@ -29,7 +29,7 @@ class Command(BaseCommand):
                     service = apps_data.get(app.service.name)
                     if not service:
                         service = {}
-                        service['id'] = app.service.id
+                        service['id'] = str(app.service.id)
                         service['total_count'] = 1
                     else:
                         service['total_count'] = service['total_count'] + 1
@@ -44,8 +44,9 @@ class Command(BaseCommand):
                 name = key,
                 total_count = val['total_count'],
             ))
-        print(apps_data)
-        
+
+        SaleReport.objects.bulk_create(apps_instances)
+        print('created')
         self.stdout.write(self.style.SUCCESS(
             'Sent!'
         ))
