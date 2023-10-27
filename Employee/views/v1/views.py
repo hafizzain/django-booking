@@ -1034,12 +1034,10 @@ def update_employee(request):
     city_name = request.data.get('city', None)
     email_changed = False
     old_email = None
-
     emp_email = request.data.get('email')
-    emp = Employee.objects.get(id=id)
-    if emp.email != emp_email:
-        old_email = emp.email
-        email_changed = True
+
+    # emp = Employee.objects.get(id=id)
+    
     
     working_days = []
     
@@ -1063,6 +1061,10 @@ def update_employee(request):
         )
     try:
         employee = Employee.objects.get(id=id)
+        if employee.email != emp_email:
+            old_email = employee.email
+            email_changed = True
+
     except Exception as err:
             return Response(
             {
@@ -1260,19 +1262,19 @@ def update_employee(request):
 
     data.update(serializer.data)
     if email_changed:
-        # user = emp.user
-        # old_email = user.email
-        # user.email = emp_email
-        # user.save()
+        user = User.objects.filter(email=old_email).first()
+        if user:
+            user.email = emp_email
+            user.save()
 
         # also changing email from public schema
         # pub_tenant = Tenant.objects.get(schema_name='public')
         # with tenant_context(pub_tenant):
-        public_user = User.objects.filter(
-            email=old_email,
-        ).first()
-        public_user.email = emp_email
-        public_user.save()
+        connection.set_schema_to_public()
+        public_user = User.objects.filter(email=old_email).first()
+        if public_user:
+            public_user.email = emp_email
+            public_user.save()
 
 
     return Response(
@@ -1283,6 +1285,8 @@ def update_employee(request):
                 'message' : ' Employee updated successfully',
                 'error_message' : Errors,
                 'Employee' : data,
+                'old_email':old_email,
+                'new_email':emp_email
             }
         },
         status=status.HTTP_200_OK
