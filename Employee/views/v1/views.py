@@ -634,7 +634,7 @@ def check_email_employees(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_employee(request):
-    user = request.user     
+    user = request.user
     
     full_name= request.data.get('full_name', None)
     employee_id= request.data.get('employee_id', None)
@@ -1033,10 +1033,12 @@ def update_employee(request):
     state_unique_id = request.data.get('state', None) 
     city_name = request.data.get('city', None)
     email_changed = False
+    old_email = None
 
     emp_email = request.data.get('email')
     emp = Employee.objects.get(id=id)
     if emp.email != emp_email:
+        old_email = emp.emai
         email_changed = True
     
     working_days = []
@@ -1258,21 +1260,21 @@ def update_employee(request):
 
     data.update(serializer.data)
     if email_changed:
-        user = emp.user
-        old_email = user.email
-        user.email = emp_email
-        user.save()
+        # user = emp.user
+        # old_email = user.email
+        # user.email = emp_email
+        # user.save()
 
         # also changing email from public schema
-        pub_tenant = Tenant.objects.get(schema_name='public')
-        with tenant_context(pub_tenant):
-            public_user = User.objects.filter(
-                email=old_email,
-                is_deleted=False,
-                user_account_type__account_type = 'Employee'
-            ).first()
-            public_user.email = emp_email
-            public_user.save()
+        # pub_tenant = Tenant.objects.get(schema_name='public')
+        # with tenant_context(pub_tenant):
+        public_user = User.objects.filter(
+            email__icontains=old_email,
+            is_deleted=False,
+            user_account_type__account_type = 'Employee'
+        ).first()
+        public_user.email = emp_email
+        public_user.save()
 
 
     return Response(
