@@ -24,6 +24,7 @@ from Employee.serializers import( EmployeSerializer , EmployeInformationsSeriali
                         
                           
                                  )
+from django.db import connection
 from threading import Thread
 from Employee.Constants.Add_Employe import add_employee
 from Service.models import Service
@@ -1261,6 +1262,17 @@ def update_employee(request):
         user.email = emp_email
         user.save()
 
+        # also changing email from public schema
+        connection.set_schema_to_public()
+        public_user = User.objects.filter(
+            email=emp.email,
+            is_deleted=False,
+            user_account_type__account_type = 'Employee'
+        ).first()
+        public_user.email = emp_email
+        public_user.save()
+
+
     return Response(
         {
             'status' : True,
@@ -1269,7 +1281,6 @@ def update_employee(request):
                 'message' : ' Employee updated successfully',
                 'error_message' : Errors,
                 'Employee' : data,
-                'email_changed': email_changed
             }
         },
         status=status.HTTP_200_OK
