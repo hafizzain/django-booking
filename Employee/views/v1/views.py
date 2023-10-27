@@ -1038,7 +1038,7 @@ def update_employee(request):
     emp_email = request.data.get('email')
     emp = Employee.objects.get(id=id)
     if emp.email != emp_email:
-        old_email = emp.emai
+        old_email = emp.email
         email_changed = True
     
     working_days = []
