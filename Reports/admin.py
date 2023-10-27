@@ -27,6 +27,5 @@ class DiscountPromotionSalesReportAdmin(admin.ModelAdmin):
 @admin.register(SaleReport)
 class SaleReportAdmin(admin.ModelAdmin):
     list_display = [
-        'id',
-        
+        'unique_id',
     ]

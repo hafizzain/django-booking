@@ -16,4 +16,4 @@ class SaleReport(models.Model):
     total_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f'{self.id}'
+        return f'{self.unique_id}'
