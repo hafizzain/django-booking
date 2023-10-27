@@ -1263,14 +1263,15 @@ def update_employee(request):
         user.save()
 
         # also changing email from public schema
-        connection.set_schema_to_public()
-        public_user = User.objects.filter(
-            email=emp.email,
-            is_deleted=False,
-            user_account_type__account_type = 'Employee'
-        ).first()
-        public_user.email = emp_email
-        public_user.save()
+        pub_tenant = Tenant.objects.get(schema_name='public')
+        with tenant_context(pub_tenant):
+            public_user = User.objects.filter(
+                email=emp.email,
+                is_deleted=False,
+                user_account_type__account_type = 'Employee'
+            ).first()
+            public_user.email = emp_email
+            public_user.save()
 
 
     return Response(
