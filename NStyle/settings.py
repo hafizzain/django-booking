@@ -371,3 +371,5 @@ except Exception as err:
     AWS_DNS_NAME = None
 
 
+# Frontend Domain
+FRONTEND_DOMAIN = env('FRONTEND_DOMAIN')
