@@ -36,17 +36,18 @@ class Command(BaseCommand):
 
                     apps_data[app.service.name] = service
         
-        apps_instances = []
         for key, val in apps_data.items():
-            apps_instances.append(SaleReport(
-                instance_id = val['id'],
+            repo_service, created = SaleReport.objects.get_or_create(
                 sale_type = 'Service',
                 name = key,
-                total_count = val['total_count'],
-            ))
+            )
+            if created:
+                repo_service.instance_id = val['id']
+            
+            repo_service.total_count = val['total_count']
+            repo_service.save()
 
-        SaleReport.objects.bulk_create(apps_instances)
-        print('created')
+        print('updated')
         self.stdout.write(self.style.SUCCESS(
             'Sent!'
         ))
