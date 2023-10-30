@@ -125,9 +125,10 @@ class ClientSerializer(serializers.ModelSerializer):
     state = StateSerializer(read_only=True)
     city = CitySerializer(read_only=True)
     last_appointment_date = serializers.DateTimeField(read_only=True)
+    last_transaction_date = serializers.DateTimeField(read_only=True)
+
     last_appointment = serializers.SerializerMethodField(read_only=True)
     last_sale = serializers.SerializerMethodField(read_only=True)
-    last_transaction = serializers.SerializerMethodField(read_only=True)
 
     country_obj = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
@@ -137,24 +138,17 @@ class ClientSerializer(serializers.ModelSerializer):
     def get_last_sale(self, obj):
         last_sale = Checkout.objects.filter(client=obj).order_by('-created_at')
         if len(last_sale) > 0:
-            self.last_sale = list(dict(CreatedAtCheckoutSerializer(last_sale[0]).data))
+            self.last_sale = CreatedAtCheckoutSerializer(last_sale[0]).data
             return self.last_sale
-        return list()
+        return None
 
     def get_last_appointment(self, obj):
         last_appointment = Appointment.objects.filter(client=obj).order_by('-created_at')
         if len(last_appointment) > 0:
-
-            self.last_appointment = list(dict(CreatedAtAppointmentSerializer(last_appointment[0]).data))
+            self.last_appointment = CreatedAtAppointmentSerializer(last_appointment[0]).data
             return self.last_appointment
-        
-        return list()
+        return None
 
-    
-    def get_last_transaction(self, obj):
-        data = self.last_sale + self.last_appointment
-        # sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
-        return data
 
     def get_total_done_appointments(self, obj):
         return AppointmentService.objects.filter(
@@ -206,7 +200,7 @@ class ClientSerializer(serializers.ModelSerializer):
         fields =['id','full_name','image','client_id','email','mobile_number','dob','postal_code','address','gender','card_number',
                  'country','city','state', 'is_active', 'language', 'about_us', 'marketing','country_obj','customer_note',
                  'created_at', 'total_done_appointments', 'total_sales', 'last_appointment_date', 'last_appointment',
-                 'last_sale', 'last_transaction']
+                 'last_sale', 'last_transaction_date']
         
 class Client_TenantSerializer(serializers.ModelSerializer):
     country_obj = serializers.SerializerMethodField(read_only=True)
