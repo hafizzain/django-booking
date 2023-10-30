@@ -32,9 +32,8 @@ class ClientManager(models.QuerySet):
                                         .values('created_at')[:1]
         
         return self.annotate(
-            last_appointment_date=Coalesce(Subquery(last_appointment_subquery), 
-                                           output_field=DateTimeField(), 
-                                           default=datetime(2000, 1, 1))
+            last_appointment_date=Coalesce(Subquery(last_appointment_subquery),
+                                           datetime(2000, 1, 1))
         )
 
 class Client(models.Model):
