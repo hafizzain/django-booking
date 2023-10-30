@@ -199,7 +199,7 @@ def get_client(request):
     page_number = request.GET.get("page") 
     all_client = paginator.get_page(page_number)
     serialized = ClientSerializer(all_client, many=True,  context={'request' : request})
-    serialized_data = list(serialized)
+    serialized_data = list(serialized.data)
 
 
     # if is_active_client:
