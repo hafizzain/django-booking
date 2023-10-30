@@ -172,6 +172,7 @@ def get_client(request):
     no_pagination = request.GET.get('no_pagination', None)
     search_text = request.GET.get('search_text', None)
     is_active = request.GET.get('active', None)
+    is_active_client = request.GET.get('is_active', False)
     all_client = Client.objects \
                     .filter(is_deleted=False, is_blocked=False) \
                     .with_last_appointment() \
@@ -198,6 +199,12 @@ def get_client(request):
     page_number = request.GET.get("page") 
     all_client = paginator.get_page(page_number)
     serialized = ClientSerializer(all_client, many=True,  context={'request' : request})
+    serialized_data = list(serialized)
+
+
+    # if is_active_client:
+    #     serialized = sorted(serialized, key=lambda x: x['created_at'], reverse=True)
+
     return Response(
         {
             'status' : 200,

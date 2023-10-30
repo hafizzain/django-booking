@@ -2,14 +2,15 @@
 from Business.models import BusinessAddress
 from rest_framework import serializers
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
-from Order.models import VoucherOrder, MemberShipOrder
+from Order.models import VoucherOrder, MemberShipOrder, Checkout
+from Order.serializers import CreatedAtCheckoutSerializer
 from Product.models import Product
 from Service.models import Service
 from Utility.models import Country, State, City
 
 from Client.models import Client, ClientGroup, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription, Promotion , Rewards , Membership, Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs , VoucherCurrencyPrice 
 from Invoices.models import SaleInvoice
-from Appointment.models import AppointmentCheckout, AppointmentEmployeeTip, AppointmentService
+from Appointment.models import AppointmentCheckout, AppointmentEmployeeTip, AppointmentService, Appointment
 from Order.models import Checkout, Order
 from Utility.serializers import StateSerializer, CitySerializer
 
@@ -111,6 +112,11 @@ class SingleClientSerializer(serializers.ModelSerializer):
                  'country','city','state', 'is_active',
                  'language', 'about_us', 'marketing','country_obj','customer_note',
                  'created_at', 'total_done_appointments', 'total_sales']
+        
+class CreatedAtAppointmentSerializer(serializers.ModelSerializer):
+
+    model = Appointment
+    fields = ['created_at']
 
 
 class ClientSerializer(serializers.ModelSerializer):
@@ -118,12 +124,30 @@ class ClientSerializer(serializers.ModelSerializer):
     state = StateSerializer(read_only=True)
     city = CitySerializer(read_only=True)
     last_appointment_date = serializers.DateTimeField(read_only=True)
+    last_appointment = serializers.SerializerMethodField(read_only=True)
+    last_sale = serializers.SerializerMethodField(read_only=True)
+    last_transaction = serializers.SerializerMethodField(read_only=True)
 
     country_obj = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
     total_done_appointments = serializers.SerializerMethodField(read_only=True)
     total_sales = serializers.SerializerMethodField(read_only=True)
 
+    def get_last_sale(self, obj):
+        last_sale = Checkout.objects.filter(client=obj).order_by('-created_at')[:1]
+        last_sale = CreatedAtCheckoutSerializer(last_sale).data
+
+    def get_last_appointment(self, obj):
+        last_appointment = Appointment.objects.filter(client=obj).order_by('-created_at')[:1]
+        return CreatedAtAppointmentSerializer(last_appointment).data
+    
+    def get_last_transaction(self, obj):
+        data = []
+        data.append(self.last_sale)
+        data.append(self.last_appointment)
+
+        sorted_data = sorted(data, key=lambda x:x['created_at'], reverse=True)
+        return sorted_data[0]
 
     def get_total_done_appointments(self, obj):
         return AppointmentService.objects.filter(
@@ -173,9 +197,9 @@ class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
         fields =['id','full_name','image','client_id','email','mobile_number','dob','postal_code','address','gender','card_number',
-                 'country','city','state', 'is_active',
-                 'language', 'about_us', 'marketing','country_obj','customer_note',
-                 'created_at', 'total_done_appointments', 'total_sales', 'last_appointment_date']
+                 'country','city','state', 'is_active', 'language', 'about_us', 'marketing','country_obj','customer_note',
+                 'created_at', 'total_done_appointments', 'total_sales', 'last_appointment_date', 'last_appointment',
+                 'last_sale', 'last_transaction']
         
 class Client_TenantSerializer(serializers.ModelSerializer):
     country_obj = serializers.SerializerMethodField(read_only=True)
