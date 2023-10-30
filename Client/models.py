@@ -26,7 +26,7 @@ class ClientManager(models.QuerySet):
     def with_last_appointment(self):
         Appointment = apps.get_model(app_label='Appointment', model_name='Appointment')
         last_appointment_subquery = Subquery(
-            Appointment.objects.filter(client_id=OuterRef('pk')).values('created_at').order_by('-created_at')[:1]
+            Appointment.objects.filter(client_id=OuterRef('id')).values('created_at').order_by('-created_at')[:1]
         )
         self.annotate(
             last_appointment_date=last_appointment_subquery
