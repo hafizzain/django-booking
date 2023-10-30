@@ -117,6 +117,7 @@ class ClientSerializer(serializers.ModelSerializer):
     country = CountrySerializer(read_only=True)
     state = StateSerializer(read_only=True)
     city = CitySerializer(read_only=True)
+    last_appointment_date = serializers.DateTimeField()
 
     country_obj = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
@@ -174,7 +175,7 @@ class ClientSerializer(serializers.ModelSerializer):
         fields =['id','full_name','image','client_id','email','mobile_number','dob','postal_code','address','gender','card_number',
                  'country','city','state', 'is_active',
                  'language', 'about_us', 'marketing','country_obj','customer_note',
-                 'created_at', 'total_done_appointments', 'total_sales']
+                 'created_at', 'total_done_appointments', 'total_sales', 'last_appointment_date']
         
 class Client_TenantSerializer(serializers.ModelSerializer):
     country_obj = serializers.SerializerMethodField(read_only=True)
