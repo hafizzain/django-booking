@@ -29,9 +29,9 @@ class ClientManager(models.QuerySet):
         last_appointment_subquery = Appointment.objects \
                                         .filter(client=OuterRef('pk')) \
                                         .order_by('-created_at') \
-                                        .values('payment_method')[:1]
+                                        .values('created_at')[:1]
         
-        self.annotate(
+        return self.annotate(
             last_appointment_date=Coalesce(Subquery(last_appointment_subquery), 0)
         )
 
