@@ -136,17 +136,19 @@ class ClientSerializer(serializers.ModelSerializer):
 
     def get_last_sale(self, obj):
         last_sale = Checkout.objects.filter(client=obj).order_by('-created_at')[:1]
-        self.last_sale = CreatedAtCheckoutSerializer(last_sale, many=True).data
+        self.last_sale = CreatedAtCheckoutSerializer(last_sale).data
         return self.last_sale
 
     def get_last_appointment(self, obj):
         last_appointment = Appointment.objects.filter(client=obj).order_by('-created_at')[:1]
-        self.last_appointment = CreatedAtAppointmentSerializer(last_appointment, many=True).data
+        self.last_appointment = CreatedAtAppointmentSerializer(last_appointment).data
         return self.last_appointment
 
     
     def get_last_transaction(self, obj):
-        data = list(self.last_sale) + list(self.last_appointment)
+        data = []
+        data.extend(self.last_sale)
+        data.extend(self.last_appointment)
         sorted_data = sorted(data, key=lambda x: x['created_at'])
         return sorted_data[0]
 
