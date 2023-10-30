@@ -174,7 +174,7 @@ def get_client(request):
     is_active = request.GET.get('active', None)
     all_client = Client.objects \
                     .filter(is_deleted=False, is_blocked=False) \
-                    .with_last_appointment() \
+                    .with_last_appointment()
                     # .order_by('-last_appointment_date')
 
     if search_text:
