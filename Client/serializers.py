@@ -147,8 +147,8 @@ class ClientSerializer(serializers.ModelSerializer):
     
     def get_last_transaction(self, obj):
         data = self.last_sale + self.last_appointment
-        # sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
-        return data
+        sorted_data = sorted(data, key=lambda x: x['created_at'], reverse=True)
+        return sorted_data
 
     def get_total_done_appointments(self, obj):
         return AppointmentService.objects.filter(
