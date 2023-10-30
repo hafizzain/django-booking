@@ -135,14 +135,20 @@ class ClientSerializer(serializers.ModelSerializer):
     total_sales = serializers.SerializerMethodField(read_only=True)
 
     def get_last_sale(self, obj):
-        last_sale = Checkout.objects.filter(client=obj).order_by('-created_at')[0]
-        self.last_sale = list(dict(CreatedAtCheckoutSerializer(last_sale).data))
-        return self.last_sale
+        last_sale = Checkout.objects.filter(client=obj).order_by('-created_at')
+        if len(last_sale) > 0:
+            self.last_sale = list(dict(CreatedAtCheckoutSerializer(last_sale[0]).data))
+            return self.last_sale
+        return list()
 
     def get_last_appointment(self, obj):
-        last_appointment = Appointment.objects.filter(client=obj).order_by('-created_at')[0]
-        self.last_appointment = list(dict(CreatedAtAppointmentSerializer(last_appointment).data))
-        return self.last_appointment
+        last_appointment = Appointment.objects.filter(client=obj).order_by('-created_at')
+        if len(last_appointment) > 0:
+
+            self.last_appointment = list(dict(CreatedAtAppointmentSerializer(last_appointment[0]).data))
+            return self.last_appointment
+        
+        return list()
 
     
     def get_last_transaction(self, obj):
