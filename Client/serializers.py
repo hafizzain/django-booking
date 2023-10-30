@@ -114,9 +114,10 @@ class SingleClientSerializer(serializers.ModelSerializer):
                  'created_at', 'total_done_appointments', 'total_sales']
         
 class CreatedAtAppointmentSerializer(serializers.ModelSerializer):
-
-    model = Appointment
-    fields = ['created_at']
+    
+    class Meta:
+        model = Appointment
+        fields = ['created_at']
 
 
 class ClientSerializer(serializers.ModelSerializer):

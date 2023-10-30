@@ -7,5 +7,6 @@ from .models  import Checkout
 
 class CreatedAtCheckoutSerializer(serializers.ModelSerializer):
 
-    model = Checkout
-    fields = ['created_at']
+    class Meta:
+        model = Checkout
+        fields = ['created_at']
