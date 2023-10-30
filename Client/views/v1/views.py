@@ -172,7 +172,10 @@ def get_client(request):
     no_pagination = request.GET.get('no_pagination', None)
     search_text = request.GET.get('search_text', None)
     is_active = request.GET.get('active', None)
-    all_client = Client.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at').distinct()
+    all_client = Client.objects \
+                    .filter(is_deleted=False, is_blocked=False) \
+                    .with_last_appointment() \
+                    .order_by('-last_appointment_date')
 
     if search_text:
         all_client = all_client.filter(Q(full_name__icontains=search_text) | Q(mobile_number__icontains=search_text))

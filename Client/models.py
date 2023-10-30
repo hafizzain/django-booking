@@ -10,6 +10,8 @@ from Authentication.models import User
 from Business.models import Business, BusinessAddress
 #from Promotions.models import ComplimentaryDiscount
 from django.db import connection
+from django.db.models import Subquery, OuterRef
+from django.apps import apps
 from Utility.models import Country, Currency, Language, State, City
 from django.utils.timezone import now
 from Product.models import Product
@@ -18,6 +20,17 @@ import uuid
 from googletrans import Translator
 from dateutil.relativedelta import relativedelta
 
+
+class ClientManager(models.QuerySet):
+
+    def with_last_appointment(self):
+        Appointment = apps.get_model(app_label='Appointment', model_name='Appointment')
+        last_appointment_subquery = Subquery(
+            Appointment.objects.filter(client=OuterRef('id')).values('created_at').order_by('-created_at')[:1]
+        )
+        self.annotate(
+            last_appointment_date=last_appointment_subquery
+        )
 
 class Client(models.Model):
     GENDER_CHOICES = [
@@ -78,6 +91,8 @@ class Client(models.Model):
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(null=True, blank=True)
+
+    objects = ClientManager.as_manager()
 
     def __str__(self):
         return str(self.id)
