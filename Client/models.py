@@ -32,7 +32,7 @@ class ClientManager(models.QuerySet):
                                         .values('created_at')[:1]
         
         return self.annotate(
-            last_appointment_date=Coalesce(Subquery(last_appointment_subquery), 0)
+            last_appointment_date=Subquery(last_appointment_subquery)
         )
 
 class Client(models.Model):
