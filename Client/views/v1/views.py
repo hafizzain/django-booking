@@ -199,11 +199,6 @@ def get_client(request):
     page_number = request.GET.get("page") 
     all_client = paginator.get_page(page_number)
     serialized = ClientSerializer(all_client, many=True,  context={'request' : request})
-    # serialized_data = list(serialized.data)
-
-
-    # if is_active_client:
-    #     serialized_data = sorted(serialized_data, key=lambda x: x['last_transaction']['created_at'], reverse=True)
 
     return Response(
         {
@@ -216,7 +211,6 @@ def get_client(request):
                 'per_page_result':results_per_page,
                 'error_message' : None,
                 'client' : serialized.data,
-                # 'serialized_data':serialized_data
             }
         },
         status=status.HTTP_200_OK
