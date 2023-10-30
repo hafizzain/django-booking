@@ -143,8 +143,8 @@ class ClientSerializer(serializers.ModelSerializer):
     
     def get_last_transaction(self, obj):
         data = []
-        data.append(self.last_sale)
-        data.append(self.last_appointment)
+        data.append(self.get_last_sale())
+        data.append(self.get_last_appointment())
 
         sorted_data = sorted(data, key=lambda x:x['created_at'], reverse=True)
         return sorted_data[0]
