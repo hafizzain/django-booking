@@ -11,6 +11,7 @@ from Business.models import Business, BusinessAddress
 #from Promotions.models import ComplimentaryDiscount
 from django.db import connection
 from django.db.models import Subquery, OuterRef
+from django.db.models.functions import Coalesce
 from django.apps import apps
 from Utility.models import Country, Currency, Language, State, City
 from django.utils.timezone import now
@@ -26,12 +27,12 @@ class ClientManager(models.QuerySet):
     def with_last_appointment(self):
         Appointment = apps.get_model(app_label='Appointment', model_name='Appointment')
         last_appointment_subquery = Appointment.objects \
-                                        .filter(client_id=OuterRef('id')) \
+                                        .filter(client=OuterRef('pk')) \
                                         .order_by('-created_at') \
                                         .values('payment_method')[:1]
         
         self.annotate(
-            last_appointment_date=Subquery(last_appointment_subquery)
+            last_appointment_date=Coalesce(Subquery(last_appointment_subquery), 0)
         )
 
 class Client(models.Model):
