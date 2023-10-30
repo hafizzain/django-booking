@@ -20,7 +20,7 @@ from Service.models import Service
 import uuid
 from googletrans import Translator
 from dateutil.relativedelta import relativedelta
-from Order.models import Checkout
+# from Order.models import Checkout
 
 
 class ClientManager(models.QuerySet):
@@ -31,7 +31,7 @@ class ClientManager(models.QuerySet):
                                         .filter(client=OuterRef('pk')) \
                                         .order_by('-created_at') \
                                         .values('created_at')[:1]
-        
+        Checkout = apps.get_model(app_label='Order', model_name='Checkout')
         last_sale_subquery = Checkout.objects \
                                         .filter(client=OuterRef('pk')) \
                                         .order_by('created_at') \
