@@ -25,14 +25,13 @@ class ClientManager(models.QuerySet):
 
     def with_last_appointment(self):
         Appointment = apps.get_model(app_label='Appointment', model_name='Appointment')
-        last_appointment_subquery = Subquery(
-            Appointment.objects \
-                .filter(client_id=OuterRef('id')) \
-                .order_by('-created_at') \
-                .values('created_at')[:1]
-        )
+        last_appointment_subquery = Appointment.objects \
+                                        .filter(client_id=OuterRef('id')) \
+                                        .order_by('-created_at') \
+                                        .values('payment_method')[:1]
+        
         self.annotate(
-            last_appointment_date=last_appointment_subquery
+            last_appointment_date=Subquery(last_appointment_subquery)
         )
 
 class Client(models.Model):
