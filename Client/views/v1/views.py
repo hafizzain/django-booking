@@ -203,7 +203,7 @@ def get_client(request):
 
 
     if is_active_client:
-        serialized_data = sorted(serialized_data, key=lambda x: x['last_transaction'][0]['created_at'], reverse=True)
+        serialized_data = sorted(serialized_data, key=lambda x: x['last_transaction']['created_at'], reverse=True)
 
     return Response(
         {
