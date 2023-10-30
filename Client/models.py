@@ -10,7 +10,7 @@ from Authentication.models import User
 from Business.models import Business, BusinessAddress
 #from Promotions.models import ComplimentaryDiscount
 from django.db import connection
-from django.db.models import Subquery, OuterRef
+from django.db.models import Subquery, OuterRef, DateTimeField
 from django.db.models.functions import Coalesce
 from django.apps import apps
 from Utility.models import Country, Currency, Language, State, City
@@ -32,7 +32,9 @@ class ClientManager(models.QuerySet):
                                         .values('created_at')[:1]
         
         return self.annotate(
-            last_appointment_date=Subquery(last_appointment_subquery)
+            last_appointment_date=Coalesce(Subquery(last_appointment_subquery), 
+                                           output_field=DateTimeField(), 
+                                           default=datetime(2000, 1, 1))
         )
 
 class Client(models.Model):

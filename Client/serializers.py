@@ -117,7 +117,7 @@ class ClientSerializer(serializers.ModelSerializer):
     country = CountrySerializer(read_only=True)
     state = StateSerializer(read_only=True)
     city = CitySerializer(read_only=True)
-    last_appointment_date = serializers.DateTimeField()
+    last_appointment_date = serializers.DateTimeField(read_only=True)
 
     country_obj = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
