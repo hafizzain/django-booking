@@ -124,7 +124,6 @@ class ClientSerializer(serializers.ModelSerializer):
     country = CountrySerializer(read_only=True)
     state = StateSerializer(read_only=True)
     city = CitySerializer(read_only=True)
-    last_appointment_date = serializers.DateTimeField(read_only=True)
     last_transaction_date = serializers.DateTimeField(read_only=True)
 
     last_appointment = serializers.SerializerMethodField(read_only=True)
@@ -138,15 +137,13 @@ class ClientSerializer(serializers.ModelSerializer):
     def get_last_sale(self, obj):
         last_sale = Checkout.objects.filter(client=obj).order_by('-created_at')
         if len(last_sale) > 0:
-            self.last_sale = CreatedAtCheckoutSerializer(last_sale[0]).data
-            return self.last_sale
+            return CreatedAtCheckoutSerializer(last_sale[0]).data
         return None
 
     def get_last_appointment(self, obj):
         last_appointment = Appointment.objects.filter(client=obj).order_by('-created_at')
         if len(last_appointment) > 0:
-            self.last_appointment = CreatedAtAppointmentSerializer(last_appointment[0]).data
-            return self.last_appointment
+            return CreatedAtAppointmentSerializer(last_appointment[0]).data
         return None
 
 
@@ -199,8 +196,7 @@ class ClientSerializer(serializers.ModelSerializer):
         model = Client
         fields =['id','full_name','image','client_id','email','mobile_number','dob','postal_code','address','gender','card_number',
                  'country','city','state', 'is_active', 'language', 'about_us', 'marketing','country_obj','customer_note',
-                 'created_at', 'total_done_appointments', 'total_sales', 'last_appointment_date', 'last_appointment',
-                 'last_sale', 'last_transaction_date']
+                 'created_at', 'total_done_appointments', 'total_sales', 'last_appointment', 'last_sale', 'last_transaction_date']
         
 class Client_TenantSerializer(serializers.ModelSerializer):
     country_obj = serializers.SerializerMethodField(read_only=True)
