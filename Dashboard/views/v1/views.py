@@ -56,7 +56,7 @@ def get_busines_client_appointment(request):
         day = today - timedelta(days=int(duration))
         checkouts = AppointmentCheckout.objects.filter(business_address__id = business_id,
                                                        created_at__gte = day,
-                                                       appointment__appointment_status='Paid')
+                                                       appointment_service__appointment_status='Paid')
     else:
         checkout_orders_total = Checkout.objects.filter(
         is_deleted=False, 
@@ -66,7 +66,7 @@ def get_busines_client_appointment(request):
         checkouts = AppointmentCheckout.objects.filter(
             is_deleted=False, 
             business_address__id = business_id,
-            appointment_service__appointment__appointment_status='Paid'
+            appointment_service__appointment_status='Paid'
         )
         
         for price in checkout_orders_total:
