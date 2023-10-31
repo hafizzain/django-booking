@@ -44,7 +44,7 @@ class ClientManager(models.QuerySet):
                                             datetime(2000, 1, 1))
         ).annotate(
             last_transaction_date=Case(
-                When(last_appointment_date__gte=F('last_appointment_date'), then=F('last_appointment_date')),
+                When(last_appointment_date__gt=F('last_sale_date'), then=F('last_appointment_date')),
                 When(last_appointment_date__lte=F('last_sale_date'), then=F('last_sale_date')),
                 output_field=DateTimeField(),
                 default=datetime(2000, 1, 1)
