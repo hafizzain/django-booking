@@ -26,6 +26,11 @@ from dateutil.relativedelta import relativedelta
 class ClientManager(models.QuerySet):
 
     def with_last_transaction_date(self):
+        """
+        This custom queryset is used to get the last transaction date of (either Appointment or Sale)
+        of a particular client and then compare them to find the least one.
+        
+        """
         Appointment = apps.get_model(app_label='Appointment', model_name='Appointment')
         last_appointment_subquery = Appointment.objects \
                                         .filter(client=OuterRef('pk')) \
