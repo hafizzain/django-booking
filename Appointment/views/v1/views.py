@@ -1368,7 +1368,7 @@ def create_blockTime(request):
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
-        )    
+        )
     try:
         business=Business.objects.get(id=business_id)
     except Exception as err:
@@ -1429,7 +1429,7 @@ def create_blockTime(request):
                 'status' : False,
                 'status_code' : 400,
                 'response' : {
-                    'message' : 'You already have appointment in this time.',
+                    'message' : 'You already have block time on this time.',
                     'error_message' : None,
                 }
             },
