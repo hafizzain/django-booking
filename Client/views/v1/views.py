@@ -172,13 +172,11 @@ def get_client(request):
     no_pagination = request.GET.get('no_pagination', None)
     search_text = request.GET.get('search_text', None)
     is_active = request.GET.get('active', None)
-    sort_by_transaction = request.GET.get('sort_by_transaction', False) # order by last transaction flag
     all_client = Client.objects \
                     .filter(is_deleted=False, is_blocked=False) \
-                    .with_last_transaction_date()
+                    .with_last_transaction_date() \
+                    .order_by('-last_transaction_date')
     
-    if sort_by_transaction:
-        all_client = all_client.order_by('-last_transaction_date')
 
     if search_text:
         all_client = all_client.filter(Q(full_name__icontains=search_text) | Q(mobile_number__icontains=search_text))
