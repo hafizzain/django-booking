@@ -48,13 +48,15 @@ def get_busines_client_appointment(request):
     all_apps_clients = Appointment.objects.filter(client__isnull=False, business_address__id = business_id).distinct('client')
     apps_clients_with_app = list(all_apps_clients.values_list('client__full_name'))
     all_apps_clients = all_apps_clients.count()
-    footfalls = AppointmentService.objects.filter(is_deleted=False, business_address__id = business_id).exclude(appointment_status__iexact ='cancel').count()
+    footfalls = AppointmentService.objects.filter(is_deleted=False, business_address__id = business_id, appointment_status__iexact='paid').count()
 
  
     if duration is not None:
         today = datetime.today()
         day = today - timedelta(days=int(duration))
-        checkouts = AppointmentCheckout.objects.filter(business_address__id = business_id, created_at__gte = day)
+        checkouts = AppointmentCheckout.objects.filter(business_address__id = business_id,
+                                                       created_at__gte = day,
+                                                       appointment__appointment_status='Paid')
     else:
         checkout_orders_total = Checkout.objects.filter(
         is_deleted=False, 
@@ -63,7 +65,8 @@ def get_busines_client_appointment(request):
         
         checkouts = AppointmentCheckout.objects.filter(
             is_deleted=False, 
-            business_address__id = business_id
+            business_address__id = business_id,
+            appointment__appointment_status='Paid'
         )
         
         for price in checkout_orders_total:
