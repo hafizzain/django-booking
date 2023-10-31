@@ -66,7 +66,7 @@ def get_busines_client_appointment(request):
         checkouts = AppointmentCheckout.objects.filter(
             is_deleted=False, 
             business_address__id = business_id,
-            appointment__appointment_status='Paid'
+            appointment_service__appointment__appointment_status='Paid'
         )
         
         for price in checkout_orders_total:
