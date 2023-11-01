@@ -714,7 +714,6 @@ def login(request):
                     'message' : 'Authenticated',
                     #'data' : employee
                     'data' : s_data,
-                    'email': user.email
                 }
             },
             status=status.HTTP_200_OK
