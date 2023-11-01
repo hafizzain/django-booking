@@ -783,78 +783,7 @@ def login(request):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
-    
-    if not social_account :
-        if not user.check_password(password):
-            return Response(
-                {
-                    'status' : False,
-                    'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
-                    'status_code_text' : 'INVALID_CREDENTIALS_4013',
-                    'response' : {
-                        'message' : 'Incorrect Password',
-                        'fields' : ['password']
-                    }
-                },
-                status=status.HTTP_404_NOT_FOUND
-            )
-        
-    if not social_account and not user.is_active:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.USER_ACCOUNT_INACTIVE_4009,
-                'status_code_text' : 'USER_ACCOUNT_INACTIVE_4009',
-                'response' : {
-                    'message' : 'This account is inactive! Please verify.',
-                    'error_message' : 'Account is not active'
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
 
-    if user.social_account and not social_account:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.ACCOUNT_ASSOCIATED_WITH_SOCIAL,
-                'status_code_text' : 'ACCOUNT_ASSOCIATED_WITH_SOCIAL',
-                'response' : {
-                    'message' : f'This Account associated with {user.social_platform}, Please signin with {user.social_platform}',
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
-
-
-
-    if not social_account and not user.is_email_verified:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.USER_EMAIL_NOT_VERIFIED_4010,
-                'status_code_text' : 'USER_EMAIL_NOT_VERIFIED_4010',
-                'response' : {
-                    'message' : 'Your Email is not verified.',
-                    'error_message' : 'User Email is not verified yet'
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
-
-    elif user.is_blocked:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.USER_ACCOUNT_IS_BLOCKED_4012,
-                'status_code_text' : 'USER_ACCOUNT_IS_BLOCKED_4012',
-                'response' : {
-                    'message' : 'Your Account is blocked! Contact our support',
-                    'error_message' : 'Users"s Account is blocked, Can"t access this account'
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
     if employee:
         #s_data['id'] = None
         employe_user = EmployeeTenantDetail.objects.get(user = user)
