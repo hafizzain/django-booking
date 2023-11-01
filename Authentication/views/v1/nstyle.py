@@ -512,7 +512,7 @@ def send_verification_otp(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
-def login(request):
+def login_flagged(request):
     email = request.data.get('email', None)
     social_account = request.data.get('social_account', False)
     password = request.data.get('password', None)
