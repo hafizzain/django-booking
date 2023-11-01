@@ -1472,6 +1472,8 @@ def update_blocktime(request):
     end_time = request.data.get('end_time', None)
     start_time = request.data.get('start_time', None)
     duration = request.data.get('duration', None)
+    date = request.data.get('date', None)
+
     if block_id is None: 
        return Response(
             {
@@ -1517,7 +1519,11 @@ def update_blocktime(request):
         
         block.appointment_time = start_time
         block.end_time = tested
-        block.save()
+    
+    if date:
+        block.appointment_date = date
+
+    block.save()
         
     serializer = UpdateAppointmentSerializer(block , data=request.data, partial=True)
     if not serializer.is_valid():
