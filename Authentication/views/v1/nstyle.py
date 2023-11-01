@@ -723,16 +723,15 @@ def login(request):
 @permission_classes([AllowAny])
 def login_flagged(request):
     user_id = request.data.get('user_id', None)
-    # tenant_domain = request.data.get('tenant_domain', False)
+    tenant_domain = request.data.get('tenant_domain', False)
     # access_token  = request.data.get('password', None)
     # social_account  = request.data.get('social', None)
 
-    user = User.objects.get(id=user_id)
-    tenant = Tenant.objects.get(user=user)
-    with tenant_context(tenant):
-        user = None
+    domain = Domain.objects.get(domain=tenant_domain)
+    with tenant_context(domain.tenant):
+        user = User.objects.get(id=user_id)
         serialized = UserLoginSerializer(user, context={'employee' : False,
-                            'tenant' : tenant})
+                            'tenant' : domain.tenant})
         s_data = dict(serialized.data)
         s_data['id'] = None
         s_data['access_token'] = None
