@@ -7,7 +7,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Product', '0014_productmedia_is_cover'),
         ('Client', '0021_auto_20220926_1508'),
     ]
 

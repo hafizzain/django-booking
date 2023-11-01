@@ -9,7 +9,6 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Business', '0011_businesstheme_theme_name'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('Employee', '0007_attendance'),
     ]

@@ -9,7 +9,6 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Business', '0029_businessaddress_is_default'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('Employee', '0046_employee_is_default'),
     ]

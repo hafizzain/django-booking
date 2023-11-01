@@ -6,7 +6,6 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Service', '0001_initial'),
         ('Employee', '0001_initial'),
     ]
 

@@ -10,7 +10,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('Business', '0009_businessvendor'),
         ('Employee', '0003_employeepermissionsetting_employeemodulepermission_and_more'),
     ]
 

@@ -8,7 +8,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Business', '0022_business_is_completed'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('Employee', '0027_vacation'),
     ]

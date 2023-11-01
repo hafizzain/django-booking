@@ -8,7 +8,6 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Service', '0005_alter_service_duration'),
         ('Employee', '0019_asset_assetdocument'),
     ]
 

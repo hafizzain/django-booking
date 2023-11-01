@@ -7,7 +7,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Business', '0022_business_is_completed'),
         ('Employee', '0021_employee_location'),
     ]
 

@@ -9,10 +9,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Service', '0024_priceservice_currency'),
-        ('Promotions', '0027_auto_20230125_1328'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('Business', '0028_businessaddress_description'),
         ('Client', '0036_clientpromotions'),
     ]
 

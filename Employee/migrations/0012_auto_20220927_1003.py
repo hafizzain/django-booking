@@ -9,7 +9,6 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Business', '0018_businesstype_image_path'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('Employee', '0011_commissionschemesetting'),
     ]

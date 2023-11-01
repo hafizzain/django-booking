@@ -11,8 +11,6 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('Utility', '0007_language_code'),
-        ('Business', '0009_businessvendor'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 

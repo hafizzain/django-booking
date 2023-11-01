@@ -9,8 +9,6 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Business', '0017_alter_adminnotificationsetting_sms_notify_for_daily_book_and_more'),
-        ('Service', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('Client', '0007_subscription'),
     ]

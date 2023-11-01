@@ -8,8 +8,6 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Service', '0019_servicegroup'),
-        ('Product', '0023_productstock_product_unit'),
         ('Client', '0029_auto_20221101_1728'),
     ]
 

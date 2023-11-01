@@ -7,8 +7,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Utility', '0013_turnoverproductrecord'),
-        ('Business', '0029_businessaddress_is_default'),
         ('MultiLanguage', '0002_alter_labels_section'),
     ]
 

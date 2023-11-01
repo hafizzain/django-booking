@@ -10,9 +10,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('Product', '0014_productmedia_is_cover'),
-        ('Business', '0017_alter_adminnotificationsetting_sms_notify_for_daily_book_and_more'),
-        ('Service', '0001_initial'),
         ('Client', '0009_delete_rewards'),
     ]
 

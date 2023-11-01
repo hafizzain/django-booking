@@ -7,7 +7,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Business', '0029_businessaddress_is_default'),
         ('Employee', '0051_alter_employeecommission_commission_amount_and_more'),
     ]
 

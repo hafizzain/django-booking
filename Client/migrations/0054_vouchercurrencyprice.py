@@ -8,7 +8,6 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Utility', '0013_turnoverproductrecord'),
         ('Client', '0053_clientloyaltypoint_points_redeemed'),
     ]
 

@@ -7,7 +7,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Promotions', '0027_auto_20230125_1328'),
         ('Client', '0037_clientpackagevalidation'),
     ]
 

@@ -10,7 +10,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('Business', '0016_alter_businessopeninghour_close_time_and_more'),
         ('Employee', '0010_auto_20220901_1655'),
     ]
 

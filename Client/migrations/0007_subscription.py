@@ -10,9 +10,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('Business', '0015_auto_20220905_1059'),
-        ('Service', '0001_initial'),
-        ('Product', '0014_productmedia_is_cover'),
         ('Client', '0006_alter_clientgroup_email'),
     ]
 
