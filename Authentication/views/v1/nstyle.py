@@ -727,6 +727,7 @@ def login_flagged(request):
     # access_token  = request.data.get('password', None)
     # social_account  = request.data.get('social', None)
 
+    connection.set_shcema_to_public()
     domain = Domain.objects.get(domain=tenant_domain)
     with tenant_context(domain.tenant):
         user = User.objects.get(id=user_id)
