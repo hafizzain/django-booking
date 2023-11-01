@@ -726,23 +726,24 @@ def login_flagged(request):
     tenant_domain = request.data.get('tenant_domain', False)
     # access_token  = request.data.get('password', None)
     # social_account  = request.data.get('social', None)
+    s_data = None
 
     connection.set_schema_to_public()
-    domain = Domain.objects.get(domain=tenant_domain)
-    with tenant_context(domain.tenant):
-        user = User.objects.get(id=user_id)
-        serialized = UserLoginSerializer(user, context={'employee' : False,
-                            'tenant' : domain.tenant})
-        s_data = dict(serialized.data)
-        s_data['id'] = None
-        s_data['access_token'] = None
-        try:
-            with tenant_context(Tenant.objects.get(user=user)):
-                tnt_token = Token.objects.get(user__username=user.username)
-                s_data['id'] = str(tnt_token.user.id)
-                s_data['access_token'] = str(tnt_token.key)
-        except:
-            pass
+    # domain = Domain.objects.get(domain=tenant_domain)
+    # with tenant_context(domain.tenant):
+    user = User.objects.get(id=user_id)
+    serialized = UserLoginSerializer(user, context={'employee' : False,
+                        'tenant' : None})
+    s_data = dict(serialized.data)
+    s_data['id'] = None
+    s_data['access_token'] = None
+    try:
+        with tenant_context(Tenant.objects.get(user=user)):
+            tnt_token = Token.objects.get(user__username=user.username)
+            s_data['id'] = str(tnt_token.user.id)
+            s_data['access_token'] = str(tnt_token.key)
+    except:
+        pass
 
 
     return Response(
