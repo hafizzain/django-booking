@@ -638,19 +638,7 @@ def login(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    # elif not user.is_mobile_verified:
-    #     return Response(
-    #         {
-    #             'status' : False,
-    #             'status_code' : StatusCodes.USER_PHONE_NUMBER_NOT_VERIFIED_4011,
-    #             'status_code_text' : 'USER_PHONE_NUMBER_NOT_VERIFIED_4011',
-    #             'response' : {
-    #                 'message' : 'Your Mobile Number is not verified',
-    #                 'error_message' : 'Users"s mobile number is not verified'
-    #             }
-    #         },
-    #         status=status.HTTP_404_NOT_FOUND
-    #     )
+
     elif user.is_blocked:
         return Response(
             {
@@ -702,7 +690,6 @@ def login(request):
                                     'tenant' : domain_name
                                     })
             s_data = dict(serialized.data)
-            #s_data['access_token'] = str(tnt_token.key)
             
     else:
         serialized = UserLoginSerializer(user, context={'employee' : False,
@@ -731,6 +718,45 @@ def login(request):
             },
             status=status.HTTP_200_OK
         )
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def login_flagged(request):
+    user_id = request.data.get('user_id', None)
+    # tenant_domain = request.data.get('tenant_domain', False)
+    # access_token  = request.data.get('password', None)
+    # social_account  = request.data.get('social', None)
+
+    user = User.objects.get(id=user_id)
+    tenant = Tenant.objects.get(user=user)
+    with tenant_context(tenant):
+        user = None
+        serialized = UserLoginSerializer(user, context={'employee' : False,
+                            'tenant' : tenant})
+        s_data = dict(serialized.data)
+        s_data['id'] = None
+        s_data['access_token'] = None
+        try:
+            with tenant_context(Tenant.objects.get(user=user)):
+                tnt_token = Token.objects.get(user__username=user.username)
+                s_data['id'] = str(tnt_token.user.id)
+                s_data['access_token'] = str(tnt_token.key)
+        except:
+            pass
+
+
+    return Response(
+            {
+                'status' : False,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Authenticated',
+                    #'data' : employee
+                    'data' : s_data
+                }
+            },
+            status=status.HTTP_200_OK
+            )
 
 
 @api_view(['PUT'])

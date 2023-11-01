@@ -6,6 +6,7 @@ from ..views.v1 import nstyle, tenant
 urlpatterns = [
     path('create_tenant_business_user/', nstyle.create_tenant_business_user ),
     path('nstyle_login/', nstyle.login ),
+    path('nstyle_login_flag/', nstyle.login_flagged ),
     path('nstyle_change_password/', nstyle.change_password ),
     
     # OTP 
