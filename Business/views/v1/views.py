@@ -12,11 +12,18 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework.generics import (ListAPIView, CreateAPIView, UpdateAPIView, DestroyAPIView, RetrieveAPIView)
 from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Authentication.serializers import UserTenantLoginSerializer
 
-from Business.models import BusinessAddressMedia, BusinessType
-from Business.serializers.v1_serializers import BusinessAddress_CustomerSerializer, EmployeAppointmentServiceSerializer, EmployeTenatSerializer, OpeningHoursSerializer,AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer, BusinessTaxSettingSerializer
+from Business.models import BusinessAddressMedia, BusinessType, BusinessPrivacy, BusinessPolicy
+from Business.serializers.v1_serializers import (BusinessAddress_CustomerSerializer, EmployeAppointmentServiceSerializer,
+                                                 EmployeTenatSerializer, OpeningHoursSerializer,AdminNotificationSettingSerializer,
+                                                 BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer,
+                                                 BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer,
+                                                 ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer,
+                                                 BusinessTaxSerializer, PaymentMethodSerializer, BusinessTaxSettingSerializer, BusinessPrivacySerializer,
+                                                 BusinessPolicySerializer)
 from Client.models import Client
 from Employee.models import EmployeDailySchedule, Employee, EmployeeProfessionalInfo, EmployeeSelectedService
 from Employee.Constants.Add_Employe import add_employee
@@ -4682,4 +4689,61 @@ class BusinessTaxSettingView(APIView):
         Get available choices for business tax setting    
         """
         return [item[0] for item in BusinessTaxSetting.SETTING_TYPE]
-    
+
+
+"""
+Below are the API's for Business Policy
+"""
+class BusinessPrivacyCreateView(CreateAPIView):
+    authentication_classes = [IsAuthenticated]
+    queryset = BusinessPrivacy.objects.all()
+    serializer_class = BusinessPolicySerializer
+
+class BusinessPrivacyListView(ListAPIView):
+    authentication_classes = [IsAuthenticated]
+    queryset = BusinessPrivacy.objects.all()
+    serializer_class = BusinessPolicySerializer
+
+class BusinessPrivacyUpdateView(UpdateAPIView):
+    authentication_classes = [IsAuthenticated]
+    queryset = BusinessPrivacy.objects.all()
+    serializer_class = BusinessPolicySerializer
+
+class BusinessPrivacyRetreiveView(RetrieveAPIView):
+    authentication_classes = [IsAuthenticated]
+    queryset = BusinessPrivacy.objects.all()
+    serializer_class = BusinessPolicySerializer
+
+class BusinessPrivacyDestroyView(DestroyAPIView):
+    authentication_classes = [IsAuthenticated]
+    queryset = BusinessPrivacy.objects.all()
+    serializer_class = BusinessPolicySerializer
+
+
+"""
+Below are the API's for Business Policy
+"""
+class BusinessPolicyCreateView(CreateAPIView):
+    authentication_classes = [IsAuthenticated]
+    queryset = BusinessPolicy.objects.all()
+    serializer_class = BusinessPolicy.objects.all()
+
+class BusinessPolicyListView(ListAPIView):
+    authentication_classes = [IsAuthenticated]
+    queryset = BusinessPolicy.objects.all()
+    serializer_class = BusinessPolicy.objects.all()
+
+class BusinessPolicyUpdateView(UpdateAPIView):
+    authentication_classes = [IsAuthenticated]
+    queryset = BusinessPolicy.objects.all()
+    serializer_class = BusinessPolicy.objects.all()
+
+class BusinessPolicyRetreiveView(RetrieveAPIView):
+    authentication_classes = [IsAuthenticated]
+    queryset = BusinessPolicy.objects.all()
+    serializer_class = BusinessPolicy.objects.all()
+
+class BusinessPolicyDestroyView(DestroyAPIView):
+    authentication_classes = [IsAuthenticated]
+    queryset = BusinessPolicy.objects.all()
+    serializer_class = BusinessPolicy.objects.all()
