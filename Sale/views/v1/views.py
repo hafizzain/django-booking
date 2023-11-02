@@ -91,8 +91,8 @@ def get_service(request):
     # if is_mobile then request.user will be employee
     # so we will filter only those services which are assigned to
     # that particular employee
-    if is_mobile and emp_id:
-        emp = Employee.objects.get(id=emp_id)
+    if is_mobile:
+        emp = Employee.objects.get(email=request.user.email)
         emp_service_ids = emp.employee_selected_service.distinct().values_list('service__id', flat=True)
         service = service.filter(id__in=emp_service_ids)
 
@@ -120,9 +120,6 @@ def get_service(request):
                 'error_message' : None,
                 'service' : serialized.data,
                 'errors' : errors,
-                'request_user':request.user.email,
-                'employee_email': emp.email,
-                'emp_user':emp.user.email
             }
         },
         status=status.HTTP_200_OK
