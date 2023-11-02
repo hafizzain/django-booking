@@ -1307,6 +1307,9 @@ def update_employee_device(request):
     postal_code=request.data.get('postal_code',None)
     address=request.data.get('address',None)
     
+    city_state = None
+    city_country = None
+    
     Errors = []
     
     if id is None:
@@ -1358,6 +1361,7 @@ def update_employee_device(request):
             unique_id = public_country.unique_id
         )
         employee.country = country
+        city_country = country
             
     if state_unique_id is not None:
         public_state = get_state_from_public(state_unique_id)
@@ -1366,13 +1370,15 @@ def update_employee_device(request):
             unique_id=public_state.unique_id
         )
         employee.state = state
+        city_state = state
             
     if city_name is not None:
         city, created= City.objects.get_or_create(name=city_name,
-                                                country=country,
-                                                state=state,
-                                                country_unique_id=country_unique_id,
-                                                state_unique_id=state_unique_id)
+                                                country=city_country,
+                                                state=city_state,
+                                                country_unique_id=country_unique_id if country_unique_id else None,
+                                                state_unique_id=state_unique_id if state_unique_id else None
+                                                )
         employee.city = city
     
     employee.save()
