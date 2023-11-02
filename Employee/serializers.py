@@ -943,6 +943,7 @@ class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField()
     employee_permission = serializers.SerializerMethodField()
+    city = CitySerializer()
     country = CountrySerializer()
     state = StateSerializer()
     
