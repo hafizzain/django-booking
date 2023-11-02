@@ -23,25 +23,25 @@ class NotificationProcessor:
 
 
         # only send notification if requerst.user is admin
-        if not user.account_type() == 'Employee':
-            # may be employee didnt registered a mobile device
-            device_registered = CustomFCMDevice.objects.filter(user=user).first()
-            if device_registered:
-                message = Message(
-                    notification=Notification(title=f"{title} Employee ", body=body)
-                )
-                device_registered.send_message(message)
-            else:
-                pass
+        # if not user.account_type() == 'Employee':
+        # may be employee didnt registered a mobile device
+        device_registered = CustomFCMDevice.objects.filter(user=user).first()
+        if device_registered:
+            message = Message(
+                notification=Notification(title=f"{title} Employee ", body=body)
+            )
+            device_registered.send_message(message)
         else:
-            device_registered = CustomFCMDevice.objects.filter(user=user).first()
-            if device_registered:
-                message = Message(
-                    notification=Notification(title=f"{title} Admin ", body=body)
-                )
-                device_registered.send_message(message)
-            else:
-                pass
+            pass
+        # else:
+        #     device_registered = CustomFCMDevice.objects.filter(user=user).first()
+        #     if device_registered:
+        #         message = Message(
+        #             notification=Notification(title=f"{title} Admin ", body=body)
+        #         )
+        #         device_registered.send_message(message)
+        #     else:
+        #         pass
 
 
     @staticmethod

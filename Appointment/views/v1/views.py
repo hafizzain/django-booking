@@ -603,6 +603,7 @@ def create_appointment(request):
 
     all_members = []
     employee_users = []
+    employee_member = []
     for appoinmnt in appointments:
         member = appoinmnt['member']
         service = appoinmnt['service']
@@ -624,7 +625,9 @@ def create_appointment(request):
         try:
             member=Employee.objects.get(id=member)
             all_members.append(str(member.id))
-            employee_users.append(User.objects.filter(email__icontains=member.email).first())
+            temp_user = User.objects.filter(email__icontains=member.email).first()
+            employee_users.append(temp_user)
+            employee_member.append(user.user_account_type.account_type)
         except Exception as err:
             return Response(
             {
@@ -845,6 +848,8 @@ def create_appointment(request):
                     'error_message' : None,
                     'error' : Errors,
                     'appointments' : serialized.data,
+                    'employee_type': employee_member,
+                    'admin_type' : request.user.user_account_type.account_type
                     
                 }
             },
