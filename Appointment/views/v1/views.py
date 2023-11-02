@@ -393,26 +393,36 @@ def get_recent_ten_appointments(request):
 def get_all_appointments_no_pagination(request):
     location_id = request.GET.get('location', None)
     appointment_status = request.GET.get('appointment_status', None)
+    search_text = request.GET.get('search_text', None)
+
+    upcoming_flags = ['Appointment_Booked', 'Appointment Booked', 'Arrived', 'In Progress']
+    completed_flags = ['Done', 'Paid']
+    cancelled_flags = ['Cancel']
 
     paginator = CustomPagination()
     paginator.page_size = 1000000
-    queries = {}
+
+    query = Q(is_blocked=False)
+
 
     if appointment_status is not None:
         if appointment_status == 'Upcomming':
-            queries['appointment_status__in'] = ['Appointment_Booked', 'Appointment Booked', 'Arrived', 'In Progress']
+            query &= Q(appointment_status__in=upcoming_flags)
         elif appointment_status == 'Completed':
-            queries['appointment_status__in'] = ['Done', 'Paid']
+            query &= Q(appointment_status__in=completed_flags)
         elif appointment_status == 'Cancelled':
-            queries['appointment_status__in'] = ['Cancel']
+            query &= Q(appointment_status__in=cancelled_flags)
         
     if location_id is not None:
-        queries['business_address__id'] = location_id
+        Q(business_address__id=location_id)
 
-    test = AppointmentService.objects.filter(
-        is_blocked=False,
-        **queries
-    ).order_by('-created_at')
+    if search_text:
+        or_query = Q(member__full_name__icontains=search_text) | \
+                   Q(appointment__client__full_name__icontains=search_text)
+        query &= or_query
+
+
+    test = AppointmentService.objects.filter(query).order_by('-created_at')
     paginated_checkout_order = paginator.paginate_queryset(test, request)
     serialize = AllAppoinmentSerializer(paginated_checkout_order, many=True)
     
