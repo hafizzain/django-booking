@@ -1344,7 +1344,6 @@ def update_employee_device(request):
                 status=status.HTTP_404_NOT_FOUND
             )
     
-
     is_mobile_exist_already = Employee.objects.filter(mobile_number=phone_number).exclude(id=employee.id)
     if is_mobile_exist_already:
         if phone_number == is_mobile_exist_already[0].mobile_number:
@@ -1355,10 +1354,9 @@ def update_employee_device(request):
                 'status_code_text' : 'INVALID_NOT_FOUND_EMPLOYEE_ID_4022',
                         'response' : {
                     'message' : 'Mobile no already exist.',
-                    'error_message' : str(err),
                 }
             },
-                status=status.HTTP_404_NOT_FOUND
+                status=status.HTTP_200_OK
             )
         
     employee.full_name = full_name
