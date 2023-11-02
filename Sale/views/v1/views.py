@@ -92,7 +92,7 @@ def get_service(request):
     # that particular employee
     if is_mobile:
         emp = Employee.objects.get(user=request.user)
-        emp_service_ids = emp.employee_selected_service.values_list('service__id', flat=True)
+        emp_service_ids = emp.employee_selected_service.distinct().values_list('service__id', flat=True)
         service = service.filter(id__in=emp_service_ids)
 
 
