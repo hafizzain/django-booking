@@ -1363,6 +1363,8 @@ def update_employee_device(request):
             )
             employee.country = country
             city_country = country
+        else:
+            employee.country = None
             
     if state_unique_id is not None:
         public_state = get_state_from_public(state_unique_id)
@@ -1373,6 +1375,8 @@ def update_employee_device(request):
             )
             employee.state = state
             city_state = state
+        else:
+            employee.state = None
             
     if city_name is not None:
         city, created= City.objects.get_or_create(name=city_name,
