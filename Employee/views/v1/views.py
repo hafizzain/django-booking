@@ -1356,21 +1356,23 @@ def update_employee_device(request):
        
     if country_unique_id is not None:
         public_country = get_country_from_public(country_unique_id)
-        country, created = Country.objects.get_or_create(
-            name=public_country.name,
-            unique_id = public_country.unique_id
-        )
-        employee.country = country
-        city_country = country
+        if public_country:
+            country, created = Country.objects.get_or_create(
+                name=public_country.name,
+                unique_id = public_country.unique_id
+            )
+            employee.country = country
+            city_country = country
             
     if state_unique_id is not None:
         public_state = get_state_from_public(state_unique_id)
-        state, created= State.objects.get_or_create(
-            name=public_state.name,
-            unique_id=public_state.unique_id
-        )
-        employee.state = state
-        city_state = state
+        if public_state:
+            state, created= State.objects.get_or_create(
+                name=public_state.name,
+                unique_id=public_state.unique_id
+            )
+            employee.state = state
+            city_state = state
             
     if city_name is not None:
         city, created= City.objects.get_or_create(name=city_name,
