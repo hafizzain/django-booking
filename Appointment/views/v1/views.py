@@ -476,10 +476,7 @@ def create_appointment(request):
     selected_promotion_type = request.data.get('selected_promotion_type', None) 
     selected_promotion_id = request.data.get('selected_promotion_id', None) 
     is_promotion_availed = request.data.get('is_promotion_availed', False)
-        
-    
-    admin_account_type = user.user_account_type.all()[0]
-    admin_account_type = admin_account_type.account_type
+
     Errors = []
     total_price_app= 0
             
@@ -605,7 +602,6 @@ def create_appointment(request):
 
     all_members = []
     employee_users = []
-    employee_member = []
     for appoinmnt in appointments:
         member = appoinmnt['member']
         service = appoinmnt['service']
@@ -629,8 +625,6 @@ def create_appointment(request):
             all_members.append(str(member.id))
             temp_user = User.objects.filter(email__icontains=member.email).first()
             employee_users.append(temp_user)
-            employe_type = temp_user.user_account_type.all()[0]
-            employe_type = employe_type.account_type
         except Exception as err:
             return Response(
             {
@@ -851,9 +845,6 @@ def create_appointment(request):
                     'error_message' : None,
                     'error' : Errors,
                     'appointments' : serialized.data,
-                    'employee_type': employe_type,
-                    'admin_type' : admin_account_type
-                    
                 }
             },
             status=status.HTTP_201_CREATED
