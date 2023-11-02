@@ -943,9 +943,15 @@ class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField()
     employee_permission = serializers.SerializerMethodField()
-    city = CitySerializer()
+    city = serializers.SerializerMethodField()
     country = CountrySerializer()
     state = StateSerializer()
+
+
+    def get_city(self, obj):
+        if obj.city:
+            return obj.city.name
+        return None
     
     def get_employee_permission(self, obj):
         try:
