@@ -1299,9 +1299,9 @@ def update_employee_device(request):
     id = request.data.get('id', None)
     full_name = request.data.get('full_name', None)
     
-    country = request.data.get('country', None) 
-    city = request.data.get('city', None) 
-    state = request.data.get('state', None) 
+    country_unique_id = request.data.get('country', None) 
+    state_unique_id = request.data.get('state', None) 
+    city_name = request.data.get('city', None)
     phone_number=request.data.get('mobile_number',None)
     image=request.data.get('image',None)
     postal_code=request.data.get('postal_code',None)
@@ -1351,26 +1351,31 @@ def update_employee_device(request):
     if image is not None:
         employee.image=image
        
-    if country is not None:
-        try:
-            country= Country.objects.get(id=country)
-            employee.country = country
-        except:
-            country = None
+    if country_unique_id is not None:
+        public_country = get_country_from_public(country_unique_id)
+        country, created = Country.objects.get_or_create(
+            name=public_country.name,
+            unique_id = public_country.unique_id
+        )
+        employee.country = country
             
-    if state is not None:
-        try:
-            state= State.objects.get(id=state)
-            employee.state = state
-        except:
-            state = None
+    if state_unique_id is not None:
+        public_state = get_state_from_public(state_unique_id)
+        state, created= State.objects.get_or_create(
+            name=public_state.name,
+            unique_id=public_state.unique_id
+        )
+        employee.state = state
             
-    if city is not None:
-        try:
-            city= City.objects.get(id=city)
-            employee.city = city
-        except:
-            city = None
+    if city_name is not None:
+        city, created= City.objects.get_or_create(name=city_name,
+                                                country=country,
+                                                state=state,
+                                                country_unique_id=country_unique_id,
+                                                state_unique_id=state_unique_id)
+        employee.city = city
+    
+    employee.save()
 
     employee.save()
     serializer = EmployeSerializer(employee, context={'request' : request,})

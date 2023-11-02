@@ -943,6 +943,8 @@ class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField()
     employee_permission = serializers.SerializerMethodField()
+    country = CountrySerializer()
+    state = StateSerializer()
     
     def get_employee_permission(self, obj):
         try:

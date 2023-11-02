@@ -2,6 +2,8 @@ from firebase_admin.messaging import Message, Notification
 
 from Notification.models import CustomFCMDevice
 
+from Authentication.models import User
+
 class NotificationProcessor:
 
     """
@@ -18,15 +20,18 @@ class NotificationProcessor:
          - body: a detailed message
         """
 
-        # may be employee didnt registered a mobile device
-        device_registered = CustomFCMDevice.objects.filter(user=user).first()
-        if device_registered:
-            message = Message(
-                notification=Notification(title=title, body=body)
-            )
-            device_registered.send_message(message)
-        else:
-            pass
+        # only send notification if requerst.user is admin
+        if NotificationProcessor.is_admin_user(user):
+
+            # may be employee didnt registered a mobile device
+            device_registered = CustomFCMDevice.objects.filter(user=user).first()
+            if device_registered:
+                message = Message(
+                    notification=Notification(title=title, body=body)
+                )
+                device_registered.send_message(message)
+            else:
+                pass
 
 
     @staticmethod
@@ -35,18 +40,34 @@ class NotificationProcessor:
         A method to handle one or multiple users
         """
 
-        # multiple users
-        if type(user) == list:
-            user_list = user
-            for user in user_list:
+        # only send notification if requerst.user is admin
+        if NotificationProcessor.is_admin_user(user):
+
+            # multiple users
+            if type(user) == list:
+                user_list = user
+                for user in user_list:
+                    NotificationProcessor.send_notification_per_user(
+                        user,
+                        title,
+                        body
+                    )
+            else: # single user
                 NotificationProcessor.send_notification_per_user(
                     user,
                     title,
                     body
                 )
-        else: # single user
-            NotificationProcessor.send_notification_per_user(
-                user,
-                title,
-                body
-            )
+
+    @staticmethod
+    def is_admin_user(user):
+        user = User.objects.filter(
+            email=user.email,
+            is_deleted=False,
+            user_account_type__account_type = 'Employee'
+        ).first()
+
+        if not user:
+            return True
+        
+        return False
