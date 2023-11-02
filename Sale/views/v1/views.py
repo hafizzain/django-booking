@@ -120,6 +120,9 @@ def get_service(request):
                 'error_message' : None,
                 'service' : serialized.data,
                 'errors' : errors,
+                'request_user':request.user.email,
+                'employee_email': emp.email,
+                'emp_user':emp.user.email
             }
         },
         status=status.HTTP_200_OK
