@@ -2,7 +2,7 @@ from firebase_admin.messaging import Message, Notification
 
 from Notification.models import CustomFCMDevice
 
-from Authentication.models import User
+from Authentication.models import User, AccountType
 
 class NotificationProcessor:
 
@@ -21,19 +21,19 @@ class NotificationProcessor:
         """
 
         # only send notification if requerst.user is admin
-        # if NotificationProcessor.is_admin_user(user):
+        if NotificationProcessor.is_admin_user(user):
 
             # may be employee didnt registered a mobile device
-        device_registered = CustomFCMDevice.objects.filter(user=user).first()
-        if device_registered:
-            message = Message(
-                notification=Notification(title=title, body=body)
-            )
-            device_registered.send_message(message)
+            device_registered = CustomFCMDevice.objects.filter(user=user).first()
+            if device_registered:
+                message = Message(
+                    notification=Notification(title=title, body=body)
+                )
+                device_registered.send_message(message)
+            else:
+                pass
         else:
             pass
-        # else:
-        #     pass
 
 
     @staticmethod
@@ -60,13 +60,14 @@ class NotificationProcessor:
 
     @staticmethod
     def is_admin_user(user):
-        user = User.objects.filter(
-            email=user.email,
-            is_deleted=False,
-            user_account_type__account_type = 'Employee'
-        ).first()
-
-        if not user:
-            return True
         
-        return False
+        account_type = AccountType.objects.filter(
+            user=user,
+            account_type='Employee'
+        ).first()
+        if account_type:
+            return False
+        else:
+            return True
+
+
