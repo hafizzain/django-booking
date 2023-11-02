@@ -32,6 +32,8 @@ class NotificationProcessor:
                 device_registered.send_message(message)
             else:
                 pass
+        else:
+            pass
 
 
     @staticmethod
@@ -40,24 +42,21 @@ class NotificationProcessor:
         A method to handle one or multiple users
         """
 
-        # only send notification if requerst.user is admin
-        if NotificationProcessor.is_admin_user(user):
-
-            # multiple users
-            if type(user) == list:
-                user_list = user
-                for user in user_list:
-                    NotificationProcessor.send_notification_per_user(
-                        user,
-                        title,
-                        body
-                    )
-            else: # single user
+        # multiple users
+        if type(user) == list:
+            user_list = user
+            for user in user_list:
                 NotificationProcessor.send_notification_per_user(
                     user,
                     title,
                     body
                 )
+        else: # single user
+            NotificationProcessor.send_notification_per_user(
+                user,
+                title,
+                body
+            )
 
     @staticmethod
     def is_admin_user(user):
