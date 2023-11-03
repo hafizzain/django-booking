@@ -585,29 +585,17 @@ def check_email_employees(request):
     email = request.data.get('email', None)
     mobile_number = request.data.get('mobile_number', None)
 
-    if not all([id]):
-        return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.MISSING_FIELDS_4001,
-                'status_code_text' : 'MISSING_FIELDS_4001',
-                'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : 'Employee id are required',
-                    'fields' : [
-                        'email',
-                    ]
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    employee = Employee.objects.get(id=id)
-    existing_email = employee.user.email
+    if id:
+        employee = Employee.objects.get(id=id)
+        existing_email = employee.user.email
+        existing_mobile_number = employee.user.mobile_number
     with tenant_context(Tenant.objects.get(schema_name = 'public')):
         if email:
-            user_email = User.objects.filter(email__icontains=email).exclude(email=existing_email).count()
-            if user_email > 1:
+            user_email = User.objects.filter(email__icontains=email)
+            if id:
+                user_email.exclude(email=existing_email)
+
+            if user_email:
                 return Response(
                     {
                         'status' : False,
@@ -623,8 +611,11 @@ def check_email_employees(request):
                     status=status.HTTP_200_OK
                 )
         if mobile_number:
-            user_mobile_number = User.objects.filter(mobile_number=mobile_number).exclude(email=existing_email).count()
-            if user_mobile_number > 1:
+            user_mobile_number = User.objects.filter(mobile_number=mobile_number)
+            if id:
+                user_mobile_number = user_mobile_number.exclude(mobile_number=existing_email)
+            
+            if user_mobile_number:
                 return Response(
                     {
                         'status' : False,
