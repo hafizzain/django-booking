@@ -595,9 +595,9 @@ def check_email_employees(request):
     """
 
     if email:
-        employees = user.filter(email=email)
+        employees = employees.filter(email=email)
         if previous_email:
-            employees = user.exclude(email=previous_email)
+            employees = employees.exclude(email=previous_email)
         if employees:
             return Response(
                 {
