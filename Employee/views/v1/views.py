@@ -331,7 +331,7 @@ def get_Employees(request):
     query &= Q(is_blocked=False)
 
     if search_text:
-        query &= Q(full_name__icontains=search_text)
+        query &= Q(full_name__icontains=search_text) | Q(mobile_number__icontains=search_text)
 
     if employee_id:
         query &= Q(id=str(employee_id))
@@ -617,7 +617,7 @@ def check_email_employees(request):
     if mobile_number:
         user = user.filter(mobile_number__icontains=mobile_number)
         if previous_mobile_number:
-            user = user.exclude(mobile_number=previous_mobile_number)
+            user = user.exclude(mobile_number__icontains=previous_mobile_number)
 
         if user:
             return Response(
