@@ -580,12 +580,12 @@ def generate_id(request):
     
 @api_view(['POST'])
 @permission_classes([AllowAny])
-def check_email_employees(request): 
+def check_email_employees(request):
+    id = request.data.get('id', None)
     email = request.data.get('email', None)
     mobile_number = request.data.get('mobile_number', None)
 
-
-    if not all([email]):
+    if not all([id]):
         return Response(
             {
                 'status' : False,
@@ -602,42 +602,44 @@ def check_email_employees(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
+    employee = Employee.objects.get(id=id)
+    existing_email = employee.user.email
     with tenant_context(Tenant.objects.get(schema_name = 'public')):
-        try:
-            employe = User.objects.get(email__icontains = email)
-            return Response(
-                {
-                    'status' : False,
-                    'status_code' : 200,
-                    'status_code_text' : '200',
-                    'response' : {
-                        'message' : f'User Already exist with this {email}!',
-                        'error_message' : None,
-                        'employee' : True
-                    }
-                },
-                status=status.HTTP_200_OK
-            )
-        except Exception as err:
-            pass
+        if email:
+            user_email = User.objects.filter(email__icontains=email).exclude(email=existing_email).count()
+            if user_email > 1:
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : 200,
+                        'status_code_text' : '200',
+                        'response' : {
+                            'message' : f'User Already exist with this {email}!',
+                            'error_message' : None,
+                            'employee' : True,
+                            'email': True,
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
+        if mobile_number:
+            user_mobile_number = User.objects.filter(mobile_number=mobile_number).exclude(email=existing_email).count()
+            if user_mobile_number > 1:
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : 200,
+                        'status_code_text' : '200',
+                        'response' : {
+                            'message_mobile' : 'User already exist with this phone number.',
+                            'error_message' : None,
+                            'employee' : True,
+                            'mobile':True
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
 
-        try:
-            employe = User.objects.get(mobile_number=mobile_number)
-            return Response(
-                {
-                    'status' : False,
-                    'status_code' : 200,
-                    'status_code_text' : '200',
-                    'response' : {
-                        'message' : f'User Already exist with this {email}!',
-                        'error_message' : None,
-                        'employee' : True
-                    }
-                },
-                status=status.HTTP_200_OK
-            )
-        except Exception as err:
-            pass
     return Response(
         {
             'status' : 200,
