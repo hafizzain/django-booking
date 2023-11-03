@@ -603,10 +603,10 @@ def check_email_employees(request):
         )
     
     with tenant_context(Tenant.objects.get(schema_name = 'public')):
+        employee = Employee.objects.get(id=id)
+        excluding_user_id = employee.user.id
         if email:
-            employee = Employee.objects.get(id=id)
-            excluding_user = employee.user.id
-            user_email = User.objects.filter(email__icontains=email).exclude(id=excluding_user)
+            user_email = User.objects.filter(email__icontains=email).exclude(id=excluding_user_id)
             if user_email:
                 return Response(
                     {
@@ -623,7 +623,7 @@ def check_email_employees(request):
                     status=status.HTTP_200_OK
                 )
         if mobile_number:
-            user_mobile_number = User.objects.filter(mobile_number=mobile_number).exclude(id=id).first()
+            user_mobile_number = User.objects.filter(mobile_number=mobile_number).exclude(id=excluding_user_id).first()
             if user_mobile_number:
                 return Response(
                     {
