@@ -646,7 +646,7 @@ def get_client_group(request):
     all_client_group= ClientGroup.objects.all().order_by('-created_at')
 
     if search_text:
-        all_client_group.filter(name__icontains=search_text)
+        all_client_group = all_client_group.filter(name__icontains=search_text)
 
     all_client_group_count= all_client_group.count()
 
