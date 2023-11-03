@@ -581,57 +581,61 @@ def generate_id(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def check_email_employees(request):
-    id = request.data.get('id', None)
     email = request.data.get('email', None)
     mobile_number = request.data.get('mobile_number', None)
 
-    if id:
-        employee = Employee.objects.get(id=id)
-        existing_email = employee.user.email
-        existing_mobile_number = employee.user.mobile_number
+    previous_email = request.data.get('previous_email', None)
+    previous_mobile_number = request.data.get('previous_mobile_number', None)
+
+
+    
     with tenant_context(Tenant.objects.get(schema_name = 'public')):
-        if email:
-            user_email = User.objects.filter(email__icontains=email)
-            if id:
-                user_email = user_email.exclude(email=existing_email)
-                user_count = user_email.count()
-            if user_email:
-                return Response(
-                    {
-                        'status' : False,
-                        'status_code' : 200,
-                        'status_code_text' : '200',
-                        'response' : {
-                            'message' : f'User Already exist with this {email}!',
-                            'error_message' : None,
-                            'employee' : True,
-                            'email': True,
-                            'user_count': user_count
-                        }
-                    },
-                    status=status.HTTP_200_OK
-                )
-        if mobile_number:
-            user_mobile_number = User.objects.filter(mobile_number=mobile_number)
-            if id:
-                user_mobile_number = user_mobile_number.exclude(mobile_number=existing_mobile_number)
-                user_mobile_number_count = user_mobile_number.count()
-            if user_mobile_number:
-                return Response(
-                    {
-                        'status' : False,
-                        'status_code' : 200,
-                        'status_code_text' : '200',
-                        'response' : {
-                            'message_mobile' : 'User already exist with this phone number.',
-                            'error_message' : None,
-                            'employee' : True,
-                            'mobile': True,
-                            'user_mobile_number_count': user_mobile_number_count
-                        }
-                    },
-                    status=status.HTTP_200_OK
-                )
+        
+        query = Q(email__icontains=email) | Q(mobile_number=mobile_number)
+        user = User.objects.filter(query)
+
+
+        if previous_email:
+            user = user.exclude(email=previous_email)
+
+        if user:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 200,
+                    'status_code_text' : '200',
+                    'response' : {
+                        'message' : f'User Already exist with this {email}!',
+                        'error_message' : None,
+                        'employee' : True,
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+        else:
+            pass
+
+        
+        if previous_mobile_number:
+            user = user.exclude(mobile_number=previous_mobile_number)
+            
+        if user:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 200,
+                    'status_code_text' : '200',
+                    'response' : {
+                        'message_mobile_number' : f'User Already exist with this phone number!',
+                        'error_message' : None,
+                        'employee' : True,
+
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+        else:
+            pass
 
     return Response(
         {
