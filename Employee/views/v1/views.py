@@ -582,7 +582,9 @@ def generate_id(request):
 @permission_classes([AllowAny])
 def check_email_employees(request):
     email = request.data.get('email', None)
-    mobile_number = request.data.get('mobile_number', None)
+    mobile_number = str(request.data.get('mobile_number', None))
+    mobile_number = mobile_number.replace('+', '')
+
 
     previous_email = request.data.get('previous_email', None)
     previous_mobile_number = request.data.get('previous_mobile_number', None)
@@ -617,10 +619,10 @@ def check_email_employees(request):
     
 
     if mobile_number:
-        employees = employees.filter(mobile_number=mobile_number)
+        employees = employees.filter(mobile_number__icontains=mobile_number)
         employees_count = employees.count()
         if previous_mobile_number:
-            employees = employees.exclude(mobile_number=previous_mobile_number)
+            employees = employees.exclude(mobile_number__icontains=previous_mobile_number)
 
         if employees:
             return Response(
