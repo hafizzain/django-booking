@@ -591,7 +591,7 @@ def check_email_employees(request):
     previous_mobile_number = previous_mobile_number.replace('+', '')
 
     employees_count = None
-    employees = Employee.objects.all()
+    employees_numbers = list(Employee.objects.values_list('mobile_number', flat=True))
     total_employees = employees.count()
     """
     TENANT SPECIFIC DATA
@@ -703,7 +703,9 @@ def check_email_employees(request):
                 'error_message' : None,
                 'employee' : False,
                 'total_employees': total_employees,
-                'after_mobile': employees_count
+                'after_mobile': employees_count,
+                'mobile_number':mobile_number,
+                'employee__numbers': employees_numbers
             }
         },
         status=status.HTTP_200_OK
