@@ -670,7 +670,8 @@ def get_client_group(request):
                 'pages':page_count,
                 'per_page_result':page_per_results,
                 'error_message' : None,
-                'clientsgroup' : serialized.data
+                'clientsgroup' : serialized.data,
+                'search_text':search_text
             }
         },
         status=status.HTTP_200_OK
