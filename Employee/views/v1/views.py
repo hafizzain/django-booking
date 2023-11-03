@@ -587,16 +587,22 @@ def check_email_employees(request):
     previous_email = request.data.get('previous_email', None)
     previous_mobile_number = request.data.get('previous_mobile_number', None)
 
+    before_previous_count = None
+    after_previous_count = None
+
+
 
     
     with tenant_context(Tenant.objects.get(schema_name = 'public')):
         
         query = Q(email__icontains=email) | Q(mobile_number=mobile_number)
         user = User.objects.filter(query)
-
+        
+        before_previous_count = user.count()
 
         if previous_email:
             user = user.exclude(email=previous_email)
+            after_previous_count = user.count()
 
         if user:
             return Response(
@@ -608,6 +614,8 @@ def check_email_employees(request):
                         'message' : f'User Already exist with this {email}!',
                         'error_message' : None,
                         'employee' : True,
+                        'before_previous_count': before_previous_count,
+                        'after_previous_count': after_previous_count
                     }
                 },
                 status=status.HTTP_200_OK
@@ -618,7 +626,7 @@ def check_email_employees(request):
         
         if previous_mobile_number:
             user = user.exclude(mobile_number=previous_mobile_number)
-            
+
         if user:
             return Response(
                 {
