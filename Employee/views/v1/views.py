@@ -669,7 +669,7 @@ def check_email_employees(request):
             user = user.filter(mobile_number__icontains=mobile_number)
 
             if previous_mobile_number:
-                user = user.exclude(mobile_number=previous_mobile_number)
+                user = user.exclude(mobile_number__icontains=previous_mobile_number)
 
             if user:
                 return Response(
