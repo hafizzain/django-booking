@@ -619,7 +619,7 @@ def check_email_employees(request):
         if previous_mobile_number:
             user = user.exclude(mobile_number=previous_mobile_number)
 
-        if user or employees:
+        if user:
             return Response(
                 {
                     'status' : False,
