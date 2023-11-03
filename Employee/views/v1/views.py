@@ -595,7 +595,7 @@ def check_email_employees(request):
     
     with tenant_context(Tenant.objects.get(schema_name = 'public')):
         
-        query = Q(email__icontains=email) | Q(mobile_number=mobile_number)
+        query = Q(email=email) | Q(mobile_number=mobile_number)
         user = User.objects.filter(query)
         
         before_previous_count = user.count()
