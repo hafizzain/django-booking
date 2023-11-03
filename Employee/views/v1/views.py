@@ -580,11 +580,12 @@ def generate_id(request):
     
 @api_view(['POST'])
 @permission_classes([AllowAny])
-def check_email_employees(request): 
+def check_email_employees(request):
+    id = request.data.get('id', None)
     email = request.data.get('email', None)
     mobile_number = request.data.get('mobile_number', None)
 
-    if not all([email]):
+    if not all([id, email, mobile_number]):
         return Response(
             {
                 'status' : False,
@@ -602,41 +603,39 @@ def check_email_employees(request):
         )
     
     with tenant_context(Tenant.objects.get(schema_name = 'public')):
-        try:
-            user_email = User.objects.filter(email__icontains=email).first()
-            if user_email:
-                return Response(
-                    {
-                        'status' : False,
-                        'status_code' : 200,
-                        'status_code_text' : '200',
-                        'response' : {
-                            'message' : f'User Already exist with this {email}!',
-                            'error_message' : None,
-                            'employee' : True,
-                            'email': True
-                        }
-                    },
-                    status=status.HTTP_200_OK
-                )
-            user_mobile_number = User.objects.filter(mobile_number=mobile_number).first()
-            if user_mobile_number:
-                return Response(
-                    {
-                        'status' : False,
-                        'status_code' : 200,
-                        'status_code_text' : '200',
-                        'response' : {
-                            'message_mobile' : 'User already exist with this phone number.',
-                            'error_message' : None,
-                            'employee' : True,
-                            'mobile':True
-                        }
-                    },
-                    status=status.HTTP_200_OK
-                )
-        except Exception as err:
-            pass
+        user_email = User.objects.filter(email__icontains=email).exclude(id=id)
+        if user_email:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 200,
+                    'status_code_text' : '200',
+                    'response' : {
+                        'message' : f'User Already exist with this {email}!',
+                        'error_message' : None,
+                        'employee' : True,
+                        'email': True
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+        user_mobile_number = User.objects.filter(mobile_number=mobile_number).exclude(id=id)
+        if user_mobile_number:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 200,
+                    'status_code_text' : '200',
+                    'response' : {
+                        'message_mobile' : 'User already exist with this phone number.',
+                        'error_message' : None,
+                        'employee' : True,
+                        'mobile':True
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+
     return Response(
         {
             'status' : 200,
