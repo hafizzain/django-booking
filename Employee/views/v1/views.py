@@ -588,16 +588,17 @@ def check_email_employees(request):
     previous_mobile_number = request.data.get('previous_mobile_number', None)
 
 
-    user = Employee.objects.all()
+    employees = Employee.objects.all()
+    total_employees = employees.count()
     """
     TENANT SPECIFIC DATA
     """
 
     if email:
-        user = user.filter(email=email)
+        employees = user.filter(email=email)
         if previous_email:
-            user = user.exclude(email=previous_email)
-        if user:
+            employees = user.exclude(email=previous_email)
+        if employees:
             return Response(
                 {
                     'status' : False,
@@ -615,11 +616,12 @@ def check_email_employees(request):
             pass
 
     if mobile_number:
-        user = user.filter(mobile_number__icontains=mobile_number)
+        employees = employees.filter(mobile_number__icontains=mobile_number)
+        employees_count = employees.count()
         if previous_mobile_number:
-            user = user.exclude(mobile_number__icontains=previous_mobile_number)
+            employees = employees.exclude(mobile_number__icontains=previous_mobile_number)
 
-        if user:
+        if employees:
             return Response(
                 {
                     'status' : False,
@@ -696,6 +698,8 @@ def check_email_employees(request):
                 'message' : 'Single Employee',
                 'error_message' : None,
                 'employee' : False,
+                'total_employees': total_employees,
+                'after_mobile': employees_count
             }
         },
         status=status.HTTP_200_OK
