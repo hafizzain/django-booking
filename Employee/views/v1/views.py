@@ -604,7 +604,9 @@ def check_email_employees(request):
     
     with tenant_context(Tenant.objects.get(schema_name = 'public')):
         if email:
-            user_email = User.objects.filter(email__icontains=email).exclude(id=id).first()
+            employee = Employee.objects.get(id=id)
+            excluding_user = employee.user.id
+            user_email = User.objects.filter(email__icontains=email).exclude(id=excluding_user)
             if user_email:
                 return Response(
                     {
@@ -615,7 +617,7 @@ def check_email_employees(request):
                             'message' : f'User Already exist with this {email}!',
                             'error_message' : None,
                             'employee' : True,
-                            'email': True
+                            'email': True,
                         }
                     },
                     status=status.HTTP_200_OK
