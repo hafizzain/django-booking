@@ -587,7 +587,8 @@ def check_email_employees(request):
 
 
     previous_email = request.data.get('previous_email', None)
-    previous_mobile_number = request.data.get('previous_mobile_number', None)
+    previous_mobile_number = str(request.data.get('previous_mobile_number', None))
+    previous_mobile_number = previous_mobile_number.replace('+', '')
 
     employees_count = None
     employees = Employee.objects.all()
