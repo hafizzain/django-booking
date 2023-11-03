@@ -603,6 +603,7 @@ def check_email_employees(request):
         # query = Q(email=email) | Q(mobile_number=mobile_number)
         
         user = User.objects.all()
+        employees = Employee.objects.all()
         before_previous_count = user.count()
 
         if email:
@@ -633,13 +634,14 @@ def check_email_employees(request):
         if mobile_number:
             comin_here = "coming here"
             user = user.filter(mobile_number=mobile_number)
+            employees = employees.filter(mobile_number=mobile_number)
 
             if previous_mobile_number:
                 then_here = "then here"
                 user = user.exclude(mobile_number=previous_mobile_number)
                 after_previous_count = user.count()
 
-            if user:
+            if user or employees:
                 not_there = "noty there"
                 return Response(
                     {
