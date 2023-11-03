@@ -582,6 +582,7 @@ def generate_id(request):
 @permission_classes([AllowAny])
 def check_email_employees(request): 
     email = request.data.get('email', None)
+    mobile_number = request.data.get('mobile_number', None)
 
     if not all([email]):
         return Response(
@@ -602,20 +603,38 @@ def check_email_employees(request):
     
     with tenant_context(Tenant.objects.get(schema_name = 'public')):
         try:
-            employe = User.objects.get(email__icontains = email)
-            return Response(
-                {
-                    'status' : False,
-                    'status_code' : 200,
-                    'status_code_text' : '200',
-                    'response' : {
-                        'message' : f'User Already exist with this {email}!',
-                        'error_message' : None,
-                        'employee' : True
-                    }
-                },
-                status=status.HTTP_200_OK
-            )
+            user_email = User.objects.filter(email__icontains=email).first()
+            if user_email:
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : 200,
+                        'status_code_text' : '200',
+                        'response' : {
+                            'message' : f'User Already exist with this {email}!',
+                            'error_message' : None,
+                            'employee' : True,
+                            'email': True
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
+            user_mobile_number = User.objects.filter(mobile_number=mobile_number).first()
+            if user_mobile_number:
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : 200,
+                        'status_code_text' : '200',
+                        'response' : {
+                            'message_mobile' : 'User already exist with this phone number.',
+                            'error_message' : None,
+                            'employee' : True,
+                            'mobile':True
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
         except Exception as err:
             pass
     return Response(
@@ -713,7 +732,7 @@ def create_employee(request):
                         'status_code' : 404,
                         'status_code_text' : '404',
                         'response' : {
-                            'message' : f'User already exist with this phonne number.',
+                            'message' : f'Employee already exist with this phonne number.',
                             'error_message' : None,
                         }
                     },
@@ -1123,7 +1142,7 @@ def update_employee(request):
     
     
     if phone_number is not None:
-        existing_employees = Employee.objects.filter(mobile_number=phone_number)
+        existing_employees = Employee.objects.filter(mobile_number=phone_number).exclude(id=id)
         if existing_employees:
             return Response(
                         {
