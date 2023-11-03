@@ -593,8 +593,8 @@ def check_email_employees(request):
         if email:
             user_email = User.objects.filter(email__icontains=email)
             if id:
-                user_email.exclude(email=existing_email)
-
+                user_email = user_email.exclude(email=existing_email)
+                user_count = user_email.count()
             if user_email:
                 return Response(
                     {
@@ -606,6 +606,7 @@ def check_email_employees(request):
                             'error_message' : None,
                             'employee' : True,
                             'email': True,
+                            'user_count': user_count
                         }
                     },
                     status=status.HTTP_200_OK
@@ -613,8 +614,8 @@ def check_email_employees(request):
         if mobile_number:
             user_mobile_number = User.objects.filter(mobile_number=mobile_number)
             if id:
-                user_mobile_number = user_mobile_number.exclude(mobile_number=existing_email)
-            
+                user_mobile_number = user_mobile_number.exclude(mobile_number=existing_mobile_number)
+                user_mobile_number_count = user_mobile_number.count()
             if user_mobile_number:
                 return Response(
                     {
@@ -625,7 +626,8 @@ def check_email_employees(request):
                             'message_mobile' : 'User already exist with this phone number.',
                             'error_message' : None,
                             'employee' : True,
-                            'mobile':True
+                            'mobile': True,
+                            'user_mobile_number_count': user_mobile_number_count
                         }
                     },
                     status=status.HTTP_200_OK
