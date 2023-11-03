@@ -598,7 +598,6 @@ def check_email_employees(request):
         # query = Q(email=email) | Q(mobile_number=mobile_number)
         
         user = User.objects.all()
-        
         before_previous_count = user.count()
 
         if email:
@@ -628,10 +627,9 @@ def check_email_employees(request):
 
         if mobile_number:
             user = user.filter(mobile_number=mobile_number)
-
-        
             if previous_mobile_number:
                 user = user.exclude(mobile_number=previous_mobile_number)
+                after_previous_count = user.count()
 
             if user:
                 return Response(
@@ -643,6 +641,8 @@ def check_email_employees(request):
                             'message_mobile_number' : f'User Already exist with this phone number!',
                             'error_message' : None,
                             'employee' : True,
+                            'before_previous_count': before_previous_count,
+                            'after_previous_count': after_previous_count
 
                         }
                     },
