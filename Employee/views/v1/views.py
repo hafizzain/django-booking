@@ -2649,7 +2649,7 @@ def create_commission(request):
     user = User.objects.filter(email__icontains=employee_id.email).first()
     title = 'Commission'
     body = 'Admin Assigns New Commission'
-    NotificationProcessor.send_notifications_to_users(user, title, body)
+    NotificationProcessor.send_notifications_to_users(user, title, body, request_user=request.user)
 
 
     serializers= CommissionSerializer(commission_setting, context={'request' : request})

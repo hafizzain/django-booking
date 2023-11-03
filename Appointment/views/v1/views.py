@@ -834,9 +834,7 @@ def create_appointment(request):
     title = "Appointment"
     body = "New Booking Assigned"
 
-    account_type_obj = request.user.user_account_type.all()[0]
-    if account_type_obj.account_type == 'Business':
-        NotificationProcessor.send_notifications_to_users(user, title, body)
+    NotificationProcessor.send_notifications_to_users(user, title, body, request_user=request.user)
 
     serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request' : request})
     return Response(
@@ -848,7 +846,6 @@ def create_appointment(request):
                     'error_message' : None,
                     'error' : Errors,
                     'appointments' : serialized.data,
-                    'request_user': account_type_obj.account_type
                 }
             },
             status=status.HTTP_201_CREATED
@@ -1016,13 +1013,13 @@ def update_appointment(request):
         user = User.objects.filter(email__icontains=employee.email).first()
         title = 'Appointment'
         body = 'Appointment Cancelled'
-        NotificationProcessor.send_notifications_to_users(user, title, body)
+        NotificationProcessor.send_notifications_to_users(user, title, body, request_user=request.user)
     else:
         # changed the employee of the existing appointment
         user = User.objects.filter(email__icontains=service_appointment.member.email).first()
         title = 'Appointment'
         body = 'New Booking Assigned'
-        NotificationProcessor.send_notifications_to_users(user, title, body)
+        NotificationProcessor.send_notifications_to_users(user, title, body, request_user=request.user)
 
     return Response(
         {
@@ -1281,7 +1278,7 @@ def update_appointment_service(request):
     user = User.objects.filter(email__icontains=service_appointment.member.email).first()
     title = 'Appointment'
     body = 'Booking Updated'
-    NotificationProcessor.send_notifications_to_users(user, title, body)
+    NotificationProcessor.send_notifications_to_users(user, title, body, request_user=request.user)
 
     return Response(
         {
@@ -2063,7 +2060,7 @@ def create_checkout(request):
     user = notify_users
     title = 'Appointment'
     body = 'Appointment completed'
-    NotificationProcessor.send_notifications_to_users(user, title, body)
+    NotificationProcessor.send_notifications_to_users(user, title, body, request_user=request.user)
     return Response(
             {
                 'status' : True,

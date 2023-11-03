@@ -142,7 +142,7 @@ def create_stafftarget(request):
     user = User.objects.filter(email__icontains=employee_id.email).first()
     title = 'Target'
     body = 'New Sales Target Assigned'
-    NotificationProcessor.send_notifications_to_users(user, title, body)
+    NotificationProcessor.send_notifications_to_users(user, title, body, request_user=request.user)
     
     
     serializers= StaffTargetSerializers(staff_target, context={'request' : request})
