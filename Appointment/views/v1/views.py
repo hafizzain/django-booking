@@ -832,7 +832,7 @@ def create_appointment(request):
     # Send Notification to one or multiple Employee
     user = employee_users
     title = "Appointment"
-    body = f"New Booking Assigned by {request.user.first_name}"
+    body = "New Booking Assigned"
 
     NotificationProcessor.send_notifications_to_users(user, title, body, request_user=request.user)
 
