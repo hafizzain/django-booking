@@ -595,15 +595,77 @@ def check_email_employees(request):
     not_there = None
 
 
+    user = Employee.objects.all()
+    before_previous_count = user.count()
 
+    """
+    TENANT SPECIFIC DATA
+    """
 
+    if email:
+        user = user.filter(email=email)
+        if previous_email:
+            user = user.exclude(email=previous_email)
+            after_previous_count = user.count()
+
+        if user:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 200,
+                    'status_code_text' : '200',
+                    'response' : {
+                        'message' : f'User Already exist with this {email}!',
+                        'error_message' : None,
+                        'employee' : True,
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+        else:
+            pass
+
+    if mobile_number:
+        comin_here = "coming here"
+        user = user.filter(mobile_number__icontains=mobile_number)
+        employees = employees.filter(mobile_number__icontains=mobile_number)
+
+        mobile_number_count = user.count()
+        employees_count = employees.count()
+
+        if previous_mobile_number:
+            then_here = "then here"
+            user = user.exclude(mobile_number=previous_mobile_number)
+            after_previous_count = user.count()
+
+        if user or employees:
+            not_there = "noty there"
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 200,
+                    'status_code_text' : '200',
+                    'response' : {
+                        'message_mobile_number' : f'User Already exist with this phone number!',
+                        'error_message' : None,
+                        'employee' : True,
+                        'before_previous_count': before_previous_count,
+                        'after_previous_count': after_previous_count
+
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+        else:
+            pass
     
-    with tenant_context(Tenant.objects.get(schema_name = 'public')):
+    with tenant_context(Tenant.objects.get(schema_name='public')):
         
-        # query = Q(email=email) | Q(mobile_number=mobile_number)
+        """
+        PUBLIC TENANT DATA
+        """
         
         user = User.objects.all()
-        employees = Employee.objects.all()
         before_previous_count = user.count()
 
         if email:
@@ -622,8 +684,6 @@ def check_email_employees(request):
                             'message' : f'User Already exist with this {email}!',
                             'error_message' : None,
                             'employee' : True,
-                            'before_previous_count': before_previous_count,
-                            'after_previous_count': after_previous_count
                         }
                     },
                     status=status.HTTP_200_OK
