@@ -587,17 +587,8 @@ def check_email_employees(request):
     previous_email = request.data.get('previous_email', None)
     previous_mobile_number = request.data.get('previous_mobile_number', None)
 
-    before_previous_count = None
-    after_previous_count = None
-
-    comin_here = None
-    then_here = None
-    not_there = None
-
 
     user = Employee.objects.all()
-    before_previous_count = user.count()
-
     """
     TENANT SPECIFIC DATA
     """
@@ -606,8 +597,6 @@ def check_email_employees(request):
         user = user.filter(email=email)
         if previous_email:
             user = user.exclude(email=previous_email)
-            after_previous_count = user.count()
-
         if user:
             return Response(
                 {
@@ -626,20 +615,11 @@ def check_email_employees(request):
             pass
 
     if mobile_number:
-        comin_here = "coming here"
         user = user.filter(mobile_number__icontains=mobile_number)
-        employees = employees.filter(mobile_number__icontains=mobile_number)
-
-        mobile_number_count = user.count()
-        employees_count = employees.count()
-
         if previous_mobile_number:
-            then_here = "then here"
             user = user.exclude(mobile_number=previous_mobile_number)
-            after_previous_count = user.count()
 
         if user or employees:
-            not_there = "noty there"
             return Response(
                 {
                     'status' : False,
@@ -649,9 +629,6 @@ def check_email_employees(request):
                         'message_mobile_number' : f'User Already exist with this phone number!',
                         'error_message' : None,
                         'employee' : True,
-                        'before_previous_count': before_previous_count,
-                        'after_previous_count': after_previous_count
-
                     }
                 },
                 status=status.HTTP_200_OK
@@ -666,13 +643,10 @@ def check_email_employees(request):
         """
         
         user = User.objects.all()
-        before_previous_count = user.count()
-
         if email:
             user = user.filter(email=email)
             if previous_email:
                 user = user.exclude(email=previous_email)
-                after_previous_count = user.count()
 
             if user:
                 return Response(
@@ -692,20 +666,13 @@ def check_email_employees(request):
                 pass
 
         if mobile_number:
-            comin_here = "coming here"
             user = user.filter(mobile_number__icontains=mobile_number)
             employees = employees.filter(mobile_number__icontains=mobile_number)
 
-            mobile_number_count = user.count()
-            employees_count = employees.count()
-
             if previous_mobile_number:
-                then_here = "then here"
                 user = user.exclude(mobile_number=previous_mobile_number)
-                after_previous_count = user.count()
 
             if user or employees:
-                not_there = "noty there"
                 return Response(
                     {
                         'status' : False,
@@ -715,9 +682,6 @@ def check_email_employees(request):
                             'message_mobile_number' : f'User Already exist with this phone number!',
                             'error_message' : None,
                             'employee' : True,
-                            'before_previous_count': before_previous_count,
-                            'after_previous_count': after_previous_count
-
                         }
                     },
                     status=status.HTTP_200_OK
@@ -733,9 +697,6 @@ def check_email_employees(request):
                 'message' : 'Single Employee',
                 'error_message' : None,
                 'employee' : False,
-                'mobile_number_count': mobile_number_count,
-                'employees_count': employees_count,
-                'coming_here': [comin_here, then_here, not_there]
             }
         },
         status=status.HTTP_200_OK
