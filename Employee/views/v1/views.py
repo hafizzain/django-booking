@@ -331,7 +331,7 @@ def get_Employees(request):
     query &= Q(is_blocked=False)
 
     if search_text:
-        query &= Q(full_name__icontains=search_text) | Q(mobile_number__icontains=search_text)
+        query &= Q(full_name__icontains=search_text) | Q(mobile_number=search_text)
 
     if employee_id:
         query &= Q(id=str(employee_id))
