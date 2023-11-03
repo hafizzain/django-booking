@@ -704,6 +704,21 @@ def create_employee(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    
+    existing_employees = Employee.objects.filter(mobile_number=mobile_number)
+    if existing_employees:
+        return Response(
+                    {
+                        'status' : False,
+                        'status_code' : 404,
+                        'status_code_text' : '404',
+                        'response' : {
+                            'message' : f'User already exist with this phonne number.',
+                            'error_message' : None,
+                        }
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
     if email is not None:
         with tenant_context(Tenant.objects.get(schema_name = 'public')):
             try:
@@ -1108,7 +1123,22 @@ def update_employee(request):
     
     
     if phone_number is not None:
-        employee.mobile_number = phone_number
+        existing_employees = Employee.objects.filter(mobile_number=phone_number)
+        if existing_employees:
+            return Response(
+                        {
+                            'status' : False,
+                            'status_code' : 404,
+                            'status_code_text' : '404',
+                            'response' : {
+                                'message' : f'Employee already exist with this phone number.',
+                                'error_message' : None,
+                            }
+                        },
+                        status=status.HTTP_404_NOT_FOUND
+                    )
+        else:
+            employee.mobile_number = phone_number
     else :
         employee.mobile_number = None
     if image is not None:
