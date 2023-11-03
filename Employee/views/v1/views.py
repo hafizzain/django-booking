@@ -667,12 +667,11 @@ def check_email_employees(request):
 
         if mobile_number:
             user = user.filter(mobile_number__icontains=mobile_number)
-            employees = employees.filter(mobile_number__icontains=mobile_number)
 
             if previous_mobile_number:
                 user = user.exclude(mobile_number=previous_mobile_number)
 
-            if user or employees:
+            if user:
                 return Response(
                     {
                         'status' : False,
