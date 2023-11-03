@@ -590,6 +590,11 @@ def check_email_employees(request):
     before_previous_count = None
     after_previous_count = None
 
+    comin_here = None
+    then_here = None
+    not_there = None
+
+
 
 
     
@@ -626,12 +631,16 @@ def check_email_employees(request):
                 pass
 
         if mobile_number:
+            comin_here = "coming here"
             user = user.filter(mobile_number=mobile_number)
+
             if previous_mobile_number:
+                then_here = "then here"
                 user = user.exclude(mobile_number=previous_mobile_number)
                 after_previous_count = user.count()
 
             if user:
+                not_there = "noty there"
                 return Response(
                     {
                         'status' : False,
@@ -658,7 +667,8 @@ def check_email_employees(request):
             'response' : {
                 'message' : 'Single Employee',
                 'error_message' : None,
-                'employee' : False
+                'employee' : False,
+                'coming_here': [comin_here, then_here, not_there]
             }
         },
         status=status.HTTP_200_OK
