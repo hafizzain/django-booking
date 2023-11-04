@@ -591,7 +591,7 @@ def check_email_employees(request):
     previous_mobile_number = previous_mobile_number.replace('+', '')
 
     employees_count = None
-    employees_numbers = list(Employee.objects.values_list('mobile_number', flat=True))
+    employees = Employee.objects.all()
     total_employees = employees.count()
     """
     TENANT SPECIFIC DATA
