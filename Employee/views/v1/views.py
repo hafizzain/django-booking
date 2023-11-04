@@ -593,11 +593,13 @@ def check_email_employees(request):
     employees_count = None
     employees = Employee.objects.all()
     total_employees = employees.count()
+    employees_numbers = employees.values_list('mobile_number', flat=True)
     """
     TENANT SPECIFIC DATA
     """
 
     if email:
+        coming_in_email = "coming_in_email"
         employees = employees.filter(email=email)
         if previous_email:
             employees = employees.exclude(email=previous_email)
@@ -620,6 +622,7 @@ def check_email_employees(request):
     
 
     if mobile_number:
+        coming_in_mobile = "coming in mobile"
         employees = employees.filter(mobile_number__icontains=mobile_number)
         employees_count = employees.count()
         if previous_mobile_number:
@@ -705,7 +708,9 @@ def check_email_employees(request):
                 'total_employees': total_employees,
                 'after_mobile': employees_count,
                 'mobile_number':mobile_number,
-                'employee__numbers': employees_numbers
+                'employee__numbers': employees_numbers,
+                'coming_in_email': coming_in_email,
+                'coming_in_mobile': coming_in_mobile
             }
         },
         status=status.HTTP_200_OK
