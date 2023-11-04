@@ -582,25 +582,19 @@ def generate_id(request):
 @permission_classes([AllowAny])
 def check_email_employees(request):
     email = request.data.get('email', None)
-    mobile_number = str(request.data.get('mobile_number', None))
-    mobile_number = mobile_number.replace('+', '')
+    mobile_number = request.data.get('mobile_number', None)
 
 
     previous_email = request.data.get('previous_email', None)
     previous_mobile_number = str(request.data.get('previous_mobile_number', None))
     previous_mobile_number = previous_mobile_number.replace('+', '')
 
-    employees_count = None
-    employees = Employee.objects.all()
-    total_employees = employees.count()
-    employees_numbers = employees.values_list('mobile_number', flat=True)
     """
     TENANT SPECIFIC DATA
     """
 
     if email:
-        coming_in_email = "coming_in_email"
-        employees = employees.filter(email=email)
+        employees = Employee.objects.filter(email=email)
         if previous_email:
             employees = employees.exclude(email=previous_email)
         if employees:
@@ -622,8 +616,7 @@ def check_email_employees(request):
     
 
     if mobile_number:
-        coming_in_mobile = "coming in mobile"
-        employees = employees.filter(mobile_number__icontains=mobile_number)
+        employees = Employee.objects.filter(mobile_number=mobile_number)
         employees_count = employees.count()
         if previous_mobile_number:
             employees = employees.exclude(mobile_number__icontains=previous_mobile_number)
@@ -651,9 +644,9 @@ def check_email_employees(request):
         PUBLIC TENANT DATA
         """
         
-        user = User.objects.all()
+        
         if email:
-            user = user.filter(email=email)
+            user = User.objects.filter(email=email)
             if previous_email:
                 user = user.exclude(email=previous_email)
 
@@ -675,7 +668,7 @@ def check_email_employees(request):
                 pass
 
         if mobile_number:
-            user = user.filter(mobile_number__icontains=mobile_number)
+            user = User.objects.filter(mobile_number__icontains=mobile_number)
 
             if previous_mobile_number:
                 user = user.exclude(mobile_number__icontains=previous_mobile_number)
@@ -705,12 +698,6 @@ def check_email_employees(request):
                 'message' : 'Single Employee',
                 'error_message' : None,
                 'employee' : False,
-                'total_employees': total_employees,
-                'after_mobile': employees_count,
-                'mobile_number':mobile_number,
-                'employee__numbers': employees_numbers,
-                'coming_in_email': coming_in_email,
-                'coming_in_mobile': coming_in_mobile
             }
         },
         status=status.HTTP_200_OK
