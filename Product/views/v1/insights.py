@@ -235,15 +235,18 @@ class FilteredInsightProducts(APIView):
         response = self.retreive_top_sold_query(request)
         if response is not None:
             return response
-        response = self.retreive_most_consumed_query(request)
-        if response is not None:
-            return response
-        response = self.retreive_most_ordered_query(request)
-        if response is not None:
-            return response
-        response = self.retreive_most_transferred_query(request)
-        if response is not None:
-            return response
+        # response = self.retreive_most_consumed_query(request)
+        # if response is not None:
+        #     return response
+        # response = self.retreive_most_ordered_query(request)
+        # if response is not None:
+        #     return response
+        # response = self.retreive_most_transferred_query(request)
+        # if response is not None:
+        #     return response
+
+
+        
         # response = self.retreive_low_stock_products_query(request)
         # if response is not None:
         #     return response
