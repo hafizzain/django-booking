@@ -41,7 +41,7 @@ class FilteredInsightProducts(APIView):
         self.end_date = request.GET.get('endDate', None)
 
         self.queries['order_by'].append('-top_sold_orders')
-        self.queries['annotate']['top_sold_orders'] = Sum('product_orders__quantity', distinct=True)
+        self.queries['annotate']['top_sold_orders'] = Sum('product_orders__quantity')
         self.queries['filter']['product_orders__location__id'] = self.location
 
         if self.top_sold:
