@@ -89,7 +89,7 @@ class FilteredInsightProducts(APIView):
                     self.queries['filter']['consumptions__created_at__date__range'] = (value, self.today_date_format)
 
         elif self.is_date_most_consumed and self.start_date and self.end_date:
-            self.queries['filter']['consumptions__created_at__date__date'] = (self.start_date, self.end_date)
+            self.queries['filter']['consumptions__created_at__date__range'] = (self.start_date, self.end_date)
         else:
             return Response(
                 {
