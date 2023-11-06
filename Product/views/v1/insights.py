@@ -44,7 +44,7 @@ class FilteredInsightProducts(APIView):
         self.queries['annotate']['top_sold_orders'] = Sum('product_orders__quantity')
         self.queries['filter']['product_orders__location__id'] = self.location
 
-        if self.top_sold :
+        if self.top_sold:
             TOP_SOLD_CHOICES = {'TOP_SOLD_PRODUCTS' : self.beggining_date, 'LAST_7_DAYS' : self.days_before_7 , 'LAST_30_DAYS' : self.days_before_30 }
             if self.top_sold in TOP_SOLD_CHOICES or re.match(DATE_REGEX, self.top_sold):
                 value = self.top_sold
@@ -60,7 +60,7 @@ class FilteredInsightProducts(APIView):
                     'status' : False,
                     'status_code' : 400,
                     'response' : {
-                        'message' : 'Invalid Top Sold Query',
+                        'message' : 'Invalid top sold query.',
                         'error_message' : None,
                     }
                 },
@@ -96,7 +96,7 @@ class FilteredInsightProducts(APIView):
                     'status' : False,
                     'status_code' : 400,
                     'response' : {
-                        'message' : 'Invalid Top Sold Query',
+                        'message' : 'Invalid most consumed query.',
                         'error_message' : None,
                     }
                 },
@@ -132,7 +132,7 @@ class FilteredInsightProducts(APIView):
                     'status' : False,
                     'status_code' : 400,
                     'response' : {
-                        'message' : 'Invalid Top Sold Query',
+                        'message' : 'Invalid most ordered query.',
                         'error_message' : None,
                     }
                 },
@@ -169,7 +169,7 @@ class FilteredInsightProducts(APIView):
                     'status' : False,
                     'status_code' : 400,
                     'response' : {
-                        'message' : 'Invalid Top Sold Query',
+                        'message' : 'Invalid most transferred query.',
                         'error_message' : None,
                     }
                 },
