@@ -63,7 +63,7 @@ def get_service(request):
     if search_text:
         query &= Q(name__icontains=search_text) |  \
                  Q(servicegroup_services__name__icontains=search_text) | \
-                 Q(location__name__icontains=search_text)
+                 Q(location__address_name__icontains=search_text)
                  
 
     if location:
