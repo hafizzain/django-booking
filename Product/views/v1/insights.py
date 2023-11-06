@@ -214,6 +214,21 @@ class FilteredInsightProducts(APIView):
 
         location_id = request.GET.get('location', None)
 
+        # region flags
+        top_sold = request.GET.get('top_sold', None)
+        is_date_top_sold = request.GET.get('is_date_top_sold', None)
+
+        most_consumed = request.GET.get('most_consumed', None)
+        is_date_most_consumed = request.GET.get('is_date_most_consumed', None)
+
+        most_ordered = request.GET.get('most_ordered', None)
+        is_date_most_ordered = request.GET.get('is_date_most_ordered', None)
+
+        most_transferred = request.GET.get('most_transferred', None)
+        is_date_most_transferred = request.GET.get('is_date_most_transferred', None)
+        # endregion
+        
+
         if not location_id:
             return Response(
                 {
@@ -232,18 +247,29 @@ class FilteredInsightProducts(APIView):
         
         self.location = location_id
 
-        response = self.retreive_top_sold_query(request)
-        if response is not None:
-            return response
-        response = self.retreive_most_consumed_query(request)
-        if response is not None:
-            return response
-        response = self.retreive_most_ordered_query(request)
-        if response is not None:
-            return response
-        response = self.retreive_most_transferred_query(request)
-        if response is not None:
-            return response
+        """
+        We are now bounding the queries to only fetch the data that we require
+        rather than quering all the data from database. (A KIND OF OPTIMIZATION)
+        """
+        if top_sold or is_date_top_sold:
+            response = self.retreive_top_sold_query(request)
+            if response is not None:
+                return response
+            
+        if most_consumed or is_date_most_consumed:    
+            response = self.retreive_most_consumed_query(request)
+            if response is not None:
+                return response
+            
+        if most_ordered or is_date_most_ordered:
+            response = self.retreive_most_ordered_query(request)
+            if response is not None:
+                return response
+
+        if most_transferred or is_date_most_transferred:   
+            response = self.retreive_most_transferred_query(request)
+            if response is not None:
+                return response
 
 
 
