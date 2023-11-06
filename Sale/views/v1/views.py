@@ -55,16 +55,16 @@ def get_service(request):
     no_pagination = request.GET.get('no_pagination', None)
     emp_id = request.GET.get('employee_id', None)
 
-    query = {}
+    query = Q(is_deleted=False) & Q(is_blocked=False)
     location_instance = None
     currency_code = None
     errors = []
     
     if search_text:
-        query['name__icontains'] = search_text
+        query &= Q(name__icontains=search_text) | Q(servicegroup_services__icontains=search_text)
 
     if location:
-        query['location__id'] = location
+        query &= Q(location__id=location)
     elif request.user.is_authenticated :
         try:
             employee = Employee.objects.get(
@@ -77,16 +77,12 @@ def get_service(request):
                 first_location = employee.location.all()[0]
                 location_instance = first_location
                 currency_code = location_instance.currency.code
-                query['location__id'] = first_location.id
+                query &= Q(location__id=first_location.id)
             else:
                 errors.append('Employee Location 0')
 
     
-    service= Service.objects.filter(
-        is_deleted = False, 
-        is_blocked = False, 
-        **query
-    ).order_by('-created_at').distinct()
+    service= Service.objects.filter(query).order_by('-created_at').distinct()
 
     # if is_mobile then request.user will be employee
     # so we will filter only those services which are assigned to
