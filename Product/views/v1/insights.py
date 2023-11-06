@@ -155,7 +155,7 @@ class FilteredInsightProducts(APIView):
         self.end_date = request.GET.get('endDate', None)
 
         self.queries['order_by'].append('-most_transferred_products')
-        self.queries['annotate']['most_transferred_products'] = Sum('products_stock_transfers__quantity')
+        self.queries['annotate']['most_transferred_products'] = Sum('products_stock_transfers__quantity', distinct=True)
         self.queries['filter']['products_stock_transfers__from_location__id'] = self.location
 
 
