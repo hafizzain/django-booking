@@ -54,7 +54,7 @@ class FilteredInsightProducts(APIView):
 
         elif self.is_date_top_sold and self.start_date and self.end_date:
             if self.start_date == self.end_date:
-                self.end_date = datetime.strptime(self.end_date) + timedelta(days=1)
+                self.end_date = datetime.strptime(self.end_date, "%Y-%m-%d") + timedelta(days=1)
             self.queries['filter']['product_orders__created_at__date__range'] = (self.start_date, self.end_date)
         else:
             return Response(
@@ -92,7 +92,7 @@ class FilteredInsightProducts(APIView):
 
         elif self.is_date_most_consumed and self.start_date and self.end_date:
             if self.start_date == self.end_date:
-                self.end_date = datetime.strptime(self.end_date) + timedelta(days=1)
+                self.end_date = datetime.strptime(self.end_date, "%Y-%m-%d") + timedelta(days=1)
             self.queries['filter']['consumptions__created_at__date__range'] = (self.start_date, self.end_date)
         else:
             return Response(
@@ -130,7 +130,7 @@ class FilteredInsightProducts(APIView):
                     
         elif self.is_date_most_ordered and self.start_date and self.end_date:
             if self.start_date == self.end_date:
-                self.end_date = datetime.strptime(self.end_date) + timedelta(days=1)
+                self.end_date = datetime.strptime(self.end_date, "%Y-%m-%d") + timedelta(days=1)
             self.queries['filter']['product_order_stock__order__created_at__date__range'] = (self.start_date, self.end_date)
         else:
             return Response(
@@ -169,7 +169,7 @@ class FilteredInsightProducts(APIView):
 
         elif self.is_date_most_transferred and self.start_date and self.end_date:
             if self.start_date == self.end_date:
-                self.end_date = datetime.strptime(self.end_date) + timedelta(days=1)
+                self.end_date = datetime.strptime(self.end_date, "%Y-%m-%d") + timedelta(days=1)
             self.queries['filter']['product_order_stock__order__created_at__date__range'] = (self.start_date, self.end_date)       
         else:
             return Response(
