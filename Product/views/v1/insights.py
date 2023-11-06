@@ -41,7 +41,7 @@ class FilteredInsightProducts(APIView):
         self.end_date = request.GET.get('endDate', None)
 
         self.queries['order_by'].append('-top_sold_orders')
-        self.queries['annotate']['top_sold_orders'] = Sum('product_orders__quantity')
+        self.queries['annotate']['top_sold_orders'] = Sum('product_orders__quantity', distinct=True)
         self.queries['filter']['product_orders__location__id'] = self.location
 
         if self.top_sold:
@@ -79,7 +79,7 @@ class FilteredInsightProducts(APIView):
         self.end_date = request.GET.get('endDate', None)
 
         self.queries['order_by'].append('-most_consumed_products')
-        self.queries['annotate']['most_consumed_products'] = Sum('consumptions__quantity')
+        self.queries['annotate']['most_consumed_products'] = Sum('consumptions__quantity', distinct=True)
         self.queries['filter']['consumptions__location__id'] = self.location
 
         if self.most_consumed : 
@@ -117,7 +117,7 @@ class FilteredInsightProducts(APIView):
         self.end_date = request.GET.get('endDate', None)
 
         self.queries['order_by'].append('-most_ordered_products')
-        self.queries['annotate']['most_ordered_products'] = Sum('product_order_stock__rec_quantity')
+        self.queries['annotate']['most_ordered_products'] = Sum('product_order_stock__rec_quantity', distinct=True)
         self.queries['filter']['product_order_stock__order__to_location__id'] = self.location
 
         if self.most_ordered :
