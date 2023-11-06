@@ -303,7 +303,7 @@ class FilteredInsightProducts(APIView):
 
             # Told Sold
             if top_sold or is_date_top_sold:
-                if (self.top_sold or self.is_date_most_ordered) and (product_instance.top_sold_orders or product_instance.top_sold_orders == 0):
+                if (self.top_sold or self.is_date_top_sold) and (product_instance.top_sold_orders or product_instance.top_sold_orders == 0):
                     product['top_sold_orders'] = int(product_instance.top_sold_orders)
                     product['quantity'] = int(product_instance.top_sold_orders)
                 else:
@@ -311,7 +311,7 @@ class FilteredInsightProducts(APIView):
 
             # Most Consumed
             if most_consumed or is_date_most_consumed:
-                if (self.most_consumed or self.is_date_most_ordered) and (product_instance.most_consumed_products or product_instance.most_consumed_products == 0):
+                if (self.most_consumed or self.is_date_most_consumed) and (product_instance.most_consumed_products or product_instance.most_consumed_products == 0):
                     product['most_consumed_products'] = int(product_instance.most_consumed_products)
                     product['quantity'] = int(product_instance.most_consumed_products)
                 else:
@@ -323,11 +323,11 @@ class FilteredInsightProducts(APIView):
                     product['most_ordered_products'] = int(product_instance.most_ordered_products)
                     product['quantity'] = int(product_instance.most_ordered_products)
                 else:
-                    product['most_ordered_products'] = self.most_ordered or self.is_date_most_ordered
+                    product['most_ordered_products'] = self.most_ordered
             
             # Most Transfered
             if most_transferred or is_date_most_transferred:
-                if (self.most_transferred or self.is_date_most_ordered) and (product_instance.most_transferred_products or product_instance.most_transferred_products == 0):
+                if (self.most_transferred or self.is_date_most_transferred) and (product_instance.most_transferred_products or product_instance.most_transferred_products == 0):
                     product['most_transferred_products'] = int(product_instance.most_transferred_products)
                     product['quantity'] = int(product_instance.most_transferred_products)
                 else:
