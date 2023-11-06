@@ -36,7 +36,7 @@ class FilteredInsightProducts(APIView):
         self.top_sold = request.GET.get('top_sold', None)
 
         # date ranges
-        self.is_date_most_ordered = request.GET.get('is_date_most_ordered', None)
+        self.is_date_top_sold = request.GET.get('is_date_top_sold', None)
         self.start_date = request.GET.get('startDate', None)
         self.end_date = request.GET.get('endDate', None)
 
@@ -52,7 +52,7 @@ class FilteredInsightProducts(APIView):
                     value = TOP_SOLD_CHOICES.get(value)
                     self.queries['filter']['product_orders__created_at__date__range'] = (value, self.today_date_format)
 
-        elif self.is_date_most_ordered and self.start_date and self.end_date:
+        elif self.is_date_top_sold and self.start_date and self.end_date:
             self.queries['filter']['product_orders__created_at__date__range'] = (self.start_date, self.end_date)
         else:
             return Response(
@@ -72,7 +72,7 @@ class FilteredInsightProducts(APIView):
         self.most_consumed = request.GET.get('most_consumed', None)
 
         # date ranges
-        self.is_date_most_ordered = request.GET.get('is_date_most_ordered', None)
+        self.is_date_most_consumed = request.GET.get('is_date_most_consumed', None)
         self.start_date = request.GET.get('startDate', None)
         self.end_date = request.GET.get('endDate', None)
 
@@ -88,7 +88,7 @@ class FilteredInsightProducts(APIView):
                     value = MOST_CONSUMED_CHOICES.get(value)
                     self.queries['filter']['consumptions__created_at__date__range'] = (value, self.today_date_format)
 
-        elif self.is_date_most_ordered and self.start_date and self.end_date:
+        elif self.is_date_most_consumed and self.start_date and self.end_date:
             self.queries['filter']['consumptions__created_at__date__date'] = (self.start_date, self.end_date)
         else:
             return Response(
@@ -144,7 +144,7 @@ class FilteredInsightProducts(APIView):
         self.most_transferred = request.GET.get('most_transferred', None)
 
         # date ranges
-        self.is_date_most_ordered = request.GET.get('is_date_most_ordered', None)
+        self.is_date_most_transferred = request.GET.get('is_date_most_transferred', None)
         self.start_date = request.GET.get('startDate', None)
         self.end_date = request.GET.get('endDate', None)
 
@@ -161,7 +161,7 @@ class FilteredInsightProducts(APIView):
                     value = MOST_TRANSFERRED_CHOICES.get(value)
                     self.queries['filter']['products_stock_transfers__created_at__date__range'] = (value, self.today_date_format)
 
-        elif self.is_date_most_ordered and self.start_date and self.end_date:
+        elif self.is_date_most_transferred and self.start_date and self.end_date:
             self.queries['filter']['product_order_stock__order__created_at__date__range'] = (self.start_date, self.end_date)       
         else:
             return Response(
@@ -235,15 +235,15 @@ class FilteredInsightProducts(APIView):
         response = self.retreive_top_sold_query(request)
         if response is not None:
             return response
-        # response = self.retreive_most_consumed_query(request)
-        # if response is not None:
-        #     return response
-        # response = self.retreive_most_ordered_query(request)
-        # if response is not None:
-        #     return response
-        # response = self.retreive_most_transferred_query(request)
-        # if response is not None:
-        #     return response
+        response = self.retreive_most_consumed_query(request)
+        if response is not None:
+            return response
+        response = self.retreive_most_ordered_query(request)
+        if response is not None:
+            return response
+        response = self.retreive_most_transferred_query(request)
+        if response is not None:
+            return response
 
 
 
@@ -282,26 +282,26 @@ class FilteredInsightProducts(APIView):
             else:
                 product['top_sold_orders'] = self.top_sold
 
-            # # Most Consumed
-            # if (self.most_consumed or self.is_date_most_ordered) and (product_instance.most_consumed_products or product_instance.most_consumed_products == 0):
-            #     product['most_consumed_products'] = int(product_instance.most_consumed_products)
-            #     product['quantity'] = int(product_instance.most_consumed_products)
-            # else:
-            #     product['most_consumed_products'] = self.most_consumed
+            # Most Consumed
+            if (self.most_consumed or self.is_date_most_ordered) and (product_instance.most_consumed_products or product_instance.most_consumed_products == 0):
+                product['most_consumed_products'] = int(product_instance.most_consumed_products)
+                product['quantity'] = int(product_instance.most_consumed_products)
+            else:
+                product['most_consumed_products'] = self.most_consumed
 
-            # # Most Ordered
-            # if (self.most_ordered or self.is_date_most_ordered) and (product_instance.most_ordered_products or product_instance.most_ordered_products == 0):
-            #     product['most_ordered_products'] = int(product_instance.most_ordered_products)
-            #     product['quantity'] = int(product_instance.most_ordered_products)
-            # else:
-            #     product['most_ordered_products'] = self.most_ordered or self.is_date_most_ordered
+            # Most Ordered
+            if (self.most_ordered or self.is_date_most_ordered) and (product_instance.most_ordered_products or product_instance.most_ordered_products == 0):
+                product['most_ordered_products'] = int(product_instance.most_ordered_products)
+                product['quantity'] = int(product_instance.most_ordered_products)
+            else:
+                product['most_ordered_products'] = self.most_ordered or self.is_date_most_ordered
             
-            # # Most Transferred
-            # if (self.most_transferred or self.is_date_most_ordered) and (product_instance.most_transferred_products or product_instance.most_transferred_products == 0):
-            #     product['most_transferred_products'] = int(product_instance.most_transferred_products)
-            #     product['quantity'] = int(product_instance.most_transferred_products)
-            # else:
-            #     product['most_transferred_products'] = self.most_transferred
+            # Most Transfered
+            if (self.most_transferred or self.is_date_most_ordered) and (product_instance.most_transferred_products or product_instance.most_transferred_products == 0):
+                product['most_transferred_products'] = int(product_instance.most_transferred_products)
+                product['quantity'] = int(product_instance.most_transferred_products)
+            else:
+                product['most_transferred_products'] = self.most_transferred
 
 
             # if self.low_stock_products :
