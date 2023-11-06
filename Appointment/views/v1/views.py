@@ -1102,7 +1102,7 @@ def update_appointment_device(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_appointment_service(request):
@@ -1250,16 +1250,18 @@ def update_appointment_service(request):
             
             # updating employee booking insight data
             # on changing appointment service.
-            # taking client from appoinntment object
+            # taking client from appointment object
             employee_insight_obj = EmployeeBookingDailyInsights.objects.filter(
                 appointment=appointment,
-                appointment__client=client,
-                appointment_service=service_appointment,
-                service=service_id
             ).first()
-            employee_insight_obj.employee = member_id
-            employee_insight_obj.set_employee_time(date_time)
-            employee_insight_obj.save()
+
+            if employee_insight_obj:
+                employee_insight_obj.appointment.client = client,
+                employee_insight_obj.appointment_service = service_appointment,
+                employee_insight_obj.service = service_id
+                employee_insight_obj.employee = member_id
+                employee_insight_obj.set_employee_time(date_time)
+                employee_insight_obj.save()
 
     
     try:
