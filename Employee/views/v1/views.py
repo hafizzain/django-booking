@@ -3829,7 +3829,7 @@ def create_vacation_emp(request):
             'status' : 200,
             'status_code' : '200',
             'response' : { 
-                'message' : 'All schedule',
+                'message' : 'Vacation added successfully',
                 'error_message' : None,
                 'schedule' : serialized.data
             }
@@ -3980,7 +3980,7 @@ def create_absence(request):
             'status' : 200,
             'status_code' : '200',
             'response' : {
-                'message' : 'All Absense Schedule',
+                'message' : 'Vacation added successfully',
                 'error_message' : None,
                 'schedule' : serialized.data
             }
@@ -4115,7 +4115,7 @@ def create_workingschedule(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_vacations(request):
+def c(request):
     employee_id = request.GET.get('employee_id', None)
     location = request.GET.get('location_id', None)
     search_text = request.GET.get('search_text', None)
