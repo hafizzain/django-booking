@@ -455,7 +455,7 @@ def get_calendar_appointment(request):
         status=status.HTTP_200_OK
     )
 
-@transaction.atomic
+# @transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_appointment(request):
@@ -1667,7 +1667,7 @@ def delete_appointment_employee_tip(request):
         status=status.HTTP_200_OK
         )
 
-@transaction.atomic
+# @transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_checkout(request):
