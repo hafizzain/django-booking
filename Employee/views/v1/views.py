@@ -2785,8 +2785,12 @@ def create_commission(request):
 def get_commission(request):
     no_pagination = request.GET.get('no_pagination')
     search_text = request.GET.get('search_text')
+    location_id = request.GET.get('location_id', None)
 
     query = Q()
+    
+    if location_id:
+        query &= Q(employee__location__id=location_id)
 
     if search_text:
         query &= Q(employee__full_name__icontains=search_text)
