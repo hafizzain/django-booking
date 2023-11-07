@@ -50,6 +50,7 @@ from Sale.Constants.Custom_pag import CustomPagination
 from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, EmployeeBusinessSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
 from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
 from MultiLanguage.models import InvoiceTranslation
+from django.db import transaction
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -798,6 +799,8 @@ def get_business_by_domain(request):
             status=status.HTTP_200_OK
         )
 
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_business_additional_information(request):
@@ -902,6 +905,7 @@ def update_business_additional_information(request):
 # business_types
 # software_used
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_business(request):
@@ -1362,7 +1366,7 @@ def delete_location(request):
             status=status.HTTP_403_FORBIDDEN
         )
 
-
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_location(request):
@@ -1609,7 +1613,7 @@ def get_business_theme(request):
         status=status.HTTP_200_OK
     )
 
-
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_business_theme(request):
@@ -1771,6 +1775,7 @@ def add_business_language(request):
         status=status.HTTP_200_OK
     )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_language(request):
@@ -2043,7 +2048,7 @@ def get_business_notification_settings(request):
         status=status.HTTP_200_OK
     )
 
-
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_business_notification_settings(request):
@@ -2182,7 +2187,7 @@ def get_business_booking_settings(request):
         status=status.HTTP_200_OK
     )
 
-
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_business_booking_settings(request):
@@ -2328,7 +2333,7 @@ def add_payment_method(request):
             status=status.HTTP_201_CREATED
         )
 
-
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_payment_method(request):
@@ -2588,6 +2593,7 @@ def add_business_tax(request):
             status=status.HTTP_201_CREATED
         )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_business_tax(request):
@@ -3203,6 +3209,7 @@ def add_business_vendor(request):
             status=status.HTTP_201_CREATED
         )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_business_vendor(request):

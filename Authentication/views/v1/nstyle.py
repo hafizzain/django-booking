@@ -25,6 +25,7 @@ from Authentication.Constants.Email import send_welcome_email
 from Employee.models import Employee
 
 from Utility.models import ExceptionRecord
+from django.db import transaction
 # Create your views here.
 
 @api_view(['GET'])
@@ -851,7 +852,7 @@ def login_flagged(request):
             status=status.HTTP_200_OK
         )
 
-
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([AllowAny])
 def change_password(request):

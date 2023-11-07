@@ -24,7 +24,7 @@ from Employee.serializers import( EmployeSerializer , EmployeInformationsSeriali
                         
                           
                                  )
-from django.db import connection
+from django.db import connection, transaction
 from threading import Thread
 from Employee.Constants.Add_Employe import add_employee
 from Service.models import Service
@@ -1105,7 +1105,8 @@ def delete_employee(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_employee(request): 
@@ -1393,7 +1394,8 @@ def update_employee(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_employee_device(request): 
@@ -1824,7 +1826,8 @@ def delete_staff_group(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_staff_group(request):
@@ -2145,7 +2148,8 @@ def create_attendence(request):
             status=status.HTTP_201_CREATED
         ) 
  
- 
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_attendence(request):
@@ -2935,6 +2939,7 @@ def delete_commission(request):
         status=status.HTTP_200_OK
     )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_commision(request):
@@ -3323,7 +3328,8 @@ def delete_asset(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_asset(request):
@@ -3566,7 +3572,8 @@ def delete_vacation(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_vacation(request):
@@ -4426,7 +4433,7 @@ def delete_absence(request):
         status=status.HTTP_200_OK
     )  
 
-
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_absence(request): 
@@ -4500,7 +4507,7 @@ def update_absence(request):
         status=status.HTTP_200_OK
         )
 
-
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_workingschedule(request): 

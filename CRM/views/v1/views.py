@@ -11,6 +11,7 @@ from CRM.serializers import SegmentSerializer
 from Client.models import Client
 from Utility.models import NstyleFile
 from NStyle.Constants import StatusCodes
+from django.db import transaction
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -175,6 +176,7 @@ def delete_segment(request):
         status=status.HTTP_200_OK
     )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_segment(request):

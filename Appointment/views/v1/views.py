@@ -852,7 +852,7 @@ def create_appointment(request):
     )    
 
 
-
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_appointment(request):
@@ -1034,6 +1034,7 @@ def update_appointment(request):
         status=status.HTTP_200_OK
     )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_appointment_device(request):
@@ -1103,6 +1104,7 @@ def update_appointment_device(request):
         status=status.HTTP_200_OK
     )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_appointment_service(request):
@@ -1476,6 +1478,7 @@ def create_blockTime(request):
             status=status.HTTP_201_CREATED
     ) 
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_blocktime(request):

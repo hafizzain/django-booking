@@ -27,6 +27,7 @@ from Product.serializers import (CategorySerializer, BrandSerializer, ProductSer
                                  ,OrderSerializer , OrderProductSerializer, ProductConsumptionSerializer,
                                  ProductStockTransferSerializer, ProductStockReportSerializer
                                  )
+from django.db import transaction
 
 
 
@@ -331,6 +332,7 @@ def add_category(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_category(request):
@@ -517,7 +519,8 @@ def add_brand(request):
         },
         status=status.HTTP_201_CREATED
     )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_brand(request):
@@ -917,6 +920,8 @@ def add_product(request):
         status=status.HTTP_201_CREATED
     )
 
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_product(request):
@@ -1626,7 +1631,7 @@ def get_orderstock(request):
     response = paginator.get_paginated_response(paginated_data, 'stocks')
     return response
 
- 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_orderstock(request):
@@ -1780,6 +1785,7 @@ def delete_orderstock(request):
         status=status.HTTP_200_OK
     )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_orderstockproduct(request):
@@ -2072,6 +2078,7 @@ def add_product_consumption(request):
         status=status.HTTP_201_CREATED
     )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_product_consumptions(request):
@@ -2483,6 +2490,7 @@ def delete_product_stock_transfer(request):
         status=status.HTTP_200_OK
     )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_product_stock_transfer(request):

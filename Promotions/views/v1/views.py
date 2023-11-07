@@ -33,6 +33,7 @@ import json
 from django.db.models import Q
 
 from django_tenants.utils import tenant_context
+from django.db import transaction
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -371,7 +372,8 @@ def delete_directorflat(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_directorflat(request):
@@ -1123,6 +1125,7 @@ def create_specificgroupdiscount(request):
             status=status.HTTP_201_CREATED
         )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_specificgroupdiscount(request):
@@ -1672,7 +1675,8 @@ def create_purchasediscount(request):
             },
             status=status.HTTP_201_CREATED
         )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_purchasediscount(request):
@@ -2210,7 +2214,8 @@ def get_specificbrand_discount(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_specificbrand_discount(request):
@@ -2649,7 +2654,8 @@ def create_spend_discount(request):
             },
             status=status.HTTP_201_CREATED
         )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_spend_discount(request):
@@ -3074,6 +3080,7 @@ def create_spend_some_amount(request):
             status=status.HTTP_201_CREATED
         )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_spend_some_amount(request):
@@ -3499,6 +3506,7 @@ def create_fixed_price_service(request):
             status=status.HTTP_201_CREATED
         )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_fixed_price_service(request):
@@ -3916,6 +3924,7 @@ def create_free_service(request):
             status=status.HTTP_201_CREATED
         )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_free_service(request):
@@ -4335,6 +4344,7 @@ def create_bundle_fixed_price(request):
             status=status.HTTP_201_CREATED
         )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_bundle_fixed_price(request):
@@ -4735,6 +4745,7 @@ def create_retail_get_service(request):
             status=status.HTTP_201_CREATED
         )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_retail_get_service(request):
@@ -5210,6 +5221,7 @@ def create_user_restricted_discount(request):
             status=status.HTTP_201_CREATED
         )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_user_restricted_discount(request):
@@ -5680,6 +5692,7 @@ def create_complimentrydiscount(request):
             status=status.HTTP_201_CREATED
         )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_complimentrydiscount(request):
@@ -6099,7 +6112,8 @@ def create_packagesdiscount(request):
             },
             status=status.HTTP_201_CREATED
         )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_packagesdiscount(request):
