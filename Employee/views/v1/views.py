@@ -1313,7 +1313,7 @@ def update_employee(request):
     )
     
     try:
-        empl_permission, created = EmployePermission.objects.get_or_create(employee=employee)
+        empl_permission = EmployePermission.objects.get_or_create(employee=employee)
     
         for permit in ALL_PERMISSIONS:
             value = request.data.get(permit, None)
