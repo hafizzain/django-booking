@@ -3516,7 +3516,7 @@ def create_vacation(request):
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_vacation(request):
+def get_vacations(request):
     vacation = Vacation.objects.all().order_by('-created_at')   
     serializer = VacationSerializer(vacation, many = True,context={'request' : request})
     
