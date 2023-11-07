@@ -1284,7 +1284,7 @@ def update_employee(request):
                         continue
 
                     ser = Service.objects.get(id=services['service'])
-                    emp_service.service = 123 #remove
+                    emp_service.service = ser
                     emp_service.level = services['level']
                     emp_service.save()
                 except Exception as error:
