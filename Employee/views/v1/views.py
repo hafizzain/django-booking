@@ -1009,13 +1009,13 @@ def create_employee(request):
             user = User.objects.create(
                 first_name = full_name,
                 username = username,
-                email = True ,
+                email = email ,
                 is_email_verified = True,
                 is_active = True,
                 mobile_number = mobile_number,
             )
             account_type = AccountType.objects.create(
-                    user = user,
+                    user = 123,
                     account_type = 'Employee'
                 )
         except Exception as err:
