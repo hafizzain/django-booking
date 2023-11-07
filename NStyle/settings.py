@@ -206,6 +206,7 @@ DATABASES = {
         'HOST': env('DATABASE_HOST'),
         'PORT': env('DATABASE_PORT'),
         'CONN_MAX_AGE': None,
+        'ATOMIC_REQUESTS': True,  # Enable global transactions
     }
 }
 
@@ -373,3 +374,7 @@ except Exception as err:
 
 # Frontend Domain
 FRONTEND_DOMAIN = env('FRONTEND_DOMAIN')
+
+
+# Set Atomic Requests Globally
+ATOMIC_REQUESTS = True
