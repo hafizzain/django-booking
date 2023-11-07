@@ -1294,7 +1294,7 @@ def update_employee(request):
                 ser = Service.objects.get(id=services['service'])
 
                 emp_service = EmployeeSelectedService.objects.create(
-                    employee=employee,
+                    employee="employee",  #remove
                     service=ser,
                     level=services['level']
                 )
