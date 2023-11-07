@@ -884,7 +884,7 @@ def create_employee(request):
         
     employee= Employee.objects.create(
         user=user,
-        business=business,
+        business="123abc",  # add business here
         full_name = full_name,
         image= image,
         employee_id= employee_id,
