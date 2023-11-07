@@ -1908,8 +1908,6 @@ def new_create_sale_order(request):
     tip = request.data.get('tip', [])
     total_price = request.data.get('total_price', None)
     minus_price = 0
-    debug_before = None
-    debug_after = None
 
     
     errors = []
@@ -2379,15 +2377,6 @@ def new_create_sale_order(request):
                 employee_commission.save()
             
 
-    # This code should be removed as its not required now.
-    # incrementing voucher max sale 
-    # if is_voucher_redeemed_global:
-    #     client_voucher = VoucherOrder.objects.get(id=redeemed_voucher_id)
-    #     debug_before = client_voucher.max_sales
-    #     client_voucher.max_sales += 1
-    #     client_voucher.save()
-    #     debug_after = client_voucher.max_sales
-    
     if type(tip) == str:
         tip = json.loads(tip)
     if type(tip) == list:
@@ -2403,7 +2392,7 @@ def new_create_sale_order(request):
                 errors.append(str(err))
             else:
                 AppointmentEmployeeTip.objects.create(
-                    checkout=checkout,
+                    checkout="checkout123",
                     member=employee_tips_id,
                     tip=float(checkout_tip),
                     business_address=business_address,
@@ -2529,8 +2518,6 @@ def new_create_sale_order(request):
                     'message' : 'Product Order Sale Created!',
                     'error_message' : errors,
                     'sale' : serialized.data,
-                    'before': debug_before,
-                    'after': debug_after
                 }
             },
             status=status.HTTP_201_CREATED
