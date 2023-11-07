@@ -2435,19 +2435,17 @@ def get_payrol_working(request):
     no_pagination = request.GET.get('no_pagination', None)
 
 
-    queries = {}
+    query = Q(is_deleted=False, is_blocked=False)
 
     if location_id:
-        queries['location'] = location_id
+        query &= Q(location=location_id)
     
     if employee_id:
-        queries['id__in'] = [employee_id]
+        query &= Q(id__in=[employee_id])
 
-    all_employe= Employee.objects.filter(
-        is_deleted = False, 
-        is_blocked = False,
-        **queries
-    )
+    all_employe= Employee.objects.filter(query) \
+                                 .with_total_commission() \
+                                 .with_total_tips()
     # .order_by('employee_employedailyschedule__date')
     all_employe_count= all_employe.count()
 

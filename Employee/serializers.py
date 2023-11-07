@@ -1004,7 +1004,9 @@ class EmployeeInformationSerializer(serializers.ModelSerializer):
         model = Employee
         fields = ['id','business', 'image','full_name', 'email', 'mobile_number','country','state','city', 'address', 'postal_code']
 
-class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):    
+class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
+    total_commission = serializers.FloatField()
+    total_tips = serializers.FloatField()
     schedule =  serializers.SerializerMethodField(read_only=True)    
     image = serializers.SerializerMethodField()
     income_type = serializers.SerializerMethodField(read_only=True)
@@ -1135,7 +1137,8 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ['id', 'employee_id','is_active','full_name','image','location','sallaryslip',
-                  'schedule','created_at', 'income_type', 'salary', 'total_earning', 'total_hours']
+                  'schedule','created_at', 'income_type', 'salary', 'total_earning', 'total_hours',
+                  'total_commission', 'total_tips']
         
 
 class Payroll_Working_device_attendence_ScheduleSerializer(serializers.ModelSerializer):    

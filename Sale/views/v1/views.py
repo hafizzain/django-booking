@@ -2397,7 +2397,7 @@ def new_create_sale_order(request):
                 errors.append(str(err))
             else:
                 AppointmentEmployeeTip.objects.create(
-                    checkout="checkout123",
+                    checkout=checkout,
                     member=employee_tips_id,
                     tip=float(checkout_tip),
                     business_address=business_address,
