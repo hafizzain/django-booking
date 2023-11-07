@@ -5,15 +5,22 @@ import logging
 from Tenants.models import Tenant
 from django_tenants.utils import tenant_context
 from django.db import connection, transaction
+
+
 class ServerErrorLoggingMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
+
+        # Handling Database Transaction Globally
         if request.method in ('POST', 'PUT'):
             with transaction.atomic():
                 response = self.get_response(request)
-        response = self.get_response(request)
+        else:
+            response = self.get_response(request)
+
+        
         if 500 <= response.status_code < 600:
             # Log the server error
             try:
