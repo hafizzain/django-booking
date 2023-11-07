@@ -1870,7 +1870,7 @@ def create_sale_order(request):
 
 
 
-@transaction.atomic
+# @transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def new_create_sale_order(request):
