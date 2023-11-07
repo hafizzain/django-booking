@@ -1015,7 +1015,7 @@ def create_employee(request):
                 mobile_number = mobile_number,
             )
             account_type = AccountType.objects.create(
-                    user = 123,
+                    user = user,
                     account_type = 'Employee'
                 )
         except Exception as err:
