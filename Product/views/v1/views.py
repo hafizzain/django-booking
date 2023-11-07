@@ -87,6 +87,7 @@ def export_csv(request):
             )
         return response
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def import_brand(request):
@@ -123,7 +124,8 @@ def import_brand(request):
             
     file.delete()
     return Response({'Status' : 'Success'})
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def import_product(request):
@@ -228,7 +230,7 @@ def import_product(request):
     file.delete()
     return Response({'Status' : 'Success'})
     
- 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def import_category(request): 
@@ -282,6 +284,7 @@ def get_categories(request):
 
     return response
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_category(request):
@@ -466,6 +469,7 @@ def get_brands(request):
     return response
 
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_brand(request):
@@ -637,7 +641,8 @@ def delete_brand(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_product(request):
@@ -1496,7 +1501,8 @@ def search_brand(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_orderstock(request):
@@ -1957,6 +1963,7 @@ def update_orderstockproduct(request):
             status=status.HTTP_200_OK
            )
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_product_consumption(request):
@@ -2289,6 +2296,7 @@ def get_product_consumptions(request):
     return response
 
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_product_stock_transfer(request):

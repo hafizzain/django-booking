@@ -55,6 +55,8 @@ from Notification.notification_processor import NotificationProcessor
 
 from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
 
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def import_employee(request):
@@ -172,6 +174,7 @@ def import_employee(request):
     return Response({'Status' : 'Success'})
         
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def import_attendance(request):
@@ -577,7 +580,8 @@ def generate_id(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def check_email_employees(request):
@@ -702,7 +706,8 @@ def check_email_employees(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_employee(request):
@@ -1530,6 +1535,7 @@ def delete_all_employees(request):
         empl.delete()
     return Response({'deleted' : True})
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def import_staff_group(request): 
@@ -1582,7 +1588,7 @@ def import_staff_group(request):
     file.delete()
     return Response({'Status' : 'Success'})
             
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_staff_group(request):
@@ -2067,7 +2073,7 @@ def get_attendence_device(request):
         status=status.HTTP_200_OK
     )
 
-    
+@transaction.atomic    
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_attendence(request):
@@ -2334,7 +2340,7 @@ def delete_payroll(request):
         status=status.HTTP_200_OK
     )
     
-    
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_sallaryslip(request):
@@ -2581,7 +2587,8 @@ def delete_payroll(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_commission(request):
@@ -3160,7 +3167,7 @@ def update_commision(request):
         status=status.HTTP_200_OK
         )
     
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_asset(request):
@@ -3422,6 +3429,7 @@ def update_asset(request):
         )
 
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_vacation(request):
@@ -3649,7 +3657,8 @@ def update_vacation(request):
         },
         status=status.HTTP_200_OK
         )
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_vacation_emp(request):
@@ -3825,7 +3834,7 @@ def create_vacation_emp(request):
     )
 
 
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_absence(request):
@@ -3975,7 +3984,7 @@ def create_absence(request):
         status=status.HTTP_200_OK
     )
         
-    
+@transaction.atomic 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_workingschedule(request):
@@ -4581,7 +4590,7 @@ def update_workingschedule(request):
         status=status.HTTP_200_OK
         )
 
-    
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_employe_account(request):
@@ -4715,6 +4724,7 @@ def create_employe_account(request):
         status=status.HTTP_200_OK
     )
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def employee_login(request):
@@ -4930,6 +4940,7 @@ def employee_logout(request):
         'message': 'Device Unlinked'
     }, status=status.HTTP_200_OK)
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def resend_password(request):
@@ -5041,7 +5052,7 @@ def resend_password(request):
             return Response({'success': False, 'response': {'message': 'Password should be 8 letters long!'}},
                             status=status.HTTP_400_BAD_REQUEST)
         
-        
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def forgot_password(request):
@@ -5135,7 +5146,7 @@ def forgot_password(request):
                      'message': 'Verification code has been sent to your provided Email'},
                     status=status.HTTP_200_OK)
     
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def verify_email(request):
@@ -5341,6 +5352,7 @@ def get_single_employee_vacation(request):
         status=status.HTTP_200_OK
     )
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def set_password(request):

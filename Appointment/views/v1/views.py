@@ -455,7 +455,7 @@ def get_calendar_appointment(request):
         status=status.HTTP_200_OK
     )
 
-# @transaction.atomic
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_appointment(request):
@@ -1349,6 +1349,7 @@ def delete_appointment(request):
         status=status.HTTP_200_OK
     )
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_blockTime(request):
@@ -1670,7 +1671,7 @@ def delete_appointment_employee_tip(request):
         status=status.HTTP_200_OK
         )
 
-# @transaction.atomic
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_checkout(request):
@@ -2078,6 +2079,8 @@ def create_checkout(request):
             },
             status=status.HTTP_201_CREATED
     ) 
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_checkout_device(request):
@@ -2485,7 +2488,9 @@ def get_client_sale(request):
             },
             status=status.HTTP_201_CREATED
         )
-    
+
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_appointment_client(request):
@@ -2739,6 +2744,7 @@ def create_appointment_client(request):
                 status=status.HTTP_201_CREATED
         )
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_employee_check_time(request):                  
@@ -2934,7 +2940,8 @@ def get_employee_check_time(request):
             },
             status=status.HTTP_200_OK
         )
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_employee_check_availability_list(request):

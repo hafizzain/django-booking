@@ -37,7 +37,7 @@ from django.db import transaction
 
 from django_tenants.utils import tenant_context   
 
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def create_client_business(request):
@@ -252,7 +252,8 @@ def create_client_business(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def customer_verify_otp(request):
@@ -396,6 +397,7 @@ def customer_verify_otp(request):
         )
 
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def customer_login(request):

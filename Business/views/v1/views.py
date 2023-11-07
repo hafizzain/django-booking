@@ -220,6 +220,7 @@ def get_user_default_data(request):
     }
 }
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def update_user_default_data(request):
@@ -490,7 +491,7 @@ def get_business_types(request):
         }
     )
 
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def create_user_business(request):
@@ -1064,7 +1065,7 @@ def get_business_locations(request, business_id):
             status=status.HTTP_200_OK
         )
 
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_business_location(request):
@@ -1691,6 +1692,7 @@ def update_business_theme(request):
         status=status.HTTP_400_BAD_REQUEST
     )
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_business_language(request):
@@ -2265,6 +2267,7 @@ def update_business_booking_settings(request):
         )
 
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_payment_method(request):
@@ -2456,7 +2459,7 @@ def get_business_payment_methods(request):
         )
     
 
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_business_tax(request):
@@ -2919,7 +2922,7 @@ def delete_business_tax(request):
             status=status.HTTP_200_OK
         )
 
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def import_business_vendor(request):
@@ -3024,6 +3027,7 @@ def get_business_vendors(request):
     response = paginator.get_paginated_response(paginated_data, 'vendors')
     return response
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def check_vendor_existance(request):
@@ -3076,6 +3080,7 @@ def check_vendor_existance(request):
             status=status.HTTP_200_OK
         )
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_business_vendor(request):
@@ -3528,7 +3533,8 @@ def get_domain_business_address(request):
             },
             status=status.HTTP_200_OK
         )
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_check_availability(request):                  
@@ -3750,7 +3756,8 @@ def get_check_availability(request):
             },
             status=status.HTTP_200_OK
         )
-        
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_employee_appointment(request):
@@ -4025,7 +4032,8 @@ def get_employee_appointment(request):
             },
             status=status.HTTP_200_OK
         )
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def create_client_business(request):
@@ -4145,7 +4153,8 @@ def create_client_business(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def employee_availability(request):                  

@@ -7,6 +7,7 @@ from rest_framework import status
 from .serializers import *
 import json
 from .models import Language as Lang
+from django.db import transaction
 
 
 
@@ -148,7 +149,7 @@ def add_translation_forms(request):
 
 
 
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_invoiceTranslation(request):
@@ -251,6 +252,7 @@ def get_invoiceTranslation(request):
                 status=status.HTTP_200_OK
             )
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def update_invoiceTranslation(request):

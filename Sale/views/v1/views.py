@@ -125,6 +125,7 @@ def get_service(request):
     )
     
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_service(request):
@@ -598,7 +599,8 @@ def update_service(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-   
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_servicegroup(request):
@@ -1431,7 +1433,8 @@ def get_sale_checkout(request):
             status=status.HTTP_201_CREATED
         )
     
-    
+
+@transaction.atomic  
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_sale_order(request):
@@ -1872,7 +1875,7 @@ def create_sale_order(request):
 
 
 
-# @transaction.atomic
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def new_create_sale_order(request):

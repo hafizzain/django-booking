@@ -40,6 +40,7 @@ def all_users(request):
     )
 
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def create_tenant_business_user(request):
@@ -179,7 +180,7 @@ def create_tenant_business_user(request):
             status=status.HTTP_201_CREATED
         )
 
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def verify_otp(request):
@@ -360,6 +361,7 @@ def verify_otp(request):
             status=status.HTTP_200_OK
         )
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_tenant_detail(request):
@@ -401,7 +403,7 @@ def get_tenant_detail(request):
     )
             
     
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def send_verification_otp(request):
@@ -511,6 +513,7 @@ def send_verification_otp(request):
             status=status.HTTP_200_OK
         )
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):
@@ -720,6 +723,7 @@ def login(request):
             status=status.HTTP_200_OK
         )
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_flagged(request):

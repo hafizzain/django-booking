@@ -27,6 +27,8 @@ from django.core.paginator import Paginator
 from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
 from django.db import transaction
 
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def import_client(request):
@@ -258,6 +260,7 @@ def generate_id(request):
         status=status.HTTP_200_OK
     )
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_client(request):
@@ -678,7 +681,7 @@ def get_client_group(request):
         status=status.HTTP_200_OK
     )
     
-    
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_client_group(request):
@@ -911,7 +914,7 @@ def delete_client_group(request):
         status=status.HTTP_200_OK
     )
     
-    
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_subscription(request):
@@ -1136,7 +1139,7 @@ def update_subscription(request):
         status=status.HTTP_200_OK
         )
     
-    
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_rewards(request):
@@ -1439,7 +1442,7 @@ def update_rewards(request):
         status=status.HTTP_200_OK
         )
     
-   
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_promotion(request):
@@ -1728,7 +1731,7 @@ def update_promotion(request):
         )
         
 
-    
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_memberships(request):
@@ -2197,7 +2200,8 @@ def update_memberships(request):
         },
         status=status.HTTP_200_OK
         )
-       
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_vouchers(request):
@@ -2506,7 +2510,8 @@ def update_vouchers(request):
         status=status.HTTP_200_OK
         )
     
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_loyalty(request):
@@ -3156,6 +3161,7 @@ def get_customer_detailed_loyalty_points(request):
         status=status.HTTP_200_OK
     )
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def check_client_existance(request):
