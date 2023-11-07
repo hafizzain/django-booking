@@ -20,6 +20,7 @@ from Authentication.models import User
 from Notification.notification_processor import NotificationProcessor
 
 from Sale.Constants.Custom_pag import CustomPagination
+from django.db import transaction
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -209,7 +210,8 @@ def delete_stafftarget(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_stafftarget(request):
@@ -593,7 +595,7 @@ def delete_storetarget(request):
         status=status.HTTP_200_OK
     )
 
-
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_storetarget(request):            
@@ -920,6 +922,7 @@ def delete_servicetarget(request):
         status=status.HTTP_200_OK
     )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_servicetarget(request):
@@ -1331,7 +1334,8 @@ def delete_retailtarget(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_retailtarget(request):

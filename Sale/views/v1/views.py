@@ -392,7 +392,8 @@ def delete_service(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_service(request):
@@ -756,7 +757,8 @@ def delete_servicegroup(request):
         },
         status=status.HTTP_200_OK
     )
-       
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_servicegroup(request):
