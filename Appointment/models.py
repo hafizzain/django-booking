@@ -318,8 +318,8 @@ class AppointmentCheckout(models.Model):
         super(AppointmentCheckout, self).save(*args, **kwargs)
 
     def get_client_loyalty_points(self):
-        if self.client:
-            redeemed_points_obj = LoyaltyPointLogs.objects.filter(client=self.appointment.client,
+        if self.appointment.client:
+            redeemed_points_obj = LoyaltyPointLogs.objects.filter(appointment__client=self.appointment.client,
                                                               location=self.business_address) \
                                                         .order_by('-created_at')
             if redeemed_points_obj:
