@@ -1843,6 +1843,10 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
     
     tip = serializers.SerializerMethodField(read_only=True)
     total_tip = serializers.SerializerMethodField(read_only=True)
+    client_loyalty_points = serializers.SerializerMethodField(read_only=True)
+
+    def get_client_loyalty_points(self, obj):
+        return obj.get_client_loyalty_points()
 
     def get_client(self, obj):
         if obj.client:
@@ -1978,7 +1982,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             'created_at', 'payment_type', 'tip', 'service_commission', 'voucher_commission', 'product_commission',
             'service_commission_type', 'product_commission_type', 'voucher_commission_type', 'ids', 'membership_product',
             'membership_service', 'membership_type', 'invoice', 'tax_name', 'tax_name1', 'total_discount',
-            'voucher_redeem_percentage', 'redeem_option', 'total_tip'
+            'voucher_redeem_percentage', 'redeem_option', 'total_tip', 'client_loyalty_points'
         ]
 
         # Remove Member from get all sale orders
@@ -2012,6 +2016,10 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
     invoice = serializers.SerializerMethodField(read_only=True)
     total_tip = serializers.SerializerMethodField(read_only=True)
     
+    client_loyalty_points = serializers.SerializerMethodField(read_only=True)
+
+    def get_client_loyalty_points(self, obj):
+        return obj.get_client_loyalty_points()
 
     def get_promotion_name(self, obj):
         return 'promotion name'
@@ -2078,5 +2086,5 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
                  'membership', 'rewards', 'tip', 'gst', 'gst1', 'gst_price', 'gst_price1', 'service_price',
                  'total_price', 'service_commission', 'service_commission_type', 'voucher_discount_percentage',
                  'created_at', 'order_type', 'client', 'location', 'price', 'promotion_name', 'invoice',
-                 'tax_name', 'tax_name1', 'total_tip']
+                 'tax_name', 'tax_name1', 'total_tip', 'client_loyalty_points']
         

@@ -7,7 +7,7 @@ from Authentication.models import User
 from Business.models import Business, BusinessAddress
 from django.utils.timezone import now
 from Service.models import Service
-from Client.models import Client, Membership, Promotion, Rewards, Vouchers
+from Client.models import Client, Membership, Promotion, Rewards, Vouchers, LoyaltyPointLogs
 from Employee.models import Employee
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 
@@ -316,6 +316,15 @@ class AppointmentCheckout(models.Model):
             self.selected_promotion_type = self.appointment.selected_promotion_type
 
         super(AppointmentCheckout, self).save(*args, **kwargs)
+
+    def get_client_loyalty_points(self):
+        if self.client:
+            redeemed_points_obj = LoyaltyPointLogs.objects.filter(client=self.client,
+                                                              location=self.location) \
+                                                        .order_by('-created_at')[0]
+            return redeemed_points_obj.points_redeemed
+        else:
+            return None
     
     @property
     def fun():

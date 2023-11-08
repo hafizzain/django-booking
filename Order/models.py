@@ -3,7 +3,7 @@ from uuid import uuid4
 from django.db import models
 from Authentication.models import User
 from Business.models import BusinessAddress
-from Client.models import Client, Membership, Promotion, Rewards, Vouchers
+from Client.models import Client, Membership, Promotion, Rewards, Vouchers, LoyaltyPointLogs
 from Promotions.models import PurchaseDiscount, SpendSomeAmount, FixedPriceService, MentionedNumberService, BundleFixed, RetailAndGetService
 from django.utils.timezone import now
 from Employee.models import Employee
@@ -95,6 +95,15 @@ class Checkout(models.Model):
     def __str__(self):
         return str(self.id)
     
+
+    def get_client_loyalty_points(self):
+        if self.client:
+            redeemed_points_obj = LoyaltyPointLogs.objects.filter(client=self.client,
+                                                              location=self.location) \
+                                                        .order_by('-created_at')[0]
+            return redeemed_points_obj.points_redeemed
+        else:
+            return None
 
 class Order(models.Model):    
     DURATION_CHOICES=[
