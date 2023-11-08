@@ -864,7 +864,7 @@ def get_servicetarget(request):
 
 
     if search_text:
-        service_target = service_target.filter(service_group__name=search_text)
+        service_target = service_target.filter(service_group__name__icontains=search_text)
 
     serialized = list(ServiceTargetSerializers(service_target, many = True,context={'request' : request}).data)
 
