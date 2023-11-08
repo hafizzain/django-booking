@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('Business', '0009_businessvendor'),
         ('Business', '0021_businessaddress_banking'),
-        ('Employee', '0019_asset_assetdocument'),
+        # ('Employee', '0019_asset_assetdocument'),
         ('Business', '0017_alter_adminnotificationsetting_sms_notify_for_daily_book_and_more'),
         ('Business', '0022_business_is_completed'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),

@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('Product', '0045_product_product_size'),
-        ('Client', '0035_alter_client_user'),
+        # ('Client', '0035_alter_client_user'),
         ('Service', '0024_priceservice_currency'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('Product', '0041_productorderstockreport_reorder_quantity'),
@@ -209,7 +209,7 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(blank=True, null=True)),
                 ('business', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='business_userrestricteddiscount', to='Business.business')),
-                ('client', models.ManyToManyField(related_name='client_userrestricteddiscount', to='Client.client')),
+                # ('client', models.ManyToManyField(related_name='client_userrestricteddiscount', to='Client.client')),
                 ('user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='user_userrestricteddiscount', to=settings.AUTH_USER_MODEL)),
                 ('promotion_name', models.CharField(default='Promotion Name', max_length=999)),
             ],

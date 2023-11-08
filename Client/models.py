@@ -8,7 +8,6 @@ from django.db import models
 from uuid import uuid4
 from Authentication.models import User
 from Business.models import Business, BusinessAddress
-#from Promotions.models import ComplimentaryDiscount
 from django.db import connection
 from django.db.models import Subquery, OuterRef, DateTimeField, Q, Count, Case, When, Value, F, CharField, Sum, FloatField
 from django.db.models.functions import Coalesce

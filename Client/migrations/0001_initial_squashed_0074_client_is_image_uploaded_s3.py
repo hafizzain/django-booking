@@ -12,6 +12,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('Utility', '0007_language_code'),
+        ('Promotions', '0024_complimentarydiscount_discountonfreeservice'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('Business', '0011_businesstheme_theme_name'),
     ]

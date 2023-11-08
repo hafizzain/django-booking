@@ -53,7 +53,6 @@ class Migration(migrations.Migration):
                 ('total', models.CharField(blank=True, max_length=500, null=True)),
                 ('payment_method', models.CharField(blank=True, max_length=500, null=True)),
                 ('language', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='Utility.language')),
-                ('location', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='Business.businessaddress')),
                 ('status', models.CharField(choices=[('active', 'active'), ('inactive', 'inactive')], default='active', max_length=10)),
                 ('user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
             ],

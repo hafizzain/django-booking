@@ -4,13 +4,17 @@ from django.conf import settings
 from Authentication.Constants.CreateTenant import add_business_types, add_software_types
 from Utility.Constants.add_data_db import add_business_types, add_software_types, add_currencies, add_languages
 
-
+import datetime
 from uuid import uuid4
 
 def CreateDummyTenants():
     total_tenants = Tenant.objects.all()
     total_tenants = len(total_tenants)
-    for i in range(10):
+    start = datetime.datetime.now()
+    
+    
+    for i in range(1):
+
         count = total_tenants + i
 
         name = f'NST-{count}'
@@ -31,7 +35,14 @@ def CreateDummyTenants():
             add_business_types(tenant = tenant)
             add_software_types(tenant = tenant)
             add_currencies(tenant=tenant)
-            add_languages(tenant=tenant)
+            try:
+                add_languages(tenant=tenant)
+            except:
+                pass
 
         tenant.is_ready = True
         tenant.save()
+
+    end = datetime.datetime.now()
+    final = end - start
+    print(f'Total Time Taken : {final.seconds} Seconds')
