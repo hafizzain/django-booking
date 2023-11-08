@@ -15,8 +15,10 @@ from Authentication.models import User
 
 from NStyle.Constants import StatusCodes
 from django_tenants.utils import tenant_context
+from django.db import transaction
 
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):

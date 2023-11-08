@@ -6,6 +6,7 @@ from .models import HelpContent
 from rest_framework import status
 from .serializers import *
 import json
+from django.db import transaction
 
 
 
@@ -232,7 +233,7 @@ def get_comment_details(request):
 
 
 
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def search_topic(request):

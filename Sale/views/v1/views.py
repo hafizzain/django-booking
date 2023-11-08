@@ -53,17 +53,21 @@ def get_service(request):
     is_mobile = request.GET.get('is_mobile', None)
     search_text = request.GET.get('search_text', None)
     no_pagination = request.GET.get('no_pagination', None)
+    emp_id = request.GET.get('employee_id', None)
 
-    query = {}
+    query = Q(is_deleted=False) & Q(is_blocked=False)
     location_instance = None
     currency_code = None
     errors = []
     
     if search_text:
-        query['name__icontains'] = search_text
+        query &= Q(name__icontains=search_text) |  \
+                 Q(servicegroup_services__name__icontains=search_text) | \
+                 Q(location__address_name__icontains=search_text)
+                 
 
     if location:
-        query['location__id'] = location
+        query &= Q(location__id=location)
     elif request.user.is_authenticated :
         try:
             employee = Employee.objects.get(
@@ -76,16 +80,22 @@ def get_service(request):
                 first_location = employee.location.all()[0]
                 location_instance = first_location
                 currency_code = location_instance.currency.code
-                query['location__id'] = first_location.id
+                query &= Q(location__id=first_location.id)
             else:
                 errors.append('Employee Location 0')
 
     
-    service= Service.objects.filter(
-        is_deleted = False, 
-        is_blocked = False, 
-        **query
-    ).order_by('-created_at').distinct()
+    service= Service.objects.filter(query).order_by('-created_at').distinct()
+
+    # if is_mobile then request.user will be employee
+    # so we will filter only those services which are assigned to
+    # that particular employee
+    if is_mobile:
+        emp = Employee.objects.get(email=request.user.email)
+        emp_service_ids = emp.employee_selected_service.distinct().values_list('service__id', flat=True)
+        service = service.filter(id__in=emp_service_ids)
+
+
     service_count= service.count()
 
     page_count = service_count / 10
@@ -115,6 +125,7 @@ def get_service(request):
     )
     
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_service(request):
@@ -382,7 +393,8 @@ def delete_service(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_service(request):
@@ -587,7 +599,8 @@ def update_service(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-   
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_servicegroup(request):
@@ -746,7 +759,8 @@ def delete_servicegroup(request):
         },
         status=status.HTTP_200_OK
     )
-       
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_servicegroup(request):
@@ -1419,7 +1433,8 @@ def get_sale_checkout(request):
             status=status.HTTP_201_CREATED
         )
     
-    
+
+@transaction.atomic  
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_sale_order(request):
@@ -1898,8 +1913,6 @@ def new_create_sale_order(request):
     tip = request.data.get('tip', [])
     total_price = request.data.get('total_price', None)
     minus_price = 0
-    debug_before = None
-    debug_after = None
 
     
     errors = []
@@ -2369,15 +2382,6 @@ def new_create_sale_order(request):
                 employee_commission.save()
             
 
-    # This code should be removed as its not required now.
-    # incrementing voucher max sale 
-    # if is_voucher_redeemed_global:
-    #     client_voucher = VoucherOrder.objects.get(id=redeemed_voucher_id)
-    #     debug_before = client_voucher.max_sales
-    #     client_voucher.max_sales += 1
-    #     client_voucher.save()
-    #     debug_after = client_voucher.max_sales
-    
     if type(tip) == str:
         tip = json.loads(tip)
     if type(tip) == list:
@@ -2519,8 +2523,6 @@ def new_create_sale_order(request):
                     'message' : 'Product Order Sale Created!',
                     'error_message' : errors,
                     'sale' : serialized.data,
-                    'before': debug_before,
-                    'after': debug_after
                 }
             },
             status=status.HTTP_201_CREATED

@@ -20,6 +20,7 @@ from Authentication.models import User
 from Notification.notification_processor import NotificationProcessor
 
 from Sale.Constants.Custom_pag import CustomPagination
+from django.db import transaction
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -63,6 +64,7 @@ def get_stafftarget(request):
     return response
 
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_stafftarget(request):
@@ -142,7 +144,7 @@ def create_stafftarget(request):
     user = User.objects.filter(email__icontains=employee_id.email).first()
     title = 'Target'
     body = 'New Sales Target Assigned'
-    NotificationProcessor.send_notifications_to_users(user, title, body)
+    NotificationProcessor.send_notifications_to_users(user, title, body, request_user=request.user)
     
     
     serializers= StaffTargetSerializers(staff_target, context={'request' : request})
@@ -209,7 +211,8 @@ def delete_stafftarget(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_stafftarget(request):
@@ -305,6 +308,7 @@ def update_stafftarget(request):
         )
     
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def copy_stafftarget(request):
@@ -426,7 +430,7 @@ def get_storetarget(request):
     response = paginator.get_paginated_response(paginated_data, 'storetarget')
     return response
 
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_storetarget(request):
@@ -593,7 +597,7 @@ def delete_storetarget(request):
         status=status.HTTP_200_OK
     )
 
-
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_storetarget(request):            
@@ -729,7 +733,8 @@ def update_storetarget(request):
         },
         status=status.HTTP_200_OK
     )    
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_servicetarget(request):
@@ -920,6 +925,7 @@ def delete_servicetarget(request):
         status=status.HTTP_200_OK
     )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_servicetarget(request):
@@ -1035,6 +1041,8 @@ def update_servicetarget(request):
         status=status.HTTP_200_OK
     )    
 
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def copy_servicetarget(request):
@@ -1144,6 +1152,8 @@ def copy_servicetarget(request):
         status=status.HTTP_200_OK
     ) 
 
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_retailtarget(request):
@@ -1331,7 +1341,8 @@ def delete_retailtarget(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_retailtarget(request):
@@ -1424,7 +1435,9 @@ def update_retailtarget(request):
         },
         status=status.HTTP_200_OK
         )
-    
+
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def copy_retailtarget(request):

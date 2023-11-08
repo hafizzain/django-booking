@@ -74,6 +74,7 @@ class UserLoginSerializer(serializers.ModelSerializer):
             'id',
             'domain',
             'access_token',  'employee', 'employee_permission',
+            'email'
         ]
 
 class UserTenantSerializer(serializers.ModelSerializer):

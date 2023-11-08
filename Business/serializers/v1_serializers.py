@@ -13,7 +13,7 @@ from Business.models import (BookingSetting, BusinessAddressMedia, BusinessType,
                              BusinessAddress, BusinessSocial, BusinessTheme, StaffNotificationSetting, 
                              ClientNotificationSetting, AdminNotificationSetting, StockNotificationSetting, 
                              BusinessPaymentMethod, BusinessTax, BusinessVendor,BusinessOpeningHour,
-                             BusinessTaxSetting
+                             BusinessTaxSetting, BusinessPolicy, BusinessPrivacy
                         )
 from Authentication.serializers import UserSerializer
 from django.conf import settings
@@ -706,3 +706,16 @@ class BusinessAddressSerilaizer(serializers.ModelSerializer):
     class Meta:
         model = BusinessAddress
         fields = ['primary_translation', 'secondary_translation']
+
+
+class BusinessPolicySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = BusinessPolicy
+        fields = '__all__'
+
+class BusinessPrivacySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = BusinessPrivacy
+        fields = '__all__'

@@ -32,11 +32,12 @@ from Utility.serializers import LanguageSerializer
 import json
 from django.db.models import Q
 from rest_framework.authtoken.models import Token
+from django.db import transaction
 
 
 from django_tenants.utils import tenant_context   
 
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def create_client_business(request):
@@ -251,7 +252,8 @@ def create_client_business(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def customer_verify_otp(request):
@@ -395,6 +397,7 @@ def customer_verify_otp(request):
         )
 
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def customer_login(request):
@@ -611,6 +614,7 @@ def get_client_appointment(request):
             status=status.HTTP_200_OK
         )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([AllowAny])
 def cancel_appointment_client(request):
@@ -706,7 +710,7 @@ def cancel_appointment_client(request):
         status=status.HTTP_200_OK
     )
     
-    
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([AllowAny])
 def update_appointment_client(request):

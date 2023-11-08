@@ -24,7 +24,7 @@ from Employee.serializers import( EmployeSerializer , EmployeInformationsSeriali
                         
                           
                                  )
-from django.db import connection
+from django.db import connection, transaction
 from threading import Thread
 from Employee.Constants.Add_Employe import add_employee
 from Service.models import Service
@@ -55,6 +55,8 @@ from Notification.notification_processor import NotificationProcessor
 
 from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
 
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def import_employee(request):
@@ -172,6 +174,7 @@ def import_employee(request):
     return Response({'Status' : 'Success'})
         
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def import_attendance(request):
@@ -331,7 +334,7 @@ def get_Employees(request):
     query &= Q(is_blocked=False)
 
     if search_text:
-        query &= Q(full_name__icontains=search_text)
+        query &= Q(full_name__icontains=search_text) | Q(mobile_number__icontains=search_text)
 
     if employee_id:
         query &= Q(id=str(employee_id))
@@ -577,32 +580,28 @@ def generate_id(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
-def check_email_employees(request): 
+def check_email_employees(request):
     email = request.data.get('email', None)
+    mobile_number = request.data.get('mobile_number', None)
 
-    if not all([email]):
-        return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.MISSING_FIELDS_4001,
-                'status_code_text' : 'MISSING_FIELDS_4001',
-                'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : 'Employee id are required',
-                    'fields' : [
-                        'email',
-                    ]
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    with tenant_context(Tenant.objects.get(schema_name = 'public')):
-        try:
-            employe = User.objects.get(email__icontains = email)
+
+    previous_email = request.data.get('previous_email', None)
+    previous_mobile_number = str(request.data.get('previous_mobile_number', None))
+    previous_mobile_number = previous_mobile_number.replace('+', '')
+
+    """
+    TENANT SPECIFIC DATA
+    """
+
+    if email:
+        employees = Employee.objects.filter(email=email)
+        if previous_email:
+            employees = employees.exclude(email=previous_email)
+        if employees:
             return Response(
                 {
                     'status' : False,
@@ -611,13 +610,90 @@ def check_email_employees(request):
                     'response' : {
                         'message' : f'User Already exist with this {email}!',
                         'error_message' : None,
-                        'employee' : True
+                        'employee' : True,
                     }
                 },
                 status=status.HTTP_200_OK
             )
-        except Exception as err:
+        else:
             pass
+    
+
+    if mobile_number:
+        employees = Employee.objects.filter(mobile_number=mobile_number)
+        employees_count = employees.count()
+        if previous_mobile_number:
+            employees = employees.exclude(mobile_number__icontains=previous_mobile_number)
+
+        if employees:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : 200,
+                    'status_code_text' : '200',
+                    'response' : {
+                        'message_mobile_number' : f'User Already exist with this phone number!',
+                        'error_message' : None,
+                        'employee' : True,
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+        else:
+            pass
+    
+    with tenant_context(Tenant.objects.get(schema_name='public')):
+        
+        """
+        PUBLIC TENANT DATA
+        """
+        
+        
+        if email:
+            user = User.objects.filter(email=email)
+            if previous_email:
+                user = user.exclude(email=previous_email)
+
+            if user:
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : 200,
+                        'status_code_text' : '200',
+                        'response' : {
+                            'message' : f'User Already exist with this {email}!',
+                            'error_message' : None,
+                            'employee' : True,
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
+            else:
+                pass
+
+        if mobile_number:
+            user = User.objects.filter(mobile_number__icontains=mobile_number)
+
+            if previous_mobile_number:
+                user = user.exclude(mobile_number__icontains=previous_mobile_number)
+
+            if user:
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : 200,
+                        'status_code_text' : '200',
+                        'response' : {
+                            'message_mobile_number' : f'User Already exist with this phone number!',
+                            'error_message' : None,
+                            'employee' : True,
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
+            else:
+                pass
+
     return Response(
         {
             'status' : 200,
@@ -625,12 +701,13 @@ def check_email_employees(request):
             'response' : {
                 'message' : 'Single Employee',
                 'error_message' : None,
-                'employee' : False
+                'employee' : False,
             }
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_employee(request):
@@ -704,6 +781,21 @@ def create_employee(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    
+    existing_employees = Employee.objects.filter(mobile_number=mobile_number)
+    if existing_employees:
+        return Response(
+                    {
+                        'status' : False,
+                        'status_code' : 404,
+                        'status_code_text' : '404',
+                        'response' : {
+                            'message' : f'Employee already exist with this phonne number.',
+                            'error_message' : None,
+                        }
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
     if email is not None:
         with tenant_context(Tenant.objects.get(schema_name = 'public')):
             try:
@@ -1018,7 +1110,8 @@ def delete_employee(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_employee(request): 
@@ -1108,7 +1201,22 @@ def update_employee(request):
     
     
     if phone_number is not None:
-        employee.mobile_number = phone_number
+        existing_employees = Employee.objects.filter(mobile_number=phone_number).exclude(id=id)
+        if existing_employees:
+            return Response(
+                        {
+                            'status' : False,
+                            'status_code' : 404,
+                            'status_code_text' : '404',
+                            'response' : {
+                                'message' : f'Employee already exist with this phone number.',
+                                'error_message' : None,
+                            }
+                        },
+                        status=status.HTTP_404_NOT_FOUND
+                    )
+        else:
+            employee.mobile_number = phone_number
     else :
         employee.mobile_number = None
     if image is not None:
@@ -1291,7 +1399,8 @@ def update_employee(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_employee_device(request): 
@@ -1299,13 +1408,16 @@ def update_employee_device(request):
     id = request.data.get('id', None)
     full_name = request.data.get('full_name', None)
     
-    country = request.data.get('country', None) 
-    city = request.data.get('city', None) 
-    state = request.data.get('state', None) 
+    country_unique_id = request.data.get('country', None) 
+    state_unique_id = request.data.get('state', None) 
+    city_name = request.data.get('city', None)
     phone_number=request.data.get('mobile_number',None)
     image=request.data.get('image',None)
     postal_code=request.data.get('postal_code',None)
     address=request.data.get('address',None)
+    
+    city_state = None
+    city_country = None
     
     Errors = []
     
@@ -1341,6 +1453,20 @@ def update_employee_device(request):
                 status=status.HTTP_404_NOT_FOUND
             )
     
+    is_mobile_exist_already = Employee.objects.filter(mobile_number=phone_number).exclude(id=employee.id)
+    if is_mobile_exist_already:
+        if phone_number == is_mobile_exist_already[0].mobile_number:
+            return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.INVALID_NOT_FOUND_EMPLOYEE_ID_4022,
+                'status_code_text' : 'INVALID_NOT_FOUND_EMPLOYEE_ID_4022',
+                        'response' : {
+                    'message' : 'Mobile no already exist.',
+                }
+            },
+                status=status.HTTP_200_OK
+            )
         
     employee.full_name = full_name
     employee.mobile_number = phone_number
@@ -1351,26 +1477,40 @@ def update_employee_device(request):
     if image is not None:
         employee.image=image
        
-    if country is not None:
-        try:
-            country= Country.objects.get(id=country)
+    if country_unique_id is not None:
+        public_country = get_country_from_public(country_unique_id)
+        if public_country:
+            country, created = Country.objects.get_or_create(
+                name=public_country.name,
+                unique_id = public_country.unique_id
+            )
             employee.country = country
-        except:
-            country = None
+            city_country = country
+        else:
+            employee.country = None
             
-    if state is not None:
-        try:
-            state= State.objects.get(id=state)
+    if state_unique_id is not None:
+        public_state = get_state_from_public(state_unique_id)
+        if public_state:
+            state, created= State.objects.get_or_create(
+                name=public_state.name,
+                unique_id=public_state.unique_id
+            )
             employee.state = state
-        except:
-            state = None
+            city_state = state
+        else:
+            employee.state = None
             
-    if city is not None:
-        try:
-            city= City.objects.get(id=city)
-            employee.city = city
-        except:
-            city = None
+    if city_name is not None:
+        city, created= City.objects.get_or_create(name=city_name,
+                                                country=city_country,
+                                                state=city_state,
+                                                country_unique_id=country_unique_id if country_unique_id else None,
+                                                state_unique_id=state_unique_id if state_unique_id else None
+                                                )
+        employee.city = city
+    
+    employee.save()
 
     employee.save()
     serializer = EmployeSerializer(employee, context={'request' : request,})
@@ -1395,6 +1535,7 @@ def delete_all_employees(request):
         empl.delete()
     return Response({'deleted' : True})
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def import_staff_group(request): 
@@ -1447,7 +1588,7 @@ def import_staff_group(request):
     file.delete()
     return Response({'Status' : 'Success'})
             
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_staff_group(request):
@@ -1691,7 +1832,8 @@ def delete_staff_group(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_staff_group(request):
@@ -1931,7 +2073,7 @@ def get_attendence_device(request):
         status=status.HTTP_200_OK
     )
 
-    
+@transaction.atomic    
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_attendence(request):
@@ -2012,7 +2154,8 @@ def create_attendence(request):
             status=status.HTTP_201_CREATED
         ) 
  
- 
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_attendence(request):
@@ -2197,7 +2340,7 @@ def delete_payroll(request):
         status=status.HTTP_200_OK
     )
     
-    
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_sallaryslip(request):
@@ -2292,19 +2435,17 @@ def get_payrol_working(request):
     no_pagination = request.GET.get('no_pagination', None)
 
 
-    queries = {}
+    query = Q(is_deleted=False, is_blocked=False)
 
     if location_id:
-        queries['location'] = location_id
+        query &= Q(location=location_id)
     
     if employee_id:
-        queries['id__in'] = [employee_id]
+        query &= Q(id__in=[employee_id])
 
-    all_employe= Employee.objects.filter(
-        is_deleted = False, 
-        is_blocked = False,
-        **queries
-    )
+    all_employe= Employee.objects.filter(query) \
+                                 .with_total_commission() \
+                                 .with_total_tips()
     # .order_by('employee_employedailyschedule__date')
     all_employe_count= all_employe.count()
 
@@ -2444,7 +2585,8 @@ def delete_payroll(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_commission(request):
@@ -2618,7 +2760,7 @@ def create_commission(request):
     user = User.objects.filter(email__icontains=employee_id.email).first()
     title = 'Commission'
     body = 'Admin Assigns New Commission'
-    NotificationProcessor.send_notifications_to_users(user, title, body)
+    NotificationProcessor.send_notifications_to_users(user, title, body, request_user=request.user)
 
 
     serializers= CommissionSerializer(commission_setting, context={'request' : request})
@@ -2641,8 +2783,12 @@ def create_commission(request):
 def get_commission(request):
     no_pagination = request.GET.get('no_pagination')
     search_text = request.GET.get('search_text')
+    location_id = request.GET.get('location_id', None)
 
     query = Q()
+    
+    if location_id:
+        query &= Q(employee__location__id=location_id)
 
     if search_text:
         query &= Q(employee__full_name__icontains=search_text)
@@ -2802,6 +2948,7 @@ def delete_commission(request):
         status=status.HTTP_200_OK
     )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_commision(request):
@@ -3022,7 +3169,7 @@ def update_commision(request):
         status=status.HTTP_200_OK
         )
     
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_asset(request):
@@ -3190,7 +3337,8 @@ def delete_asset(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_asset(request):
@@ -3283,6 +3431,7 @@ def update_asset(request):
         )
 
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_vacation(request):
@@ -3367,7 +3516,7 @@ def create_vacation(request):
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_vacation(request):
+def get_vacations(request):
     vacation = Vacation.objects.all().order_by('-created_at')   
     serializer = VacationSerializer(vacation, many = True,context={'request' : request})
     
@@ -3433,7 +3582,8 @@ def delete_vacation(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_vacation(request):
@@ -3509,7 +3659,8 @@ def update_vacation(request):
         },
         status=status.HTTP_200_OK
         )
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_vacation_emp(request):
@@ -3676,7 +3827,7 @@ def create_vacation_emp(request):
             'status' : 200,
             'status_code' : '200',
             'response' : { 
-                'message' : 'All schedule',
+                'message' : 'Vacation added successfully',
                 'error_message' : None,
                 'schedule' : serialized.data
             }
@@ -3685,7 +3836,7 @@ def create_vacation_emp(request):
     )
 
 
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_absence(request):
@@ -3827,7 +3978,7 @@ def create_absence(request):
             'status' : 200,
             'status_code' : '200',
             'response' : {
-                'message' : 'All Absense Schedule',
+                'message' : 'Vacation added successfully',
                 'error_message' : None,
                 'schedule' : serialized.data
             }
@@ -3835,7 +3986,7 @@ def create_absence(request):
         status=status.HTTP_200_OK
     )
         
-    
+@transaction.atomic 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_workingschedule(request):
@@ -3962,7 +4113,7 @@ def create_workingschedule(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_vacations(request):
+def c(request):
     employee_id = request.GET.get('employee_id', None)
     location = request.GET.get('location_id', None)
     search_text = request.GET.get('search_text', None)
@@ -4293,7 +4444,7 @@ def delete_absence(request):
         status=status.HTTP_200_OK
     )  
 
-
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_absence(request): 
@@ -4367,7 +4518,7 @@ def update_absence(request):
         status=status.HTTP_200_OK
         )
 
-
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_workingschedule(request): 
@@ -4441,7 +4592,7 @@ def update_workingschedule(request):
         status=status.HTTP_200_OK
         )
 
-    
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_employe_account(request):
@@ -4575,6 +4726,7 @@ def create_employe_account(request):
         status=status.HTTP_200_OK
     )
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def employee_login(request):
@@ -4790,6 +4942,7 @@ def employee_logout(request):
         'message': 'Device Unlinked'
     }, status=status.HTTP_200_OK)
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def resend_password(request):
@@ -4901,7 +5054,7 @@ def resend_password(request):
             return Response({'success': False, 'response': {'message': 'Password should be 8 letters long!'}},
                             status=status.HTTP_400_BAD_REQUEST)
         
-        
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def forgot_password(request):
@@ -4995,7 +5148,7 @@ def forgot_password(request):
                      'message': 'Verification code has been sent to your provided Email'},
                     status=status.HTTP_200_OK)
     
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def verify_email(request):
@@ -5201,6 +5354,7 @@ def get_single_employee_vacation(request):
         status=status.HTTP_200_OK
     )
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def set_password(request):

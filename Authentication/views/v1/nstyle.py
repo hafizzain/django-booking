@@ -25,6 +25,7 @@ from Authentication.Constants.Email import send_welcome_email
 from Employee.models import Employee
 
 from Utility.models import ExceptionRecord
+from django.db import transaction
 # Create your views here.
 
 @api_view(['GET'])
@@ -39,6 +40,7 @@ def all_users(request):
     )
 
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def create_tenant_business_user(request):
@@ -178,7 +180,7 @@ def create_tenant_business_user(request):
             status=status.HTTP_201_CREATED
         )
 
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def verify_otp(request):
@@ -359,6 +361,7 @@ def verify_otp(request):
             status=status.HTTP_200_OK
         )
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_tenant_detail(request):
@@ -400,7 +403,7 @@ def get_tenant_detail(request):
     )
             
     
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def send_verification_otp(request):
@@ -510,6 +513,7 @@ def send_verification_otp(request):
             status=status.HTTP_200_OK
         )
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):
@@ -638,19 +642,7 @@ def login(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    # elif not user.is_mobile_verified:
-    #     return Response(
-    #         {
-    #             'status' : False,
-    #             'status_code' : StatusCodes.USER_PHONE_NUMBER_NOT_VERIFIED_4011,
-    #             'status_code_text' : 'USER_PHONE_NUMBER_NOT_VERIFIED_4011',
-    #             'response' : {
-    #                 'message' : 'Your Mobile Number is not verified',
-    #                 'error_message' : 'Users"s mobile number is not verified'
-    #             }
-    #         },
-    #         status=status.HTTP_404_NOT_FOUND
-    #     )
+
     elif user.is_blocked:
         return Response(
             {
@@ -702,7 +694,139 @@ def login(request):
                                     'tenant' : domain_name
                                     })
             s_data = dict(serialized.data)
-            #s_data['access_token'] = str(tnt_token.key)
+            
+    else:
+        serialized = UserLoginSerializer(user, context={'employee' : False,
+                            'tenant' : None})
+        s_data = dict(serialized.data)
+        s_data['id'] = None
+        s_data['access_token'] = None
+        try:
+            with tenant_context(Tenant.objects.get(user=user)):
+                tnt_token = Token.objects.get(user__username=user.username)
+                s_data['id'] = str(tnt_token.user.id)
+                s_data['access_token'] = str(tnt_token.key)
+        except:
+            pass
+
+
+    return Response(
+            {
+                'status' : False,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Authenticated',
+                    #'data' : employee
+                    'data' : s_data,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
+@transaction.atomic
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def login_flagged(request):
+    email = request.data.get('email', None)
+    # social_account = request.data.get('social_account', False)
+    # password = request.data.get('password', None)
+
+    user = None
+    employee = False
+    s_data = {}
+    
+    if not email:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'Email is required.',
+                    'fields' : [
+                        'email',
+                        ],
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    connection.set_schema_to_public()
+    try:
+        user = User.objects.get(
+            email =email,
+            is_deleted=False,
+            user_account_type__account_type = 'Employee'
+        )
+        employee = True
+    except Exception as err: 
+        user = None
+        
+    if user == None:
+        try:
+            user = User.objects.filter(
+                email=email,
+                is_deleted=False
+            ).exclude(user_account_type__account_type = 'Everyone')
+            if len(user) > 0:
+                user = user[0]
+            else:
+                raise Exception('User Does not exists with this Email')
+        
+        except Exception as err:
+            return Response(
+                {
+                    'status' : False,
+                    'status_code' : StatusCodes.INVALID_CREDENTIALS_4013,
+                    'status_code_text' : 'INVALID_CREDENTIALS_4013',
+                    'response' : {
+                        'message' : 'User does not exist with this email',
+                        'error_message' : str(err),
+                        'fields' : ['email']
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+    if employee:
+        #s_data['id'] = None
+        employe_user = EmployeeTenantDetail.objects.get(user = user)
+        with tenant_context(employe_user.tenant):
+            user = User.objects.get(
+                email=email,
+                is_deleted=False,
+                user_account_type__account_type = 'Employee'
+            )
+            try:
+                emp = Employee.objects.get(email = str(user.email))
+            except:
+                pass
+            else:
+                if not emp.is_active:
+                    return Response(
+                        {
+                            'status' : False,
+                            'status_code' : 403,
+                            'status_code_text' : 'EMPLOYEE_INACTIVE',
+                            'response' : {
+                                'message' : 'Your employee is inactive',
+                                'error_message' : 'User Employee is not active, Please enable is_active flag'
+                            }
+                        },
+                        status=status.HTTP_403_FORBIDDEN
+                    )
+            try:
+                token = Token.objects.get(user=user)
+            except Token.DoesNotExist:
+                token = Token.objects.create(user=user)
+            domain_name = str(employe_user.tenant.domain).split('.')[0]
+            serialized = UserLoginSerializer(user, context={'employee' : True,
+                                    'request' : request,
+                                    'token' : token.key,
+                                    'tenant' : domain_name
+                                    })
+            s_data = dict(serialized.data)
             
     else:
         serialized = UserLoginSerializer(user, context={'employee' : False,
@@ -732,7 +856,7 @@ def login(request):
             status=status.HTTP_200_OK
         )
 
-
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([AllowAny])
 def change_password(request):

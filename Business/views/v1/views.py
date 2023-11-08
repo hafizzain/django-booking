@@ -12,11 +12,18 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework.generics import (ListAPIView, CreateAPIView, UpdateAPIView, DestroyAPIView, RetrieveAPIView)
 from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Authentication.serializers import UserTenantLoginSerializer
 
-from Business.models import BusinessAddressMedia, BusinessType
-from Business.serializers.v1_serializers import BusinessAddress_CustomerSerializer, EmployeAppointmentServiceSerializer, EmployeTenatSerializer, OpeningHoursSerializer,AdminNotificationSettingSerializer, BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer, BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer, ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer, BusinessTaxSerializer, PaymentMethodSerializer, BusinessTaxSettingSerializer
+from Business.models import BusinessAddressMedia, BusinessType, BusinessPrivacy, BusinessPolicy
+from Business.serializers.v1_serializers import (BusinessAddress_CustomerSerializer, EmployeAppointmentServiceSerializer,
+                                                 EmployeTenatSerializer, OpeningHoursSerializer,AdminNotificationSettingSerializer,
+                                                 BookingSettingSerializer, BusinessTypeSerializer, Business_GetSerializer, Business_PutSerializer,
+                                                 BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer,
+                                                 ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer,
+                                                 BusinessTaxSerializer, PaymentMethodSerializer, BusinessTaxSettingSerializer, BusinessPrivacySerializer,
+                                                 BusinessPolicySerializer)
 from Client.models import Client
 from Employee.models import EmployeDailySchedule, Employee, EmployeeProfessionalInfo, EmployeeSelectedService
 from Employee.Constants.Add_Employe import add_employee
@@ -43,6 +50,7 @@ from Sale.Constants.Custom_pag import CustomPagination
 from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, EmployeeBusinessSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer
 from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
 from MultiLanguage.models import InvoiceTranslation
+from django.db import transaction
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -212,6 +220,7 @@ def get_user_default_data(request):
     }
 }
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def update_user_default_data(request):
@@ -482,7 +491,7 @@ def get_business_types(request):
         }
     )
 
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def create_user_business(request):
@@ -791,6 +800,8 @@ def get_business_by_domain(request):
             status=status.HTTP_200_OK
         )
 
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_business_additional_information(request):
@@ -895,6 +906,7 @@ def update_business_additional_information(request):
 # business_types
 # software_used
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_business(request):
@@ -1053,7 +1065,7 @@ def get_business_locations(request, business_id):
             status=status.HTTP_200_OK
         )
 
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_business_location(request):
@@ -1355,7 +1367,7 @@ def delete_location(request):
             status=status.HTTP_403_FORBIDDEN
         )
 
-
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_location(request):
@@ -1602,7 +1614,7 @@ def get_business_theme(request):
         status=status.HTTP_200_OK
     )
 
-
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_business_theme(request):
@@ -1680,6 +1692,7 @@ def update_business_theme(request):
         status=status.HTTP_400_BAD_REQUEST
     )
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_business_language(request):
@@ -1764,6 +1777,7 @@ def add_business_language(request):
         status=status.HTTP_200_OK
     )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_language(request):
@@ -2036,7 +2050,7 @@ def get_business_notification_settings(request):
         status=status.HTTP_200_OK
     )
 
-
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_business_notification_settings(request):
@@ -2175,7 +2189,7 @@ def get_business_booking_settings(request):
         status=status.HTTP_200_OK
     )
 
-
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_business_booking_settings(request):
@@ -2253,6 +2267,7 @@ def update_business_booking_settings(request):
         )
 
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_payment_method(request):
@@ -2321,7 +2336,7 @@ def add_payment_method(request):
             status=status.HTTP_201_CREATED
         )
 
-
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_payment_method(request):
@@ -2444,7 +2459,7 @@ def get_business_payment_methods(request):
         )
     
 
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_business_tax(request):
@@ -2581,6 +2596,7 @@ def add_business_tax(request):
             status=status.HTTP_201_CREATED
         )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_business_tax(request):
@@ -2906,7 +2922,7 @@ def delete_business_tax(request):
             status=status.HTTP_200_OK
         )
 
-
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def import_business_vendor(request):
@@ -3011,6 +3027,7 @@ def get_business_vendors(request):
     response = paginator.get_paginated_response(paginated_data, 'vendors')
     return response
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def check_vendor_existance(request):
@@ -3063,6 +3080,7 @@ def check_vendor_existance(request):
             status=status.HTTP_200_OK
         )
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_business_vendor(request):
@@ -3196,6 +3214,7 @@ def add_business_vendor(request):
             status=status.HTTP_201_CREATED
         )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_business_vendor(request):
@@ -3514,7 +3533,8 @@ def get_domain_business_address(request):
             },
             status=status.HTTP_200_OK
         )
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_check_availability(request):                  
@@ -3736,7 +3756,8 @@ def get_check_availability(request):
             },
             status=status.HTTP_200_OK
         )
-        
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_employee_appointment(request):
@@ -4011,7 +4032,8 @@ def get_employee_appointment(request):
             },
             status=status.HTTP_200_OK
         )
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def create_client_business(request):
@@ -4131,7 +4153,8 @@ def create_client_business(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def employee_availability(request):                  
@@ -4682,4 +4705,61 @@ class BusinessTaxSettingView(APIView):
         Get available choices for business tax setting    
         """
         return [item[0] for item in BusinessTaxSetting.SETTING_TYPE]
-    
+
+
+"""
+Below are the API's for Business Policy
+"""
+class BusinessPrivacyCreateView(CreateAPIView):
+    authentication_classes = [IsAuthenticated]
+    queryset = BusinessPrivacy.objects.all()
+    serializer_class = BusinessPolicySerializer
+
+class BusinessPrivacyListView(ListAPIView):
+    authentication_classes = [IsAuthenticated]
+    queryset = BusinessPrivacy.objects.all()
+    serializer_class = BusinessPolicySerializer
+
+class BusinessPrivacyUpdateView(UpdateAPIView):
+    authentication_classes = [IsAuthenticated]
+    queryset = BusinessPrivacy.objects.all()
+    serializer_class = BusinessPolicySerializer
+
+class BusinessPrivacyRetreiveView(RetrieveAPIView):
+    authentication_classes = [IsAuthenticated]
+    queryset = BusinessPrivacy.objects.all()
+    serializer_class = BusinessPolicySerializer
+
+class BusinessPrivacyDestroyView(DestroyAPIView):
+    authentication_classes = [IsAuthenticated]
+    queryset = BusinessPrivacy.objects.all()
+    serializer_class = BusinessPolicySerializer
+
+
+"""
+Below are the API's for Business Policy
+"""
+class BusinessPolicyCreateView(CreateAPIView):
+    authentication_classes = [IsAuthenticated]
+    queryset = BusinessPolicy.objects.all()
+    serializer_class = BusinessPolicy.objects.all()
+
+class BusinessPolicyListView(ListAPIView):
+    authentication_classes = [IsAuthenticated]
+    queryset = BusinessPolicy.objects.all()
+    serializer_class = BusinessPolicy.objects.all()
+
+class BusinessPolicyUpdateView(UpdateAPIView):
+    authentication_classes = [IsAuthenticated]
+    queryset = BusinessPolicy.objects.all()
+    serializer_class = BusinessPolicy.objects.all()
+
+class BusinessPolicyRetreiveView(RetrieveAPIView):
+    authentication_classes = [IsAuthenticated]
+    queryset = BusinessPolicy.objects.all()
+    serializer_class = BusinessPolicy.objects.all()
+
+class BusinessPolicyDestroyView(DestroyAPIView):
+    authentication_classes = [IsAuthenticated]
+    queryset = BusinessPolicy.objects.all()
+    serializer_class = BusinessPolicy.objects.all()

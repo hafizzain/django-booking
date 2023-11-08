@@ -13,11 +13,26 @@ from NStyle.choices import EmployeeDailyInsightChoices
 
 
 class EmployeeManager(models.QuerySet):
+
+    def with_total_commission(self):
+        return self.annotate(
+            total_commission = Coalesce(
+                Sum('commissions__commission_amount'),
+                0.0,
+                output_field=FloatField()
+            )
+        )
+    
+    def with_total_tips(self):
+        return self.annotate(
+            total_tips = Coalesce(
+                Sum('checkout_member_tips__tip'),
+                0.0,
+                output_field=FloatField()
+            )
+        )
     
     def with_completed_appointments(self, employee_ids, date, business_address):
-        """
-        
-        """
         appointment_filter = Q(member_appointments__appointment_date=date) \
                             & Q(member_appointments__business_address=business_address)
         

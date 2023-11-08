@@ -393,26 +393,36 @@ def get_recent_ten_appointments(request):
 def get_all_appointments_no_pagination(request):
     location_id = request.GET.get('location', None)
     appointment_status = request.GET.get('appointment_status', None)
+    search_text = request.GET.get('search_text', None)
+
+    upcoming_flags = ['Appointment_Booked', 'Appointment Booked', 'Arrived', 'In Progress']
+    completed_flags = ['Done', 'Paid']
+    cancelled_flags = ['Cancel']
 
     paginator = CustomPagination()
     paginator.page_size = 1000000
-    queries = {}
+
+    query = Q(is_blocked=False)
+
 
     if appointment_status is not None:
         if appointment_status == 'Upcomming':
-            queries['appointment_status__in'] = ['Appointment_Booked', 'Appointment Booked', 'Arrived', 'In Progress']
+            query &= Q(appointment_status__in=upcoming_flags)
         elif appointment_status == 'Completed':
-            queries['appointment_status__in'] = ['Done', 'Paid']
+            query &= Q(appointment_status__in=completed_flags)
         elif appointment_status == 'Cancelled':
-            queries['appointment_status__in'] = ['Cancel']
+            query &= Q(appointment_status__in=cancelled_flags)
         
     if location_id is not None:
-        queries['business_address__id'] = location_id
+        Q(business_address__id=location_id)
 
-    test = AppointmentService.objects.filter(
-        is_blocked=False,
-        **queries
-    ).order_by('-created_at')
+    if search_text:
+        or_query = Q(member__full_name__icontains=search_text) | \
+                   Q(appointment__client__full_name__icontains=search_text)
+        query &= or_query
+
+
+    test = AppointmentService.objects.filter(query).order_by('-created_at')
     paginated_checkout_order = paginator.paginate_queryset(test, request)
     serialize = AllAppoinmentSerializer(paginated_checkout_order, many=True)
     
@@ -466,8 +476,7 @@ def create_appointment(request):
     selected_promotion_type = request.data.get('selected_promotion_type', None) 
     selected_promotion_id = request.data.get('selected_promotion_id', None) 
     is_promotion_availed = request.data.get('is_promotion_availed', False)
-        
-       
+
     Errors = []
     total_price_app= 0
             
@@ -614,7 +623,8 @@ def create_appointment(request):
         try:
             member=Employee.objects.get(id=member)
             all_members.append(str(member.id))
-            employee_users.append(User.objects.filter(email__icontains=member.email).first())
+            temp_user = User.objects.filter(email__icontains=member.email).first()
+            employee_users.append(temp_user)
         except Exception as err:
             return Response(
             {
@@ -823,7 +833,8 @@ def create_appointment(request):
     user = employee_users
     title = "Appointment"
     body = "New Booking Assigned"
-    NotificationProcessor.send_notifications_to_users(user, title, body)
+
+    NotificationProcessor.send_notifications_to_users(user, title, body, request_user=request.user)
 
     serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request' : request})
     return Response(
@@ -835,14 +846,13 @@ def create_appointment(request):
                     'error_message' : None,
                     'error' : Errors,
                     'appointments' : serialized.data,
-                    
                 }
             },
             status=status.HTTP_201_CREATED
     )    
 
 
-
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_appointment(request):
@@ -1003,13 +1013,13 @@ def update_appointment(request):
         user = User.objects.filter(email__icontains=employee.email).first()
         title = 'Appointment'
         body = 'Appointment Cancelled'
-        NotificationProcessor.send_notifications_to_users(user, title, body)
+        NotificationProcessor.send_notifications_to_users(user, title, body, request_user=request.user)
     else:
         # changed the employee of the existing appointment
         user = User.objects.filter(email__icontains=service_appointment.member.email).first()
         title = 'Appointment'
         body = 'New Booking Assigned'
-        NotificationProcessor.send_notifications_to_users(user, title, body)
+        NotificationProcessor.send_notifications_to_users(user, title, body, request_user=request.user)
 
     return Response(
         {
@@ -1024,6 +1034,7 @@ def update_appointment(request):
         status=status.HTTP_200_OK
     )
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_appointment_device(request):
@@ -1092,7 +1103,8 @@ def update_appointment_device(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_appointment_service(request):
@@ -1240,16 +1252,17 @@ def update_appointment_service(request):
             
             # updating employee booking insight data
             # on changing appointment service.
-            # taking client from appoinntment object
+            # taking client from appointment object
             employee_insight_obj = EmployeeBookingDailyInsights.objects.filter(
                 appointment=appointment,
-                appointment__client=client,
-                appointment_service=service_appointment,
-                service=service_id
             ).first()
-            employee_insight_obj.employee = member_id
-            employee_insight_obj.set_employee_time(date_time)
-            employee_insight_obj.save()
+
+            if employee_insight_obj:
+                employee_insight_obj.appointment_service = service_appointment
+                employee_insight_obj.service = service_id
+                employee_insight_obj.employee = member_id
+                employee_insight_obj.set_employee_time(date_time)
+                employee_insight_obj.save()
 
     
     try:
@@ -1268,7 +1281,7 @@ def update_appointment_service(request):
     user = User.objects.filter(email__icontains=service_appointment.member.email).first()
     title = 'Appointment'
     body = 'Booking Updated'
-    NotificationProcessor.send_notifications_to_users(user, title, body)
+    NotificationProcessor.send_notifications_to_users(user, title, body, request_user=request.user)
 
     return Response(
         {
@@ -1336,6 +1349,7 @@ def delete_appointment(request):
         status=status.HTTP_200_OK
     )
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_blockTime(request):
@@ -1465,6 +1479,7 @@ def create_blockTime(request):
             status=status.HTTP_201_CREATED
     ) 
 
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_blocktime(request):
@@ -1472,6 +1487,8 @@ def update_blocktime(request):
     end_time = request.data.get('end_time', None)
     start_time = request.data.get('start_time', None)
     duration = request.data.get('duration', None)
+    date = request.data.get('date', None)
+
     if block_id is None: 
        return Response(
             {
@@ -1517,7 +1534,11 @@ def update_blocktime(request):
         
         block.appointment_time = start_time
         block.end_time = tested
-        block.save()
+    
+    if date:
+        block.appointment_date = date
+
+    block.save()
         
     serializer = UpdateAppointmentSerializer(block , data=request.data, partial=True)
     if not serializer.is_valid():
@@ -2044,7 +2065,7 @@ def create_checkout(request):
     user = notify_users
     title = 'Appointment'
     body = 'Appointment completed'
-    NotificationProcessor.send_notifications_to_users(user, title, body)
+    NotificationProcessor.send_notifications_to_users(user, title, body, request_user=request.user)
     return Response(
             {
                 'status' : True,
@@ -2058,6 +2079,8 @@ def create_checkout(request):
             },
             status=status.HTTP_201_CREATED
     ) 
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_checkout_device(request):
@@ -2465,7 +2488,9 @@ def get_client_sale(request):
             },
             status=status.HTTP_201_CREATED
         )
-    
+
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_appointment_client(request):
@@ -2719,6 +2744,7 @@ def create_appointment_client(request):
                 status=status.HTTP_201_CREATED
         )
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_employee_check_time(request):                  
@@ -2914,7 +2940,8 @@ def get_employee_check_time(request):
             },
             status=status.HTTP_200_OK
         )
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_employee_check_availability_list(request):

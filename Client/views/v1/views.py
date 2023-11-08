@@ -25,7 +25,10 @@ import json
 from NStyle.Constants import StatusCodes
 from django.core.paginator import Paginator
 from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
+from django.db import transaction
 
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def import_client(request):
@@ -257,6 +260,7 @@ def generate_id(request):
         status=status.HTTP_200_OK
     )
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_client(request):
@@ -465,7 +469,7 @@ def create_client(request):
         status=status.HTTP_201_CREATED
     )
 
-
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_client(request): 
@@ -646,7 +650,7 @@ def get_client_group(request):
     all_client_group= ClientGroup.objects.all().order_by('-created_at')
 
     if search_text:
-        all_client_group.filter(name__icontains=search_text)
+        all_client_group = all_client_group.filter(name__icontains=search_text)
 
     all_client_group_count= all_client_group.count()
 
@@ -670,13 +674,14 @@ def get_client_group(request):
                 'pages':page_count,
                 'per_page_result':page_per_results,
                 'error_message' : None,
-                'clientsgroup' : serialized.data
+                'clientsgroup' : serialized.data,
+                'search_text':search_text
             }
         },
         status=status.HTTP_200_OK
     )
     
-    
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_client_group(request):
@@ -765,7 +770,7 @@ def create_client_group(request):
         ) 
     
 
-   
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_client_group(request):
@@ -909,7 +914,7 @@ def delete_client_group(request):
         status=status.HTTP_200_OK
     )
     
-    
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_subscription(request):
@@ -1071,7 +1076,7 @@ def delete_subscription(request):
     )
     
 
-    
+@transaction.atomic   
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_subscription(request):
@@ -1134,7 +1139,7 @@ def update_subscription(request):
         status=status.HTTP_200_OK
         )
     
-    
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_rewards(request):
@@ -1332,7 +1337,8 @@ def delete_rewards(request):
         },
         status=status.HTTP_200_OK
     )
-   
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_rewards(request):
@@ -1436,7 +1442,7 @@ def update_rewards(request):
         status=status.HTTP_200_OK
         )
     
-   
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_promotion(request):
@@ -1621,7 +1627,7 @@ def delete_promotion(request):
         status=status.HTTP_200_OK
     )
     
-    
+@transaction.atomic   
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_promotion(request):
@@ -1725,7 +1731,7 @@ def update_promotion(request):
         )
         
 
-    
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_memberships(request):
@@ -2002,7 +2008,8 @@ def delete_memberships(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_memberships(request):
@@ -2193,7 +2200,8 @@ def update_memberships(request):
         },
         status=status.HTTP_200_OK
         )
-       
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_vouchers(request):
@@ -2392,7 +2400,8 @@ def delete_vouchers(request):
         },
         status=status.HTTP_200_OK
     )
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_vouchers(request):
@@ -2501,7 +2510,8 @@ def update_vouchers(request):
         status=status.HTTP_200_OK
         )
     
-    
+
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_loyalty(request):
@@ -2797,7 +2807,8 @@ def delete_loyalty(request):
         status=status.HTTP_200_OK
     )
     
-    
+
+@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_loyalty(request):
@@ -3150,6 +3161,7 @@ def get_customer_detailed_loyalty_points(request):
         status=status.HTTP_200_OK
     )
 
+@transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def check_client_existance(request):

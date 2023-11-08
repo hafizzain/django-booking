@@ -2,7 +2,7 @@ from datetime import datetime
 from django.db import models
 from django.utils.timezone import now
 from Authentication.models import User
-from Client.models import Client
+from Client.models import Client, LoyaltyPointLogs
 from Employee.models import Employee
 from Business.models import BusinessAddress
 from uuid import uuid4
@@ -18,6 +18,7 @@ from Appointment.models import Appointment, AppointmentCheckout, AppointmentServ
 from Utility.models import ExceptionRecord
 from MultiLanguage.models import InvoiceTranslation
 from MultiLanguage.serializers import InvoiceTransSerializer
+
 
 
 class SaleInvoice(models.Model):
@@ -232,6 +233,7 @@ class SaleInvoice(models.Model):
                     'payment_type': self.payment_type,
                     'location':self.location.address_name,
                     'business_address':self.location,
+                    'redeemed_points':self.get_client_loyalty_points(),
                     **tax_details,
                     **checkout_redeem_data,
                 }
@@ -271,4 +273,14 @@ class SaleInvoice(models.Model):
             data['voucher_redeem_percentage'] = checkout.voucher_redeem_percentage
 
         return data
+    
+    def get_client_loyalty_points(self):
+        if self.client:
+            redeemed_points_obj = LoyaltyPointLogs.objects.filter(client=self.client,
+                                                              location=self.location) \
+                                                        .order_by('-created_at')[0]
+            return redeemed_points_obj.points_redeemed
+        else:
+            return None
+
 
