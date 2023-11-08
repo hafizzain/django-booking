@@ -22,6 +22,7 @@ from Employee.models import Employee, EmployeeCommission
 from Business.models import BusinessAddress
 from Service.models import ServiceGroup
 from Product.models import Brand
+from Business.serializers.v1_serializers import BusinessAddressSerilaizer
 
 
 from Reports.serializers import DiscountPromotionSalesReport_serializer
@@ -209,11 +210,15 @@ def get_commission_reports_by_commission_details_updated(request):
         '-created_at'
     )
 
+    # invoicce translation data
+    business_address = BusinessAddress.objects.get(id=location_id)
+    invoice_translations = BusinessAddressSerilaizer(business_address).data
+
     serialized = list(EmployeeCommissionReportsSerializer(employee_commissions, many=True, context={'request' : request}).data)
     paginator = CustomPagination()
     paginator.page_size = 100000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(serialized, request)
-    response = paginator.get_paginated_response(paginated_data, 'sales')
+    response = paginator.get_paginated_response(paginated_data, 'sales', invoice_translations)
     return response
 
 
