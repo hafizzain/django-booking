@@ -1,6 +1,6 @@
 from django.db import models
 from Utility.models import Language as AllLanguages
-from Business.models import BusinessAddress
+# from Business.models import BusinessAddress
 from Authentication.models import User
 
 
@@ -33,7 +33,7 @@ class Labels(models.Model):
 
 class InvoiceTranslation(models.Model):
     status_type=(('active', 'active'),('inactive', 'inactive'))
-    location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True)
+    # location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True)
     language = models.ForeignKey(AllLanguages, on_delete=models.PROTECT, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
     invoice = models.CharField(max_length=500, null=True, blank=True)
