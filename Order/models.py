@@ -100,8 +100,11 @@ class Checkout(models.Model):
         if self.client:
             redeemed_points_obj = LoyaltyPointLogs.objects.filter(client=self.client,
                                                               location=self.location) \
-                                                        .order_by('-created_at')[0]
-            return redeemed_points_obj.points_redeemed
+                                                        .order_by('-created_at')
+            if redeemed_points_obj:
+                return redeemed_points_obj[0].points_redeemed
+            else:
+                return None
         else:
             return None
 
