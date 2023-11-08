@@ -257,6 +257,15 @@
                 </div>
                 <p>{{sub_total}} {{currency_code}}</p>
               </div>
+              
+              {% if redeemed_points %}
+                <div class="flex items-center justify-between text-primary text-sm font-bold">
+                  <div>
+                    <p>Redeemed Points</p>
+                  </div>
+                  <p>{{redeemed_points}}</p>
+                </div>
+              {% endif %}
 
               <div class="flex items-center justify-between text-primary text-sm font-bold">
                 <div>
