@@ -250,14 +250,6 @@
               </div>
               {% endif %}
 
-              <div class="flex items-center justify-between text-primary text-sm font-bold">
-                <div>
-                  <p>{{ business_address.primary_translation.subtotal}}</p>
-                  {% if business_address.secondary_translation.subtotal %}<p class="arabic">{{ business_address.secondary_translation.subtotal}} {% endif %}</p>
-                </div>
-                <p>{{sub_total}} {{currency_code}}</p>
-              </div>
-              
               {% if redeemed_points %}
                 <div class="flex items-center justify-between text-primary text-sm font-bold">
                   <div>
@@ -266,6 +258,15 @@
                   <p>{{redeemed_points}}</p>
                 </div>
               {% endif %}
+
+              <div class="flex items-center justify-between text-primary text-sm font-bold">
+                <div>
+                  <p>{{ business_address.primary_translation.subtotal}}</p>
+                  {% if business_address.secondary_translation.subtotal %}<p class="arabic">{{ business_address.secondary_translation.subtotal}} {% endif %}</p>
+                </div>
+                <p>{{sub_total}} {{currency_code}}</p>
+              </div>
+              
 
               <div class="flex items-center justify-between text-primary text-sm font-bold">
                 <div>
