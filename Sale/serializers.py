@@ -91,7 +91,7 @@ class ServiceGroupSerializer(serializers.ModelSerializer):
         return obj.is_active
     
     def get_services(self, obj):
-            all_service = obj.services.all()
+            all_service = obj.services.filter(is_deleted=False)
             #ser = Service.objects.get(id = obj.services)
             return ServiceSearchSerializer(all_service, many = True, context=self.context).data
     
