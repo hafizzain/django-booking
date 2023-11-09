@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     replaces = [('Sale', '0001_initial'), ('Sale', '0002_auto_20220930_1507'), ('Sale', '0003_delete_service')]
 
     dependencies = [
-        ('Business', '0018_businesstype_image_path'),
+        # ('Business', '0018_businesstype_image_path'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('Employee', '0011_commissionschemesetting'),
     ]
