@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('Business', '0021_businessaddress_banking'),
         ('Business', '0028_businessaddress_description'),
-        ('Business', '0009_businessvendor'),
+        # ('Business', '0009_businessvendor'),
     ]
 
     operations = [
