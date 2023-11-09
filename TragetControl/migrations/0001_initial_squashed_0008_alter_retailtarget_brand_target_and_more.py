@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('Service', '0023_servicegroup_allow_client_to_select_team_member'),
         ('Employee', '0030_alter_commissionschemesetting_commission_cycle'),
-        ('Business', '0022_business_is_completed'),
+        # ('Business', '0022_business_is_completed'),
         ('Product', '0031_remove_orderstock_location_orderstock_from_location_and_more'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]

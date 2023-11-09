@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         ('Business', '0021_businessaddress_banking'),
         # ('Employee', '0019_asset_assetdocument'),
         ('Business', '0017_alter_adminnotificationsetting_sms_notify_for_daily_book_and_more'),
-        ('Business', '0022_business_is_completed'),
+        # ('Business', '0022_business_is_completed'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('Utility', '0012_auto_20221015_1633'),
         ('Utility', '0013_turnoverproductrecord'),

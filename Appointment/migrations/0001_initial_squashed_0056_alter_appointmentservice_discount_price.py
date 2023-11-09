@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('Employee', '0040_alter_employedailyschedule_date'),
-        ('Business', '0022_business_is_completed'),
+        # ('Business', '0022_business_is_completed'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('Service', '0001_initial'),
         ('Service', '0003_service_price'),
