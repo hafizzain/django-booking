@@ -48,14 +48,12 @@ from django.db.models import Subquery, OuterRef
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_service(request):
-    title = request.GET.get('title', '')
     location = request.GET.get('location_id', None)
     is_mobile = request.GET.get('is_mobile', None)
     search_text = request.GET.get('search_text', None)
     no_pagination = request.GET.get('no_pagination', None)
-    emp_id = request.GET.get('employee_id', None)
 
-    query = Q(is_deleted=False) & Q(is_blocked=False)
+    query = Q(is_deleted=False)
     location_instance = None
     currency_code = None
     errors = []
