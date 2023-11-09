@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('Business', '0029_businessaddress_is_default'),
+        # ('Business', '0029_businessaddress_is_default'),
         ('Invoices', '0004_saleinvoice_checkout'),
         ('Client', '0069_alter_loyaltypoints_number_points'),
     ]

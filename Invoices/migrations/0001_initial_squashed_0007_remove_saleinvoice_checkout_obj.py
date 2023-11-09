@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('Appointment', '0043_appointment_is_promotion_and_more'),
         ('Client', '0063_client_is_default'),
-        ('Business', '0029_businessaddress_is_default'),
+        # ('Business', '0029_businessaddress_is_default'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('Order', '0034_alter_order_discount_price'),
     ]
