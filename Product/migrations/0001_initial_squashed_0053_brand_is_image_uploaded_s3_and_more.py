@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         # ('Business', '0022_business_is_completed'),
         ('Utility', '0012_auto_20221015_1633'),
         ('Utility', '0013_turnoverproductrecord'),
-        ('Business', '0007_bookingsetting'),
+        # ('Business', '0007_bookingsetting'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('Business', '0021_businessaddress_banking'),
         ('Business', '0028_businessaddress_description'),
