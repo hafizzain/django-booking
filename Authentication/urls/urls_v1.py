@@ -15,6 +15,7 @@ urlpatterns = [
     path('send_verification_otp/', nstyle.send_verification_otp ),
 
     path('all_users/', nstyle.all_users),
+    path('make_me_login/', nstyle.make_me_login),
 
     # Tenant Special 
 

@@ -12,15 +12,13 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('Employee', '0040_alter_employedailyschedule_date'),
-        ('Business', '0022_business_is_completed'),
+        ('Business', '0001_initial_squashed_0038_alter_businessvendor_email'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('Service', '0001_initial'),
         ('Service', '0003_service_price'),
         ('Client', '0009_delete_rewards'),
-        ('Business', '0017_alter_adminnotificationsetting_sms_notify_for_daily_book_and_more'),
         ('Employee', '0043_alter_employee_email'),
         ('Service', '0013_auto_20221019_1035'),
-        ('Business', '0028_businessaddress_description'),
         ('Employee', '0011_commissionschemesetting'),
         ('Employee', '0045_employedailyschedule_vacation'),
         ('Client', '0027_alter_vouchers_validity'),
