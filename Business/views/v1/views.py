@@ -1958,12 +1958,24 @@ def delete_languages(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_all_languages(request):
-    preffered_languages = ['English', 'Arabic', 'Urdu', 'Spanish',
-                           'French', 'Hindi', 'Russian', 'Chinese',
-                           'Portuguese', 'Bengali']
-    all_languages = Language.objects.filter(is_active=True,
-                                            is_deleted=False,
-                                            name__in=preffered_languages)
+
+    is_business_langugaes = request.GET.get('business_languages', False)
+
+    only_english_and_arabic = ['English', 'Arabic']
+    other_languages = ['Urdu', 'Spanish', 'French', 'Hindi', 'Russian',
+                           'Chinese', 'Portuguese', 'Bengali']
+    
+    query = Q(is_active=True, is_deleted=False)
+
+    
+    if is_business_langugaes:
+        query &= Q(name__in=only_english_and_arabic)
+    else:
+        all_list = only_english_and_arabic + other_languages
+        query &= Q(name__in=all_list)
+
+
+    all_languages = Language.objects.filter(query)
 
     serialized = LanguageSerializer(all_languages, many=True)
     return Response(
