@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
         ('Service', '0001_initial'),
         ('Service', '0003_service_price'),
         ('Client', '0009_delete_rewards'),
-        ('Business', '0017_alter_adminnotificationsetting_sms_notify_for_daily_book_and_more'),
+        # ('Business', '0017_alter_adminnotificationsetting_sms_notify_for_daily_book_and_more'),
         ('Employee', '0043_alter_employee_email'),
         ('Service', '0013_auto_20221019_1035'),
         ('Business', '0028_businessaddress_description'),
