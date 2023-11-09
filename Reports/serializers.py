@@ -1080,6 +1080,13 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
     
     tip = serializers.SerializerMethodField(read_only=True)
     checkout = serializers.SerializerMethodField(read_only=True)
+    payment_type = serializers.SerializerMethodField(read_only=True)
+
+    def get_payment_type(self, obj):
+        try:
+            return obj.invoice.payment_type
+        except:
+            return None
 
     def get_checkout(self, obj):
         checkout = Checkout.objects.filter(id=obj.checkout_id).first()
@@ -1226,6 +1233,7 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
             'membership_service', 
             'tip',
             'checkout',
+            'payment_type'
         ]
 
         

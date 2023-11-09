@@ -3207,6 +3207,7 @@ def add_business_vendor(request):
                 'response' : {
                     'message' : 'Something went wrong',
                     'error_message' : str(err),
+                    'email':email
                 }
             },
             status=status.HTTP_400_BAD_REQUEST
