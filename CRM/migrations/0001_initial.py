@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('Client', '0030_auto_20221102_1603'),
-        # ('Business', '0022_business_is_completed'),
+        ('Business', '0001_initial_squashed_0038_alter_businessvendor_email'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 

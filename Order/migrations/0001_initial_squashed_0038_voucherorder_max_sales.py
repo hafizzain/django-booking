@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
         ('Employee', '0020_auto_20221014_1252'),
         ('Service', '0024_priceservice_currency'),
         ('Client', '0055_vouchers_discount_percentage'),
-        # ('Business', '0022_business_is_completed'),
+        ('Business', '0001_initial_squashed_0038_alter_businessvendor_email'),
         ('Client', '0025_alter_subscription_select_amount'),
         ('Client', '0027_alter_vouchers_validity'),
     ]

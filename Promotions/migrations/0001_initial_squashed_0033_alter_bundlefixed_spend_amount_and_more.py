@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         ('Service', '0024_priceservice_currency'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('Product', '0041_productorderstockreport_reorder_quantity'),
-        # ('Business', '0028_businessaddress_description'),
+        ('Business', '0001_initial_squashed_0038_alter_businessvendor_email'),
     ]
 
     operations = [
