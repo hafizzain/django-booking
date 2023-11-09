@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         ('Service', '0032_alter_service_initial_deposit_alter_service_price'),
         ('Appointment', '0055_appointmentservice_is_redeemed_and_more'),
         ('Employee', '0055_alter_categorycommission_commission_percentage_and_more'),
-        ('Business', '0031_businesstaxsetting'),
+        # ('Business', '0031_businesstaxsetting'),
     ]
 
     operations = [
