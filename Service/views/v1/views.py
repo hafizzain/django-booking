@@ -23,7 +23,8 @@ from Sale.serializers import ServiceSerializer
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_services(request):
-    service= Service.objects.filter(is_deleted=False, is_blocked=False).order_by('-created_at')
+    query = Q(is_deleted=False) | Q(is_blocked=False)
+    service= Service.objects.filter(query).order_by('-created_at')
     serialized = ServiceSerializer(service,  many=True, )
     return Response(
         {
