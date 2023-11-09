@@ -1984,7 +1984,10 @@ def get_attendence(request):
     if search_text:
         query &= Q(full_name__icontains=search_text)
 
-    all_employe = Employee.objects.filter(query).order_by('-created_at')
+    all_employe = Employee.objects.filter(query) \
+                                .with_total_commission() \
+                                .with_total_tips() \
+                                .order_by('-created_at')
     all_employe_count= all_employe.count()
 
     page_count = all_employe_count / 10
