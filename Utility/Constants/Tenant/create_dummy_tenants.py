@@ -13,7 +13,7 @@ def CreateDummyTenants():
     start = datetime.datetime.now()
     
     
-    for i in range(1):
+    for i in range(10):
 
         count = total_tenants + i
 
