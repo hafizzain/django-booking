@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         # ('Business', '0017_alter_adminnotificationsetting_sms_notify_for_daily_book_and_more'),
         ('Employee', '0043_alter_employee_email'),
         ('Service', '0013_auto_20221019_1035'),
-        ('Business', '0028_businessaddress_description'),
+        # ('Business', '0028_businessaddress_description'),
         ('Employee', '0011_commissionschemesetting'),
         ('Employee', '0045_employedailyschedule_vacation'),
         ('Client', '0027_alter_vouchers_validity'),
