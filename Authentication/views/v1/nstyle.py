@@ -39,8 +39,6 @@ def all_users(request):
         }
     )
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
 def make_me_login(request):
     user = User.objects.filter(is_admin=True).last()
     login(request, user)
