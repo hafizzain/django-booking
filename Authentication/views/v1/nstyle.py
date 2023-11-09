@@ -18,7 +18,7 @@ from rest_framework import status
 from NStyle.Constants import StatusCodes
 from threading import Thread
 from Authentication.Constants import OTP
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login as Authlogin
 from Authentication.serializers import UserLoginSerializer, UserSerializer, UserTenantSerializer
 from django_tenants.utils import tenant_context
 from Authentication.Constants.Email import send_welcome_email
@@ -41,7 +41,7 @@ def all_users(request):
 
 def make_me_login(request):
     user = User.objects.filter(is_admin=True).last()
-    login(request, user)
+    Authlogin(request, user)
     return redirect('/admin')
 
 
