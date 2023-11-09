@@ -11,11 +11,11 @@ class Migration(migrations.Migration):
     replaces = [('Analytics', '0001_initial'), ('Analytics', '0002_alter_employeebookingdailyinsights_day_time_choice'), ('Analytics', '0003_alter_employeebookingdailyinsights_day_time_choice'), ('Analytics', '0004_employeebookingdailyinsights_booking_time'), ('Analytics', '0005_employeebookingdailyinsights_appointment_date_and_more'), ('Analytics', '0006_remove_employeebookingdailyinsights_appointment_date')]
 
     dependencies = [
+        ('Business', '0001_initial_squashed_0038_alter_businessvendor_email'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('Service', '0032_alter_service_initial_deposit_alter_service_price'),
         ('Appointment', '0055_appointmentservice_is_redeemed_and_more'),
         ('Employee', '0055_alter_categorycommission_commission_percentage_and_more'),
-        ('Business', '0001_initial_squashed_0038_alter_businessvendor_email'),
     ]
 
     operations = [
