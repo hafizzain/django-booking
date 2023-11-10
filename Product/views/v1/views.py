@@ -271,7 +271,7 @@ def get_categories(request):
     search_text = request.query_params.get('search_text', None)
     no_pagination = request.query_params.get('no_pagination', None)
 
-    all_categories = Category.objects.all()
+    all_categories = Category.objects.order_by('-created_at')
     if search_text:
         all_categories = all_categories.filter(name__icontains=search_text)
 
@@ -456,7 +456,7 @@ def get_brands(request):
     search_text = request.query_params.get('search_text', None)
     no_pagination = request.query_params.get('no_pagination', None)
 
-    all_brands = Brand.objects.all()
+    all_brands = Brand.objects.order_by('-created_at')
     if search_text:
         all_brands = all_brands.filter(name__icontains=search_text)
         

@@ -3029,7 +3029,7 @@ def get_business_vendors(request):
         query |= Q(mobile_number__icontains=search_text)
         query |= Q(address__icontains=search_text)
         query |= Q(user__email__icontains=search_text)
-        all_vendors = all_vendors.filter(query)
+        all_vendors = all_vendors.filter(query).order_by('-created_at')
         
     serialized = list(BusinessVendorSerializer(all_vendors, many=True).data)
 
