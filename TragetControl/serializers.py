@@ -124,7 +124,7 @@ class StoreTargetSerializers(serializers.ModelSerializer):
         month = self.context['month']
 
         date_string =  f'{year} {month} 01'
-        c_year = datetime.strptime(date_string, '%Y %-m %d')
+        c_year = datetime.strptime(date_string, '%Y %m %d')
         try:
             tier = TierStoreTarget.objects.filter(storetarget=obj,
                                                   year=c_year)
