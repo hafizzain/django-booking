@@ -95,9 +95,13 @@ class GETStoreTargetSerializers(serializers.ModelSerializer):
         except Exception as err:
             print(err)
     
-    def get_tier(self,obj):
+    def get_tier(self, obj):
+        
         try:
-            tier = TierStoreTarget.objects.filter(storetarget = obj, )
+            tier = TierStoreTarget.objects.filter(storetarget=obj,
+                                                  year=self.context['year'],
+                                                  date__month=self.context['month']
+                                                  )
             return TierStoreTargetSerializers(tier, many = True ,context=self.context).data
         except Exception as err:
             print(err)

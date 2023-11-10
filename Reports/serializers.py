@@ -501,10 +501,9 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
     
     def get_tier_target(self,obj):
         try:
-            tier = StoreTarget.objects.filter(
-                )
+            tier = StoreTarget.objects.all()
                 
-            return StoreTargetSerializers(tier,many = True ,context=self.context).data
+            return StoreTargetSerializers(tier, many=True , context=self.context).data
         except Exception as err:
             return str(err)
     
