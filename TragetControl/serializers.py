@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from rest_framework import serializers
 from Business.models import BusinessAddress
 from Employee.models import Employee, EmployeeProfessionalInfo
@@ -118,11 +120,14 @@ class StoreTargetSerializers(serializers.ModelSerializer):
             print(err)
     
     def get_tier(self,obj):
+        year = self.context['year']
+        month = self.context['month']
+
+        date_string =  f'{year} {month} 01'
+        c_year = datetime.strptime(date_string, '%Y %-m %d')
         try:
             tier = TierStoreTarget.objects.filter(storetarget=obj,
-                                                  year__date=self.context['year'],
-                                                  year__month=self.context['month']
-                                                  )
+                                                  year=c_year)
             return TierStoreTargetSerializers(tier, many=True, context=self.context).data
         except Exception as err:
             print(err)
