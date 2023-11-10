@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from django.db.models import Q
+
 from rest_framework import serializers
 from Business.models import BusinessAddress
 from Employee.models import Employee, EmployeeProfessionalInfo
@@ -120,14 +122,17 @@ class StoreTargetSerializers(serializers.ModelSerializer):
             print(err)
     
     def get_tier(self,obj):
-        year = self.context['year']
-        month = self.context['month']
+        year = self.context.get('year', None)
+        month = self.context.get('month', None)
 
-        date_string =  f'{year} {month} 01'
-        c_year = datetime.strptime(date_string, '%Y %m %d')
         try:
-            tier = TierStoreTarget.objects.filter(storetarget=obj,
-                                                  year=c_year)
+            query = Q(storetarget=obj)
+            if year and month:
+                date_string =  f'{year} {month} 01'
+                c_year = datetime.strptime(date_string, '%Y %m %d')
+                query &= Q(year=c_year)
+
+            tier = TierStoreTarget.objects.filter(query)
             return TierStoreTargetSerializers(tier, many=True, context=self.context).data
         except Exception as err:
             print(err)
