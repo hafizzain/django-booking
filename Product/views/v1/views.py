@@ -1182,8 +1182,25 @@ def get_products(request):
     start_time = datetime.datetime.now()
     location_id = request.GET.get('location_id', None)
     search_text = request.query_params.get('search_text', None)
+    quick_sales = request.query_params.get('quick_sales', False)
     
-    
+    query = Q(is_deleted=False)
+
+    if quick_sales:
+        query &= Q(is_active=True)
+
+    if location_id:
+        # Filter out those products which have product stock for this particular location
+        product_ids = list(ProductStock.objects.filter(location__id=location_id).values_list('product__id', flat=True))
+        query &= Q(id__in=product_ids)
+
+    if search_text:
+        #query building
+        query &= Q(name__icontains=search_text)
+        query |= Q(category__name__icontains=search_text)
+        query |= Q(brand__name__icontains=search_text)
+        query |= Q(product_type__icontains=search_text)
+
     all_products = Product.objects.prefetch_related(
         'location',
         'product_currencyretailprice',
@@ -1191,16 +1208,8 @@ def get_products(request):
         'consumptions',
         'product_medias',
         'product_stock',
-    ).filter(is_deleted=False).order_by('-created_at')
+    ).filter(query).order_by('-created_at')
 
-    if search_text:
-        #query building
-        query = Q(name__icontains=search_text)
-        query |= Q(category__name__icontains=search_text)
-        query |= Q(brand__name__icontains=search_text)
-        query |= Q(product_type__icontains=search_text)
-
-        all_products = all_products.filter(query)
     
     all_products_count = all_products.count()
     
