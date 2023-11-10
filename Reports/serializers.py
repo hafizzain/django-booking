@@ -517,6 +517,9 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
             app = AppointmentService.objects.filter(
                 business_address=obj,
                 appointment_status='Done',
+                created_at__year=year,
+                created_at__month=month
+
             )
             service_orders = ServiceOrder.objects.filter(
                 is_deleted=False,
