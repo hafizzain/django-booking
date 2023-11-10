@@ -827,7 +827,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
                         
             service_target = ServiceTarget.objects.filter(
                 service_group = obj,
-                created_at__icontains = year,
+                # created_at__icontains = year,
                 location__id =  location,
                 ) 
             for ord  in service_target:
