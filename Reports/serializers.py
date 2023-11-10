@@ -521,7 +521,9 @@ class BusinesAddressReportSerializer(serializers.ModelSerializer):
             service_orders = ServiceOrder.objects.filter(
                 is_deleted=False,
                 location=obj,
-                created_at__icontains=year
+                created_at__year=year,
+                created_at__month=month
+
             )
 
             for ord in app:
