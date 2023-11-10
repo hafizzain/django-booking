@@ -1077,7 +1077,7 @@ def update_product(request):
             pass
         
         
-        old_data = ProductTranslations.objects.filter(product = product)
+        old_data = ProductTranslations.objects.filter(product=product)
         for old in old_data:
             old = ProductTranslations.objects.get(id = old.id)
             old.delete()
@@ -1099,14 +1099,14 @@ def update_product(request):
 
     
     # Hard coding the creation of english language translation
-    # to keep the dynamic invoicingnlanguage in place.
-    old_product_name = request.data.get('name', None)
-    english_language = Language.objects.filter(name='English').first()
-    ProductTranslations.objects.create(
-        product=product,
-        product_name=old_product_name,
-        language=english_language
-    )
+    # to keep the dynamic invoicing language in place.
+    # old_product_name = request.data.get('name', None)
+    # english_language = Language.objects.filter(name='English').first()
+    # ProductTranslations.objects.create(
+    #     product=product,
+    #     product_name=old_product_name,
+    #     language=english_language
+    # )
 
     location_quantities = request.data.get('location_quantities', None)
     if location_quantities is not None:
