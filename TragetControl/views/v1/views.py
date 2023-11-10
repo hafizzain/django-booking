@@ -540,7 +540,8 @@ def create_storetarget(request):
             'response' : {
                 'message' : 'Store Target Successfully!',
                 'error_message' : None,
-                'storetarget' : serializer.data
+                'storetarget' : serializer.data,
+                'year':c_year
             }
         },
         status=status.HTTP_201_CREATED
