@@ -98,10 +98,7 @@ class GETStoreTargetSerializers(serializers.ModelSerializer):
     def get_tier(self, obj):
         
         try:
-            tier = TierStoreTarget.objects.filter(storetarget=obj,
-                                                  year=self.context['year'],
-                                                  date__month=self.context['month']
-                                                  )
+            tier = TierStoreTarget.objects.filter(storetarget=obj)
             return TierStoreTargetSerializers(tier, many = True ,context=self.context).data
         except Exception as err:
             print(err)
@@ -122,8 +119,11 @@ class StoreTargetSerializers(serializers.ModelSerializer):
     
     def get_tier(self,obj):
         try:
-            tier = TierStoreTarget.objects.filter(storetarget = obj)
-            return TierStoreTargetSerializers(tier,many = True ,context=self.context).data
+            tier = TierStoreTarget.objects.filter(storetarget=obj,
+                                                  year__date=self.context['year'],
+                                                  year__month=self.context['month']
+                                                  )
+            return TierStoreTargetSerializers(tier, many=True, context=self.context).data
         except Exception as err:
             print(err)
     
