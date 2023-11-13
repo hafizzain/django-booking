@@ -335,12 +335,8 @@ class VoucherSerializer(serializers.ModelSerializer):
     voucher_count = serializers.SerializerMethodField()
 
     def get_currency_voucher(self, obj):
-        currency_id = self.context.get('currency_id', None)
-        if not currency_id:
-            return None
-
         try:
-            cvp = VoucherCurrencyPrice.objects.filter(voucher = obj, currency__id = currency_id).distinct()
+            cvp = VoucherCurrencyPrice.objects.filter(voucher = obj).distinct()
             return CurrencyPriceVoucherSerializers(cvp, many= True).data
         except Exception as err:
             print(err)
