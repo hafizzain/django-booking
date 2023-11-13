@@ -2317,8 +2317,44 @@ def create_vouchers(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_vouchers(request):
+    location_id = request.GET.get('location_id', None)
+    if not location_id:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'location_id'
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        location = BusinessAddress.objects.get(id=location_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.LOCATION_NOT_FOUND_4014,
+                'response' : {
+                    'message' : 'Location not found',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    currency = location.currency
+    
     search_text = request.GET.get('search_text')
     all_voucher= Vouchers.objects.all().order_by('-created_at')
+
+    # voucher_vouchercurrencyprice__currency = currency
     all_voucher_count= all_voucher.count()
 
     if search_text:
@@ -2333,7 +2369,7 @@ def get_vouchers(request):
     page_number = request.GET.get("page") 
     all_voucher = paginator.get_page(page_number)
 
-    serialized = VoucherSerializer(all_voucher, many=True)
+    serialized = VoucherSerializer(all_voucher, many=True, context={'currency_id' : str(currency.id) if currency else None})
     return Response(
         {
             'status' : 200,
