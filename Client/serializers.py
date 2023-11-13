@@ -340,7 +340,7 @@ class VoucherSerializer(serializers.ModelSerializer):
             return None
 
         try:
-            cvp = VoucherCurrencyPrice.objects.filter(voucher = obj, currency = currency_id).distinct()
+            cvp = VoucherCurrencyPrice.objects.filter(voucher = obj, currency__id = currency_id).distinct()
             return CurrencyPriceVoucherSerializers(cvp, many= True).data
         except Exception as err:
             print(err)
