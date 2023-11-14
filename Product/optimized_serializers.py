@@ -27,13 +27,25 @@ class OptimizedBrandSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Brand
-        fields = ['id', 'name', 'description', 'website', 'image', 'is_active']
+        fields = [
+            'id', 
+            'name', 
+            # 'description', 
+            # 'website', 
+            # 'image', 
+            # 'is_active'
+        ]
 
 
 class OptimizedCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'name', 'is_active', 'created_at']
+        fields = [
+            'id', 
+            'name', 
+            # 'is_active', 
+            # 'created_at'
+        ]
 
 
 class OptimizedCurrencyRetailPriceSerializer(serializers.ModelSerializer):
