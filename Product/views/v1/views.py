@@ -1267,6 +1267,11 @@ def get_products_optimized(request):
         # Filter out those products which have product stock for this particular location
         product_ids = list(ProductStock.objects.filter(location__id=location_id).values_list('product__id', flat=True))
         query &= Q(id__in=product_ids)
+    
+    try:
+        location = BusinessAddress.objects.get(id=location_id)
+    except:
+        location = None
 
     if search_text:
         #query building
@@ -1298,6 +1303,7 @@ def get_products_optimized(request):
     serialized = optSerializers.OtpimizedProductSerializer(products, many=True, 
                                    context={'request' : request,
                                             'location': location_id,
+                                            'location_currency' : location.currency.id if location and location.currency else None
                                             })
     data = serialized.data
     end_time = datetime.datetime.now()

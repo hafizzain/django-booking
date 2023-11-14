@@ -139,8 +139,13 @@ class OtpimizedProductSerializer(serializers.ModelSerializer):
     #         return None
     
     def get_currency_retail_price(self, obj):
-            currency_retail = CurrencyRetailPrice.objects.filter(product = obj)
-            return OptimizedCurrencyRetailPriceSerializer( currency_retail, many = True).data
+        location_currency_id = self.context.get('location_currency', None)
+
+        currency_retail = CurrencyRetailPrice.objects.filter(
+            product = obj,
+            currency__id = location_currency_id
+        )
+        return OptimizedCurrencyRetailPriceSerializer( currency_retail, many = True).data
         
     # def get_stocktransfer(self, obj):
         
