@@ -37,17 +37,24 @@ class OptimizedCategorySerializer(serializers.ModelSerializer):
 
 
 class OptimizedCurrencyRetailPriceSerializer(serializers.ModelSerializer):
-    currency_code = serializers.SerializerMethodField(read_only=True)
+    currency_code = serializers.CharField(source='currency.code')
     
-    def get_currency_code(self, obj):
-        try:
-            return obj.currency.code
-        except Exception as err:
-            return str(err)
+    # def get_currency_code(self, obj):
+    #     try:
+    #         return obj.currency.code
+    #     except Exception as err:
+    #         return str(err)
             
     class Meta:
         model = CurrencyRetailPrice
-        fields = '__all__'
+        # fields = '__all__'
+        fields = [
+            'id',
+            'retail_price',
+            'currency',
+            'currency_code',
+        ]
+
 
 class OptimizedLocationSerializer(serializers.ModelSerializer):
     class Meta:
