@@ -1253,7 +1253,7 @@ def get_products(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_products_optimized(request):
-    start_time = datetime.datetime.now()
+    # start_time = datetime.datetime.now()
     location_id = request.GET.get('location_id', None)
     search_text = request.query_params.get('search_text', None)
     quick_sales = request.query_params.get('quick_sales', False)
@@ -1306,16 +1306,16 @@ def get_products_optimized(request):
                                             'location_currency' : location.currency.id if location and location.currency else None
                                             })
     data = serialized.data
-    end_time = datetime.datetime.now()
+    # end_time = datetime.datetime.now()
 
     return Response(
         {
             'status' : True,
             'status_code' : 200,
-            'request' : {
-                'seconds' : (end_time - start_time).seconds,
-                'total_seconds' : (end_time - start_time).total_seconds(),
-            },
+            # 'request' : {
+            #     'seconds' : (end_time - start_time).seconds,
+            #     'total_seconds' : (end_time - start_time).total_seconds(),
+            # },
             'response' : {
                 'total_count' : len(all_products),
                 'message' : 'All business Products!',
