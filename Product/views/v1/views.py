@@ -29,6 +29,7 @@ from Product.serializers import (CategorySerializer, BrandSerializer, ProductSer
                                  )
 from django.db import transaction
 
+import Product.optimized_serializers as optSerializers
 
 
 
@@ -1294,7 +1295,7 @@ def get_products_optimized(request):
     page_number = request.GET.get("page") 
     products = paginator.get_page(page_number)
 
-    serialized = ProductSerializer(products, many=True, 
+    serialized = optSerializers.OtpimizedProductSerializer(products, many=True, 
                                    context={'request' : request,
                                             'location': location_id,
                                             })
