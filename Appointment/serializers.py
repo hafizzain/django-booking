@@ -103,9 +103,7 @@ class EmployeAppoinmentSerializer(serializers.ModelSerializer):
         
 class TodayAppoinmentSerializer(serializers.ModelSerializer):
     member = serializers.SerializerMethodField(read_only=True)
-    service = serializers.SerializerMethodField(read_only=True)
-    end_time = serializers.SerializerMethodField(read_only=True)
-      
+    service = serializers.SerializerMethodField(read_only=True)      
     
     def get_member(self, obj):
         try: 
@@ -117,20 +115,7 @@ class TodayAppoinmentSerializer(serializers.ModelSerializer):
             return obj.service.name
         except Exception as err:
             None
-    
-    def get_end_time(self, obj):
-        app_date_time = f'2000-01-01 {obj.appointment_time}'
 
-        try:
-            # duration = DURATION_CHOICES_DATA[obj.duration]
-            duration = DURATION_CHOICES[obj.duration]
-            app_date_time = datetime.fromisoformat(app_date_time)
-            datetime_duration = app_date_time + timedelta(minutes=duration)
-            datetime_duration = datetime_duration.strftime('%H:%M:%S')
-            return datetime_duration
-        except Exception as err:
-            print(err)
-            return str(err)
     class Meta:
         model = AppointmentService
         fields = ('id', 'appointment_time', 'appointment_date', 'member' , 'service', 'appointment' )
