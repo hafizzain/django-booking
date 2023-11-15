@@ -1,6 +1,6 @@
 
 from Product.models import Product
-from Product.optimized_serializers import OptimizedProductSerializerForInsights, OtpimizedProductSerializer
+from Product.optimized_serializers import OtpimizedProductSerializerDashboard
 
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -495,7 +495,7 @@ def get_top_products_dashboard(request):
     ).order_by('-most_transferred_products')[:10]
 
 
-    data = OtpimizedProductSerializer(products, many=True).data
+    data = OtpimizedProductSerializerDashboard(products, many=True).data
 
 
     return Response(
