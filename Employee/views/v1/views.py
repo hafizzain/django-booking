@@ -782,38 +782,38 @@ def create_employee(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    existing_employees = Employee.objects.filter(mobile_number=mobile_number)
-    if existing_employees:
-        return Response(
-                    {
-                        'status' : False,
-                        'status_code' : 404,
-                        'status_code_text' : '404',
-                        'response' : {
-                            'message' : f'Employee already exist with this phonne number.',
-                            'error_message' : None,
-                        }
-                    },
-                    status=status.HTTP_404_NOT_FOUND
-                )
-    if email is not None:
-        with tenant_context(Tenant.objects.get(schema_name = 'public')):
-            try:
-                employe = User.objects.get(email__icontains = email)
-                return Response(
-                    {
-                        'status' : False,
-                        'status_code' : 404,
-                        'status_code_text' : '404',
-                        'response' : {
-                            'message' : f'User Already exist with this {email}!',
-                            'error_message' : None,
-                        }
-                    },
-                    status=status.HTTP_404_NOT_FOUND
-                )
-            except Exception as err:
-                pass
+    # existing_employees = Employee.objects.filter(mobile_number=mobile_number)
+    # if existing_employees:
+    #     return Response(
+    #                 {
+    #                     'status' : False,
+    #                     'status_code' : 404,
+    #                     'status_code_text' : '404',
+    #                     'response' : {
+    #                         'message' : f'Employee already exist with this phonne number.',
+    #                         'error_message' : None,
+    #                     }
+    #                 },
+    #                 status=status.HTTP_404_NOT_FOUND
+    #             )
+    # if email is not None:
+    #     with tenant_context(Tenant.objects.get(schema_name = 'public')):
+    #         try:
+    #             employe = User.objects.get(email__icontains = email)
+    #             return Response(
+    #                 {
+    #                     'status' : False,
+    #                     'status_code' : 404,
+    #                     'status_code_text' : '404',
+    #                     'response' : {
+    #                         'message' : f'User Already exist with this {email}!',
+    #                         'error_message' : None,
+    #                     }
+    #                 },
+    #                 status=status.HTTP_404_NOT_FOUND
+    #             )
+    #         except Exception as err:
+    #             pass
     
     if len(salary) > 7:
         return Response(
