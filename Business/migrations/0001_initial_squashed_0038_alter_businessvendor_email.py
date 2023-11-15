@@ -12,10 +12,8 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('Profile', '0002_userlanguage'),
-        ('Utility', '0002_currency'),
-        ('Utility', '0007_language_code'),
+        ('Utility', '0001_initial_squashed_0018_state_unique_id'),
         ('MultiLanguage', '0006_translationlabels'),
-        ('Utility', '0012_auto_20221015_1633'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 

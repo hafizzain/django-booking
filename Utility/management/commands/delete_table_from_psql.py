@@ -8,12 +8,19 @@ class Command(BaseCommand):
         import psycopg2
 
         # PostgreSQL connection parameters
+        # db_params = {
+        #     "host": "localhost",
+        #     "port": "5432",
+        #     "database": "nstyle",
+        #     "user": "postgres",
+        #     "password": "1234",
+        # }
         db_params = {
-            "host": "localhost",
+            "host": "nstylebeta.cjvh6t1bhvqx.ap-south-1.rds.amazonaws.com",
             "port": "5432",
-            "database": "nstyle",
-            "user": "postgres",
-            "password": "1234",
+            "database": "nspgsqlpro",
+            "user": "nstylepostgres",
+            "password": "tijarahsystemhs2021",
         }
 
         # Name of the table you want to delete
