@@ -7,7 +7,7 @@ from Utility.models import ExceptionRecord
 import datetime
 from uuid import uuid4
 
-def CreateDummyTenants():
+def CreateDummyTenants(t_amount):
     total_tenants = Tenant.objects.all()
     total_tenants = len(total_tenants)
     start = datetime.datetime.now()
@@ -19,7 +19,6 @@ def CreateDummyTenants():
         is_resolved = True
     )
     
-    t_amount = 15
     for i in range(t_amount):
 
         count = total_tenants + i

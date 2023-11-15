@@ -193,7 +193,7 @@ def TenantsListingPage(request):
 @login_required(login_url='/super-admin/super-login/')
 def CreateFreeTenants(request):
     try:
-        thrd = Thread(target=CreateDummyTenants)
+        thrd = Thread(target=CreateDummyTenants, args=[10])
         thrd.start()
     except Exception as err:
         messages.error(request, str(err))
