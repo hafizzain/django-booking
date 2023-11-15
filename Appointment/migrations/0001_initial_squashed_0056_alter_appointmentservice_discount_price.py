@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
         ('Employee', '0011_commissionschemesetting'),
         ('Employee', '0045_employedailyschedule_vacation'),
         ('Client', '0027_alter_vouchers_validity'),
-        ('Employee', '0020_auto_20221014_1252'),
+        ('Employee', '0001_initial_squashed_0056_employee_is_image_uploaded_s3'),
         ('Order', '0026_redeemmembershipitem_service_and_more'),
     ]
 

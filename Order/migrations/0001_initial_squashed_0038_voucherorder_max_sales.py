@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
         ('Employee', '0045_employedailyschedule_vacation'),
         ('Client', '0030_auto_20221102_1603'),
         ('Product', '0045_product_product_size'),
-        ('Employee', '0020_auto_20221014_1252'),
+        ('Employee', '0001_initial_squashed_0056_employee_is_image_uploaded_s3'),
         ('Service', '0024_priceservice_currency'),
         ('Client', '0055_vouchers_discount_percentage'),
         ('Business', '0001_initial_squashed_0038_alter_businessvendor_email'),
