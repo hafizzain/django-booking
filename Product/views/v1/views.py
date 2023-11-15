@@ -2374,7 +2374,7 @@ def get_product_consumptions(request):
         query |= Q(quantity_s__icontains=search_text)
         product_consumptions = product_consumptions.annotate(
             quantity_s=Cast('quantity', CharField())
-        ).filter(query)
+        ).filter(query).order_by('created_at')
    
     serialized = list(ProductConsumptionSerializer(product_consumptions, many=True).data)
 
