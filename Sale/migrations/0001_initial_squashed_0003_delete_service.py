@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('Business', '0001_initial_squashed_0038_alter_businessvendor_email'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('Employee', '0011_commissionschemesetting'),
+        ('Employee', '0001_initial_squashed_0056_employee_is_image_uploaded_s3'),
     ]
 
     operations = [
