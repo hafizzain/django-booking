@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('Employee', '0001_initial_squashed_0056_employee_is_image_uploaded_s3'),
-        ('Utility', '0012_auto_20221015_1633'),
+        ('Utility', '0001_initial_squashed_0018_state_unique_id'),
     ]
 
     operations = [
