@@ -416,7 +416,7 @@ def get_employees_dashboard(request):
 
     employees = Employee.objects.filter(query)
 
-    data = OptimizedEmployeeSerializerDashboard(employees, many=True).data
+    data = OptimizedEmployeeSerializerDashboard(employees, many=True, context={'request' : request}).data
 
     return Response(
         {
