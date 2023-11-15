@@ -48,12 +48,12 @@ def verify_tenant_email_mobile(prev_tenant_name='public', user=None, verify='Mob
         set_schema(schema_name_=prev_tenant_name)
     
 def createFreeAvailableTenants():
-    free_tenants = Tenant.objects.filter(
-        is_active = False,
-        is_ready = True,
-        user__isnull = True
-    )
-    if free_tenants.count() < 20:
-        CreateDummyTenants()
+    # free_tenants = Tenant.objects.filter(
+    #     is_active = False,
+    #     is_ready = True,
+    #     user__isnull = True
+    # )
+    # if free_tenants.count() < 20:
+    #     CreateDummyTenants()
 
-        
+    CreateDummyTenants()
