@@ -265,3 +265,36 @@ class OtpimizedProductSerializer(serializers.ModelSerializer):
             # 'slug', 
             'id'
         ]
+
+
+
+class OptimizedProductSerializerForInsights(serializers.ModelSerializer):
+    cover_image = serializers.SerializerMethodField()
+    most_transferred_products = serializers.IntegerField()
+    
+    def get_cover_image(self, obj):
+        cvr_img = ProductMedia.objects.filter(product=obj, is_cover=True, is_deleted=False).order_by('-created_at')
+        try:
+            if len(cvr_img) > 0 :
+                cvr_img = cvr_img[0]
+                request = self.context['request']
+                url = tenant_media_base_url(request, is_s3_url=cvr_img.is_image_uploaded_s3)
+                return f'{url}{cvr_img.image}'
+        except:
+            return None
+
+
+    class Meta:
+        model = Product
+        fields = [
+            'id', 
+            'name',
+            'cover_image',
+            'most_transferred_products'
+
+        ]
+        read_only_fields = [
+            'id'
+        ]
+
+

@@ -65,6 +65,8 @@ urlpatterns = [
     # Insights 
     path('get_filtered_insight_products/', insights.FilteredInsightProducts.as_view()),
     path('get_filtered_insight_chart_products/', insights.get_filtered_chat_products),
+    path('get_top_products_dashboard/', insights.get_top_products_dashboard),
+
     
     #Testing Api
     path('get_test_api/', views.get_test_api)

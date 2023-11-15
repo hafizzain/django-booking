@@ -1,5 +1,6 @@
 
 from Product.models import Product
+from Product.optimized_serializers import OptimizedProductSerializerForInsights
 
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -440,6 +441,63 @@ def get_filtered_chat_products(request):
         }
 
         data.append(product)
+
+
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 200,
+                'response' : {
+                    'message' : 'Insight Products',
+                    'error_message' : None,
+                    'products' : data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_top_products_dashboard(request):
+    """
+    This view is replication of get_filtered_chat_products/
+    with a minor chnage inn the data.
+    """
+
+    location_id = request.GET.get('location', None)
+    selected_year = request.GET.get('selected_year', '2023')
+
+    if not location_id:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 400,
+                'response' : {
+                    'message' : 'Please provide following missing fields',
+                    'error_message' : 'Missing fields error',
+                    'fields' : [
+                        'location'
+                    ]
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    
+    location_obj = BusinessAddress.objects.get(id=location_id)
+
+    sum_filter = Q(product_orders__location=location_obj)
+    products = Product.objects \
+    .filter(
+        product_stock__location = location_obj,
+        is_deleted = False,
+        product_orders__created_at__range = ('2020-01-01', f'{selected_year}-12-31'),
+        product_orders__location=location_obj) \
+    .annotate(
+        most_transferred_products = Coalesce(Sum('product_orders__quantity', filter=sum_filter), 0) \
+    ).order_by('-most_transferred_products')[:10]
+
+
+    data = OptimizedProductSerializerForInsights(products, many=True).data
 
 
     return Response(
