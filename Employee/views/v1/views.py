@@ -21,9 +21,9 @@ from Employee.serializers import( EmployeSerializer , EmployeInformationsSeriali
                           StaffpermisionSerializers , AttendanceSerializers
                           ,PayrollSerializers, UserEmployeeSerializer, VacationSerializer,singleEmployeeSerializer , CommissionSerializer
                           , AssetSerializer, WorkingScheduleSerializer,NewScheduleSerializer,NewVacationSerializer,NewAbsenceSerializer,
-                        
                           
                                  )
+from Employee.optimized_serializers import OptimizedEmployeeSerializerDashboard
 from django.db import connection, transaction
 from threading import Thread
 from Employee.Constants.Add_Employe import add_employee
@@ -403,7 +403,36 @@ def get_Employees(request):
             },
             status=status.HTTP_200_OK
         )
-    
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_employees_dashboard(request):
+    location_id = request.GET.get('location_id', None)
+
+    query = Q(is_deleted=False)
+    if location_id:
+        query &= Q(location__id=location_id)
+
+    employees = Employee.objects.filter(query)
+
+    data = OptimizedEmployeeSerializerDashboard(employees, many=True).data
+
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Employees',
+                'error_message' : None,
+                'Employee' : data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_single_employee(request):
