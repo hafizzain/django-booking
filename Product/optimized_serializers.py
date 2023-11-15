@@ -268,9 +268,9 @@ class OtpimizedProductSerializer(serializers.ModelSerializer):
 
 
 
-class OptimizedProductSerializerForInsights(serializers.ModelSerializer):
+class OtpimizedProductSerializerDashboard(serializers.ModelSerializer):
     cover_image = serializers.SerializerMethodField()
-    most_transferred_products = serializers.IntegerField()
+
     
     def get_cover_image(self, obj):
         cvr_img = ProductMedia.objects.filter(product=obj, is_cover=True, is_deleted=False).order_by('-created_at')
@@ -288,12 +288,12 @@ class OptimizedProductSerializerForInsights(serializers.ModelSerializer):
         model = Product
         fields = [
             'id', 
-            'name',
+            'name', 
             'cover_image',
-            'most_transferred_products'
 
         ]
         read_only_fields = [
+            # 'slug', 
             'id'
         ]
 

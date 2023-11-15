@@ -1,6 +1,6 @@
 
 from Product.models import Product
-from Product.optimized_serializers import OptimizedProductSerializerForInsights
+from Product.optimized_serializers import OtpimizedProductSerializerDashboard
 
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -464,8 +464,7 @@ def get_top_products_dashboard(request):
     with a minor chnage inn the data.
     """
 
-    location_id = request.GET.get('location', None)
-    selected_year = request.GET.get('selected_year', '2023')
+    location_id = request.GET.get('location_id', None)
 
     if not location_id:
         return Response(
@@ -476,7 +475,7 @@ def get_top_products_dashboard(request):
                     'message' : 'Please provide following missing fields',
                     'error_message' : 'Missing fields error',
                     'fields' : [
-                        'location'
+                        'location_id'
                     ]
                 }
             },
@@ -490,14 +489,15 @@ def get_top_products_dashboard(request):
     .filter(
         product_stock__location = location_obj,
         is_deleted = False,
-        product_orders__created_at__range = ('2020-01-01', f'{selected_year}-12-31'),
         product_orders__location=location_obj) \
     .annotate(
         most_transferred_products = Coalesce(Sum('product_orders__quantity', filter=sum_filter), 0) \
     ).order_by('-most_transferred_products')[:10]
 
 
-    data = OptimizedProductSerializerForInsights(products, many=True).data
+    data = OtpimizedProductSerializerDashboard(products, many=True, 
+                                            context={'request' : request,
+                                            }).data
 
 
     return Response(
