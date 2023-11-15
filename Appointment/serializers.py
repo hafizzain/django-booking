@@ -105,14 +105,7 @@ class TodayAppoinmentSerializer(serializers.ModelSerializer):
     member = serializers.SerializerMethodField(read_only=True)
     service = serializers.SerializerMethodField(read_only=True)
     end_time = serializers.SerializerMethodField(read_only=True)
-    location = serializers.SerializerMethodField(read_only=True)
-    
-    def get_location(self, obj):
-        try:
-            loc = BusinessAddress.objects.get(id = obj.business_address.id)
-            return LocationSerializer(loc).data
-        except Exception as err:
-            print(err)      
+      
     
     def get_member(self, obj):
         try: 
@@ -140,8 +133,7 @@ class TodayAppoinmentSerializer(serializers.ModelSerializer):
             return str(err)
     class Meta:
         model = AppointmentService
-        fields = ('id', 'appointment_time', 'appointment_date','duration',
-                  'member' , 'service', 'end_time', 'location', 'appointment' )
+        fields = ('id', 'appointment_time', 'appointment_date', 'member' , 'service', 'appointment' )
         
 class AppointmentServiceSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)

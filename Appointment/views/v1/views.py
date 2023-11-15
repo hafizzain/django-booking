@@ -245,11 +245,22 @@ def get_appointments_device(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_today_appointments(request):
+
+    location_id = request.GET.get('location_id', None)
+
     today = date.today()
-    today_appointment = AppointmentService.objects.filter(
-        appointment_date__icontains = today, is_blocked=False 
-        ).exclude(appointment_status__in=['Cancel', 'Done', 'Paid']) \
-         .order_by('appointment_time')
+    include_query = Q(is_blocked=False, appointment_date__icontains = today,)
+    exclude_query = Q(appointment_status__in=['Cancel', 'Done', 'Paid'])
+
+
+    if location_id:
+        include_query &= Q(business_address__id=location_id)
+
+
+    today_appointment = AppointmentService.objects \
+                            .filter(include_query) \
+                            .exclude(exclude_query) \
+                            .order_by('appointment_time')
     
 
     serialize = TodayAppoinmentSerializer(today_appointment, many=True)
@@ -2494,6 +2505,9 @@ def get_client_sale(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_appointment_client(request):
+    """
+    This view is deprecated and not in use.
+    """
     #user = request.user
     tenant_id = request.data.get('hash', None)
     business_id = request.data.get('business', None)
@@ -2716,11 +2730,11 @@ def create_appointment_client(request):
                 appointment_service.save()
         serialized = AppoinmentSerializer(appointment)
 
-        try:
-            thrd = Thread(target=Add_appointment_nn, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
-            thrd.start()
-        except Exception as err:
-            pass
+        # try: 
+        #     # thrd = Thread(target=Add_appointment_nn, args=[], kwargs={'appointment' : appointment, 'tenant' : request.tenant})
+        #     # thrd.start()
+        # except Exception as err:
+        #     pass
         
         all_memebers= Employee.objects.filter(
             is_deleted = False,

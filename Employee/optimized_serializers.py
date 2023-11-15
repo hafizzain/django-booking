@@ -25,4 +25,4 @@ class OptimizedEmployeeSerializerDashboard(serializers.ModelSerializer):
         return total_sale_employee(obj.id)
     class Meta:
         model = Employee
-        fields =['full_name', 'image', 'total_sale']
+        fields =['full_name', 'image', 'total_sale', 'employee_id']
