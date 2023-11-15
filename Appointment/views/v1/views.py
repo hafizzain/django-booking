@@ -260,6 +260,7 @@ def get_today_appointments(request):
     today_appointment = AppointmentService.objects \
                             .filter(include_query) \
                             .exclude(exclude_query) \
+                            .select_related('member', 'service') \
                             .order_by('appointment_time')
     
 
