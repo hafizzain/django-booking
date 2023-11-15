@@ -2362,7 +2362,7 @@ def get_product_consumptions(request):
     no_pagination = request.query_params.get('no_pagination', None)
     location_id = request.query_params.get('location_id', None)
     
-    product_consumptions = ProductConsumption.objects.filter(is_deleted=False)
+    product_consumptions = ProductConsumption.objects.filter(is_deleted=False).order_by('-created_at')
 
     if location_id:
         location = BusinessAddress.objects.get(id=str(location_id))
@@ -2372,9 +2372,10 @@ def get_product_consumptions(request):
         query = Q(product__name__icontains=search_text)
         query |= Q(location__address_name__icontains=search_text)
         query |= Q(quantity_s__icontains=search_text)
+
         product_consumptions = product_consumptions.annotate(
             quantity_s=Cast('quantity', CharField())
-        ).filter(query).order_by('-created_at')
+        ).filter(query)
    
     serialized = list(ProductConsumptionSerializer(product_consumptions, many=True).data)
 
