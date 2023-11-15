@@ -3022,14 +3022,15 @@ def get_business_vendors(request):
     search_text = request.query_params.get('search_text', None)
     no_pagination = request.query_params.get('no_pagination', None)
 
-    all_vendors = BusinessVendor.objects.filter(is_deleted=False, is_closed=False)
+    all_vendors = BusinessVendor.objects.filter(is_deleted=False, is_closed=False).order_by('-created_at')
+    
     if search_text:
         # query
         query = Q(vendor_name__icontains=search_text)
         query |= Q(mobile_number__icontains=search_text)
         query |= Q(address__icontains=search_text)
         query |= Q(user__email__icontains=search_text)
-        all_vendors = all_vendors.filter(query).order_by('-created_at')
+        all_vendors = all_vendors.filter(query)
         
     serialized = list(BusinessVendorSerializer(all_vendors, many=True).data)
 
