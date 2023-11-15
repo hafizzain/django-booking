@@ -13,7 +13,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('Business', '0001_initial_squashed_0038_alter_businessvendor_email'),
-        # ('Employee', '0019_asset_assetdocument'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('Utility', '0001_initial_squashed_0018_state_unique_id'),
     ]
