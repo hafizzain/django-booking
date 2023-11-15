@@ -11,11 +11,10 @@ class Migration(migrations.Migration):
     replaces = [('Promotions', '0001_initial'), ('Promotions', '0002_auto_20230109_1638'), ('Promotions', '0003_auto_20230110_1452'), ('Promotions', '0004_purchasediscount_servicegroupdiscount_specificgroupdiscount'), ('Promotions', '0005_auto_20230111_1141'), ('Promotions', '0006_alter_dayrestrictions_directorflat'), ('Promotions', '0007_auto_20230112_1136'), ('Promotions', '0008_auto_20230112_1200'), ('Promotions', '0009_spenddiscount'), ('Promotions', '0010_auto_20230113_2356'), ('Promotions', '0011_auto_20230116_2339'), ('Promotions', '0012_auto_20230117_0948'), ('Promotions', '0013_auto_20230117_1445'), ('Promotions', '0014_auto_20230117_1516'), ('Promotions', '0015_fixedpriceservice'), ('Promotions', '0016_auto_20230118_1251'), ('Promotions', '0017_auto_20230119_1113'), ('Promotions', '0018_auto_20230119_1555'), ('Promotions', '0019_productandgetspecific_retailandgetservice'), ('Promotions', '0020_auto_20230120_1641'), ('Promotions', '0021_userrestricteddiscount'), ('Promotions', '0022_auto_20230121_1124'), ('Promotions', '0023_auto_20230121_1130'), ('Promotions', '0024_complimentarydiscount_discountonfreeservice'), ('Promotions', '0025_auto_20230123_1132'), ('Promotions', '0026_auto_20230125_1042'), ('Promotions', '0027_auto_20230125_1328'), ('Promotions', '0028_servicegroupdiscount_brand_and_more'), ('Promotions', '0029_productandgetspecific_promotion_type'), ('Promotions', '0030_productandgetspecific_brand'), ('Promotions', '0031_bundlefixed_promotion_name_and_more'), ('Promotions', '0032_promotionexcludeditem'), ('Promotions', '0033_alter_bundlefixed_spend_amount_and_more')]
 
     dependencies = [
-        ('Product', '0045_product_product_size'),
+        ('Product', '0001_initial_squashed_0053_brand_is_image_uploaded_s3_and_more'),
         # ('Client', '0035_alter_client_user'),
         ('Service', '0024_priceservice_currency'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('Product', '0041_productorderstockreport_reorder_quantity'),
         ('Business', '0001_initial_squashed_0038_alter_businessvendor_email'),
     ]
 
