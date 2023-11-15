@@ -495,7 +495,9 @@ def get_top_products_dashboard(request):
     ).order_by('-most_transferred_products')[:10]
 
 
-    data = OtpimizedProductSerializerDashboard(products, many=True).data
+    data = OtpimizedProductSerializerDashboard(products, many=True, 
+                                            context={'request' : request,
+                                            }).data
 
 
     return Response(
