@@ -3515,26 +3515,6 @@ def create_vacation(request):
             },
             status=status.HTTP_201_CREATED
         ) 
-    
-    
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def get_vacations(request):
-    vacation = Vacation.objects.all().order_by('-created_at')   
-    serializer = VacationSerializer(vacation, many = True,context={'request' : request})
-    
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Vacation',
-                'error_message' : None,
-                'vacation' : serializer.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
@@ -4116,7 +4096,7 @@ def create_workingschedule(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def c(request):
+def get_vacations(request):
     employee_id = request.GET.get('employee_id', None)
     location = request.GET.get('location_id', None)
     search_text = request.GET.get('search_text', None)
