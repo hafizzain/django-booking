@@ -3103,7 +3103,7 @@ def add_business_vendor(request):
     address = request.data.get('address', None)
     mobile_number = request.data.get('mobile_number', None)
 
-    email = request.data.get('email', None)
+    email = request.data.get('email', '')
     country_unique_id = request.data.get('country', None)
     state_unique_id = request.data.get('state', None)
     city_name = request.data.get('city', None)
@@ -3184,6 +3184,7 @@ def add_business_vendor(request):
         
     try:
         vendor = BusinessVendor.objects.create(
+            email = email,
             user = user,
             business = business,
             country = country if country_unique_id else None,
@@ -3196,9 +3197,6 @@ def add_business_vendor(request):
             mobile_number = mobile_number,
             is_active = is_active,
         )
-        if email:
-            vendor.email = email
-            vendor.save()
     except Exception as err:
         return Response(
             {
