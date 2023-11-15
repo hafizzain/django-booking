@@ -10,8 +10,8 @@ class Migration(migrations.Migration):
     replaces = [('Permissions', '0001_initial'), ('Permissions', '0002_auto_20221018_0958'), ('Permissions', '0003_auto_20230220_1121')]
 
     dependencies = [
-        ('Employee', '0020_auto_20221014_1252'),
-        ('Utility', '0012_auto_20221015_1633'),
+        ('Employee', '0001_initial_squashed_0056_employee_is_image_uploaded_s3'),
+        ('Utility', '0001_initial_squashed_0018_state_unique_id'),
     ]
 
     operations = [

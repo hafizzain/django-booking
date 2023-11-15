@@ -11,15 +11,12 @@ class Migration(migrations.Migration):
     replaces = [('Order', '0001_initial'), ('Order', '0002_auto_20221022_1021'), ('Order', '0003_order_user'), ('Order', '0004_alter_order_payment_type'), ('Order', '0005_alter_order_status'), ('Order', '0006_auto_20221027_1503'), ('Order', '0007_order_sold_quantity'), ('Order', '0008_auto_20221107_1645'), ('Order', '0009_order_quantity'), ('Order', '0010_alter_checkout_client'), ('Order', '0011_alter_order_client'), ('Order', '0012_checkout_tip'), ('Order', '0013_auto_20230126_1737'), ('Order', '0014_auto_20230126_1739'), ('Order', '0015_auto_20230130_1533'), ('Order', '0016_auto_20230130_1606'), ('Order', '0017_auto_20230209_1639'), ('Order', '0018_alter_order_total_price'), ('Order', '0019_alter_order_total_price'), ('Order', '0020_auto_20230302_1210'), ('Order', '0021_checkout_is_promotion'), ('Order', '0022_alter_checkout_member'), ('Order', '0023_checkout_selected_promotion_id_and_more'), ('Order', '0024_redeemedmembership'), ('Order', '0025_alter_redeemedmembership_checkout_and_more'), ('Order', '0026_redeemmembershipitem_service_and_more'), ('Order', '0027_order_is_redeemed_order_redeemed_instance_id_and_more'), ('Order', '0028_checkout_tax_amount_checkout_tax_applied'), ('Order', '0029_alter_order_discount_price'), ('Order', '0030_alter_order_discount_percentage'), ('Order', '0031_alter_checkout_product_commission_and_more'), ('Order', '0032_checkout_tax_amount1_checkout_tax_applied1'), ('Order', '0033_checkout_tax_name_checkout_tax_name1'), ('Order', '0034_alter_order_discount_price'), ('Order', '0035_order_total_discount'), ('Order', '0036_checkout_total_discount_and_more'), ('Order', '0037_checkout_redeem_option_and_more'), ('Order', '0038_voucherorder_max_sales')]
 
     dependencies = [
-        ('Employee', '0021_employee_location'),
         ('Client', '0032_auto_20221114_1155'),
         ('Service', '0015_alter_service_service_type'),
-        ('Product', '0022_alter_product_product_size'),
+        ('Product', '0001_initial_squashed_0053_brand_is_image_uploaded_s3_and_more'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('Employee', '0045_employedailyschedule_vacation'),
         ('Client', '0030_auto_20221102_1603'),
-        ('Product', '0045_product_product_size'),
-        ('Employee', '0020_auto_20221014_1252'),
+        ('Employee', '0001_initial_squashed_0056_employee_is_image_uploaded_s3'),
         ('Service', '0024_priceservice_currency'),
         ('Client', '0055_vouchers_discount_percentage'),
         ('Business', '0001_initial_squashed_0038_alter_businessvendor_email'),

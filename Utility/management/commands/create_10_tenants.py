@@ -9,7 +9,7 @@ class Command(BaseCommand):
     # Handle method to handle out the process of creating the admin user
     def handle(self, *args, **options):
         try:
-            thrd = Thread(target=CreateDummyTenants)
+            thrd = Thread(target=CreateDummyTenants, args=[10])
             thrd.start()
         except Exception as err:
             self.stdout.write(self.style.ERROR(

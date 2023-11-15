@@ -323,9 +323,7 @@ fcm_credentials = env('GOOGLE_APPLICATION_CREDENTIALS')
 try:
     with open(fcm_credentials, 'r') as cred:
         json_data = json.loads(cred.read())
-except:
-    pass
-else:
+
     cred = credentials.Certificate(json_data)
     FIREBASE_APP = initialize_app(cred)
     FCM_DJANGO_SETTINGS = {
@@ -334,6 +332,8 @@ else:
         "ONE_DEVICE_PER_USER": True,
         "DELETE_INACTIVE_DEVICES": False,
     }
+except:
+    pass
 
 
 AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')

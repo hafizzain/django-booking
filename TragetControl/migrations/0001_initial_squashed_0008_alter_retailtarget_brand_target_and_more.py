@@ -12,9 +12,9 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('Service', '0023_servicegroup_allow_client_to_select_team_member'),
-        ('Employee', '0030_alter_commissionschemesetting_commission_cycle'),
+        ('Employee', '0001_initial_squashed_0056_employee_is_image_uploaded_s3'),
         ('Business', '0001_initial_squashed_0038_alter_businessvendor_email'),
-        ('Product', '0031_remove_orderstock_location_orderstock_from_location_and_more'),
+        ('Product', '0001_initial_squashed_0053_brand_is_image_uploaded_s3_and_more'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 

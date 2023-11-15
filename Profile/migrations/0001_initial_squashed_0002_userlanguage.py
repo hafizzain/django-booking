@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     replaces = [('Profile', '0001_initial'), ('Profile', '0002_userlanguage')]
 
     dependencies = [
-        ('Utility', '0001_initial'),
+        ('Utility', '0001_initial_squashed_0018_state_unique_id'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
