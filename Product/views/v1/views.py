@@ -271,9 +271,7 @@ def import_category(request):
                 name_str = name if name else ''
                 status_flag = True if status_check == 'Active' else False
                 categories_list.append(
-                    Category(name=name_str,
-                        status=status_flag
-                        )
+                    Category(name=name_str, is_active=status_flag)
                 )
             else:
                 return Response(
