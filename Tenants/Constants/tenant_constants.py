@@ -6,6 +6,7 @@ from django_tenants.utils import tenant_context
 from Tenants.models import Tenant
 from Authentication.models import User
 from Utility.Constants.Tenant.create_dummy_tenants import CreateDummyTenants
+from Utility.models import ExceptionRecord
 
 
 def set_schema(schema_name_=None, user=None):
@@ -48,4 +49,7 @@ def verify_tenant_email_mobile(prev_tenant_name='public', user=None, verify='Mob
         set_schema(schema_name_=prev_tenant_name)
     
 def createFreeAvailableTenants():
-    CreateDummyTenants(15)
+    try:
+        CreateDummyTenants(15)
+    except Exception as err:
+        ExceptionRecord.objects.create(text = f'Tenant Cronjob ERROR :: {str(err)}')
