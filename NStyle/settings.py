@@ -271,7 +271,7 @@ CRONJOBS = [
     ('* * * * *', 'Apponitment.Constants.today_appointment.today_appointment'),
     ('* * * * *', 'Product.Constants.Product_automation.ReorderQunatity'),
     # ('0 0 * * *', 'Tenants.Constants.tenant_constants.createFreeAvailableTenants'),
-    ('* * * * *', 'Tenants.Constants.tenant_constants.createFreeAvailableTenants'),
+    ('1 * * * *', 'Tenants.Constants.tenant_constants.createFreeAvailableTenants'),
 ]
 
 
