@@ -2984,7 +2984,7 @@ def import_business_vendor(request):
                         email=email,
                         address=address,
                         gstin=gst_in,
-                        status=status
+                        is_active=is_active
                         )
                 )
             else:
