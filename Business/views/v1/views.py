@@ -2979,6 +2979,7 @@ def import_business_vendor(request):
                 is_active = True if status_check == 'Active' else False
                 vendors_list.append(
                     BusinessVendor(
+                        user=user,
                         vendor_name=name,
                         mobile_number=contact,
                         email=email,
