@@ -270,7 +270,8 @@ USE_TZ = True
 CRONJOBS = [
     ('* * * * *', 'Apponitment.Constants.today_appointment.today_appointment'),
     ('* * * * *', 'Product.Constants.Product_automation.ReorderQunatity'),
-    ('0 0 * * *', 'Tenants.Constants.tenant_constants.createFreeAvailableTenants'),
+    # ('0 0 * * *', 'Tenants.Constants.tenant_constants.createFreeAvailableTenants'),
+    ('15 * * * *', 'Tenants.Constants.tenant_constants.createFreeAvailableTenants'),
 ]
 
 
@@ -378,3 +379,7 @@ FRONTEND_DOMAIN = env('FRONTEND_DOMAIN')
 
 # Set Atomic Requests Globally
 ATOMIC_REQUESTS = True
+try:
+    from .local_settings import LIVE_SERVER_PATH
+except:
+    LIVE_SERVER_PATH = '/home/ubuntu/backend-nstyle/'

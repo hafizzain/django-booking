@@ -2,17 +2,15 @@ from itertools import islice
 import csv, json
 from Business.models import BusinessType
 from Tenants.models import Tenant
-from Utility.models import Country, Software, State, City, Currency, Language
+from Utility.models import Country, Software, State, City, Currency, Language, ExceptionRecord
 
 from django_tenants.utils import tenant_context
-
 
 def add_business_types(tenant=None):
     if tenant is None:
         tenant = Tenant.objects.get(schema_name='public')
-
     with tenant_context(tenant):
-        with open('Utility/Files/business_types.json', 'r') as inp_file:
+        with open(f'Utility/Files/business_types.json', 'r') as inp_file:
             file = json.load(inp_file)
             bs_types_objs = []
             for row in file:

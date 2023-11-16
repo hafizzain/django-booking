@@ -31,7 +31,6 @@ def create_route53_alias_record(domain_name):
         }]
 
         response = route53_client.change_resource_record_sets(HostedZoneId=settings.AWS_MY_ZONE_ID, ChangeBatch={'Changes': changes})
-        print(response)
 
     except Exception as err:
         print(f"Error creating A record: {err}")
@@ -42,7 +41,4 @@ def create_route53_alias_record(domain_name):
         time_diff = time_end - time_start
 
         total_seconds = time_diff.total_seconds()
-
-        ExceptionRecord.objects.create(text = f'AWS Record Creation DIFF {total_seconds} Seconds for {domain_name}')
-        ExceptionRecord.objects.create(text = f'response :: {str(response)}')
         return True
