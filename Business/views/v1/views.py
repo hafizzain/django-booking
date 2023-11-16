@@ -3,6 +3,7 @@
 
 from datetime import datetime, time, timedelta
 import email
+import csv
 from typing import Any
 from django.conf import settings
 from operator import ge
@@ -2961,40 +2962,45 @@ def import_business_vendor(request):
     file = NstyleFile.objects.create(
         file = vendor_csv
     )
-    with open( file.file.path , 'r', encoding='utf-8') as imp_file:
-        for index, row in enumerate(imp_file):
-            if index == 0:
-                continue
-            row = row.split(',')
-            row = row
-            
-            if len(row) < 5:
-                continue
-            vendor_name = row[0].strip('"')
-            phone = row[1].strip('"')
-            email = row[2].strip('"')
-            address = row[3].strip('"')
-            status_ven = row[4].strip('"')
-            gstin = row[5].strip('"')
-            
-            create_vendor = BusinessVendor.objects.create(
-                user = user,
-                business = business,
-                vendor_name =vendor_name,
-                mobile_number = phone,
-                address =  address,
-                gstin =gstin,
-                email = email,
-                #is_active = status
-            )
-            if status_ven.strip() ==  'Active':
-                create_vendor.is_active =True
-                create_vendor.save()
-            else :
-                create_vendor.is_active = False
-                create_vendor.save()
-                
-            print(f'Added Vendor {create_vendor} ... {vendor_name} ')
+
+    vendors_list = []
+    with open( file.file.path , 'r', encoding='utf-8-sig', newline='') as csv_file:
+        csv_reader = csv.DictReader(csv_file, delimiter=',')
+        for row in csv_reader:
+            if not all([row['Name'], row['Status']]):
+                name = row['Vendor Name'] if row['Vendor Name'] else ''
+                contact = row['Contact'] if row['Contact'] else ''
+                email = row['Email'] if row['Email'] else ''
+                address = row['Address'] if row['Address'] else ''
+                status = True if row['Status'] == 'Active' else False
+                gst_in = row['GST IN'] if row['GST IN'] else ''
+
+
+                status = True if row['Status'] == 'Active' else False
+                vendors_list.append(
+                    BusinessVendor(
+                        name=name,
+                        mobile_number=contact,
+                        email=email,
+                        adress=address,
+                        gstin=gst_in,
+                        status=status
+                        )
+                )
+            else:
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                        'status_code_text' : 'MISSING_FIELDS_4001',
+                        'response' : {
+                            'message' : 'Invalid Data!',
+                            'error_message' : 'All fields are required.',
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        BusinessVendor.objects.bulk_create(vendors_list)
                 
     file.delete()
     all_vendors = BusinessVendor.objects.filter(is_deleted=False, is_closed=False)

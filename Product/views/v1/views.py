@@ -260,30 +260,48 @@ def import_category(request):
     file = NstyleFile.objects.create(
         file = category_csv
     )
-    with open( file.file.path , 'r', encoding='utf-8') as imp_file:
-        for index, row in enumerate(imp_file):
-            if index == 0:
-                continue
-            row = row.split(',')
-            row = row
-            
-            if len(row) < 3:
-                continue
-            name = row[0].strip('"')
-            active=row[2].replace('\n', '').strip('"')
-            
-            category = Category.objects.create(
-                name = name,
-            )  
-            if active == 'Active':
-               category.active = True
-               category.save()
-            else:
-                category.active  = False
-                category.save()
-                
-    file.delete()
-    return Response({'Status' : 'Success'})
+    categories_list = []
+    try:
+        with open( file.file.path , 'r', encoding='utf-8-sig', newline='') as csv_file:
+            csv_reader = csv.DictReader(csv_file, delimiter=',')
+            for row in csv_reader:
+                if not all([row['Name'], row['Status']]):
+                    name = row['Name'] if row['Name'] else ''
+                    status = True if row['Status'] == 'Active' else False
+                    categories_list.append(
+                        Category(name=name,
+                            status=status
+                            )
+                    )
+                else:
+                    return Response(
+                        {
+                            'status' : False,
+                            'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                            'status_code_text' : 'MISSING_FIELDS_4001',
+                            'response' : {
+                                'message' : 'Invalid Data!',
+                                'error_message' : 'All fields are required.',
+                            }
+                        },
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            Category.objects.bulk_create(categories_list)
+            file.delete()
+            return Response({'Status' : 'Success'})
+    except:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'Error occured in uploading file',
+                'response' : {
+                    'message' : 'Something went wrong.',
+                    'error_message' : 'Something went wrong.',
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
