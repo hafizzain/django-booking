@@ -6,7 +6,6 @@ from Utility.models import Country, Software, State, City, Currency, Language, E
 
 from django_tenants.utils import tenant_context
 import os
-from django.conf import settings
 
 def add_business_types(tenant=None):
     ExceptionRecord.objects.create(
@@ -19,7 +18,7 @@ def add_business_types(tenant=None):
         ExceptionRecord.objects.create(
             text=f'{os.getcwd()}',
         )
-        with open(f'{settings.LIVE_SERVER_PATH}Utility/Files/business_types.json', 'r') as inp_file:
+        with open(f'Utility/Files/business_types.json', 'r') as inp_file:
             file = json.load(inp_file)
             bs_types_objs = []
             for row in file:
@@ -37,7 +36,7 @@ def add_software_types(tenant=None):
         tenant = Tenant.objects.get(schema_name='public')
 
     with tenant_context(tenant):
-        with open(f'{settings.LIVE_SERVER_PATH}Utility/Files/software_types.json', 'r') as inp_file:
+        with open('Utility/Files/software_types.json', 'r') as inp_file:
             file = json.load(inp_file)
             softwares_objs = []
             for row in file:
@@ -54,7 +53,7 @@ def add_countries(tenant=None):
         tenant = Tenant.objects.get(schema_name='public')
 
     with tenant_context(tenant):
-        with open(f'{settings.LIVE_SERVER_PATH}Utility/Files/countries.csv', 'r') as inp_file:
+        with open('Utility/Files/countries.csv', 'r') as inp_file:
             csv_file = csv.DictReader(inp_file, delimiter=',')
             countries_objs = []
             for row in csv_file:
@@ -75,7 +74,7 @@ def add_states(tenant=None):
         tenant = Tenant.objects.get(schema_name='public')
 
     with tenant_context(tenant):
-        with open(f'{settings.LIVE_SERVER_PATH}Utility/Files/states.csv', 'r') as inp_file:
+        with open('Utility/Files/states.csv', 'r') as inp_file:
             csv_reader = csv.DictReader(inp_file, delimiter=',')
             states_objects = []
             for row in csv_reader:
@@ -98,7 +97,7 @@ def add_cities(tenant=None):
     with tenant_context(tenant):
 
 
-        with open(f'{settings.LIVE_SERVER_PATH}Utility/Files/cities.csv', 'r') as inp_file:
+        with open('Utility/Files/cities.csv', 'r') as inp_file:
             csv_reader = csv.DictReader(inp_file, delimiter=',')
             cities_objects = []
             for row in csv_reader:
@@ -122,7 +121,7 @@ def add_currencies(tenant=None):
 
     with tenant_context(tenant):
 
-        with open(f'{settings.LIVE_SERVER_PATH}Utility/Files/Currencies.csv', 'r') as f:
+        with open('Utility/Files/Currencies.csv', 'r') as f:
             reader = csv.reader(f)
             header = next(reader)
             currencies_objs = []
@@ -145,7 +144,7 @@ def add_languages(tenant=None):
 
     with tenant_context(tenant):
 
-        with open(f'{settings.LIVE_SERVER_PATH}Utility/Files/languages.csv', 'r') as f:
+        with open('Utility/Files/languages.csv', 'r') as f:
             reader = csv.reader(f)
             # header = next(reader)
             langs_objs = []
