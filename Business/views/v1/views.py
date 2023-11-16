@@ -2982,7 +2982,7 @@ def import_business_vendor(request):
                         vendor_name=name,
                         mobile_number=contact,
                         email=email,
-                        adress=address,
+                        address=address,
                         gstin=gst_in,
                         status=status
                         )
