@@ -261,47 +261,47 @@ def import_category(request):
         file = category_csv
     )
     categories_list = []
-    # try:
-    with open( file.file.path , 'r', encoding='utf-8-sig', newline='') as csv_file:
-        csv_reader = csv.DictReader(csv_file, delimiter=',')
-        for row in csv_reader:
-            name = row.get('Category Name', None)
-            status_check = row.get('Status', None)
-            if not all([name, status]):
-                name_str = name if name else ''
-                status_flag = True if status_check == 'Active' else False
-                categories_list.append(
-                    Category(name=name_str, is_active=status_flag)
-                )
-            else:
-                return Response(
-                    {
-                        'status' : False,
-                        'status_code' : StatusCodes.MISSING_FIELDS_4001,
-                        'status_code_text' : 'MISSING_FIELDS_4001',
-                        'response' : {
-                            'message' : 'Invalid Data!',
-                            'error_message' : 'All fields are required.',
-                        }
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-        Category.objects.bulk_create(categories_list)
-        file.delete()
-        return Response({'Status' : 'Success'})
-    # except:
-    #     return Response(
-    #         {
-    #             'status' : False,
-    #             'status_code' : StatusCodes.MISSING_FIELDS_4001,
-    #             'status_code_text' : 'Error occured in uploading file',
-    #             'response' : {
-    #                 'message' : 'Something went wrong.',
-    #                 'error_message' : 'Something went wrong.',
-    #             }
-    #         },
-    #         status=status.HTTP_400_BAD_REQUEST
-    #     )
+    try:
+        with open( file.file.path , 'r', encoding='utf-8-sig', newline='') as csv_file:
+            csv_reader = csv.DictReader(csv_file, delimiter=',')
+            for row in csv_reader:
+                name = row.get('Category Name', None)
+                status_check = row.get('Status', None)
+                if not all([name, status]):
+                    name_str = name if name else ''
+                    status_flag = True if status_check == 'Active' else False
+                    categories_list.append(
+                        Category(name=name_str, is_active=status_flag)
+                    )
+                else:
+                    return Response(
+                        {
+                            'status' : False,
+                            'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                            'status_code_text' : 'MISSING_FIELDS_4001',
+                            'response' : {
+                                'message' : 'Invalid Data!',
+                                'error_message' : 'All fields are required.',
+                            }
+                        },
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            Category.objects.bulk_create(categories_list)
+            file.delete()
+            return Response({'Status' : 'Success'})
+    except:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'Error occured in uploading file',
+                'response' : {
+                    'message' : 'Something went wrong.',
+                    'error_message' : 'Something went wrong.',
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
