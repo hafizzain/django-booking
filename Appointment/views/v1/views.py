@@ -37,7 +37,7 @@ from Appointment.models import Appointment, AppointmentService, AppointmentNotes
 from Appointment.serializers import (CheckoutSerializer, AppoinmentSerializer, ServiceClientSaleSerializer, ServiceEmployeeSerializer,
                                      SingleAppointmentSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer,
                                        EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer, 
-                                       AppointmenttLogSerializer)
+                                       AppointmenttLogSerializer, AppointmentSerializerDashboard)
 from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
 from Utility.models import ExceptionRecord
@@ -382,9 +382,12 @@ def get_recent_ten_appointments(request):
     query &= Q(appointment_status__in=completed_flags)
     query &= Q(business_address__id=location_id)
 
-    recent_ten_appointments = AppointmentService.objects.filter(query).order_by('-created_at')[:10]
+    recent_ten_appointments = AppointmentService.objects \
+                                .filter(query) \
+                                .select_related('member', 'service', 'appointment__client') \
+                                .order_by('-created_at')[:10]
 
-    serialized = AllAppoinmentSerializer(recent_ten_appointments, many=True)
+    serialized = AppointmentSerializerDashboard(recent_ten_appointments, many=True)
     
     return Response(
         {

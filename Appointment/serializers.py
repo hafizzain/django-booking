@@ -483,6 +483,36 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             'appointments',
         ]
 
+
+class AppointmentSerializerDashboard(serializers.ModelSerializer):
+    member = serializers.SerializerMethodField(read_only=True)
+    service = serializers.SerializerMethodField(read_only=True)
+    client = serializers.SerializerMethodField(read_only=True)
+   
+    
+    def get_client(self, obj):
+        try:
+            return obj.appointment.client.full_name
+        except Exception as err:
+            return None
+        
+    def get_member(self, obj):
+        try:
+            return obj.member.full_name
+        except Exception as err:
+            return None
+        
+    def get_service(self, obj):
+        try:
+            return obj.service.name
+        except Exception as err:
+            return None
+        
+    
+    class Meta:
+        model = AppointmentService
+        fields= ['id', 'service', 'member', 'price', 'client']
+
 class AllAppoinmentSerializer(serializers.ModelSerializer):
     member = serializers.SerializerMethodField(read_only=True)
     member_id = serializers.SerializerMethodField(read_only=True)
