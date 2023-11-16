@@ -2967,16 +2967,16 @@ def import_business_vendor(request):
     with open( file.file.path , 'r', encoding='utf-8-sig', newline='') as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=',')
         for row in csv_reader:
-            if not all([row['Name'], row['Status']]):
-                name = row['Vendor Name'] if row['Vendor Name'] else ''
-                contact = row['Contact'] if row['Contact'] else ''
-                email = row['Email'] if row['Email'] else ''
-                address = row['Address'] if row['Address'] else ''
-                status = True if row['Status'] == 'Active' else False
-                gst_in = row['GST IN'] if row['GST IN'] else ''
 
+            name = row.get('Vendor Name', None)
+            contact = row.get('Contact', None)
+            email = row.get('Email', None)
+            address = row.get('Address', None)
+            status_check = row.get('Status', None)
+            gst_in = row.get('GST IN', None)
 
-                status = True if row['Status'] == 'Active' else False
+            if all([name, contact, email, address, status_check, gst_in]) and (name not in ["", None]):
+                is_active = True if status_check == 'Active' else False
                 vendors_list.append(
                     BusinessVendor(
                         name=name,
