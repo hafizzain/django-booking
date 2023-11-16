@@ -103,16 +103,7 @@ class EmployeAppoinmentSerializer(serializers.ModelSerializer):
         
 class TodayAppoinmentSerializer(serializers.ModelSerializer):
     member = serializers.SerializerMethodField(read_only=True)
-    service = serializers.SerializerMethodField(read_only=True)
-    end_time = serializers.SerializerMethodField(read_only=True)
-    location = serializers.SerializerMethodField(read_only=True)
-    
-    def get_location(self, obj):
-        try:
-            loc = BusinessAddress.objects.get(id = obj.business_address.id)
-            return LocationSerializer(loc).data
-        except Exception as err:
-            print(err)      
+    service = serializers.SerializerMethodField(read_only=True)      
     
     def get_member(self, obj):
         try: 
@@ -124,24 +115,10 @@ class TodayAppoinmentSerializer(serializers.ModelSerializer):
             return obj.service.name
         except Exception as err:
             None
-    
-    def get_end_time(self, obj):
-        app_date_time = f'2000-01-01 {obj.appointment_time}'
 
-        try:
-            # duration = DURATION_CHOICES_DATA[obj.duration]
-            duration = DURATION_CHOICES[obj.duration]
-            app_date_time = datetime.fromisoformat(app_date_time)
-            datetime_duration = app_date_time + timedelta(minutes=duration)
-            datetime_duration = datetime_duration.strftime('%H:%M:%S')
-            return datetime_duration
-        except Exception as err:
-            print(err)
-            return str(err)
     class Meta:
         model = AppointmentService
-        fields = ('id', 'appointment_time', 'appointment_date','duration',
-                  'member' , 'service', 'end_time', 'location', 'appointment' )
+        fields = ('id', 'appointment_time', 'appointment_date', 'member' , 'service', 'appointment' )
         
 class AppointmentServiceSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
@@ -505,6 +482,36 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             'unavailable_time',
             'appointments',
         ]
+
+
+class AppointmentSerializerDashboard(serializers.ModelSerializer):
+    member = serializers.SerializerMethodField(read_only=True)
+    service = serializers.SerializerMethodField(read_only=True)
+    client = serializers.SerializerMethodField(read_only=True)
+   
+    
+    def get_client(self, obj):
+        try:
+            return obj.appointment.client.full_name
+        except Exception as err:
+            return None
+        
+    def get_member(self, obj):
+        try:
+            return obj.member.full_name
+        except Exception as err:
+            return None
+        
+    def get_service(self, obj):
+        try:
+            return obj.service.name
+        except Exception as err:
+            return None
+        
+    
+    class Meta:
+        model = AppointmentService
+        fields= ['id', 'service', 'member', 'price', 'client']
 
 class AllAppoinmentSerializer(serializers.ModelSerializer):
     member = serializers.SerializerMethodField(read_only=True)
