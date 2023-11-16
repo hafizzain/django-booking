@@ -103,17 +103,19 @@ def import_brand(request):
         with open( file.file.path , 'r', encoding='utf-8-sig', newline='') as csv_file:
             csv_reader = csv.DictReader(csv_file, delimiter=',')
             for row in csv_reader:
-                if not all([row['Product Name'], row['Website'], row['Status'], row['Description']]):
-                    name = row['Product Name'] if row['Product Name'] else ''
-                    website = row['Website'] if row['Website'] else ''
-                    description = row['Description'] if row['Description'] else ''
-                    status = True if row['Status'] == 'Active' else False
+                name = row['Product Name']
+                website = row['Website']
+                is_active = row['Status']
+                description = row['Description']
+
+                if all([website, is_active, description]) and name not in ['', None]:
                     brands_list.append(
-                        Brand(name=name,
+                        Brand(
+                            name=name,
                             website=website,
                             description=description,
-                            status=status
-                            )
+                            status=is_active
+                        )
                     )
                 else:
                     return Response(
