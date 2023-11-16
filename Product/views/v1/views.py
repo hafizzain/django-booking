@@ -99,54 +99,54 @@ def import_brand(request):
         file = brand_csv
     )
     brands_list = []
-    # try:
-    with open( file.file.path , 'r', encoding='utf-8-sig', newline='') as csv_file:
-        csv_reader = csv.DictReader(csv_file, delimiter=',')
-        for row in csv_reader:
-            name = row.get('Product Name', None)
-            website = row.get('Website', None)
-            status_check = row.get('Status', None)
-            description = row.get('Description', None)
+    try:
+        with open( file.file.path , 'r', encoding='utf-8-sig', newline='') as csv_file:
+            csv_reader = csv.DictReader(csv_file, delimiter=',')
+            for row in csv_reader:
+                name = row.get('Product Name', None)
+                website = row.get('Website', None)
+                status_check = row.get('Status', None)
+                description = row.get('Description', None)
 
-            if all([website, status_check, description]) and (name not in ['', None]):
-                is_active = True if status_check == 'Active' else False
-                brands_list.append(
-                    Brand(
-                        name=name,
-                        website=website,
-                        description=description,
-                        is_active=is_active
+                if all([website, status_check, description]) and (name not in ['', None]):
+                    is_active = True if status_check == 'Active' else False
+                    brands_list.append(
+                        Brand(
+                            name=name,
+                            website=website,
+                            description=description,
+                            is_active=is_active
+                        )
                     )
-                )
-            else:
-                return Response(
-                    {
-                        'status' : False,
-                        'status_code' : StatusCodes.MISSING_FIELDS_4001,
-                        'status_code_text' : 'MISSING_FIELDS_4001',
-                        'response' : {
-                            'message' : 'Invalid Data!',
-                            'error_message' : 'All fields are required.',
-                        }
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-        Brand.objects.bulk_create(brands_list)
-        file.delete()
-        return Response({'Status' : 'Success'})
-    # except:
-    #     return Response(
-    #         {
-    #             'status' : False,
-    #             'status_code' : StatusCodes.MISSING_FIELDS_4001,
-    #             'status_code_text' : 'Error occured in uploading file',
-    #             'response' : {
-    #                 'message' : 'Something went wrong.',
-    #                 'error_message' : 'Something went wrong.',
-    #             }
-    #         },
-    #         status=status.HTTP_400_BAD_REQUEST
-    #     )
+                else:
+                    return Response(
+                        {
+                            'status' : False,
+                            'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                            'status_code_text' : 'MISSING_FIELDS_4001',
+                            'response' : {
+                                'message' : 'Invalid Data!',
+                                'error_message' : 'All fields are required.',
+                            }
+                        },
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            Brand.objects.bulk_create(brands_list)
+            file.delete()
+            return Response({'Status' : 'Success'})
+    except:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'Error occured in uploading file',
+                'response' : {
+                    'message' : 'Something went wrong.',
+                    'error_message' : 'Something went wrong.',
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 @transaction.atomic
 @api_view(['POST'])
