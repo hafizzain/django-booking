@@ -266,10 +266,10 @@ def import_category(request):
             csv_reader = csv.DictReader(csv_file, delimiter=',')
             for row in csv_reader:
                 name = row.get('Name', None)
-                status = row.get('Status', None)
+                status_check = row.get('Status', None)
                 if not all([name, status]):
                     name_str = name if name else ''
-                    status_flag = True if row['Status'] == 'Active' else False
+                    status_flag = True if status_check == 'Active' else False
                     categories_list.append(
                         Category(name=name_str,
                             status=status_flag
