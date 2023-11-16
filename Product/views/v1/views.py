@@ -105,7 +105,7 @@ def import_brand(request):
         for row in csv_reader:
             name = row['Product Name']
             website = row['Website']
-            is_active = row['Status']
+            is_active = True if row['Status'] == 'Active' else False
             description = row['Description']
 
             if all([website, is_active, description]) and name not in ['', None]:
