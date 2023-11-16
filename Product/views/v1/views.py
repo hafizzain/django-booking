@@ -265,12 +265,14 @@ def import_category(request):
         with open( file.file.path , 'r', encoding='utf-8-sig', newline='') as csv_file:
             csv_reader = csv.DictReader(csv_file, delimiter=',')
             for row in csv_reader:
-                if not all([row['Name'], row['Status']]):
-                    name = row['Name'] if row['Name'] else ''
-                    status = True if row['Status'] == 'Active' else False
+                name = row.get('Name', None)
+                status = row.get('Status', None)
+                if not all([name, status]):
+                    name_str = name if name else ''
+                    status_flag = True if row['Status'] == 'Active' else False
                     categories_list.append(
-                        Category(name=name,
-                            status=status
+                        Category(name=name_str,
+                            status=status_flag
                             )
                     )
                 else:
