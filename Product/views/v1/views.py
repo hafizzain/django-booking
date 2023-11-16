@@ -114,7 +114,7 @@ def import_brand(request):
                         name=name,
                         website=website,
                         description=description,
-                        status=is_active
+                        is_active=is_active
                     )
                 )
             else:
