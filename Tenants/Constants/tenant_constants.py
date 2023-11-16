@@ -50,7 +50,13 @@ def verify_tenant_email_mobile(prev_tenant_name='public', user=None, verify='Mob
     
 def createFreeAvailableTenants():
     import os
+    ExceptionRecord.objects.create(
+        text=f'{os.getcwd()}',
+    )
     os.chdir(settings.LIVE_SERVER_PATH)
+    ExceptionRecord.objects.create(
+        text=f'{os.getcwd()}',
+    )
     try:
         CreateDummyTenants(1)
     except Exception as err:
