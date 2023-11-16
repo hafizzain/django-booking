@@ -99,53 +99,53 @@ def import_brand(request):
         file = brand_csv
     )
     brands_list = []
-    try:
-        with open( file.file.path , 'r', encoding='utf-8-sig', newline='') as csv_file:
-            csv_reader = csv.DictReader(csv_file, delimiter=',')
-            for row in csv_reader:
-                name = row['Product Name']
-                website = row['Website']
-                is_active = row['Status']
-                description = row['Description']
+    # try:
+    with open( file.file.path , 'r', encoding='utf-8-sig', newline='') as csv_file:
+        csv_reader = csv.DictReader(csv_file, delimiter=',')
+        for row in csv_reader:
+            name = row['Product Name']
+            website = row['Website']
+            is_active = row['Status']
+            description = row['Description']
 
-                if all([website, is_active, description]) and name not in ['', None]:
-                    brands_list.append(
-                        Brand(
-                            name=name,
-                            website=website,
-                            description=description,
-                            status=is_active
-                        )
+            if all([website, is_active, description]) and name not in ['', None]:
+                brands_list.append(
+                    Brand(
+                        name=name,
+                        website=website,
+                        description=description,
+                        status=is_active
                     )
-                else:
-                    return Response(
-                        {
-                            'status' : False,
-                            'status_code' : StatusCodes.MISSING_FIELDS_4001,
-                            'status_code_text' : 'MISSING_FIELDS_4001',
-                            'response' : {
-                                'message' : 'Invalid Data!',
-                                'error_message' : 'All fields are required.',
-                            }
-                        },
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
-            Brand.objects.bulk_create(brands_list)
-            file.delete()
-            return Response({'Status' : 'Success'})
-    except:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.MISSING_FIELDS_4001,
-                'status_code_text' : 'Error occured in uploading file',
-                'response' : {
-                    'message' : 'Something went wrong.',
-                    'error_message' : 'Something went wrong.',
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
+                )
+            else:
+                return Response(
+                    {
+                        'status' : False,
+                        'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                        'status_code_text' : 'MISSING_FIELDS_4001',
+                        'response' : {
+                            'message' : 'Invalid Data!',
+                            'error_message' : 'All fields are required.',
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        Brand.objects.bulk_create(brands_list)
+        file.delete()
+        return Response({'Status' : 'Success'})
+    # except:
+    #     return Response(
+    #         {
+    #             'status' : False,
+    #             'status_code' : StatusCodes.MISSING_FIELDS_4001,
+    #             'status_code_text' : 'Error occured in uploading file',
+    #             'response' : {
+    #                 'message' : 'Something went wrong.',
+    #                 'error_message' : 'Something went wrong.',
+    #             }
+    #         },
+    #         status=status.HTTP_400_BAD_REQUEST
+    #     )
 
 @transaction.atomic
 @api_view(['POST'])
