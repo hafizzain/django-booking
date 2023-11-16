@@ -2979,7 +2979,7 @@ def import_business_vendor(request):
                 is_active = True if status_check == 'Active' else False
                 vendors_list.append(
                     BusinessVendor(
-                        name=name,
+                        vendor_name=name,
                         mobile_number=contact,
                         email=email,
                         adress=address,
