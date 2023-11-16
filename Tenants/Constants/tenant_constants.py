@@ -50,6 +50,6 @@ def verify_tenant_email_mobile(prev_tenant_name='public', user=None, verify='Mob
     
 def createFreeAvailableTenants():
     try:
-        CreateDummyTenants(15)
+        CreateDummyTenants(1)
     except Exception as err:
         ExceptionRecord.objects.create(text = f'Tenant Cronjob ERROR :: {str(err)}')
