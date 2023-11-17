@@ -278,7 +278,9 @@ class SaleInvoice(models.Model):
         if self.client:
             redeemed_points_obj = LoyaltyPointLogs.objects.filter(client=self.client,
                                                               location=self.location) \
-                                                        .order_by('-created_at')[0]
+                                                        .order_by('-created_at')
+            if len(redeemed_points_obj) > 0:
+                redeemed_points_obj = redeemed_points_obj[0]
             return redeemed_points_obj.points_redeemed
         else:
             return None
