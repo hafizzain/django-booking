@@ -1751,7 +1751,7 @@ def get_orderstock(request):
     order_stocks = OrderStock.objects \
     .filter(
         is_deleted = False,                                      
-        order_stock__product__is_deleted=False,
+        # order_stock__product__is_deleted=False, # order record should be there even if its product gets soft deeleted
         to_location=business_addr) \
     .order_by('-created_at').distinct()
     
