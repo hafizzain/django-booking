@@ -93,38 +93,60 @@ def export_csv(request):
 @permission_classes([IsAuthenticated])
 def import_brand(request):
     brand_csv = request.data.get('file', None)
-    user= request.user
+    user = request.user
     
     file = NstyleFile.objects.create(
         file = brand_csv
     )
-    with open( file.file.path , 'r', encoding='utf-8') as imp_file:
-        for index, row in enumerate(imp_file):
-            if index == 0:
-                continue
-            row = row.split(',')
-            row = row
-            
-            if len(row) < 5:
-                continue
-            name =  row[0].strip('"')
-            website =  row[1].strip('"')
-            status =  row[2].strip('"')
-            description =  row[3].strip('"')
-            brand = Brand.objects.create(
-                name=name,
-                description=description,
-                website=website,
-            )
-            if status == 'Active':
-                brand.is_active = True
-                brand.save()
-            else:
-                brand.is_active = False
-                brand.save()
-            
-    file.delete()
-    return Response({'Status' : 'Success'})
+    brands_list = []
+    try:
+        with open( file.file.path , 'r', encoding='utf-8-sig', newline='') as csv_file:
+            csv_reader = csv.DictReader(csv_file, delimiter=',')
+            for row in csv_reader:
+                name = row.get('Product Name', None)
+                website = row.get('Website', None)
+                status_check = row.get('Status', None)
+                description = row.get('Description', None)
+
+                if all([website, status_check, description]) and (name not in ['', None]):
+                    is_active = True if status_check == 'Active' else False
+                    brands_list.append(
+                        Brand(
+                            name=name,
+                            website=website,
+                            description=description,
+                            is_active=is_active
+                        )
+                    )
+                else:
+                    return Response(
+                        {
+                            'status' : False,
+                            'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                            'status_code_text' : 'MISSING_FIELDS_4001',
+                            'response' : {
+                                'message' : 'Invalid Data!',
+                                'error_message' : 'All fields are required.',
+                            }
+                        },
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            Brand.objects.bulk_create(brands_list)
+            file.delete()
+            return Response({'Status' : 'Success'})
+    except:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'Error occured in uploading file',
+                'response' : {
+                    'message' : 'Something went wrong.',
+                    'error_message' : 'Something went wrong.',
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 @transaction.atomic
 @api_view(['POST'])
@@ -241,30 +263,48 @@ def import_category(request):
     file = NstyleFile.objects.create(
         file = category_csv
     )
-    with open( file.file.path , 'r', encoding='utf-8') as imp_file:
-        for index, row in enumerate(imp_file):
-            if index == 0:
-                continue
-            row = row.split(',')
-            row = row
-            
-            if len(row) < 3:
-                continue
-            name = row[0].strip('"')
-            active=row[2].replace('\n', '').strip('"')
-            
-            category = Category.objects.create(
-                name = name,
-            )  
-            if active == 'Active':
-               category.active = True
-               category.save()
-            else:
-                category.active  = False
-                category.save()
-                
-    file.delete()
-    return Response({'Status' : 'Success'})
+    categories_list = []
+    try:
+        with open( file.file.path , 'r', encoding='utf-8-sig', newline='') as csv_file:
+            csv_reader = csv.DictReader(csv_file, delimiter=',')
+            for row in csv_reader:
+                name = row.get('Category Name', None)
+                status_check = row.get('Status', None)
+
+                if (status_check) and (name not in ['', None]):
+                    status_flag = True if status_check == 'Active' else False
+                    categories_list.append(
+                        Category(name=name, is_active=status_flag)
+                    )
+                else:
+                    return Response(
+                        {
+                            'status' : False,
+                            'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                            'status_code_text' : 'MISSING_FIELDS_4001',
+                            'response' : {
+                                'message' : 'Invalid Data!',
+                                'error_message' : 'Enter all the data',
+                            }
+                        },
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            Category.objects.bulk_create(categories_list)
+            file.delete()
+            return Response({'Status' : 'Success'})
+    except:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'Error occured in uploading file',
+                'response' : {
+                    'message' : 'Something went wrong.',
+                    'error_message' : 'Something went wrong.',
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -1711,7 +1751,7 @@ def get_orderstock(request):
     order_stocks = OrderStock.objects \
     .filter(
         is_deleted = False,                                      
-        order_stock__product__is_deleted=False,
+        # order_stock__product__is_deleted=False, # order record should be there even if its product gets soft deeleted
         to_location=business_addr) \
     .order_by('-created_at').distinct()
     

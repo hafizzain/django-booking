@@ -118,7 +118,7 @@ class TodayAppoinmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AppointmentService
-        fields = ('id', 'appointment_time', 'appointment_date', 'member' , 'service', 'appointment' )
+        fields = ('id', 'duration', 'appointment_time', 'appointment_date', 'member' , 'service', 'appointment' )
         
 class AppointmentServiceSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)

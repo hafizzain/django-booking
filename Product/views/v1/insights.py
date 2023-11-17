@@ -290,7 +290,7 @@ class FilteredInsightProducts(APIView):
         #     return response
 
         filtered_products = Product.objects.filter(
-            is_deleted = False,
+            # is_deleted = False, # commenting this out because we also want deleted products to be shown in inventory insights
             product_stock__location__id = location_id,
             **self.queries['filter'],
         ).annotate(
@@ -424,7 +424,7 @@ def get_filtered_chat_products(request):
     products = Product.objects \
     .filter(
         product_stock__location = location_obj,
-        is_deleted = False,
+        # is_deleted = False,   # commenting this out because we also want deleted products to be shown in inventory insights
         product_orders__created_at__range = ('2020-01-01', f'{selected_year}-12-31'),
         product_orders__location=location_obj) \
     .annotate(
