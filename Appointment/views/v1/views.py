@@ -1025,7 +1025,7 @@ def update_appointment(request):
     
     if is_cancelled:
         #  deleted the appointment
-        user = User.objects.filter(email__icontains=employee.email).first()
+        user = User.objects.filter(email__icontains=service_appointment.member.email).first()
         title = 'Appointment'
         body = 'Appointment Cancelled'
         NotificationProcessor.send_notifications_to_users(user, title, body, request_user=request.user)
