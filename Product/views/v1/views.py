@@ -1218,8 +1218,8 @@ def get_products(request):
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_products, 10)
     page_number = request.GET.get("page") 
+    paginator = Paginator(all_products, 10 if page_number else 10000000)
     products = paginator.get_page(page_number)
 
     serialized = ProductSerializer(products, many=True, 
@@ -1296,8 +1296,8 @@ def get_products_optimized(request):
     if page_count > int(page_count):
         page_count = int(page_count) + 1
 
-    paginator = Paginator(all_products, 10)
     page_number = request.GET.get("page") 
+    paginator = Paginator(all_products, 10 if page_number else 10000000)
     products = paginator.get_page(page_number)
 
     serialized = optSerializers.OtpimizedProductSerializer(products, many=True, 
