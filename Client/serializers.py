@@ -120,6 +120,12 @@ class CreatedAtAppointmentSerializer(serializers.ModelSerializer):
         fields = ['created_at']
 
 
+class ClientDropdownSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model  = Client
+        fields = ['id', 'full_name', 'email', 'client_id']
+
 class ClientSerializer(serializers.ModelSerializer):
     country = CountrySerializer(read_only=True)
     state = StateSerializer(read_only=True)

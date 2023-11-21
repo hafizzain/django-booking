@@ -16,7 +16,11 @@ from Business.models import Business, BusinessAddress
 from Product.models import Product
 from Utility.models import Country, Currency, ExceptionRecord, Language, State, City
 from Client.models import Client, ClientGroup, ClientPackageValidation, ClientPromotions, CurrencyPriceMembership, DiscountMembership, LoyaltyPoints, Subscription , Rewards , Promotion , Membership , Vouchers, ClientLoyaltyPoint, LoyaltyPointLogs,VoucherCurrencyPrice
-from Client.serializers import SingleClientSerializer, ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , VoucherSerializer, ClientLoyaltyPointSerializer, CustomerLoyaltyPointsLogsSerializer, CustomerDetailedLoyaltyPointsLogsSerializer, ClientVouchersSerializer, ClientMembershipsSerializer
+from Client.serializers import (SingleClientSerializer, ClientSerializer, ClientGroupSerializer, LoyaltyPointsSerializer, 
+                                SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , 
+                                VoucherSerializer, ClientLoyaltyPointSerializer, CustomerLoyaltyPointsLogsSerializer, 
+                                CustomerDetailedLoyaltyPointsLogsSerializer, ClientVouchersSerializer, ClientMembershipsSerializer,
+                                ClientDropdownSerializer)
 from Utility.models import NstyleFile
 
 from Sale.Constants.Custom_pag import CustomPagination
@@ -163,6 +167,36 @@ def get_single_client(request):
                 'message' : 'Single client',
                 'error_message' : None,
                 'client' : seralized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_client_dropdown(request):
+
+    is_active = request.GET.get('active', None)
+    all_client = Client.objects \
+                    .filter(is_deleted=False, is_blocked=False)
+
+    if is_active is not None:
+        if is_active == 'true':
+            all_client = all_client.filter(is_active=True)
+        
+        if is_active == 'false':
+            all_client = all_client.filter(is_active=False)
+
+    serialized = ClientSerializer(all_client, many=True,  context={'request' : request})
+
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Client',
+                'error_message' : None,
+                'client' : serialized.data,
             }
         },
         status=status.HTTP_200_OK

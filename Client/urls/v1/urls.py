@@ -6,6 +6,7 @@ urlpatterns = [
     #Client
    path('create_client/',views.create_client), 
    path('get_client/',views.get_client),
+   path('get_client_dropdown/',views.get_client_dropdown),
    path('update_client/', views.update_client),
    path('delete_client/', views.delete_client),
    path('get_single_client/', views.get_single_client),
