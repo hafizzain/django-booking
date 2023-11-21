@@ -21,7 +21,7 @@ from Employee.serializers import( EmployeSerializer , EmployeInformationsSeriali
                           StaffpermisionSerializers , AttendanceSerializers
                           ,PayrollSerializers, UserEmployeeSerializer, VacationSerializer,singleEmployeeSerializer , CommissionSerializer
                           , AssetSerializer, WorkingScheduleSerializer,NewScheduleSerializer,NewVacationSerializer,NewAbsenceSerializer,
-                          
+                          EmployeeDropdownSerializer
                                  )
 from Employee.optimized_serializers import OptimizedEmployeeSerializerDashboard
 from django.db import connection, transaction
@@ -423,7 +423,7 @@ def get_Employees_dropdown(request):
     
     all_employee_count = all_employe.count()
 
-    serialized = singleEmployeeSerializer(all_employe,  many=True, context={'request' : request} )
+    serialized = EmployeeDropdownSerializer(all_employe,  many=True, context={'request' : request} )
     data = serialized.data
     return Response(
         {

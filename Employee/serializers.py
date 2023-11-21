@@ -593,6 +593,13 @@ class LocationSerializerOP(serializers.ModelSerializer):
         model = BusinessAddress
         fields = ['id']
 
+
+class EmployeeDropdownSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Employee
+        fields = ['id', 'full_name', 'mobile_number', 'email']
+
 class singleEmployeeSerializer(serializers.ModelSerializer):
     salary = serializers.SerializerMethodField(read_only=True)
     income_type = serializers.SerializerMethodField(read_only=True)
