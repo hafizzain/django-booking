@@ -403,6 +403,40 @@ def get_Employees(request):
             },
             status=status.HTTP_200_OK
         )
+    
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_Employees_dropdown(request):
+    location_id = request.GET.get('location_id', None)
+
+    query = Q(is_deleted=False)
+    query &= Q(is_blocked=False)
+
+    if location_id:
+        location = BusinessAddress.objects.get(id=str(location_id))
+        query &= Q(location=location)
+     
+
+    all_employe = Employee.objects \
+                    .filter(query) 
+    
+    all_employee_count = all_employe.count()
+
+    serialized = singleEmployeeSerializer(all_employe,  many=True, context={'request' : request} )
+    data = serialized.data
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'count':all_employee_count,
+                'error_message' : None,
+                'employees' : data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
 
 @api_view(['GET'])

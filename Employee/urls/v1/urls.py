@@ -6,6 +6,7 @@ urlpatterns = [
     #Employee
     path('get_single_employee/', views.get_single_employee),
     path('get_employees/', views.get_Employees),
+    path('get_employees_dropdown/', views.get_Employees_dropdown),
     path('get_employees_dashboard/', views.get_employees_dashboard),
 
     path('create_employee/', views.create_employee),
