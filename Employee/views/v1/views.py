@@ -412,6 +412,8 @@ def get_Employees_dropdown(request):
 
     query = Q(is_deleted=False)
     query &= Q(is_blocked=False)
+    query &= Q(is_active=True)
+
 
     if location_id:
         location = BusinessAddress.objects.get(id=str(location_id))

@@ -598,7 +598,7 @@ class EmployeeDropdownSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ['id', 'full_name', 'mobile_number', 'email']
+        fields = ['id', 'full_name', 'mobile_number', 'email', 'employee_id']
 
 class singleEmployeeSerializer(serializers.ModelSerializer):
     salary = serializers.SerializerMethodField(read_only=True)
