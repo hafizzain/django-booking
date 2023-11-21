@@ -26,7 +26,7 @@ from Product.models import ( Category, Brand, CurrencyRetailPrice , Product, Pro
 from Product.serializers import (CategorySerializer, BrandSerializer, ProductSerializer, ProductWithStockSerializer
                                  ,OrderSerializer , OrderProductSerializer, ProductConsumptionSerializer,
                                  ProductStockTransferSerializer, ProductStockReportSerializer,
-                                 BrandSerializerDropdown, CategorySerializerDropdown
+                                 BrandSerializerDropdown
                                  )
 from django.db import transaction
 
@@ -306,14 +306,33 @@ def import_category(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
+    
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_categories(request):
+    search_text = request.query_params.get('search_text', None)
+    no_pagination = request.query_params.get('no_pagination', None)
 
     all_categories = Category.objects.order_by('-created_at')
+    if search_text:
+        all_categories = all_categories.filter(name__icontains=search_text)
 
-    serialized = CategorySerializerDropdown(all_categories, many=True).data
+    serialized = list(CategorySerializer(all_categories, many=True).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'categories')
+
+    return response
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_categories_dropdown(request):
+    all_categories = Category.objects.order_by('-created_at')
+    serialized = CategorySerializer(all_categories, many=True)
 
     return Response(
         {
@@ -327,7 +346,6 @@ def get_categories(request):
         },
         status=status.HTTP_201_CREATED
     )
-
 
 @transaction.atomic
 @api_view(['POST'])
@@ -518,7 +536,7 @@ def get_brands(request):
 @permission_classes([AllowAny])
 def get_brands_dropdown(request):
     all_brands = Brand.objects.order_by('-created_at')
-    serialized = BrandSerializerDropdown(all_brands, many=True, context={'request' : request}).data
+    serialized = BrandSerializerDropdown(all_brands, many=True, context={'request' : request})
 
     return Response(
         {

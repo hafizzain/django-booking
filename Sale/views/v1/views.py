@@ -32,7 +32,11 @@ from Product.models import Product, ProductOrderStockReport, ProductStock
 from django.db.models import Avg, Count, Min, Sum, Q, F
 
 
-from Sale.serializers import AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, VoucherOrderSerializer, SaleOrders_CheckoutSerializer, SaleOrders_AppointmentCheckoutSerializer
+from Sale.serializers import (AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, 
+                            ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, 
+                            VoucherOrderSerializer, SaleOrders_CheckoutSerializer, SaleOrders_AppointmentCheckoutSerializer,
+                            ServiceSerializerDropdown
+                            )
 from rest_framework.pagination import PageNumberPagination
 from django.core.paginator import Paginator
 from Invoices.models import SaleInvoice
@@ -117,6 +121,63 @@ def get_service(request):
                 'error_message' : None,
                 'service' : serialized.data,
                 'errors' : errors,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_service_dropdown(request):
+    location = request.GET.get('location_id', None)
+    is_mobile = request.GET.get('is_mobile', None)
+
+    query = Q(is_deleted=False)
+    location_instance = None
+    currency_code = None
+    errors = []
+                 
+
+    if location:
+        query &= Q(location__id=location)
+
+    elif request.user.is_authenticated :
+        try:
+            employee = Employee.objects.get(
+                email = request.user.email
+            )
+        except Exception as err:
+            errors.append(str(err))
+        else:
+            if len(employee.location.all()) > 0:
+                first_location = employee.location.all()[0]
+                location_instance = first_location
+                currency_code = location_instance.currency.code
+                query &= Q(location__id=first_location.id)
+            else:
+                errors.append('Employee Location 0')
+
+    
+    services = Service.objects.filter(query).order_by('-created_at').distinct()
+
+    # if is_mobile then request.user will be employee
+    # so we will filter only those services which are assigned to
+    # that particular employee
+    if is_mobile:
+        emp = Employee.objects.get(email=request.user.email)
+        emp_service_ids = emp.employee_selected_service.distinct().values_list('service__id', flat=True)
+        service = service.filter(id__in=emp_service_ids)
+
+    serialized = ServiceSerializerDropdown(services,  many=True)
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Service',
+                'error_message' : None,
+                'service' : serialized.data,
             }
         },
         status=status.HTTP_200_OK

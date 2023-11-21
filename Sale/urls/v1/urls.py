@@ -5,6 +5,7 @@ from Sale.views.v1 import views
 urlpatterns = [
     path('create_service/',views.create_service),
     path('get_service/',views.get_service),
+    path('get_service_dropdown/',views.get_service_dropdown),
     path('delete_service/',views.delete_service),
     path('update_service/',views.update_service),
     

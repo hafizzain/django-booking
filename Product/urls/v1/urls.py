@@ -6,7 +6,7 @@ from Product.views.v1 import views, insights
 urlpatterns = [
     # Category Paths 
     path('get_categories/', views.get_categories),
-    path('get_categories_dropdown/', views.get_categories),
+    path('get_categories_dropdown/', views.get_categories_drop),
     path('add_category/', views.add_category),
     path('update_category/', views.update_category),
     path('delete_category/', views.delete_category),

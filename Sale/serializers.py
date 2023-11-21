@@ -287,7 +287,13 @@ class LocationServiceSerializer(serializers.ModelSerializer):
         model = BusinessAddress
         #fields = '__all__'
         exclude =  ['is_primary', 'is_active', 'is_closed', 'is_deleted', 'created_at', 'user', 'business', 'is_email_verified','is_mobile_verified']
+
+
+class ServiceSerializerDropdown(serializers.ModelSerializer):
         
+    class Meta:
+        model = Service
+        fields = ['id', 'name']
 class ServiceSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
     employees = serializers.SerializerMethodField(read_only=True)
