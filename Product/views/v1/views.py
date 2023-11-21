@@ -25,7 +25,8 @@ from Product.models import ( Category, Brand, CurrencyRetailPrice , Product, Pro
                            )
 from Product.serializers import (CategorySerializer, BrandSerializer, ProductSerializer, ProductWithStockSerializer
                                  ,OrderSerializer , OrderProductSerializer, ProductConsumptionSerializer,
-                                 ProductStockTransferSerializer, ProductStockReportSerializer
+                                 ProductStockTransferSerializer, ProductStockReportSerializer,
+                                 BrandSerializerDropdown, CategorySerializerDropdown
                                  )
 from django.db import transaction
 
@@ -309,21 +310,24 @@ def import_category(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_categories(request):
-    search_text = request.query_params.get('search_text', None)
-    no_pagination = request.query_params.get('no_pagination', None)
 
     all_categories = Category.objects.order_by('-created_at')
-    if search_text:
-        all_categories = all_categories.filter(name__icontains=search_text)
 
-    serialized = list(CategorySerializer(all_categories, many=True).data)
+    serialized = CategorySerializerDropdown(all_categories, many=True).data
 
-    paginator = CustomPagination()
-    paginator.page_size = 100000 if no_pagination else 10
-    paginated_data = paginator.paginate_queryset(serialized, request)
-    response = paginator.get_paginated_response(paginated_data, 'categories')
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 201,
+            'response' : {
+                'message' : 'Brand Added!',
+                'error_message' : None,
+                'brand' : serialized.data
+            }
+        },
+        status=status.HTTP_201_CREATED
+    )
 
-    return response
 
 @transaction.atomic
 @api_view(['POST'])
@@ -508,6 +512,26 @@ def get_brands(request):
     paginated_data = paginator.paginate_queryset(serialized, request)
     response = paginator.get_paginated_response(paginated_data, 'brands')
     return response
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_brands_dropdown(request):
+    all_brands = Brand.objects.order_by('-created_at')
+    serialized = BrandSerializerDropdown(all_brands, many=True, context={'request' : request}).data
+
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 201,
+            'response' : {
+                'message' : 'Brand Added!',
+                'error_message' : None,
+                'brand' : serialized.data
+            }
+        },
+        status=status.HTTP_201_CREATED
+    )
 
 
 @transaction.atomic

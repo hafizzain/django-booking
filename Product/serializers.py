@@ -32,6 +32,12 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ['id', 'name', 'is_active', 'created_at']
 
+
+class CategorySerializerDropdown(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'name']
+
 class BrandSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
 
@@ -48,6 +54,13 @@ class BrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Brand
         fields = ['id', 'name', 'description', 'website', 'image', 'is_active']
+
+
+class BrandSerializerDropdown(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Brand
+        fields = ['id', 'name']
 
 
 class ProductMediaSerializer(serializers.ModelSerializer):
