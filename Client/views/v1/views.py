@@ -187,7 +187,7 @@ def get_client_dropdown(request):
         if is_active == 'false':
             all_client = all_client.filter(is_active=False)
 
-    serialized = ClientSerializer(all_client, many=True,  context={'request' : request})
+    serialized = ClientDropdownSerializer(all_client, many=True,  context={'request' : request})
 
     return Response(
         {
