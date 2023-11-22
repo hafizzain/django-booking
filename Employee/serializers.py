@@ -596,9 +596,21 @@ class LocationSerializerOP(serializers.ModelSerializer):
 
 class EmployeeDropdownSerializer(serializers.ModelSerializer):
 
+    image = serializers.SerializerMethodField()
+
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
+                return f'{url}{obj.image}'
+            except:
+                return obj.image
+        return None
+
     class Meta:
         model = Employee
-        fields = ['id', 'full_name', 'mobile_number', 'email', 'employee_id']
+        fields = ['id', 'full_name', 'mobile_number', 'email', 'employee_id', 'image']
 
 class singleEmployeeSerializer(serializers.ModelSerializer):
     salary = serializers.SerializerMethodField(read_only=True)
