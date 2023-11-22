@@ -1335,9 +1335,7 @@ def get_products(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_products_dropdown(request):
-    location_id = request.GET.get('location_id', None)
-    quick_sales = request.query_params.get('quick_sales', False)
-    
+    location_id = request.GET.get('location_id', None)    
     query = Q(is_deleted=False, is_active=True)
 
 
@@ -1345,13 +1343,6 @@ def get_products_dropdown(request):
         # Filter out those products which have product stock for this particular location
         product_ids = list(ProductStock.objects.filter(location__id=location_id).values_list('product__id', flat=True))
         query &= Q(id__in=product_ids)
-
-    # if search_text:
-    #     #query building
-    #     query &= Q(name__icontains=search_text)
-    #     query |= Q(category__name__icontains=search_text)
-    #     query |= Q(brand__name__icontains=search_text)
-    #     query |= Q(product_type__icontains=search_text)
 
     all_products = Product.objects.filter(query).select_related('brand').order_by('-created_at')
 

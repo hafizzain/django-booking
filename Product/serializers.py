@@ -333,9 +333,26 @@ class ProductSerializer(serializers.ModelSerializer):
 class ProductSerializerDropDown(serializers.ModelSerializer):
 
     brand = BrandSerializer(read_only=True)
+    location_quantities = serializers.SerializerMethodField(read_only=True)
+
+
+
+    def get_location_quantities(self, obj):
+        location = self.context['location']
+        if location is not None:
+            all_stocks = ProductStock.objects.filter(product=obj, location__is_deleted=False, location__id = location).order_by('-created_at')
+            return ProductStockSerializer(all_stocks, many=True).data
+        else:
+            all_stocks = ProductStock.objects.filter(product=obj,
+                                                     is_deleted=False,
+                                                     location__is_deleted=False,
+                                                     location__is_closed=False,
+                                                     location__is_active=True).order_by('-created_at')
+            return ProductStockSerializer(all_stocks, many=True).data
+        
     class Meta:
         model = Product
-        fields = ['id', 'name', 'brand']
+        fields = ['id', 'name', 'brand', 'location_quantities']
 
 class ProductTranlationsSerializerNew(serializers.ModelSerializer):
     
