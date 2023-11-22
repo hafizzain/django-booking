@@ -45,7 +45,7 @@ def get_services(request):
 @permission_classes([AllowAny])
 def get_services_dropdown(request):
     
-    query = Q(is_deleted=False, is_active=True)
+    query = Q(is_deleted=False)
     services = Service.objects.filter(query).order_by('-created_at')
     serialized = ServiceSerializerDropdown(services,  many=True)
     return Response(
