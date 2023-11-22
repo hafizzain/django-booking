@@ -91,7 +91,7 @@ def get_service(request):
                 errors.append('Employee Location 0')
 
     
-    # services = Service.objects.filter(query).order_by('-created_at').distinct()
+    services = Service.objects.filter(query).order_by('-created_at').distinct()
 
     # if is_mobile then request.user will be employee
     # so we will filter only those services which are assigned to
@@ -99,7 +99,7 @@ def get_service(request):
     if is_mobile:
         emp = Employee.objects.get(email=request.user.email)
         emp_service_ids = emp.employee_selected_service.distinct().values_list('service__id', flat=True)
-        services = Service.objects.filter(id__in=emp_service_ids)
+        services = Service.objects.filter(id__in=emp_service_ids).order_by('-created_at')
 
 
     service_count= services.count()
