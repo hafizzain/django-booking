@@ -339,9 +339,9 @@ def get_categories_dropdown(request):
             'status' : True,
             'status_code' : 201,
             'response' : {
-                'message' : 'Brand Added!',
+                'message' : 'All Categories',
                 'error_message' : None,
-                'brand' : serialized.data
+                'categories' : serialized.data
             }
         },
         status=status.HTTP_201_CREATED
@@ -543,7 +543,7 @@ def get_brands_dropdown(request):
             'status' : True,
             'status_code' : 201,
             'response' : {
-                'message' : 'Brand Added!',
+                'message' : 'All Brands',
                 'error_message' : None,
                 'brand' : serialized.data
             }
