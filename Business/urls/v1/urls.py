@@ -55,6 +55,7 @@ urlpatterns = [
     # Business Vendor 
     path('add_business_vendor/', views.add_business_vendor),
     path('get_business_vendors/', views.get_business_vendors),
+    path('get_business_vendors_dropdown/', views.get_business_vendors_dropdown),
     path('check_vendor_existance/', views.check_vendor_existance),
     path('update_business_vendor/', views.update_business_vendor),
     path('delete_business_vendor/', views.delete_business_vendor),

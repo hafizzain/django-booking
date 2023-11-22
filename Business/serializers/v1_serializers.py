@@ -617,6 +617,13 @@ class BusinessVendorSerializer(serializers.ModelSerializer):
             'is_active',
         ]
 
+
+class BusinessVendorSerializerDropdown(serializers.ModelSerializer):
+
+    class Meta:
+        model = BusinessVendor
+        fields = ['id', 'vendor_name']
+
 class BusiessAddressAppointmentSerializer(serializers.ModelSerializer):
     currency = serializers.SerializerMethodField()
     

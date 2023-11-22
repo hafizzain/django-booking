@@ -24,7 +24,7 @@ from Business.serializers.v1_serializers import (BusinessAddress_CustomerSeriali
                                                  BusinessAddress_GetSerializer, BusinessThemeSerializer, BusinessVendorSerializer,
                                                  ClientNotificationSettingSerializer, StaffNotificationSettingSerializer, StockNotificationSettingSerializer,
                                                  BusinessTaxSerializer, PaymentMethodSerializer, BusinessTaxSettingSerializer, BusinessPrivacySerializer,
-                                                 BusinessPolicySerializer)
+                                                 BusinessPolicySerializer, BusinessVendorSerializerDropdown)
 from Client.models import Client
 from Employee.models import EmployeDailySchedule, Employee, EmployeeProfessionalInfo, EmployeeSelectedService
 from Employee.Constants.Add_Employe import add_employee
@@ -3047,6 +3047,28 @@ def get_business_vendors(request):
     response = paginator.get_paginated_response(paginated_data, 'vendors')
     return response
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_business_vendors_dropdown(request):
+
+    all_vendors = BusinessVendor.objects.filter(is_deleted=False, is_closed=False).order_by('-created_at')
+        
+    serialized = BusinessVendorSerializerDropdown(all_vendors, many=True)
+
+    return Response(
+            {
+                'status' : True,
+                'status_code' : 201,
+                'status_code_text' : '201',
+                'response' : {
+                    'message' : 'All business vendors',
+                    'error_message' : None,
+                    'vendors' : serialized.data
+                }
+            },
+            status=status.HTTP_201_CREATED
+    )
+
 @transaction.atomic
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -3231,7 +3253,7 @@ def add_business_vendor(request):
                 }
             },
             status=status.HTTP_201_CREATED
-        )
+    )
 
 @transaction.atomic
 @api_view(['PUT'])
