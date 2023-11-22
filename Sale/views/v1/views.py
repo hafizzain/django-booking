@@ -96,10 +96,10 @@ def get_service(request):
     # if is_mobile then request.user will be employee
     # so we will filter only those services which are assigned to
     # that particular employee
-    if is_mobile:
-        emp = Employee.objects.get(email=request.user.email)
-        emp_service_ids = emp.employee_selected_service.distinct().values_list('service__id', flat=True)
-        services = services.filter(id__in=emp_service_ids)
+    # if is_mobile:
+    #     emp = Employee.objects.get(email=request.user.email)
+    #     emp_service_ids = emp.employee_selected_service.distinct().values_list('service__id', flat=True)
+    #     services = services.filter(id__in=emp_service_ids)
 
 
     service_count= services.count()
