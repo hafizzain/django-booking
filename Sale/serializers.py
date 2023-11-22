@@ -290,10 +290,20 @@ class LocationServiceSerializer(serializers.ModelSerializer):
 
 
 class ServiceSerializerDropdown(serializers.ModelSerializer):
-        
+    
+    service_group = serializers.SerializerMethodField(read_only=True)
+
+
+    def get_service_group(self, obj):
+        try:
+            group = ServiceGroup.objects.filter(services = obj, is_deleted = False)
+            return ServiceGroupSerializer(group, many = True ).data
+        except Exception as err:
+            print(str(err))
+            pass
     class Meta:
         model = Service
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'service_group']
 class ServiceSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
     employees = serializers.SerializerMethodField(read_only=True)
