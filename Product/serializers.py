@@ -344,6 +344,19 @@ class ProductSerializer(serializers.ModelSerializer):
 class ProductSerializerDropDown(serializers.ModelSerializer):
 
     brand = BrandSerializer(read_only=True)
+    media = serializers.SerializerMethodField()
+
+
+
+    def get_media(self, obj):
+        try:
+            context = self.context
+        except:
+            context = {}
+        all_medias = ProductMedia.objects.filter(product=obj, is_deleted=False).order_by('-created_at')
+        return ProductMediaSerializer(all_medias, many=True, context=context).data
+    
+
     location_quantities = serializers.SerializerMethodField(read_only=True)
 
     def get_location_quantities(self, obj):
@@ -361,7 +374,7 @@ class ProductSerializerDropDown(serializers.ModelSerializer):
         
     class Meta:
         model = Product
-        fields = ['id', 'name', 'brand', 'location_quantities']
+        fields = ['id', 'name', 'brand', 'location_quantities', 'media']
 
 class ProductTranlationsSerializerNew(serializers.ModelSerializer):
     
