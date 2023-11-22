@@ -2204,6 +2204,13 @@ def create_checkout_device(request):
         )
     
 
+    AppointmentEmployeeTip.objects.create(
+        appointment = appointments,
+        member = members,
+        tip = tip,
+        business_address = business_address,
+    )
+
     
     checkout = AppointmentCheckout.objects.create(
         appointment = appointments,
@@ -2229,13 +2236,6 @@ def create_checkout_device(request):
         service_price = service_price,
         total_price = total_price,
         checkout = f'{checkout.id}',
-    )
-
-    AppointmentEmployeeTip.objects.create(
-        appointment = appointments,
-        member = members,
-        tip = tip,
-        business_address = business_address,
     )
 
     
