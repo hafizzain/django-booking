@@ -70,6 +70,7 @@ def get_service(request):
 
     if location:
         query &= Q(location__id=location)
+
     elif request.user.is_authenticated :
         try:
             employee = Employee.objects.get(
@@ -87,24 +88,25 @@ def get_service(request):
                 errors.append('Employee Location 0')
 
     
-    service= Service.objects.filter(query).order_by('-created_at').distinct()
+    services = Service.objects.filter(query).order_by('-created_at')
 
     # if is_mobile then request.user will be employee
     # so we will filter only those services which are assigned to
     # that particular employee
-    if is_mobile:
-        emp = Employee.objects.get(email=request.user.email)
-        emp_service_ids = emp.employee_selected_service.distinct().values_list('service__id', flat=True)
-        service = service.filter(id__in=emp_service_ids)
+    
+    # if is_mobile:
+    #     emp = Employee.objects.get(email=request.user.email)
+    #     emp_service_ids = list(emp.employee_selected_service.values_list('service__id', flat=True))
+    #     services = services.filter(id__in=emp_service_ids)
 
 
-    service_count= service.count()
+    service_count= services.count()
 
     page_count = service_count / 10
     if page_count > int(page_count):
         page_count = int(page_count) + 1
     per_page_results = 100000 if no_pagination else 10
-    paginator = Paginator(service, per_page_results)
+    paginator = Paginator(services, per_page_results)
     page_number = request.GET.get("page") 
     services = paginator.get_page(page_number)
 
