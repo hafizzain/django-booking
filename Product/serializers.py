@@ -332,9 +332,10 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class ProductSerializerDropDown(serializers.ModelSerializer):
 
+    brand = BrandSerializer(read_only=True)
     class Meta:
         model = Product
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'brand']
 
 class ProductTranlationsSerializerNew(serializers.ModelSerializer):
     

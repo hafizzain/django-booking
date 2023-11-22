@@ -1353,7 +1353,7 @@ def get_products_dropdown(request):
     #     query |= Q(brand__name__icontains=search_text)
     #     query |= Q(product_type__icontains=search_text)
 
-    all_products = Product.objects.filter(query).order_by('-created_at')
+    all_products = Product.objects.filter(query).select_related('brand').order_by('-created_at')
 
     serialized = ProductSerializerDropDown(all_products, many=True)
 
