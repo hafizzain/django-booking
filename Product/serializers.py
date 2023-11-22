@@ -142,6 +142,17 @@ class ProductStockSerializer(serializers.ModelSerializer):
                   'reorder_quantity', 'available_quantity','sold_quantity',
                   'sellable_quantity','consumable_quantity' , 'amount', 'unit' ,
                   'alert_when_stock_becomes_lowest', 'sold_quantity','turnover','status_text','status','is_active' ]
+        
+
+class ProductStockSerializerOP(serializers.ModelSerializer):
+    current_stock = serializers.SerializerMethodField()
+
+    def get_current_stock(self, obj):
+        return obj.available_quantity
+
+    class Meta:
+        model = ProductStock
+        fields = ['low_stock', 'current_stock', 'reorder_quantity']
 
 class ProductWithStockSerializer(serializers.ModelSerializer):
     stock = serializers.SerializerMethodField()
@@ -335,20 +346,18 @@ class ProductSerializerDropDown(serializers.ModelSerializer):
     brand = BrandSerializer(read_only=True)
     location_quantities = serializers.SerializerMethodField(read_only=True)
 
-
-
     def get_location_quantities(self, obj):
         location = self.context['location']
         if location is not None:
             all_stocks = ProductStock.objects.filter(product=obj, location__is_deleted=False, location__id = location).order_by('-created_at')
-            return ProductStockSerializer(all_stocks, many=True).data
+            return ProductStockSerializerOP(all_stocks, many=True).data
         else:
             all_stocks = ProductStock.objects.filter(product=obj,
                                                      is_deleted=False,
                                                      location__is_deleted=False,
                                                      location__is_closed=False,
                                                      location__is_active=True).order_by('-created_at')
-            return ProductStockSerializer(all_stocks, many=True).data
+            return ProductStockSerializerOP(all_stocks, many=True).data
         
     class Meta:
         model = Product
