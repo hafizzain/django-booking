@@ -15,7 +15,7 @@ from rest_framework.response import Response
 
 from Service.models import Service
 
-from Sale.serializers import ServiceSerializer
+from Sale.serializers import ServiceSerializer, ServiceSerializerDropdown
 
 # from Service.models import Service
 # from Service.serializers import ServiceSerializer
@@ -27,6 +27,27 @@ def get_services(request):
     query = Q(is_deleted=False)
     service= Service.objects.filter(query).order_by('-created_at')
     serialized = ServiceSerializer(service,  many=True, )
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Service',
+                'error_message' : None,
+                'service' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_services_dropdown(request):
+    
+    query = Q(is_deleted=False, is_active=True)
+    services = Service.objects.filter(query).order_by('-created_at')
+    serialized = ServiceSerializerDropdown(services,  many=True)
     return Response(
         {
             'status' : 200,
