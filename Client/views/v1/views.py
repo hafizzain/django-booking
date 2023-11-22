@@ -178,14 +178,8 @@ def get_client_dropdown(request):
 
     is_active = request.GET.get('active', None)
     all_client = Client.objects \
-                    .filter(is_deleted=False, is_blocked=False)
+                    .filter(is_deleted=False, is_blocked=False, is_active=True)
 
-    if is_active is not None:
-        if is_active == 'true':
-            all_client = all_client.filter(is_active=True)
-        
-        if is_active == 'false':
-            all_client = all_client.filter(is_active=False)
 
     serialized = ClientDropdownSerializer(all_client, many=True,  context={'request' : request})
 

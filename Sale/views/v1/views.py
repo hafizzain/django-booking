@@ -133,9 +133,8 @@ def get_service_dropdown(request):
     location = request.GET.get('location_id', None)
     is_mobile = request.GET.get('is_mobile', None)
 
-    query = Q(is_deleted=False)
+    query = Q(is_deleted=False, is_active=True)
     location_instance = None
-    currency_code = None
     errors = []
                  
 

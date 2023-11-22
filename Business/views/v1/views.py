@@ -3051,7 +3051,7 @@ def get_business_vendors(request):
 @permission_classes([AllowAny])
 def get_business_vendors_dropdown(request):
 
-    all_vendors = BusinessVendor.objects.filter(is_deleted=False, is_closed=False).order_by('-created_at')
+    all_vendors = BusinessVendor.objects.filter(is_deleted=False, is_closed=False, is_active=True).order_by('-created_at')
         
     serialized = BusinessVendorSerializerDropdown(all_vendors, many=True)
 

@@ -331,7 +331,7 @@ def get_categories(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_categories_dropdown(request):
-    all_categories = Category.objects.order_by('-created_at')
+    all_categories = Category.objects.filter(is_active=True).order_by('-created_at')
     serialized = CategorySerializerDropdown(all_categories, many=True)
 
     return Response(
@@ -535,7 +535,7 @@ def get_brands(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_brands_dropdown(request):
-    all_brands = Brand.objects.order_by('-created_at')
+    all_brands = Brand.objects.filter(is_active=True).order_by('-created_at')
     serialized = BrandSerializerDropdown(all_brands, many=True, context={'request' : request})
 
     return Response(
