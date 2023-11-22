@@ -2231,14 +2231,11 @@ def create_checkout_device(request):
         checkout = f'{checkout.id}',
     )
 
-    employee_tip = AppointmentEmployeeTip.objects.create(
-        checkout=checkout,
+    AppointmentEmployeeTip.objects.create(
         appointment = appointments,
         member = members,
-        business_address = business_address,
-        business = appointments.business,
         tip = tip,
-        total_price = total_price
+        business_address = business_address,
     )
 
     
