@@ -2232,6 +2232,7 @@ def create_checkout_device(request):
     )
 
     employee_tip = AppointmentEmployeeTip.objects.create(
+        checkout=checkout,
         appointment = appointments,
         member = members,
         business_address = business_address,
