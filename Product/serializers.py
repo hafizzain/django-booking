@@ -330,6 +330,12 @@ class ProductSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['slug', 'id']
 
+class ProductSerializerDropDown(serializers.ModelSerializer):
+
+    class Meta:
+        model = Product
+        fields = ['id', 'name']
+
 class ProductTranlationsSerializerNew(serializers.ModelSerializer):
     
     class Meta:
