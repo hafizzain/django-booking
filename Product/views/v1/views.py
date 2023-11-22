@@ -1346,7 +1346,7 @@ def get_products_dropdown(request):
 
     all_products = Product.objects.filter(query).select_related('brand').order_by('-created_at')
 
-    serialized = ProductSerializerDropDown(all_products, many=True)
+    serialized = ProductSerializerDropDown(all_products, many=True, context={'location':location_id})
 
     return Response(
         {
