@@ -81,7 +81,15 @@ class ServiceSearchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
         fields = ['id','name', 'arabic_name', 'location', 'client_can_book', 'employees','priceservice', 'slot_availible_for_online']
-        
+
+
+class ServiceGroupOP(serializers.ModelSerializer):
+    
+    class Meta:
+        model = ServiceGroup
+        fields = ['id', 'name']
+
+
 class ServiceGroupSerializer(serializers.ModelSerializer):
     
     services  = serializers.SerializerMethodField(read_only=True)
@@ -293,11 +301,10 @@ class ServiceSerializerDropdown(serializers.ModelSerializer):
     
     service_group = serializers.SerializerMethodField(read_only=True)
 
-
     def get_service_group(self, obj):
         try:
-            group = ServiceGroup.objects.filter(services = obj, is_deleted = False)
-            return ServiceGroupSerializer(group, many = True ).data
+            group = ServiceGroup.objects.filter(services=obj, is_deleted=False)
+            return ServiceGroupOP(group, many=True).data
         except Exception as err:
             print(str(err))
             pass
