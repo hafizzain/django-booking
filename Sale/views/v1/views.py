@@ -97,8 +97,8 @@ def get_service(request):
     # so we will filter only those services which are assigned to
     # that particular employee
 
-    if is_mobile and emp_id:
-        service_ids = list(EmployeeSelectedService.objects.filter(employee__id=emp_id).values_list('service__id', flat=True))
+    if is_mobile:
+        service_ids = list(EmployeeSelectedService.objects.filter(employee__email=request.user.email).values_list('service__id', flat=True))
         # emp = Employee.objects.get(id=emp_id)
         # emp_service_ids = list(emp.employee_selected_service.values_list('service__id', flat=True))
         services = services.filter(id__in=service_ids)
