@@ -56,8 +56,11 @@ def get_service(request):
     is_mobile = request.GET.get('is_mobile', None)
     search_text = request.GET.get('search_text', None)
     no_pagination = request.GET.get('no_pagination', None)
+    emp_id = request.GET.get('employee_id', None)
+
 
     query = Q(is_deleted=False)
+    
     location_instance = None
     currency_code = None
     errors = []
@@ -93,11 +96,11 @@ def get_service(request):
     # if is_mobile then request.user will be employee
     # so we will filter only those services which are assigned to
     # that particular employee
-    
-    # if is_mobile:
-    #     emp = Employee.objects.get(email=request.user.email)
-    #     emp_service_ids = list(emp.employee_selected_service.values_list('service__id', flat=True))
-    #     services = services.filter(id__in=emp_service_ids)
+
+    if is_mobile and emp_id:
+        emp = Employee.objects.get(id=emp_id)
+        emp_service_ids = list(emp.employee_selected_service.values_list('service__id', flat=True))
+        services = services.filter(id__in=emp_service_ids)
 
 
     service_count= services.count()
