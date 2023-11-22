@@ -26,7 +26,7 @@ from Product.models import ( Category, Brand, CurrencyRetailPrice , Product, Pro
 from Product.serializers import (CategorySerializer, BrandSerializer, ProductSerializer, ProductWithStockSerializer
                                  ,OrderSerializer , OrderProductSerializer, ProductConsumptionSerializer,
                                  ProductStockTransferSerializer, ProductStockReportSerializer,
-                                 BrandSerializerDropdown
+                                 BrandSerializerDropdown, CategorySerializerDropdown
                                  )
 from django.db import transaction
 
@@ -332,7 +332,7 @@ def get_categories(request):
 @permission_classes([AllowAny])
 def get_categories_dropdown(request):
     all_categories = Category.objects.order_by('-created_at')
-    serialized = CategorySerializer(all_categories, many=True)
+    serialized = CategorySerializerDropdown(all_categories, many=True)
 
     return Response(
         {
