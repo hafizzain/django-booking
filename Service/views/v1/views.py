@@ -16,6 +16,7 @@ from rest_framework.response import Response
 from Service.models import Service
 
 from Sale.serializers import ServiceSerializer, ServiceSerializerDropdown
+from Sale.Constants.Custom_pag import CustomPagination
 
 # from Service.models import Service
 # from Service.serializers import ServiceSerializer
@@ -47,19 +48,14 @@ def get_services_dropdown(request):
     
     query = Q(is_deleted=False)
     services = Service.objects.filter(query).prefetch_related('servicegroup_services').order_by('-created_at')
-    serialized = ServiceSerializerDropdown(services,  many=True)
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Service',
-                'error_message' : None,
-                'service' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+
+    serialized = list(ServiceSerializerDropdown(services,  many=True).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'services')
+    return response
     
 
 # @api_view(['GET'])

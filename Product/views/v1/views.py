@@ -332,20 +332,13 @@ def get_categories(request):
 @permission_classes([AllowAny])
 def get_categories_dropdown(request):
     all_categories = Category.objects.filter(is_active=True).order_by('-created_at')
-    serialized = CategorySerializerDropdown(all_categories, many=True)
+    serialized = list(CategorySerializerDropdown(all_categories, many=True).data)
 
-    return Response(
-        {
-            'status' : True,
-            'status_code' : 201,
-            'response' : {
-                'message' : 'All Categories',
-                'error_message' : None,
-                'categories' : serialized.data
-            }
-        },
-        status=status.HTTP_201_CREATED
-    )
+    paginator = CustomPagination()
+    paginator.page_size = 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'categories')
+    return response
 
 @transaction.atomic
 @api_view(['POST'])
@@ -536,20 +529,13 @@ def get_brands(request):
 @permission_classes([AllowAny])
 def get_brands_dropdown(request):
     all_brands = Brand.objects.filter(is_active=True).order_by('-created_at')
-    serialized = BrandSerializerDropdown(all_brands, many=True, context={'request' : request})
+    serialized = list(BrandSerializerDropdown(all_brands, many=True, context={'request' : request}).data)
 
-    return Response(
-        {
-            'status' : True,
-            'status_code' : 201,
-            'response' : {
-                'message' : 'All Brands',
-                'error_message' : None,
-                'brand' : serialized.data
-            }
-        },
-        status=status.HTTP_201_CREATED
-    )
+    paginator = CustomPagination()
+    paginator.page_size = 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'brands')
+    return response
 
 
 @transaction.atomic
@@ -1346,20 +1332,13 @@ def get_products_dropdown(request):
 
     all_products = Product.objects.filter(query).select_related('brand').order_by('-created_at')
 
-    serialized = ProductSerializerDropDown(all_products, many=True, context={'location':location_id})
+    serialized = list(ProductSerializerDropDown(all_products, many=True, context={'location':location_id}).data)
 
-    return Response(
-        {
-            'status' : True,
-            'status_code' : 200,
-            'response' : {
-                'message' : 'All business Products!',
-                'error_message' : None,
-                'products' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    paginator = CustomPagination()
+    paginator.page_size = 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'products')
+    return response
 
    
 @api_view(['GET'])

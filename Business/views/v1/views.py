@@ -3054,21 +3054,13 @@ def get_business_vendors_dropdown(request):
 
     all_vendors = BusinessVendor.objects.filter(is_deleted=False, is_closed=False, is_active=True).order_by('-created_at')
         
-    serialized = BusinessVendorSerializerDropdown(all_vendors, many=True)
+    serialized = list(BusinessVendorSerializerDropdown(all_vendors, many=True).data)
 
-    return Response(
-            {
-                'status' : True,
-                'status_code' : 201,
-                'status_code_text' : '201',
-                'response' : {
-                    'message' : 'All business vendors',
-                    'error_message' : None,
-                    'vendors' : serialized.data
-                }
-            },
-            status=status.HTTP_201_CREATED
-    )
+    paginator = CustomPagination()
+    paginator.page_size = 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'vendors')
+    return response
 
 @transaction.atomic
 @api_view(['POST'])

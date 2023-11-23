@@ -54,6 +54,7 @@ from Notification.serializers import FCMDeviceSerializer
 from Notification.notification_processor import NotificationProcessor
 
 from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
+from Sale.Constants.Custom_pag import CustomPagination
 
 
 @transaction.atomic
@@ -420,25 +421,15 @@ def get_Employees_dropdown(request):
         query &= Q(location=location)
      
 
-    all_employe = Employee.objects \
-                    .filter(query) 
-    
-    all_employee_count = all_employe.count()
+    all_employe = Employee.objects.filter(query) 
 
-    serialized = EmployeeDropdownSerializer(all_employe,  many=True, context={'request' : request} )
-    data = serialized.data
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'count':all_employee_count,
-                'error_message' : None,
-                'employees' : data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    serialized = list(EmployeeDropdownSerializer(all_employe,  many=True, context={'request' : request}).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'employees')
+    return response
 
 
 @api_view(['GET'])

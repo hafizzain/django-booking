@@ -176,25 +176,16 @@ def get_single_client(request):
 @permission_classes([AllowAny])
 def get_client_dropdown(request):
 
-    is_active = request.GET.get('active', None)
-    all_client = Client.objects \
-                    .filter(is_deleted=False, is_blocked=False, is_active=True)
+    all_client = Client.objects.filter(is_deleted=False, is_blocked=False, is_active=True)
 
 
-    serialized = ClientDropdownSerializer(all_client, many=True,  context={'request' : request})
+    serialized = list(ClientDropdownSerializer(all_client, many=True,  context={'request' : request}).data)
 
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Client',
-                'error_message' : None,
-                'client' : serialized.data,
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    paginator = CustomPagination()
+    paginator.page_size = 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'clients')
+    return response
 
 
 @api_view(['GET'])
