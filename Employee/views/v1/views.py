@@ -355,7 +355,8 @@ def get_Employees(request):
                     .filter(query) \
                     .select_related('user', 'business','country', 'state', 'city', 'employee_permissions') \
                     .prefetch_related('location') \
-                    .order_by('-created_at')
+                    .with_total_sale() \
+                    .order_by('-total_sale')
     all_employee_count = all_employe.count()
     
     page_count = all_employee_count / 10

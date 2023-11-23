@@ -14,6 +14,36 @@ from NStyle.choices import EmployeeDailyInsightChoices
 
 class EmployeeManager(models.QuerySet):
 
+    def with_total_sale(self):
+        appointment_sale_filter = Q(appointment_status='Done')
+        discounted_order_filter = Q(checkout__is_deleted = False, discount_price__isnull=False)
+        non_discounted_order_filter = Q(checkout__is_deleted = False, discount_price__isnull=True)
+        return self.annotate(
+            appointment_sale = Coalesce(
+                Sum('member_appointments__total_price', filter=appointment_sale_filter),
+                0.0,
+                output_field=FloatField()
+            ),
+            
+            discounted_orders = Coalesce(
+                Sum((F('member_orders__discount_price') * F('member_orders__quantity')), filter=discounted_order_filter),
+                0.0,
+                output_field=FloatField()
+            ),
+
+            non_discounted_orders = Coalesce(
+                Sum((F('member_orders__total_price') * F('member_orders__quantity')), filter=non_discounted_order_filter),
+                0.0,
+                output_field=FloatField()
+            )
+        ).annotate(
+            total_sale = Coalesce(
+                (F('appointment_sale') + F('discounted_orders') + F('non_discounted_orders')),
+                0.0,
+                output_field=FloatField()
+            )
+        )
+
     def with_total_commission(self):
         return self.annotate(
             total_commission = Coalesce(
