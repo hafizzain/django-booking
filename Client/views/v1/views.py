@@ -178,18 +178,20 @@ def get_client_dropdown(request):
     search_text = request.GET.get('search_text', None)
     no_pagination = request.GET.get('no_pagination', None)
     page = request.GET.get('page', None)
+    is_searched = False
 
     all_client = Client.objects.filter(is_deleted=False, is_blocked=False, is_active=True)
 
     if search_text:
         all_client = all_client.filter(Q(full_name__icontains=search_text) | Q(mobile_number__icontains=search_text))
+        is_searched = True
         
     serialized = list(ClientDropdownSerializer(all_client, many=True,  context={'request' : request}).data)
 
     paginator = CustomPagination()
     paginator.page_size = 1000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(serialized, request)
-    response = paginator.get_paginated_response(paginated_data, 'clients', extra=None, current_page=page)
+    response = paginator.get_paginated_response(paginated_data, 'clients', extra=None, current_page=page, is_searched=is_searched)
     return response
 
 

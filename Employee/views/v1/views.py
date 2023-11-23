@@ -414,6 +414,7 @@ def get_Employees_dropdown(request):
     location_id = request.GET.get('location_id', None)
     search_text = request.GET.get('search_text', None)
     page = request.query_params.get('page', None)
+    is_searched = False
 
     query = Q(is_deleted=False)
     query &= Q(is_blocked=False)
@@ -421,6 +422,7 @@ def get_Employees_dropdown(request):
 
     if search_text:
         query &= Q(full_name__icontains=search_text) | Q(mobile_number__icontains=search_text)
+        is_searched = True
 
 
     if location_id:
@@ -435,7 +437,7 @@ def get_Employees_dropdown(request):
     paginator = CustomPagination()
     paginator.page_size = 1000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(serialized, request)
-    response = paginator.get_paginated_response(paginated_data, 'employees', extra=None, current_page=page)
+    response = paginator.get_paginated_response(paginated_data, 'employees', extra=None, current_page=page, is_searched=is_searched)
     return response
 
 
