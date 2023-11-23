@@ -331,13 +331,17 @@ def get_categories(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_categories_dropdown(request):
+    no_pagination = request.GET.get('no_pagination', None)
+    page = request.GET.get('page', None)
+
+
     all_categories = Category.objects.filter(is_active=True).order_by('-created_at')
     serialized = list(CategorySerializerDropdown(all_categories, many=True).data)
 
     paginator = CustomPagination()
-    paginator.page_size = 10
+    paginator.page_size = 1000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(serialized, request)
-    response = paginator.get_paginated_response(paginated_data, 'categories')
+    response = paginator.get_paginated_response(paginated_data, 'categories', extra=None, current_page=page)
     return response
 
 @transaction.atomic
@@ -528,13 +532,19 @@ def get_brands(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_brands_dropdown(request):
+    search_text = request.query_params.get('search_text', None)
+    no_pagination = request.GET.get('no_pagination', None)
+    page = request.GET.get('page', None)
+
     all_brands = Brand.objects.filter(is_active=True).order_by('-created_at')
+    if search_text:
+        all_brands = all_brands.filter(name__icontains=search_text)
     serialized = list(BrandSerializerDropdown(all_brands, many=True, context={'request' : request}).data)
 
     paginator = CustomPagination()
-    paginator.page_size = 10
+    paginator.page_size = 1000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(serialized, request)
-    response = paginator.get_paginated_response(paginated_data, 'brands')
+    response = paginator.get_paginated_response(paginated_data, 'brands', extra=None, current_page=page)
     return response
 
 
@@ -1321,7 +1331,12 @@ def get_products(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_products_dropdown(request):
-    location_id = request.GET.get('location_id', None)    
+    search_text = request.query_params.get('search_text', None)
+    location_id = request.GET.get('location_id', None)
+    no_pagination = request.GET.get('no_pagination', None)
+    page = request.GET.get('page', None)
+
+
     query = Q(is_deleted=False, is_active=True)
 
 
@@ -1330,14 +1345,21 @@ def get_products_dropdown(request):
         product_ids = list(ProductStock.objects.filter(location__id=location_id).values_list('product__id', flat=True))
         query &= Q(id__in=product_ids)
 
+    if search_text:
+        #query building
+        query &= Q(name__icontains=search_text)
+        query |= Q(category__name__icontains=search_text)
+        query |= Q(brand__name__icontains=search_text)
+        query |= Q(product_type__icontains=search_text)
+
     all_products = Product.objects.filter(query).select_related('brand').order_by('-created_at')
 
     serialized = list(ProductSerializerDropDown(all_products, many=True, context={'location':location_id}).data)
 
     paginator = CustomPagination()
-    paginator.page_size = 10
+    paginator.page_size = 1000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(serialized, request)
-    response = paginator.get_paginated_response(paginated_data, 'products')
+    response = paginator.get_paginated_response(paginated_data, 'products', extra=None, current_page=page)
     return response
 
    

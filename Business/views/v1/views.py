@@ -3051,15 +3051,26 @@ def get_business_vendors(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_business_vendors_dropdown(request):
+    search_text = request.query_params.get('search_text', None)
+    no_pagination = request.GET.get('no_pagination', None)
+    page = request.GET.get('page', None)
 
     all_vendors = BusinessVendor.objects.filter(is_deleted=False, is_closed=False, is_active=True).order_by('-created_at')
+
+    if search_text:
+        # query
+        query = Q(vendor_name__icontains=search_text)
+        query |= Q(mobile_number__icontains=search_text)
+        query |= Q(address__icontains=search_text)
+        query |= Q(user__email__icontains=search_text)
+        all_vendors = all_vendors.filter(query)
         
     serialized = list(BusinessVendorSerializerDropdown(all_vendors, many=True).data)
 
     paginator = CustomPagination()
-    paginator.page_size = 10
+    paginator.page_size = 1000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(serialized, request)
-    response = paginator.get_paginated_response(paginated_data, 'vendors')
+    response = paginator.get_paginated_response(paginated_data, 'vendors', extra=None, current_page=page)
     return response
 
 @transaction.atomic
