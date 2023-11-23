@@ -434,7 +434,7 @@ def get_Employees_dropdown(request):
     paginator = CustomPagination()
     paginator.page_size = 10
     paginated_data = paginator.paginate_queryset(serialized, request)
-    response = paginator.get_paginated_response(paginated_data, 'employees', page)
+    response = paginator.get_paginated_response(paginated_data, 'employees', extra=None, current_page=page)
     return response
 
 
