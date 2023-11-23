@@ -2292,11 +2292,14 @@ def service_appointment_count(request):
             count += service_order.quantity
 
         data = {
-            # 'id' : str(ser.id),
             'name' : str(ser.name),
             'count' : count
         }
         return_data.append(data)
+
+    sorted_data = sorted(data, key=lambda x: x['count'], reverse=True)[:10]
+    
+
     return Response(
             {
                 'status' : True,
@@ -2304,7 +2307,7 @@ def service_appointment_count(request):
                 'response' : {
                     'message' : 'Appointment Checkout Create!',
                     'error_message' : None,
-                    'data' : return_data,
+                    'data' : sorted_data,
                     
                 }
             },
