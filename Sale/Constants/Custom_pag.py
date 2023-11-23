@@ -30,12 +30,12 @@ class CustomPagination(PageNumberPagination):
             'count': count,
             'pages' : count / per_page_result,
             'per_page_result': per_page_result ,
+            'current_page':current_page if current_page else None,
             'response' : {
                 'message' : f'All {pramas_data}',
                 'error_message' : None,
                 pramas_data : data,
                 'invoice_translations': invoice_translations,
-                'current_page':current_page if current_page else None
             }
 
         })

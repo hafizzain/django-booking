@@ -412,7 +412,7 @@ def get_Employees(request):
 def get_Employees_dropdown(request):
     location_id = request.GET.get('location_id', None)
     search_text = request.GET.get('search_text', None)
-    page = request.GET.get('page', None)
+    page = request.query_params.get('page', None)
 
     query = Q(is_deleted=False)
     query &= Q(is_blocked=False)
