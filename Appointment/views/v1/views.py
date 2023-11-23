@@ -2297,7 +2297,7 @@ def service_appointment_count(request):
         }
         return_data.append(data)
 
-    sorted_data = sorted(data, key=lambda x: x['count'], reverse=True)[:10]
+    sorted_data = sorted(return_data, key=lambda x: x['count'], reverse=True)[:10]
     
 
     return Response(
