@@ -366,6 +366,7 @@ def update_user_default_data(request):
                 client_instance.email = email
                 client_instance.mobile_number = phone_number
                 client_instance.business = location.business
+                client_instance.is_activ = True
                 client_instance.save()
             
             if email not in ['', None]:
