@@ -15,9 +15,12 @@ from NStyle.choices import EmployeeDailyInsightChoices
 class EmployeeManager(models.QuerySet):
 
     def with_total_sale(self):
-        appointment_sale_filter = Q(appointment_status='Done')
-        discounted_order_filter = Q(checkout__is_deleted = False, discount_price__isnull=False)
-        non_discounted_order_filter = Q(checkout__is_deleted = False, discount_price__isnull=True)
+
+        # filters
+        appointment_sale_filter = Q(member_appointments__appointment_status='Done')
+        discounted_order_filter = Q(member_orders__checkout__is_deleted = False, member_orders__discount_price__isnull=False)
+        non_discounted_order_filter = Q(member_orders__checkout__is_deleted = False, member_orders__discount_price__isnull=True)
+
         return self.annotate(
             appointment_sale = Coalesce(
                 Sum('member_appointments__total_price', filter=appointment_sale_filter),
