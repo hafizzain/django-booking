@@ -613,6 +613,7 @@ class EmployeeDropdownSerializer(serializers.ModelSerializer):
         fields = ['id', 'full_name', 'mobile_number', 'email', 'employee_id', 'image']
 
 class singleEmployeeSerializer(serializers.ModelSerializer):
+    total_sale = serializers.FloatField(read_only=True)
     salary = serializers.SerializerMethodField(read_only=True)
     income_type = serializers.SerializerMethodField(read_only=True)
     designation = serializers.SerializerMethodField(read_only=True)
@@ -626,9 +627,9 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
     services = serializers.SerializerMethodField(read_only=True)
         
     location = serializers.SerializerMethodField()
-    total_sale = serializers.SerializerMethodField()
+    total_sale_s = serializers.SerializerMethodField()
     
-    def get_total_sale(self,obj):
+    def get_total_sale_s(self,obj):
         return total_sale_employee(obj)
 
     
@@ -712,7 +713,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
         model =Employee
         fields = [
             'id',
-            'total_sale',
+            'total_sale_s',
             'image',
             'salary',
             'email',
@@ -732,6 +733,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'created_at' ,
             'location', 
             'is_active',
+            'total_sale'
             ]   
 
 class CategoryCommissionSerializer(serializers.ModelSerializer):
