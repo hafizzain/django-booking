@@ -596,7 +596,16 @@ class LocationSerializerOP(serializers.ModelSerializer):
 
 class EmployeeDropdownSerializer(serializers.ModelSerializer):
 
+    designation = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
+
+    def get_designation(self, obj):
+        emp_professional_info = EmployeeProfessionalInfo.objects.filter(employee=obj).first()
+        if emp_professional_info:
+            return emp_professional_info.designation
+        else:
+            return None
+
 
     def get_image(self, obj):
         if obj.image:
@@ -610,7 +619,7 @@ class EmployeeDropdownSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ['id', 'full_name', 'mobile_number', 'email', 'employee_id', 'image']
+        fields = ['id', 'full_name', 'mobile_number', 'email', 'employee_id', 'image', 'designation']
 
 class singleEmployeeSerializer(serializers.ModelSerializer):
     total_sale = serializers.FloatField(read_only=True)
