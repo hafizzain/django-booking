@@ -448,12 +448,21 @@ def get_all_appointments_no_pagination(request):
 @permission_classes([AllowAny])
 def get_calendar_appointment(request):
     selected_date = request.GET.get('selected_date', None)
+    location_id = request.GET.get('location_id', None)
+    employee = request.GET.get('employee', None)
+
+    query = Q(is_deleted=False, is_active=True)
+
+    if location_id:
+        query &= Q(location__id=location_id)
+
+    if employee != 'All':
+        query &= Q(id=employee)
+    
 
 
-    all_memebers= Employee.objects.filter(
-        is_deleted = False,
-        is_active = True,
-    ).order_by('-created_at')
+
+    all_memebers = Employee.objects.filter(query).order_by('-created_at')
     print(all_memebers)
     serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request' : request, 'selected_date' : selected_date})
 
