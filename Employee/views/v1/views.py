@@ -450,7 +450,9 @@ def get_employees_dashboard(request):
     if location_id:
         query &= Q(location__id=location_id)
 
-    employees = Employee.objects.filter(query)
+    employees = Employee.objects.filter(query) \
+                                .with_total_sale() \
+                                .order_by('-total_sale')[:10]
 
     data = OptimizedEmployeeSerializerDashboard(employees, many=True, context={'request' : request}).data
 
