@@ -454,7 +454,8 @@ def get_calendar_appointment(request):
     query = Q(is_deleted=False, is_active=True)
 
     if location_id:
-        query &= Q(location__id=location_id)
+        location = BusinessAddress.objects.get(id=location_id)
+        query &= Q(location=location)
 
     if employee != 'All':
         query &= Q(id=employee)
