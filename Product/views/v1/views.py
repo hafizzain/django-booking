@@ -1256,7 +1256,7 @@ def update_product(request):
         )
    
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def get_products(request):
     start_time = datetime.datetime.now()
     location_id = request.GET.get('location_id', None)
