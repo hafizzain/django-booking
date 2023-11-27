@@ -847,7 +847,9 @@ def get_servicegroup(request):
         query &= Q(name__icontains=search_text)
 
 
-    service_group = ServiceGroup.objects.filter(query).order_by('-created_at')
+    service_group = ServiceGroup.objects \
+                                .prefetch_related('services') \
+                                .filter(query).order_by('-created_at')
     serialized = list(ServiceGroupSerializer(service_group,  many=True, context={'request' : request}).data)
 
     paginator = CustomPagination()

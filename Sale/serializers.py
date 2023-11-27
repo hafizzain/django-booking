@@ -83,6 +83,24 @@ class ServiceSearchSerializer(serializers.ModelSerializer):
         fields = ['id','name', 'arabic_name', 'location', 'client_can_book', 'employees','priceservice', 'slot_availible_for_online']
 
 
+class ServiceSearchSerializerForServiceGroup(serializers.ModelSerializer):
+    priceservice = serializers.SerializerMethodField(read_only=True)
+    employees = serializers.SerializerMethodField(read_only=True)
+    
+    def get_employees(self, obj):
+        emp = EmployeeSelectedService.objects.filter(service = obj) 
+        return EmployeeSelected_TenantServiceSerializer(emp, many = True, context=self.context).data
+    
+    def get_priceservice(self, obj):
+        try:
+            ser = PriceService.objects.filter(service = obj).order_by('-created_at')
+            return PriceServiceSerializers(ser, many = True).data
+        except Exception as err:
+            pass
+    class Meta:
+        model = Service
+        fields = ['id','name', 'location', 'client_can_book', 'priceservice', 'slot_availible_for_online']
+
 class ServiceGroupOP(serializers.ModelSerializer):
     
     class Meta:
@@ -117,7 +135,7 @@ class ServiceGroup_TenantSerializer(serializers.ModelSerializer):
     def get_services(self, obj):
             all_service = obj.services.all()
             #ser = Service.objects.get(id = obj.services)
-            return ServiceSearchSerializer(all_service, many = True).data
+            return ServiceSearchSerializerForServiceGroup(all_service, many = True).data
     
     class Meta:
         model = ServiceGroup
