@@ -134,13 +134,18 @@ def get_service(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_service_optimized(request):
-    location = request.GET.get('location_id', None)
+    location_id = request.GET.get('location_id', None)
     is_mobile = request.GET.get('is_mobile', None)
     search_text = request.GET.get('search_text', None)
     no_pagination = request.GET.get('no_pagination', None)
 
-
     query = Q(is_deleted=False)
+
+    currency = BusinessAddress.objects.get(id=location_id).currency
+    if currency:
+        # filter out those services which has the currency price for the current location currency.
+        service_ids = list(PriceService.objects.filter(currency=currency).values_list('service__id'))
+        query &= Q(id__in=service_ids)
     
     location_instance = None
     currency_code = None
@@ -152,8 +157,8 @@ def get_service_optimized(request):
                  Q(location__address_name__icontains=search_text)
                  
 
-    if location:
-        query &= Q(location__id=location)
+    if location_id:
+        query &= Q(location__id=location_id)
 
     elif request.user.is_authenticated :
         try:
