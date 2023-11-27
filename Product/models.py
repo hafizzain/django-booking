@@ -1,5 +1,6 @@
 from django.db import models
-from django.db.models import F, Q
+from django.db.models import F, Q, Sum, FloatField
+from django.db.models.functions import Coalesce
 from django.utils.timezone import now
 from django.core.validators import MinValueValidator
 import uuid
@@ -13,17 +14,18 @@ from Utility.models import Language
 
 class ProductManager(models.QuerySet):
 
-    def with_total_sale(self):
+    def with_total_quantity_sold(self):
         """
         Returns the total sale of a product by taking the sum of product of quantity * current_price
         or quantity * discount_price.
         """
         return self.annotate(
-                total_current_price_value=F('product_orders__quantity') * F('product_orders__current_price'),
-                total_discount_price_value=F('product_orders__quantity') * F('product_orders__discount_price')
-            ).annotate(
-                total_value = F('total_current_price_value') + F('total_discount_price_value')
+            total_quantity_sold = Coalesce(
+                Sum('product_orders__quantity'),
+                0,
+                output_field=FloatField()
             )
+        )
 
 class Category(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
