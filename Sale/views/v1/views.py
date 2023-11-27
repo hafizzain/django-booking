@@ -35,7 +35,7 @@ from django.db.models import Avg, Count, Min, Sum, Q, F
 from Sale.serializers import (AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, 
                             ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, 
                             VoucherOrderSerializer, SaleOrders_CheckoutSerializer, SaleOrders_AppointmentCheckoutSerializer,
-                            ServiceSerializerDropdown
+                            ServiceSerializerDropdown, ServiceSerializerOP
                             )
 from rest_framework.pagination import PageNumberPagination
 from django.core.paginator import Paginator
@@ -193,7 +193,7 @@ def get_service_optimized(request):
     page_number = request.GET.get("page") 
     services = paginator.get_page(page_number)
 
-    serialized = ServiceSerializer(services,  many=True, context={'request' : request, 'location_instance' : location_instance, 'is_mobile' : is_mobile, 'currency_code' : currency_code} )
+    serialized = ServiceSerializerOP(services,  many=True, context={'request' : request, 'location_instance' : location_instance, 'is_mobile' : is_mobile, 'currency_code' : currency_code} )
     return Response(
         {
             'status' : 200,
