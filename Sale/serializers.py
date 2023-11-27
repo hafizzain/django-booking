@@ -85,11 +85,6 @@ class ServiceSearchSerializer(serializers.ModelSerializer):
 
 class ServiceSearchSerializerForServiceGroup(serializers.ModelSerializer):
     priceservice = serializers.SerializerMethodField(read_only=True)
-    employees = serializers.SerializerMethodField(read_only=True)
-    
-    def get_employees(self, obj):
-        emp = EmployeeSelectedService.objects.filter(service = obj) 
-        return EmployeeSelected_TenantServiceSerializer(emp, many = True, context=self.context).data
     
     def get_priceservice(self, obj):
         location = BusinessAddress.objects.get(id=self.context['location_id'])
