@@ -1400,7 +1400,10 @@ def get_products_optimized(request):
         'consumptions',
         'product_medias',
         'product_stock',
-    ).filter(query).order_by('-created_at')
+    ) \
+    .filter(query) \
+    .with_total_sale() \
+    .order_by('-created_at')
 
     
     all_products_count = all_products.count()
