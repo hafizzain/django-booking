@@ -180,12 +180,16 @@ def get_client_dropdown(request):
     page = request.GET.get('page', None)
     is_searched = False
 
-    all_client = Client.objects.filter(is_deleted=False, is_blocked=False, is_active=True)
+    query = Q(is_deleted=False, is_blocked=False, is_active=True)
 
     if search_text:
-        all_client = all_client.filter(Q(full_name__icontains=search_text) | Q(mobile_number__icontains=search_text))
+        query &= Q(full_name__icontains=search_text) | \
+                 Q(mobile_number__icontains=search_text) | \
+                 Q(email__icontains=search_text) | \
+                 Q(client_id__icontains=search_text)        
         is_searched = True
         
+    all_client = Client.objects.filter(query).order_by('-created_at')
     serialized = list(ClientDropdownSerializer(all_client, many=True,  context={'request' : request}).data)
 
     paginator = CustomPagination()
