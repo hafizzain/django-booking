@@ -10,7 +10,7 @@ from Product.Constants.index import tenant_media_base_url, tenant_media_domain
 from Utility.models import Currency, ExceptionRecord
 from Sale.Constants.Promotion import get_promotions
 
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from Service.models import PriceService, Service, ServiceGroup
 from Invoices.models import SaleInvoice
 from django.db.models import F
@@ -410,6 +410,38 @@ class ServiceSerializer(serializers.ModelSerializer):
             'enable_vouchers',
             'invoices'
             ]
+        
+
+class ServiceSerializerOP(serializers.ModelSerializer):    
+    priceservice = serializers.SerializerMethodField(read_only=True)
+    price = serializers.SerializerMethodField(read_only=True)
+    
+    def get_price(self, obj):
+        try:
+            ser = PriceService.objects.filter(service=obj).order_by('-created_at').first()
+            return ser.price
+        except Exception as err:
+            pass
+            #print(err)
+    
+    def get_priceservice(self, obj):
+        is_mobile = self.context.get('is_mobile', None)
+        currency_code = self.context.get('currency_code', None)
+        query = Q(service=obj)
+
+        if currency_code is not None:
+            query &= Q(currency__code=currency_code)
+
+        try:
+            ser = PriceService.objects.filter(query).order_by('-created_at')
+            return PriceServiceSerializers(ser, many = True).data
+        except Exception as err:
+            pass
+    
+        
+    class Meta:
+        model = Service
+        fields = ['id', 'name', 'price', 'location', 'controls_time_slot', 'client_can_book', 'slot_availible_for_online', 'priceservice']
                
 
 class ServiceTranlationsSerializer(serializers.ModelSerializer):

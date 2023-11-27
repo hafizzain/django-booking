@@ -133,6 +133,87 @@ def get_service(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
+def get_service_optimized(request):
+    location = request.GET.get('location_id', None)
+    is_mobile = request.GET.get('is_mobile', None)
+    search_text = request.GET.get('search_text', None)
+    no_pagination = request.GET.get('no_pagination', None)
+
+
+    query = Q(is_deleted=False)
+    
+    location_instance = None
+    currency_code = None
+    errors = []
+    
+    if search_text:
+        query &= Q(name__icontains=search_text) |  \
+                 Q(servicegroup_services__name__icontains=search_text) | \
+                 Q(location__address_name__icontains=search_text)
+                 
+
+    if location:
+        query &= Q(location__id=location)
+
+    elif request.user.is_authenticated :
+        try:
+            employee = Employee.objects.get(
+                email = request.user.email
+            )
+        except Exception as err:
+            errors.append(str(err))
+        else:
+            if len(employee.location.all()) > 0:
+                first_location = employee.location.all()[0]
+                location_instance = first_location
+                currency_code = location_instance.currency.code
+                query &= Q(location__id=first_location.id)
+            else:
+                errors.append('Employee Location 0')
+
+    
+    services = Service.objects.filter(query).order_by('-created_at').distinct()
+
+    # if is_mobile then request.user will be employee
+    # so we will filter only those services which are assigned to
+    # that particular employee
+    if is_mobile:
+        emp = Employee.objects.get(email=request.user.email)
+        emp_service_ids = emp.employee_selected_service.distinct().values_list('service__id', flat=True)
+        services = Service.objects.filter(id__in=emp_service_ids).order_by('-created_at')
+
+
+    service_count = services.count()
+
+    page_count = service_count / 10
+    if page_count > int(page_count):
+        page_count = int(page_count) + 1
+    per_page_results = 100000 if no_pagination else 10
+    paginator = Paginator(services, per_page_results)
+    page_number = request.GET.get("page") 
+    services = paginator.get_page(page_number)
+
+    serialized = ServiceSerializer(services,  many=True, context={'request' : request, 'location_instance' : location_instance, 'is_mobile' : is_mobile, 'currency_code' : currency_code} )
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Service',
+                'count':service_count,
+                'pages':page_count,
+                'per_page_result':20,
+                'error_message' : None,
+                'service' : serialized.data,
+                'errors' : errors,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def get_service_dropdown(request):
     location = request.GET.get('location_id', None)
     is_mobile = request.GET.get('is_mobile', None)
@@ -2155,20 +2236,20 @@ def new_create_sale_order(request):
                 item_name = product.name
                 
             try:
-                transfer = ProductStock.objects.get(product__id=product.id, location = business_address.id)
+                product_stock = ProductStock.objects.get(product__id=product.id, location = business_address.id)
                 
-                if transfer.available_quantity >= int(quantity):
+                if product_stock.available_quantity >= int(quantity):
                     stock_transfer = ProductOrderStockReport.objects.create(
                         report_choice = 'Sold',
                         product = product,
                         user = request.user,
                         location = business_address,
-                        before_quantity = transfer.available_quantity      
+                        before_quantity = product_stock.available_quantity      
                     )                    
-                    sold = transfer.available_quantity - int(quantity)
-                    transfer.available_quantity = sold
-                    transfer.sold_quantity += int(quantity)
-                    transfer.save()
+                    sold = product_stock.available_quantity - int(quantity)
+                    product_stock.available_quantity = sold
+                    product_stock.sold_quantity += int(quantity)
+                    product_stock.save()
                     
                     stock_transfer.after_quantity = sold
                     stock_transfer.save()                    
@@ -2180,9 +2261,9 @@ def new_create_sale_order(request):
                 errors.append(str(err))
             try:
                 admin_email = StockNotificationSetting.objects.get(business = str(business_address.business))
-                if admin_email.notify_stock_turnover == True and transfer.available_quantity <= 5:
+                if admin_email.notify_stock_turnover == True and product_stock.available_quantity <= 5:
                     try:
-                        thrd = Thread(target=ProductTurnover, args=[], kwargs={'product' : product,'product_stock': transfer, 'business_address':business_address.id ,'tenant' : request.tenant})
+                        thrd = Thread(target=ProductTurnover, args=[], kwargs={'product' : product,'product_stock': product_stock, 'business_address':business_address.id ,'tenant' : request.tenant})
                         thrd.start()
                     except Exception as err:
                         ExceptionRecord.objects.create(
@@ -2193,9 +2274,9 @@ def new_create_sale_order(request):
             
             try:
                 admin_email = StockNotificationSetting.objects.get(business = str(business_address.business))
-                if admin_email.notify_for_lowest_stock == True and transfer.available_quantity <= 5:
+                if admin_email.notify_for_lowest_stock == True and product_stock.available_quantity <= 5:
                     try:
-                        thrd = Thread(target=stock_lowest, args=[], kwargs={'product' : product,'product_stock': transfer, 'business_address':business_address.id ,'tenant' : request.tenant,'quantity': transfer.available_quantity})
+                        thrd = Thread(target=stock_lowest, args=[], kwargs={'product' : product,'product_stock': product_stock, 'business_address':business_address.id ,'tenant' : request.tenant,'quantity': product_stock.available_quantity})
                         thrd.start()
                     except Exception as err:
                         ExceptionRecord.objects.create(
