@@ -2085,6 +2085,158 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
 
         # Remove Member from get all sale orders
 
+
+
+class SaleOrders_CheckoutSerializerOP(serializers.ModelSerializer):
+    product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
+    service  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
+    membership  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
+    voucher  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
+    
+    client = serializers.SerializerMethodField(read_only=True)
+    location = serializers.SerializerMethodField(read_only=True)
+
+    # membership_product = serializers.SerializerMethodField(read_only=True)
+    # membership_service = serializers.SerializerMethodField(read_only=True)
+    # membership_type = serializers.SerializerMethodField(read_only=True)
+    invoice = serializers.SerializerMethodField(read_only=True)
+
+    gst = serializers.FloatField(source='tax_applied')
+    gst1 = serializers.FloatField(source='tax_applied1')
+    gst_price = serializers.SerializerMethodField()
+    gst_price1 = serializers.FloatField(source='tax_amount1')
+    
+    tip = serializers.SerializerMethodField(read_only=True)
+    total_tip = serializers.SerializerMethodField(read_only=True)
+    client_loyalty_points = serializers.SerializerMethodField(read_only=True)
+
+    def get_client_loyalty_points(self, obj):
+        return obj.get_client_loyalty_points()
+
+    def get_client(self, obj):
+        if obj.client:
+            serializers = ClientSerializer(obj.client).data
+            return serializers
+        return None
+    
+    def get_location(self, obj):
+        if obj.location:
+            serializers = LocationSerializer(obj.location).data
+            return serializers
+        
+        return None
+        
+    def get_membership(self, obj):
+        
+        check = MemberShipOrder.objects.only(
+            'id',
+            'membership',
+            'current_price',
+            'quantity',
+        ).select_related(
+            'membership',
+        ).filter(
+            checkout = obj
+        )
+        # return MemberShipOrderSerializer(check, many = True , context=self.context ).data
+        return SaleOrder_MemberShipSerializer(check, many = True ).data
+
+
+    def get_voucher(self, obj):
+        
+        check = VoucherOrder.objects.only(
+            'id',
+            'voucher',
+            'current_price',
+            'quantity',
+        ).select_related(
+            'voucher',
+        ).filter(
+            checkout = obj
+        )
+        # return VoucherOrderSerializer(check, many = True , context=self.context ).data
+        return SaleOrder_VoucherSerializer(check, many = True ).data
+
+
+    def get_product(self, obj):
+        
+        check = ProductOrder.objects.only(
+                'current_price', 
+                'id',
+                'quantity',
+                'product',
+            ).select_related(
+                'product',
+            ).filter(
+            checkout = obj
+        )
+        # data =  ProductOrderSerializer(check, many = True , context=self.context ).data
+        data =  SaleOrder_ProductSerializer(check, many = True ).data
+        self.product = data
+        return self.product
+            
+    # def get_membership_product(self, obj):
+    #     return self.product
+
+    def get_service(self, obj):
+        service = ServiceOrder.objects.only(
+            'id',
+            'quantity',
+            'current_price',
+            'service',
+        ).select_related(
+            'service',
+        ).filter(
+            checkout = obj
+        )
+        # data = ServiceOrderSerializer(service, many = True , context=self.context ).data
+        data = SaleOrder_ServiceSerializer(service, many = True ).data
+        self.service = data
+        return self.service
+    
+    # def get_membership_service(self, obj):
+    #     return self.service
+    
+    # def get_membership_type(self, obj):
+    #     try:
+    #         data = Membership.objects.filter(discount=obj).first()
+    #     except:
+    #         pass
+    #     return data
+    
+    def get_tip(self, obj):
+        tips = AppointmentEmployeeTip.objects.filter(checkout=obj)
+        serialized_tips = CheckoutTipsSerializer(tips, many=True).data
+        return serialized_tips
+
+    def get_total_tip(self, obj):
+        tips = AppointmentEmployeeTip.objects.filter(checkout=obj).aggregate(
+            total_tip=Sum('tip')
+        )
+        return tips['total_tip']
+
+    
+    def get_invoice(self, obj):
+        try:
+            invoice = SaleInvoice.objects.get(checkout__icontains = obj)
+            serializer = SaleInvoiceSerializer(invoice, context=self.context)
+            return serializer.data
+        except Exception as e:
+            return str(e)
+        
+    def get_gst_price(self, obj):
+        try:
+            return obj.tax_amount
+        except:
+            return 0
+    
+    class Meta:
+        model = Checkout
+        fields = ['id', 'product', 'service', 'membership', 'voucher', 'client', 'location', 'gst','gst1','gst_price',
+                  'gst_price1', 'created_at', 'payment_type', 'tip', 'invoice', 'tax_name', 'tax_name1', 'total_discount',
+                  'redeem_option', 'total_tip', 'client_loyalty_points'
+                  ]
+
 class SaleInvoiceSerializer(serializers.ModelSerializer):
     file = serializers.SerializerMethodField(read_only = True)
 
@@ -2185,4 +2337,90 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
                  'total_price', 'service_commission', 'service_commission_type', 'voucher_discount_percentage',
                  'created_at', 'order_type', 'client', 'location', 'price', 'promotion_name', 'invoice',
                  'tax_name', 'tax_name1', 'total_tip', 'client_loyalty_points']
+
+
+
+class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
+    location = serializers.SerializerMethodField(read_only=True)
+    client = serializers.SerializerMethodField(read_only=True)
+    order_type  = serializers.SerializerMethodField(read_only=True)
+    # service  = serializers.SerializerMethodField(read_only=True)
+    # price  = serializers.SerializerMethodField(read_only=True)
+    # voucher_discount_percentage = serializers.SerializerMethodField(read_only=True)
+    appointment_service  = serializers.SerializerMethodField(read_only=True)
+    # promotion_name  = serializers.SerializerMethodField(read_only=True)
+    
+    tip = serializers.SerializerMethodField(read_only=True)
+    invoice = serializers.SerializerMethodField(read_only=True)
+    total_tip = serializers.SerializerMethodField(read_only=True)
+    
+    client_loyalty_points = serializers.SerializerMethodField(read_only=True)
+
+    def get_client_loyalty_points(self, obj):
+        return obj.get_client_loyalty_points()
+
+    # def get_promotion_name(self, obj):
+    #     return 'promotion name'
+
+    def get_appointment_service(self, obj):
+        service = AppointmentService.objects.filter(appointment = obj.appointment)
+        return UpdateAppointmentSerializer(service, many = True).data
+    
+    # def get_service(self, obj):
+    #     if obj.service:
+    #         cli = f"{obj.service.name}"
+    #         return cli
+    #     return None
+            
+    def get_order_type(self, obj):
+        return 'Appointment'
+    
+    def get_client(self, obj):
+        if obj.appointment and obj.appointment.client:
+            serializers = ClientSerializer(obj.appointment.client).data
+            return serializers
+        
+        return None
+        
+    def get_price(self, obj):
+        if obj.appointment_service:
+            return obj.appointment_service.price
+        
+        return None
+          
+    def get_location(self, obj):
+        if obj.business_address:
+            serializers = LocationSerializer(obj.business_address).data
+            return serializers
+    
+        return None
+    
+    # def get_voucher_discount_percentage(self, obj):
+    #     return 'voucher discount percentage'
+    
+    def get_tip(self, obj):
+        tips = AppointmentEmployeeTip.objects.filter(appointment=obj.appointment)
+        serialized_tips = AppointmentTipsSerializer(tips, many=True).data
+        return serialized_tips
+    
+    def get_total_tip(self, obj):
+        tips = AppointmentEmployeeTip.objects.filter(appointment=obj.appointment).aggregate(
+            total_tip=Sum('tip')
+        )
+        return tips['total_tip']
+    
+    def get_invoice(self, obj):
+        try:
+            invoice = SaleInvoice.objects.get(checkout__icontains = obj)
+            serializer = SaleInvoiceSerializer(invoice, context=self.context)
+            return serializer.data
+        except Exception as e:
+            return str(e)
+    
+    class Meta:
+        model = AppointmentCheckout
+        fields = ['id', 'appointment_service', 'payment_method', 'business_address', 'tip', 'gst',
+                  'gst1', 'gst_price', 'gst_price1', 'total_price', 'created_at', 'order_type',
+                  'client', 'location', 'invoice', 'tax_name', 'tax_name1', 'total_tip',
+                  'client_loyalty_points']
         

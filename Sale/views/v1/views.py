@@ -35,7 +35,8 @@ from django.db.models import Avg, Count, Min, Sum, Q, F
 from Sale.serializers import (AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, 
                             ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, 
                             VoucherOrderSerializer, SaleOrders_CheckoutSerializer, SaleOrders_AppointmentCheckoutSerializer,
-                            ServiceSerializerDropdown, ServiceSerializerOP, ServiceGroupSerializerOP
+                            ServiceSerializerDropdown, ServiceSerializerOP, ServiceGroupSerializerOP, SaleOrders_CheckoutSerializerOP,
+                            SaleOrders_AppointmentCheckoutSerializerOP
                             )
 from rest_framework.pagination import PageNumberPagination
 from django.core.paginator import Paginator
@@ -1175,6 +1176,127 @@ def get_all_sale_orders_pagination(request):
 
     checkout_data = list(SaleOrders_CheckoutSerializer(checkout_order, many=True, context={'request': request}).data)
     appointment_data = list(SaleOrders_AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
+
+    data_total = checkout_data + appointment_data
+    sorted_data = sorted(data_total, key=lambda x: x['created_at'], reverse=True)
+
+
+    if recent_five_sales:
+        sorted_data = sorted_data[:5]
+
+    # invoicce translation data
+    business_address = BusinessAddress.objects.get(id=location_id)
+    invoice_translations = BusinessAddressSerilaizer(business_address).data
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(sorted_data, request)
+    response = paginator.get_paginated_response(paginated_data, 'sales', invoice_translations)
+
+    return response
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_all_sale_orders_optimized(request):
+    location_id = request.GET.get('location', None)
+    range_start =  request.GET.get('range_start', None)
+    range_end = request.GET.get('range_end', None)
+    no_pagination = request.GET.get('no_pagination', None)
+    recent_five_sales = request.GET.get('recent_five_sales', False)
+    search_text = request.GET.get('search_text', None)
+    client_id = request.GET.get('client', None)
+    service_id = request.GET.get('service', None)
+
+    sale_checkouts = None
+    appointment_checkouts = None
+
+    if range_end is not None:
+        range_end = dt.strptime(range_end, '%Y-%m-%d').date()
+        range_end = range_end + timedelta(days=1)
+        range_end = str(range_end)
+
+    query = Q()
+    app_queries = Q(business_address__id=location_id)
+    sale_queries = Q(is_deleted=False, location__id=location_id)
+
+
+    if range_start:
+        query &= Q(created_at__range = (range_start, range_end))
+    
+    if client_id:
+        sale_queries &= Q(client__id=client_id) & query
+        app_queries &= Q(appointment__client__id=client_id) & query
+    
+    if service_id:
+        service_orders = ServiceOrder.objects.filter(
+            service__id = service_id
+        ).values_list('checkout' , flat=True)
+
+        sale_queries &= Q(id__in=list(service_orders))
+        app_queries &= Q(appointment__appointment_services__service__id=service_id)
+
+    # if search_text:
+    #     # removing # for better search
+    #     search_text = search_text.replace('#', '')
+    #     sale_queries['client__full_name__icontains'] = search_text
+    #     app_queries['appointment__client__full_name__icontains'] = search_text
+
+    #     invoice_checkout_ids = list(SaleInvoice.objects.filter(id__icontains=search_text).values_list('checkout', flat=True))
+    #     sale_checkouts = Checkout.objects.select_related(
+    #                         'location',
+    #                         'location__currency',
+    #                         'client',
+    #                         'member'
+    #                     ).prefetch_related(
+    #                         'checkout_orders',
+    #                         'checkout_orders__user',
+    #                         'checkout_orders__client',
+    #                         'checkout_orders__member',
+    #                         'checkout_orders__location',
+    #                         'checkout_orders__location__currency',
+    #                     ).filter(id__in=invoice_checkout_ids) \
+    #                     .distinct()
+    #     appointment_checkouts = AppointmentCheckout.objects.select_related(
+    #                             'appointment_service',
+    #                             'business_address',
+    #                             'appointment',
+    #                             'appointment__client',
+    #                             'service',
+    #                         ).filter(
+    #                             id__in=invoice_checkout_ids
+    #                         ).distinct()
+
+    checkout_order = Checkout.objects.select_related(
+        'location',
+        'location__currency',
+        'client',
+        'member'
+    ).prefetch_related(
+        'checkout_orders',
+        'checkout_orders__user',
+        'checkout_orders__client',
+        'checkout_orders__member',
+        'checkout_orders__location',
+        'checkout_orders__location__currency',
+    ).filter(sale_queries).distinct()
+
+    appointment_checkout = AppointmentCheckout.objects.select_related(
+            'appointment_service',
+            'business_address',
+            'appointment',
+            'appointment__client',
+            'service',
+        ).filter(app_queries).distinct()
+    
+    # if sale_checkouts:
+    #     checkout_order = checkout_order | sale_checkouts
+
+    # if appointment_checkouts:
+    #     appointment_checkout = appointment_checkout | appointment_checkouts
+
+    checkout_data = list(SaleOrders_CheckoutSerializerOP(checkout_order, many=True, context={'request': request}).data)
+    appointment_data = list(SaleOrders_AppointmentCheckoutSerializerOP(appointment_checkout, many=True, context={'request': request}).data)
 
     data_total = checkout_data + appointment_data
     sorted_data = sorted(data_total, key=lambda x: x['created_at'], reverse=True)
