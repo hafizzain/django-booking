@@ -18,12 +18,12 @@ class ProductManager(models.QuerySet):
         Returns the total sale of a product by taking the sum of product of quantity * current_price
         or quantity * discount_price.
         """
-        self.annotate(
-            total_current_price_value=F('product_orders__quantity') * F('product_orders__current_price'),
-            total_discount_price_value=F('product_orders__quantity') * F('product_orders__discount_price')
-        ).annotate(
-            total_value = F('total_current_price_value') + F('total_discount_price_value')
-        )
+        return self.annotate(
+                total_current_price_value=F('product_orders__quantity') * F('product_orders__current_price'),
+                total_discount_price_value=F('product_orders__quantity') * F('product_orders__discount_price')
+            ).annotate(
+                total_value = F('total_current_price_value') + F('total_discount_price_value')
+            )
 
 class Category(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
