@@ -441,7 +441,7 @@ class ServiceSerializerOP(serializers.ModelSerializer):
         
     class Meta:
         model = Service
-        fields = ['id', 'name', 'price', 'location', 'controls_time_slot', 'client_can_book', 'slot_availible_for_online', 'priceservice']
+        fields = ['id', 'name', 'price', 'controls_time_slot', 'client_can_book', 'slot_availible_for_online', 'priceservice']
                
 
 class ServiceTranlationsSerializer(serializers.ModelSerializer):
