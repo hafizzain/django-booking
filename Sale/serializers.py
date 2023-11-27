@@ -132,7 +132,10 @@ class ServiceGroupSerializerOP(serializers.ModelSerializer):
         return obj.is_active
     
     def get_services(self, obj):
-            all_service = obj.services.filter(is_deleted=False)
+            location = BusinessAddress.objects.get(id=self.context['location_id'])
+            currency = location.currency
+            service_ids = list(PriceService.objects.filter(currency=currency).values_list('service__id', flat=True))
+            all_service = obj.services.filter(is_deleted=False, id__in=service_ids)
             return ServiceSearchSerializerForServiceGroup(all_service, many = True, context=self.context).data
     
     class Meta:
