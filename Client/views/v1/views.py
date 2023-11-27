@@ -21,6 +21,7 @@ from Client.serializers import (SingleClientSerializer, ClientSerializer, Client
                                 VoucherSerializer, ClientLoyaltyPointSerializer, CustomerLoyaltyPointsLogsSerializer, 
                                 CustomerDetailedLoyaltyPointsLogsSerializer, ClientVouchersSerializer, ClientMembershipsSerializer,
                                 ClientDropdownSerializer)
+from Business.serializers.v1_serializers import BusinessAddressSerilaizer
 from Utility.models import NstyleFile
 
 from Sale.Constants.Custom_pag import CustomPagination
@@ -3197,6 +3198,10 @@ def get_customer_detailed_loyalty_points(request):
 
     data = CustomerDetailedLoyaltyPointsLogsSerializer(customers_points, many=True, context={'request' : request}).data
 
+    # invoicce translation data
+    business_address = BusinessAddress.objects.get(id=location_id)
+    invoice_translations = BusinessAddressSerilaizer(business_address).data
+
     return Response(
         {
             'status' : True,
@@ -3208,7 +3213,8 @@ def get_customer_detailed_loyalty_points(request):
                 'pages':page_count,
                 'per_page_result':results_per_page,
                 'error_message' : None,
-                'data' : data
+                'data' : data,
+                'invoice_translations':invoice_translations
             }
         },
         status=status.HTTP_200_OK
