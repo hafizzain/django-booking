@@ -140,7 +140,7 @@ class OptimizedProductStockSerializer(serializers.ModelSerializer):
 class OtpimizedProductSerializer(serializers.ModelSerializer):
     brand=OptimizedBrandSerializer(read_only=True)
     category= OptimizedCategorySerializer(read_only=True)
-    total_value = serializers.DecimalField(read_only=True)
+    total_value = serializers.FloatField(read_only=True)
     # vendor= VendorSerializer(read_only=True)
     
     # media = serializers.SerializerMethodField()
