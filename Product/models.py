@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import F, Q
 from django.utils.timezone import now
 from django.core.validators import MinValueValidator
 import uuid
@@ -9,6 +10,20 @@ from Utility.models import Currency
 from googletrans import Translator
 from Utility.models import Language
 
+
+class ProductManager(models.QuerySet):
+
+    def with_total_sale(self):
+        """
+        Returns the total sale of a product by taking the sum of product of quantity * current_price
+        or quantity * discount_price.
+        """
+        self.annotate(
+            total_current_price_value=F('product_orders__quantity') * F('product_orders__current_price'),
+            total_discount_price_value=F('product_orders__quantity') * F('product_orders__discount_price')
+        ).annotate(
+            total_value = F('total_current_price_value') + F('total_discount_price_value')
+        )
 
 class Category(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
@@ -85,6 +100,8 @@ class Product(models.Model):
     is_deleted = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
+
+    objects = ProductManager.as_manager()
 
     @property
     def short_id(self):

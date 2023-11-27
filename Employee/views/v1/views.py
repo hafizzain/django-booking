@@ -423,7 +423,10 @@ def get_Employees_dropdown(request):
     query &= Q(is_active=True)
 
     if search_text:
-        query &= Q(full_name__icontains=search_text) | Q(mobile_number__icontains=search_text)
+        query &= Q(full_name__icontains=search_text) | \
+                Q(mobile_number__icontains=search_text) | \
+                Q(email__icontains=search_text) | \
+                Q(employee_id__icontains=search_text)
         is_searched = True
 
 
