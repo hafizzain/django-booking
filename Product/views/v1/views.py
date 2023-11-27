@@ -1402,7 +1402,7 @@ def get_products_optimized(request):
         'product_stock',
     ) \
     .filter(query) \
-    .with_total_quantity_sold() \
+    .with_total_orders() \
     .order_by('-created_at')
 
     

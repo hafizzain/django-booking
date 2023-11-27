@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import F, Q, Sum, FloatField
+from django.db.models import Count, IntegerField
 from django.db.models.functions import Coalesce
 from django.utils.timezone import now
 from django.core.validators import MinValueValidator
@@ -14,16 +14,16 @@ from Utility.models import Language
 
 class ProductManager(models.QuerySet):
 
-    def with_total_quantity_sold(self):
+    def with_total_orders(self):
         """
         Returns the total sale of a product by taking the sum of product of quantity * current_price
         or quantity * discount_price.
         """
         return self.annotate(
-            total_quantity_sold = Coalesce(
-                Sum('product_orders__quantity'),
+            total_orders = Coalesce(
+                Count('product_orders'),
                 0,
-                output_field=FloatField()
+                output_field=IntegerField()
             )
         )
 
