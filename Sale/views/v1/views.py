@@ -35,7 +35,7 @@ from django.db.models import Avg, Count, Min, Sum, Q, F
 from Sale.serializers import (AppointmentCheckoutSerializer, BusinessAddressSerializer, CheckoutSerializer, MemberShipOrderSerializer, 
                             ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, 
                             VoucherOrderSerializer, SaleOrders_CheckoutSerializer, SaleOrders_AppointmentCheckoutSerializer,
-                            ServiceSerializerDropdown, ServiceSerializerOP
+                            ServiceSerializerDropdown, ServiceSerializerOP, ServiceGroupSerializerOP
                             )
 from rest_framework.pagination import PageNumberPagination
 from django.core.paginator import Paginator
@@ -851,6 +851,28 @@ def get_servicegroup(request):
                                 .prefetch_related('services') \
                                 .filter(query).order_by('-created_at')
     serialized = list(ServiceGroupSerializer(service_group,  many=True, context={'request' : request}).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'sales')
+    return response
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_servicegroup_optimized(request):
+    no_pagination = request.GET.get('no_pagination', None)
+    search_text = request.GET.get('search_text', None)
+
+    query = Q(is_deleted=False)
+    if search_text:
+        query &= Q(name__icontains=search_text)
+
+
+    service_group = ServiceGroup.objects \
+                                .prefetch_related('services') \
+                                .filter(query).order_by('-created_at')
+    serialized = list(ServiceGroupSerializerOP(service_group,  many=True, context={'request' : request}).data)
 
     paginator = CustomPagination()
     paginator.page_size = 100000 if no_pagination else 10
