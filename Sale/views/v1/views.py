@@ -144,7 +144,7 @@ def get_service_optimized(request):
     currency = BusinessAddress.objects.get(id=location_id).currency
     if currency:
         # filter out those services which has the currency price for the current location currency.
-        service_ids = list(PriceService.objects.filter(currency=currency).values_list('service__id'))
+        service_ids = list(PriceService.objects.filter(currency=currency).values_list('service__id', flat=True))
         query &= Q(id__in=service_ids)
     
     location_instance = None
