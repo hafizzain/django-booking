@@ -435,7 +435,7 @@ def get_Employees_dropdown(request):
         query &= Q(location=location)
      
 
-    all_employe = Employee.objects.filter(query) 
+    all_employe = Employee.objects.filter(query).order_by('-created_at')
 
     serialized = list(EmployeeDropdownSerializer(all_employe,  many=True, context={'request' : request}).data)
 

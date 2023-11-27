@@ -464,7 +464,6 @@ def get_calendar_appointment(request):
 
 
     all_memebers = Employee.objects.filter(query).order_by('-created_at')
-    print(all_memebers)
     serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request' : request, 'selected_date' : selected_date})
 
     return Response(
