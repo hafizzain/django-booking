@@ -92,8 +92,10 @@ class ServiceSearchSerializerForServiceGroup(serializers.ModelSerializer):
         return EmployeeSelected_TenantServiceSerializer(emp, many = True, context=self.context).data
     
     def get_priceservice(self, obj):
+        location = BusinessAddress.objects.get(id=self.context['location_id'])
+        currency = location.currency
         try:
-            ser = PriceService.objects.filter(service = obj).order_by('-created_at')
+            ser = PriceService.objects.filter(service=obj, currency=currency).order_by('-created_at')
             return PriceServiceSerializers(ser, many = True).data
         except Exception as err:
             pass
@@ -136,7 +138,6 @@ class ServiceGroupSerializerOP(serializers.ModelSerializer):
     
     def get_services(self, obj):
             all_service = obj.services.filter(is_deleted=False)
-            #ser = Service.objects.get(id = obj.services)
             return ServiceSearchSerializerForServiceGroup(all_service, many = True, context=self.context).data
     
     class Meta:

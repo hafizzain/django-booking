@@ -861,6 +861,7 @@ def get_servicegroup(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_servicegroup_optimized(request):
+    location_id = request.GET.get('location_id', None)
     no_pagination = request.GET.get('no_pagination', None)
     search_text = request.GET.get('search_text', None)
 
@@ -872,7 +873,8 @@ def get_servicegroup_optimized(request):
     service_group = ServiceGroup.objects \
                                 .prefetch_related('services') \
                                 .filter(query).order_by('-created_at')
-    serialized = list(ServiceGroupSerializerOP(service_group,  many=True, context={'request' : request}).data)
+    serialized = list(ServiceGroupSerializerOP(service_group,  many=True, context={'request' : request,
+                                                                                   'location_id':location_id}).data)
 
     paginator = CustomPagination()
     paginator.page_size = 100000 if no_pagination else 10
