@@ -1402,8 +1402,8 @@ def get_products_optimized(request):
         'product_stock',
     ) \
     .filter(query) \
-    .order_by('-created_at')
-    # .with_total_sale() \
+    .with_total_sale() \
+    # .order_by('-created_at')
 
     
     all_products_count = all_products.count()
