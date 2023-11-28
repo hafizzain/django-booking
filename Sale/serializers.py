@@ -2365,7 +2365,7 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
     invoice = serializers.SerializerMethodField(read_only=True)
     total_tip = serializers.SerializerMethodField(read_only=True)
     subtotal = serializers.SerializerMethodField(read_only=True)
-    total_tax = serializers.SerializerMethodField(read_ONLY=True)
+    total_tax = serializers.SerializerMethodField(read_only=True)
 
     def get_total_tax(self, obj):
         return obj.get_total_tax()
