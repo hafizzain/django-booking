@@ -1291,7 +1291,9 @@ def get_all_sale_orders_optimized(request):
             'appointment',
             'appointment__client',
             'service',
-        ).filter(app_queries).distinct()
+        ).filter(app_queries) \
+        .with_total_tax() \
+        .distinct()
     
     # if sale_checkouts:
     #     checkout_order = checkout_order | sale_checkouts

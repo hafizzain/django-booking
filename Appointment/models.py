@@ -11,6 +11,8 @@ from Client.models import Client, Membership, Promotion, Rewards, Vouchers, Loya
 from Employee.models import Employee
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 
+from .managers import AppointmentCheckoutManager
+
 from Order.models import Checkout
 class AppointmentLogs(models.Model):
     LOG_TYPE_CHOICES =[
@@ -304,6 +306,8 @@ class AppointmentCheckout(models.Model):
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
+
+    objects = AppointmentCheckoutManager.as_manager()
     
     def __str__(self):
         return str(self.id)
