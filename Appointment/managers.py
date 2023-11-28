@@ -2,7 +2,8 @@ from django.db import models
 from django.db.models import F, Sum, FloatField, Case, When, Value, Subquery, OuterRef
 from django.db.models.functions import Coalesce
 
-from .models import AppointmentService
+from django.apps import apps
+# from .models import AppointmentService
 
 class AppointmentCheckoutManager(models.QuerySet):
 
@@ -13,7 +14,7 @@ class AppointmentCheckoutManager(models.QuerySet):
                 0.0,
                 output_field=FloatField()
             ),
-            final_price=Subquery(AppointmentService.objects.filter(appointment=OuterRef('appointment')).aggregate(
+            final_price=Subquery(apps.get_model('AppointmentService').objects.filter(appointment=OuterRef('appointment')).aggregate(
                 Coalesce(
                     Case(
                         When(is_redeemed=True, then="redeemed_price"),
