@@ -21,7 +21,7 @@ class AppointmentCheckoutManager(models.QuerySet):
                     0.0,
                     output_field=FloatField()
             )).annotate(
-                total_price = Coalesce(Sum('final_price'), 0.0, output_field=FloatField())
+                final_total_price = Coalesce(Sum('final_price'), 0.0, output_field=FloatField())
         ).annotate(
-            tax_and_price_total=Coalesce(F('total_price') + F('total_tax'), 0.0, output_field=FloatField())
+            tax_and_price_total=Coalesce(F('final_total_price') + F('total_tax'), 0.0, output_field=FloatField())
         )
