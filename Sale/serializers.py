@@ -2371,7 +2371,7 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
     
     # client_loyalty_points = serializers.SerializerMethodField(read_only=True)
     subtotal = serializers.SerializerMethodField(read_only=True)
-    total_sale = serializers.SerializerMethodField(read_only=True)
+    # total_sale = serializers.SerializerMethodField(read_only=True)
 
     # def get_client_loyalty_points(self, obj):
     #     return obj.get_client_loyalty_points()
@@ -2436,25 +2436,25 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
             return str(e)
         
 
-    def get_total_sale(self, obj):
-        total = 0
+    # def get_total_sale(self, obj):
+    #     total = 0
 
-        if self.get_total_sale(obj):
-            total += self.get_total_sale(obj)
+    #     if self.get_total_sale(obj):
+    #         total += self.get_total_sale(obj)
 
-        if self.get_total_tip(obj):
-            total += self.get_total_tip(obj)
+    #     if self.get_total_tip(obj):
+    #         total += self.get_total_tip(obj)
 
-        if obj.gst_price:
-            total += obj.gst_price
+    #     if obj.gst_price:
+    #         total += obj.gst_price
         
-        if obj.gst_price1:
-            total += obj.gst_price1
+    #     if obj.gst_price1:
+    #         total += obj.gst_price1
 
-        return total
+    #     return total
     
     class Meta:
         model = AppointmentCheckout
-        fields = ['id', 'payment_method', 'order_type', 'client', 'total_tip', 'total_tax', 'subtotal', 'total_sale',
+        fields = ['id', 'payment_method', 'order_type', 'client', 'total_tip', 'total_tax', 'subtotal', 
                   'invoice']
         
