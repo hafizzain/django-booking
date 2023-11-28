@@ -2401,10 +2401,6 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
             return serializer.data
         except Exception as e:
             return str(e)
-        
-
-    def get_total_sale(self, obj):
-        total = 0
 
     
     class Meta:
