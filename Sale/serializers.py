@@ -2225,11 +2225,11 @@ class SaleOrders_CheckoutSerializerOP(serializers.ModelSerializer):
         except Exception as e:
             return str(e)
         
-    # def get_gst_price(self, obj):
-    #     try:
-    #         return obj.tax_amount
-    #     except:
-    #         return 0
+    def get_gst_price(self, obj):
+        try:
+            return obj.tax_amount
+        except:
+            return 0
     
     class Meta:
         model = Checkout
