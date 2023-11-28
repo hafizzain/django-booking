@@ -10,7 +10,7 @@ from Product.Constants.index import tenant_media_base_url, tenant_media_domain
 from Utility.models import Currency, ExceptionRecord
 from Sale.Constants.Promotion import get_promotions
 
-from django.db.models import Sum, Q
+from django.db.models import Sum, Q, Case, When
 from Service.models import PriceService, Service, ServiceGroup
 from Invoices.models import SaleInvoice
 from django.db.models import F, FloatField
@@ -2373,7 +2373,18 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
     def get_subtotal(self, obj):
         services_prices = AppointmentService.objects.filter(appointment=obj.appointment)
         if services_prices:
-            sub_total = services_prices.aggregate(sub_total=Coalesce(Sum('total_price'), 0.0, output_field=FloatField()))
+            sub_total = services_prices.annotate(
+                sub_total=Coalesce(
+                     Case(
+                         When(is_redeemed=True, then="redeemed_price"),
+                         When(discount_price__isnull=False, then="discount_price"),
+                         When(price__isnull=False, then="price"),
+                         default="total_price"
+                     ),
+                     0.0,
+                     output_field=FloatField()
+                     )
+            ).aggregate(sub_total=Sum('sub_total'))
             return sub_total['sub_total']
         else:
             return 0
