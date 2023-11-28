@@ -2371,10 +2371,9 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
         return obj.get_total_tax()
     
     def get_subtotal(self, obj):
-        services_prices = AppointmentService.objects.filter(appointment=obj.appointment)
-        if services_prices:
-            sub_total = services_prices.annotate(
-                sub_total=Coalesce(
+        services_prices = AppointmentService.objects.filter(appointment=obj.appointment) \
+            .annotate(
+                final_total=Coalesce(
                      Case(
                          When(is_redeemed=True, then="redeemed_price"),
                          When(discount_price__isnull=False, then="discount_price"),
@@ -2384,10 +2383,8 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
                      0.0,
                      output_field=FloatField()
                      )
-            ).aggregate(sub_total=Sum('sub_total'))
-            return sub_total['sub_total']
-        else:
-            return 0
+            ).aggregate(sub_total_s=Sum('final_total'))
+        return services_prices['sub_total_s']
             
     def get_order_type(self, obj):
         return 'Appointment'
