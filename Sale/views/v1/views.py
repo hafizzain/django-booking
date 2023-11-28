@@ -1292,7 +1292,7 @@ def get_all_sale_orders_optimized(request):
             'appointment__client',
             'service',
         ).filter(app_queries) \
-        .with_total_tax() \
+        .with_total_tax_and_price() \
         .distinct()
     
     # if sale_checkouts:

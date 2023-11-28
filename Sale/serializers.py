@@ -13,7 +13,8 @@ from Sale.Constants.Promotion import get_promotions
 from django.db.models import Sum, Q
 from Service.models import PriceService, Service, ServiceGroup
 from Invoices.models import SaleInvoice
-from django.db.models import F
+from django.db.models import F, FloatField
+from django.db.models.functions import Coalesce
 from Product.models import Product
 from Service.models import Service, ServiceTranlations
 from Utility.models import Language
@@ -2359,36 +2360,20 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
 
 
 class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
-    # location = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)
     order_type = serializers.SerializerMethodField(read_only=True)
-    total_tax = serializers.FloatField()
-    # appointment_service  = serializers.SerializerMethodField(read_only=True)
-    
-    # tip = serializers.SerializerMethodField(read_only=True)
+    tax_and_price_total = serializers.FloatField()
     invoice = serializers.SerializerMethodField(read_only=True)
     total_tip = serializers.SerializerMethodField(read_only=True)
+    # subtotal = serializers.SerializerMethodField(read_only=True)
     
-    # client_loyalty_points = serializers.SerializerMethodField(read_only=True)
-    subtotal = serializers.SerializerMethodField(read_only=True)
-    # total_sale = serializers.SerializerMethodField(read_only=True)
-
-    # def get_client_loyalty_points(self, obj):
-    #     return obj.get_client_loyalty_points()
-    
-    def get_subtotal(self, obj):
-        services_prices = AppointmentService.objects.filter(appointment=obj.appointment)
-        if services_prices:
-            sub_total = services_prices.aggregate(sub_total=Sum('total_price'))
-            return sub_total['sub_total']
-        else:
-            return None
-        
-
-
-    # def get_appointment_service(self, obj):
-    #     service = AppointmentService.objects.filter(appointment = obj.appointment)
-    #     return UpdateAppointmentSerializer(service, many = True).data
+    # def get_subtotal(self, obj):
+    #     services_prices = AppointmentService.objects.filter(appointment=obj.appointment)
+    #     if services_prices:
+    #         sub_total = services_prices.aggregate(sub_total=Sum('total_price'))
+    #         return sub_total['sub_total']
+    #     else:
+    #         return None
             
     def get_order_type(self, obj):
         return 'Appointment'
@@ -2399,32 +2384,11 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
             return serializers
         
         return None
-        
-    # def get_price(self, obj):
-    #     if obj.appointment_service:
-    #         return obj.appointment_service.price
-        
-    #     return None
-          
-    # def get_location(self, obj):
-    #     if obj.business_address:
-    #         serializers = LocationSerializer(obj.business_address).data
-    #         return serializers
-    
-    #     return None
-    
-    # def get_voucher_discount_percentage(self, obj):
-    #     return 'voucher discount percentage'
-    
-    # def get_tip(self, obj):
-    #     tips = AppointmentEmployeeTip.objects.filter(appointment=obj.appointment)
-    #     serialized_tips = AppointmentTipsSerializer(tips, many=True).data
-    #     return serialized_tips
     
     def get_total_tip(self, obj):
-        tips = AppointmentEmployeeTip.objects.filter(appointment=obj.appointment).aggregate(
-            total_tip=Sum('tip')
-        )
+        tips = AppointmentEmployeeTip.objects \
+                .filter(appointment=obj.appointment) \
+                .aggregate(total_tip=Coalesce(Sum('tip'), 0.0, output_field=FloatField()))
         return tips['total_tip']
     
     def get_invoice(self, obj):
@@ -2434,27 +2398,9 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
             return serializer.data
         except Exception as e:
             return str(e)
-        
-
-    # def get_total_sale(self, obj):
-    #     total = 0
-
-    #     if self.get_total_sale(obj):
-    #         total += self.get_total_sale(obj)
-
-    #     if self.get_total_tip(obj):
-    #         total += self.get_total_tip(obj)
-
-    #     if obj.gst_price:
-    #         total += obj.gst_price
-        
-    #     if obj.gst_price1:
-    #         total += obj.gst_price1
-
-    #     return total
     
     class Meta:
         model = AppointmentCheckout
-        fields = ['id', 'payment_method', 'order_type', 'client', 'total_tip', 'total_tax', 'subtotal', 
+        fields = ['id', 'payment_method', 'order_type', 'client', 'total_tip', 'tax_and_price_total',
                   'invoice', 'created_at']
         
