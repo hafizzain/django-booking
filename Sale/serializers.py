@@ -2437,7 +2437,15 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
         
 
     def get_total_sale(self, obj):
-        return obj.gst_price + obj.gst_price1 + self.get_total_tip(obj) + self.get_subtotal(obj)
+        total = self.get_total_tip(obj) + self.get_subtotal(obj)
+
+        if obj.gst_price:
+            total += obj.gst_price
+        
+        if obj.gst_price1:
+            total += obj.gst_price1
+
+        return total
     
     class Meta:
         model = AppointmentCheckout
