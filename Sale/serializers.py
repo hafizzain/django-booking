@@ -2362,9 +2362,11 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
 class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
     order_type = serializers.SerializerMethodField(read_only=True)
-    tax_and_price_total = serializers.FloatField()
+    # tax_and_price_total = serializers.FloatField()
+    final_total_price = serializers.FloatField()
     invoice = serializers.SerializerMethodField(read_only=True)
     total_tip = serializers.SerializerMethodField(read_only=True)
+
     # subtotal = serializers.SerializerMethodField(read_only=True)
     
     # def get_subtotal(self, obj):
@@ -2401,6 +2403,6 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
     
     class Meta:
         model = AppointmentCheckout
-        fields = ['id', 'payment_method', 'order_type', 'client', 'total_tip', 'tax_and_price_total',
+        fields = ['id', 'payment_method', 'order_type', 'client', 'total_tip', 'final_total_price',
                   'invoice', 'created_at']
         
