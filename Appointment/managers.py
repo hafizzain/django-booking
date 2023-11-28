@@ -8,7 +8,7 @@ class AppointmentCheckoutManager(models.QuerySet):
         return self.annotate(
             total_tax=Coalesce(
                 Sum(F('gst_price') + F('gst_price1')),
-                0,
+                0.0,
                 output_field=FloatField()
             )
         )
