@@ -2437,7 +2437,13 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
         
 
     def get_total_sale(self, obj):
-        total = self.get_total_tip(obj) + self.get_subtotal(obj)
+        total = 0
+
+        if self.get_total_sale(obj):
+            total += self.get_total_sale(obj)
+
+        if self.get_total_tip(obj):
+            total += self.get_total_tip(obj)
 
         if obj.gst_price:
             total += obj.gst_price
