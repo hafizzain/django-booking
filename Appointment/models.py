@@ -10,9 +10,6 @@ from Service.models import Service
 from Client.models import Client, Membership, Promotion, Rewards, Vouchers, LoyaltyPointLogs
 from Employee.models import Employee
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
-
-from .managers import AppointmentCheckoutManager
-
 from Order.models import Checkout
 class AppointmentLogs(models.Model):
     LOG_TYPE_CHOICES =[
@@ -306,8 +303,6 @@ class AppointmentCheckout(models.Model):
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
-
-    objects = AppointmentCheckoutManager.as_manager()
     
     def __str__(self):
         return str(self.id)
@@ -332,6 +327,18 @@ class AppointmentCheckout(models.Model):
                 return None
         else:
             return None
+        
+
+    def get_total_tax(self):
+        """
+        A helper method to add total tax.
+        """
+        total = 0
+        if self.gst_price:
+            total += self.gst_price
+        if self.gst_price1:
+            total += self.gst_price1
+        return total
     
     @property
     def fun():

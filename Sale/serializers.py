@@ -2362,20 +2362,21 @@ class SaleOrders_AppointmentCheckoutSerializer(serializers.ModelSerializer):
 class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
     order_type = serializers.SerializerMethodField(read_only=True)
-    # tax_and_price_total = serializers.FloatField()
-    final_total_price = serializers.FloatField()
     invoice = serializers.SerializerMethodField(read_only=True)
     total_tip = serializers.SerializerMethodField(read_only=True)
+    subtotal = serializers.SerializerMethodField(read_only=True)
+    total_tax = serializers.SerializerMethodField(read_ONLY=True)
 
-    # subtotal = serializers.SerializerMethodField(read_only=True)
+    def get_total_tax(self, obj):
+        return obj.get_total_tax()
     
-    # def get_subtotal(self, obj):
-    #     services_prices = AppointmentService.objects.filter(appointment=obj.appointment)
-    #     if services_prices:
-    #         sub_total = services_prices.aggregate(sub_total=Sum('total_price'))
-    #         return sub_total['sub_total']
-    #     else:
-    #         return None
+    def get_subtotal(self, obj):
+        services_prices = AppointmentService.objects.filter(appointment=obj.appointment)
+        if services_prices:
+            sub_total = services_prices.aggregate(sub_total=Coalesce(Sum('total_price'), 0.0, output_field=FloatField()))
+            return sub_total['sub_total']
+        else:
+            return 0
             
     def get_order_type(self, obj):
         return 'Appointment'
@@ -2400,9 +2401,14 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
             return serializer.data
         except Exception as e:
             return str(e)
+        
+
+    def get_total_sale(self, obj):
+        total = 0
+
     
     class Meta:
         model = AppointmentCheckout
-        fields = ['id', 'payment_method', 'order_type', 'client', 'total_tip', 'final_total_price',
-                  'invoice', 'created_at']
+        fields = ['id', 'payment_method', 'order_type', 'client',
+                  'invoice', 'created_at', 'subtotal', 'total_tax', 'total_tip']
         
