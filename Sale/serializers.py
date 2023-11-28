@@ -2456,5 +2456,5 @@ class SaleOrders_AppointmentCheckoutSerializerOP(serializers.ModelSerializer):
     class Meta:
         model = AppointmentCheckout
         fields = ['id', 'payment_method', 'order_type', 'client', 'total_tip', 'total_tax', 'subtotal', 
-                  'invoice']
+                  'invoice', 'created_at']
         
