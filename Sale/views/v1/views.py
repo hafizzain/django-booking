@@ -92,7 +92,11 @@ def get_service(request):
                 errors.append('Employee Location 0')
 
     
-    services = Service.objects.filter(query).order_by('-created_at').distinct()
+    services = Service.objects \
+                    .filter(query) \
+                    .with_total_orders() \
+                    .order_by('-total_orders') \
+                    .distinct()
 
     # if is_mobile then request.user will be employee
     # so we will filter only those services which are assigned to

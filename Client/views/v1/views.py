@@ -1956,7 +1956,9 @@ def create_memberships(request):
 @permission_classes([AllowAny])
 def get_memberships(request):
     search_text = request.GET.get('search_text')
-    all_memberships= Membership.objects.all().order_by('-created_at')
+    all_memberships= Membership.objects \
+                        .with_total_orders() \
+                        .order_by('-total_orders')
     all_memberships_count = all_memberships.count()
 
     if search_text:
@@ -2372,7 +2374,10 @@ def get_vouchers(request):
         else:
             if location.currency:
                 query['voucher_vouchercurrencyprice__currency__id'] = str(location.currency.id)
-    all_voucher= Vouchers.objects.filter(**query).order_by('-created_at')
+    all_voucher= Vouchers.objects \
+                        .filter(**query) \
+                        .with_total_orders() \
+                        .order_by('-total_orders')
     all_voucher_count= all_voucher.count()
 
     if search_text:

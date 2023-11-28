@@ -1403,7 +1403,7 @@ def get_products_optimized(request):
     ) \
     .filter(query) \
     .with_total_orders() \
-    .order_by('-created_at')
+    .order_by('-total_orders')
 
     
     all_products_count = all_products.count()

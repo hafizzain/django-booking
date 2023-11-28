@@ -9,7 +9,7 @@ from uuid import uuid4
 from Authentication.models import User
 from Business.models import Business, BusinessAddress
 from django.db import connection
-from django.db.models import Subquery, OuterRef, DateTimeField, Q, Count, Case, When, Value, F, CharField, Sum, FloatField
+from django.db.models import Subquery, OuterRef, DateTimeField,Count, Case, When, F, IntegerField
 from django.db.models.functions import Coalesce
 from django.apps import apps
 from Utility.models import Country, Currency, Language, State, City
@@ -259,6 +259,18 @@ class Promotion(models.Model):
     def __str__(self):
         return str(self.id)
 
+
+
+class VoucherManager(models.QuerySet):
+
+    def with_total_orders(self):
+        return self.annotate(
+            total_orders=Coalesce(
+                Count('voucher_orders'),
+                0,
+                output_field=IntegerField()
+            )
+        )
 class Vouchers(models.Model):
     VALIDITY_CHOICE = [
         ('Days' , 'Days'),
@@ -299,6 +311,8 @@ class Vouchers(models.Model):
     is_deleted = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
+
+    objects = VoucherManager.as_manager()
 
     def save(self, *args, **kwargs):
         translator = Translator()
@@ -353,6 +367,19 @@ class Rewards(models.Model):
     def __str__(self):
         return str(self.id)
 
+
+class MembershipManager(models.QuerySet):
+
+
+    def with_total_orders(self):
+        return self.annotate(
+            total_orders=Coalesce(
+                Count('membership_orders'),
+                0,
+                output_field=IntegerField()
+            )
+        )
+
 class Membership(models.Model):
     MEMBERSHIP_CHOICES =[
         ('Product' , 'Product'),
@@ -398,6 +425,8 @@ class Membership(models.Model):
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(null=True, blank=True)
+
+    objects = MembershipManager.as_manager()
 
     def save(self, *args, **kwargs):
         translator = Translator()

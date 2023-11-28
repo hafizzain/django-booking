@@ -1,8 +1,8 @@
-from email.policy import default
-from pyexpat import model
 from uuid import uuid4
 from django.db import models
 from django.utils.timezone import now
+from django.db.models.functions import Coalesce
+from django.db.models import Count, IntegerField
 
 from Authentication.models import User
 from Business.models import Business, BusinessAddress
@@ -11,7 +11,16 @@ from Utility.models import Currency
 from googletrans import Translator
 from Utility.models import Language
 
+class ServiceManager(models.QuerySet):
 
+    def with_total_orders(self):
+        return self.annotate(
+            total_orders = Coalesce(
+                Count('service_orders'),
+                0,
+                output_field=IntegerField()
+            )
+        )
 
 class Service(models.Model):
     SERVICE_CHOICE = [
@@ -101,7 +110,9 @@ class Service(models.Model):
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(null=True, blank=True)
     
-    is_package = models.BooleanField(default=False, )
+    is_package = models.BooleanField(default=False)
+
+    objects = ServiceManager.as_manager()
 
     def save(self, *args, **kwargs):
         translator = Translator()
