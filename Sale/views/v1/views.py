@@ -1283,7 +1283,9 @@ def get_all_sale_orders_optimized(request):
         'checkout_orders__member',
         'checkout_orders__location',
         'checkout_orders__location__currency',
-    ).filter(sale_queries).distinct()
+    ).filter(sale_queries) \
+    .with_total_tax() \
+    .distinct()
 
     appointment_checkout = AppointmentCheckout.objects.select_related(
             'appointment_service',

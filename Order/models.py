@@ -1,6 +1,8 @@
 from email.policy import default
 from uuid import uuid4
 from django.db import models
+from django.db.models import Sum, F, FloatField, Case, When
+from django.db.models.functions import Coalesce
 from Authentication.models import User
 from Business.models import BusinessAddress
 from Client.models import Client, Membership, Promotion, Rewards, Vouchers, LoyaltyPointLogs
@@ -9,6 +11,74 @@ from django.utils.timezone import now
 from Employee.models import Employee
 from Product.models import Product, CurrencyRetailPrice
 from Service.models import Service, PriceService
+
+class ProductServiceCommonOrderManager(models.QuerySet):
+
+    def with_subtotal(self):
+        return self.annotate(
+            final_price=Coalesce(
+                Case(
+                    When(is_redeemed=True, then="redeemed_price"),
+                    When(discount_price__isnull=False, then="discount_price"),
+                    default="current_price"
+                ),
+                0.0,
+                output_field=FloatField()
+            )
+        ).annotate(
+            subtotal=Coalesce(
+                F('final_price') * F('quantity'),
+                0.0,
+                output_field=FloatField()
+            )
+        )
+    
+
+# class ServiceOrderManager(models.QuerySet):
+
+#     def with_subtotal(self):
+#         return self.annotate(
+#             final_price=Coalesce(
+#                 Case(
+#                     When(is_redeemed=True, then="redeemed_price"),
+#                     When(discount_price__isnull=False, then="discount_price"),
+#                     default="current_price"
+#                 ),
+#                 0.0,
+#                 output_field=FloatField()
+#             )
+#         ).annotate(
+#             subtotal=Coalesce(
+#                 F('final_price') * F('quantity'),
+#                 0.0,
+#                 output_field=FloatField()
+#             )
+#         )
+
+
+class MembershipVoucherCommonOrderManager(models.QuerySet):
+
+    def with_subtotal(self):
+        return self.annotate(
+            subtotal=Coalesce(
+                F('current_price') * F('quantity'),
+                0.0,
+                output_field=FloatField()
+            )
+        )
+
+    
+
+class CheckoutManager(models.QuerySet):
+
+    def with_total_tax(self):
+        return self.annotate(
+            total_tax=Coalesce(
+                Sum(F('tax_applied') + F('tax_applied1')),
+                0.0,
+                output_field=FloatField()
+            )
+        )
 
 # Create your models here.
 class Checkout(models.Model):
@@ -92,6 +162,8 @@ class Checkout(models.Model):
     created_at = models.DateTimeField(auto_now_add=now)
     updated_at = models.DateTimeField(null=True, blank=True)
     
+    objects = CheckoutManager.as_manager()
+
     def __str__(self):
         return str(self.id)
     
@@ -194,6 +266,7 @@ class Order(models.Model):
 
 class ProductOrder(Order):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_orders')
+    objects = ProductServiceCommonOrderManager.as_manager()
     
     def __str__(self):
         return str(self.id)
@@ -201,16 +274,17 @@ class ProductOrder(Order):
 
 class ServiceOrder(Order):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='service_orders')
+    objects = ProductServiceCommonOrderManager.as_manager()
 
     def __str__(self):
         return str(self.id)
 
 class MemberShipOrder(Order):
     membership = models.ForeignKey(Membership, on_delete=models.CASCADE, related_name='membership_orders')
-
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
 
+    objects = MembershipVoucherCommonOrderManager.as_manager()
     
     def __str__(self):
         return str(self.id)
@@ -218,12 +292,12 @@ class MemberShipOrder(Order):
 
 class VoucherOrder(Order):
     voucher = models.ForeignKey(Vouchers, on_delete=models.CASCADE, related_name='voucher_orders')
-    
     max_sales = models.IntegerField(default=0)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     
-    
+    objects = MembershipVoucherCommonOrderManager.as_manager()
+
     def __str__(self):
         return str(self.id)
     
