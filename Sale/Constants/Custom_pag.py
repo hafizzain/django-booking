@@ -17,12 +17,11 @@ from rest_framework.response import Response
 #         })
 
 class CustomPagination(PageNumberPagination):
-    def get_paginated_response(self, data, pramas_data, extra=None, current_page=None, is_searched=None):
+    def get_paginated_response(self, data, pramas_data, invoice_translations=None, current_page=None, is_searched=None):
         base_url = self.request.build_absolute_uri().split('?')[0] + '?'
         count = self.page.paginator.count
         per_page_result = self.page_size
-        invoice_translations = extra if extra else None
-        return Response({
+        data = {
             'links': {
                'next': base_url + self.get_next_link().split('?')[-1] if self.get_next_link() else None,
                'previous': base_url + self.get_previous_link().split('?')[-1] if self.get_previous_link() else None
@@ -36,10 +35,14 @@ class CustomPagination(PageNumberPagination):
                 'message' : f'All {pramas_data}',
                 'error_message' : None,
                 pramas_data : data,
-                'invoice_translations': invoice_translations,
             }
 
-        })
+        }
+
+        if invoice_translations:
+            data['per_page_result']['invoice_transaltions'] = invoice_translations
+            
+        return Response(data)
 
 
 

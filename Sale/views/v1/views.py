@@ -1081,6 +1081,7 @@ def get_all_sale_orders_pagination(request):
     search_text = request.GET.get('search_text', None)
     client_id = request.GET.get('client', None)
     service_id = request.GET.get('service', None)
+    checkout_id = request.GET.get('checkout_id', None)
 
     sale_checkouts = None
     appointment_checkouts = None
@@ -1094,7 +1095,9 @@ def get_all_sale_orders_pagination(request):
     app_queries = {}
     sale_queries = {}
 
-
+    if checkout_id:
+        queries['id'] = checkout_id
+        
     if range_start:
         queries['created_at__range'] = (range_start, range_end)
     
@@ -1240,70 +1243,51 @@ def get_all_sale_orders_optimized(request):
         sale_queries &= Q(id__in=list(service_orders))
         app_queries &= Q(appointment__appointment_services__service__id=service_id)
 
-    # if search_text:
-    #     # removing # for better search
-    #     search_text = search_text.replace('#', '')
-    #     sale_queries['client__full_name__icontains'] = search_text
-    #     app_queries['appointment__client__full_name__icontains'] = search_text
+    if search_text:
+        # removing # for better search
+        search_text = search_text.replace('#', '')
+        sale_queries['client__full_name__icontains'] = search_text
+        app_queries['appointment__client__full_name__icontains'] = search_text
 
-    #     invoice_checkout_ids = list(SaleInvoice.objects.filter(id__icontains=search_text).values_list('checkout', flat=True))
-    #     sale_checkouts = Checkout.objects.select_related(
-    #                         'location',
-    #                         'location__currency',
-    #                         'client',
-    #                         'member'
-    #                     ).prefetch_related(
-    #                         'checkout_orders',
-    #                         'checkout_orders__user',
-    #                         'checkout_orders__client',
-    #                         'checkout_orders__member',
-    #                         'checkout_orders__location',
-    #                         'checkout_orders__location__currency',
-    #                     ).filter(id__in=invoice_checkout_ids) \
-    #                     .distinct()
-    #     appointment_checkouts = AppointmentCheckout.objects.select_related(
-    #                             'appointment_service',
-    #                             'business_address',
-    #                             'appointment',
-    #                             'appointment__client',
-    #                             'service',
-    #                         ).filter(
-    #                             id__in=invoice_checkout_ids
-    #                         ).distinct()
+        # invoice_checkout_ids = list(SaleInvoice.objects.filter(id__icontains=search_text).values_list('checkout', flat=True))
+        # sale_checkouts = Checkout.objects.select_related(
+        #                     'location',
+        #                     'location__currency',
+        #                     'client',
+        #                     'member'
+        #                 ).prefetch_related(
+        #                     'checkout_orders',
+        #                     'checkout_orders__user',
+        #                     'checkout_orders__client',
+        #                     'checkout_orders__member',
+        #                     'checkout_orders__location',
+        #                     'checkout_orders__location__currency',
+        #                 ).filter(id__in=invoice_checkout_ids) \
+        #                 .distinct()
+        # appointment_checkouts = AppointmentCheckout.objects.select_related(
+        #                         'appointment_service',
+        #                         'business_address',
+        #                         'appointment',
+        #                         'appointment__client',
+        #                         'service',
+        #                     ).filter(
+        #                         id__in=invoice_checkout_ids
+        #                     ).distinct()
 
-    checkout_order = Checkout.objects.select_related(
-        'location',
-        'location__currency',
-        'client',
-        'member'
-    ).prefetch_related(
-        'checkout_orders',
-        'checkout_orders__user',
-        'checkout_orders__client',
-        'checkout_orders__member',
-        'checkout_orders__location',
-        'checkout_orders__location__currency',
-    ).filter(sale_queries) \
+    checkout_order = Checkout.objects \
+    .filter(sale_queries) \
+    .select_related('client', 'member') \
+    .prefetch_related('checkout_orders') \
     .with_total_tax() \
     .distinct()
 
-    appointment_checkout = AppointmentCheckout.objects.select_related(
-            'appointment_service',
-            'business_address',
-            'appointment',
-            'appointment__client',
-            'service',
-        ).filter(app_queries) \
-        .distinct()
-    
-    # if sale_checkouts:
-    #     checkout_order = checkout_order | sale_checkouts
+    appointment_checkout = AppointmentCheckout.objects \
+    .filter(app_queries) \
+    .select_related('appointment__client') \
+    .distinct()
 
-    # if appointment_checkouts:
-    #     appointment_checkout = appointment_checkout | appointment_checkouts
-
-    checkout_data = list(SaleOrders_CheckoutSerializerOP(checkout_order, many=True, context={'request': request}).data)
-    appointment_data = list(SaleOrders_AppointmentCheckoutSerializerOP(appointment_checkout, many=True, context={'request': request}).data)
+    checkout_data = list(SaleOrders_CheckoutSerializerOP(checkout_order, many=True).data)
+    appointment_data = list(SaleOrders_AppointmentCheckoutSerializerOP(appointment_checkout, many=True).data)
 
     data_total = checkout_data + appointment_data
     sorted_data = sorted(data_total, key=lambda x: x['created_at'], reverse=True)
@@ -1312,77 +1296,13 @@ def get_all_sale_orders_optimized(request):
     if recent_five_sales:
         sorted_data = sorted_data[:5]
 
-    # invoicce translation data
-    business_address = BusinessAddress.objects.get(id=location_id)
-    invoice_translations = BusinessAddressSerilaizer(business_address).data
 
     paginator = CustomPagination()
     paginator.page_size = 100000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(sorted_data, request)
-    response = paginator.get_paginated_response(paginated_data, 'sales', invoice_translations)
+    response = paginator.get_paginated_response(paginated_data, 'sales')
 
     return response
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def get_recent_five_sales(request):
-    location_id = request.GET.get('location', None)
-
-
-    queries = {}
-    app_queries = {}
-    sale_queries = {}
-
-    checkout_order = Checkout.objects.select_related(
-        'location',
-        'location__currency',
-        'client',
-        'member'
-    ).prefetch_related(
-        'checkout_orders',
-        'checkout_orders__user',
-        'checkout_orders__client',
-        'checkout_orders__member',
-        'checkout_orders__location',
-        'checkout_orders__location__currency',
-    ).filter(
-        is_deleted=False,
-        location__id=location_id,
-        **queries,
-        **sale_queries
-    ).distinct()
-
-    appointment_checkout = AppointmentCheckout.objects.select_related(
-            'appointment_service',
-            'business_address',
-            'appointment',
-            'appointment__client',
-            'service',
-        ).filter(
-            business_address__id = location_id,
-            **queries,
-            **app_queries
-        ).distinct()
-
-    checkout_data = list(SaleOrders_CheckoutSerializer(checkout_order, many=True, context={'request': request}).data)
-    appointment_data = list(SaleOrders_AppointmentCheckoutSerializer(appointment_checkout, many=True, context={'request': request}).data)
-
-    data_total = checkout_data + appointment_data
-    data_total = data_total[:5]
-    sorted_data = sorted(data_total, key=lambda x: x['created_at'], reverse=True)
-
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'Last 5 Orders',
-                'error_message' : None,
-                'orders' : sorted_data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
 
 
 @api_view(['GET'])

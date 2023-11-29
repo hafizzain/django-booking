@@ -2144,31 +2144,9 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
 class SaleOrders_CheckoutSerializerOP(serializers.ModelSerializer):
     total_tax = serializers.FloatField()
     subtotal = serializers.SerializerMethodField(read_only=True)
-
-    # product  = serializers.SerializerMethodField(read_only=True) #ProductOrderSerializer(read_only = True)
-    # service  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
-    # membership  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
-    # voucher  = serializers.SerializerMethodField(read_only=True) #serviceOrderSerializer(read_only = True)
-    
     client = serializers.SerializerMethodField(read_only=True)
-    # location = serializers.SerializerMethodField(read_only=True)
-
-    # membership_product = serializers.SerializerMethodField(read_only=True)
-    # membership_service = serializers.SerializerMethodField(read_only=True)
-    # membership_type = serializers.SerializerMethodField(read_only=True)
     invoice = serializers.SerializerMethodField(read_only=True)
-
-    # gst = serializers.FloatField(source='tax_applied')
-    # gst1 = serializers.FloatField(source='tax_applied1')
-    # gst_price = serializers.SerializerMethodField()
-    # gst_price1 = serializers.FloatField(source='tax_amount1')
-    
-    # tip = serializers.SerializerMethodField(read_only=True)
     total_tip = serializers.SerializerMethodField(read_only=True)
-    # client_loyalty_points = serializers.SerializerMethodField(read_only=True)
-
-    # def get_client_loyalty_points(self, obj):
-    #     return obj.get_client_loyalty_points()
 
     def get_client(self, obj):
         if obj.client:
@@ -2176,13 +2154,6 @@ class SaleOrders_CheckoutSerializerOP(serializers.ModelSerializer):
             return serializers
         return None
     
-    # def get_location(self, obj):
-    #     if obj.location:
-    #         serializers = LocationSerializer(obj.location).data
-    #         return serializers
-        
-    #     return None
-
 
     def get_subtotal(self, obj):
         product_total = ProductOrder.objects \
@@ -2203,89 +2174,6 @@ class SaleOrders_CheckoutSerializerOP(serializers.ModelSerializer):
                             .aggregate(final_subtotal=Coalesce(Sum('subtotal'), 0.0))['final_subtotal']
         
         return product_total + service_total + membership_total + voucher_total
-        
-    # def get_membership(self, obj):
-        
-    #     check = MemberShipOrder.objects.only(
-    #         'id',
-    #         'membership',
-    #         'current_price',
-    #         'quantity',
-    #     ).select_related(
-    #         'membership',
-    #     ).filter(
-    #         checkout = obj
-    #     )
-    #     # return MemberShipOrderSerializer(check, many = True , context=self.context ).data
-    #     return SaleOrder_MemberShipSerializer(check, many = True ).data
-
-
-    # def get_voucher(self, obj):
-        
-    #     check = VoucherOrder.objects.only(
-    #         'id',
-    #         'voucher',
-    #         'current_price',
-    #         'quantity',
-    #     ).select_related(
-    #         'voucher',
-    #     ).filter(
-    #         checkout = obj
-    #     )
-    #     # return VoucherOrderSerializer(check, many = True , context=self.context ).data
-    #     return SaleOrder_VoucherSerializer(check, many = True ).data
-
-
-    # def get_product(self, obj):
-        
-    #     check = ProductOrder.objects.only(
-    #             'current_price', 
-    #             'id',
-    #             'quantity',
-    #             'product',
-    #         ).select_related(
-    #             'product',
-    #         ).filter(
-    #         checkout = obj
-    #     )
-    #     # data =  ProductOrderSerializer(check, many = True , context=self.context ).data
-    #     data =  SaleOrder_ProductSerializer(check, many = True ).data
-    #     self.product = data
-    #     return self.product
-            
-    # def get_membership_product(self, obj):
-    #     return self.product
-
-    # def get_service(self, obj):
-    #     service = ServiceOrder.objects.only(
-    #         'id',
-    #         'quantity',
-    #         'current_price',
-    #         'service',
-    #     ).select_related(
-    #         'service',
-    #     ).filter(
-    #         checkout = obj
-    #     )
-    #     # data = ServiceOrderSerializer(service, many = True , context=self.context ).data
-    #     data = SaleOrder_ServiceSerializer(service, many = True ).data
-    #     self.service = data
-    #     return self.service
-    
-    # def get_membership_service(self, obj):
-    #     return self.service
-    
-    # def get_membership_type(self, obj):
-    #     try:
-    #         data = Membership.objects.filter(discount=obj).first()
-    #     except:
-    #         pass
-    #     return data
-    
-    # def get_tip(self, obj):
-    #     tips = AppointmentEmployeeTip.objects.filter(checkout=obj)
-    #     serialized_tips = CheckoutTipsSerializer(tips, many=True).data
-    #     return serialized_tips
 
     def get_total_tip(self, obj):
         tips = AppointmentEmployeeTip.objects \
@@ -2302,7 +2190,7 @@ class SaleOrders_CheckoutSerializerOP(serializers.ModelSerializer):
     
     def get_invoice(self, obj):
         try:
-            invoice = SaleInvoice.objects.get(checkout__icontains = obj)
+            invoice = SaleInvoice.objects.get(checkout__icontains=obj)
             serializer = SaleInvoiceSerializerOP(invoice, context=self.context)
             return serializer.data
         except Exception as e:
