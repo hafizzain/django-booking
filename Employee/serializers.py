@@ -1322,7 +1322,7 @@ class Payroll_WorkingScheduleSerializerOP(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ['id', 'full_name', 'schedule','created_at', 'total_earning', 'total_hours',
-                  'total_commission', 'total_tips']
+                  'total_commission', 'total_tips', 'employee_info']
         
 
 class Payroll_Working_device_attendence_ScheduleSerializer(serializers.ModelSerializer):    
