@@ -405,7 +405,7 @@ class StaffGroupSerializers(serializers.ModelSerializer):
     
     def get_employees(self, obj):
         all_employees = obj.employees.all()
-        return singleEmployeeSerializerOP(all_employees, many=True, context=self.context).data
+        return EmployeeSerializerForStaffGroup(all_employees, many=True, context=self.context).data
             
     
     def get_staff_permission(self, obj):
@@ -777,6 +777,11 @@ class singleEmployeeSerializerOP(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ['id', 'image', 'email', 'full_name', 'employee_info', 'is_active']  
+
+class EmployeeSerializerForStaffGroup(singleEmployeeSerializerOP):
+    class Meta(singleEmployeeSerializerOP.Meta):
+        model = User
+        fields = singleEmployeeSerializerOP.Meta.fields + ['employee_id']
 
 class CategoryCommissionSerializer(serializers.ModelSerializer):
     
