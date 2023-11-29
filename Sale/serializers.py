@@ -2310,7 +2310,7 @@ class SaleOrders_CheckoutSerializerOP(serializers.ModelSerializer):
     
     class Meta:
         model = Checkout
-        fields = ['id', 'payment_method', 'order_type', 'client',
+        fields = ['id', 'payment_type', 'order_type', 'client',
                   'invoice', 'created_at', 'subtotal', 'total_tax', 'total_tip']
 
 class SaleInvoiceSerializer(serializers.ModelSerializer):
