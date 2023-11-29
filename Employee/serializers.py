@@ -780,7 +780,7 @@ class singleEmployeeSerializerOP(serializers.ModelSerializer):
 
 class EmployeeSerializerForStaffGroup(singleEmployeeSerializerOP):
     class Meta(singleEmployeeSerializerOP.Meta):
-        model = User
+        model = Employee
         fields = singleEmployeeSerializerOP.Meta.fields + ['employee_id']
 
 class CategoryCommissionSerializer(serializers.ModelSerializer):
