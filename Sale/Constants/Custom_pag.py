@@ -40,7 +40,7 @@ class CustomPagination(PageNumberPagination):
         }
 
         if invoice_translations:
-            data['response']['invoice_transaltions'] = invoice_translations
+            data['response']['invoice_translations'] = invoice_translations
             
         return Response(data)
 
