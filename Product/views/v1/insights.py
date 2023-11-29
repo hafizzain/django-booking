@@ -425,7 +425,7 @@ def get_filtered_chat_products(request):
     .filter(
         product_stock__location = location_obj,
         # is_deleted = False,   # commenting this out because we also want deleted products to be shown in inventory insights
-        product_orders__created_at__range = ('2020-01-01', f'{selected_year}-12-31'),
+        product_orders__created_at__year = selected_year,
         product_orders__location=location_obj) \
     .annotate(
         most_transferred_products = Coalesce(Sum('product_orders__quantity', filter=sum_filter), 0) \
