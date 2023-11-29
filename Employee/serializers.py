@@ -884,6 +884,12 @@ class ScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployeDailySchedule
         fields = '__all__'
+
+
+class ScheduleSerializerOP(serializers.ModelSerializer):            
+    class Meta:
+        model = EmployeDailySchedule
+        fields = ['id', 'date','is_vocation', 'is_leave', 'from_date', 'day', 'end_time_shift', 'end_time', 'start_time']
         
 class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
     total_hours = serializers.SerializerMethodField(read_only=True)
@@ -950,42 +956,12 @@ class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
                   'date','is_leave','is_off','is_vacation','is_active','created_at','updated_at', 'total_hours_dummy']
 
 class WorkingScheduleSerializer(serializers.ModelSerializer):
-    start_time = serializers.SerializerMethodField(read_only=True)
-    end_time = serializers.SerializerMethodField(read_only=True)
-    
-    # monday =  serializers.SerializerMethodField(read_only=True)
-    # tuesday =  serializers.SerializerMethodField(read_only=True)
-    # wednesday =  serializers.SerializerMethodField(read_only=True)
-    # thursday =  serializers.SerializerMethodField(read_only=True)
-    # friday =  serializers.SerializerMethodField(read_only=True)
-    # saturday =  serializers.SerializerMethodField(read_only=True)
-    # sunday =  serializers.SerializerMethodField(read_only=True)
-    
     schedule =  serializers.SerializerMethodField(read_only=True)
-    vacation =  serializers.SerializerMethodField(read_only=True)
-
-    # absense = serializers.SerializerMethodField(read_only=True)
-    
     image = serializers.SerializerMethodField()
-    
-    location = serializers.SerializerMethodField(read_only=True)
-    
-    def get_location(self, obj):
-        loc = obj.location.all()
-        return LocationSerializer(loc, many =True ).data
-
     
     def get_schedule(self, obj):
         schedule =  EmployeDailySchedule.objects.filter(employee= obj )
-        return ScheduleSerializer(schedule, many = True,context=self.context).data
-    
-    def get_vacation(self, obj):
-        vacation = Vacation.objects.filter(employee= obj )
-        return VacationSerializer(vacation, many = True,context=self.context).data
-    
-    # def get_absense(self, obj):
-    #     absense = Vacation.objects.filter(employee= obj )
-    #     return VacationSerializer(absense, many = True,context=self.context).data
+        return ScheduleSerializerOP(schedule, many = True,context=self.context).data
     
     def get_image(self, obj):
         if obj.image:
@@ -997,22 +973,9 @@ class WorkingScheduleSerializer(serializers.ModelSerializer):
                 return obj.image
         return None
     
-    def get_start_time(self, obj):        
-        try:
-            time = EmployeeProfessionalInfo.objects.get(employee=obj)
-            return time.start_time 
-        except: 
-            return None
-    def get_end_time(self, obj):        
-        try:
-            time = EmployeeProfessionalInfo.objects.get(employee=obj)
-            return time.end_time
-        except: 
-            return None
-    
     class Meta:
         model = Employee
-        fields = ['id', 'full_name','image','start_time', 'end_time','vacation','schedule','location','created_at']
+        fields = ['id', 'full_name','image', 'schedule', 'created_at']
 
 class SingleEmployeeInformationSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
