@@ -56,7 +56,7 @@ urlpatterns = [
     path('update_asset/', views.update_asset), 
     
     #Working Schedule
-    path('working_schedule/', views.working_schedule),
+    path('working_schedule/', views.get_workingschedule),
     path('single_employee_schedule/', views.single_employee_schedule),
     
     #Generate ID
