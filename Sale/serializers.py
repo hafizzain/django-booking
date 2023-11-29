@@ -2188,19 +2188,19 @@ class SaleOrders_CheckoutSerializerOP(serializers.ModelSerializer):
         product_total = ProductOrder.objects \
                             .filter(checkout=obj) \
                             .with_subtotal() \
-                            .aggregate(final_subtotal=Sum('subtotal'))['final_subtotal']
+                            .aggregate(final_subtotal=Coalesce(Sum('subtotal'), 0.0))['final_subtotal']
         service_total = ServiceOrder.objects \
                             .filter(checkout=obj) \
                             .with_subtotal() \
-                            .aggregate(final_subtotal=Sum('subtotal'))['final_subtotal']
+                            .aggregate(final_subtotal=Coalesce(Sum('subtotal'), 0.0))['final_subtotal']
         membership_total = MemberShipOrder.objects \
                             .filter(checkout=obj) \
                             .with_subtotal() \
-                            .aggregate(final_subtotal=Sum('subtotal'))['final_subtotal']
+                            .aggregate(final_subtotal=Coalesce(Sum('subtotal'), 0.0))['final_subtotal']
         voucher_total = VoucherOrder.objects \
                             .filter(checkout=obj) \
                             .with_subtotal() \
-                            .aggregate(final_subtotal=Sum('subtotal'))['final_subtotal']
+                            .aggregate(final_subtotal=Coalesce(Sum('subtotal'), 0.0))['final_subtotal']
         
         return product_total + service_total + membership_total + voucher_total
         
