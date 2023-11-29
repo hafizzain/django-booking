@@ -351,7 +351,7 @@ class ServiceSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField(read_only=True)
     employees = serializers.SerializerMethodField(read_only=True)
     service_group = serializers.SerializerMethodField(read_only=True)
-    total_orders = serializers.IntegerField()
+    total_orders = serializers.IntegerField(read_only=True)
     priceservice = serializers.SerializerMethodField(read_only=True)
     price = serializers.SerializerMethodField(read_only=True)
 
