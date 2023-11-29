@@ -1990,7 +1990,7 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
 
     gst = serializers.FloatField(source='tax_applied')
     gst1 = serializers.FloatField(source='tax_applied1')
-    gst_price = serializers.SerializerMethodField()
+    gst_price = serializers.FloatField(source='tax_amount')
     gst_price1 = serializers.FloatField(source='tax_amount1')
     
     tip = serializers.SerializerMethodField(read_only=True)
@@ -2119,12 +2119,6 @@ class SaleOrders_CheckoutSerializer(serializers.ModelSerializer):
             return serializer.data
         except Exception as e:
             return str(e)
-        
-    def get_gst_price(self, obj):
-        try:
-            return obj.tax_amount
-        except:
-            return 0
     
     class Meta:
         model = Checkout
