@@ -405,7 +405,7 @@ class StaffGroupSerializers(serializers.ModelSerializer):
     
     def get_employees(self, obj):
         all_employees = obj.employees.all()
-        return singleEmployeeSerializer(all_employees, many=True, context=self.context).data
+        return singleEmployeeSerializerOP(all_employees, many=True, context=self.context).data
             
     
     def get_staff_permission(self, obj):
