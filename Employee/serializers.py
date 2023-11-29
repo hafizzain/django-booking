@@ -776,7 +776,7 @@ class singleEmployeeSerializerOP(serializers.ModelSerializer):
         
     class Meta:
         model = Employee
-        fields = ['id', 'image', 'email', 'full_name', 'employee_info']  
+        fields = ['id', 'image', 'email', 'full_name', 'employee_info', 'is_active']  
 
 class CategoryCommissionSerializer(serializers.ModelSerializer):
     
