@@ -72,7 +72,7 @@ class EmployeInformationsSerializerOP(serializers.ModelSerializer):
     
     class Meta:
         model = EmployeeProfessionalInfo
-        fields = ['salary', 'income_type']
+        fields = ['salary', 'income_type', 'designation']
         
         
 class ScheduleSerializer(serializers.ModelSerializer):
@@ -753,7 +753,7 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             ]
         
 class singleEmployeeSerializerOP(serializers.ModelSerializer):
-    total_sale = serializers.FloatField(read_only=True)
+    # total_sale = serializers.FloatField(read_only=True)
     image = serializers.SerializerMethodField()
     employee_info = serializers.SerializerMethodField(read_only=True)
     
@@ -776,7 +776,7 @@ class singleEmployeeSerializerOP(serializers.ModelSerializer):
         
     class Meta:
         model = Employee
-        fields = ['id', 'image', 'email', 'full_name', 'employee_info', 'total_sale', 'designation']  
+        fields = ['id', 'image', 'email', 'full_name', 'employee_info']  
 
 class CategoryCommissionSerializer(serializers.ModelSerializer):
     
