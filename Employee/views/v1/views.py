@@ -20,7 +20,7 @@ from Employee.serializers import( EmployeSerializer , EmployeInformationsSeriali
                                  ScheduleSerializer, SingleEmployeeInformationSerializer, StaffGroupSerializers, EmployeeDropdownSerializer,
                                  AttendanceSerializers, PayrollSerializers, UserEmployeeSerializer, VacationSerializer,singleEmployeeSerializer,
                                  CommissionSerializer, AssetSerializer, WorkingScheduleSerializer,NewVacationSerializer,
-                                 NewAbsenceSerializer, singleEmployeeSerializerOP
+                                 NewAbsenceSerializer, singleEmployeeSerializerOP, Payroll_WorkingScheduleSerializerOP
                                  )
 from Employee.optimized_serializers import OptimizedEmployeeSerializerDashboard
 from django.db import connection, transaction
@@ -2617,7 +2617,7 @@ def get_payrol_working(request):
     all_employe = paginator.get_page(page_number)
 
 
-    serialized = Payroll_WorkingScheduleSerializer(all_employe,  many=True, context={'request' : request, 'start_date' : start_date, 'end_date' : end_date} )
+    serialized = Payroll_WorkingScheduleSerializerOP(all_employe,  many=True, context={'request' : request, 'start_date' : start_date, 'end_date' : end_date} )
    
     return Response(
         {

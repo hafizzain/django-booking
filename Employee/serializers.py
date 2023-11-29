@@ -73,6 +73,13 @@ class EmployeInformationsSerializerOP(serializers.ModelSerializer):
     class Meta:
         model = EmployeeProfessionalInfo
         fields = ['salary', 'income_type', 'designation']
+
+
+class EmployeInformationsSerializerForPayroll(serializers.ModelSerializer):
+    
+    class Meta:
+        model = EmployeeProfessionalInfo
+        fields = ['income_type']
         
         
 class ScheduleSerializer(serializers.ModelSerializer):
@@ -1206,6 +1213,115 @@ class Payroll_WorkingScheduleSerializer(serializers.ModelSerializer):
         model = Employee
         fields = ['id', 'employee_id','is_active','full_name','image','location','sallaryslip',
                   'schedule','created_at', 'income_type', 'salary', 'total_earning', 'total_hours',
+                  'total_commission', 'total_tips']
+        
+
+class Payroll_WorkingScheduleSerializerOP(serializers.ModelSerializer):
+    total_commission = serializers.FloatField(read_only=True)
+    total_tips = serializers.FloatField(read_only=True)
+    schedule =  serializers.SerializerMethodField(read_only=True)    
+    total_earning = serializers.SerializerMethodField(read_only=True)    
+    total_hours = serializers.SerializerMethodField(read_only=True)
+    employee_info = serializers.SerializerMethodField(read_only=True)
+
+    def get_employee_info(self, obj):
+        try:
+            employee_info = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return EmployeInformationsSerializerForPayroll(employee_info).data
+        except:
+            return None
+            
+    
+
+    def get_total_hours(self, obj):
+        start_date = self.context.get('start_date', None)
+        end_date = self.context.get('end_date', None)
+        now_date = datetime.now()
+
+        month_start_date = start_date or f'{now_date.year}-{now_date.month}-01'
+        month_end_date = end_date or now_date.strftime('%Y-%m-%d')
+
+        employee_schedules =  EmployeDailySchedule.objects.filter(
+            employee = obj,
+            is_leave = False,
+            date__range = (month_start_date, month_end_date)
+        ).order_by('-date')
+        hours = 0
+        for schedule in employee_schedules:
+            hours += schedule.total_hours
+        
+        return hours
+
+
+    def get_total_earning(self, obj):
+        now_date = datetime.now()
+        total_days = calendar.monthrange(now_date.year, now_date.month)[1]
+        date = now_date.date
+
+        start_date = self.context.get('start_date', None)
+        end_date = self.context.get('end_date', None)
+
+        month_start_date = start_date or f'{now_date.year}-{now_date.month}-01'
+        month_end_date = end_date or f'{now_date.year}-{now_date.month}-{total_days}'
+
+        employee_schedules =  EmployeDailySchedule.objects.filter(
+            employee = obj,
+            is_leave = False,
+            date__range = (month_start_date, month_end_date)
+        ).order_by('-date')
+
+        try:
+            income_type_info = EmployeeProfessionalInfo.objects.get(employee=obj)
+        except:
+            income_type = None
+        else:
+            total_earning = 0
+            salary = income_type_info.salary # 300
+            income_type = income_type_info.income_type
+
+            if income_type == 'Monthly_Salary':
+                per_day_salary = salary / total_days # 10
+                total_earning += (employee_schedules.count() * per_day_salary)
+
+            elif income_type == 'Daily_Income':
+                total_earning += (employee_schedules.count() * salary)
+                pass
+            elif income_type == 'Hourly_Rate':
+                total_hours = 0
+                for schedule in employee_schedules:
+                    total_hours += schedule.total_hours
+                
+                total_earning += (total_hours * salary)
+
+            return total_earning
+
+
+    def get_schedule(self, obj):
+        now_date = datetime.now()
+        start_date = self.context.get('start_date', None)
+        end_date = self.context.get('end_date', None)
+
+        total_days = calendar.monthrange(now_date.year, now_date.month)[1]
+
+        month_start_date = start_date or f'{now_date.year}-{now_date.month}-01'
+        month_end_date = end_date or f'{now_date.year}-{now_date.month}-{total_days}'
+
+        schedule =  EmployeDailySchedule.objects.filter(
+            employee = obj,
+            date__range = (month_start_date, month_end_date)
+        ).exclude(is_leave = True).order_by('-date')
+        # ).order_by('employee__employee_employedailyschedule__date')            
+        context = self.context
+        try:
+            context['income_type'] = EmployeeProfessionalInfo.objects.get(employee=obj).income_type
+        except:
+            context['income_type'] = None
+        return WorkingSchedulePayrollSerializer(schedule, many = True,context=context).data
+    
+    
+    class Meta:
+        model = Employee
+        fields = ['id', 'full_name', 'schedule','created_at', 'total_earning', 'total_hours',
                   'total_commission', 'total_tips']
         
 
