@@ -74,7 +74,7 @@ class CheckoutManager(models.QuerySet):
     def with_total_tax(self):
         return self.annotate(
             total_tax=Coalesce(
-                Sum(F('tax_applied') + F('tax_applied1')),
+                Sum(F('tax_amount') + F('tax_amount1')),
                 0.0,
                 output_field=FloatField()
             )
