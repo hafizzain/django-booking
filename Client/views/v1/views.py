@@ -196,7 +196,7 @@ def get_client_dropdown(request):
     paginator = CustomPagination()
     paginator.page_size = 1000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(serialized, request)
-    response = paginator.get_paginated_response(paginated_data, 'clients', extra=None, current_page=page, is_searched=is_searched)
+    response = paginator.get_paginated_response(paginated_data, 'clients', invoice_translations=None, current_page=page, is_searched=is_searched)
     return response
 
 

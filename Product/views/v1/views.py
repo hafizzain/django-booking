@@ -341,7 +341,7 @@ def get_categories_dropdown(request):
     paginator = CustomPagination()
     paginator.page_size = 1000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(serialized, request)
-    response = paginator.get_paginated_response(paginated_data, 'categories', extra=None, current_page=page)
+    response = paginator.get_paginated_response(paginated_data, 'categories', invoice_translations=None, current_page=page)
     return response
 
 @transaction.atomic
@@ -544,7 +544,7 @@ def get_brands_dropdown(request):
     paginator = CustomPagination()
     paginator.page_size = 1000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(serialized, request)
-    response = paginator.get_paginated_response(paginated_data, 'brands', extra=None, current_page=page)
+    response = paginator.get_paginated_response(paginated_data, 'brands', invoice_translations=None, current_page=page)
     return response
 
 
@@ -1359,7 +1359,7 @@ def get_products_dropdown(request):
     paginator = CustomPagination()
     paginator.page_size = 1000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(serialized, request)
-    response = paginator.get_paginated_response(paginated_data, 'products', extra=None, current_page=page)
+    response = paginator.get_paginated_response(paginated_data, 'products', invoice_translations=None, current_page=page)
     return response
 
    
