@@ -334,7 +334,7 @@ def get_employees_mainpage(request):
     query = Q(is_deleted=False, is_blocked=False)
 
     if is_active:
-        query &= Q(is_active=True)
+        query &= Q(is_active=is_active)
 
     if search_text:
         query &= Q(full_name__icontains=search_text) | Q(mobile_number__icontains=search_text)
