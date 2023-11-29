@@ -15,13 +15,12 @@ from Utility.Constants.Data.PermissionsValues import ALL_PERMISSIONS, PERMISSION
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from Employee.serializers import( EmployeSerializer , EmployeInformationsSerializer
-                          , EmployPermissionSerializer,  EmployeModulesSerializer, EmployeeInformationSerializer
-                          ,  EmployeeMarketingSerializers, Payroll_Working_device_attendence_ScheduleSerializer, Payroll_Working_deviceScheduleSerializer, Payroll_WorkingScheduleSerializer, SallarySlipPayrolSerializers, ScheduleSerializer, SingleEmployeeInformationSerializer, StaffGroupSerializers , 
-                          StaffpermisionSerializers , AttendanceSerializers
-                          ,PayrollSerializers, UserEmployeeSerializer, VacationSerializer,singleEmployeeSerializer , CommissionSerializer
-                          , AssetSerializer, WorkingScheduleSerializer,NewScheduleSerializer,NewVacationSerializer,NewAbsenceSerializer,
-                          EmployeeDropdownSerializer
+from Employee.serializers import( EmployeSerializer , EmployeInformationsSerializer, Payroll_Working_device_attendence_ScheduleSerializer,
+                                 Payroll_Working_deviceScheduleSerializer, Payroll_WorkingScheduleSerializer, SallarySlipPayrolSerializers,
+                                 ScheduleSerializer, SingleEmployeeInformationSerializer, StaffGroupSerializers, EmployeeDropdownSerializer,
+                                 AttendanceSerializers, PayrollSerializers, UserEmployeeSerializer, VacationSerializer,singleEmployeeSerializer,
+                                 CommissionSerializer, AssetSerializer, WorkingScheduleSerializer,NewVacationSerializer,
+                                 NewAbsenceSerializer, singleEmployeeSerializerOP
                                  )
 from Employee.optimized_serializers import OptimizedEmployeeSerializerDashboard
 from django.db import connection, transaction
@@ -320,6 +319,90 @@ def search_employee(request):
         },
         status=status.HTTP_200_OK
     )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_employees_mainpage(request):
+    no_pagination = request.GET.get('no_pagination', None)
+    search_text = request.GET.get('search_text', None)
+    location_id = request.GET.get('location_id', None)
+    designation = request.GET.get('designation', None)
+    income_type = request.GET.get('income_type', None)
+    is_active = request.GET.get('is_active', None)
+
+
+    query = Q(is_deleted=False, is_blocked=False)
+
+    if is_active:
+        query &= Q(is_active=True)
+
+    if search_text:
+        query &= Q(full_name__icontains=search_text) | Q(mobile_number__icontains=search_text)
+
+    if designation:
+        query &= Q(employee_professional_details__designation=designation)
+
+    if income_type:
+        query &= Q(employee_professional_details__income_type=income_type)
+
+    if location_id:
+        location = BusinessAddress.objects.get(id=str(location_id))
+        query &= Q(location=location)
+     
+
+    all_employe= Employee.objects \
+                    .filter(query) \
+                    .with_total_sale() \
+                    .order_by('-total_sale')
+    
+    all_employee_count = all_employe.count()
+    
+    page_count = all_employee_count / 10
+    if page_count > int(page_count):
+        page_count = int(page_count) + 1
+
+    results_per_page = 10000 if no_pagination else 10
+    paginator = Paginator(all_employe, results_per_page)
+    page_number = request.GET.get("page", None)
+
+    if page_number is not None: 
+        all_employe = paginator.get_page(page_number)
+
+        serialized = singleEmployeeSerializerOP(all_employe,  many=True, context={'request' : request} )
+        data = serialized.data
+        return Response(
+            {
+                'status' : 200,
+                'status_code' : '200',
+                'response' : {
+                    'message' : f'Page {page_number} Employee',
+                    'count':all_employee_count,
+                    'pages':page_count,
+                    'per_page_result':results_per_page,
+                    'error_message' : None,
+                    'employees' : data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+    else:
+        serialized = singleEmployeeSerializerOP(all_employe,  many=True, context={'request' : request} )
+        data = serialized.data
+        return Response(
+            {
+                'status' : 200,
+                'status_code' : '200',
+                'response' : {
+                    'message' : 'All Employee',
+                    'count':all_employee_count,
+                    'pages':page_count,
+                    'per_page_result':20,
+                    'error_message' : None,
+                    'employees' : data
+                }
+            },
+            status=status.HTTP_200_OK
+        )
 
 @api_view(['GET'])
 @permission_classes([AllowAny])

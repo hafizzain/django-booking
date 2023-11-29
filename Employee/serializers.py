@@ -66,6 +66,13 @@ class EmployeInformationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployeeProfessionalInfo
         exclude = ['employee', 'id']
+
+
+class EmployeInformationsSerializerOP(serializers.ModelSerializer):
+    
+    class Meta:
+        model = EmployeeProfessionalInfo
+        fields = ['salary', 'income_type']
         
         
 class ScheduleSerializer(serializers.ModelSerializer):
@@ -743,7 +750,33 @@ class singleEmployeeSerializer(serializers.ModelSerializer):
             'location', 
             'is_active',
             'total_sale'
-            ]   
+            ]
+        
+class singleEmployeeSerializerOP(serializers.ModelSerializer):
+    total_sale = serializers.FloatField(read_only=True)
+    image = serializers.SerializerMethodField()
+    employee_info = serializers.SerializerMethodField(read_only=True)
+    
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
+                return f'{url}{obj.image}'
+            except:
+                return obj.image
+        return None
+        
+    def get_employee_info(self, obj):
+        try:
+            professional = EmployeeProfessionalInfo.objects.get(employee=obj)
+            return EmployeInformationsSerializerOP(professional).data
+        except:
+            return None
+        
+    class Meta:
+        model = Employee
+        fields = ['id', 'image', 'email', 'full_name', 'employee_info', 'total_sale', 'designation']  
 
 class CategoryCommissionSerializer(serializers.ModelSerializer):
     
