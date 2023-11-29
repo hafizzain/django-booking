@@ -889,7 +889,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
 class ScheduleSerializerOP(serializers.ModelSerializer):            
     class Meta:
         model = EmployeDailySchedule
-        fields = ['id', 'date','is_vocation', 'is_leave', 'from_date', 'day', 'end_time_shift', 'end_time', 'start_time']
+        fields = ['id', 'date','is_vacation', 'is_leave', 'from_date', 'day', 'end_time_shift', 'end_time', 'start_time']
         
 class WorkingSchedulePayrollSerializer(serializers.ModelSerializer):
     total_hours = serializers.SerializerMethodField(read_only=True)
