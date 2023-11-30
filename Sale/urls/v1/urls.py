@@ -28,6 +28,8 @@ urlpatterns = [
     #Service Group
     path('create_servicegroup/', views.create_servicegroup),
     path('get_servicegroup/', views.get_servicegroup),
+    path('get_servicegroup_main_page/', views.get_servicegroup_main_page),
+
     path('get_servicegroup_optimized/', views.get_servicegroup_optimized),
 
     path('delete_servicegroup/', views.delete_servicegroup),

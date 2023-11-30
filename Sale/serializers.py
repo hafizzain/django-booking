@@ -84,6 +84,11 @@ class ServiceSearchSerializer(serializers.ModelSerializer):
         fields = ['id','name', 'arabic_name', 'location', 'client_can_book', 'employees','priceservice', 'slot_availible_for_online']
 
 
+class ServiceSerializerForServiceGroup(serializers.ModelSerializer):
+    class Meta:
+        model = Service
+        fields = ['id', 'name']
+
 class ServiceSearchSerializerForServiceGroup(serializers.ModelSerializer):
     priceservice = serializers.SerializerMethodField(read_only=True)
     
@@ -122,6 +127,14 @@ class ServiceGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceGroup
         fields = ['id', 'business', 'name', 'services', 'status', 'allow_client_to_select_team_member']
+
+
+class ServiceGroupSerializerMainPage(serializers.ModelSerializer):
+    
+    services  = ServiceSerializerForServiceGroup(many=True)
+    class Meta:
+        model = ServiceGroup
+        fields = ['id', 'business', 'name', 'services', 'is_active']
 
 
 class ServiceGroupSerializerOP(serializers.ModelSerializer):

@@ -36,7 +36,7 @@ from Sale.serializers import (AppointmentCheckoutSerializer, BusinessAddressSeri
                             ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, 
                             VoucherOrderSerializer, SaleOrders_CheckoutSerializer, SaleOrders_AppointmentCheckoutSerializer,
                             ServiceSerializerDropdown, ServiceSerializerOP, ServiceGroupSerializerOP, SaleOrders_CheckoutSerializerOP,
-                            SaleOrders_AppointmentCheckoutSerializerOP, ServiceSerializerMainpage
+                            SaleOrders_AppointmentCheckoutSerializerOP, ServiceSerializerMainpage, ServiceGroupSerializerMainPage
                             )
 from rest_framework.pagination import PageNumberPagination
 from django.core.paginator import Paginator
@@ -940,6 +940,33 @@ def create_servicegroup(request):
 def get_servicegroup(request):
     no_pagination = request.GET.get('no_pagination', None)
     search_text = request.GET.get('search_text', None)
+    service_group_id = request.GET.get('service_group_id', None)
+
+    query = Q(is_deleted=False)
+
+    if service_group_id:
+        query &= Q(id=service_group_id)
+
+    if search_text:
+        query &= Q(name__icontains=search_text)
+
+
+    service_group = ServiceGroup.objects \
+                                .prefetch_related('services') \
+                                .filter(query).order_by('-created_at')
+    serialized = list(ServiceGroupSerializer(service_group,  many=True, context={'request' : request}).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'sales')
+    return response
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_servicegroup_main_page(request):
+    no_pagination = request.GET.get('no_pagination', None)
+    search_text = request.GET.get('search_text', None)
 
     query = Q(is_deleted=False)
     if search_text:
@@ -949,7 +976,7 @@ def get_servicegroup(request):
     service_group = ServiceGroup.objects \
                                 .prefetch_related('services') \
                                 .filter(query).order_by('-created_at')
-    serialized = list(ServiceGroupSerializer(service_group,  many=True, context={'request' : request}).data)
+    serialized = list(ServiceGroupSerializerMainPage(service_group,  many=True).data)
 
     paginator = CustomPagination()
     paginator.page_size = 100000 if no_pagination else 10
