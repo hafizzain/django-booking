@@ -351,7 +351,7 @@ class LocationServiceSerializer(serializers.ModelSerializer):
 class LocationServiceSerializerOP(serializers.ModelSerializer):
     class Meta:
         model = BusinessAddress
-        fields = ['id', 'name']
+        fields = ['id', 'address_name']
 
 
 class ServiceSerializerDropdown(serializers.ModelSerializer):
