@@ -20,7 +20,8 @@ from Client.serializers import (SingleClientSerializer, ClientSerializer, Client
                                 SubscriptionSerializer , RewardSerializer , PromotionSerializer , MembershipSerializer , 
                                 VoucherSerializer, ClientLoyaltyPointSerializer, CustomerLoyaltyPointsLogsSerializer, 
                                 CustomerDetailedLoyaltyPointsLogsSerializer, ClientVouchersSerializer, ClientMembershipsSerializer,
-                                ClientDropdownSerializer)
+                                ClientDropdownSerializer, CustomerDetailedLoyaltyPointsLogsSerializerOP
+                                )
 from Business.serializers.v1_serializers import BusinessAddressSerilaizer
 from Utility.models import NstyleFile
 
@@ -3155,7 +3156,87 @@ def get_customers_loyalty_points_logs(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_customer_detailed_loyalty_points(request):
+def get_customer_detailed_loyalty_points_list(request):
+    location_id = request.GET.get('location_id', None)
+    client_id = request.GET.get('customer_id', None)
+    no_pagination = request.GET.get('no_pagination',None)
+    start_date = request.GET.get('start_date', '2020-01-01')
+    end_date = request.GET.get('end_date', datetime.now().strftime('%Y-%m-%d'))
+
+
+    if not all([location_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required!',
+                    'fields' : [
+                        'location_id',
+                        'customer_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    queries = {}
+    if client_id is not None:
+        queries['client_id'] = client_id
+
+    customers_points = LoyaltyPointLogs.objects.select_related(
+        'location',
+        'client',
+        'loyalty',
+    ).filter(
+        location__id = location_id,
+        created_at__date__range = (start_date, end_date),
+        is_active = True,
+        is_deleted = False,
+        **queries
+    ).order_by('-created_at')
+
+    all_loyality_logs_count= customers_points.count()
+
+    page_count = all_loyality_logs_count / 10
+    if page_count > int(page_count):
+        page_count = int(page_count) + 1
+
+    results_per_page = 10000 if no_pagination else 10
+    paginator = Paginator(customers_points, results_per_page)
+    page_number = request.GET.get("page") 
+    customers_points = paginator.get_page(page_number)
+
+    data = CustomerDetailedLoyaltyPointsLogsSerializerOP(customers_points, many=True, context={'request' : request}).data
+
+    # invoicce translation data
+    business_address = BusinessAddress.objects.get(id=location_id)
+    invoice_translations = BusinessAddressSerilaizer(business_address).data
+
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'status_code_text' : '200',
+            'response' : {
+                'message' : 'Loyalty Points Logs',
+                'count':all_loyality_logs_count,
+                'pages':page_count,
+                'per_page_result':results_per_page,
+                'error_message' : None,
+                'data' : data,
+                'invoice_translations':invoice_translations
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_customer_detailed_loyalty_points_detail(request):
     location_id = request.GET.get('location_id', None)
     client_id = request.GET.get('customer_id', None)
     no_pagination = request.GET.get('no_pagination',None)

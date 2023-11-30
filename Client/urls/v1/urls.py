@@ -60,7 +60,9 @@ urlpatterns = [
 
    path('get_client_available_loyalty_points/', views.get_client_available_loyalty_points),
    path('get_customers_loyalty_points_logs/', views.get_customers_loyalty_points_logs),
-   path('get_customer_detailed_loyalty_points/', views.get_customer_detailed_loyalty_points),
+   path('get_customer_detailed_loyalty_points_list/', views.get_customer_detailed_loyalty_points_list),
+   path('get_customer_detailed_loyalty_points_detail/', views.get_customer_detailed_loyalty_points_detail),
+
 
    #Vouchers client checkout 
    path('get_client_all_vouchers/', views.get_client_all_vouchers),
