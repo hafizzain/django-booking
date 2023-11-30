@@ -130,9 +130,6 @@ class ServiceGroupSerializerOP(serializers.ModelSerializer):
         model = ServiceGroup
         fields = ['id', 'name']
     
-    class Meta:
-        model = ServiceGroup
-        fields = ['id', 'business', 'name', 'services', 'status', 'allow_client_to_select_team_member']
 class ServiceGroup_TenantSerializer(serializers.ModelSerializer):
     
     services  = serializers.SerializerMethodField(read_only=True)
