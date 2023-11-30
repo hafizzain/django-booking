@@ -261,8 +261,8 @@ class EmployeeSelectedServiceSerializer(serializers.ModelSerializer):
 class EmployeeSelectedServiceSerializerOP(serializers.ModelSerializer):
     
     class Meta:
-        model = EmployeeSelectedService
-        fields = ['employee__id', 'employee__full_name'] 
+        model = Employee
+        fields = ['id', 'full_name'] 
 
 class EmployeeSelected_TenantServiceSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField(read_only=True)
@@ -494,7 +494,7 @@ class ServiceSerializerMainpage(serializers.ModelSerializer):
             
     
     def get_employees(self, obj):
-        emp = obj.employee_service.filter(employee__is_deleted = False ) 
+        emp = obj.employee_service.filter(employee__is_deleted=False).values_list('employee__id', flat=True)
         return EmployeeSelectedServiceSerializerOP(emp, many = True, context=self.context).data
         
     
