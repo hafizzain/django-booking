@@ -1247,7 +1247,7 @@ class DiscountPromotionSalesReport_serializerOP(serializers.ModelSerializer):
         
     class Meta:
         model = DiscountPromotionSalesReport
-        fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location', 'client']
+        fields = ['id', 'promotion_name', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location', 'client']
 
         
 
