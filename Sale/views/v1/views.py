@@ -206,7 +206,7 @@ def get_service_main_page(request):
     page_number = request.GET.get("page") 
     services = paginator.get_page(page_number)
 
-    serialized = ServiceSerializerMainpage(services,  many=True, context={'request' : request, 'location_instance' : location_instance, 'is_mobile' : is_mobile, 'currency_code' : currency_code} )
+    serialized = ServiceSerializerMainpage(services,  many=True)
     return Response(
         {
             'status' : 200,
