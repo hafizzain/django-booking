@@ -32,6 +32,11 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ['id', 'name', 'is_active', 'created_at']
 
+class CategorySerializerForProduct(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['name']
+
 
 class CategorySerializerDropdown(serializers.ModelSerializer):
     class Meta:
@@ -54,6 +59,13 @@ class BrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Brand
         fields = ['id', 'name', 'description', 'website', 'image', 'is_active']
+
+
+class BrandSerializerForProduct(serializers.ModelSerializer):
+
+    class Meta:
+        model = Brand
+        fields = ['name']
 
 
 class BrandSerializerDropdown(serializers.ModelSerializer):
@@ -96,7 +108,65 @@ class VendorSerializer(serializers.ModelSerializer):
         model = BusinessVendor
         fields = '__all__'
 
+
+class VendorSerializerForProduct(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessVendor
+        fields = ['vendor_name']
+
+
+
+
+
 class ProductStockSerializer(serializers.ModelSerializer):
+    current_stock = serializers.SerializerMethodField()
+    location = serializers.SerializerMethodField()
+    turnover = serializers.SerializerMethodField()
+    status_text = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+    
+    def get_turnover(self, obj):
+        try:
+            quantity = obj.available_quantity - obj.sold_quantity
+            return 'Highest' if int(quantity) > 0 else 'Lowest' 
+        except Exception as err:
+            print(err)
+            
+    def get_status_text(self, obj):
+        try:
+            #quantity = obj.available_quantity - obj.sold_quantity
+            return 'Highest' if int(obj.sold_quantity) > 50 else 'Lowest'
+        except Exception as err:
+            print(err)
+            
+    def get_status(self, obj):
+        try:
+            quantity = obj.available_quantity - obj.sold_quantity
+            return 'True' if int(quantity) > 0 else 'False'
+        except Exception as err:
+            print(err)
+    
+    def get_location(self, obj):
+        try:
+            print(obj.location)
+            loc = BusinessAddress.objects.get(id = str(obj.location), is_deleted=False )
+            return LocationSerializer(loc).data
+        except Exception as err:
+            print(err)
+            None
+
+    def get_current_stock(self, obj):
+        return obj.available_quantity
+
+    class Meta:
+        model = ProductStock
+        fields = ['id', 'location', 'low_stock', 'current_stock', 'product',
+                  'reorder_quantity', 'available_quantity','sold_quantity',
+                  'sellable_quantity','consumable_quantity' , 'amount', 'unit' ,
+                  'alert_when_stock_becomes_lowest', 'sold_quantity','turnover','status_text','status','is_active' ]
+        
+
+class ProductStockSerializerForProduct(serializers.ModelSerializer):
     current_stock = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField()
     turnover = serializers.SerializerMethodField()
@@ -338,6 +408,83 @@ class ProductSerializer(serializers.ModelSerializer):
             'location',
             'is_active',
             'invoices'
+        ]
+        read_only_fields = ['slug', 'id']
+
+
+class ProductSerializerMainPage(serializers.ModelSerializer):
+    brand =BrandSerializerForProduct(read_only=True)
+    category = CategorySerializerForProduct(read_only=True)
+    vendor = VendorSerializerForProduct(read_only=True)
+    
+    # media = serializers.SerializerMethodField()
+    # stocks = serializers.SerializerMethodField(read_only=True)
+    location_quantities = serializers.SerializerMethodField(read_only=True)
+    cover_image = serializers.SerializerMethodField()
+    consumed = serializers.SerializerMethodField()
+    stocktransfer = serializers.SerializerMethodField()
+    currency_retail_price = serializers.SerializerMethodField()
+    
+    
+    def get_currency_retail_price(self, obj):
+        currency_retail = list(obj.product_currencyretailprice.values('currency', 'retail_price'))
+        return currency_retail
+        
+    def get_stocktransfer(self, obj):
+        stocktransfer = list(obj.products_stock_transfers.values('quantity'))
+        return stocktransfer
+        
+    def get_consumed(self, obj):
+        consumption = list(obj.consumptions.values('location', 'quantity'))
+        return consumption
+    
+    def get_cover_image(self, obj):
+        cvr_img = ProductMedia.objects.filter(product=obj, is_cover=True, is_deleted=False).order_by('-created_at')
+        try:
+            if len(cvr_img) > 0 :
+                cvr_img = cvr_img[0]
+                request = self.context['request']
+                url = tenant_media_base_url(request, is_s3_url=cvr_img.is_image_uploaded_s3)
+                return f'{url}{cvr_img.image}'
+        except:
+            return None
+
+    def get_location_quantities(self, obj):
+        location = self.context['location']
+        if location is not None:
+            all_stocks = list(obj.product_stock.filter(
+                                                  location__is_deleted=False,
+                                                  location__id = location) \
+                                                .values('location', 'available_quantity'))
+            
+            return all_stocks
+        else:
+            all_stocks = list(obj.product_stock.filter(
+                                                     is_deleted=False,
+                                                     location__is_deleted=False,
+                                                     location__is_closed=False,
+                                                     location__is_active=True) \
+                                                .values('location', 'available_quantity'))
+                                                
+                                                
+            return all_stocks
+
+
+    class Meta:
+        model = Product
+        fields = [
+            'id', 
+            'name', 
+            'currency_retail_price',
+            'barcode_id',
+            'cover_image',
+            'location_quantities',
+            'vendor',
+            'category',
+            'brand', 
+            'consumed',
+            'stocktransfer',
+            'is_active',
         ]
         read_only_fields = ['slug', 'id']
 
