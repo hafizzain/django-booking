@@ -3052,7 +3052,7 @@ def get_business_vendors(request):
 @permission_classes([AllowAny])
 def get_business_vendors_dropdown(request):
     search_text = request.query_params.get('search_text', None)
-    no_pagination = request.GET.get('no_pagination', None)
+    # no_pagination = request.GET.get('no_pagination', None)
     page = request.GET.get('page', None)
 
     is_searched = False
@@ -3071,7 +3071,7 @@ def get_business_vendors_dropdown(request):
     serialized = list(BusinessVendorSerializerDropdown(all_vendors, many=True).data)
 
     paginator = CustomPagination()
-    paginator.page_size = 1000 if no_pagination else 10
+    paginator.page_size = 10 if page else 100000
     paginated_data = paginator.paginate_queryset(serialized, request)
     response = paginator.get_paginated_response(paginated_data, 'vendors', invoice_translations=None, current_page=page, is_searched=is_searched)
     return response

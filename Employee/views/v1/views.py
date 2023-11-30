@@ -493,11 +493,11 @@ def get_Employees(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_Employees_dropdown(request):
-    no_pagination = request.GET.get('no_pagination', None)
+    # no_pagination = request.GET.get('no_pagination', None)
     location_id = request.GET.get('location_id', None)
     search_text = request.GET.get('search_text', None)
     page = request.query_params.get('page', None)
-    is_calendar = request.query_params.get('is_calendar', None)
+    # is_calendar = request.query_params.get('is_calendar', None)
 
     is_searched = False
 
@@ -523,7 +523,7 @@ def get_Employees_dropdown(request):
     serialized = list(EmployeeDropdownSerializer(all_employe,  many=True, context={'request' : request}).data)
 
     paginator = CustomPagination()
-    paginator.page_size = 1000 if (no_pagination or is_calendar) else 10
+    paginator.page_size = 10 if page else 100000
     paginated_data = paginator.paginate_queryset(serialized, request)
     response = paginator.get_paginated_response(paginated_data, 'employees', invoice_translations=None, current_page=page, is_searched=is_searched)
     return response

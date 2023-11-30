@@ -55,7 +55,7 @@ def get_services_dropdown(request):
     serialized = list(ServiceSerializerDropdown(services,  many=True).data)
 
     paginator = CustomPagination()
-    paginator.page_size = 1000 if no_pagination else 10
+    paginator.page_size = 100000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(serialized, request)
     response = paginator.get_paginated_response(paginated_data, 'services', invoice_translations=None, current_page=page)
     return response

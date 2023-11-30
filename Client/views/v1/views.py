@@ -178,7 +178,7 @@ def get_single_client(request):
 @permission_classes([AllowAny])
 def get_client_dropdown(request):
     search_text = request.GET.get('search_text', None)
-    no_pagination = request.GET.get('no_pagination', None)
+    # no_pagination = request.GET.get('no_pagination', None)
     page = request.GET.get('page', None)
     is_searched = False
 
@@ -195,7 +195,7 @@ def get_client_dropdown(request):
     serialized = list(ClientDropdownSerializer(all_client, many=True,  context={'request' : request}).data)
 
     paginator = CustomPagination()
-    paginator.page_size = 1000 if no_pagination else 10
+    paginator.page_size = 10 if page else 100000
     paginated_data = paginator.paginate_queryset(serialized, request)
     response = paginator.get_paginated_response(paginated_data, 'clients', invoice_translations=None, current_page=page, is_searched=is_searched)
     return response
