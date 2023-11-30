@@ -3211,10 +3211,6 @@ def get_customer_detailed_loyalty_points_list(request):
 
     data = CustomerDetailedLoyaltyPointsLogsSerializerOP(customers_points, many=True, context={'request' : request}).data
 
-    # invoicce translation data
-    business_address = BusinessAddress.objects.get(id=location_id)
-    invoice_translations = BusinessAddressSerilaizer(business_address).data
-
     return Response(
         {
             'status' : True,
@@ -3227,7 +3223,6 @@ def get_customer_detailed_loyalty_points_list(request):
                 'per_page_result':results_per_page,
                 'error_message' : None,
                 'data' : data,
-                'invoice_translations':invoice_translations
             }
         },
         status=status.HTTP_200_OK
@@ -3238,34 +3233,10 @@ def get_customer_detailed_loyalty_points_list(request):
 @permission_classes([AllowAny])
 def get_customer_detailed_loyalty_points_detail(request):
     location_id = request.GET.get('location_id', None)
-    client_id = request.GET.get('customer_id', None)
     no_pagination = request.GET.get('no_pagination',None)
-    start_date = request.GET.get('start_date', '2020-01-01')
-    end_date = request.GET.get('end_date', datetime.now().strftime('%Y-%m-%d'))
     loyalty_logs_id = request.GET.get('loyalty_logs_id', None)
 
-
-    if not all([location_id]):
-        return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.MISSING_FIELDS_4001,
-                'status_code_text' : 'MISSING_FIELDS_4001',
-                'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : 'fields are required!',
-                    'fields' : [
-                        'location_id',
-                        'customer_id',
-                    ]
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
     queries = {}
-    if client_id is not None:
-        queries['client_id'] = client_id
 
     if loyalty_logs_id:
         queries['id'] = loyalty_logs_id
@@ -3274,13 +3245,7 @@ def get_customer_detailed_loyalty_points_detail(request):
         'location',
         'client',
         'loyalty',
-    ).filter(
-        location__id = location_id,
-        created_at__date__range = (start_date, end_date),
-        is_active = True,
-        is_deleted = False,
-        **queries
-    ).order_by('-created_at')
+    ).filter(**queries).order_by('-created_at')
 
     all_loyality_logs_count= customers_points.count()
 
