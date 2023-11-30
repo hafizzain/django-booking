@@ -24,10 +24,8 @@ from Service.models import ServiceGroup
 from Product.models import Brand
 from Business.serializers.v1_serializers import BusinessAddressSerilaizer
 
-
-from Reports.serializers import DiscountPromotionSalesReport_serializer
 from Reports.models import DiscountPromotionSalesReport
-from Reports.serializers import DiscountPromotionSalesReport_serializer
+from Reports.serializers import DiscountPromotionSalesReport_serializer, DiscountPromotionSalesReport_serializerOP
 
 
 @api_view(['GET'])
@@ -224,7 +222,7 @@ def get_commission_reports_by_commission_details_updated(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_promotions_and_discounts_sales(request):
+def get_promotions_and_discounts_sales_detail(request):
     location_id = request.GET.get('location_id', None)
     search_text = request.GET.get('search_text', None)
     start_date =  request.GET.get('start_date', None)
@@ -277,6 +275,57 @@ def get_promotions_and_discounts_sales(request):
     ) \
     .order_by('-created_at')
     data = DiscountPromotionSalesReport_serializer(sales, many=True, context={'request' : request}).data
+    
+    paginated_data = paginator.paginate_queryset(data, request)
+
+    return paginator.get_paginated_response(paginated_data, 'sales')
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_promotions_and_discounts_sales_list(request):
+    location_id = request.GET.get('location_id', None)
+    search_text = request.GET.get('search_text', None)
+    start_date =  request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
+
+    if not all([location_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'location id is required',
+                    'fields' : [
+                        'location',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+    paginator = CustomPagination()
+    paginator.page_size = 10
+
+    query = Q(is_deleted = False, is_active = True, location__id = location_id,)
+
+    if search_text:
+        query = Q(invoice_id_str__icontains=search_text)
+        query |= Q(promotion_name__icontains=search_text)
+
+    if start_date and end_date:
+        query &= Q(created_at__range= (start_date, end_date))
+
+    sales = DiscountPromotionSalesReport.objects \
+                .filter(query) \
+                .select_related('location', 'client', 'invoice') \
+                .annotate(invoice_id_str=Cast('invoice__id', CharField())) \
+                .order_by('-created_at')
+    
+    data = DiscountPromotionSalesReport_serializerOP(sales, many=True, context={'request' : request}).data
     
     paginated_data = paginator.paginate_queryset(data, request)
 

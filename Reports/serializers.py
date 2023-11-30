@@ -1240,6 +1240,15 @@ class DiscountPromotionSalesReport_serializer(serializers.ModelSerializer):
             'payment_type'
         ]
 
+
+class DiscountPromotionSalesReport_serializerOP(serializers.ModelSerializer):
+    location = LocationSerializer(read_only=True)
+    client = ClientSerializer()    
+        
+    class Meta:
+        model = DiscountPromotionSalesReport
+        fields = ['id', 'promotion', 'invoice', 'created_at', 'original_price', 'discounted_price', 'location', 'client']
+
         
 
 class AppointmentService_DiscountReportSerializer(serializers.ModelSerializer):

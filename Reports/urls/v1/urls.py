@@ -11,6 +11,8 @@ urlpatterns = [
     path('get_service_target_report/', views.get_service_target_report),
     path('get_retail_target_report/', views.get_retail_target_report),
 
-    path('get_promotions_and_discounts_sales', views.get_promotions_and_discounts_sales)
+    path('get_promotions_and_discounts_sales_list', views.get_promotions_and_discounts_sales_list),
+    path('get_promotions_and_discounts_sales_detail', views.get_promotions_and_discounts_sales_detail),
+
     
 ]
