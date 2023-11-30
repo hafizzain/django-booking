@@ -57,7 +57,7 @@ def get_service(request):
     is_mobile = request.GET.get('is_mobile', None)
     search_text = request.GET.get('search_text', None)
     no_pagination = request.GET.get('no_pagination', None)
-    emp_id = request.GET.get('employee_id', None)
+    service_id = request.GET.get('service_id', None)
 
 
     query = Q(is_deleted=False)
@@ -74,6 +74,9 @@ def get_service(request):
 
     if location:
         query &= Q(location__id=location)
+
+    if service_id:
+        query &= Q(id=service_id)
 
     elif request.user.is_authenticated :
         try:
