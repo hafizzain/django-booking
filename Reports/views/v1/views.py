@@ -227,6 +227,7 @@ def get_promotions_and_discounts_sales_detail(request):
     search_text = request.GET.get('search_text', None)
     start_date =  request.GET.get('start_date', None)
     end_date = request.GET.get('end_date', None)
+    id = request.GET.get('id', None)
 
     if not all([location_id]):
         return Response(
@@ -249,36 +250,32 @@ def get_promotions_and_discounts_sales_detail(request):
     paginator = CustomPagination()
     paginator.page_size = 10
 
-    queries = {}
+    query = Q(is_deleted=False, is_active=True, location__id=location_id)
 
-    query = Q()
-    
+    if id:
+        query &= Q(id=id)
+
     if search_text:
         query = Q(invoice_id_str__icontains=search_text)
         query |= Q(promotion_name__icontains=search_text)
 
     if start_date and end_date:
-        queries['created_at__range'] = (start_date, end_date)
+        query &= Q(created_at__range= (start_date, end_date))
 
     sales = DiscountPromotionSalesReport.objects \
-    .filter(
-        is_deleted = False,
-        is_active = True,
-        location__id = location_id,
-        **queries
-    ) \
-    .annotate(
-        invoice_id_str=Cast('invoice__id', CharField())
-    ) \
-    .filter(
-        query
-    ) \
-    .order_by('-created_at')
+                .filter(query) \
+                .select_related('location', 'client', 'invoice') \
+                .annotate(invoice_id_str=Cast('invoice__id', CharField())) \
+                .order_by('-created_at')
+    
     data = DiscountPromotionSalesReport_serializer(sales, many=True, context={'request' : request}).data
     
     paginated_data = paginator.paginate_queryset(data, request)
 
-    return paginator.get_paginated_response(paginated_data, 'sales')
+    business_address = BusinessAddress.objects.get(id=location_id)
+    invoice_translations = BusinessAddressSerilaizer(business_address).data
+
+    return paginator.get_paginated_response(paginated_data, 'sales', invoice_translations=invoice_translations)
 
 
 @api_view(['GET'])
