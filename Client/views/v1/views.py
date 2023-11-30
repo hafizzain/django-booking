@@ -3242,6 +3242,7 @@ def get_customer_detailed_loyalty_points_detail(request):
     no_pagination = request.GET.get('no_pagination',None)
     start_date = request.GET.get('start_date', '2020-01-01')
     end_date = request.GET.get('end_date', datetime.now().strftime('%Y-%m-%d'))
+    loyalty_logs_id = request.GET.get('loyalty_logs_id', None)
 
 
     if not all([location_id]):
@@ -3265,6 +3266,9 @@ def get_customer_detailed_loyalty_points_detail(request):
     queries = {}
     if client_id is not None:
         queries['client_id'] = client_id
+
+    if loyalty_logs_id:
+        queries['id'] = loyalty_logs_id
 
     customers_points = LoyaltyPointLogs.objects.select_related(
         'location',
