@@ -266,7 +266,7 @@ class Client_TenantSerializer(serializers.ModelSerializer):
         
         
 class ClientGroupSerializer(serializers.ModelSerializer):
-    client = ClientSerializerOP()
+    client = ClientSerializerOP(read_only=True, many=True)
     
     class Meta:
         model = ClientGroup
