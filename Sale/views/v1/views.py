@@ -36,7 +36,7 @@ from Sale.serializers import (AppointmentCheckoutSerializer, BusinessAddressSeri
                             ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, 
                             VoucherOrderSerializer, SaleOrders_CheckoutSerializer, SaleOrders_AppointmentCheckoutSerializer,
                             ServiceSerializerDropdown, ServiceSerializerOP, ServiceGroupSerializerOP, SaleOrders_CheckoutSerializerOP,
-                            SaleOrders_AppointmentCheckoutSerializerOP
+                            SaleOrders_AppointmentCheckoutSerializerOP, ServiceSerializerMainpage
                             )
 from rest_framework.pagination import PageNumberPagination
 from django.core.paginator import Paginator
@@ -118,6 +118,95 @@ def get_service(request):
     services = paginator.get_page(page_number)
 
     serialized = ServiceSerializer(services,  many=True, context={'request' : request, 'location_instance' : location_instance, 'is_mobile' : is_mobile, 'currency_code' : currency_code} )
+    return Response(
+        {
+            'status' : 200,
+            'status_code' : '200',
+            'response' : {
+                'message' : 'All Service',
+                'count':service_count,
+                'pages':page_count,
+                'per_page_result':20,
+                'error_message' : None,
+                'service' : serialized.data,
+                'errors' : errors,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_service_main_page(request):
+    location = request.GET.get('location_id', None)
+    is_mobile = request.GET.get('is_mobile', None)
+    search_text = request.GET.get('search_text', None)
+    no_pagination = request.GET.get('no_pagination', None)
+
+
+    query = Q(is_deleted=False)
+    
+    location_instance = None
+    currency_code = None
+    errors = []
+    
+    if search_text:
+        query &= Q(name__icontains=search_text) |  \
+                 Q(servicegroup_services__name__icontains=search_text) | \
+                 Q(location__address_name__icontains=search_text)
+                 
+
+    if location:
+        query &= Q(location__id=location)
+
+    elif request.user.is_authenticated :
+        try:
+            employee = Employee.objects.get(
+                email = request.user.email
+            )
+        except Exception as err:
+            errors.append(str(err))
+        else:
+            if len(employee.location.all()) > 0:
+                first_location = employee.location.all()[0]
+                location_instance = first_location
+                currency_code = location_instance.currency.code
+                query &= Q(location__id=first_location.id)
+            else:
+                errors.append('Employee Location 0')
+    
+    services = Service.objects \
+                    .filter(query) \
+                    .prefetch_related('location',
+                                      'servicegroup_services',
+                                      'employee_service',
+                                      'employee_service',
+                                      'service_priceservice') \
+                    .with_total_orders() \
+                    .order_by('-total_orders') \
+                    .distinct()
+
+    # if is_mobile then request.user will be employee
+    # so we will filter only those services which are assigned to
+    # that particular employee
+    if is_mobile:
+        emp = Employee.objects.get(email=request.user.email)
+        emp_service_ids = emp.employee_selected_service.distinct().values_list('service__id', flat=True)
+        services = Service.objects.filter(id__in=emp_service_ids).order_by('-created_at')
+
+
+    service_count= services.count()
+
+    page_count = service_count / 10
+    if page_count > int(page_count):
+        page_count = int(page_count) + 1
+    per_page_results = 100000 if no_pagination else 10
+    paginator = Paginator(services, per_page_results)
+    page_number = request.GET.get("page") 
+    services = paginator.get_page(page_number)
+
+    serialized = ServiceSerializerMainpage(services,  many=True, context={'request' : request, 'location_instance' : location_instance, 'is_mobile' : is_mobile, 'currency_code' : currency_code} )
     return Response(
         {
             'status' : 200,

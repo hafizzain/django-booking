@@ -126,6 +126,13 @@ class ServiceGroupSerializer(serializers.ModelSerializer):
 
 class ServiceGroupSerializerOP(serializers.ModelSerializer):
     
+    class Meta:
+        model = ServiceGroup
+        fields = ['id', 'name']
+
+
+class ServiceGroupSerializerOP(serializers.ModelSerializer):
+    
     services  = serializers.SerializerMethodField(read_only=True)
     status  = serializers.SerializerMethodField(read_only=True)
 
@@ -249,7 +256,13 @@ class EmployeeSelectedServiceSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = EmployeeSelectedService
-        fields = ['id', 'service', 'employee', 'level', 'full_name', 'designation','image', 'location']     
+        fields = ['id', 'service', 'employee', 'level', 'full_name', 'designation','image', 'location']
+
+class EmployeeSelectedServiceSerializerOP(serializers.ModelSerializer):
+    
+    class Meta:
+        model = EmployeeSelectedService
+        fields = ['employee__id', 'employee__full_name'] 
 
 class EmployeeSelected_TenantServiceSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField(read_only=True)
@@ -290,6 +303,8 @@ class EmployeeSelected_TenantServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployeeSelectedService
         fields = ['id', 'service', 'employee', 'level', 'full_name', 'designation','image','status', 'location']
+
+
 class Employee_TenantServiceSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
@@ -331,6 +346,12 @@ class LocationServiceSerializer(serializers.ModelSerializer):
         model = BusinessAddress
         #fields = '__all__'
         exclude =  ['is_primary', 'is_active', 'is_closed', 'is_deleted', 'created_at', 'user', 'business', 'is_email_verified','is_mobile_verified']
+
+
+class LocationServiceSerializerOP(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessAddress
+        fields = ['id', 'name']
 
 
 class ServiceSerializerDropdown(serializers.ModelSerializer):
@@ -446,6 +467,50 @@ class ServiceSerializer(serializers.ModelSerializer):
             'enable_vouchers',
             'invoices',
             'total_orders'
+            ]
+
+
+class ServiceSerializerMainpage(serializers.ModelSerializer):
+    location = serializers.SerializerMethodField(read_only=True)
+    employees = serializers.SerializerMethodField(read_only=True)
+    service_group = serializers.SerializerMethodField(read_only=True)
+    price = serializers.SerializerMethodField(read_only=True)
+    
+    def get_price(self, obj):
+        try:
+            ser = obj.service_priceservice.order_by('-created_at').first()
+            return ser.price
+        except Exception as err:
+            pass
+            
+    
+    def get_service_group(self, obj):
+        try:
+            group = obj.servicegroup_services.filter(is_deleted = False)
+            return ServiceGroupSerializerOP(group, many = True ).data
+        except Exception as err:
+            print(str(err))
+            pass
+            
+    
+    def get_employees(self, obj):
+        emp = obj.employee_service.filter(employee__is_deleted = False ) 
+        return EmployeeSelectedServiceSerializerOP(emp, many = True, context=self.context).data
+        
+    
+    def get_location(self, obj):
+        locations = obj.location.filter(is_deleted = False)
+        return LocationServiceSerializerOP(locations, many = True, ).data
+        
+    class Meta:
+        model = Service
+        fields = [
+            'id',
+            'name' , 
+            'employees', 
+            'price',
+            'location',
+            'service_group',
             ]
         
 
