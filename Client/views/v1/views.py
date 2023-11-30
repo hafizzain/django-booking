@@ -678,12 +678,19 @@ def get_client_group(request):
     no_pagination = request.GET.get('no_pagination', None)
     search_text = request.GET.get('search_text', None)
 
-    all_client_group= ClientGroup.objects.all().order_by('-created_at')
+
+    query = Q()
 
     if search_text:
-        all_client_group = all_client_group.filter(name__icontains=search_text)
+        query &= Q(name__icontains=search_text)
 
-    all_client_group_count= all_client_group.count()
+
+    all_client_group = ClientGroup.objects \
+                        .filter(query) \
+                        .prefetch_related('client') \
+                        .order_by('-created_at')
+
+    all_client_group_count = all_client_group.count()
 
     page_count = all_client_group_count / 10
     if page_count > int(page_count):

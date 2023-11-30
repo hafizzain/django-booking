@@ -217,6 +217,25 @@ class ClientSerializer(serializers.ModelSerializer):
                  'country','city','state', 'is_active', 'language', 'about_us', 'marketing','country_obj','customer_note',
                  'created_at', 'total_done_appointments', 'total_sales', 'last_appointment', 'last_sale', 'last_transaction_date']
         
+class ClientSerializerOP(serializers.ModelSerializer):
+    
+    image = serializers.SerializerMethodField()
+
+
+    def get_image(self, obj):
+        if obj.image:
+            try:
+                request = self.context["request"]
+                url = tenant_media_base_url(request, is_s3_url=obj.is_image_uploaded_s3)
+                return f'{url}{obj.image}'
+            except:
+                return f'{obj.image}'
+        return None
+
+    class Meta:
+        model = Client
+        fields = ['id', 'is_active', 'full_name', 'email', 'client_id', 'mobile_number', 'image']
+        
 class Client_TenantSerializer(serializers.ModelSerializer):
     country_obj = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
@@ -247,15 +266,11 @@ class Client_TenantSerializer(serializers.ModelSerializer):
         
         
 class ClientGroupSerializer(serializers.ModelSerializer):
-    client =serializers.SerializerMethodField(read_only=True)
-    
-    def get_client(self, obj):
-        all_client =obj.client.all()
-        return ClientSerializer(all_client, many=True, context=self.context).data
+    client = ClientSerializerOP()
     
     class Meta:
         model = ClientGroup
-        fields = ['id','name','business','is_active','email','created_at','client']
+        fields = ['id','name','is_active','email','created_at','client']
     
 class SubscriptionSerializer(serializers.ModelSerializer):
     
