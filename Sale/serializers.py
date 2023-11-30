@@ -477,20 +477,13 @@ class ServiceSerializerMainpage(serializers.ModelSerializer):
     price = serializers.SerializerMethodField(read_only=True)
     
     def get_price(self, obj):
-        try:
-            ser = obj.service_priceservice.order_by('-created_at').first()
-            return ser.price
-        except Exception as err:
-            pass
+        ser = obj.service_priceservice.order_by('-created_at').first()
+        return ser.price
             
     
     def get_service_group(self, obj):
-        try:
-            group = obj.servicegroup_services.filter(is_deleted = False)
-            return ServiceGroupSerializerOP(group, many = True ).data
-        except Exception as err:
-            print(str(err))
-            pass
+        group = obj.servicegroup_services.filter(is_deleted=False)
+        return ServiceGroupSerializerOP(group, many = True ).data
             
     
     def get_employees(self, obj):
