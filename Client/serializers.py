@@ -709,7 +709,7 @@ class CustomerDetailedLoyaltyPointsLogsSerializerOP(serializers.ModelSerializer)
 
     class Meta:
         model = LoyaltyPointLogs
-        fields = ['customer', 'loyalty', 'points_earned', 'points_redeemed','balance',
+        fields = ['id', 'customer', 'loyalty', 'points_earned', 'points_redeemed','balance',
                   'checkout', 'invoice', 'actual_sale_value_redeemed', 'created_at']
 
 class SaleInvoiceSerializer(serializers.ModelSerializer):
