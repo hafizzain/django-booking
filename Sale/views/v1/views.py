@@ -319,6 +319,9 @@ def get_service_optimized(request):
 def get_service_dropdown(request):
     location = request.GET.get('location_id', None)
     is_mobile = request.GET.get('is_mobile', None)
+    search_text = request.GET.get('search_text', None)
+    page = request.GET.get('page', None)
+    is_searched = False
 
     query = Q(is_deleted=False, is_active=True)
     location_instance = None
@@ -327,6 +330,12 @@ def get_service_dropdown(request):
 
     if location:
         query &= Q(location__id=location)
+
+    if search_text:
+        query &= Q(name__icontains=search_text) |  \
+                 Q(servicegroup_services__name__icontains=search_text) | \
+                 Q(location__address_name__icontains=search_text)
+        is_searched = True
 
     elif request.user.is_authenticated :
         try:
@@ -355,19 +364,12 @@ def get_service_dropdown(request):
         emp_service_ids = emp.employee_selected_service.distinct().values_list('service__id', flat=True)
         service = service.filter(id__in=emp_service_ids)
 
-    serialized = ServiceSerializerDropdown(services,  many=True)
-    return Response(
-        {
-            'status' : 200,
-            'status_code' : '200',
-            'response' : {
-                'message' : 'All Service',
-                'error_message' : None,
-                'service' : serialized.data,
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    serialized = list(ServiceSerializerDropdown(services,  many=True).data)
+    paginator = CustomPagination()
+    paginator.page_size = 10 if page else 100000
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'vendors', invoice_translations=None, current_page=page, is_searched=is_searched)
+    return response
     
 
 @transaction.atomic

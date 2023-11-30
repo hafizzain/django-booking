@@ -3054,7 +3054,6 @@ def get_business_vendors_dropdown(request):
     search_text = request.query_params.get('search_text', None)
     # no_pagination = request.GET.get('no_pagination', None)
     page = request.GET.get('page', None)
-
     is_searched = False
 
     all_vendors = BusinessVendor.objects.filter(is_deleted=False, is_closed=False, is_active=True).order_by('-created_at')
