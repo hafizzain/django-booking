@@ -468,8 +468,9 @@ class ServiceSerializerMainpage(serializers.ModelSerializer):
             
     
     def get_employees(self, obj):
-        emp = obj.employee_service.filter(employee__is_deleted=False).values_list('employee__id', flat=True)
-        return EmployeeSelectedServiceSerializerOP(emp, many = True, context=self.context).data
+        emp_ids = obj.employee_service.filter(employee__is_deleted=False).values_list('employee__id', flat=True)
+        employees = Employee.objects.filter(id__in=emp_ids)
+        return EmployeeSelectedServiceSerializerOP(employees, many = True, context=self.context).data
         
     
     def get_location(self, obj):
