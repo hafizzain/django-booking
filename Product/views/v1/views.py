@@ -1263,7 +1263,7 @@ def get_products(request):
     location_id = request.GET.get('location_id', None)
     search_text = request.query_params.get('search_text', None)
     quick_sales = request.query_params.get('quick_sales', False)
-    product_id = request.query_params.get('product_id', False)
+    product_id = request.query_params.get('product_id', None)
 
     
     query = Q(is_deleted=False)
