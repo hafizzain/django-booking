@@ -1263,11 +1263,16 @@ def get_products(request):
     location_id = request.GET.get('location_id', None)
     search_text = request.query_params.get('search_text', None)
     quick_sales = request.query_params.get('quick_sales', False)
+    product_id = request.query_params.get('product_id', False)
+
     
     query = Q(is_deleted=False)
 
     if quick_sales:
         query &= Q(is_active=True)
+
+    if product_id:
+        query &= Q(id=product_id)
 
     if location_id:
         # Filter out those products which have product stock for this particular location
