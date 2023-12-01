@@ -1904,7 +1904,7 @@ def get_orderstock(request):
     business_addr = BusinessAddress.objects.get(id=str(business_address_id))
     order_stocks = OrderStock.objects \
                     .filter(is_deleted = False, to_location=business_addr) \
-                    .select_related('to_location', 'vendor', 'order_stock__product') \
+                    .select_related('to_location', 'vendor') \
                     .prefetch_related('order_stock') \
                     .order_by('-created_at').distinct()
     

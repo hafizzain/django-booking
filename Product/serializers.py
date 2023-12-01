@@ -635,7 +635,7 @@ class OrderSerializerMainPage(serializers.ModelSerializer):
     
     
     def get_products(self, obj):
-        orderstockproduct = obj.order_stock.all()
+        orderstockproduct = obj.order_stock.select_related('product')
         return OrderProductForOrderSerializer(orderstockproduct, many=True).data
     
     class Meta:
