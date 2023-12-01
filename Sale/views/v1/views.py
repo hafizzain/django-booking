@@ -36,7 +36,8 @@ from Sale.serializers import (AppointmentCheckoutSerializer, BusinessAddressSeri
                             ProductOrderSerializer, ServiceGroupSerializer, ServiceOrderSerializer, ServiceSerializer, 
                             VoucherOrderSerializer, SaleOrders_CheckoutSerializer, SaleOrders_AppointmentCheckoutSerializer,
                             ServiceSerializerDropdown, ServiceSerializerOP, ServiceGroupSerializerOP, SaleOrders_CheckoutSerializerOP,
-                            SaleOrders_AppointmentCheckoutSerializerOP, ServiceSerializerMainpage, ServiceGroupSerializerMainPage
+                            SaleOrders_AppointmentCheckoutSerializerOP, ServiceSerializerMainpage, ServiceGroupSerializerMainPage,
+                            ServiceGroupSerializerOptimized
                             )
 from rest_framework.pagination import PageNumberPagination
 from django.core.paginator import Paginator
@@ -999,7 +1000,7 @@ def get_servicegroup_optimized(request):
     service_group = ServiceGroup.objects \
                                 .prefetch_related('services') \
                                 .filter(query).order_by('-created_at')
-    serialized = list(ServiceGroupSerializerOP(service_group,  many=True, context={'request' : request,
+    serialized = list(ServiceGroupSerializerOptimized(service_group,  many=True, context={'request' : request,
                                                                                    'location_id':location_id}).data)
 
     paginator = CustomPagination()

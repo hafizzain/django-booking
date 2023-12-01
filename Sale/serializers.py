@@ -136,6 +136,22 @@ class ServiceGroupSerializerMainPage(serializers.ModelSerializer):
         model = ServiceGroup
         fields = ['id', 'business', 'name', 'services', 'is_active']
 
+class ServiceGroupSerializerOptimized(serializers.ModelSerializer):
+
+    services  = serializers.SerializerMethodField(read_only=True)
+    status  = serializers.SerializerMethodField(read_only=True)
+
+    def get_status(self, obj):
+        return obj.is_active
+
+    def get_services(self, obj):
+            all_service = obj.services.filter(is_deleted=False)
+            #ser = Service.objects.get(id = obj.services)
+            return ServiceSearchSerializerForServiceGroup(all_service, many = True, context=self.context).data
+
+    class Meta:
+        model = ServiceGroup
+        fields = ['id', 'business', 'name', 'services', 'status', 'allow_client_to_select_team_member']
 
 class ServiceGroupSerializerOP(serializers.ModelSerializer):
     
