@@ -766,10 +766,10 @@ class ProductStockReport_OrderStockReportsSerializer(serializers.ModelSerializer
     consumed_location = BusinessAddressNameSerializer()
     vendor_name = serializers.SerializerMethodField(read_only=True)
     created_at = serializers.SerializerMethodField()
-    short_id = serializers.SerializerMethodField()
+    # short_id = serializers.SerializerMethodField()
 
-    def get_short_id(self, report_instance):
-        return f'{report_instance.short_id}'
+    # def get_short_id(self, report_instance):
+    #     return f'{report_instance.short_id}'
 
 
     def get_created_at(self, report_instance):
