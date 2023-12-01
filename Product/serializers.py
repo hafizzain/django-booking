@@ -5,7 +5,7 @@ from Product.Constants.index import tenant_media_base_url
 from Product.models import (Category, Brand, CurrencyRetailPrice, Product, ProductMedia, ProductOrderStockReport, 
                             ProductStock, OrderStock , OrderStockProduct, ProductConsumption, ProductStockTransfer)
 from Business.models import BusinessAddress, BusinessVendor
-from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer
+from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer, BusiessAddressTransferSerializer
 
 from Utility.models import Language
 from Product.models import ProductTranslations
@@ -655,9 +655,9 @@ class ProductConsumptionSerializer(serializers.ModelSerializer):
 
 class ProductStockTransferSerializer(serializers.ModelSerializer):
 
-    product = ProductOrderSerializer()
-    from_location = BusiessAddressAppointmentSerializer()
-    to_location = BusiessAddressAppointmentSerializer()
+    product = ProductOrderForOrderProductSerializer()
+    from_location = BusiessAddressTransferSerializer()
+    to_location = BusiessAddressTransferSerializer()
     created_at = serializers.DateTimeField(format="%d-%m-%Y")
     
     class Meta:
