@@ -313,7 +313,7 @@ class ProductWithStockSerializerOP(serializers.ModelSerializer):
         if location_id:
             query &= Q(location__id=location_id)
 
-        stock = obj.product_stock.objects.filter(query)
+        stock = obj.product_stock.filter(query)
         return ProductStockSerializerMainPage(stock, many = True).data
 
     class Meta:
