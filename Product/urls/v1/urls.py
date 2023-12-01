@@ -35,6 +35,8 @@ urlpatterns = [
 
     # Stocks Path 
     path('get_stocks/', views.get_stocks),
+    path('get_stocks_dummy/', views.get_stocks_dummy),
+
     path('delete_stock/', views.delete_stock),
     path('filter_stock/', views.filter_stock),
 

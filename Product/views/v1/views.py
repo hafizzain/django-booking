@@ -1627,8 +1627,8 @@ def search_product(request):
 @permission_classes([AllowAny])
 def get_stocks(request):
     location_id = request.GET.get('location_id', None)
-    no_pagination = request.GET.get('no_pagination', None)
     search_text = request.GET.get('search_text', None)
+    page = request.GET.get('page', None)
     
 
     query = Q(is_active=True, is_deleted=False, product_stock__gt=0)
@@ -1647,7 +1647,20 @@ def get_stocks(request):
                     .with_location_based_transfer(location_id) \
                     .order_by('-sold_quantity')
     
-    serialized = ProductWithStockSerializerOP(all_stocks, many=True, context={'location_id' : location_id}).data
+    serialized = list(ProductWithStockSerializerOP(all_stocks, many=True, context={'location_id' : location_id}).data)
+
+    paginator = CustomPagination()
+    paginator.page_size = 10 if page else 100000
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'stocks')
+    return response
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_stocks_dummy(request):
+    all_stocks = Product.objects.filter(is_active=True, is_deleted=False, product_stock__gt=0 ).order_by('-created_at').distinct()
+    serialized = ProductWithStockSerializer(all_stocks, many=True, context={'request' : request}).data
     return Response(
         {
             'status' : True,

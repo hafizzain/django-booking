@@ -50,7 +50,8 @@ class ProductManager(models.QuerySet):
             sold_quantity = Coalesce(
                 Subquery(
                 ProductStock.objects
-                        .filter(product=OuterRef('pk'), location__id=location_id)
+                        .filter(product=OuterRef('pk'), location__id=location_id, is_deleted=False) \
+                        .order_by('-created_at') \
                         .values('sold_quantity')[:1]
             ),
             0,
