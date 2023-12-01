@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Count, IntegerField
+from django.db.models import Count, IntegerField, Sum, FloatField, Q, Subquery, OuterRef
 from django.db.models.functions import Coalesce
 from django.utils.timezone import now
 from django.core.validators import MinValueValidator
@@ -24,6 +24,54 @@ class ProductManager(models.QuerySet):
                 Count('product_orders'),
                 0,
                 output_field=IntegerField()
+            )
+        )
+    
+    def with_location_based_consumption(self, location_id):
+        """
+        Returns the location based consumption of the product
+        args:
+            -locationn_id
+        """
+        consumption_filter = Q(consumptions__location__id=location_id)
+        return self.annotate(
+            total_consumption=Coalesce(
+                Sum('consumptions__quantity', filter=consumption_filter),
+                0.0,
+                output_field=FloatField()
+            )   
+        )
+
+    def with_location_based_stock_info(self, location_id):
+        """
+        Returns the aggregation of the sum of sold quantity for particular location.
+        """
+        return self.annotate(
+            sold_quantity = Coalesce(
+                Subquery(
+                Product.objects
+                        .filter(product=OuterRef('pk'), location__id=location_id)
+                        .values('sold_quantity')[:1]
+            ),
+            0,
+            output_field=IntegerField()
+            ),
+
+        )
+    
+    def with_location_based_transfer(self, location_id):
+        """
+        Returns the sum of quantity transferred from this location to other 
+        locations
+        args:
+            -location_id
+        """
+        transfer_filter = Q(products_stock_transfers__from_location=location_id)
+        return self.annotate(
+            total_transfer = Coalesce(
+                Sum('products_stock_transfers__quantity', filter=transfer_filter),
+                0.0,
+                output_field=FloatField()
             )
         )
 

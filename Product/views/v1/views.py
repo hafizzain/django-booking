@@ -27,7 +27,7 @@ from Product.serializers import (CategorySerializer, BrandSerializer, ProductSer
                                  ,OrderSerializer , OrderProductSerializer, ProductConsumptionSerializer,
                                  ProductStockTransferSerializer, ProductStockReportSerializer,
                                  BrandSerializerDropdown, CategorySerializerDropdown, ProductSerializerDropDown,
-                                 ProductSerializerMainPage, OrderSerializerMainPage
+                                 ProductSerializerMainPage, OrderSerializerMainPage, ProductWithStockSerializerOP
                                  )
 from django.db import transaction
 
@@ -1626,8 +1626,28 @@ def search_product(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_stocks(request):
-    all_stocks = Product.objects.filter(is_active=True, is_deleted=False, product_stock__gt=0 ).order_by('-created_at').distinct()
-    serialized = ProductWithStockSerializer(all_stocks, many=True, context={'request' : request}).data
+    location_id = request.GET.get('location_id', None)
+    no_pagination = request.GET.get('no_pagination', None)
+    search_text = request.GET.get('search_text', None)
+    
+
+    query = Q(is_active=True, is_deleted=False, product_stock__gt=0)
+
+    if search_text:
+        query &= Q(name__icontains=search_text) | \
+                Q(vendor__vendor_name__icontains=search_text) | \
+                Q(category__name__icontains=search_text) | \
+                Q(brand__name__icontains=search_text)
+
+    all_stocks = Product.objects \
+                    .filter(query) \
+                    .prefetch_related('product_stock', 'product_currencyretailprice') \
+                    .with_location_based_stock_info(location_id) \
+                    .with_location_based_consumption(location_id) \
+                    .with_location_based_transfer(location_id) \
+                    .order_by('-sold_quantity')
+    
+    serialized = ProductWithStockSerializerOP(all_stocks, many=True, context={'location_id' : location_id}).data
     return Response(
         {
             'status' : True,

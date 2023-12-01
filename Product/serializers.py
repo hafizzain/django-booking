@@ -166,6 +166,37 @@ class ProductStockSerializer(serializers.ModelSerializer):
                   'alert_when_stock_becomes_lowest', 'sold_quantity','turnover','status_text','status','is_active' ]
         
 
+class ProductStockSerializerMainPage(serializers.ModelSerializer):
+    turnover = serializers.SerializerMethodField()
+    status_text = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+    
+    def get_turnover(self, obj):
+        try:
+            quantity = obj.available_quantity - obj.sold_quantity
+            return 'Highest' if int(quantity) > 0 else 'Lowest' 
+        except Exception as err:
+            print(err)
+            
+    def get_status_text(self, obj):
+        try:
+            #quantity = obj.available_quantity - obj.sold_quantity
+            return 'Highest' if int(obj.sold_quantity) > 50 else 'Lowest'
+        except Exception as err:
+            print(err)
+            
+    def get_status(self, obj):
+        try:
+            quantity = obj.available_quantity - obj.sold_quantity
+            return 'True' if int(quantity) > 0 else 'False'
+        except Exception as err:
+            print(err)
+
+    class Meta:
+        model = ProductStock
+        fields = ['id', 'sold_quantity', 'available_quantity', 'turnover', 'status_text', 'status']
+        
+
 class ProductStockSerializerForProduct(serializers.ModelSerializer):
     current_stock = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField()
@@ -260,6 +291,34 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'arabic_name', 'cost_price','category', 'brand', 'vendor',
                   'stock','stocktransfer','location','consumed','currency_retail_price'
                   ]
+        read_only_fields = ['id']
+
+
+class ProductWithStockSerializerOP(serializers.ModelSerializer):
+    stock = serializers.SerializerMethodField()
+    total_consumption = serializers.FloatField()
+    total_transfer = serializers.FloatField()
+    currency_retail_price = serializers.SerializerMethodField()
+
+    
+    def get_currency_retail_price(self, obj):
+            currency_retail = obj.product_currencyretailprice \
+                                    .filter(product=obj) \
+                                    .select_related('currency')
+            return CurrencyRetailPriceSerializer(currency_retail, many=True).data
+
+    def get_stock(self, obj):
+        location_id = self.context.get('locstion_id', None)
+        query = Q(product=obj, is_deleted=False)
+        if location_id:
+            query &= Q(location__id=location_id)
+
+        stock = obj.product_stock.objects.filter(query)
+        return ProductStockSerializerMainPage(stock, many = True).data
+
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'stock','currency_retail_price', ]
         read_only_fields = ['id']
         
 
