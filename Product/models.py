@@ -90,7 +90,9 @@ class ProductManager(models.QuerySet):
                     ProductStock.objects
                         .filter(OuterRef('pk'), location=location_id, is_deleted=False) \
                         .values('available_quantity')[:1]
-                )
+                ),
+                0.0,
+                output_field=FloatField()
             )
         )
 
