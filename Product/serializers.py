@@ -308,7 +308,7 @@ class ProductWithStockSerializerOP(serializers.ModelSerializer):
         return CurrencyRetailPriceSerializer(currency_retail, many=True).data
 
     def get_stock(self, obj):
-        location_id = self.context.get('locstion_id', None)
+        location_id = self.context.get('location_id', None)
         query = Q(product=obj, is_deleted=False)
         if location_id:
             query &= Q(location__id=location_id)
