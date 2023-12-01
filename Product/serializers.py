@@ -5,7 +5,7 @@ from Product.Constants.index import tenant_media_base_url
 from Product.models import (Category, Brand, CurrencyRetailPrice, Product, ProductMedia, ProductOrderStockReport, 
                             ProductStock, OrderStock , OrderStockProduct, ProductConsumption, ProductStockTransfer)
 from Business.models import BusinessAddress, BusinessVendor
-from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer, BusiessAddressTransferSerializer
+from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer, BusiessAddressTransferSerializer, BusinessAddressNameSerializer
 
 from Utility.models import Language
 from Product.models import ProductTranslations
@@ -90,6 +90,8 @@ class ProductMediaSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductMedia
         fields = ['id', 'image']
+
+
 class CurrencyRetailPriceSerializer(serializers.ModelSerializer):
     currency_code = serializers.SerializerMethodField(read_only=True)
     
@@ -102,6 +104,19 @@ class CurrencyRetailPriceSerializer(serializers.ModelSerializer):
     class Meta:
         model = CurrencyRetailPrice
         fields = '__all__'        
+
+class CurrencyRetailPriceSerializerOP(serializers.ModelSerializer):
+    currency_code = serializers.SerializerMethodField(read_only=True)
+    
+    def get_currency_code(self, obj):
+        try:
+            return obj.currency.code
+        except Exception as err:
+            return str(err)
+            
+    class Meta:
+        model = CurrencyRetailPrice
+        fields = ['retail_price', 'currency', 'currency_code']   
         
 class VendorSerializer(serializers.ModelSerializer):
     class Meta:
@@ -745,10 +760,10 @@ class ProductOrderStockReportSerializer(serializers.ModelSerializer):
 
 class ProductStockReport_OrderStockReportsSerializer(serializers.ModelSerializer):
     
-    from_location = BusiessAddressAppointmentSerializer()
-    to_location = BusiessAddressAppointmentSerializer()
-    location = BusiessAddressAppointmentSerializer()
-    consumed_location = BusiessAddressAppointmentSerializer()
+    from_location = BusinessAddressNameSerializer()
+    to_location = BusinessAddressNameSerializer()
+    location = BusinessAddressNameSerializer()
+    consumed_location = BusinessAddressNameSerializer()
     vendor_name = serializers.SerializerMethodField(read_only=True)
     created_at = serializers.SerializerMethodField()
     short_id = serializers.SerializerMethodField()
@@ -769,29 +784,24 @@ class ProductStockReport_OrderStockReportsSerializer(serializers.ModelSerializer
 
     class Meta:
         model = ProductOrderStockReport
-        fields = ['id', 'from_location', 'to_location', 'quantity', 'short_id', 'location', 
+        fields = ['id', 'from_location', 'to_location', 'quantity', 'location', 
                   'consumed_location', 'vendor_name', 'report_choice', 'quantity', 
-                  'before_quantity', 'after_quantity', 'reorder_quantity', 'created_at', 'vendor'
+                  'before_quantity', 'after_quantity', 'reorder_quantity', 'created_at'
                   ]
     
 
 
 class ProductStockReportSerializer(serializers.ModelSerializer):
-    # avaiable = serializers.SerializerMethodField()
     retail_price = serializers.SerializerMethodField()
     brand = serializers.SerializerMethodField()
     reports = serializers.SerializerMethodField()
 
-    current_stock = serializers.SerializerMethodField()
+    # current_stock = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
 
     def get_created_at(self, product_instance):
         return f'{product_instance.created_at.strftime("%Y-%m-%d")}'
 
-    def get_current_stock(self, product_instance):
-        location_id = self.context.get('location_id')
-        stock = product_instance.product_stock.get(location = location_id, is_deleted=False)
-        return stock.available_quantity
     
     def get_brand(self, obj):
         try:
@@ -805,11 +815,13 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
         product_retails_ = obj.product_currencyretailprice.filter(
             currency__id = currency_id,
             is_deleted = False
+        ).select_related(
+            'currency'
         )
 
         if len(product_retails_) > 0 :
             retail_price_instance = product_retails_[0]
-            return CurrencyRetailPriceSerializer(retail_price_instance).data
+            return CurrencyRetailPriceSerializerOP(retail_price_instance).data
         
         return {}
 
@@ -826,6 +838,12 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
             Q(report_choice = 'Transfer_to', to_location__id = location_id) |
             Q(report_choice__in = ['Purchase', 'Consumed', 'Sold']),
             **filter_query
+        ).select_related(
+            'location',
+            'consumed_location',
+            'from_location',
+            'to_location',
+            'vendor'
         ).order_by('-created_at')
         
         serialized_data = ProductStockReport_OrderStockReportsSerializer(product_reports, many=True)

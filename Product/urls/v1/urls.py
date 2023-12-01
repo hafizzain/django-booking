@@ -67,7 +67,7 @@ urlpatterns = [
     path('update_product_stock_transfer/', views.update_product_stock_transfer),
     
     #Inventory Reports
-    path('get_product_stock_report/', views.get_product_stock_report_dummy),
+    path('get_product_stock_report/', views.get_product_stock_report),
     path('get_product_stock_report_dummy/', views.get_product_stock_report_dummy),
 
 

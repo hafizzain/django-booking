@@ -75,6 +75,25 @@ class ProductManager(models.QuerySet):
                 output_field=FloatField()
             )
         )
+    
+    def with_location_based_current_stock(self, location_id):
+        """
+        Returns the sum of quantity transferred from this location to other 
+        locations
+        args:
+            -location_id
+        """
+        stock_filter = Q(location=location_id, is_deleted=False)
+        return self.annotate(
+            current_stock=Coalesce(
+                Subquery(
+                    ProductStock.objects
+                        .filter(OuterRef('pk'), location=location_id, is_deleted=False) \
+                        .values('available_quantity')[:1]
+                )
+            )
+        )
+
 
 class Category(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
@@ -352,10 +371,7 @@ class ProductOrderStockReport(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_stock_report')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='users_location_product_stock_report')
-
     vendor = models.ForeignKey(BusinessVendor, on_delete=models.CASCADE, related_name='vendor_product_stock_report', default=None, null=True, blank=True)
-
-    
     location =  models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='location_product_stock_report')
     consumed_location =  models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='consumed_location_product_stock_report')
     from_location = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='from_location_product_stock_report')

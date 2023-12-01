@@ -638,6 +638,12 @@ class BusiessAddressAppointmentSerializer(serializers.ModelSerializer):
         fields = ['id', 'address_name', 'currency']
 
 
+class BusinessAddressNameSerializer(serializers.ModelSerializer):
+
+    model = BusinessAddress
+    fields = ['address_name']
+
+
 class BusiessAddressTransferSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessAddress
