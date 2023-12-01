@@ -789,7 +789,7 @@ class ProductStockReport_OrderStockReportsSerializer(serializers.ModelSerializer
 class ProductStockReportSerializer(serializers.ModelSerializer):
     retail_price = serializers.SerializerMethodField()
     brand = serializers.SerializerMethodField()
-    reports = serializers.SerializerMethodField()
+    # reports = serializers.SerializerMethodField()
     current_stock = serializers.FloatField()
     created_at = serializers.SerializerMethodField()
 
@@ -819,34 +819,34 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
         
         return {}
 
-    def get_reports(self, product_instance):
-        report_type = self.context.get('report_type', None)
-        location_id = self.context.get('location_id', None)
+    # def get_reports(self, product_instance):
+    #     report_type = self.context.get('report_type', None)
+    #     location_id = self.context.get('location_id', None)
 
-        query = Q(product=product_instance)
+    #     query = Q(product=product_instance)
 
-        if report_type:
-            query &= Q(report_choice=report_type)
+    #     if report_type:
+    #         query &= Q(report_choice=report_type)
 
-        product_reports = ProductOrderStockReport.objects.filter(
-            Q(report_choice = 'Transfer_from', from_location__id = location_id) |
-            Q(report_choice = 'Transfer_to', to_location__id = location_id) |
-            Q(report_choice__in = ['Purchase', 'Consumed', 'Sold']),
-            query
-        ).select_related(
-            'location',
-            'consumed_location',
-            'from_location',
-            'to_location',
-            'vendor'
-        )
+    #     product_reports = ProductOrderStockReport.objects.filter(
+    #         Q(report_choice = 'Transfer_from', from_location__id = location_id) |
+    #         Q(report_choice = 'Transfer_to', to_location__id = location_id) |
+    #         Q(report_choice__in = ['Purchase', 'Consumed', 'Sold']),
+    #         query
+    #     ).select_related(
+    #         'location',
+    #         'consumed_location',
+    #         'from_location',
+    #         'to_location',
+    #         'vendor'
+    #     )
         
-        serialized_data = ProductStockReport_OrderStockReportsSerializer(product_reports, many=True)
-        return serialized_data.data
+    #     serialized_data = ProductStockReport_OrderStockReportsSerializer(product_reports, many=True)
+    #     return serialized_data.data
             
     class Meta:
         model = Product
-        fields = ['id', 'name', 'arabic_name', 'retail_price', 'current_stock', 'brand', 'reports', 'cost_price', 'created_at']
+        fields = ['id', 'name', 'arabic_name', 'retail_price', 'current_stock', 'brand', 'cost_price', 'created_at']
 
 
 class ProductInsightSerializer(serializers.ModelSerializer):
