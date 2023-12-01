@@ -847,8 +847,8 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
             'vendor'
         ).order_by('-created_at')
         
-        serialized_data = ProductStockReport_OrderStockReportsSerializer(product_reports, many=True)
-        return serialized_data.data
+        serialized_data =list(ProductStockReport_OrderStockReportsSerializer(product_reports, many=True).data)
+        return serialized_data
             
     class Meta:
         model = Product
