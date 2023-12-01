@@ -3061,7 +3061,7 @@ def get_product_stock_report_dummy(request):
     products = Product.objects \
                 .filter(query) \
                 .prefetch_related('product_stock', 'product_currencyretailprice', 'product_stock_report') \
-                .with_location_based_current_stock()
+                .with_location_based_current_stock(location_id)
     
     serialized = list(ProductStockReportSerializer(
         products, 
