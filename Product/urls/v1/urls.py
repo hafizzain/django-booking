@@ -68,6 +68,8 @@ urlpatterns = [
     
     #Inventory Reports
     path('get_product_stock_report/', views.get_product_stock_report),
+    path('get_product_stock_report_dummy/', views.get_product_stock_report_dummy),
+
 
     # Insights 
     path('get_filtered_insight_products/', insights.FilteredInsightProducts.as_view()),

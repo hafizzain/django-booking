@@ -3001,3 +3001,85 @@ def get_product_stock_report(request):
     paginated_data = paginator.paginate_queryset(serialized, request)
     response = paginator.get_paginated_response(paginated_data, 'product_stock_report')
     return response
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_product_stock_report_dummy(request):
+
+    brand_id = request.GET.get('brand_id', None)
+    query = request.GET.get('query', '')
+    report_type = request.GET.get('report_type', None)
+    location_id = request.GET.get('location_id', None)
+
+    if not all([location_id]):
+        return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'All fields are required.',
+                    'fields' : [
+                        'location_id',
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        location = BusinessAddress.objects.get(
+            id = location_id
+        )
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : 'LOCATION DOES NOT EXIST',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    filter_queries = {}
+
+    if brand_id:
+        filter_queries['brand__id'] = brand_id
+
+    if report_type:
+        filter_queries['product_stock_report__report_choice'] = report_type
+
+    products = Product.objects.prefetch_related(
+        'product_stock'
+    ).filter(
+        product_stock__location = location,
+        is_deleted = False,
+        name__icontains=query,
+        **filter_queries
+    ).prefetch_related(
+        'product_stock',
+        'product_currencyretailprice',
+        'product_stock_report',
+    )
+    
+    serialized = list(ProductStockReportSerializer(
+        products, 
+        many = True,
+        context = {
+            'location_id' : location.id,
+            'report_type' : report_type,
+            'location_currency_id' : location.currency.id if location.currency else None,
+        }
+    ).data)
+    
+    paginator = CustomPagination()
+    paginator.page_size = 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'product_stock_report')
+    return response

@@ -790,7 +790,7 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
 
     def get_current_stock(self, product_instance):
         location_id = self.context.get('location_id')
-        stock = ProductStock.objects.get(product=product_instance, location = location_id, is_deleted=False)#[0]
+        stock = product_instance.product_stock.get(location = location_id, is_deleted=False)
         return stock.available_quantity
     
     def get_brand(self, obj):
@@ -802,8 +802,7 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
     def get_retail_price(self, obj):
         currency_id = self.context.get('location_currency_id')
 
-        product_retails_ = CurrencyRetailPrice.objects.filter(
-            product = obj,
+        product_retails_ = obj.product_currencyretailprice.filter(
             currency__id = currency_id,
             is_deleted = False
         )
@@ -822,11 +821,10 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
         if report_type:
             filter_query['report_choice'] = report_type
 
-        product_reports = ProductOrderStockReport.objects.filter(
+        product_reports = product_instance.product_stock_report.filter(
             Q(report_choice = 'Transfer_from', from_location__id = location_id) |
             Q(report_choice = 'Transfer_to', to_location__id = location_id) |
             Q(report_choice__in = ['Purchase', 'Consumed', 'Sold']),
-            product = product_instance,
             **filter_query
         ).order_by('-created_at')
         
@@ -836,7 +834,6 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'name', 'arabic_name', 'retail_price', 'brand', 'reports', 'current_stock', 'cost_price', 'created_at']
-        #  'avaiable',
 
 
 class ProductInsightSerializer(serializers.ModelSerializer):
