@@ -2554,21 +2554,23 @@ def get_product_consumptions(request):
     search_text = request.query_params.get('search_text', None)
     no_pagination = request.query_params.get('no_pagination', None)
     location_id = request.query_params.get('location_id', None)
-    
-    product_consumptions = ProductConsumption.objects.filter(is_deleted=False).order_by('-created_at')
+
+
+    query = Q(is_deleted=False)
 
     if location_id:
-        location = BusinessAddress.objects.get(id=str(location_id))
-        product_consumptions = product_consumptions.filter(location=location)
-    
+        query &= Q(location__id=location_id)
+
     if search_text:
         query = Q(product__name__icontains=search_text)
         query |= Q(location__address_name__icontains=search_text)
         query |= Q(quantity_s__icontains=search_text)
 
-        product_consumptions = product_consumptions.annotate(
-            quantity_s=Cast('quantity', CharField())
-        ).filter(query)
+    product_consumptions = ProductConsumption.objects \
+                            .select_related('product', 'location') \
+                            .annotate(quantity_s=Cast('quantity', CharField())) \
+                            .filter(query) \
+                            .order_by('-created_at')
    
     serialized = list(ProductConsumptionSerializer(product_consumptions, many=True).data)
 

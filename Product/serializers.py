@@ -646,7 +646,7 @@ class OrderSerializerMainPage(serializers.ModelSerializer):
 
 class ProductConsumptionSerializer(serializers.ModelSerializer):
 
-    product = ProductOrderSerializer()
+    product = ProductOrderForOrderProductSerializer()
     location = BusiessAddressAppointmentSerializer()
     class Meta:
         model = ProductConsumption
