@@ -83,12 +83,11 @@ class ProductManager(models.QuerySet):
         args:
             -location_id
         """
-        stock_filter = Q(location=location_id, is_deleted=False)
         return self.annotate(
             current_stock=Coalesce(
                 Subquery(
                     ProductStock.objects
-                        .filter(OuterRef('pk'), location=location_id, is_deleted=False) \
+                        .filter(product=OuterRef('pk'), location=location_id, is_deleted=False) \
                         .values('available_quantity')[:1]
                 ),
                 0.0,
