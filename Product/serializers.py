@@ -795,7 +795,7 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
     retail_price = serializers.SerializerMethodField()
     brand = serializers.SerializerMethodField()
     reports = serializers.SerializerMethodField()
-    # current_stock = serializers.FloatField()
+    current_stock = serializers.FloatField()
 
     # current_stock = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
@@ -852,7 +852,7 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
             
     class Meta:
         model = Product
-        fields = ['id', 'name', 'arabic_name', 'retail_price', 'brand', 'reports', 'cost_price', 'created_at']
+        fields = ['id', 'name', 'arabic_name', 'retail_price', 'current_stock', 'brand', 'reports', 'cost_price', 'created_at']
 
 
 class ProductInsightSerializer(serializers.ModelSerializer):
