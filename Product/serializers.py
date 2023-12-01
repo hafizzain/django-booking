@@ -766,10 +766,6 @@ class ProductStockReport_OrderStockReportsSerializer(serializers.ModelSerializer
     consumed_location = BusinessAddressNameSerializer()
     vendor_name = serializers.SerializerMethodField(read_only=True)
     created_at = serializers.SerializerMethodField()
-    # short_id = serializers.SerializerMethodField()
-
-    # def get_short_id(self, report_instance):
-    #     return f'{report_instance.short_id}'
 
 
     def get_created_at(self, report_instance):
@@ -780,7 +776,6 @@ class ProductStockReport_OrderStockReportsSerializer(serializers.ModelSerializer
             return obj.vendor.vendor_name
         except Exception as err:
             return None
-    
 
     class Meta:
         model = ProductOrderStockReport
@@ -796,8 +791,6 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
     brand = serializers.SerializerMethodField()
     reports = serializers.SerializerMethodField()
     current_stock = serializers.FloatField()
-
-    # current_stock = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
 
     def get_created_at(self, product_instance):
@@ -827,18 +820,19 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
         return {}
 
     def get_reports(self, product_instance):
-        filter_query = {}
         report_type = self.context.get('report_type', None)
         location_id = self.context.get('location_id', None)
 
-        if report_type:
-            filter_query['report_choice'] = report_type
+        query = Q(product=product_instance)
 
-        product_reports = product_instance.product_stock_report.filter(
+        if report_type:
+            query &= Q(report_choice=report_type)
+
+        product_reports = ProductOrderStockReport.objects.filter(
             Q(report_choice = 'Transfer_from', from_location__id = location_id) |
             Q(report_choice = 'Transfer_to', to_location__id = location_id) |
             Q(report_choice__in = ['Purchase', 'Consumed', 'Sold']),
-            **filter_query
+            query
         ).select_related(
             'location',
             'consumed_location',
