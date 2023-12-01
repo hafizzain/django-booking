@@ -49,7 +49,7 @@ class ProductManager(models.QuerySet):
         return self.annotate(
             sold_quantity = Coalesce(
                 Subquery(
-                Product.objects
+                ProductStock.objects
                         .filter(product=OuterRef('pk'), location__id=location_id)
                         .values('sold_quantity')[:1]
             ),

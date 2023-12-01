@@ -302,10 +302,10 @@ class ProductWithStockSerializerOP(serializers.ModelSerializer):
 
     
     def get_currency_retail_price(self, obj):
-            currency_retail = obj.product_currencyretailprice \
-                                    .filter(product=obj) \
-                                    .select_related('currency')
-            return CurrencyRetailPriceSerializer(currency_retail, many=True).data
+        currency_retail = obj.product_currencyretailprice \
+                                .filter(product=obj) \
+                                .select_related('currency')
+        return CurrencyRetailPriceSerializer(currency_retail, many=True).data
 
     def get_stock(self, obj):
         location_id = self.context.get('locstion_id', None)
