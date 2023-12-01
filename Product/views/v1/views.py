@@ -1892,7 +1892,7 @@ def create_orderstock(request):
                 }
             },
             status=status.HTTP_201_CREATED
-        ) 
+        )
  
 @api_view(['GET'])
 @permission_classes([AllowAny])
