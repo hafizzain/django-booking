@@ -2721,9 +2721,16 @@ def get_product_stock_transfers(request):
     search_text = request.query_params.get('search_text', None)
     no_pagination = request.query_params.get('no_pagination', None)
 
-    stock_tranfers = ProductStockTransfer.objects.filter(is_deleted=False).order_by('-created_at').distinct()
+    query = Q(is_deleted=False)
+
     if search_text:
-        stock_tranfers = stock_tranfers.filter(product__name__icontains=search_text)
+        query &= Q(product__name__icontains=search_text)
+
+    stock_tranfers = ProductStockTransfer.objects \
+                        .select_related('product', 'to_location', 'from_location') \
+                        .filter(query) \
+                        .order_by('-created_at').distinct()
+
 
     serialized = list(ProductStockTransferSerializer(stock_tranfers, many=True).data)
     paginator = CustomPagination()
