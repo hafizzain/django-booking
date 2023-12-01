@@ -27,7 +27,7 @@ from Product.serializers import (CategorySerializer, BrandSerializer, ProductSer
                                  ,OrderSerializer , OrderProductSerializer, ProductConsumptionSerializer,
                                  ProductStockTransferSerializer, ProductStockReportSerializer,
                                  BrandSerializerDropdown, CategorySerializerDropdown, ProductSerializerDropDown,
-                                 ProductSerializerMainPage
+                                 ProductSerializerMainPage, OrderSerializerMainPage
                                  )
 from django.db import transaction
 
@@ -1903,16 +1903,15 @@ def get_orderstock(request):
     
     business_addr = BusinessAddress.objects.get(id=str(business_address_id))
     order_stocks = OrderStock.objects \
-    .filter(
-        is_deleted = False,                                      
-        # order_stock__product__is_deleted=False, # order record should be there even if its product gets soft deeleted
-        to_location=business_addr) \
-    .order_by('-created_at').distinct()
+                    .filter(is_deleted = False, to_location=business_addr) \
+                    .select_related('to_location', 'vendor', 'order_stock__product') \
+                    .prefetch_related('order_stock') \
+                    .order_by('-created_at').distinct()
     
     if search_text:
         order_stocks = order_stocks.filter(id__icontains=search_text)
         
-    serialized = list(OrderSerializer(order_stocks, many=True, context={'request' : request}).data)
+    serialized = list(OrderSerializerMainPage(order_stocks, many=True, context={'request' : request}).data)
 
     paginator = CustomPagination()
     paginator.page_size = 100000 if no_pagination else 10

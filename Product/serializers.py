@@ -562,13 +562,26 @@ class ProductOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
+
+
+class ProductOrderForOrderProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'name']
         
 class OrderProductSerializer(serializers.ModelSerializer):
     product = ProductOrderSerializer()
-
     class Meta:
         model = OrderStockProduct
         fields = ['id', 'order', 'quantity','rec_quantity', 'product', 'status', 'note', 'is_finished']
+
+
+class OrderProductForOrderSerializer(serializers.ModelSerializer):
+    product = ProductOrderForOrderProductSerializer()
+
+    class Meta:
+        model = OrderStockProduct
+        fields = ['id', 'quantity','rec_quantity', 'product', 'status', 'is_finished']
 
 class OrderSerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField(read_only=True)
@@ -602,6 +615,33 @@ class OrderSerializer(serializers.ModelSerializer):
         model= OrderStock
         fields=('id','business','vendor','to_location','from_location','to_location_name',
                 'status','vendor_name','location_name','products', 'created_at')
+
+class OrderSerializerMainPage(serializers.ModelSerializer):
+    products = serializers.SerializerMethodField(read_only=True)
+    to_location_name = serializers.SerializerMethodField(read_only=True)
+    vendor_name = serializers.SerializerMethodField(read_only=True)
+    
+    def get_vendor_name(self, obj):
+        try:
+            return obj.vendor.vendor_name
+        except Exception as err:
+            return None
+        
+    def get_to_location_name(self, obj):
+        try:
+            return obj.to_location.address_name
+        except Exception as err:
+            return None
+    
+    
+    def get_products(self, obj):
+        orderstockproduct = obj.order_stock.all()
+        return OrderProductForOrderSerializer(orderstockproduct, many=True).data
+    
+    class Meta:
+        model = OrderStock
+        fields=('id', 'vendor','to_location', 'to_location_name',
+                'status','vendor_name', 'products')
 
 
 class ProductConsumptionSerializer(serializers.ModelSerializer):
