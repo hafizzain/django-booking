@@ -1628,8 +1628,9 @@ def search_product(request):
 def get_stocks(request):
     location_id = request.GET.get('location_id', None)
     search_text = request.GET.get('search_text', None)
+    no_pagination = request.GET.get('no_pagination', None)
     page = request.GET.get('page', None)
-    
+
 
     query = Q(is_active=True, is_deleted=False, product_stock__gt=0)
 
@@ -1650,7 +1651,7 @@ def get_stocks(request):
     serialized = list(ProductWithStockSerializerOP(all_stocks, many=True, context={'location_id' : location_id}).data)
 
     paginator = CustomPagination()
-    paginator.page_size = 10 if page else 100000
+    paginator.page_size = 100000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(serialized, request)
     response = paginator.get_paginated_response(paginated_data, 'stocks')
     return response
