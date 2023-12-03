@@ -23,7 +23,7 @@ from Sale.serializers import (MemberShipOrderSerializer, POSerializerForClientSa
                               SOSerializerForClientSale)
 
 #from Service.models import Service
-from Service.models import Service
+from Service.models import Service, PriceService
 from Employee.models import CategoryCommission, CommissionSchemeSetting, EmployeDailySchedule, Employee, EmployeeSelectedService, EmployeeCommission
 from Authentication.models import User
 from NStyle.Constants import StatusCodes
@@ -2266,16 +2266,28 @@ def create_checkout_device(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def service_appointment_count(request):
-    address = request.GET.get('address', None)
+    location_id = request.GET.get('address', None)
     duration = request.GET.get('duration', None) 
     
-    
+    query = Q(is_deleted=False)
+
     try:
-        adds = BusinessAddress.objects.get(id = address)
+        location = BusinessAddress.objects.get(id = location_id)
+        query &= Q(location__id=location_id)
     except Exception as err:
-        adds = None
+        location = None
         print(err)
-    services = Service.objects.all()
+
+
+    currency = BusinessAddress.objects.get(id=location_id).currency
+    if currency:
+        # filter out those services which has the currency price for the current location currency.
+        service_ids = list(PriceService.objects.filter(currency=currency).values_list('service__id', flat=True))
+        query &= Q(id__in=service_ids)
+
+
+    services = Service.objects.filter(query)
+    
     return_data =[]
     for ser in services:
         count = 0
@@ -2284,15 +2296,15 @@ def service_appointment_count(request):
             day = today - timedelta(days=int(duration))
 
             app_service = AppointmentService.objects.filter(service=ser,
-                                                            business_address=adds,
+                                                            business_address=location,
                                                             appointment_status__in=['Paid', 'Done'],
                                                             created_at__gte = day )
-            sale_services = ServiceOrder.objects.filter(service = ser, created_at__gte = day, location=adds)
+            sale_services = ServiceOrder.objects.filter(service = ser, created_at__gte = day, location=location)
         else:
             app_service = AppointmentService.objects.filter(service=ser,
-                                                            business_address=adds,
+                                                            business_address=location,
                                                             appointment_status__in=['Paid', 'Done'],)
-            sale_services = ServiceOrder.objects.filter(service=ser, location=adds)
+            sale_services = ServiceOrder.objects.filter(service=ser, location=location)
 
 
         count += app_service.count()
