@@ -262,20 +262,25 @@
               <div class="flex items-center justify-between text-primary text-sm font-bold">
                 <div>
                   <p>{{ business_address.primary_translation.subtotal}}</p>
-                  {% if business_address.secondary_translation.subtotal %}<p class="arabic">{{ business_address.secondary_translation.subtotal}} {% endif %}</p>
+                  {% if business_address.secondary_translation.subtotal %}<p class="arabic">{{ business_address.secondary_translation.subtotal }} {% endif %}</p>
                 </div>
                 <p>{{sub_total}} {{currency_code}}</p>
               </div>
               
-
-              <div class="flex items-center justify-between text-primary text-sm font-bold">
-                <div>
-                  <p>{{ business_address.primary_translation.tips }}</p>
-                  {% if business_address.secondary_translation.tips %}<p class="arabic">{{ business_address.secondary_translation.tips}} {% endif %}</p>
+              {% if total_tip %}
+                <div class="flex items-center justify-between text-primary text-sm font-bold">
+                  <div>
+                    <p>{{ business_address.primary_translation.tips }}</p>
+                    {% if business_address.secondary_translation.tips %}<p class="arabic">{{ business_address.secondary_translation.tips }} {% endif %}</p>
+                  </div>
+                  <p>{{ total_tip }} {{ currency_code }}</p>
                 </div>
-                <p>{{ total_tip }} {{ currency_code }}</p>
-              </div>
-              
+              {% endif %}
+
+              {% if tax_applied or tax_applied1 %}
+                <p>{{ business_address.primary_translation.taxes }}</p>
+                {% if business_address.secondary_translation.taxes %}<p class="arabic">{{ business_address.secondary_translation.taxes }} {% endif %}</p>
+              {% endif %}
               {% if tax_applied %}
               <div
                 class="flex items-center justify-between text-[#7B7B7B] text-sm"
