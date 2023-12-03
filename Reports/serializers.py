@@ -246,7 +246,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             # Mannaging Product Commission
             if commission.commission_category == 'Retail':
                 product_commission += full_commission
-                total_product_price += commission.sale_value
+                total_product_price += commission.sale_value * commission.quantity
 
             # Mannaging Services Commission
             elif commission.commission_category == 'Service':
@@ -1009,7 +1009,7 @@ class EmployeeCommissionReportsSerializer(serializers.ModelSerializer):
             "id": f'{commission_instance.id}',
             "quantity": commission_instance.quantity,
             "name": commission_instance.item_name,
-            "price": commission_instance.sale_value,
+            "price": commission_instance.sale_value * commission_instance.quantity,
             "order_type": commission_instance.commission_category,
             "payment_type": "Cash",
             "tip": commission_instance.tip,

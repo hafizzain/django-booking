@@ -208,7 +208,7 @@ def get_commission_reports_by_commission_details_updated(request):
         '-created_at'
     )
 
-    # invoicce translation data
+    # invoice translation data
     business_address = BusinessAddress.objects.get(id=location_id)
     invoice_translations = BusinessAddressSerilaizer(business_address).data
 
