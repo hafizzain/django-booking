@@ -14,14 +14,16 @@ from Utility.models import Language
 
 class ProductManager(models.QuerySet):
 
-    def with_total_orders(self):
+    def with_total_orders(self, location):
         """
         Returns the total sale of a product by taking the sum of product of quantity * current_price
         or quantity * discount_price.
         """
+
+        order_filter = Q(location=location)
         return self.annotate(
             total_orders = Coalesce(
-                Count('product_orders'),
+                Count('product_orders', filter=order_filter),
                 0,
                 output_field=IntegerField()
             )
