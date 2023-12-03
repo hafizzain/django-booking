@@ -1455,11 +1455,11 @@ def get_products_optimized(request):
         query &= Q(is_active=True)
 
     if location_id:
-        # Filter out those products which have product stock for this particular location
+        # only show products if they have price added in that particular location 
         location = BusinessAddress.objects.get(id=location_id)
-        product_ids_from_stock = list(ProductStock.objects.filter(location__id=location_id).values_list('product__id', flat=True))
+        # product_ids_from_stock = list(ProductStock.objects.filter(location__id=location_id).values_list('product__id', flat=True))
         product_ids_from_price = list(CurrencyRetailPrice.objects.filter(currency__id=location.currency.id).values_list('product__id', flat=True))
-        ids = product_ids_from_price + product_ids_from_stock
+        ids = product_ids_from_price
 
         query &= Q(id__in=ids)
     
