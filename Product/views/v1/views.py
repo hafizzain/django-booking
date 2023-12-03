@@ -1456,8 +1456,12 @@ def get_products_optimized(request):
 
     if location_id:
         # Filter out those products which have product stock for this particular location
-        product_ids = list(ProductStock.objects.filter(location__id=location_id).values_list('product__id', flat=True))
-        query &= Q(id__in=product_ids)
+        location = BusinessAddress.objects.get(id=id)
+        product_ids_from_stock = list(ProductStock.objects.filter(location__id=location_id).values_list('product__id', flat=True))
+        product_ids_from_price = list(CurrencyRetailPrice.objects.filter(currency__id=location.currency.id).values_list('product__id', flat=True))
+        ids = product_ids_from_price + product_ids_from_stock
+
+        query &= Q(id__in=ids)
     
     try:
         location = BusinessAddress.objects.get(id=location_id)
