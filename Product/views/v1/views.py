@@ -1648,7 +1648,7 @@ def get_stocks(request):
 
     location = BusinessAddress.objects.get(id=location_id)
 
-    query = Q(is_active=True, is_deleted=False, product_stock__gt=0)
+    query = Q(is_active=True, is_deleted=False)
 
     if search_text:
         query &= Q(name__icontains=search_text) | \
