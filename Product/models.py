@@ -41,7 +41,7 @@ class ProductManager(models.QuerySet):
 
         return self.annotate(
             total_consumption=Coalesce(
-                Sum('consumptions__quantity', filter=query, distinct=True),
+                Sum('consumptions__quantity', filter=query),
                 0.0,
                 output_field=FloatField()
             )   
