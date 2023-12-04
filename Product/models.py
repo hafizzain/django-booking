@@ -35,10 +35,11 @@ class ProductManager(models.QuerySet):
         args:
             -locationn_id
         """
-        consumption_filter = Q(is_deleted=False, consumptions__location_id=location_id)
+        location = BusinessAddress.objects.get(id=location_id)
+        consumption_filter = Q(is_deleted=False, consumptions__location=location)
         return self.annotate(
             total_consumption=Coalesce(
-                Sum('consumptions__quantity', filter=consumption_filter),
+                Sum('consumptions__quantity', filter=consumption_filter, distinct=True),
                 0.0,
                 output_field=FloatField()
             )   
@@ -69,7 +70,8 @@ class ProductManager(models.QuerySet):
         args:
             -location_id
         """
-        transfer_filter = Q(products_stock_transfers__from_location=location_id, is_deleted=False)
+        location = BusinessAddress.objects.get(id=location_id)
+        transfer_filter = Q(products_stock_transfers__from_location=location, is_deleted=False)
         return self.annotate(
             total_transfer = Coalesce(
                 Sum('products_stock_transfers__quantity', filter=transfer_filter, distinct=True),
