@@ -320,7 +320,7 @@ class ProductWithStockSerializerOP(serializers.ModelSerializer):
     total_transfer = serializers.FloatField()
     currency_retail_price = serializers.SerializerMethodField()
 
-    def get_total_consumption(self, obj):
+    def get_total_consumption_debug(self, obj):
         query = Q(product=obj)
         location_id = self.context.get('location_id', None)
 
