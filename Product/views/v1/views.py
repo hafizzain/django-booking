@@ -2779,7 +2779,7 @@ def get_product_stock_transfers(request):
     stock_tranfers = ProductStockTransfer.objects \
                         .select_related('product', 'to_location', 'from_location') \
                         .filter(query) \
-                        .order_by('-created_at').distinct()
+                        .order_by('-created_at')
 
 
     serialized = list(ProductStockTransferSerializer(stock_tranfers, many=True).data)
