@@ -838,14 +838,18 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
         query = Q(product=product_instance)
 
         if report_type:
-            query &= Q(report_choice=report_type)
+            if report_type == 'Purchase':
+                query &= Q(report_choice=report_type)
+            elif report_type == 'Consumed':
+                query &= Q(report_choice=report_type)
+            elif report_type == 'Sold':
+                query &= Q(report_choice=report_type)
+            elif report_type == 'Transfer_From':
+                query &= Q(from_location__id=location_id)
+            elif report_type == 'Transfer_To':
+                query &= Q(to_location__id=location_id)
 
-        product_reports = ProductOrderStockReport.objects.filter(
-            Q(report_choice = 'Transfer_from', from_location__id = location_id) |
-            Q(report_choice = 'Transfer_to', to_location__id = location_id) |
-            Q(report_choice__in = ['Purchase', 'Consumed', 'Sold']),
-            query
-        ).select_related(
+        product_reports = ProductOrderStockReport.objects.filter(query).select_related(
             'location',
             'consumed_location',
             'from_location',

@@ -3071,8 +3071,8 @@ def get_product_stock_report_dummy(request):
     if brand_id:
         query &= Q(brand__id=brand_id)
 
-    if report_type:
-        query &= Q(product_stock_report__report_choice=report_type)
+    # if report_type:
+    #     query &= Q(product_stock_report__report_choice=report_type)
 
     products = Product.objects \
                 .filter(query) \
