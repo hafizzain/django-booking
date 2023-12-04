@@ -1648,7 +1648,6 @@ def get_stocks(request):
                     .filter(query) \
                     .prefetch_related('product_stock', 'product_currencyretailprice') \
                     .with_location_based_stock_info(location_id) \
-                    .with_location_based_consumption(location_id) \
                     .with_location_based_transfer(location_id) \
                     .order_by('-sold_quantity')
     
