@@ -857,7 +857,7 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
             'vendor'
         )
         
-        serialized_data = ProductStockReport_OrderStockReportsSerializerDebug(product_reports, many=True)
+        serialized_data = ProductStockReport_OrderStockReportsSerializer(product_reports, many=True)
         return serialized_data.data
             
     class Meta:

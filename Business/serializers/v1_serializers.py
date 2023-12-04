@@ -641,7 +641,7 @@ class BusiessAddressAppointmentSerializer(serializers.ModelSerializer):
 class BusinessAddressNameSerializer(serializers.ModelSerializer):
 
     model = BusinessAddress
-    fields = ['address_name']
+    fields = ['id', 'address_name']
 
 
 class BusiessAddressTransferSerializer(serializers.ModelSerializer):
