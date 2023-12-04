@@ -83,7 +83,7 @@ class ProductManager(models.QuerySet):
         
         return self.annotate(
             total_transfer = Coalesce(
-                Sum('products_stock_transfers__quantity', filter=query),
+                Sum('products_stock_transfers__quantity', filter=query, distinct=True),
                 0.0,
                 output_field=FloatField()
             )
