@@ -1426,6 +1426,7 @@ def get_products_dropdown(request):
 
 
     query = Q(is_deleted=False, is_active=True)
+    search_query = Q()
 
 
     if location_id:
@@ -1434,14 +1435,13 @@ def get_products_dropdown(request):
         query &= Q(id__in=product_ids)
 
     if search_text:
-        #query building
         is_searched = True
-        query &= Q(name__icontains=search_text)
-        query |= Q(category__name__icontains=search_text)
-        query |= Q(brand__name__icontains=search_text)
-        query |= Q(product_type__icontains=search_text)
+        search_query = Q(name__icontains=search_text)
+        search_query |= Q(category__name__icontains=search_text)
+        search_query |= Q(brand__name__icontains=search_text)
+        search_query |= Q(product_type__icontains=search_text)
 
-    all_products = Product.objects.filter(query).select_related('brand').order_by('-created_at')
+    all_products = Product.objects.filter(query & search_query).select_related('brand').order_by('-created_at')
 
     serialized = list(ProductSerializerDropDown(all_products, many=True, context={'location':location_id}).data)
 
