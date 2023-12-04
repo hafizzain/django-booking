@@ -44,7 +44,7 @@ class ProductManager(models.QuerySet):
                 Sum('consumptions__quantity', filter=query),
                 0.0,
                 output_field=FloatField()
-            )   
+            )
         )
 
     def with_location_based_stock_info(self, location=None):
@@ -83,7 +83,7 @@ class ProductManager(models.QuerySet):
         
         return self.annotate(
             total_transfer = Coalesce(
-                Sum('products_stock_transfers__quantity', filter=query, distinct=True),
+                Sum('products_stock_transfers__quantity', filter=query),
                 0.0,
                 output_field=FloatField()
             )
