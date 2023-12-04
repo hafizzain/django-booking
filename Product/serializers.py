@@ -10,6 +10,10 @@ from Business.serializers.v1_serializers import BusiessAddressAppointmentSeriali
 from Utility.models import Language
 from Product.models import ProductTranslations
 
+from django.db.models import Sum, FloatField
+from django.db.models.functions import Coalesce
+
+
 
 
 class FileUploadSerializer(serializers.Serializer):
@@ -311,14 +315,24 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
 
 class ProductWithStockSerializerOP(serializers.ModelSerializer):
     stock = serializers.SerializerMethodField()
-    total_consumption = serializers.FloatField()
-    # total_consumption_debug = serializers.SerializerMethodField()
+    total_consumption = serializers.SerializerMethodField()
     total_transfer = serializers.FloatField()
     currency_retail_price = serializers.SerializerMethodField()
 
-    # def get_total_consumption_debug(self, obj):
-    #     comsumption = ProductConsumption.objects.filter(product = obj)
-    #     return ProductConsumptionSerializer(comsumption, many = True).data
+    def get_total_consumption(self, obj):
+        query = Q(product=obj)
+        location_id = self.context.get('location_id', None)
+
+        if location_id:
+            query &= Q(location_id=location_id)
+        consumption = ProductConsumption.objects \
+                        .filter(query) \
+                        .aggregate(consumption=Coalesce(
+                            Sum('quantity'),
+                            0.0,
+                            output_field=FloatField()
+                        ))
+        return consumption['consumption']
 
     
     def get_currency_retail_price(self, obj):
