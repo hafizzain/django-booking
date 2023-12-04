@@ -325,8 +325,7 @@ class ProductWithStockSerializerOP(serializers.ModelSerializer):
     def get_total_transfer_debug(self, obj):
         transfers = ProductStockTransfer.objects.filter(
             product=obj,
-            from_location_id=self.context.get('location'),
-            is_deleted=False
+            from_location__id=self.context.get('location'),
         )
 
         return ProductStockTransferlocationSerializer(transfers, many=True).data
