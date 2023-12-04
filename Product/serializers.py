@@ -336,8 +336,7 @@ class ProductWithStockSerializerOP(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'stock','currency_retail_price', 'total_transfer', 'total_consumption',
-                  'total_transfer_debug']
+        fields = ['id', 'name', 'stock','currency_retail_price', 'total_transfer', 'total_consumption']
         read_only_fields = ['id']
         
 
