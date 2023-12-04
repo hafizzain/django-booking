@@ -324,7 +324,7 @@ class ProductWithStockSerializerOP(serializers.ModelSerializer):
         location_id = self.context.get('location_id', None)
         query = Q(product=obj, is_deleted=False)
         if location_id:
-            query &= Q(location__id=location_id)
+            query &= Q(from_location_id=location_id)
         transfers = ProductStockTransfer.objects \
                         .filter(query)
         
