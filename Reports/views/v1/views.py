@@ -67,7 +67,7 @@ def get_commission_reports_by_staff(request):
     ).filter(
         is_deleted = False,
         is_active = True,
-        location__id=location_id
+        location__id = location_id
     ).order_by('-created_at')
     serialized = ComissionReportsEmployeSerializer(employee,  many=True, context={
                         'request' : request, 

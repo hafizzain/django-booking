@@ -838,13 +838,9 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
         query = Q(product=product_instance)
 
         if report_type:
-            if report_type == 'Purchase':
-                query &= Q(report_choice=report_type)
-            elif report_type == 'Consumed':
-                query &= Q(report_choice=report_type)
-            elif report_type == 'Sold':
-                query &= Q(report_choice=report_type)
-            elif report_type == 'Transfer_From':
+            query &= Q(report_choice=report_type)
+
+            if report_type == 'Transfer_From':
                 query &= Q(from_location__id=location_id)
             elif report_type == 'Transfer_To':
                 query &= Q(to_location__id=location_id)
