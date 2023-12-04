@@ -811,13 +811,13 @@ class StaffCommissionReport(serializers.ModelSerializer):
                    ]
         
 class ServiceGroupReport(serializers.ModelSerializer):
-    service = serializers.SerializerMethodField(read_only=True)
+    # service = serializers.SerializerMethodField(read_only=True)
     service_target = serializers.SerializerMethodField(read_only=True)
     total_service_sales = serializers.SerializerMethodField(read_only=True)
     
-    def get_service(self, obj):
-        ser = obj.services.all()
-        return ServiceReportSerializer(ser, many =True ).data
+    # def get_service(self, obj):
+    #     ser = obj.services.all()
+    #     return ServiceReportSerializer(ser, many =True ).data
     
     def get_service_target(self, obj):
         try:
@@ -885,7 +885,7 @@ class ServiceGroupReport(serializers.ModelSerializer):
             return str(err)
     class Meta:
         model = ServiceGroup
-        fields = ['id','name','service','service_target', 'total_service_sales']
+        fields = ['id','name', 'service_target', 'total_service_sales']
         
 class ReportBrandSerializer(serializers.ModelSerializer): 
     product_sale_price = serializers.SerializerMethodField(read_only=True)
