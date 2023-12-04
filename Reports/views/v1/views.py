@@ -57,6 +57,7 @@ def get_reports_staff_target(request):
 @permission_classes([AllowAny])
 def get_commission_reports_by_staff(request):
     
+    location_id = request.GET.get('location_id', None)
     range_start = request.GET.get('range_start', None)
     year = request.GET.get('year', None)
     range_end = request.GET.get('range_end', None)
@@ -66,6 +67,7 @@ def get_commission_reports_by_staff(request):
     ).filter(
         is_deleted = False,
         is_active = True,
+        location__id=location_id
     ).order_by('-created_at')
     serialized = ComissionReportsEmployeSerializer(employee,  many=True, context={
                         'request' : request, 
