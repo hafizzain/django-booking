@@ -835,7 +835,7 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
         report_type = self.context.get('report_type', None)
         location_id = self.context.get('location_id', None)
 
-        query = Q(product=product_instance)
+        query = Q(product=product_instance, location__id=location_id)
 
         if report_type:
             query &= Q(report_choice=report_type)
