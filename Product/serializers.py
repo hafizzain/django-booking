@@ -318,18 +318,6 @@ class ProductWithStockSerializerOP(serializers.ModelSerializer):
     total_consumption = serializers.FloatField()
     total_transfer = serializers.FloatField()
     currency_retail_price = serializers.SerializerMethodField()
-    total_transfer_debug = serializers.SerializerMethodField()
-
-    def get_total_transfer_debug(self, obj):
-        location_id = self.context.get('location_id', None)
-        query = Q(product=obj, is_deleted=False)
-        if location_id:
-            query &= Q(from_location_id=location_id)
-        transfers = ProductStockTransfer.objects \
-                        .filter(query)
-        
-        return ProductStockTransferlocationSerializer(transfers, many=True).data
-
 
     def get_currency_retail_price(self, obj):
         currency_retail = obj.product_currencyretailprice \
