@@ -69,10 +69,10 @@ class ProductManager(models.QuerySet):
         args:
             -location_id
         """
-        transfer_filter = Q(products_stock_transfers__from_location=location_id)
+        transfer_filter = Q(products_stock_transfers__from_location=location_id, is_deleted=False)
         return self.annotate(
             total_transfer = Coalesce(
-                Sum('products_stock_transfers__quantity', filter=transfer_filter),
+                Sum('products_stock_transfers__quantity', filter=transfer_filter, distinct=True),
                 0.0,
                 output_field=FloatField()
             )
