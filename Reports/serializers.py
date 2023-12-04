@@ -264,53 +264,6 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
             'voucher_commission': round(vouchers_commissions, 2)
         }
         return data
-        
-        # app = AppointmentService.objects.filter(
-        #     member=obj,
-        #     appointment_status='Done',
-        # )
-        # if range_start:
-        #     range_start = datetime.strptime(range_start, '%Y-%m-%d').date()
-        #     range_end = datetime.strptime(range_end, '%Y-%m-%d').date()
-        #     app = app.filter(created_at__range=(range_start, range_end))
-        # total_service_commission = app.aggregate(Sum('service_commission'))['service_commission__sum'] or 0
-
-        # product_orders = ProductOrder.objects.filter(
-        #     is_deleted=False,
-        #     member=obj,
-        # )
-        # if range_start:
-        #     product_orders = product_orders.filter(created_at__range=(range_start, range_end))
-        # total_product_price = product_orders.aggregate(Sum('checkout__total_product_price'))['checkout__total_product_price__sum'] or 0
-        # product_commission = product_orders.aggregate(Sum('checkout__product_commission'))['checkout__product_commission__sum'] or 0
-
-        # service_orders = ServiceOrder.objects.filter(
-        #     is_deleted=False,
-        #     member=obj,
-        # )
-        # if range_start:
-        #     service_orders = service_orders.filter(created_at__range=(range_start, range_end))
-        # service_commission = service_orders.aggregate(Sum('checkout__service_commission'))['checkout__service_commission__sum'] or 0
-
-        # voucher_orders = VoucherOrder.objects.filter(
-        #     is_deleted=False,
-        #     member=obj,
-        # )
-        # if range_start:
-        #     voucher_orders = voucher_orders.filter(created_at__range=(range_start, range_end))
-        # voucher_commission = voucher_orders.aggregate(Sum('checkout__voucher_commission'))['checkout__voucher_commission__sum'] or 0
-
-        # commission_total = total_service_commission + product_commission + voucher_commission
-        
-        # ser_commission = int(service_commission) + int(total_service_commission)
-        # data = {
-        #     'product_sale_price': total_product_price,
-        #     'commission_total': commission_total,
-        #     'service_commission': ser_commission,
-        #     'product_commission': product_commission,
-        #     'voucher_commission': voucher_commission,
-        # }
-        # return data
             
     def get_service_sale_price(self, obj):
         range_start = self.context.get("range_start")
@@ -321,39 +274,6 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
 
         if range_start and range_end:
             query['created_at__range'] = (range_start, range_end)
-
-        # if range_start:
-        #     range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
-        # if range_end:
-        #     range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
-            
-        # appointments_total = 0
-        # service_orders_total = 0
-        
-        # if range_start and range_end:
-        #     appointments_total = AppointmentService.objects.filter(
-        #         member=obj,
-        #         appointment_status='Done',
-        #         created_at__range=(range_start, range_end)
-        #     ).aggregate(total=Coalesce(Sum('price'), 0))['total']
-            
-        #     service_orders_total = ServiceOrder.objects.filter(
-        #         is_deleted=False,
-        #         member=obj,
-        #         created_at__range=(range_start, range_end)
-        #     ).aggregate(total=Coalesce(Sum('checkout__total_service_price'), 0))['total']
-        # else:
-        #     appointments_total = AppointmentService.objects.filter(
-        #         member=obj,
-        #         appointment_status='Done'
-        #     ).aggregate(total=Coalesce(Sum('price'), 0))['total']
-            
-        #     service_orders_total = ServiceOrder.objects.filter(
-        #         is_deleted=False,
-        #         member=obj
-        #     ).aggregate(total=Coalesce(Sum('checkout__total_service_price'), 0))['total']
-        
-        # total = appointments_total + service_orders_total
 
         services_commissions = EmployeeCommission.objects.filter(
             employee = obj,
@@ -366,53 +286,6 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
         self.total_service_sale_price = total_sale
         
         return self.total_service_sale_price
-
-
-    
-    # def get_service_sale_price(self, obj):
-    #     try:
-    #         range_start = self.context["range_start"]
-    #         range_end = self.context["range_end"]
-    #         year = self.context["year"]
-            
-    #         if range_start:
-    #             range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
-    #             range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
-            
-    #         total = 0
-    #         service_orders = ServiceOrder.objects.filter(is_deleted=False, 
-    #                     member = obj,
-    #                     #created_at__icontains = year
-    #                     )
-    #         app   = AppointmentService.objects.filter(
-    #             member = obj,
-    #             appointment_status = 'Done',
-    #             #created_at__icontains = year
-    #         )
-    #         for appointment  in app:                
-    #             create = str(appointment.created_at)
-    #             created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
-                
-    #             if range_start:
-    #                 if range_start >= created_at  and created_at <= range_end:
-    #                     total += int(appointment.price)
-    #             else:
-    #                 total += int(appointment.price)
-                    
-    #         for ord  in service_orders:                
-    #             create = str(ord.created_at)
-    #             created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
-                
-    #             if range_start:
-    #                 if range_start >= created_at  and created_at <= range_end:
-    #                     total += int(ord.checkout.total_service_price)
-    #             else:
-    #                 total += int(ord.checkout.total_service_price)
-                                          
-    #         return total         
-            
-    #     except Exception as err:
-    #         return str(err)
         
     def get_voucher_sale_price(self, obj):
         range_start = self.context["range_start"]
@@ -422,33 +295,7 @@ class ComissionReportsEmployeSerializer(serializers.ModelSerializer):
 
         if range_start and range_end:
             query['created_at__range'] = (range_start, range_end)
-
-        # try:
-        #     year = self.context["year"]
-            
-        #     if range_start:
-        #         range_start = datetime.strptime(range_start, "%Y-%m-%d").date()
-        #         range_end = datetime.strptime(range_end, "%Y-%m-%d").date()
-            
-        #     total = 0
-        #     service_orders = VoucherOrder.objects.filter(is_deleted=False, 
-        #                 member = obj,
-        #                 #created_at__icontains = year
-        #                 )
-        #     for ord  in service_orders:
-        #         create = str(ord.created_at)
-        #         created_at = datetime.strptime(create, "%Y-%m-%d %H:%M:%S.%f%z").date()
-                
-        #         if range_start:
-        #             if range_start >= created_at  and created_at <= range_end:
-        #                 total += int(ord.checkout.total_voucher_price)
-        #         else:
-        #             total += int(ord.checkout.total_voucher_price)
-                                
-        #     return total         
-            
-        # except Exception as err:
-        #     return str(err)    
+   
         vouchers_commissions = EmployeeCommission.objects.filter(
             employee = obj,
             commission_category = 'Voucher',
