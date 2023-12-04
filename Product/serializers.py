@@ -326,6 +326,7 @@ class ProductWithStockSerializerOP(serializers.ModelSerializer):
         transfers = ProductStockTransfer.objects.filter(
             product=obj,
             from_location__id=self.context.get('location_id'),
+            is_deleted=False
         )
 
         return ProductStockTransferlocationSerializer(transfers, many=True).data
