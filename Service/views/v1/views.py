@@ -45,19 +45,30 @@ def get_services(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_services_dropdown(request):
-    no_pagination = request.GET.get('no_pagination', None)
+    search_text = request.GET.get('search_text', None)
     page = request.GET.get('page', None)
+    is_searched = False
+
+
 
     
     query = Q(is_deleted=False)
+
+
+    if search_text:
+        query &= Q(name__icontains=search_text) |  \
+                 Q(servicegroup_services__name__icontains=search_text) | \
+                 Q(location__address_name__icontains=search_text)
+        is_searched = True
+        
     services = Service.objects.filter(query).prefetch_related('servicegroup_services').order_by('-created_at')
 
     serialized = list(ServiceSerializerDropdown(services,  many=True).data)
 
     paginator = CustomPagination()
-    paginator.page_size = 100000 if no_pagination else 10
+    paginator.page_size = 10 if page else 100000
     paginated_data = paginator.paginate_queryset(serialized, request)
-    response = paginator.get_paginated_response(paginated_data, 'services', invoice_translations=None, current_page=page)
+    response = paginator.get_paginated_response(paginated_data, 'services', invoice_translations=None, current_page=page, is_searched=True)
     return response
     
 
