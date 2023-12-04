@@ -89,18 +89,22 @@ class ProductManager(models.QuerySet):
             )
         )
     
-    def with_location_based_current_stock(self, location_id):
+    def with_location_based_current_stock(self, location=None):
         """
         Returns the sum of quantity transferred from this location to other 
         locations
         args:
             -location_id
         """
+        query = Q(product=OuterRef('pk'), is_deleted=False)
+        if location:
+            query &= Q(location=location)
         return self.annotate(
             current_stock=Coalesce(
                 Subquery(
                     ProductStock.objects
-                        .filter(product=OuterRef('pk'), location=location_id, is_deleted=False) \
+                        .filter(query) \
+                        .order_by('-created_at') \
                         .values('available_quantity')[:1]
                 ),
                 0.0,
