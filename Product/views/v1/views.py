@@ -3066,7 +3066,7 @@ def get_product_stock_report_dummy(request):
     query = Q(product_stock__location = location, is_deleted = False)
 
     if search_text:
-        query &= Q(name__icontains=query)
+        query &= Q(name__icontains=search_text)
 
     if brand_id:
         query &= Q(brand__id=brand_id)
