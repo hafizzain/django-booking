@@ -764,27 +764,27 @@ class ProductOrderStockReportSerializer(serializers.ModelSerializer):
 
 class ProductStockReport_OrderStockReportsSerializer(serializers.ModelSerializer):
     
-    # from_location = BusinessAddressNameSerializer()
-    # to_location = BusinessAddressNameSerializer()
-    # location = BusinessAddressNameSerializer()
-    # consumed_location = BusinessAddressNameSerializer()
-    # vendor_name = serializers.SerializerMethodField(read_only=True)
-    # created_at = serializers.SerializerMethodField()
+    from_location = BusinessAddressNameSerializer()
+    to_location = BusinessAddressNameSerializer()
+    location = BusinessAddressNameSerializer()
+    consumed_location = BusinessAddressNameSerializer()
+    vendor_name = serializers.SerializerMethodField(read_only=True)
+    created_at = serializers.SerializerMethodField()
 
 
-    # def get_created_at(self, report_instance):
-    #     return f'{report_instance.created_at.strftime("%Y-%m-%d")}'
+    def get_created_at(self, report_instance):
+        return f'{report_instance.created_at.strftime("%Y-%m-%d")}'
 
-    # def get_vendor_name(self, obj):
-    #     try:
-    #         return obj.vendor.vendor_name
-    #     except Exception as err:
-    #         return None
+    def get_vendor_name(self, obj):
+        try:
+            return obj.vendor.vendor_name
+        except Exception as err:
+            return None
 
     class Meta:
         model = ProductOrderStockReport
         fields = ['id', 'from_location', 'to_location', 'quantity', 'location', 
-                  'consumed_location', 'report_choice', 'quantity', 
+                  'consumed_location', 'report_choice', 'quantity', 'created_at', 'vendor_name',
                   'before_quantity', 'after_quantity', 'reorder_quantity'
                   ]
         

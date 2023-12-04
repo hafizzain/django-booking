@@ -640,8 +640,9 @@ class BusiessAddressAppointmentSerializer(serializers.ModelSerializer):
 
 class BusinessAddressNameSerializer(serializers.ModelSerializer):
 
-    model = BusinessAddress
-    fields = ['id', 'address_name']
+    class Meta:
+        model = BusinessAddress
+        fields = ['id', 'address_name']
 
 
 class BusiessAddressTransferSerializer(serializers.ModelSerializer):
