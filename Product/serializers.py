@@ -787,6 +787,14 @@ class ProductStockReport_OrderStockReportsSerializer(serializers.ModelSerializer
                   'consumed_location', 'vendor_name', 'report_choice', 'quantity', 
                   'before_quantity', 'after_quantity', 'reorder_quantity', 'created_at'
                   ]
+        
+
+class ProductStockReport_OrderStockReportsSerializerDebug(serializers.ModelSerializer):
+    
+
+    class Meta:
+        model = ProductOrderStockReport
+        fields = '__all__'
     
 
 
@@ -845,7 +853,7 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
             'vendor'
         )
         
-        serialized_data = ProductStockReport_OrderStockReportsSerializer(product_reports, many=True)
+        serialized_data = ProductStockReport_OrderStockReportsSerializerDebug(product_reports, many=True)
         return serialized_data.data
             
     class Meta:
