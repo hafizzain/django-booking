@@ -764,10 +764,10 @@ class ProductOrderStockReportSerializer(serializers.ModelSerializer):
 
 class ProductStockReport_OrderStockReportsSerializer(serializers.ModelSerializer):
     
-    from_location = BusinessAddressNameSerializer()
-    to_location = BusinessAddressNameSerializer()
-    location = BusinessAddressNameSerializer()
-    consumed_location = BusinessAddressNameSerializer()
+    # from_location = BusinessAddressNameSerializer()
+    # to_location = BusinessAddressNameSerializer()
+    # location = BusinessAddressNameSerializer()
+    # consumed_location = BusinessAddressNameSerializer()
     # vendor_name = serializers.SerializerMethodField(read_only=True)
     # created_at = serializers.SerializerMethodField()
 
