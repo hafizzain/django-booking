@@ -35,7 +35,7 @@ class ProductManager(models.QuerySet):
         args:
             -locationn_id
         """
-        consumption_filter = Q(consumptions__location_id=location_id)
+        consumption_filter = Q(is_deleted=False, consumptions__location_id=location_id)
         return self.annotate(
             total_consumption=Coalesce(
                 Sum('consumptions__quantity', filter=consumption_filter),
