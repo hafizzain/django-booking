@@ -29,33 +29,40 @@ class ProductManager(models.QuerySet):
             )
         )
     
-    def with_location_based_consumption(self, location_id):
+    def with_location_based_consumption(self, location=None):
         """
         Returns the location based consumption of the product
         args:
             -locationn_id
         """
-        location = BusinessAddress.objects.get(id=location_id)
-        consumption_filter = Q(is_deleted=False, consumptions__location=location)
+        query = Q(is_deleted=False)
+        if location:
+            query &= Q(consumptions__location=location)
+
         return self.annotate(
             total_consumption=Coalesce(
-                Sum('consumptions__quantity', filter=consumption_filter, distinct=True),
+                Sum('consumptions__quantity', filter=query, distinct=True),
                 0.0,
                 output_field=FloatField()
             )   
         )
 
-    def with_location_based_stock_info(self, location_id):
+    def with_location_based_stock_info(self, location=None):
         """
         Returns the aggregation of the sum of sold quantity for particular location.
         """
+        query = Q(is_deleted=False, product=OuterRef('pk'))
+
+        if location:
+            query &= Q(location=location)
+
         return self.annotate(
             sold_quantity = Coalesce(
                 Subquery(
                 ProductStock.objects
-                        .filter(product=OuterRef('pk'), location__id=location_id, is_deleted=False) \
-                        .order_by('-created_at') \
-                        .values('sold_quantity')[:1]
+                    .filter(query) \
+                    .order_by('-created_at') \
+                    .values('sold_quantity')[:1]
             ),
             0,
             output_field=IntegerField()
@@ -63,18 +70,20 @@ class ProductManager(models.QuerySet):
 
         )
     
-    def with_location_based_transfer(self, location_id):
+    def with_location_based_transfer(self, location=None):
         """
         Returns the sum of quantity transferred from this location to other 
         locations
         args:
             -location_id
         """
-        location = BusinessAddress.objects.get(id=location_id)
-        transfer_filter = Q(products_stock_transfers__from_location=location, is_deleted=False)
+        query = Q(is_deleted=False)
+        if location:
+            query &= Q(products_stock_transfers__from_location=location)
+        
         return self.annotate(
             total_transfer = Coalesce(
-                Sum('products_stock_transfers__quantity', filter=transfer_filter, distinct=True),
+                Sum('products_stock_transfers__quantity', filter=query, distinct=True),
                 0.0,
                 output_field=FloatField()
             )

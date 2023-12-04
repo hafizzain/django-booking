@@ -1646,6 +1646,7 @@ def get_stocks(request):
     no_pagination = request.GET.get('no_pagination', None)
     page = request.GET.get('page', None)
 
+    location = BusinessAddress.objects.get(id=location_id)
 
     query = Q(is_active=True, is_deleted=False, product_stock__gt=0)
 
@@ -1658,8 +1659,9 @@ def get_stocks(request):
     all_stocks = Product.objects \
                     .filter(query) \
                     .prefetch_related('product_stock', 'product_currencyretailprice') \
-                    .with_location_based_stock_info(location_id) \
-                    .with_location_based_transfer(location_id) \
+                    .with_location_based_consumption(location) \
+                    .with_location_based_stock_info(location) \
+                    .with_location_based_transfer(location) \
                     .order_by('-sold_quantity')
     
     serialized = list(ProductWithStockSerializerOP(all_stocks, many=True, context={'location_id' : location_id}).data)
