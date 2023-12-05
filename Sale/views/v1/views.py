@@ -968,9 +968,17 @@ def get_servicegroup(request):
 def get_servicegroup_main_page(request):
     no_pagination = request.GET.get('no_pagination', None)
     search_text = request.GET.get('search_text', None)
+    is_active = request.GET.get('is_active', None)
+    page = request.GET.get('page', None)
+    is_searched = False
+
+
+    if is_active:
+        query &= Q(is_active=True)
 
     query = Q(is_deleted=False)
     if search_text:
+        is_searched = True
         query &= Q(name__icontains=search_text)
 
 
@@ -982,7 +990,7 @@ def get_servicegroup_main_page(request):
     paginator = CustomPagination()
     paginator.page_size = 100000 if no_pagination else 10
     paginated_data = paginator.paginate_queryset(serialized, request)
-    response = paginator.get_paginated_response(paginated_data, 'sales')
+    response = paginator.get_paginated_response(paginated_data, 'sales', is_searched=is_searched, current_page=page)
     return response
 
 @api_view(['GET'])
