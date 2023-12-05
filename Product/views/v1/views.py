@@ -1659,9 +1659,7 @@ def get_stocks(request):
     all_stocks = Product.objects \
                     .filter(query) \
                     .prefetch_related('product_stock', 'product_currencyretailprice') \
-                    .with_location_based_consumption(location) \
                     .with_location_based_stock_info(location) \
-                    .with_location_based_transfer(location) \
                     .order_by('-sold_quantity')
     
     serialized = list(ProductWithStockSerializerOP(all_stocks, many=True, context={'location_id' : location_id}).data)

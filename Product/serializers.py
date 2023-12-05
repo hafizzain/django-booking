@@ -315,21 +315,30 @@ class ProductWithStockSerializer(serializers.ModelSerializer):
 
 class ProductWithStockSerializerOP(serializers.ModelSerializer):
     stock = serializers.SerializerMethodField()
-    total_consumption = serializers.FloatField()
-    total_transfer_debug = serializers.SerializerMethodField()
-
-    total_transfer = serializers.FloatField()
+    total_consumption = serializers.SerializerMethodField()
+    total_transfer = serializers.SerializerMethodField()
     currency_retail_price = serializers.SerializerMethodField()
 
 
-    def get_total_transfer_debug(self, obj):
+    def get_total_consumption(self, obj):
+
+        consumptions = ProductConsumption.objects.filter(
+            product=obj,
+            location=self.context.get('location_id'),
+            is_deleted=False
+        ).aggregate(total_consumption=Coalesce(Sum('quantity'), 0.0, output_field=FloatField()))
+
+        return consumptions['total_consumption']
+
+
+    def get_total_transfer(self, obj):
         transfers = ProductStockTransfer.objects.filter(
             product=obj,
             from_location__id=self.context.get('location_id'),
             is_deleted=False
-        )
+        ).aggregate(total_transfer=Coalesce(Sum('quantity'), 0.0, output_field=FloatField()))
 
-        return ProductStockTransferlocationSerializer(transfers, many=True).data
+        return transfers['total_transfer']
         
 
     def get_currency_retail_price(self, obj):
@@ -349,8 +358,7 @@ class ProductWithStockSerializerOP(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'stock','currency_retail_price', 'total_transfer', 'total_consumption',
-                  'total_transfer_debug']
+        fields = ['id', 'name', 'stock','currency_retail_price', 'total_transfer', 'total_consumption']
         read_only_fields = ['id']
         
 
