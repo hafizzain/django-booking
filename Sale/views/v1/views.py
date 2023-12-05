@@ -1368,10 +1368,9 @@ def get_all_sale_orders_optimized(request):
     if search_text:
         # removing # for better search
         search_text = search_text.replace('#', '')
-        sale_queries['client__full_name__icontains'] = search_text
-        app_queries['appointment__client__full_name__icontains'] = search_text
-
-        # invoice_checkout_ids = list(SaleInvoice.objects.filter(id__icontains=search_text).values_list('checkout', flat=True))
+        invoice_checkout_ids = list(SaleInvoice.objects.filter(id__icontains=search_text).values_list('checkout__id', flat=True))
+        sale_queries &= Q(id__in=invoice_checkout_ids) | Q(client__full_name__icontains=search_text)
+        app_queries &= Q(id__in=invoice_checkout_ids) | Q(appointment__client__full_name__icontains=search_text)
         # sale_checkouts = Checkout.objects.select_related(
         #                     'location',
         #                     'location__currency',
