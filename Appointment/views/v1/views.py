@@ -449,7 +449,15 @@ def get_all_appointments_no_pagination(request):
 def get_calendar_appointment(request):
     selected_date = request.GET.get('selected_date', None)
     location_id = request.GET.get('location_id', None)
-    employee = request.GET.get('employee', None)
+    employee_ids = request.GET.get('employee', None)
+
+    if type(employee_ids) == str:
+        employee_ids = employee_ids.replace("'", '"')
+        employee_ids = json.loads(employee_ids)
+    elif type(employee_ids) == list:
+        pass
+
+    
 
     query = Q(is_deleted=False, is_active=True)
 
@@ -457,8 +465,10 @@ def get_calendar_appointment(request):
         location = BusinessAddress.objects.get(id=location_id)
         query &= Q(location=location)
 
-    if employee != 'All':
-        query &= Q(id=employee)
+
+    if employee_ids != 'All':
+        employee_ids = [emp['id'] for emp in employee_ids]
+        query &= Q(id__in=employee_ids)
     
 
 
