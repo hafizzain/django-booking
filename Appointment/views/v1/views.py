@@ -451,27 +451,22 @@ def get_calendar_appointment(request):
     location_id = request.GET.get('location_id', None)
     employee_ids = request.GET.get('employee', None)
 
-    if type(employee_ids) == str:
-        employee_ids = employee_ids.replace("'", '"')
-        employee_ids = json.loads(employee_ids)
-    elif type(employee_ids) == list:
-        pass
-
     
-
     query = Q(is_deleted=False, is_active=True)
+    
+    if employee_ids != 'All':
+        if type(employee_ids) == str:
+            employee_ids = employee_ids.replace("'", '"')
+            employee_ids = json.loads(employee_ids)
+        elif type(employee_ids) == list:
+            pass
+
+        employee_ids = [emp['id'] for emp in employee_ids]
+        query &= Q(id__in=employee_ids)
 
     if location_id:
         location = BusinessAddress.objects.get(id=location_id)
         query &= Q(location=location)
-
-
-    if employee_ids != 'All':
-        employee_ids = [emp['id'] for emp in employee_ids]
-        query &= Q(id__in=employee_ids)
-    
-
-
 
     all_memebers = Employee.objects.filter(query).order_by('-created_at')
     serialized = EmployeeAppointmentSerializer(all_memebers, many=True, context={'request' : request, 'selected_date' : selected_date})
