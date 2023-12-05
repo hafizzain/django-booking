@@ -515,9 +515,6 @@ class ProductSerializerMainPage(serializers.ModelSerializer):
     brand =BrandSerializerForProduct(read_only=True)
     category = CategorySerializerForProduct(read_only=True)
     vendor = VendorSerializerForProduct(read_only=True)
-    
-    # media = serializers.SerializerMethodField()
-    # stocks = serializers.SerializerMethodField(read_only=True)
     location_quantities = serializers.SerializerMethodField(read_only=True)
     cover_image = serializers.SerializerMethodField()
     consumed = serializers.SerializerMethodField()
@@ -530,12 +527,28 @@ class ProductSerializerMainPage(serializers.ModelSerializer):
         return currency_retail
         
     def get_stocktransfer(self, obj):
-        stocktransfer = list(obj.products_stock_transfers.values('quantity'))
-        return stocktransfer
+        location = self.context.get('locatioon' ,None)
+
+        query = Q()
+        if location:
+            query &= Q(from_location__id=location)
+        stocktransfer = obj.products_stock_transfers \
+                                .filter(query) \
+                                .aggregate(total_transfer=Coalesce(Sum('quantity'), 0.0, output_field=FloatField()))
+
+        return stocktransfer['total_transfer']
         
     def get_consumed(self, obj):
-        consumption = list(obj.consumptions.values('location', 'quantity'))
-        return consumption
+        location = self.context.get('locatioon' ,None)
+
+        query = Q()
+        if location:
+            query &= Q(location__id=location)
+        stocktransfer = obj.consumptions \
+                                .filter(query) \
+                                .aggregate(total_consumed=Coalesce(Sum('quantity'), 0.0, output_field=FloatField()))
+        
+        return stocktransfer['total_consumed']
     
     def get_cover_image(self, obj):
         cvr_img = ProductMedia.objects.filter(product=obj, is_cover=True, is_deleted=False).order_by('-created_at')
