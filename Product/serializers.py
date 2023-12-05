@@ -531,7 +531,9 @@ class ProductSerializerMainPage(serializers.ModelSerializer):
 
         query = Q()
         if location:
-            query &= Q(from_location__id=location)
+            query &= Q(from_location__id=location,
+                       product=obj,
+                       is_deleted=False)
         stocktransfer = obj.products_stock_transfers \
                                 .filter(query) \
                                 .aggregate(total_transfer=Coalesce(Sum('quantity'), 0.0, output_field=FloatField()))
@@ -543,7 +545,9 @@ class ProductSerializerMainPage(serializers.ModelSerializer):
 
         query = Q()
         if location:
-            query &= Q(location__id=location)
+            query &= Q(location__id=location,
+                       product=obj,
+                       is_deleted=False)
         stocktransfer = obj.consumptions \
                                 .filter(query) \
                                 .aggregate(total_consumed=Coalesce(Sum('quantity'), 0.0, output_field=FloatField()))
