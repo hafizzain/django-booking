@@ -210,7 +210,7 @@ def get_client(request):
     all_client = Client.objects \
                     .filter(is_deleted=False, is_blocked=False) \
                     .with_last_transaction_date() \
-                    # .order_by('-last_transaction_date')
+                    .order_by(F('last_transaction_date').desc(nulls_last=True))
     
 
     if search_text:
@@ -235,13 +235,13 @@ def get_client(request):
     paginator = Paginator(all_client, results_per_page)
     page_number = request.GET.get("page") 
     all_client = paginator.get_page(page_number)
-    client_serialized = list(ClientSerializer(all_client, many=True,  context={'request' : request}).data)
+    client_serialized = ClientSerializer(all_client, many=True,  context={'request' : request})
 
-    for client in client_serialized:
-        if client['last_transaction_date'] == datetime(2000, 1, 1):
-            client['last_transaction_date'] = None
+    # for client in client_serialized:
+    #     if client['last_transaction_date'] == datetime(2000, 1, 1, 0, 0, 0):
+    #         client['last_transaction_date'] = None
 
-    sorted_data = sorted(client_serialized, key=lambda x: x['last_transaction_date'], reverse=True)
+    # sorted_data = sorted(client_serialized, key=lambda x: x['last_transaction_date'], reverse=True)
 
     return Response(
         {
@@ -253,7 +253,7 @@ def get_client(request):
                 'pages':page_count,
                 'per_page_result':results_per_page,
                 'error_message' : None,
-                'client' : sorted_data,
+                'client' : client_serialized.data,
             }
         },
         status=status.HTTP_200_OK
