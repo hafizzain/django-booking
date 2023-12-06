@@ -1,4 +1,4 @@
-
+from datetime import datetime
 from Business.models import BusinessAddress
 from rest_framework import serializers
 from Product.Constants.index import tenant_media_base_url, tenant_media_domain
@@ -144,7 +144,7 @@ class ClientSerializer(serializers.ModelSerializer):
     country = CountrySerializer(read_only=True)
     state = StateSerializer(read_only=True)
     city = CitySerializer(read_only=True)
-    last_transaction_date = serializers.DateTimeField(read_only=True)
+    last_transaction_date = serializers.SerializerMethodField(read_only=True)
 
     last_appointment = serializers.SerializerMethodField(read_only=True)
     last_sale = serializers.SerializerMethodField(read_only=True)
@@ -153,6 +153,12 @@ class ClientSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     total_done_appointments = serializers.SerializerMethodField(read_only=True)
     total_sales = serializers.SerializerMethodField(read_only=True)
+
+    def get_last_transaction_date(self, obj):
+        if obj.last_transaction_date == datetime(2000, 1, 1):
+            return None
+        
+        return obj.last_transaction_date
 
     def get_last_sale(self, obj):
         last_sale = Checkout.objects.filter(client=obj).order_by('-created_at')

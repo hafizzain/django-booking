@@ -1422,7 +1422,6 @@ def get_products_main_page(request):
 def get_products_dropdown(request):
     search_text = request.query_params.get('search_text', None)
     location_id = request.GET.get('location_id', None)
-    # no_pagination = request.GET.get('no_pagination', None)
     page = request.GET.get('page', None)
     is_searched = False
 
