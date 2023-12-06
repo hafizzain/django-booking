@@ -889,7 +889,7 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
             'from_location',
             'to_location',
             'vendor'
-        )
+        ).order_by('-created_at')
         
         serialized_data = ProductStockReport_OrderStockReportsSerializer(product_reports, many=True)
         return serialized_data.data
