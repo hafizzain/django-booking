@@ -158,6 +158,7 @@ class FilteredInsightProducts(APIView):
         self.queries['order_by'].append('-most_transferred_products')
         self.queries['annotate']['most_transferred_products'] = Sum('products_stock_transfers__quantity', distinct=True)
         self.queries['filter']['products_stock_transfers__from_location__id'] = self.location
+        self.queries['filter']['products_stock_transfers__is_deleted'] = False
 
 
         if self.most_transferred :
@@ -171,8 +172,8 @@ class FilteredInsightProducts(APIView):
         elif self.is_date_most_transferred and self.start_date and self.end_date:
             if self.start_date == self.end_date:
                 self.end_date = datetime.strptime(self.end_date, "%Y-%m-%d") + timedelta(days=1)
-            self.queries['filter']['product_order_stock__order__created_at__date__range'] = (self.start_date, self.end_date)       
-            # self.queries['filter']['products_stock_transfers__created_at__date__range'] = (self.start_date, self.end_date)       
+            # self.queries['filter']['product_order_stock__order__created_at__date__range'] = (self.start_date, self.end_date)       
+            self.queries['filter']['products_stock_transfers__created_at__date__range'] = (self.start_date, self.end_date)       
         else:
             return Response(
                 {
