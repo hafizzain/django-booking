@@ -43,9 +43,9 @@ class ClientManager(models.QuerySet):
         
         return self.annotate(
             last_appointment_date=Coalesce(Subquery(last_appointment_subquery),
-                                            datetime(2000, 1, 1)),
+                                            Value(None)),
             last_sale_date=Coalesce(Subquery(last_sale_subquery),
-                                            datetime(2000, 1, 1))
+                                            Value(None))
         ).annotate(
             last_transaction_date=Case(
                 When(last_appointment_date__gt=F('last_sale_date'), then=F('last_appointment_date')),
