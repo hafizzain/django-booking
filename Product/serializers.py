@@ -874,7 +874,7 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
         location_id = self.context.get('location_id', None)
 
         query = Q(product=product_instance)
-        location &= Q(location__id=location_id) | Q(consumed_location__id=location_id)
+        location_query = Q(location__id=location_id) | Q(consumed_location__id=location_id)
         if report_type:
             query &= Q(report_choice=report_type)
 
@@ -883,7 +883,7 @@ class ProductStockReportSerializer(serializers.ModelSerializer):
             elif report_type == 'Transfer_to':
                 query &= Q(to_location__id=location_id)
 
-        product_reports = ProductOrderStockReport.objects.filter(query).select_related(
+        product_reports = ProductOrderStockReport.objects.filter(query & location_query).select_related(
             'location',
             'consumed_location',
             'from_location',
