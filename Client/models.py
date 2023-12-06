@@ -9,7 +9,7 @@ from uuid import uuid4
 from Authentication.models import User
 from Business.models import Business, BusinessAddress
 from django.db import connection
-from django.db.models import Subquery, OuterRef, DateTimeField,Count, Case, When, F, IntegerField
+from django.db.models import Subquery, OuterRef, DateTimeField,Count, Case, When, F, IntegerField, Value
 from django.db.models.functions import Coalesce
 from django.apps import apps
 from Utility.models import Country, Currency, Language, State, City
@@ -43,15 +43,15 @@ class ClientManager(models.QuerySet):
         
         return self.annotate(
             last_appointment_date=Coalesce(Subquery(last_appointment_subquery),
-                                            datetime(2000, 1, 1)),
+                                            datetime(2000, 1, 1, 0, 0, 0)),
             last_sale_date=Coalesce(Subquery(last_sale_subquery),
-                                            datetime(2000, 1, 1))
+                                            datetime(2000, 1, 1, 0, 0, 0))
         ).annotate(
             last_transaction_date=Case(
                 When(last_appointment_date__gt=F('last_sale_date'), then=F('last_appointment_date')),
                 When(last_appointment_date__lte=F('last_sale_date'), then=F('last_sale_date')),
                 output_field=DateTimeField(),
-                default=datetime(2000, 1, 1)
+                default=datetime(2000, 1, 1, 0, 0, 0)
             )
         )
 

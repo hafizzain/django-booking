@@ -625,7 +625,7 @@ class ProductSerializerDropDown(serializers.ModelSerializer):
         
     class Meta:
         model = Product
-        fields = ['id', 'name', 'brand', 'location_quantities']
+        fields = ['id', 'name', 'brand', 'location_quantities', 'product_size']
 
 class ProductTranlationsSerializerNew(serializers.ModelSerializer):
     
