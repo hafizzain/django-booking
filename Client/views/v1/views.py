@@ -235,8 +235,13 @@ def get_client(request):
     paginator = Paginator(all_client, results_per_page)
     page_number = request.GET.get("page") 
     all_client = paginator.get_page(page_number)
-    serialized = list(ClientSerializer(all_client, many=True,  context={'request' : request}).data)
-    sorted_data = sorted(serialized, key=lambda x: x['last_transaction_date'], reverse=True)
+    client_serialized = list(ClientSerializer(all_client, many=True,  context={'request' : request}).data)
+
+    for client in client_serialized:
+        if client['last_transaction_date'] == datetime(2000, 1, 1):
+            client['last_transaction_date'] = None
+
+    sorted_data = sorted(client_serialized, key=lambda x: x['last_transaction_date'], reverse=True)
 
     return Response(
         {
