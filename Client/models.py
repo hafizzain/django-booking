@@ -9,7 +9,7 @@ from uuid import uuid4
 from Authentication.models import User
 from Business.models import Business, BusinessAddress
 from django.db import connection
-from django.db.models import Subquery, OuterRef, DateTimeField,Count, Case, When, F, IntegerField
+from django.db.models import Subquery, OuterRef, DateTimeField,Count, Case, When, F, IntegerField, Value
 from django.db.models.functions import Coalesce
 from django.apps import apps
 from Utility.models import Country, Currency, Language, State, City
@@ -51,7 +51,7 @@ class ClientManager(models.QuerySet):
                 When(last_appointment_date__gt=F('last_sale_date'), then=F('last_appointment_date')),
                 When(last_appointment_date__lte=F('last_sale_date'), then=F('last_sale_date')),
                 output_field=DateTimeField(),
-                default=datetime(2000, 1, 1)
+                default=Value(None)
             )
         )
 
