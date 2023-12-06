@@ -1360,7 +1360,7 @@ def get_products_main_page(request):
     if location_id:
         # Filter out those products which have product stock for this particular location
         product_ids = list(ProductStock.objects \
-                           .filter(location__id=location_id, available_quantity__gt=0) \
+                           .filter(location__id=location_id, location__is_deleted=False) \
                            .values_list('product__id', flat=True))
         query &= Q(id__in=product_ids)
 
