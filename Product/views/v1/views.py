@@ -2608,10 +2608,8 @@ def get_product_consumptions(request):
 
     query = Q(is_deleted=False)
 
-    search_query = Q()
-
-    if location_id:
-        query &= Q(location__id=location_id)
+    # if location_id:
+    #     query &= Q(location__id=location_id)
 
     if search_text:
         query &= Q(product__name__icontains=search_text) | \
