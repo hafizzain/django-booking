@@ -210,7 +210,7 @@ def get_client(request):
     all_client = Client.objects \
                     .filter(is_deleted=False, is_blocked=False) \
                     .with_last_transaction_date() \
-                    .order_by('-last_transaction_date')
+                    # .order_by('-last_transaction_date')
     
 
     if search_text:
@@ -224,6 +224,8 @@ def get_client(request):
             all_client = all_client.filter(is_active=False)
 
     all_client_count=all_client.count()
+
+    all_client = all_client.filter(last_transaction_date__isnull=False).order_by('-last_transaction_date') & all_client.filter(last_transaction_date__isnull=True)
 
     page_count = all_client_count / 10
     if page_count > int(page_count):
