@@ -2365,6 +2365,7 @@ def add_product_consumption(request):
     try:
         consumed = ProductStock.objects.get(product__id=product.id, location = location.id )
         if consumed.available_quantity >= int(quantity):
+
             stock_cunsumed = ProductOrderStockReport.objects.create(
             report_choice = 'Consumed',
             product = product,
@@ -2373,12 +2374,14 @@ def add_product_consumption(request):
             quantity = int(quantity), 
             before_quantity = consumed.available_quantity     
             )
+            
             sold = consumed.available_quantity - int(quantity)
             consumed.available_quantity = sold
             consumed.consumed_quantity +=  int(quantity)
             consumed.save()
             stock_cunsumed.after_quantity = sold
             stock_cunsumed.save()
+
         else:
             return Response(
             {
