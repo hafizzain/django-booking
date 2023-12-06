@@ -1391,7 +1391,7 @@ def get_products_main_page(request):
 
     serialized = ProductSerializerMainPage(products, many=True, 
                                    context={'request' : request,
-                                            'location': location_id,
+                                            'location_id': location_id,
                                             })
     data = serialized.data
     end_time = datetime.datetime.now()
@@ -2608,8 +2608,8 @@ def get_product_consumptions(request):
 
     query = Q(is_deleted=False)
 
-    # if location_id:
-    #     query &= Q(location__id=location_id)
+    if location_id:
+        query &= Q(location__id=location_id)
 
     if search_text:
         query &= Q(product__name__icontains=search_text) | \

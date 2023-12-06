@@ -527,7 +527,7 @@ class ProductSerializerMainPage(serializers.ModelSerializer):
         return currency_retail
         
     def get_stocktransfer(self, obj):
-        location = self.context.get('locatioon' ,None)
+        location = self.context.get('location_id' ,None)
 
         query = Q()
         if location:
@@ -541,7 +541,7 @@ class ProductSerializerMainPage(serializers.ModelSerializer):
         return stocktransfer['total_transfer']
         
     def get_consumed(self, obj):
-        location = self.context.get('locatioon' ,None)
+        location = self.context.get('location_id' ,None)
 
         query = Q()
         if location:
@@ -566,8 +566,8 @@ class ProductSerializerMainPage(serializers.ModelSerializer):
             return None
 
     def get_location_quantities(self, obj):
-        location = self.context['location']
-        if location is not None:
+        location = self.context.get('location_id', None)
+        if location:
             all_stocks = list(obj.product_stock.filter(
                                                   location__is_deleted=False,
                                                   location__id = location) \
