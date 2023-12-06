@@ -61,7 +61,10 @@ def get_services_dropdown(request):
                  Q(location__address_name__icontains=search_text)
         is_searched = True
         
-    services = Service.objects.filter(query).prefetch_related('servicegroup_services').order_by('-created_at')
+    services = Service.objects.filter(query) \
+                .prefetch_related('servicegroup_services') \
+                .distinct() \
+                .order_by('-created_at')
 
     serialized = list(ServiceSerializerDropdown(services,  many=True).data)
 
