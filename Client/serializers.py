@@ -156,9 +156,9 @@ class ClientSerializer(serializers.ModelSerializer):
 
     def get_last_transaction_date(self, obj):
         if obj.last_transaction_date == datetime(2000, 1, 1):
-            return None
+            return 'XYZ'
         
-        return obj.last_transaction_date
+        return 'ABC'
 
     def get_last_sale(self, obj):
         last_sale = Checkout.objects.filter(client=obj).order_by('-created_at')
