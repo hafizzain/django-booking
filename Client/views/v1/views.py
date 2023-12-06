@@ -225,7 +225,7 @@ def get_client(request):
 
     all_client_count=all_client.count()
 
-    all_client = all_client.filter(last_transaction_date__isnull=False).order_by('-last_transaction_date') & all_client.filter(last_transaction_date__isnull=True)
+    # all_client = all_client.filter(last_transaction_date__isnull=False).order_by('-last_transaction_date') & all_client.filter(last_transaction_date__isnull=True)
 
     page_count = all_client_count / 10
     if page_count > int(page_count):
@@ -235,7 +235,8 @@ def get_client(request):
     paginator = Paginator(all_client, results_per_page)
     page_number = request.GET.get("page") 
     all_client = paginator.get_page(page_number)
-    serialized = ClientSerializer(all_client, many=True,  context={'request' : request})
+    serialized = list(ClientSerializer(all_client, many=True,  context={'request' : request}).data)
+    sorted_data = sorted(serialized, key=lambda x: x['last_transaction_date'], reverse=True)
 
     return Response(
         {
@@ -247,7 +248,7 @@ def get_client(request):
                 'pages':page_count,
                 'per_page_result':results_per_page,
                 'error_message' : None,
-                'client' : serialized.data,
+                'client' : sorted_data,
             }
         },
         status=status.HTTP_200_OK
