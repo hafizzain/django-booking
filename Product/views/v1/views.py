@@ -2612,7 +2612,7 @@ def get_product_consumptions(request):
         query &= Q(location__id=location_id)
 
     if search_text:
-        query = Q(product__name__icontains=search_text)
+        query &= Q(product__name__icontains=search_text)
         query |= Q(location__address_name__icontains=search_text)
         query |= Q(quantity_s__icontains=search_text)
 
