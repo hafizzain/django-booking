@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Count, IntegerField, Sum, FloatField, Q, Subquery, OuterRef
+from django.db.models import Count, IntegerField, Sum, FloatField, Q, Subquery, OuterRef, Case, When, F, Value, CharField
 from django.db.models.functions import Coalesce
 from django.utils.timezone import now
 from django.core.validators import MinValueValidator
@@ -112,6 +112,41 @@ class ProductManager(models.QuerySet):
             )
         )
 
+    def with_stock_health(self, location):
+        query = Q(product=OuterRef('pk'), is_deleted=False)
+        if location:
+            query &= Q(location=location)
+        return self.annotate(
+            current_stock=Coalesce(
+                Subquery(ProductStock.objects \
+                            .filter(query) \
+                            .order_by('-created_at') \
+                            .values('available_quantity')[:1]
+                ),
+                0.0,
+                output_field=IntegerField()
+            ),
+            reorder_quantity=Coalesce(
+                Subquery(ProductStock.objects \
+                            .filter(query) \
+                            .order_by('-created_at') \
+                            .values('reorder_quantity')[:1]
+                ),
+                0.0,
+                output_field=IntegerField()
+            )
+        ).annotate(
+            half_max_quantity=F('reorder_quantity') / 2
+        ).annotate(
+            stock_health=Coalesce(
+                Case(
+                    When(current_stock__gte=F('reorder_quantity'), then=Value('High')),
+                    When(current_stock__lt=F('reorder_quantity'), then=Value('Low'))
+                ),
+                Value(None),
+                output_field=CharField()
+            )
+        )
 
 class Category(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)

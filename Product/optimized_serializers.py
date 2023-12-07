@@ -150,6 +150,7 @@ class OtpimizedProductSerializer(serializers.ModelSerializer):
     # consumed = serializers.SerializerMethodField()
     # stocktransfer = serializers.SerializerMethodField()
     currency_retail_price = serializers.SerializerMethodField()
+    stock_health = serializers.CharField()
     
     # location = serializers.SerializerMethodField()
     # location = serializers.SerializerMethodField(read_only=True)
@@ -262,6 +263,7 @@ class OtpimizedProductSerializer(serializers.ModelSerializer):
             'brand', 
             'short_description',
             'total_orders',
+            'stock_health',
             # 'is_active',
             # 'short_id', 
             # 'arabic_name', 
