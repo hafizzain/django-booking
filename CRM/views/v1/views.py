@@ -6,251 +6,238 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Q
 from Business.models import Business
-from CRM.models import Segment
-from CRM.serializers import SegmentSerializer
-from Client.models import Client
+from CRM.models import *
+from CRM.serializers import *
 from Utility.models import NstyleFile
 from NStyle.Constants import StatusCodes
 from django.db import transaction
+from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
+from rest_framework import filters
+from rest_framework.generics import ListAPIView
+from Notification.notification_processor import NotificationProcessor
+from Client.models import Client
+from Client.serializers import ClientSerializer
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def get_segment(request):
-    all_segment = Segment.objects.filter(is_deleted = False).order_by('-created_at')
-    serialized = SegmentSerializer(all_segment , many = True)
+
+
+class Segment(APIView):
+    permission_classes = [IsAuthenticated]
     
-    return Response(
-        {
-            'status' : True,
-            'status_code' : 200,
-            'status_code_text' : '200',
-            'response' : {
-                'message' : 'All Segment',
-                'error_message' : None,
-                'segment': serialized.data,
+    def get(self, request , pk = None):
+        if pk is not None:
+            segment = get_object_or_404(Segment, pk=pk)
+            serializer = SegmentSerializer(segment)
+            data = {
+                    "success": True,
+                    "message": "get_segment",
+                    "code": "get_segment_API",
+                    "data": serializer.data
             }
-        },
-        status=status.HTTP_200_OK
-    )
-
-@transaction.atomic
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def create_segment(request):
-    user = request.user  
-    business_id= request.data.get('business', None) 
-    
-    name = request.data.get('name', None) 
-    segemnt_type = request.data.get('segemnt_type', None) 
-    
-    client = request.data.get('client', None) 
-    description = request.data.get('description', None) 
-    
-    is_status = request.data.get('is_status', None) 
-    
-    segment_error = []
-    
-    if not all([business_id, name, segemnt_type , description ]):
-        return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.MISSING_FIELDS_4001,
-                'status_code_text' : 'MISSING_FIELDS_4001',
-                'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : 'All fields are required.',
-                    'fields' : [
-                        'business_id',
-                        'name',
-                        'segemnt_type',
-                        'description',
-                    ]
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    try:
-        business=Business.objects.get(id=business_id)
-    except Exception as err:
-        return Response(
-            {
-                'status' : True,
-                'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
-                'status_code_text' :'BUSINESS_NOT_FOUND_4015' ,
-                'response' : {
-                    'message' : 'Business not found!',
-                    'error_message' : str(err),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
-    segment = Segment.objects.create(
-        user = user,
-        business = business,
+            return Response(data, status=status.HTTP_200_success)
+        else:
+            segment = Segment.objects.prefetch_related('client').filter(is_deleted = False)
+            serializer = SegmentSerializer(segment, many=True)
+            data = {
+                    "success": True,
+                    "message": "get_All_segment",
+                    "code": "get_segment_API",
+                    "data": serializer.data
+            }
+            return Response(data, status=status.HTTP_200_success)   
         
-        name =  name,
-        segemnt_type = segemnt_type,
-        description = description
-    )
-    
-    if is_status is not None:
-        segment.is_active = True
-    else:
-         segment.is_active = False
-         
-    if client is not None:
-        if type(client) ==  str:
-            client = json.loads(client)
-            
-        for usr in client:
-            try:
-                employe = Client.objects.get(id=usr)  
-                segment.client.add(employe)
-            except Exception as err:
-                segment_error.append(str(err))
-    segment.save()
-    serialized = SegmentSerializer(segment)
-    
-    return Response(
-        {
-            'status' : True,
-            'status_code' : 200,
-            'status_code_text' : '200',
-            'response' : {
-                'message' : 'Segment Created successfully',
-                'error_message' : None,
-                'segment': serialized.data,
-                'segment_error' : segment_error
+    @transaction.atomic       
+    def post(self, request):
+        serializer = SegmentSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                    "success": True,
+                    "message": "segment created successfully",
+                    "code": "segment_create_API",
+                    "data": serializer.data
             }
-        },
-        status=status.HTTP_200_OK
-    )
+            return Response(data, status=status.HTTP_200_success)
+        else:   
+            data = {
+                    "success": False,
+                    "message": "segment not created",
+                    "code": "segment_create_API",
+                    "Error": serializer.errors
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST) 
 
-@api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
-def delete_segment(request):
-    segment_id = request.data.get('id', None)
-    if id is None: 
-       return Response(
-            {
-                'status' : False,
-                'status_code' : StatusCodes.MISSING_FIELDS_4001,
-                'status_code_text' : 'MISSING_FIELDS_4001',
-                'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : 'fields are required.',
-                    'fields' : [
-                        'id'                         
-                    ]
+    @transaction.atomic     
+    def update(self, request, pk):
+        segment = get_object_or_404(pk = pk)
+        serializer = SegmentSerializer(segment, data=request.data)
+        if not segment.is_static():
+                if serializer.is_valid():
+                        serializer.save()
+                        data = {
+                                "success": True,
+                                "message": "segment updated successfully",
+                                "code": "segment_update_API",
+                                "data": serializer.data
+                        }
+                        return Response(data, status=status.HTTP_200_success)
+                else:    
+                        data = {
+                                "success": False,
+                                "message": "segment not updated",
+                                "code": "segment_update_API",
+                                "Error": serializer.errors
+                        }
+                        return Response(data, status=status.HTTP_400_BAD_REQUEST)
+        else:
+                data = {
+                        "success": False,
+                        "message": "segment not updated",
+                        "code": "segment_update_API",
+                        "Error": "segment type is static"
                 }
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
+                return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+    @transaction.atomic   
+    def delete(self, request, pk):
+        segment = get_object_or_404(Segment, pk=pk)
+        serializer = SegmentSerializer(segment, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                    "success": True,
+                    "message": "segment deleted successfully",
+                    "code": "segment_delete_API",
+            }
+            return Response(data, status=status.HTTP_200_success)
+        else:
+            data = {
+                    "success": False,
+                    "message": "segment not deleted",
+                    "code": "segment_delete_API",
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+class Campaigns(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request , pk = None):
+        if pk is not None:
+            camapingn = get_object_or_404(Campaigns, pk=pk)
+            serialized = CampaignsSerializer(camapingn)
+            data = {
+                    "success": True,
+                    "message": "campaign get Successfully",
+                    "code": "get_campaign_API",
+                    "data": serialized.data
+            }
+            return Response(data, status=status.HTTP_200_success)
+        else:
+            campaigns = Campaign.objects.all().filter(is_deleted = False)
+            serialized = CampaignsSerializer(campaigns, many=True)
+            data = {
+                    "success": True,
+                    "message": "All campaigns get Successfully",
+                    "code": "get_campaigns_API",
+                    "data": serialized.data
+            }
+            return Response(data, status=status.HTTP_200_success) 
           
-    try:
-        segment = Segment.objects.get(id=segment_id)
-    except Exception as err:
-        return Response(
-            {
-                'status' : False,
-                'status_code' : 404,
-                'status_code_text' : '404',
-                'response' : {
-                    'message' : 'Invalid Segment ID!',
-                    'error_message' : str(err),
-                }
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
+    @transaction.atomic
+    def post(self, request):
+        serializer = CampaignsSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                    "success": True,
+                    "message": "campaign created successfully",
+                    "code": "campaign_create_API",
+                    "data": serializer.data
+            }
+            return Response(serializer.data, status=status.HTTP_200_success)
+        else:   
+            data = {
+                    "success": False,
+                    "message": "campaign not created",
+                    "code": "campaign_create_API",
+                    "Error": serializer.errors
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST) 
+
+    @transaction.atomic     
+    def update(self, request, pk):
+        campaign = get_object_or_404(Campaign,pk=pk)
+        serializer = CampaignsSerializer(campaign, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                    "success": True,
+                    "message": "campaign updated successfully",
+                    "code": "campaign_update_API",
+                    "data": serializer.data
+            }
+            return Response(serializer.data, status=status.HTTP_200_success)
+        else:    
+            data = {
+                    "success": False,
+                    "message": "campaign not updated",
+                    "code": "campaign_update_API",
+                    "Error": serializer.errors
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+        
+    @transaction.atomic   
+    def delete(self, request, pk):
+        campaign = get_object_or_404(Campaign, pk=pk)
+        serializer = CampaignsSerializer(campaign, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                    "success": True,
+                    "message": "campaign deleted successfully",
+                    "code": "campaign_delete_API",
+            }
+            return Response(data, status=status.HTTP_200_success)
+        else:
+            data = {
+                    "success": False,
+                    "message": "campaign not deleted",
+                    "code": "campaign_delete_API",
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+        
+class ClientFilter(ListAPIView):
     
-    segment.delete()
-    return Response(
-        {
-            'status' : True,
-            'status_code' : 200,
-            'status_code_text' : '200',
-            'response' : {
-                'message' : 'Segment deleted successfully',
-                'error_message' : None
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    queryset = Client.objects.all().filter(is_deleted = False)
+    serializer_class = ClientSerializer
+       
+    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    search_fields = ['gender']
 
-@transaction.atomic
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def update_segment(request):
-    segment_id = request.data.get('id', None)
-    client = request.data.get('client', None) 
+    def get_queryset(self):
+        queryset = Client.objects.all().filter(is_deleted = False)
 
-    if segment_id is None: 
-        return Response(
-        {
-            'status' : False,
-            'status_code' : StatusCodes.MISSING_FIELDS_4001,
-            'status_code_text' : 'MISSING_FIELDS_4001',
-            'response' : {
-                'message' : 'Invalid Data!',
-                'error_message' : 'Subscription ID are required.',
-                'fields' : [
-                    'id'                         
-                ]
-            }
-        },
-        status=status.HTTP_400_BAD_REQUEST
-        )
-    try:
-        segment = Segment.objects.get(id=segment_id)
-    except Exception as err:
-        return Response(
-            {
-                'status' : False,
-                'status_code_text' : 'INVALID_SEGMENT_ID',
-                'response' : {
-                    'message' : 'Segment Not Found',
-                    'error_message' : str(err),
-                }
-            },
-                status=status.HTTP_404_NOT_FOUND
-        )
-    segment_error =[]
-    if client is not None:
-        if type(client) ==  str:
-            client = json.loads(client)
+        gender = self.request.query_params.get('gender', None)
+        if gender:
+            queryset = queryset.filter(gender = gender)
             
-        for usr in client:
-            try:
-                employe = Client.objects.get(id=usr)  
-                segment.client.add(employe)
-            except Exception as err:
-                print(err)
-                segment_error.append(str(err))
-    segment.save()
-    serializer = SegmentSerializer(segment, data=request.data, partial=True)
-    if not serializer.is_valid():
-        return Response(
-                {
-            'status' : False,
-            'status_code' : StatusCodes.SERIALIZER_INVALID_4024,
-            'response' : {
-                'message' : 'Segment Serializer Invalid',
-                'error_message' : str(serializer.errors),
-            }
-        },
-        status=status.HTTP_404_NOT_FOUND
-        )
-    serializer.save()
-    return Response(
-        {
-            'status' : True,
-            'status_code' : 200,
-            'response' : {
-                'message' : 'Update Segment Successfully',
-                'error_message' : None,
-                'segment' : serializer.data,
-                'segment_error' : segment_error,
-            }
-        },
-        status=status.HTTP_200_OK
-        )
+        return queryset
+
+
+# class RunCampaigns():
+#     def get_target_client_emails(self, request, pk=None):
+#         campaigns = get_object_or_404(Campaign, pk=pk)
+#         serialized = CampaignsSerializer(campaigns)
+        
+#         if campaigns.is_email():
+#             target_client_emails = campaigns.segment.client.values_list('email', flat=True)
+            
+#         elif campaigns.is_appnotifaction():
+#             users = 
+#             title = campaigns.objects.values('title')
+#             body = campaigns.content.values('content')
+            
+#             NotificationProcessor.send_notifications_to_users(users, title, body, request_user=request.user)
+
