@@ -50,6 +50,8 @@ from Analytics.models import EmployeeBookingDailyInsights
 from django.db.models import Sum
 from django.db import transaction
 
+from ... import choices
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_single_appointments(request):
@@ -1329,9 +1331,9 @@ def update_appointment_service(request):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_appointment(request):
-    appointment_service_id = request.data.get('id', None)
+    appointment_id = request.data.get('id', None)
 
-    if appointment_service_id is None: 
+    if appointment_id is None: 
        return Response(
             {
                 'status' : False,
@@ -1349,7 +1351,7 @@ def delete_appointment(request):
         )
           
     try:
-        app_service = AppointmentService.objects.get(id=appointment_service_id)
+        appointment = Appointment.objects.get(id=appointment_id)
     except Exception as err:
         return Response(
             {
@@ -1364,7 +1366,7 @@ def delete_appointment(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-    app_service.delete()
+    appointment.delete()
     return Response(
         {
             'status' : True,
@@ -3230,5 +3232,46 @@ def get_appointment_logs(request):
                 }
             },
             status=status.HTTP_200_OK
-        )
+    )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def appointment_service_status_update(request):
+    status = request.GET.get('status', None)
+    appointment_id = request.GET.get('appointment_id', None)
+    appointment_service_id = request.GET.get('appointment_service_id', None)
+
+    #changing the status
+    appointment_service = AppointmentService.objects.get(id=appointment_service_id)
+    appointment_service.status = status
+    appointment_service.save()
+
+    # check if any service has status of started
+    query = Q(status__in=[choices.AppointmentServiceStatus.STARTED,
+                          choices.AppointmentServiceStatus.FINISHED,
+                          choices.AppointmentServiceStatus.VOID])
     
+    appointment_service = AppointmentService.objects.filter(query)
+    if appointment_service:
+        appointment = Appointment.objects.get(id=appointment_id)
+        appointment.status = choices.AppointmentStatus.STARTED
+        appointment.save()
+
+    serialized = AppointmentServiceSerializer(appointment_service)
+
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Appointment Service',
+                'error_message' : None,
+                'appointment_logs' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
+
