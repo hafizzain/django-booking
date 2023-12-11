@@ -3243,13 +3243,13 @@ def get_appointment_logs(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def appointment_service_status_update(request):
-    status = request.data.get('status', None)
+    appointment_service_status = request.data.get('status', None)
     appointment_id = request.data.get('appointment_id', None)
     appointment_service_id = request.data.get('appointment_service_id', None)
 
     #changing the status
     appointment_service = AppointmentService.objects.get(id=appointment_service_id)
-    appointment_service.status = status
+    appointment_service.status = appointment_service_status
     appointment_service.save()
 
     # check if any service has status of started
