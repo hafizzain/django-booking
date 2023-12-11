@@ -3240,7 +3240,7 @@ def get_appointment_logs(request):
     )
 
 
-@api_view(['PUT'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def appointment_service_status_update(request):
     status = request.GET.get('status', None)
