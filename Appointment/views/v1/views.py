@@ -1367,8 +1367,11 @@ def delete_appointment(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    
+    appointment_services = AppointmentService.objects.filter(appointment=appointment)
+
     appointment.delete()
+    appointment_services.delete()
+    
     return Response(
         {
             'status' : True,
@@ -3250,6 +3253,13 @@ def appointment_service_status_update(request):
     #changing the status
     appointment_service = AppointmentService.objects.get(id=appointment_service_id)
     appointment_service.status = appointment_service_status
+
+    if appointment_service_status == choices.AppointmentServiceStatus.STARTED:
+        appointment_service.service_start_time = datetime.now()
+
+    elif appointment_service_status == choices.AppointmentServiceStatus.FINISHED:
+        appointment_service.service_end_time = datetime.now()
+
     appointment_service.save()
 
     # check if any service has status of started
