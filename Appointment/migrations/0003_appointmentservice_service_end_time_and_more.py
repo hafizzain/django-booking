@@ -13,12 +13,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='appointmentservice',
             name='service_end_time',
-            field=models.DateTimeField(default=None),
+            field=models.DateTimeField(default=None, null=True),
         ),
         migrations.AddField(
             model_name='appointmentservice',
             name='service_start_time',
-            field=models.DateTimeField(default=None),
+            field=models.DateTimeField(default=None, null=True),
         ),
         migrations.AlterField(
             model_name='appointment',
