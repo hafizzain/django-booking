@@ -11,6 +11,8 @@ from Client.models import Client, Membership, Promotion, Rewards, Vouchers, Loya
 from Employee.models import Employee
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 from Order.models import Checkout
+from . import choices
+
 class AppointmentLogs(models.Model):
     LOG_TYPE_CHOICES =[
         ('Create' , 'Create'),
@@ -91,7 +93,7 @@ class Appointment(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client_appointments', null=True, blank=True)
     business_address = models.ForeignKey(BusinessAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='appointment_address')
     member = models.ForeignKey(Employee, on_delete=models.SET_NULL, related_name='employee_appointments_lg', null=True, blank=True)
-
+    status = models.CharField(max_length=100, choices=choices.AppointmentStatus.choices, null=True, blank=True)
     
     client_type= models.CharField(choices=TYPE_CHOICES, max_length=50, null=True, blank=True, )
     discount_type = models.CharField(max_length=50, choices= DISCOUNT_CHOICES, null=True, blank=True)
@@ -166,8 +168,8 @@ class AppointmentService(models.Model):
     slot_availible_for_online = models.CharField(max_length=100, default='', null=True, blank=True,)
     
     appointment_status = models.CharField(choices=BOOKED_CHOICES, max_length=100, default='Appointment Booked')
+    status = models.CharField(max_length=100, choices=choices.AppointmentServiceStatus.choices, null=True, blank=True)
     tip = models.FloatField(default=0, null=True, blank=True) # Not in Use
-    
     price = models.FloatField(default=0, null=True, blank=True)
     
     service_commission = models.FloatField(default = 0 , null=True, blank=True)    
