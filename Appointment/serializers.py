@@ -880,7 +880,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
         fields = ['id', 'client', 'appointment_tips', 'notes', 'business_address',
-                  'client_type','appointmnet_service', 'customer_note']
+                  'client_type','appointmnet_service', 'customer_note', 'status']
   
 class AppointmentServiceSeriailzer(serializers.ModelSerializer):
     class Meta:
