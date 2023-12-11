@@ -13,8 +13,7 @@ urlpatterns = [
     path('get_appointments_service/', views.get_appointments_service),
 
     # new apis for latest requirements
-
-    path('appointment_service_status_update/', views.get_appointments_service),
+    path('appointment_service_status_update/', views.appointment_service_status_update),
     
 
     path('get_appointments_device/', views.get_appointments_device),
