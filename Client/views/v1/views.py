@@ -1,6 +1,6 @@
 from datetime import date, datetime
 from threading import Thread
-
+from Appointment.models import Appointment
 from Order.models import VoucherOrder, Vouchers, MemberShipOrder, Membership
 from django.db.models.functions import Cast
 from Client.Constants.Add_Employe import add_client
@@ -181,7 +181,14 @@ def get_client_dropdown(request):
     # no_pagination = request.GET.get('no_pagination', None)
     page = request.GET.get('page', None)
     is_searched = False
-
+    start_date = request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
+    
+    if start_date and end_date:
+            appointments = Appointment.objects\
+                        .filter(created_at__range=(start_date, end_date))\
+                            .values_list('client__id')
+                
     query = Q(is_deleted=False, is_blocked=False, is_active=True)
 
     if search_text:

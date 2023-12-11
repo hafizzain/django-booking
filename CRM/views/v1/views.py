@@ -17,7 +17,8 @@ from rest_framework import filters
 from rest_framework.generics import ListAPIView
 from Notification.notification_processor import NotificationProcessor
 from Client.models import Client
-from Client.serializers import ClientSerializer
+from Appointment.models import Appointment
+from Appointment.serializers import AppoinmentSerializer
 
 
 
@@ -207,24 +208,55 @@ class Campaigns(APIView):
                     "code": "campaign_delete_API",
             }
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
-        
-class ClientFilter(ListAPIView):
+
+# class ClientFilter(ListAPIView):
     
-    queryset = Client.objects.all().filter(is_deleted = False)
-    serializer_class = ClientSerializer
+#     queryset = Client.objects.all().filter(is_deleted = False)
+#     serializer_class = ClientSerializer
        
-    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
-    search_fields = ['gender']
+#     filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+#     search_fields = ['gender','total_sales','total_done_appointments']
 
-    def get_queryset(self):
-        queryset = Client.objects.all().filter(is_deleted = False)
+#     def get_queryset(self):
+#         queryset = Client.objects.all().filter(is_deleted = False)
 
-        gender = self.request.query_params.get('gender', None)
-        if gender:
-            queryset = queryset.filter(gender = gender)
+#         gender = self.request.query_params.get('gender', None)
+#         if gender:
+#             queryset = queryset.filter(gender = gender)
             
-        return queryset
+#         total_sales = self.request.query_params.get('total_sales', None)
+#         if total_sales:
+#                 queryset = queryset.filter(total_sales = total_sales)
+                
+#         total_done_appointments = self.request.query_params.get('total_done_appointments')
+#         if total_done_appointments:
+#                 queryset = queryset.filter(total_done_appointments = total_done_appointments)
+        
+#         data = {
+#                     "success": True,
+#                     "message": "Client Filter successfully",
+#                     "code": "client_filter_API",
+#                     "data": queryset
+#             }
+#         return Response(data, status=status.HTTP_200_success)
 
+        
+# class AppointmentFilter(ListAPIView):
+        
+#         queryset = Appointment.objects.all().filter(is_deleted = False)
+#         serializer_class = AppoinmentSerializer
+#         filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+#         search_fields = ['created_at ','clint']
+        
+#         def get_queryset(self):
+#                 queryset = Appointment.objects.all().filter(is_deleted = False)
+
+#                 start_date = self.request.query_params.get('start_date')
+#                 end_date = self.request.query_params.get('end_date')
+#                 if start_date and end_date:
+#                         date_range_filter = Q(created_at__gte=start_date, created_at__lte=end_date)
+#                         queryset = queryset.filter(date_range_filter)
+#                 return queryset
 
 # class RunCampaigns():
 #     def get_target_client_emails(self, request, pk=None):
