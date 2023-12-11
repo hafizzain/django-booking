@@ -12,18 +12,18 @@ BOOKED_CHOICES = [
     ]
 
 class AppointmentStatus(models.TextChoices):
-    BOOKED = 'booked', 'Booked'
-    STARTED = 'started', 'Started'
-    FINISHED = 'finished', 'Finished'
-    DONE = 'done', 'Done'
+    BOOKED = 'Booked', 'Booked'
+    STARTED = 'Started', 'Started'
+    FINISHED = 'Finished', 'Finished'
+    DONE = 'Done', 'Done'
     CANCELLED = 'cancelled', 'Cancelled'
 
 
 class AppointmentServiceStatus(models.TextChoices):
-    BOOKED = 'booked', 'Booked'
-    STARTED = 'started', 'Started'
-    FINISHED = 'finished', 'Finished'
-    VOID = 'void', 'Void'
+    BOOKED = 'Booked', 'Booked'
+    STARTED = 'Started', 'Started'
+    FINISHED = 'Finished', 'Finished'
+    VOID = 'Void', 'Void'
 
 
 
