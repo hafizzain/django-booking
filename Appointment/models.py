@@ -179,6 +179,8 @@ class AppointmentService(models.Model):
     discount_percentage = models.FloatField(default = 0 , null=True, blank=True)
 
     total_price = models.FloatField(default = 0 , null=True, blank=True)
+    service_start_time = models.DateTimeField(default=None)
+    service_end_time = models.DateTimeField(default=None)
 
     # redeemed attributes
     is_redeemed = models.BooleanField(default=False)
