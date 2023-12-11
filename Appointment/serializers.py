@@ -678,7 +678,7 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
         if obj.appointment_status == 'Cancel':
             return 'Cancelled'
     def get_status(self, obj):
-        return obj.appointment_status
+        return obj.status
     
     def get_appointment_type(self, obj):
         try:
