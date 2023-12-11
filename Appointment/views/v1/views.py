@@ -3257,8 +3257,8 @@ def appointment_service_status_update(request):
                           choices.AppointmentServiceStatus.FINISHED,
                           choices.AppointmentServiceStatus.VOID])
     
-    appointment_service = AppointmentService.objects.filter(query)
-    if appointment_service:
+    appointment_service_check = AppointmentService.objects.filter(query)
+    if appointment_service_check:
         appointment = Appointment.objects.get(id=appointment_id)
         appointment.status = choices.AppointmentStatus.STARTED
         appointment.save()
@@ -3272,7 +3272,7 @@ def appointment_service_status_update(request):
             'response' : {
                 'message' : 'Appointment Service',
                 'error_message' : None,
-                'appointment_logs' : serialized.data
+                'appointment_service' : serialized.data
             }
         },
         status=status.HTTP_200_OK
