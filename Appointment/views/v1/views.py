@@ -572,6 +572,7 @@ def create_appointment(request):
             client_type=client_type,
             payment_method=payment_method,
             discount_type=discount_type,
+            status=choices.AppointmentStatus.BOOKED
         )
 
     if is_promotion_availed:
@@ -761,6 +762,7 @@ def create_appointment(request):
             total_price = price,
             slot_availible_for_online = slot_availible_for_online,
             client_can_book = client_can_book,
+            status=choices.AppointmentServiceStatus.BOOKED
         )
         price_com =  0
         try:
@@ -1490,7 +1492,8 @@ def create_blockTime(request):
             member = member,
             details = details,
             is_blocked = True,
-            end_time = tested
+            end_time = tested,
+            status=choices.AppointmentServiceStatus.BOOKED
         )
     
     all_members =Employee.objects.filter(is_deleted=False, is_active = True).order_by('-created_at')
@@ -2673,6 +2676,7 @@ def create_appointment_client(request):
                 client_type='IN HOUSE',
                 payment_method=payment_method,
                 discount_type=discount_type,
+                status=choices.AppointmentStatus.BOOKED
             )
         if business_address_id is not None:
             appointment.business_address = business_address
@@ -2753,6 +2757,7 @@ def create_appointment_client(request):
                 member = member,
                 price = price,
                 total_price = price,
+                status=choices.AppointmentServiceStatus.BOOKED
             )
             if fav is not None:
                 appointment_service.is_favourite = True
@@ -3235,7 +3240,7 @@ def get_appointment_logs(request):
     )
 
 
-@api_view(['GET'])
+@api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def appointment_service_status_update(request):
     status = request.GET.get('status', None)
