@@ -193,6 +193,12 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
         'client_type','duration', 'currency','created_at','service', 'client','location', 'is_blocked' ,'details' 
         ]
 
+class AppointmentServiceSerializerBasic(serializers.ModelSerializer):
+
+    class Meta:
+        model = AppointmentService
+        fields = '__all__'
+
 class AppoinmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment

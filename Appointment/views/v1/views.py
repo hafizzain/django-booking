@@ -37,7 +37,7 @@ from Appointment.models import Appointment, AppointmentService, AppointmentNotes
 from Appointment.serializers import (CheckoutSerializer, AppoinmentSerializer, ServiceClientSaleSerializer, ServiceEmployeeSerializer,
                                      SingleAppointmentSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer,
                                        EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer, 
-                                       AppointmenttLogSerializer, AppointmentSerializerDashboard)
+                                       AppointmenttLogSerializer, AppointmentSerializerDashboard, AppointmentServiceSerializerBasic)
 from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
 from Utility.models import ExceptionRecord
@@ -3263,7 +3263,7 @@ def appointment_service_status_update(request):
         appointment.status = choices.AppointmentStatus.STARTED
         appointment.save()
 
-    serialized = AppointmentServiceSerializer(appointment_service)
+    serialized = AppointmentServiceSerializerBasic(appointment_service)
 
     return Response(
         {
