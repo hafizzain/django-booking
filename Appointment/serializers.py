@@ -833,6 +833,7 @@ class PaidUnpaidAppointmentSerializer(serializers.ModelSerializer):
     booking_id = serializers.SerializerMethodField(read_only=True)
     booking_date = serializers.SerializerMethodField(read_only=True)
     subtotal = serializers.SerializerMethodField(read_only=True)
+    payment_date = serializers.SerializerMethodField(read_only=True)
     
     def get_booking_id(self, obj):
         return obj.get_booking_id()
@@ -889,6 +890,14 @@ class PaidUnpaidAppointmentSerializer(serializers.ModelSerializer):
                                     final_price=Sum('currency_price')
                                 )
             return services_prices['final_price']
+        
+
+    def get_payment_date(self, obj):
+        try:
+            appointment_checkout = AppointmentCheckout.objects.get(appointment=obj)
+            return appointment_checkout.created_at
+        except:
+            return None
 
 
     
@@ -896,7 +905,7 @@ class PaidUnpaidAppointmentSerializer(serializers.ModelSerializer):
         
     class Meta:
         model = Appointment
-        fields= ['id', 'booking_id', 'client_name', 'booking_date', 'subtotal', 'status']
+        fields= ['id', 'booking_id', 'client_name', 'booking_date', 'subtotal', 'status', 'payment_date']
 
 class NoteSerializer(serializers.ModelSerializer):
     

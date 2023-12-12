@@ -1951,6 +1951,10 @@ def create_checkout(request):
         service_commission_type = service_commission_type,        
     )
 
+    # change the status of appointment after checkout
+    appointments.status = choices.AppointmentStatus.DONE
+    appointments.save()
+
     for i_employee_commission in empl_commissions_instances:
         i_employee_commission.sale_id = checkout.id
         i_employee_commission.save()
@@ -2263,6 +2267,9 @@ def create_checkout_device(request):
 
     
     invoice.save() # Do not remove this
+    # change the status of appointment after checkout
+    appointments.status = choices.AppointmentStatus.DONE
+    appointments.save()
     serialized = CheckoutSerializer(checkout)
     return Response(
             {
@@ -3294,17 +3301,16 @@ def paid_unpaid_clients(request):
     location_id = request.GET.get('location_id', None)
     no_pagination = request.GET.get('no_pagination', None)
     is_paid = request.GET.get('is_paid', None)
-    is_unpaid = request.GET.get('is_unpaid', None)
     start_date = request.GET.get('start_date', None)
     end_date = request.GET.get('end_date', None)
 
 
     query = Q()
 
-    if is_paid:
+    if is_paid == 'paid':
         query &= Q(status=choices.AppointmentStatus.DONE)
 
-    if is_unpaid:
+    if is_paid == 'unpaid':
         query &= ~Q(status=choices.AppointmentStatus.DONE)
 
     if location_id:
