@@ -14,7 +14,7 @@ class Command(BaseCommand):
     # Handle method to handle out the process of creating the admin user
     def handle(self, *args, **options):
 
-        html_file = render_to_string("otp_email.html", {
+        html_file = render_to_string("otp_email_optimized.html", {
             # 'user_name': user_otp.user.username,
             'user_name': 'Huzaifa',
             'otp': '6596', 
