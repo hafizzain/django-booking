@@ -3291,6 +3291,8 @@ def appointment_service_status_update(request):
 
 @api_view(['GET'])
 def paid_unpaid_clients(request):
+    location_id = request.GET.get('location_id', None)
+    no_pagination = request.GET.get('no_pagination', None)
     is_paid = request.GET.get('is_paid', None)
     is_unpaid = request.GET.get('is_unpaid', None)
     start_date = request.GET.get('start_date', None)
@@ -3305,6 +3307,9 @@ def paid_unpaid_clients(request):
     if is_unpaid:
         query &= ~Q(status=choices.AppointmentStatus.DONE)
 
+    if location_id:
+        query &= Q(business_address__id=location_id)
+
     if start_date and end_date:
         query &= Q(created_at__range=(start_date, end_date))
 
@@ -3312,19 +3317,12 @@ def paid_unpaid_clients(request):
                     .filter(query) \
                     .select_related('client') \
                     .order_by('-created_by')
-
-    serialized = PaidUnpaidAppointmentSerializer(appointments, many=True)
-
-    return Response(
-        {
-            'status' : True,
-            'status_code' : 200,
-            'response' : {
-                'message' : 'All Clients',
-                'error_message' : None,
-                'clients' : serialized.data
-            }
-        },
-        status=status.HTTP_200_OK
-    )
+    
+    serialized = list(PaidUnpaidAppointmentSerializer(appointments, many=True).data)
+    
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'categories')
+    return response
 
