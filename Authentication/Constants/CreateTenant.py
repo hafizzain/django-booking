@@ -245,41 +245,41 @@ def create_employee(tenant=None, user = None, business=None, data=None):
 
                     bds_schedule.save()
                 
-                try:
-                    username = user.email.split('@')[0]
-                    try:
-                        user_check = User.objects.get(username = username)
-                    except Exception as err:
-                        #data.append(f'username user is client errors {str(err)}')'
-                        email_check = f'{username}-abc'
-                        pass
-                    else:
-                        username = f'{username} {len(User.objects.all())}'
-                        email_check = f'{username} {len(User.objects.all())}'
+                # try:
+                #     username = user.email.split('@')[0]
+                #     try:
+                #         user_check = User.objects.get(username = username)
+                #     except Exception as err:
+                #         #data.append(f'username user is client errors {str(err)}')'
+                #         email_check = f'{username}-abc'
+                #         pass
+                #     else:
+                #         username = f'{username} {len(User.objects.all())}'
+                #         email_check = f'{username} {len(User.objects.all())}'
 
-                except Exception as err:
-                    pass
-                auto_generate_email = f'{email_check}@gmail.com'
+                # except Exception as err:
+                #     pass
+                # auto_generate_email = f'{email_check}@gmail.com'
                 
-                user = User.objects.create(
-                    first_name = user.full_name,
-                    username = username,
-                    email = auto_generate_email ,
-                    is_email_verified = True,
-                    is_active = True,
-                    mobile_number = user.mobile_number,
-                )
+                # user = User.objects.create(
+                #     first_name = user.full_name,
+                #     username = username,
+                #     email = auto_generate_email ,
+                #     is_email_verified = True,
+                #     is_active = True,
+                #     mobile_number = user.mobile_number,
+                # )
                 
-                account_type = AccountType.objects.create(
-                        user = user,
-                        account_type = 'Employee'
-                    )
+                # account_type = AccountType.objects.create(
+                #         user = user,
+                #         account_type = 'Employee'
+                #     )
                 
-                try:
-                    thrd = Thread(target=add_employee, args=['ABCD', auto_generate_email, user.mobile_number, template, business.business_name, tenant.id, domain, user])
-                    thrd.start()
-                except Exception as err:
-                    pass
+                # try:
+                #     thrd = Thread(target=add_employee, args=['ABCD', auto_generate_email, user.mobile_number, template, business.business_name, tenant.id, domain, user])
+                #     thrd.start()
+                # except Exception as err:
+                #     pass
         except Exception as err:
             ExceptionRecord.objects.create(
                 text = f'errors in some create employee {str(err)}'
