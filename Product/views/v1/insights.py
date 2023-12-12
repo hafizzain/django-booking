@@ -174,6 +174,7 @@ class FilteredInsightProducts(APIView):
                 self.end_date = datetime.strptime(self.end_date, "%Y-%m-%d") + timedelta(days=1)
             # self.queries['filter']['product_order_stock__order__created_at__date__range'] = (self.start_date, self.end_date)       
             self.queries['filter']['products_stock_transfers__created_at__date__range'] = (self.start_date, self.end_date)       
+
         else:
             return Response(
                 {

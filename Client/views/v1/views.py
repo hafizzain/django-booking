@@ -34,6 +34,12 @@ from Utility.Constants.get_from_public_schema import get_country_from_public, ge
 from django.db import transaction
 from Order.models import Checkout
 
+from Appointment import choices
+from Appointment.models import Appointment
+from Appointment.serializers import PaidUnpaidAppointmentSerializer
+
+
+
 @transaction.atomic
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -2995,7 +3001,7 @@ def update_loyalty(request):
             }
         },
         status=status.HTTP_200_OK
-        )
+    )
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -3372,6 +3378,3 @@ def check_client_existance(request):
         },
         status=status.HTTP_200_OK
     )
-
-# Select Related  => Single Object => (Inside FK + OTO Relaion)
-# prefetch related => Many to Many => (MTM + Outside FK)

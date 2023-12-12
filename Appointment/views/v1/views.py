@@ -37,7 +37,8 @@ from Appointment.models import Appointment, AppointmentService, AppointmentNotes
 from Appointment.serializers import (CheckoutSerializer, AppoinmentSerializer, ServiceClientSaleSerializer, ServiceEmployeeSerializer,
                                      SingleAppointmentSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer,
                                        EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer, 
-                                       AppointmenttLogSerializer, AppointmentSerializerDashboard, AppointmentServiceSerializerBasic)
+                                       AppointmenttLogSerializer, AppointmentSerializerDashboard, AppointmentServiceSerializerBasic,
+                                       PaidUnpaidAppointmentSerializer)
 from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
 from Utility.models import ExceptionRecord
@@ -1950,6 +1951,10 @@ def create_checkout(request):
         service_commission_type = service_commission_type,        
     )
 
+    # change the status of appointment after checkout
+    appointments.status = choices.AppointmentStatus.DONE
+    appointments.save()
+
     for i_employee_commission in empl_commissions_instances:
         i_employee_commission.sale_id = checkout.id
         i_employee_commission.save()
@@ -2262,6 +2267,9 @@ def create_checkout_device(request):
 
     
     invoice.save() # Do not remove this
+    # change the status of appointment after checkout
+    appointments.status = choices.AppointmentStatus.DONE
+    appointments.save()
     serialized = CheckoutSerializer(checkout)
     return Response(
             {
@@ -3288,5 +3296,39 @@ def appointment_service_status_update(request):
         status=status.HTTP_200_OK
     )
 
+@api_view(['GET'])
+def paid_unpaid_clients(request):
+    location_id = request.GET.get('location_id', None)
+    no_pagination = request.GET.get('no_pagination', None)
+    is_paid = request.GET.get('is_paid', None)
+    start_date = request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
 
+
+    query = Q()
+
+    if is_paid == 'paid':
+        query &= Q(status=choices.AppointmentStatus.DONE)
+
+    if is_paid == 'unpaid':
+        query &= ~Q(status=choices.AppointmentStatus.DONE)
+
+    if location_id:
+        query &= Q(business_address__id=location_id)
+
+    if start_date and end_date:
+        query &= Q(created_at__range=(start_date, end_date))
+
+    appointments = Appointment.objects \
+                    .filter(query) \
+                    .select_related('client') \
+                    .order_by('-created_at')
+    
+    serialized = list(PaidUnpaidAppointmentSerializer(appointments, many=True).data)
+    
+    paginator = CustomPagination()
+    paginator.page_size = 100000 if no_pagination else 10
+    paginated_data = paginator.paginate_queryset(serialized, request)
+    response = paginator.get_paginated_response(paginated_data, 'appointments')
+    return response
 
