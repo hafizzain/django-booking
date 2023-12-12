@@ -43,3 +43,5 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(
             'Subdomain Secured Successfully!!'
         ))
+# hashedsystem555@gmail.com
+# fhtoyjtxiohplpli
