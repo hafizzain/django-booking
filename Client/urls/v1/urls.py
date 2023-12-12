@@ -75,7 +75,6 @@ urlpatterns = [
 
 
    path('check_client_existance/', views.check_client_existance),
-   # new apis
-   path('paid_unpaid_clients/', views.paid_unpaid_clients),
+   
 
 ]

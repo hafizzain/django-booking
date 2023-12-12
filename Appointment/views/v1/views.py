@@ -37,7 +37,8 @@ from Appointment.models import Appointment, AppointmentService, AppointmentNotes
 from Appointment.serializers import (CheckoutSerializer, AppoinmentSerializer, ServiceClientSaleSerializer, ServiceEmployeeSerializer,
                                      SingleAppointmentSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer,
                                        EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer, 
-                                       AppointmenttLogSerializer, AppointmentSerializerDashboard, AppointmentServiceSerializerBasic)
+                                       AppointmenttLogSerializer, AppointmentSerializerDashboard, AppointmentServiceSerializerBasic,
+                                       PaidUnpaidAppointmentSerializer)
 from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
 from Utility.models import ExceptionRecord
@@ -3288,5 +3289,42 @@ def appointment_service_status_update(request):
         status=status.HTTP_200_OK
     )
 
+@api_view(['GET'])
+def paid_unpaid_clients(request):
+    is_paid = request.GET.get('is_paid', None)
+    is_unpaid = request.GET.get('is_unpaid', None)
+    start_date = request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
 
+
+    query = Q()
+
+    if is_paid:
+        query &= Q(status=choices.AppointmentStatus.DONE)
+
+    if is_unpaid:
+        query &= ~Q(status=choices.AppointmentStatus.DONE)
+
+    if start_date and end_date:
+        query &= Q(created_at__range=(start_date, end_date))
+
+    appointments = Appointment.objects \
+                    .filter(query) \
+                    .select_related('client') \
+                    .order_by('-created_by')
+
+    serialized = PaidUnpaidAppointmentSerializer(appointments, many=True)
+
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'All Clients',
+                'error_message' : None,
+                'clients' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
