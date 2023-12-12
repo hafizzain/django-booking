@@ -193,6 +193,12 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
         'client_type','duration', 'currency','created_at','service', 'client','location', 'is_blocked' ,'details' 
         ]
 
+class AppointmentServiceSerializerBasic(serializers.ModelSerializer):
+
+    class Meta:
+        model = AppointmentService
+        fields = '__all__'
+
 class AppoinmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
@@ -672,7 +678,7 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
         if obj.appointment_status == 'Cancel':
             return 'Cancelled'
     def get_status(self, obj):
-        return obj.appointment_status
+        return obj.status
     
     def get_appointment_type(self, obj):
         try:
@@ -736,7 +742,8 @@ class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
         fields= ('id', 'service', 'member', 'price', 'client', 'designation',
                  'appointment_date', 'appointment_time', 'duration','srv_name','status',
                  'booked_by' , 'booking_id', 'appointment_type','client_can_book','slot_availible_for_online',
-                 'appointment_status', 'location','employee_list', 'created_at', 'is_deleted', 'appointment_service_member')
+                 'appointment_status', 'location','employee_list', 'created_at', 'is_deleted', 'appointment_service_member',
+                 'service_start_time', 'service_end_time')
         
       
 class SingleAppointmentSerializer(serializers.ModelSerializer):
@@ -874,7 +881,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
         fields = ['id', 'client', 'appointment_tips', 'notes', 'business_address',
-                  'client_type','appointmnet_service', 'customer_note']
+                  'client_type','appointmnet_service', 'customer_note', 'status']
   
 class AppointmentServiceSeriailzer(serializers.ModelSerializer):
     class Meta:

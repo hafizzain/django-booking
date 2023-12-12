@@ -37,7 +37,7 @@ from Appointment.models import Appointment, AppointmentService, AppointmentNotes
 from Appointment.serializers import (CheckoutSerializer, AppoinmentSerializer, ServiceClientSaleSerializer, ServiceEmployeeSerializer,
                                      SingleAppointmentSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer,
                                        EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer, 
-                                       AppointmenttLogSerializer, AppointmentSerializerDashboard)
+                                       AppointmenttLogSerializer, AppointmentSerializerDashboard, AppointmentServiceSerializerBasic)
 from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
 from Utility.models import ExceptionRecord
@@ -572,6 +572,7 @@ def create_appointment(request):
             client_type=client_type,
             payment_method=payment_method,
             discount_type=discount_type,
+            status=choices.AppointmentStatus.BOOKED
         )
 
     if is_promotion_availed:
@@ -761,6 +762,7 @@ def create_appointment(request):
             total_price = price,
             slot_availible_for_online = slot_availible_for_online,
             client_can_book = client_can_book,
+            status=choices.AppointmentServiceStatus.BOOKED
         )
         price_com =  0
         try:
@@ -1365,8 +1367,11 @@ def delete_appointment(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    
+    appointment_services = AppointmentService.objects.filter(appointment=appointment)
+
     appointment.delete()
+    appointment_services.delete()
+    
     return Response(
         {
             'status' : True,
@@ -1490,7 +1495,8 @@ def create_blockTime(request):
             member = member,
             details = details,
             is_blocked = True,
-            end_time = tested
+            end_time = tested,
+            status=choices.AppointmentServiceStatus.BOOKED
         )
     
     all_members =Employee.objects.filter(is_deleted=False, is_active = True).order_by('-created_at')
@@ -2673,6 +2679,7 @@ def create_appointment_client(request):
                 client_type='IN HOUSE',
                 payment_method=payment_method,
                 discount_type=discount_type,
+                status=choices.AppointmentStatus.BOOKED
             )
         if business_address_id is not None:
             appointment.business_address = business_address
@@ -2753,6 +2760,7 @@ def create_appointment_client(request):
                 member = member,
                 price = price,
                 total_price = price,
+                status=choices.AppointmentServiceStatus.BOOKED
             )
             if fav is not None:
                 appointment_service.is_favourite = True
@@ -3235,16 +3243,23 @@ def get_appointment_logs(request):
     )
 
 
-@api_view(['GET'])
+@api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def appointment_service_status_update(request):
-    status = request.GET.get('status', None)
-    appointment_id = request.GET.get('appointment_id', None)
-    appointment_service_id = request.GET.get('appointment_service_id', None)
+    appointment_service_status = request.data.get('status', None)
+    appointment_id = request.data.get('appointment_id', None)
+    appointment_service_id = request.data.get('appointment_service_id', None)
 
     #changing the status
     appointment_service = AppointmentService.objects.get(id=appointment_service_id)
-    appointment_service.status = status
+    appointment_service.status = appointment_service_status
+
+    if appointment_service_status == choices.AppointmentServiceStatus.STARTED:
+        appointment_service.service_start_time = datetime.now()
+
+    elif appointment_service_status == choices.AppointmentServiceStatus.FINISHED:
+        appointment_service.service_end_time = datetime.now()
+
     appointment_service.save()
 
     # check if any service has status of started
@@ -3252,13 +3267,13 @@ def appointment_service_status_update(request):
                           choices.AppointmentServiceStatus.FINISHED,
                           choices.AppointmentServiceStatus.VOID])
     
-    appointment_service = AppointmentService.objects.filter(query)
-    if appointment_service:
+    appointment_service_check = AppointmentService.objects.filter(query)
+    if appointment_service_check:
         appointment = Appointment.objects.get(id=appointment_id)
         appointment.status = choices.AppointmentStatus.STARTED
         appointment.save()
 
-    serialized = AppointmentServiceSerializer(appointment_service)
+    serialized = AppointmentServiceSerializerBasic(appointment_service)
 
     return Response(
         {
@@ -3267,7 +3282,7 @@ def appointment_service_status_update(request):
             'response' : {
                 'message' : 'Appointment Service',
                 'error_message' : None,
-                'appointment_logs' : serialized.data
+                'appointment_service' : serialized.data
             }
         },
         status=status.HTTP_200_OK
