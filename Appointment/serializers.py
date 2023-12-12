@@ -871,6 +871,7 @@ class PaidUnpaidAppointmentSerializer(serializers.ModelSerializer):
 
             query_for_price = Q(service=OuterRef('pk'), currency=currency)
             service_ids = list(obj.appointment_services.values_list('service__id', flat=True))
+
             services_prices = Service.objects \
                                 .filter(id__in=service_ids) \
                                 .annotate(
@@ -878,7 +879,8 @@ class PaidUnpaidAppointmentSerializer(serializers.ModelSerializer):
                                         Subquery(
                                             PriceService.objects \
                                                 .filter(query_for_price)
-                                                .values('price')[0]
+                                                .order_by('-created_at')
+                                                .values('price')[:1]
                                         ),
                                         0.0,
                                         output_field=FloatField()
