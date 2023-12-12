@@ -125,6 +125,11 @@ class Appointment(models.Model):
 
         except:
             return ''
+        
+    def get_booking_id(self):
+        id = str(self.id).split('-')[0:2]
+        id = ''.join(id)
+        return id
 
 
     def __str__(self):
@@ -167,6 +172,7 @@ class AppointmentService(models.Model):
     client_can_book = models.CharField(max_length=100, default='', null=True, blank=True)
     slot_availible_for_online = models.CharField(max_length=100, default='', null=True, blank=True,)
     
+    # still using appointment_status in some places but status should be used now
     appointment_status = models.CharField(choices=BOOKED_CHOICES, max_length=100, default='Appointment Booked')
     status = models.CharField(max_length=100, choices=choices.AppointmentServiceStatus.choices, null=True, blank=True)
     tip = models.FloatField(default=0, null=True, blank=True) # Not in Use

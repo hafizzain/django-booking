@@ -16,7 +16,7 @@ class AppointmentStatus(models.TextChoices):
     STARTED = 'Started', 'Started'
     FINISHED = 'Finished', 'Finished'
     DONE = 'Done', 'Done'
-    CANCELLED = 'cancelled', 'Cancelled'
+    CANCELLED = 'Cancelled', 'Cancelled'
 
 
 class AppointmentServiceStatus(models.TextChoices):

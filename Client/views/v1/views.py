@@ -32,6 +32,9 @@ from NStyle.Constants import StatusCodes
 from django.core.paginator import Paginator
 from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
 from django.db import transaction
+from Appointment import choices
+from Appointment.models import Appointment
+from Appointment.serializers import PaidUnpaidAppointmentSerializer
 
 
 @transaction.atomic
@@ -2961,7 +2964,7 @@ def update_loyalty(request):
             }
         },
         status=status.HTTP_200_OK
-        )
+    )
     
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -3339,5 +3342,42 @@ def check_client_existance(request):
         status=status.HTTP_200_OK
     )
 
-# Select Related  => Single Object => (Inside FK + OTO Relaion)
-# prefetch related => Many to Many => (MTM + Outside FK)
+
+@api_view(['GET'])
+def paid_unpaid_clients(request):
+    is_paid = request.GET.get('is_paid', None)
+    is_unpaid = request.GET.get('is_unpaid', None)
+    start_date = request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
+
+
+    query = Q()
+
+    if is_paid:
+        query &= Q(status=choices.AppointmentStatus.DONE)
+
+    if is_unpaid:
+        query &= ~Q(status=choices.AppointmentStatus.DONE)
+
+    if start_date and end_date:
+        query &= Q(created_at__range=(start_date, end_date))
+
+    appointments = Appointment.objects \
+                    .filter(query) \
+                    .select_related('client') \
+                    .order_by('-created_by')
+
+    serialized = PaidUnpaidAppointmentSerializer(appointments, many=True)
+
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'All Clients',
+                'error_message' : None,
+                'clients' : serialized.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )

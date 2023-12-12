@@ -4,7 +4,10 @@ from pkgutil import read_code
 from pyexpat import model
 from re import A
 from Client.models import Client
-#from Sale.serializers import LocationServiceSerializer
+
+from django.db.models.functions import Coalesce
+from django.db.models import Sum, Case, When, FloatField, Subquery, OuterRef
+
 from rest_framework import serializers
 from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Appointment.models import Appointment, AppointmentCheckout, AppointmentNotes, AppointmentService, AppointmentLogs, LogDetails, AppointmentEmployeeTip
@@ -18,6 +21,7 @@ from Product.Constants.index import tenant_media_base_url
 from django.db.models import Q, F
 from Business.serializers.v1_serializers import CurrencySerializer
 from Client.serializers import ClientSerializer
+from . import choices
 
 
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
@@ -822,7 +826,75 @@ class SingleAppointmentSerializer(serializers.ModelSerializer):
                  'appointment_time', 'end_time', 'member','price',
                  'appointment_status', 'currency', 'booked_by', 'booking_id', 'appointment_date', 'client_type', 'duration' , 'notes', 'is_favourite'
             )
+
+
+class PaidUnpaidAppointmentSerializer(serializers.ModelSerializer):
+    client_name = serializers.SerializerMethodField(read_only=True)
+    booking_id = serializers.SerializerMethodField(read_only=True)
+    booking_date = serializers.SerializerMethodField(read_only=True)
+    subtotal = serializers.SerializerMethodField(read_only=True)
+    
+    def get_booking_id(self, obj):
+        return obj.get_booking_id()
+    
+    def get_client_name(self, obj):
+        try:
+            return obj.client.full_name
+        except Exception as err:
+            pass
+
+    def get_booking_date(self, obj):
+        return obj.created_at
+    
+    def get_subtotal(self, obj):
+        # if the checkout is done
+        if obj.status == choices.AppointmentStatus.DONE:
+            services_prices = AppointmentService.objects \
+                .filter(appointment=obj) \
+                .annotate(
+                    final_total=Coalesce(
+                        Case(
+                            When(is_redeemed=True, then="redeemed_price"),
+                            When(discount_price__isnull=False, then="discount_price"),
+                            When(price__isnull=False, then="price"),
+                            default="total_price"
+                        ),
+                        0.0,
+                        output_field=FloatField()
+                        )
+                ).aggregate(sub_total_s=Sum('final_total'))
+            return services_prices['sub_total_s']
+        else:
+            # if the checkout is not done
+            location = BusinessAddress.objects.filter(id=obj.business_address.id).select_related('currency').order_by('-created_at')
+            currency = location[0].currency
+
+            query_for_price = Q(OuterRef('pk'), currency=currency)
+            service_ids = list(obj.appointment_services.values_list('service__id', flat=True))
+            services_prices = Service.objects \
+                                .filter(id__in=service_ids) \
+                                .annotate(
+                                    currency_price=Coalesce(
+                                        Subquery(
+                                            PriceService.objects \
+                                                .filter(query_for_price)
+                                                .values('price')[0]
+                                        ),
+                                        0.0,
+                                        output_field=FloatField()
+                                    )
+                                ).aggregate(
+                                    final_price=Sum('currency_price')
+                                )
+            return services_prices['final_price']
+
+
+    
+
         
+    class Meta:
+        model = Appointment
+        fields= ['id', 'booking_id', 'client_name', 'booking_date', 'subtotal', 'status']
 
 class NoteSerializer(serializers.ModelSerializer):
     
@@ -1010,4 +1082,11 @@ class AppointmenttLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentLogs
         fields = ('id', 'log_type', 'logged_by', 'log_details','created_at')
-        
+
+
+class AppointmentForClientSerializer(serializers.ModelSerializer):
+
+
+    class Meta:
+        model = Appointment
+        fields = ['']
