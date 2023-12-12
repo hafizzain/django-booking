@@ -1,5 +1,6 @@
 from django.urls import path, include
 from CRM.views.v1.views import *
+from Client.views.v1.views import get_client_dropdown
 
 
 urlpatterns = [
@@ -13,6 +14,6 @@ urlpatterns = [
     path('campaing-create', Campaigns.as_view()),
     path('campaing-update/<str:id>/update/', Campaigns.as_view()),
     path('campaing-delete/<str:id>/delete/', Campaigns.as_view()),
-    path('client-filter',ClientFilter.as_view()),
-    
+    path('client-filter/', get_client_dropdown)
+   
 ]
