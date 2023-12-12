@@ -3316,7 +3316,7 @@ def paid_unpaid_clients(request):
     appointments = Appointment.objects \
                     .filter(query) \
                     .select_related('client') \
-                    .order_by('-created_by')
+                    .order_by('-created_at')
     
     serialized = list(PaidUnpaidAppointmentSerializer(appointments, many=True).data)
     
