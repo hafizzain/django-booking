@@ -869,7 +869,7 @@ class PaidUnpaidAppointmentSerializer(serializers.ModelSerializer):
             location = BusinessAddress.objects.filter(id=obj.business_address.id).select_related('currency').order_by('-created_at')
             currency = location[0].currency
 
-            query_for_price = Q(OuterRef('pk'), currency=currency)
+            query_for_price = Q(service=OuterRef('pk'), currency=currency)
             service_ids = list(obj.appointment_services.values_list('service__id', flat=True))
             services_prices = Service.objects \
                                 .filter(id__in=service_ids) \
