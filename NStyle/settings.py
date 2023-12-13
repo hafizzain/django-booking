@@ -240,8 +240,8 @@ DEFAULT_RENDERER_CLASSES = [
 
 if DEBUG:
     DEFAULT_RENDERER_CLASSES = [
-        'rest_framework.renderers.BrowsableAPIRenderer',
-    ]
+    'Utility.customizations.renderers.CustomRenderer',
+]
 
 
 REST_FRAMEWORK = {
