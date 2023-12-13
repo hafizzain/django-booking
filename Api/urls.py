@@ -23,6 +23,6 @@ urlpatterns = [
     path('v1/help/', include('Help.urls.v1.urls')),
     path('v1/multilanguage/', include('MultiLanguage.urls.v1.urls')),
     path('v1/insights/', include('Analytics.urls')),
-    path('v1/crm/', include('CRM.urls'))
+   
 
     ]

@@ -19,9 +19,9 @@ from Service.models import Service
 import uuid
 from googletrans import Translator
 from dateutil.relativedelta import relativedelta
-from django.db.models import Count
-from django.db.models.functions import Coalesce,Q
-from Appointment.models import AppointmentService
+from django.db.models import Count, Q
+from django.db.models.functions import Coalesce
+# from Appointment.models import AppointmentService
 # from Order.models import Checkout
 
 
