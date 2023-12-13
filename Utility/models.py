@@ -192,6 +192,7 @@ class TurnOverProductRecord(models.Model):
         return str(self.id)
 
 class CommonField(models.Model):
+    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     is_active = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)

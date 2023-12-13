@@ -9,7 +9,6 @@ from .choices import *
 
 
 class Segment(CommonField):
-    id = models.UUIDField(default=uuid4, unique=True, editable=False, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='segment')
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_segment')
     client = models.ManyToManyField(Client, related_name='segment_clients')

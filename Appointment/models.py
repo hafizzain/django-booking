@@ -12,6 +12,7 @@ from Employee.models import Employee
 from Utility.Constants.Data.Durations import DURATION_CHOICES_DATA
 from Order.models import Checkout
 from . import choices
+from Utility.models import CommonField
 
 class AppointmentLogs(models.Model):
     LOG_TYPE_CHOICES =[
@@ -392,3 +393,11 @@ class AppointmentNotes(models.Model):
     def __str__(self):
         return str(self.id)
 
+
+class MissedOpportunity(CommonField):
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client_missed_opportunities')
+    service = models.ManyToManyField(Service, related_name='service_missed_opportunities')
+    employee = models.ManyToManyField(Employee, related_name='employee_missed_opportunities')
+    note = models.TextField()
+
+    date_time = models.DateTimeField()
