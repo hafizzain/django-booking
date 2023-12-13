@@ -31,7 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 CSRF_TRUSTED_ORIGINS=[
     # 'https://*.YOUR_DOMAIN.COM',
     'https://hashedsystems.com',
@@ -234,11 +234,19 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+DEFAULT_RENDERER_CLASSES = [
+    'Utility.customizations.renderers.CustomRenderer',
+]
+
+if DEBUG:
+    DEFAULT_RENDERER_CLASSES = [
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ]
+
+
 REST_FRAMEWORK = {
 
-    'DEFAULT_RENDERER_CLASSES': [
-        'Utility.customizations.renderers.CustomRenderer',
-    ],
+    'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES,
 
     'DEFAULT_AUTHENTICATION_CLASSES' : [
         'rest_framework.authentication.TokenAuthentication'
