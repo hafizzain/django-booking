@@ -21,6 +21,8 @@ from Appointment.models import Appointment
 from Appointment.serializers import AppoinmentSerializer
 from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
+from django.conf import settings
+from rest_framework import status
 
 
 class Segment(APIView):
@@ -38,7 +40,7 @@ class Segment(APIView):
             }
             return Response(data, status=status.HTTP_200_success)
         else:
-            segment = Segment.objects.prefetch_related('client').filter(is_deleted = False)
+            segment = Segment.objects.all()
             serializer = SegmentSerializer(segment, many=True)
             data = {
                     "success": True,
@@ -136,7 +138,7 @@ class Campaigns(APIView):
             }
             return Response(data, status=status.HTTP_200_success)
         else:
-            campaigns = Campaign.objects.all().filter(is_deleted = False)
+            campaigns = Campaign.objects.all()
             serialized = CampaignsSerializer(campaigns, many=True)
             data = {
                     "success": True,
