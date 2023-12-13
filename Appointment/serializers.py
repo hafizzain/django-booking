@@ -1115,4 +1115,4 @@ class MissedOpportunityBasicSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MissedOpportunity
-        fields = '__all__'
+        fields = ['client', 'service', 'employee', 'note']
