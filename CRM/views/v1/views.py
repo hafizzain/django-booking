@@ -208,23 +208,3 @@ class Campaigns(APIView):
                     "code": "campaign_delete_API",
             }
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
-
-
-        
-
-
-# class RunCampaigns():
-#     def get_target_client_emails(self, request, pk=None):
-#         campaigns = get_object_or_404(Campaign, pk=pk)
-#         serialized = CampaignsSerializer(campaigns)
-        
-#         if campaigns.is_email():
-#             target_client_emails = campaigns.segment.client.values_list('email', flat=True)
-            
-#         elif campaigns.is_appnotifaction():
-#             users = 
-#             title = campaigns.objects.values('title')
-#             body = campaigns.content.values('content')
-            
-#             NotificationProcessor.send_notifications_to_users(users, title, body, request_user=request.user)
-
