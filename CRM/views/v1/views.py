@@ -19,11 +19,12 @@ from Notification.notification_processor import NotificationProcessor
 from Client.models import Client
 from Appointment.models import Appointment
 from Appointment.serializers import AppoinmentSerializer
-
+from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
 
 
 class Segment(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     
     def get(self, request , pk = None):
         if pk is not None:
@@ -121,12 +122,12 @@ class Segment(APIView):
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
 class Campaigns(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     
     def get(self, request , pk = None):
         if pk is not None:
-            camapingn = get_object_or_404(Campaigns, pk=pk)
-            serialized = CampaignsSerializer(camapingn)
+            campaign = get_object_or_404(Campaigns, pk=pk)
+            serialized = CampaignsSerializer(campaign)
             data = {
                     "success": True,
                     "message": "campaign get Successfully",
