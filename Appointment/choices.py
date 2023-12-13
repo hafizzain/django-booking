@@ -26,4 +26,7 @@ class AppointmentServiceStatus(models.TextChoices):
     VOID = 'Void', 'Void'
 
 
+class PaymentChoices(models.TextChoices):
+    PAID = 'Paid', 'Paid'
+    UNPAID = 'Unpaid', 'Unpaid'
 
