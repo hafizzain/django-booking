@@ -88,7 +88,6 @@ SHARED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'django_tenants',
     'rest_framework',
     'rest_framework.authtoken',
@@ -383,3 +382,4 @@ try:
     from .local_settings import LIVE_SERVER_PATH
 except:
     LIVE_SERVER_PATH = '/home/ubuntu/backend-nstyle/'
+    

@@ -19,6 +19,9 @@ from Service.models import Service
 import uuid
 from googletrans import Translator
 from dateutil.relativedelta import relativedelta
+from django.db.models import Count, Q
+from django.db.models.functions import Coalesce
+# from Appointment.models import AppointmentService
 # from Order.models import Checkout
 
 
@@ -54,7 +57,20 @@ class ClientManager(models.QuerySet):
                 default=Value(None)
             )
         )
+        
+    def count_total_visit(self, start_date=None, end_date=None):
+        
+        appointment_filter = Q(created_at__range=(start_date, end_date))
+        return self.annotate(
+            total_visit = Coalesce(
+                Count('client_appointments', filter=appointment_filter),
+                0,
+                output_field=IntegerField()
+            )
+        )
+        
 
+        
 class Client(models.Model):
     GENDER_CHOICES = [
         ('Male' , 'Male'),

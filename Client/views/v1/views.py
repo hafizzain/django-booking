@@ -1,6 +1,6 @@
 from datetime import date, datetime
 from threading import Thread
-
+from Appointment.models import Appointment, AppointmentCheckout
 from Order.models import VoucherOrder, Vouchers, MemberShipOrder, Membership
 from django.db.models.functions import Cast
 from Client.Constants.Add_Employe import add_client
@@ -32,9 +32,12 @@ from NStyle.Constants import StatusCodes
 from django.core.paginator import Paginator
 from Utility.Constants.get_from_public_schema import get_country_from_public, get_state_from_public
 from django.db import transaction
+from Order.models import Checkout
+
 from Appointment import choices
 from Appointment.models import Appointment
 from Appointment.serializers import PaidUnpaidAppointmentSerializer
+
 
 
 @transaction.atomic
@@ -184,9 +187,40 @@ def get_client_dropdown(request):
     # no_pagination = request.GET.get('no_pagination', None)
     page = request.GET.get('page', None)
     is_searched = False
-
+    start_date = request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
+    gender = request.GET.get('gender', None)
+    number_visit = request.GET.get('number_visit', None)
+    spend_amount = request.GET.get('spend_amount', None)
     query = Q(is_deleted=False, is_blocked=False, is_active=True)
-
+    
+    
+    if start_date and end_date:
+        appoint_client_ids = list(AppointmentCheckout.objects\
+                    .filter(created_at__range=(start_date, end_date))\
+                    .values_list('appointment__client__id'))
+        
+        checkout_client_ids = list(Checkout.objects\
+                    .filter(created_at__rang=(start_date, end_date))\
+                    .values_list('client__id'))
+        
+        # appoint_client_ids.extend(checkout_client_ids)
+        merged_client_ids_list = list(set(appoint_client_ids+checkout_client_ids))
+        query &= Q(id__in=merged_client_ids_list) 
+    
+        
+    if gender:
+        query &= Q(gender=gender)
+    
+    if number_visit:
+        query &= Q(total_visit=number_visit)  
+        
+    if spend_amount:
+        total_spend_amount = list(AppointmentCheckout.objects \
+                    .filter(total_price = spend_amount) \
+                    .values_list('appointment__client__id'))
+        query &= Q(id__in=total_spend_amount) 
+        
     if search_text:
         query &= Q(full_name__icontains=search_text) | \
                  Q(mobile_number__icontains=search_text) | \
@@ -194,7 +228,10 @@ def get_client_dropdown(request):
                  Q(client_id__icontains=search_text)        
         is_searched = True
         
-    all_client = Client.objects.filter(query).order_by('-created_at')
+    all_client = Client.objects \
+                    .count_total_visit(start_date, end_date) \
+                    .filter(query) \
+                    .order_by('-created_at')
     serialized = list(ClientDropdownSerializer(all_client, many=True,  context={'request' : request}).data)
 
     paginator = CustomPagination()

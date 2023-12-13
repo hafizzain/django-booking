@@ -190,4 +190,13 @@ class TurnOverProductRecord(models.Model):
     
     def __str__(self):
         return str(self.id)
+
+class CommonField(models.Model):
+    is_active = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
+    updated_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=now)
     
+    class Meta:
+        abstract = True

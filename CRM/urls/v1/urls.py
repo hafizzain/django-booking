@@ -1,11 +1,19 @@
 from django.urls import path, include
+from CRM.views.v1.views import *
+from Client.views.v1.views import get_client_dropdown
 
-from CRM.views.v1 import views
 
 urlpatterns = [
-    #Segment
-    path('create_segment/', views.create_segment),
-    path('get_segment/', views.get_segment),
-    path('delete_segment/', views.delete_segment),
-    path('update_segment/', views.update_segment),
+    path('segment-list/', Segment.as_view()),
+    path('segment/<str:id>/', Segment.as_view()),
+    path('segment-create', Segment.as_view()),
+    path('segment-update/<str:id>/update/', Segment.as_view()),
+    path('segment-delete/<str:id>/delete/', Segment.as_view()),
+    path('campaing-list/', Campaigns.as_view()),
+    path('campaing/<str:id>/', Campaigns.as_view()),
+    path('campaing-create', Campaigns.as_view()),
+    path('campaing-update/<str:id>/update/', Campaigns.as_view()),
+    path('campaing-delete/<str:id>/delete/', Campaigns.as_view()),
+    path('client-filter/', get_client_dropdown)
+   
 ]
