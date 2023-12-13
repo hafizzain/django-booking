@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 from uuid import uuid4
 from Authentication.models import User
@@ -6,6 +7,7 @@ from django.utils.timezone import now
 from Client.models import Client
 from Utility.models import CommonField
 from .choices import *
+
 
 
 class Segment(CommonField):
@@ -48,3 +50,8 @@ class Campaign(CommonField):
     def is_both(self):
         return self.compingn_type == CampaignChoices.BOTH
     
+    def is_start_date(self):
+        return self.start_date >= datetime.now().date()
+    
+    def end_date(self):
+        return self.end_date <= datetime.now().date()
