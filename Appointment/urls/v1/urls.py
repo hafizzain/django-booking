@@ -61,5 +61,8 @@ urlpatterns = [
     path('get_employee_insights/', views.get_employee_appointment_insights),
 
     # new apis
-   path('paid_unpaid_appointments/', views.paid_unpaid_clients),
+    path('paid_unpaid_appointments/', views.paid_unpaid_clients),
+
+    # missed opportunities
+    path('missed_opportunities/', views.MissedOpportunityListCreate.as_view(), name='list-create-missed-opportunities')
 ]
