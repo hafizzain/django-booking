@@ -54,6 +54,7 @@ from Notification.notification_processor import NotificationProcessor
 from Analytics.models import EmployeeBookingDailyInsights
 from django.db.models import Sum
 from django.db import transaction
+from Utility.json_utilities import format_json_string
 
 from ... import choices
 
@@ -3344,7 +3345,7 @@ def create_missed_opportunity(request):
     client_id = request.data.get('client_id', None)
     opportunity_date = request.data.get('opportunity_date', None)
     note = request.data.get('notes', None)
-    services_data = request.data.get('services', None)
+    services_data = format_json_string(request.data.get('services', None))
 
     services_list = []
 
