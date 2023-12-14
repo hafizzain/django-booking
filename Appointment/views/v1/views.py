@@ -3382,7 +3382,7 @@ def create_missed_opportunity(request):
     return Response(
         {
             'status' : True,
-            'status_code' : 201,
+            'status_code' : 200,
             'response' : {
                 'message' : 'Missed opportunity created',
                 'error_message' : None,
