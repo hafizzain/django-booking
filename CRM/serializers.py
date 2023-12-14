@@ -11,6 +11,10 @@ class SegmentSerializer(serializers.ModelSerializer):
         model =  Segment
         fields = '__all__'
         
+    def create(self, validated_data):
+        validated_data['user'] = self.context.get('user')
+        return super().create(validated_data)
+        
 class CampaignsSerializer(serializers.ModelSerializer):
         
     class Meta:
