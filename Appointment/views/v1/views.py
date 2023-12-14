@@ -3408,7 +3408,7 @@ class MissedOpportunityListCreate(generics.ListAPIView):
             'response' : {
                 'message' : 'Missed opportunity created',
                 'error_message' : None,
-                'missed_opportunities' : serialized_data
+                'missed_opportunities' : serialized_data.data
             }
         }, status=status.HTTP_200_OK)
 
