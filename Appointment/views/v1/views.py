@@ -3340,7 +3340,6 @@ class MissedOpportunityListCreate(generics.ListCreateAPIView):
 
     serializer_class = MissedOpportunityBasicSerializer
     queryset = MissedOpportunity.objects \
-                .prefetch_related('service', 'employee') \
                 .select_related('client')
     
 
