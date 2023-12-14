@@ -1115,7 +1115,7 @@ class AppointmentForClientSerializer(serializers.ModelSerializer):
 
 class OpportunityEmployeeServiceSerializer(serializers.ModelSerializer):
     service_name = serializers.CharField(source='service.name')
-    employee_name = serializers.CharField(source='employee.name')
+    employee_name = serializers.CharField(source='employee.full_name')
 
     class Meta:
         model = OpportunityEmployeeService
