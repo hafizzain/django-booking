@@ -1116,7 +1116,7 @@ class AppointmentForClientSerializer(serializers.ModelSerializer):
 class OpportunityEmployeeServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = OpportunityEmployeeService
-        fields = ['service', 'employee', 'durtion', 'time']
+        fields = ['service', 'employee', 'duration', 'time']
 
 
 class MissedOpportunityBasicSerializer(serializers.ModelSerializer):
