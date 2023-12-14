@@ -3410,7 +3410,7 @@ class MissedOpportunityListCreate(generics.ListAPIView):
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             response_data = self.get_paginated_response(serializer.data).data
-            response_data['total_pages'] = self.paginator.page.paginator.num_pages
+            response_data['pages'] = self.paginator.page.paginator.num_pages
             data = response_data
 
         serializer = self.get_serializer(queryset, many=True)
