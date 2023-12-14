@@ -12,8 +12,13 @@ class SegmentSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
     def create(self, validated_data):
-        validated_data['user'] = self.context.get('user')
-        return super().create(validated_data)
+        user = self.context['request'].user
+        segment = Segment.objects.create(
+            **validated_data,
+            user=user
+        )
+        
+        return segment
         
 class CampaignsSerializer(serializers.ModelSerializer):
         

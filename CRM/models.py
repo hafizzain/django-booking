@@ -18,9 +18,6 @@ class Segment(CommonField):
     segment_type =  models.CharField(choices=SegmentChoice.choices, max_length=30)
     description =  models.CharField(max_length=300, null=True, blank=True)
     
-    # Add the default manager
-    objects = models.Manager()
-    
     def __str__(self):
         return str(self.name)
     
@@ -40,9 +37,6 @@ class Campaign(CommonField):
     user = models.ForeignKey(User, on_delete = models.CASCADE)
     
     REQUIRED_FIELDS = ['start_date', 'end_date']
-    
-    # Add the default manager
-    objects = models.Manager()
     
     def __str__(self):
         return str(self.title)
