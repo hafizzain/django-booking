@@ -196,8 +196,8 @@ class CommonField(models.Model):
     is_active = models.BooleanField(default=True)
     is_blocked = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
-    updated_at = models.DateTimeField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=now)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
         abstract = True
