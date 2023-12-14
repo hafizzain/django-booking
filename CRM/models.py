@@ -18,8 +18,11 @@ class Segment(CommonField):
     segemnt_type =  models.CharField(choices=SegmentChoice.choices, max_length=30)
     description =  models.CharField(max_length=300, null=True, blank=True)
     
+    # Add the default manager
+    objects = models.Manager()
+    
     def __str__(self):
-        return str(self.id)
+        return str(self.name)
     
     def is_static(self):
         return self.segemnt_type == SegmentChoice.STATIC
@@ -37,6 +40,9 @@ class Campaign(CommonField):
     user = models.ForeignKey(User, on_delete = models.CASCADE)
     
     REQUIRED_FIELDS = ['start_date', 'end_date']
+    
+    # Add the default manager
+    objects = models.Manager()
     
     def __str__(self):
         return str(self.title)
