@@ -41,7 +41,8 @@ from Appointment.serializers import (CheckoutSerializer, AppoinmentSerializer, S
                                      SingleAppointmentSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer,
                                        EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer, 
                                        AppointmenttLogSerializer, AppointmentSerializerDashboard, AppointmentServiceSerializerBasic,
-                                       PaidUnpaidAppointmentSerializer, MissedOpportunityBasicSerializer)
+                                       PaidUnpaidAppointmentSerializer, MissedOpportunityBasicSerializer, OpportunityEmployeeServiceSerializer,
+                                       )
 from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
 from Utility.models import ExceptionRecord
@@ -3345,14 +3346,26 @@ def create_missed_opportunity(request):
     note = request.data.get('notes', None)
     services_data = request.data.get('services', None)
 
-
     services_list = []
+
+    if client_id:
+        client = Client.objects.get(id=client_id)
+    else:
+        client = None
+
+    client_opportunity = ClientMissedOpportunity.objects.create(
+                            client=client,
+                            client_type=client_type,
+                            date=opportunity_date,
+                            note=note,
+                        )
 
     for data in services_data:
         employee = Employee.objects.get(id=data['employee_id'])
         service = Service.objects.get(id=data['service_id'])
         services_list.append(
             OpportunityEmployeeService(
+                client_missed_opportunity=client_opportunity,
                 employee=employee,
                 service=service,
                 duration=data['duration'],
@@ -3360,7 +3373,10 @@ def create_missed_opportunity(request):
             )
         )
     
-    OpportunityEmployeeService.objects.bulk_create(services_list)
+    missed_opportunities = OpportunityEmployeeService.objects.bulk_create(services_list)
+
+    serialized_data = OpportunityEmployeeServiceSerializer(missed_opportunities, many=True)
+    return Response(serialized_data.data, status=status.HTTP_201_CREATED)
 
 
 
