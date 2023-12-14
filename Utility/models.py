@@ -198,6 +198,8 @@ class CommonField(models.Model):
     is_deleted = models.BooleanField(default=False)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    objects = models.Manager()
     
     class Meta:
         abstract = True

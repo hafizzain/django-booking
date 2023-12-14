@@ -394,11 +394,15 @@ class AppointmentNotes(models.Model):
         return str(self.id)
 
 
+class OpportunityEmployeeService(CommonField):
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='service_missed_opportunities')
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_missed_opportunities')
+    duration = models.DurationField()
+    time = models.TimeField()
+
 class MissedOpportunity(CommonField):
-    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client_missed_opportunities')
-
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='service_missed_opportunities', null=True)
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_missed_opportunities', null=True)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client_missed_opportunities', null=True)
+    client_type = models.CharField(max_length=200, choices=choices.ClientType.choices, null=True)
+    services = models.ManyToManyField(OpportunityEmployeeService, related_name='missed_opportunities')
     note = models.TextField()
-
     date_time = models.DateTimeField()
