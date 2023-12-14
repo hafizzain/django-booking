@@ -24,7 +24,7 @@ from Utility.models import NstyleFile
 
 
 class SegmentAPIView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     
     def get(self, request , pk=None):
         if pk is not None:
@@ -32,20 +32,26 @@ class SegmentAPIView(APIView):
             serializer = SegmentSerializer(segment)
             data = {
                     "success": True,
-                    "message": "get_segment",
-                    "code": "get_segment_API",
-                    "data": serializer.data
-            }
+                    "status_code" : 200,
+                    "response" : {
+                        "message" : "Segment get Successfully",
+                        "error_message" : None,
+                        "data" : serializer.data
+                    }
+                }
             return Response(data, status=status.HTTP_200_OK)
         else:
             segment = Segment.objects.all()
             serializer = SegmentSerializer(segment, many=True)
             data = {
                     "success": True,
-                    "message": "get_All_segment",
-                    "code": "get_segment_API",
-                    "data": serializer.data
-            }
+                    "status_code" : 200,
+                    "response" : {
+                        "message" : "Segment get Successfully",
+                        "error_message" : None,
+                        "data" : serializer.data
+                    }
+                }
             return Response(data, status=status.HTTP_200_OK)   
         
     @transaction.atomic       
@@ -59,19 +65,25 @@ class SegmentAPIView(APIView):
         if serializer.is_valid():
             serializer.save()
             data = {
-                    "success": True,
-                    "message": "segment created successfully",
-                    "code": "segment_create_API",
-                    "data": serializer.data
-            }
+                    "status" : True,
+                    "status_code" : 201,
+                    "response" : {
+                        "message" : "Segment created successfully",
+                        "error_message" : None,
+                        "data" : serializer.data
+                    }
+                }
             return Response(data, status=status.HTTP_200_OK)
         else:   
             data = {
                     "success": False,
-                    "message": "segment not created",
-                    "code": "segment_create_API",
-                    "Error": serializer.errors
-            }
+                    "status_code" : 400,
+                    "response" : {
+                        "message" : "Segment not created",
+                        "error_message" : serializer.errors,
+                        "data" : None
+                    }
+                }
             return Response(data, status=status.HTTP_400_BAD_REQUEST) 
 
     @transaction.atomic     
@@ -83,26 +95,35 @@ class SegmentAPIView(APIView):
                 serializer.save()
                 data = {
                     "success": True,
-                    "message": "segment updated successfully",
-                    "code": "segment_update_API",
-                    "data": serializer.data
+                    "status_code" : 200,
+                    "response" : {
+                        "message" : "Segment updated successfully",
+                        "error_message" : None,
+                        "data" : serializer.data
+                    }
                 }
                 return Response(data, status=status.HTTP_200_OK)
             else:    
                 data = {
                         "success": False,
-                        "message": "segment not updated",
-                        "code": "segment_update_API",
-                        "Error": serializer.errors
+                        "status_code" : 400,
+                        "response" : {
+                            "message" : "Segment not updated",
+                            "error_message" : serializer.errors,
+                            "data" : None
+                        }
                     }
                 return Response(data, status=status.HTTP_400_BAD_REQUEST)
         else:
                 data = {
                         "success": False,
-                        "message": "segment not updated",
-                        "code": "segment_update_API",
-                        "Error": "segment type is static"
-                }
+                        "status_code" : 400,
+                        "response" : {
+                            "message" : "Segment not updated",
+                            "error_message" : "Segment type is static",
+                            "data" : None
+                        }
+                    }
                 return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
     @transaction.atomic   
@@ -113,21 +134,29 @@ class SegmentAPIView(APIView):
             serializer.save()
             data = {
                     "success": True,
-                    "message": "segment deleted successfully",
-                    "code": "segment_delete_API",
-            }
+                    "status_code" : 200,
+                    "response" : {
+                        "message" : "Segment deleted successfully",
+                        "error_message" : None,
+                        "data" : None
+                    }
+                }
             return Response(data, status=status.HTTP_200_OK)
         else:
             data = {
                     "success": False,
-                    "message": "segment not deleted",
-                    "code": "segment_delete_API",
-            }
+                    "status_code" : 400,
+                    "response" : {
+                        "message" : "Segment not deleted",
+                        "error_message" : serializer.errors,
+                        "data" : None
+                    }
+                }
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CampaignsAPIView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     
     def get(self, request , pk=None):
         if pk is not None:
@@ -135,19 +164,25 @@ class CampaignsAPIView(APIView):
             serialized = CampaignsSerializer(campaign)
             data = {
                     "success": True,
-                    "message": "campaign get Successfully",
-                    "code": "get_campaign_API",
-                    "data": serialized.data
-            }
+                    "status_code" : 200,
+                    "response" : {
+                        "message" : "Campaign get Successfully",
+                        "error_message" : None,
+                        "data" : serialized.data
+                    }
+                }
             return Response(data, status=status.HTTP_200_OK)
         else:
             campaigns = Campaign.objects.all()
             serialized = CampaignsSerializer(campaigns, many=True)
             data = {
                     "success": True,
-                    "message": "All campaigns get Successfully",
-                    "code": "get_campaigns_API",
-                    "data": serialized.data
+                    "status_code" : 200,
+                    "response" : {
+                        "message" : "Campaign get Successfully",
+                        "error_message" : None,
+                        "data" : serialized.data
+                    }
             }
             return Response(data, status=status.HTTP_200_OK) 
           
@@ -159,18 +194,24 @@ class CampaignsAPIView(APIView):
             serializer.save()
             data = {
                     "success": True,
-                    "message": "campaign created successfully",
-                    "code": "campaign_create_API",
-                    "data": serializer.data
+                    "status_code" : 200,
+                    "response" : {
+                        "message" : "campaign created successfully",
+                        "error_message" : None,
+                        "data" : serializer.data
+                    }
             }
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:   
             data = {
                     "success": False,
-                    "message": "campaign not created",
-                    "code": "campaign_create_API",
-                    "Error": serializer.errors
-            }
+                    "status_code" : 400,
+                    "response" : {
+                        "message" : "campaign not created",
+                        "error_message" : serializer.errors,
+                        "data" : None
+                    }
+                }
             return Response(data, status=status.HTTP_400_BAD_REQUEST) 
 
     @transaction.atomic     
@@ -181,18 +222,24 @@ class CampaignsAPIView(APIView):
             serializer.save()
             data = {
                     "success": True,
-                    "message": "campaign updated successfully",
-                    "code": "campaign_update_API",
-                    "data": serializer.data
-            }
+                    "status_code" : 200,
+                    "response" : {
+                        "message" : "campaign updated successfully",
+                        "error_message" : None,
+                        "data" : serializer.data
+                    }
+                }
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:    
             data = {
                     "success": False,
-                    "message": "campaign not updated",
-                    "code": "campaign_update_API",
-                    "Error": serializer.errors
-            }
+                    "status_code" : 400,
+                    "response" : {
+                        "message" : "campaign not updated",
+                        "error_message" : serializer.errors,
+                        "data" : None
+                    }
+                }
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
         
     @transaction.atomic   
@@ -203,16 +250,53 @@ class CampaignsAPIView(APIView):
             serializer.save()
             data = {
                     "success": True,
-                    "message": "campaign deleted successfully",
-                    "code": "campaign_delete_API",
+                    "status_code" : 200,
+                    "response" : {
+                        "message" : "campaign deleted successfully",
+                        "error_message" : None,
+                        "data" : None
+                    }
             }
             return Response(data, status=status.HTTP_200_OK)
         else:
             data = {
                     "success": False,
-                    "message": "campaign not deleted",
-                    "code": "campaign_delete_API",
+                    "status_code" : 400,
+                    "response" : {
+                        "message" : "campaign not deleted",
+                        "error_message" : serializer.errors,
+                        "data" : None
+                    }
             }
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
         
+class RunCampaign(APIView):
+    def check_campaign(self,request,pk=None):
+        campaign = get_object_or_404(Campaign, id=pk)
+        serialized = CampaignsSerializer(campaign)
+        if campaign.is_start_date() and campaign.is_end_date():
+            if campaign.is_email():
+                email = list(Campaign.objects \
+                        .filter(id=pk) \
+                        .values_list(
+                            'segment__client__email',
+                        )
+                    )
+                content = Campaign.objects \
+                        .filter(id=pk) \
+                        .values_list(
+                            'content',
+                        )
+                title = Campaign.objects \
+                        .filter(id=pk) \
+                        .values_list(
+                            'title',
+                        )
+                email_campaign = EmailMultiAlternatives(
+                                title,
+                                content,
+                                settings.EMAIL_HOST_USER,
+                                to = [email],                           
+                            )
+                email_campaign.send()
