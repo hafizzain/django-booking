@@ -32,20 +32,26 @@ class SegmentAPIView(APIView):
             serializer = SegmentSerializer(segment)
             data = {
                     "success": True,
-                    "message": "get_segment",
-                    "code": "get_segment_API",
-                    "data": serializer.data
-            }
+                    "status_code" : 200,
+                    "response" : {
+                        "message" : "Segment get Successfully",
+                        "error_message" : None,
+                        "data" : serializer.data
+                    }
+                }
             return Response(data, status=status.HTTP_200_OK)
         else:
             segment = Segment.objects.all()
             serializer = SegmentSerializer(segment, many=True)
             data = {
                     "success": True,
-                    "message": "get_All_segment",
-                    "code": "get_segment_API",
-                    "data": serializer.data
-            }
+                    "status_code" : 200,
+                    "response" : {
+                        "message" : "Segment get Successfully",
+                        "error_message" : None,
+                        "data" : serializer.data
+                    }
+                }
             return Response(data, status=status.HTTP_200_OK)   
         
     @transaction.atomic       
