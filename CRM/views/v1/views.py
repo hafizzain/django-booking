@@ -26,7 +26,7 @@ from Utility.models import NstyleFile
 class Segment(APIView):
     # permission_classes = [IsAuthenticated]
     
-    def get(self, request , pk = None):
+    def get(self, request , pk=None):
         if pk is not None:
             segment = get_object_or_404(Segment, pk=pk)
             serializer = SegmentSerializer(segment)
@@ -51,7 +51,7 @@ class Segment(APIView):
     @transaction.atomic       
     def post(self, request):
         serializer = SegmentSerializer(data=request.data,
-                                    context={'user':request.user})
+                                    context={'request':request})
         
         if serializer.is_valid():
             serializer.save()
