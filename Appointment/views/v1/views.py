@@ -3400,9 +3400,8 @@ class MissedOpportunityListCreate(generics.ListAPIView):
     queryset = ClientMissedOpportunity.objects \
                 .select_related('client')
     
-
-    def get(self, request, *args, **kwargs):
-        serialized_data = super().get(request, *args, **kwargs)
+    def list(self, request, *args, **kwargs):
+        serialized_data = super().list(request, *args, **kwargs)
         return Response({
             'status': True,
             'status_code': 201,
