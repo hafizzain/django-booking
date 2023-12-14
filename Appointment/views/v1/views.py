@@ -13,6 +13,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import generics
+from rest_framework.pagination import PageNumberPagination
 
 from rest_framework import status
 from Appointment.Constants.durationchoice import DURATION_CHOICES
@@ -3399,6 +3400,7 @@ class MissedOpportunityListCreate(generics.ListAPIView):
     serializer_class = MissedOpportunityBasicSerializer
     queryset = ClientMissedOpportunity.objects \
                 .select_related('client')
+    pagination_class = PageNumberPagination
     
     def list(self, request, *args, **kwargs):
         serialized_data = super().list(request, *args, **kwargs)
