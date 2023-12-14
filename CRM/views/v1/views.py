@@ -23,12 +23,12 @@ from Notification.notification_processor import NotificationProcessor
 from Utility.models import NstyleFile
 
 
-class Segment(APIView):
+class SegmentAPIView(APIView):
     # permission_classes = [IsAuthenticated]
     
     def get(self, request , pk=None):
         if pk is not None:
-            segment = get_object_or_404(Segment, pk=pk)
+            segment = get_object_or_404(Segment, id=pk)
             serializer = SegmentSerializer(segment)
             data = {
                     "success": True,
@@ -50,8 +50,11 @@ class Segment(APIView):
         
     @transaction.atomic       
     def post(self, request):
+        user = request.user
+        request.data['user'] = user.id
+         
         serializer = SegmentSerializer(data=request.data,
-                                    context={'request':request})
+                                       context={'request': request})
         
         if serializer.is_valid():
             serializer.save()
@@ -73,7 +76,7 @@ class Segment(APIView):
 
     @transaction.atomic     
     def update(self, request, pk):
-        segment = get_object_or_404(pk = pk)
+        segment = get_object_or_404(id=pk)
         serializer = SegmentSerializer(segment, data=request.data)
         if not segment.is_static():
             if serializer.is_valid():
@@ -104,7 +107,7 @@ class Segment(APIView):
 
     @transaction.atomic   
     def delete(self, request, pk):
-        segment = get_object_or_404(Segment, pk=pk)
+        segment = get_object_or_404(Segment, id=pk)
         serializer = SegmentSerializer(segment, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -123,12 +126,12 @@ class Segment(APIView):
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
 
-class Campaigns(APIView):
+class CampaignsAPIView(APIView):
     # permission_classes = [IsAuthenticated]
     
-    def get(self, request , pk = None):
+    def get(self, request , pk=None):
         if pk is not None:
-            campaign = get_object_or_404(Campaigns, pk=pk)
+            campaign = get_object_or_404(Campaign, id=pk)
             serialized = CampaignsSerializer(campaign)
             data = {
                     "success": True,
@@ -172,7 +175,7 @@ class Campaigns(APIView):
 
     @transaction.atomic     
     def update(self, request, pk):
-        campaign = get_object_or_404(Campaign,pk=pk)
+        campaign = get_object_or_404(Campaign,id=pk)
         serializer = CampaignsSerializer(campaign, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -194,7 +197,7 @@ class Campaigns(APIView):
         
     @transaction.atomic   
     def delete(self, request, pk):
-        campaign = get_object_or_404(Campaign, pk=pk)
+        campaign = get_object_or_404(Campaign, id=pk)
         serializer = CampaignsSerializer(campaign, data=request.data)
         if serializer.is_valid():
             serializer.save()
