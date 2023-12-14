@@ -3356,7 +3356,7 @@ def create_missed_opportunity(request):
     client_opportunity = ClientMissedOpportunity.objects.create(
                             client=client,
                             client_type=client_type,
-                            date=opportunity_date,
+                            date_time=opportunity_date,
                             note=note,
                         )
 
