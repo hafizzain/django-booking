@@ -34,3 +34,9 @@ class ClientType(models.TextChoices):
     INHOUSE = 'IN HOUSE', 'IN HOUSE'
     SALOON = 'SALOON', 'SALOON'
 
+
+class MissedOpportunityReason(models.TextChoices):
+    TECHNICIAN = 'Technician', 'Technician'
+    OUT_OF_STOCK = 'Out of stock', 'Out of stock'
+
+

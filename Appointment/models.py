@@ -395,7 +395,8 @@ class AppointmentNotes(models.Model):
 
 class ClientMissedOpportunity(CommonField):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client_missed_opportunities', null=True)
-    client_type = models.CharField(max_length=200, choices=choices.ClientType.choices, null=True)
+    client_type = models.CharField(max_length=200, choices=choices.ClientType.choices, null=True, blank=True)
+    dependency = models.CharField(max_length=200, choices=choices.MissedOpportunityReason.choices, null=True, blank=True)
     note = models.TextField()
     date_time = models.DateTimeField()
 
