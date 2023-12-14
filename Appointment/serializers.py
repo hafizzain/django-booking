@@ -11,7 +11,7 @@ from django.db.models import Sum, Case, When, FloatField, Subquery, OuterRef
 from rest_framework import serializers
 from Appointment.Constants.durationchoice import DURATION_CHOICES
 from Appointment.models import (Appointment, AppointmentCheckout, AppointmentNotes, AppointmentService, 
-                                AppointmentLogs, LogDetails, AppointmentEmployeeTip, MissedOpportunity)
+                                AppointmentLogs, LogDetails, AppointmentEmployeeTip, ClientMissedOpportunity)
 from Business.models import BusinessAddress
 from Business.serializers.v1_serializers import BusiessAddressAppointmentSerializer
 from Client.serializers import ClientAppointmentSerializer
@@ -1114,5 +1114,5 @@ class AppointmentForClientSerializer(serializers.ModelSerializer):
 class MissedOpportunityBasicSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = MissedOpportunity
+        model = ClientMissedOpportunity
         fields = ['client', 'service', 'employee', 'note']

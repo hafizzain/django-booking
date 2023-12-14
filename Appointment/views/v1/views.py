@@ -35,7 +35,8 @@ from datetime import date, timedelta
 from threading import Thread
 
 from Appointment.models import (Appointment, AppointmentService, AppointmentNotes , AppointmentCheckout ,
-                                AppointmentLogs, LogDetails, AppointmentEmployeeTip, MissedOpportunity)
+                                AppointmentLogs, LogDetails, AppointmentEmployeeTip, ClientMissedOpportunity,
+                                OpportunityEmployeeService)
 from Appointment.serializers import (CheckoutSerializer, AppoinmentSerializer, ServiceClientSaleSerializer, ServiceEmployeeSerializer,
                                      SingleAppointmentSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer,
                                        EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer, 
@@ -3335,11 +3336,38 @@ def paid_unpaid_clients(request):
     return response
 
 
+@api_view(['POST'])
+@transaction.atomic
+def create_missed_opportunity(request):
+    client_type = request.data.get('client_type', None)
+    client_id = request.data.get('client_id', None)
+    opportunity_date = request.data.get('opportunity_date', None)
+    note = request.data.get('notes', None)
+    services_data = request.data.get('services', None)
+
+
+    services_list = []
+
+    for data in services_data:
+        employee = Employee.objects.get(id=data['employee_id'])
+        service = Service.objects.get(id=data['service_id'])
+        services_list.append(
+            OpportunityEmployeeService(
+                employee=employee,
+                service=service,
+                duration=data['duration'],
+                time=data['time']
+            )
+        )
+    
+    OpportunityEmployeeService.objects.bulk_create(services_list)
+
+
 
 class MissedOpportunityListCreate(generics.ListCreateAPIView):
 
     serializer_class = MissedOpportunityBasicSerializer
-    queryset = MissedOpportunity.objects \
+    queryset = ClientMissedOpportunity.objects \
                 .select_related('client')
     
 
