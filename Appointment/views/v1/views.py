@@ -12,6 +12,7 @@ from Sale.Constants.Custom_pag import CustomPagination
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework import generics
 
 from rest_framework import status
 from Appointment.Constants.durationchoice import DURATION_CHOICES
@@ -33,12 +34,13 @@ from Client.models import Client, ClientPackageValidation, ClientPromotions, Loy
 from datetime import date, timedelta
 from threading import Thread
 
-from Appointment.models import Appointment, AppointmentService, AppointmentNotes , AppointmentCheckout , AppointmentLogs, LogDetails, AppointmentEmployeeTip
+from Appointment.models import (Appointment, AppointmentService, AppointmentNotes , AppointmentCheckout ,
+                                AppointmentLogs, LogDetails, AppointmentEmployeeTip, MissedOpportunity)
 from Appointment.serializers import (CheckoutSerializer, AppoinmentSerializer, ServiceClientSaleSerializer, ServiceEmployeeSerializer,
                                      SingleAppointmentSerializer ,AllAppoinmentSerializer, SingleNoteSerializer, TodayAppoinmentSerializer,
                                        EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer, 
                                        AppointmenttLogSerializer, AppointmentSerializerDashboard, AppointmentServiceSerializerBasic,
-                                       PaidUnpaidAppointmentSerializer)
+                                       PaidUnpaidAppointmentSerializer, MissedOpportunityBasicSerializer)
 from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
 from Utility.models import ExceptionRecord
@@ -3331,4 +3333,14 @@ def paid_unpaid_clients(request):
     paginated_data = paginator.paginate_queryset(serialized, request)
     response = paginator.get_paginated_response(paginated_data, 'appointments')
     return response
+
+
+
+class MissedOpportunityListCreate(generics.ListCreateAPIView):
+
+    serializer_class = MissedOpportunityBasicSerializer
+    queryset = MissedOpportunity.objects \
+                .prefetch_related('service', 'employee') \
+                .select_related('client')
+    
 
