@@ -3392,10 +3392,22 @@ def create_missed_opportunity(request):
 
 
 
-class MissedOpportunityListCreate(generics.ListCreateAPIView):
+class MissedOpportunityListCreate(generics.ListAPIView):
 
     serializer_class = MissedOpportunityBasicSerializer
     queryset = ClientMissedOpportunity.objects \
                 .select_related('client')
     
+
+    def get(self, request, *args, **kwargs):
+        serialized_data = super().get(request, *args, **kwargs)
+        return Response({
+            'status': True,
+            'status_code': 201,
+            'response' : {
+                'message' : 'Missed opportunity created',
+                'error_message' : None,
+                'missed_opportunities' : serialized_data
+            }
+        }, status=status.HTTP_200_OK)
 
