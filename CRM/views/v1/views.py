@@ -50,8 +50,11 @@ class Segment(APIView):
         
     @transaction.atomic       
     def post(self, request):
+        user = request.user
+        request.data['user'] = user.id
+         
         serializer = SegmentSerializer(data=request.data,
-                                    context={'request':request})
+                                       context={'request': request})
         
         if serializer.is_valid():
             serializer.save()

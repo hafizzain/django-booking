@@ -11,14 +11,14 @@ class SegmentSerializer(serializers.ModelSerializer):
         model =  Segment
         fields = '__all__'
         
-    def create(self, validated_data):
-        user = self.context['request'].user
-        segment = Segment.objects.create(
-            **validated_data,
-            user=user
-        )
+    # def create(self, validated_data):
+    #     user = self.context['request'].user
+    #     segment = Segment.objects.create(
+    #         **validated_data,
+    #         user=user
+    #     )
         
-        return segment
+    #     return segment
         
 class CampaignsSerializer(serializers.ModelSerializer):
         
