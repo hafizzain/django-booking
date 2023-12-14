@@ -2,7 +2,6 @@ from django.urls import path, include
 from CRM.views.v1.views import *
 from Client.views.v1.views import get_client_dropdown
 
-
 urlpatterns = [
     path('segment-list/', Segment.as_view()),
     path('segment/<str:id>/', Segment.as_view()),
