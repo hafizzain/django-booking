@@ -196,7 +196,8 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
         'price','total_price', 'discount_price',
         'appointment_time', 
         'end_time','is_favourite',
-        'client_type','duration', 'currency','created_at','service', 'client','location', 'is_blocked' ,'details' 
+        'client_type','duration', 'currency','created_at','service', 'client','location', 'is_blocked' ,'details',
+        'status'
         ]
 
 class AppointmentServiceSerializerBasic(serializers.ModelSerializer):
