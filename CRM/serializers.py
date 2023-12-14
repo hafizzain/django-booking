@@ -12,7 +12,7 @@ class ClientSerializer(serializers.ModelSerializer):
         
         
 class SegmentSerializer(serializers.ModelSerializer):
-    clients = ClientSerializer(many=True, read_only=True, source='client')
+    client_data = ClientSerializer(many=True, read_only=True, source='client')
     
     class Meta:
         model =  Segment
