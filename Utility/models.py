@@ -199,7 +199,7 @@ class CommonField(models.Model):
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    objects = models.Manager()
+    objects = models.QuerySet.as_manager()
     
     class Meta:
         abstract = True
