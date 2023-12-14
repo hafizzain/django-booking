@@ -126,33 +126,21 @@ class SegmentAPIView(APIView):
                     }
                 return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
-    @transaction.atomic   
-    def delete(self, request, pk):
+    @transaction.atomic
+    def destroy(self, request, pk):
         segment = get_object_or_404(Segment, id=pk)
-        serializer = SegmentSerializer(segment, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            data = {
-                    "success": True,
-                    "status_code" : 200,
-                    "response" : {
-                        "message" : "Segment deleted successfully",
-                        "error_message" : None,
-                        "data" : None
-                    }
+        segment.is_deleted = True
+        segment.save() 
+        data = {
+                "success": True,
+                "status_code" : 200,
+                "response" : {
+                    "message" : "Segment deleted successfully",
+                    "error_message" : None,
+                    "data" : None
                 }
-            return Response(data, status=status.HTTP_200_OK)
-        else:
-            data = {
-                    "success": False,
-                    "status_code" : 400,
-                    "response" : {
-                        "message" : "Segment not deleted",
-                        "error_message" : serializer.errors,
-                        "data" : None
-                    }
-                }
-            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+            }
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class CampaignsAPIView(APIView):
