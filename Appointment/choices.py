@@ -30,3 +30,7 @@ class PaymentChoices(models.TextChoices):
     PAID = 'Paid', 'Paid'
     UNPAID = 'Unpaid', 'Unpaid'
 
+class ClientType(models.TextChoices):
+    INHOUSE = 'IN HOUSE', 'IN HOUSE'
+    SALOON = 'SALOON', 'SALOON'
+
