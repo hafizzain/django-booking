@@ -3345,6 +3345,7 @@ def create_missed_opportunity(request):
     client_id = request.data.get('client_id', None)
     opportunity_date = request.data.get('opportunity_date', None)
     note = request.data.get('notes', None)
+    dependency = request.data.get('dependency', None)
     services_data = format_json_string(request.data.get('services', None))
 
     services_list = []
@@ -3358,6 +3359,7 @@ def create_missed_opportunity(request):
                             client=client,
                             client_type=client_type,
                             date_time=opportunity_date,
+                            dependency=dependency,
                             note=note,
                         )
 
