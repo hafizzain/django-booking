@@ -1113,15 +1113,22 @@ class AppointmentForClientSerializer(serializers.ModelSerializer):
         fields = ['']
 
 
+class OpportunityEmployeeServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OpportunityEmployeeService
+        fields = ['service', 'employee', 'durtion', 'time']
+
+
 class MissedOpportunityBasicSerializer(serializers.ModelSerializer):
+    services = serializers.SerializerMethodField(read_only=True)
+
+    def get_services(self, obj):
+        services = OpportunityEmployeeService.objects.filter(client_missed_opportunity=obj)
+        return OpportunityEmployeeServiceSerializer(services, many=True).data
 
     class Meta:
         model = ClientMissedOpportunity
-        fields = ['client', 'service', 'employee', 'note']
+        fields = ['client', 'client_type', 'note', 'date_time', 'services']
 
 
-class OpportunityEmployeeServiceSerializer(serializers.ModelSerializer):
 
-    class Meta:
-        model = OpportunityEmployeeService
-        fields = '__all__'
