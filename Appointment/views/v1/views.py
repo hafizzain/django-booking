@@ -3376,12 +3376,19 @@ def create_missed_opportunity(request):
     
     OpportunityEmployeeService.objects.bulk_create(services_list)
 
-    serialized_data = MissedOpportunityBasicSerializer(client_opportunity)
-    return Response({
-        'missed_opportunities': serialized_data.data,
-        'message': 'Missed opportunity created.'
-
-    })
+    serializer = MissedOpportunityBasicSerializer(client_opportunity)
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 201,
+            'response' : {
+                'message' : 'Missed opportunity created',
+                'error_message' : None,
+                'missed_opportunity' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
 
 
