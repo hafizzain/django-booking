@@ -3405,12 +3405,13 @@ class MissedOpportunityListCreate(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         page = self.paginate_queryset(queryset)
+        data = None
 
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             response_data = self.get_paginated_response(serializer.data).data
             response_data['total_pages'] = self.paginator.page.paginator.num_pages
-            return Response(response_data)
+            data = response_data
 
         serializer = self.get_serializer(queryset, many=True)
         return Response({
@@ -3419,7 +3420,7 @@ class MissedOpportunityListCreate(generics.ListAPIView):
             'response' : {
                 'message' : 'All missed opportunities',
                 'error_message' : None,
-                'missed_opportunities' : serializer.data
+                'missed_opportunities' : data
             }
         }, status=status.HTTP_200_OK)
 
