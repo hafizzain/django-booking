@@ -201,7 +201,7 @@ def get_client_dropdown(request):
                     .values_list('appointment__client__id'))
         
         checkout_client_ids = list(Checkout.objects\
-                    .filter(created_at__rang=(start_date, end_date))\
+                    .filter(created_at__range=(start_date, end_date))\
                     .values_list('client__id'))
         
         # appoint_client_ids.extend(checkout_client_ids)

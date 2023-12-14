@@ -4,25 +4,23 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from django.db.models import Q
+from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
+from rest_framework import status
+
+from Client.models import Client
 from Business.models import Business
 from CRM.models import *
 from CRM.serializers import *
-from Utility.models import NstyleFile
 from NStyle.Constants import StatusCodes
 from django.db import transaction
-from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
-
-from rest_framework.generics import ListAPIView
-from Notification.notification_processor import NotificationProcessor
-from Client.models import Client
-from Appointment.models import Appointment
-from Appointment.serializers import AppoinmentSerializer
+from django.db.models import Q
 from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
-from rest_framework import status
+from Notification.notification_processor import NotificationProcessor
+from Utility.models import NstyleFile
 
 
 class Segment(APIView):
@@ -38,7 +36,7 @@ class Segment(APIView):
                     "code": "get_segment_API",
                     "data": serializer.data
             }
-            return Response(data, status=status.HTTP_200_success)
+            return Response(data, status=status.HTTP_200_OK)
         else:
             segment = Segment.objects.all()
             serializer = SegmentSerializer(segment, many=True)
@@ -48,11 +46,12 @@ class Segment(APIView):
                     "code": "get_segment_API",
                     "data": serializer.data
             }
-            return Response(data, status=status.HTTP_200_success)   
+            return Response(data, status=status.HTTP_200_OK)   
         
     @transaction.atomic       
     def post(self, request):
-        serializer = SegmentSerializer(data=request.data)
+        serializer = SegmentSerializer(data=request.data,
+                                    context={'user':request.user})
         
         if serializer.is_valid():
             serializer.save()
@@ -62,7 +61,7 @@ class Segment(APIView):
                     "code": "segment_create_API",
                     "data": serializer.data
             }
-            return Response(data, status=status.HTTP_200_success)
+            return Response(data, status=status.HTTP_200_OK)
         else:   
             data = {
                     "success": False,
@@ -77,23 +76,23 @@ class Segment(APIView):
         segment = get_object_or_404(pk = pk)
         serializer = SegmentSerializer(segment, data=request.data)
         if not segment.is_static():
-                if serializer.is_valid():
-                        serializer.save()
-                        data = {
-                                "success": True,
-                                "message": "segment updated successfully",
-                                "code": "segment_update_API",
-                                "data": serializer.data
-                        }
-                        return Response(data, status=status.HTTP_200_success)
-                else:    
-                        data = {
-                                "success": False,
-                                "message": "segment not updated",
-                                "code": "segment_update_API",
-                                "Error": serializer.errors
-                        }
-                        return Response(data, status=status.HTTP_400_BAD_REQUEST)
+            if serializer.is_valid():
+                serializer.save()
+                data = {
+                    "success": True,
+                    "message": "segment updated successfully",
+                    "code": "segment_update_API",
+                    "data": serializer.data
+                }
+                return Response(data, status=status.HTTP_200_OK)
+            else:    
+                data = {
+                        "success": False,
+                        "message": "segment not updated",
+                        "code": "segment_update_API",
+                        "Error": serializer.errors
+                    }
+                return Response(data, status=status.HTTP_400_BAD_REQUEST)
         else:
                 data = {
                         "success": False,
@@ -114,7 +113,7 @@ class Segment(APIView):
                     "message": "segment deleted successfully",
                     "code": "segment_delete_API",
             }
-            return Response(data, status=status.HTTP_200_success)
+            return Response(data, status=status.HTTP_200_OK)
         else:
             data = {
                     "success": False,
@@ -122,6 +121,7 @@ class Segment(APIView):
                     "code": "segment_delete_API",
             }
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
 
 class Campaigns(APIView):
     # permission_classes = [IsAuthenticated]
@@ -136,7 +136,7 @@ class Campaigns(APIView):
                     "code": "get_campaign_API",
                     "data": serialized.data
             }
-            return Response(data, status=status.HTTP_200_success)
+            return Response(data, status=status.HTTP_200_OK)
         else:
             campaigns = Campaign.objects.all()
             serialized = CampaignsSerializer(campaigns, many=True)
@@ -146,7 +146,7 @@ class Campaigns(APIView):
                     "code": "get_campaigns_API",
                     "data": serialized.data
             }
-            return Response(data, status=status.HTTP_200_success) 
+            return Response(data, status=status.HTTP_200_OK) 
           
     @transaction.atomic
     def post(self, request):
@@ -160,7 +160,7 @@ class Campaigns(APIView):
                     "code": "campaign_create_API",
                     "data": serializer.data
             }
-            return Response(serializer.data, status=status.HTTP_200_success)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:   
             data = {
                     "success": False,
@@ -182,7 +182,7 @@ class Campaigns(APIView):
                     "code": "campaign_update_API",
                     "data": serializer.data
             }
-            return Response(serializer.data, status=status.HTTP_200_success)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:    
             data = {
                     "success": False,
@@ -203,7 +203,7 @@ class Campaigns(APIView):
                     "message": "campaign deleted successfully",
                     "code": "campaign_delete_API",
             }
-            return Response(data, status=status.HTTP_200_success)
+            return Response(data, status=status.HTTP_200_OK)
         else:
             data = {
                     "success": False,
@@ -211,3 +211,5 @@ class Campaigns(APIView):
                     "code": "campaign_delete_API",
             }
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+        
