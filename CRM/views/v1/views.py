@@ -300,19 +300,6 @@ class CampaignsAPIView(APIView):
             }
         return Response(data, status=status.HTTP_200_OK)
 
-class SegmentFilter(ListAPIView):
-    
-    
-    def get_queryset(self):
-        
-        
-        
-
-        # Filter by gender
-        
-
-        return queryset
-
 class RunCampaign(APIView):
     def check_campaign(self,request,pk=None):
         campaign = get_object_or_404(Campaign, id=pk)
