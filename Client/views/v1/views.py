@@ -205,21 +205,21 @@ def get_client_dropdown(request):
                     .values_list('client__id'))
         
         # appoint_client_ids.extend(checkout_client_ids)
-        merged_client_ids_list = list(set(appoint_client_ids+checkout_client_ids))
-        query &= Q(id__in=merged_client_ids_list) 
+        # merged_client_ids_list = list(set(appoint_client_ids+checkout_client_ids))
+        query &= Q(id__in=appoint_client_ids) 
     
         
     if gender:
         query &= Q(gender=gender)
     
     if number_visit:
-        query &= Q(total_visit=number_visit)  
+        query &= Q(total_visit=number_visit)
         
-    if spend_amount:
-        total_spend_amount = list(AppointmentCheckout.objects \
-                    .filter(total_price = spend_amount) \
-                    .values_list('appointment__client__id'))
-        query &= Q(id__in=total_spend_amount) 
+    # if spend_amount:
+    #     # total_spend_amount = list(AppointmentCheckout.objects \
+    #     #             .filter(total_price = spend_amount) \
+    #     #             .values_list('appointment__client__id'))
+    #     # query &= Q(id__in=total_spend_amount) 
         
     if search_text:
         query &= Q(full_name__icontains=search_text) | \
