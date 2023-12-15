@@ -1157,7 +1157,7 @@ def update_appointment_service(request):
     action_type = request.data.get('action_type', None)
     
     cursor = connection.cursor()
-    cursor.execute('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ')
+    cursor.execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE')
 
     errors = []
     if appointment_id is None: 
