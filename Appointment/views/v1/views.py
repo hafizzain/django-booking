@@ -1294,14 +1294,14 @@ def update_appointment_service(request):
             # updating employee booking insight data
             # on changing appointment service.
             # taking client from appointment object
-            employee_insight_obj = EmployeeBookingDailyInsights.objects.get(appointment=appointment)
+            # employee_insight_obj = EmployeeBookingDailyInsights.objects.get(appointment=appointment)
 
-            if employee_insight_obj:
-                employee_insight_obj.appointment_service = service_appointment
-                employee_insight_obj.service = service_id
-                employee_insight_obj.employee = member_id
-                employee_insight_obj.set_employee_time(date_time)
-                employee_insight_obj.save()
+            # if employee_insight_obj:
+            #     employee_insight_obj.appointment_service = service_appointment
+            #     employee_insight_obj.service = service_id
+            #     employee_insight_obj.employee = member_id
+            #     employee_insight_obj.set_employee_time(date_time)
+            #     employee_insight_obj.save()
 
     
     try:
