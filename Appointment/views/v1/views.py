@@ -3395,7 +3395,8 @@ def create_missed_opportunity(request):
 
 
 
-class MissedOpportunityListCreate(generics.ListAPIView):
+class MissedOpportunityListCreate(generics.ListAPIView,
+                                  generics.DestroyAPIView):
 
     serializer_class = MissedOpportunityBasicSerializer
     queryset = ClientMissedOpportunity.objects \
