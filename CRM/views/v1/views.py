@@ -125,6 +125,17 @@ class SegmentAPIView(APIView):
                         }
                     }
                     return Response(data, status=status.HTTP_302_FOUND)
+            else:
+                data = {
+                    "success": False,
+                    "status_code" : 400,
+                    "response" : {
+                        "message" : "Segment not created",
+                        "error_message" : serializer.errors,
+                        "data" : None
+                    }
+                }
+                return Response(data, status=status.HTTP_400_BAD_REQUEST) 
 
         if serializer.is_valid():
             serializer.save()
@@ -138,18 +149,7 @@ class SegmentAPIView(APIView):
                     }
                 }
             return Response(data, status=status.HTTP_200_OK)
-        else:   
-            data = {
-                    "success": False,
-                    "status_code" : 400,
-                    "response" : {
-                        "message" : "Segment not created",
-                        "error_message" : serializer.errors,
-                        "data" : None
-                    }
-                }
-            return Response(data, status=status.HTTP_400_BAD_REQUEST) 
-
+         
     @transaction.atomic
     def put(self, request, pk):
         segment = get_object_or_404(Segment, id=pk)
