@@ -55,6 +55,7 @@ from Notification.notification_processor import NotificationProcessor
 from Analytics.models import EmployeeBookingDailyInsights
 from django.db.models import Sum
 from django.db import transaction
+from django.db import connection
 from Utility.json_utilities import format_json_string
 
 from ... import choices
@@ -1155,6 +1156,9 @@ def update_appointment_service(request):
     client = request.data.get('client', None)
     action_type = request.data.get('action_type', None)
     
+    cursor = connection.cursor()
+    cursor.execute('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ')
+
     errors = []
     if appointment_id is None: 
        return Response(
@@ -1242,8 +1246,7 @@ def update_appointment_service(request):
 
         elif type(appointments) == list:
             pass
-        
-        transaction.commit()
+
         for app in appointments:
             appointment_date = appointment_date_g or app.get('appointment_date', None)
             date_time = app.get('date_time', None)
