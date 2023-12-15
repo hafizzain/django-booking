@@ -66,6 +66,6 @@ urlpatterns = [
     # missed opportunities
     path('create_missed_opportunity/', views.create_missed_opportunity),
     path('missed_opportunities/', views.MissedOpportunityListCreate.as_view(), name='list-create-missed-opportunities'),
-    path('missed_opportunities/<str:pk>/', views.MissedOpportunityListCreate.as_view(), name='missed-opportunities-delete')
+    path('missed_opportunities/<str:pk>', views.MissedOpportunityListCreate.as_view(), name='missed-opportunities-delete')
 
 ]
