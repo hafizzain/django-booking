@@ -10,8 +10,6 @@ from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import filters
 
-from Client.models import Client
-from Business.models import Business
 from CRM.models import *
 from CRM.serializers import *
 from NStyle.Constants import StatusCodes
@@ -31,8 +29,10 @@ class SegmentAPIView(APIView):
     page_size = 10
     
     queryset = Segment.objects.prefetch_related('client') \
+                            .select_related('user', 'business') \
                             .filter(is_deleted=False) \
                             .order_by('-created_at')
+                            
     serializer_class = SegmentSerializer
     filter_backends = [filters.OrderingFilter, filters.SearchFilter]
     search_fields = ['name', 'segment_type', 'is_active']
@@ -58,7 +58,7 @@ class SegmentAPIView(APIView):
                             .filter(is_deleted=False) \
                             .order_by('-created_at')
                             
-            name = self.request.query_params.get('name', None)
+            name = self.request.query_params.get('search_text', None)
             if name:
                 filtered_queryset = filtered_queryset.filter(name=name)
 
@@ -299,6 +299,7 @@ class CampaignsAPIView(APIView):
                 }
             }
         return Response(data, status=status.HTTP_200_OK)
+
 
 class RunCampaign(APIView):
     def check_campaign(self,request,pk=None):
