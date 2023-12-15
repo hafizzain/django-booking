@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework import status
+from rest_framework.pagination import PageNumberPagination
 
 from Client.models import Client
 from Business.models import Business
@@ -25,6 +26,8 @@ from Utility.models import NstyleFile
 
 class SegmentAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    pagination_class = PageNumberPagination
+    page_size = 10
     
     def get(self, request , pk=None):
         if pk is not None:
@@ -41,8 +44,10 @@ class SegmentAPIView(APIView):
                 }
             return Response(data, status=status.HTTP_200_OK)
         else:
-            segment = Segment.objects.all()
-            serializer = SegmentSerializer(segment, many=True)
+            segment = Segment.objects.all().filter(is_deleted=False)
+            paginator = self.pagination_class()
+            result_page = paginator.paginate_queryset(segment, request)
+            serializer = SegmentSerializer(result_page, many=True)
             data = {
                     "success": True,
                     "status_code" : 200,
@@ -86,8 +91,11 @@ class SegmentAPIView(APIView):
                 }
             return Response(data, status=status.HTTP_400_BAD_REQUEST) 
 
-    @transaction.atomic     
-    def update(self, request, pk):
+    @transaction.atomic
+    def put(self, request, pk):
+        return self.update_segment(request, pk)
+    
+    def update_segment(self, request, pk):
         segment = get_object_or_404(id=pk)
         serializer = SegmentSerializer(segment, data=request.data)
         if not segment.is_static():
@@ -145,6 +153,8 @@ class SegmentAPIView(APIView):
 
 class CampaignsAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    pagination_class = PageNumberPagination
+    page_size = 10
     
     def get(self, request , pk=None):
         if pk is not None:
@@ -161,7 +171,7 @@ class CampaignsAPIView(APIView):
                 }
             return Response(data, status=status.HTTP_200_OK)
         else:
-            campaigns = Campaign.objects.all()
+            campaigns = Campaign.objects.all().filter(is_deleted=False)
             serialized = CampaignsSerializer(campaigns, many=True)
             data = {
                     "success": True,
@@ -202,8 +212,11 @@ class CampaignsAPIView(APIView):
                 }
             return Response(data, status=status.HTTP_400_BAD_REQUEST) 
 
-    @transaction.atomic     
-    def update(self, request, pk):
+    @transaction.atomic
+    def put(self, request, pk):
+        return self.update_campaign(request, pk)
+      
+    def update_campaign(self, request, pk):
         campaign = get_object_or_404(Campaign,id=pk)
         serializer = CampaignsSerializer(campaign, data=request.data)
         if serializer.is_valid():
@@ -231,32 +244,20 @@ class CampaignsAPIView(APIView):
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
         
     @transaction.atomic   
-    def delete(self, request, pk):
+    def destroy(self, request, pk):
         campaign = get_object_or_404(Campaign, id=pk)
-        serializer = CampaignsSerializer(campaign, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            data = {
-                    "success": True,
-                    "status_code" : 200,
-                    "response" : {
-                        "message" : "campaign deleted successfully",
-                        "error_message" : None,
-                        "data" : None
-                    }
+        campaign.is_deleted = True
+        campaign.save() 
+        data = {
+                "success": True,
+                "status_code" : 200,
+                "response" : {
+                    "message" : "campaign deleted successfully",
+                    "error_message" : None,
+                    "data" : None
+                }
             }
-            return Response(data, status=status.HTTP_200_OK)
-        else:
-            data = {
-                    "success": False,
-                    "status_code" : 400,
-                    "response" : {
-                        "message" : "campaign not deleted",
-                        "error_message" : serializer.errors,
-                        "data" : None
-                    }
-            }
-            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+        return Response(data, status=status.HTTP_200_OK)
 
         
 class RunCampaign(APIView):
