@@ -111,6 +111,21 @@ class SegmentAPIView(APIView):
         serializer = SegmentSerializer(data=request.data,
                                        context={'request': request})
         
+        try:
+            serializer.is_valid(raise_exception=True)
+        except serializers.ValidationError as e:
+            if "name" in e.detail and "unique" in e.detail["name"][0].lower():
+                    data = {
+                        "success": False,
+                        "status_code": 302,
+                        "response": {
+                            "message": "Segment not created",
+                            "error_message": "Segment with this name already exists.",
+                            "data": None
+                        }
+                    }
+                    return Response(data, status=status.HTTP_302_FOUND)
+
         if serializer.is_valid():
             serializer.save()
             data = {
@@ -255,9 +270,6 @@ class CampaignsAPIView(APIView):
 
     @transaction.atomic
     def put(self, request, pk):
-        return self.update_campaign(request, pk)
-      
-    def update_campaign(self, request, pk):
         campaign = get_object_or_404(Campaign,id=pk)
         serializer = CampaignsSerializer(campaign, data=request.data)
         if serializer.is_valid():
@@ -285,7 +297,7 @@ class CampaignsAPIView(APIView):
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
         
     @transaction.atomic   
-    def destroy(self, request, pk):
+    def delete(self, request, pk):
         campaign = get_object_or_404(Campaign, id=pk)
         campaign.is_deleted = True
         campaign.save() 
