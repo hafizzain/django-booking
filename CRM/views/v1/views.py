@@ -30,6 +30,7 @@ class SegmentAPIView(APIView):
     page_size = 10
     
     def get(self, request , pk=None):
+        no_pagination = request.GET.get('no_pagination', None)
         if pk is not None:
             segment = get_object_or_404(Segment, id=pk)
             serializer = SegmentSerializer(segment)
@@ -44,20 +45,37 @@ class SegmentAPIView(APIView):
                 }
             return Response(data, status=status.HTTP_200_OK)
         else:
-            segment = Segment.objects.all().filter(is_deleted=False)
-            paginator = self.pagination_class()
-            result_page = paginator.paginate_queryset(segment, request)
-            serializer = SegmentSerializer(result_page, many=True)
-            data = {
-                    "success": True,
-                    "status_code" : 200,
-                    "response" : {
-                        "message" : "Segment get Successfully",
-                        "error_message" : None,
-                        "data" : serializer.data
+            if no_pagination:
+                segment = Segment.objects.all().filter(is_deleted=False)
+                serializer = SegmentSerializer(segment, many=True)
+                data = {
+                        "success": True,
+                        "status_code" : 200,
+                        "response" : {
+                            "message" : "Segment get Successfully",
+                            "error_message" : None,
+                            "data" : serializer.data
+                        }
                     }
-                }
-            return Response(data, status=status.HTTP_200_OK)   
+                return Response(data, status=status.HTTP_200_OK)
+            else:
+                segment = Segment.objects.all().filter(is_deleted=False)
+                paginator = self.pagination_class()
+                result_page = paginator.paginate_queryset(segment, request)
+                serializer = SegmentSerializer(result_page, many=True)
+                data = {
+                        'count': paginator.page.paginator.count,
+                        'next': paginator.get_next_link(),
+                        'previous': paginator.get_previous_link(),
+                        "success": True,
+                        "status_code" : 200,
+                        "response" : {
+                            "message" : "Segment get Successfully",
+                            "error_message" : None,
+                            "data" : serializer.data
+                        }
+                    }
+                return Response(data, status=status.HTTP_200_OK)   
         
     @transaction.atomic       
     def post(self, request):
