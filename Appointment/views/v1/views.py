@@ -3396,7 +3396,8 @@ def create_missed_opportunity(request):
 
 
 class MissedOpportunityListCreate(generics.ListAPIView,
-                                  generics.DestroyAPIView):
+                                  generics.DestroyAPIView,
+                                  generics.RetrieveAPIView):
 
     serializer_class = MissedOpportunityBasicSerializer
     queryset = ClientMissedOpportunity.objects \
@@ -3426,6 +3427,20 @@ class MissedOpportunityListCreate(generics.ListAPIView,
                 'missed_opportunities' : data
             }
         }, status=status.HTTP_200_OK)
+
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response({
+            'status': True,
+            'status_code': 200,
+            'response': {
+                'message': 'Missed opportunity retrieved successfully',
+                'error_message': None,
+                'missed_opportunity': serializer.data
+            }
+        }, status=status.HTTP_200_OK)
     
 
     def destroy(self, request, *args, **kwargs):
@@ -3435,7 +3450,7 @@ class MissedOpportunityListCreate(generics.ListAPIView,
             'status': True,
             'status_code': 204,
             'response' : {
-                'message' : 'Missed opportunity deleted',
+                'message' : 'Missed opportunity deleted successfully',
                 'error_message' : None,
             }
         }, status=status.HTTP_204_NO_CONTENT)
