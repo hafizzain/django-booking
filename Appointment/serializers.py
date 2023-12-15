@@ -196,7 +196,8 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
         'price','total_price', 'discount_price',
         'appointment_time', 
         'end_time','is_favourite',
-        'client_type','duration', 'currency','created_at','service', 'client','location', 'is_blocked' ,'details' 
+        'client_type','duration', 'currency','created_at','service', 'client','location', 'is_blocked' ,'details',
+        'status'
         ]
 
 class AppointmentServiceSerializerBasic(serializers.ModelSerializer):
@@ -1112,15 +1113,27 @@ class AppointmentForClientSerializer(serializers.ModelSerializer):
         fields = ['']
 
 
-class MissedOpportunityBasicSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = ClientMissedOpportunity
-        fields = ['client', 'service', 'employee', 'note']
-
-
 class OpportunityEmployeeServiceSerializer(serializers.ModelSerializer):
+    service_name = serializers.CharField(source='service.name')
+    employee_name = serializers.CharField(source='employee.full_name')
 
     class Meta:
         model = OpportunityEmployeeService
-        fields = '__all__'
+        fields = ['service_name', 'employee_name', 'duration', 'time']
+
+
+class MissedOpportunityBasicSerializer(serializers.ModelSerializer):
+    services = serializers.SerializerMethodField(read_only=True)
+
+    def get_services(self, obj):
+        services = OpportunityEmployeeService.objects \
+                    .filter(client_missed_opportunity=obj) \
+                    .select_related('service', 'employee')
+        return OpportunityEmployeeServiceSerializer(services, many=True).data
+
+    class Meta:
+        model = ClientMissedOpportunity
+        fields = ['id', 'client', 'client_type', 'note', 'date_time', 'services', 'dependency']
+
+
+

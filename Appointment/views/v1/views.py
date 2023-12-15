@@ -13,6 +13,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import generics
+from rest_framework.pagination import PageNumberPagination
 
 from rest_framework import status
 from Appointment.Constants.durationchoice import DURATION_CHOICES
@@ -54,6 +55,7 @@ from Notification.notification_processor import NotificationProcessor
 from Analytics.models import EmployeeBookingDailyInsights
 from django.db.models import Sum
 from django.db import transaction
+from Utility.json_utilities import format_json_string
 
 from ... import choices
 
@@ -3344,7 +3346,8 @@ def create_missed_opportunity(request):
     client_id = request.data.get('client_id', None)
     opportunity_date = request.data.get('opportunity_date', None)
     note = request.data.get('notes', None)
-    services_data = request.data.get('services', None)
+    dependency = request.data.get('dependency', None)
+    services_data = format_json_string(request.data.get('services', None))
 
     services_list = []
 
@@ -3357,6 +3360,7 @@ def create_missed_opportunity(request):
                             client=client,
                             client_type=client_type,
                             date_time=opportunity_date,
+                            dependency=dependency,
                             note=note,
                         )
 
@@ -3373,17 +3377,56 @@ def create_missed_opportunity(request):
             )
         )
     
-    missed_opportunities = OpportunityEmployeeService.objects.bulk_create(services_list)
+    OpportunityEmployeeService.objects.bulk_create(services_list)
 
-    serialized_data = OpportunityEmployeeServiceSerializer(missed_opportunities, many=True)
-    return Response(serialized_data.data, status=status.HTTP_201_CREATED)
+    serializer = MissedOpportunityBasicSerializer(client_opportunity)
+    return Response(
+        {
+            'status' : True,
+            'status_code' : 200,
+            'response' : {
+                'message' : 'Missed opportunity created',
+                'error_message' : None,
+                'missed_opportunity' : serializer.data
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
 
 
-class MissedOpportunityListCreate(generics.ListCreateAPIView):
+class MissedOpportunityListCreate(generics.ListAPIView):
 
     serializer_class = MissedOpportunityBasicSerializer
     queryset = ClientMissedOpportunity.objects \
                 .select_related('client')
+    pagination_class = PageNumberPagination
     
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        data = None
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            response_data = self.get_paginated_response(serializer.data).data
+            response_data['pages'] = self.paginator.page.paginator.num_pages
+            data = response_data
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({
+            'status': True,
+            'status_code': 201,
+            'response' : {
+                'message' : 'All missed opportunities',
+                'error_message' : None,
+                'missed_opportunities' : data
+            }
+        }, status=status.HTTP_200_OK)
+    
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
