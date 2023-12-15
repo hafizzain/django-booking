@@ -1796,7 +1796,18 @@ def create_checkout(request):
     try:
         business_address = BusinessAddress.objects.get(id = str(business_address))
     except Exception as err:
-        business_address = None
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Business Address id is required',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
         
     if type(tip) == str:
         tip = json.loads(tip)
@@ -3289,7 +3300,7 @@ def appointment_service_status_update(request):
 
     appointment.status = appointment_status
     appointment.save()
-    
+
     serialized = AppointmentServiceSerializerBasic(appointment_service)
 
     return Response(
