@@ -60,7 +60,7 @@ class SegmentAPIView(APIView):
                             
             name = self.request.query_params.get('search_text', None)
             if name:
-                filtered_queryset = filtered_queryset.filter(name=name)
+                filtered_queryset = filtered_queryset.filter(name__icontains=name)
 
             segment_type = self.request.query_params.get('segment_type', None)
             if segment_type:
