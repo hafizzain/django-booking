@@ -249,6 +249,8 @@ REST_FRAMEWORK = {
 
     'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES,
 
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+
     'DEFAULT_AUTHENTICATION_CLASSES' : [
         'rest_framework.authentication.TokenAuthentication'
     ],
@@ -394,8 +396,3 @@ try:
     from .local_settings import LIVE_SERVER_PATH
 except:
     LIVE_SERVER_PATH = '/home/ubuntu/backend-nstyle/'
-
-#DRF Filter 
-REST_FRAMEWORK = {
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
-}
