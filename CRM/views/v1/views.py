@@ -45,8 +45,8 @@ class SegmentAPIView(APIView):
                 }
             return Response(data, status=status.HTTP_200_OK)
         else:
+            segment = Segment.objects.all().filter(is_deleted=False)
             if no_pagination:
-                segment = Segment.objects.all().filter(is_deleted=False)
                 serializer = SegmentSerializer(segment, many=True)
                 data = {
                         "success": True,
@@ -59,7 +59,6 @@ class SegmentAPIView(APIView):
                     }
                 return Response(data, status=status.HTTP_200_OK)
             else:
-                segment = Segment.objects.all().filter(is_deleted=False)
                 paginator = self.pagination_class()
                 result_page = paginator.paginate_queryset(segment, request)
                 serializer = SegmentSerializer(result_page, many=True)
