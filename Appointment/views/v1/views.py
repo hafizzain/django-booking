@@ -3287,17 +3287,22 @@ def appointment_service_status_update(request):
         appointment_service.service_end_time = datetime.now()
     appointment_service.save()
 
+    STARTED_OR_VOID = [choices.AppointmentServiceStatus.STARTED, choices.AppointmentServiceStatus.VOID]
     
     appoint_service_statuses = list(AppointmentService.objects.filter(appointment=appointment).values_list('status', flat=True))
 
     is_all_finished = all([True if status == choices.AppointmentServiceStatus.FINISHED else False for status in appoint_service_statuses])
-    is_one_started = any([True if status == choices.AppointmentServiceStatus.STARTED else False for status in appoint_service_statuses])
+    is_all_void = all([True if status == choices.AppointmentServiceStatus.VOID else False for status in appoint_service_statuses])
 
-    if is_one_started:
-        appointment.status = choices.AppointmentStatus.STARTED
-        appointment.save()
-    if is_all_finished:
+    # is_one_started = any([True if status in STARTED_OR_VOID else False for status in appoint_service_statuses])
+
+    # if is_one_started:
+        
+    if is_all_finished or is_all_void:
         appointment.status = choices.AppointmentStatus.FINISHED
+        appointment.save()
+    else:
+        appointment.status = choices.AppointmentStatus.STARTED
         appointment.save()
 
     
