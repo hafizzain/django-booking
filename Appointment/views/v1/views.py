@@ -3402,7 +3402,8 @@ class MissedOpportunityListCreate(generics.ListAPIView,
     queryset = ClientMissedOpportunity.objects \
                 .select_related('client')
     pagination_class = PageNumberPagination
-    # lookup_field = 'id'  # Specify the lookup field as 'id' for UUID
+    lookup_field = 'pk'  # Specify the lookup field as 'id' for UUID
+    lookup_url_kwarg = 'pk'
     
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
