@@ -200,8 +200,16 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
         'status'
         ]
 
+
+class AppointmentSerializerForStatus(serializers.ModelSerializer):
+
+    class Meta:
+        model = Appointment
+        fields = ['id', 'status']
+
 class AppointmentServiceSerializerBasic(serializers.ModelSerializer):
 
+    appointment = AppointmentSerializerForStatus(read_only=True)
     class Meta:
         model = AppointmentService
         fields = '__all__'
