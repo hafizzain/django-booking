@@ -1147,6 +1147,7 @@ def update_appointment_device(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
+@transaction.atomic
 def update_appointment_service(request):
     appointment_id = request.data.get('id', None)
     appointments = request.data.get('appointments', None)
