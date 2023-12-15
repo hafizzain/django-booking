@@ -198,15 +198,15 @@ def get_client_dropdown(request):
     if start_date and end_date:
         appoint_client_ids = list(AppointmentCheckout.objects\
                     .filter(created_at__range=(start_date, end_date))\
-                    .values_list('appointment__client__id'))
+                    .values_list('appointment__client__id', flat=True))
         
         checkout_client_ids = list(Checkout.objects\
                     .filter(created_at__range=(start_date, end_date))\
-                    .values_list('client__id'))
+                    .values_list('client__id', flat=True))
         
         # appoint_client_ids.extend(checkout_client_ids)
-        # merged_client_ids_list = list(set(appoint_client_ids+checkout_client_ids))
-        query &= Q(id__in=appoint_client_ids) 
+        merged_client_ids_list = list(set(appoint_client_ids+checkout_client_ids))
+        query &= Q(id__in=merged_client_ids_list) 
     
         
     if gender:
