@@ -10,8 +10,6 @@ from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import filters
 
-from Client.models import Client
-from Business.models import Business
 from CRM.models import *
 from CRM.serializers import *
 from NStyle.Constants import StatusCodes
@@ -31,8 +29,10 @@ class SegmentAPIView(APIView):
     page_size = 10
     
     queryset = Segment.objects.prefetch_related('client') \
+                            .select_related('user', 'business') \
                             .filter(is_deleted=False) \
                             .order_by('-created_at')
+                            
     serializer_class = SegmentSerializer
     filter_backends = [filters.OrderingFilter, filters.SearchFilter]
     search_fields = ['name', 'segment_type', 'is_active']
@@ -58,7 +58,7 @@ class SegmentAPIView(APIView):
                             .filter(is_deleted=False) \
                             .order_by('-created_at')
                             
-            name = self.request.query_params.get('name', None)
+            name = self.request.query_params.get('search_text', None)
             if name:
                 filtered_queryset = filtered_queryset.filter(name=name)
 
@@ -111,6 +111,32 @@ class SegmentAPIView(APIView):
         serializer = SegmentSerializer(data=request.data,
                                        context={'request': request})
         
+        try:
+            serializer.is_valid(raise_exception=True)
+        except serializers.ValidationError as e:
+            if "name" in e.detail and "unique" in e.detail["name"][0].lower():
+                    data = {
+                        "success": False,
+                        "status_code": 302,
+                        "response": {
+                            "message": "Segment not created",
+                            "error_message": "Segment with this name already exists.",
+                            "data": None
+                        }
+                    }
+                    return Response(data, status=status.HTTP_302_FOUND)
+            else:
+                data = {
+                    "success": False,
+                    "status_code" : 400,
+                    "response" : {
+                        "message" : "Segment not created",
+                        "error_message" : serializer.errors,
+                        "data" : None
+                    }
+                }
+                return Response(data, status=status.HTTP_400_BAD_REQUEST) 
+
         if serializer.is_valid():
             serializer.save()
             data = {
@@ -123,18 +149,7 @@ class SegmentAPIView(APIView):
                     }
                 }
             return Response(data, status=status.HTTP_200_OK)
-        else:   
-            data = {
-                    "success": False,
-                    "status_code" : 400,
-                    "response" : {
-                        "message" : "Segment not created",
-                        "error_message" : serializer.errors,
-                        "data" : None
-                    }
-                }
-            return Response(data, status=status.HTTP_400_BAD_REQUEST) 
-
+         
     @transaction.atomic
     def put(self, request, pk):
         segment = get_object_or_404(Segment, id=pk)
@@ -255,9 +270,6 @@ class CampaignsAPIView(APIView):
 
     @transaction.atomic
     def put(self, request, pk):
-        return self.update_campaign(request, pk)
-      
-    def update_campaign(self, request, pk):
         campaign = get_object_or_404(Campaign,id=pk)
         serializer = CampaignsSerializer(campaign, data=request.data)
         if serializer.is_valid():
@@ -285,7 +297,7 @@ class CampaignsAPIView(APIView):
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
         
     @transaction.atomic   
-    def destroy(self, request, pk):
+    def delete(self, request, pk):
         campaign = get_object_or_404(Campaign, id=pk)
         campaign.is_deleted = True
         campaign.save() 
@@ -299,6 +311,7 @@ class CampaignsAPIView(APIView):
                 }
             }
         return Response(data, status=status.HTTP_200_OK)
+
 
 class RunCampaign(APIView):
     def check_campaign(self,request,pk=None):
