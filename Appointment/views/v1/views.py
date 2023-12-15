@@ -1192,118 +1192,118 @@ def update_appointment_service(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-    with transaction.atomic():
-        if client:
-            try:
-                client = Client.objects.get(id=client)
-                appointment.client = client
-                customer_type = client.full_name
-                appointment.save()
-            except Exception as err:
-                client = None
-                customer_type = 'WALKIN'
-            
-        if client_type:
-            appointment.client_type = client_type
+    # with transaction.atomic():
+    if client:
+        try:
+            client = Client.objects.get(id=client)
+            appointment.client = client
+            customer_type = client.full_name
             appointment.save()
+        except Exception as err:
+            client = None
+            customer_type = 'WALKIN'
         
-        if appointment_notes:
+    if client_type:
+        appointment.client_type = client_type
+        appointment.save()
+    
+    if appointment_notes:
+        try:
+            notes = AppointmentNotes.objects.filter(appointment =appointment )
+            for no in notes:
+                no.delete()
+            notes =  AppointmentNotes.objects.create(
+                appointment =appointment ,
+                text = appointment_notes 
+            )
+            
+        except Exception as err:
+            errors.append(str(err))
+            
+            
+    active_user_staff = None
+    try:
+        active_user_staff = Employee.objects.get(
+            email = request.user.email,
+            is_deleted = False,
+            is_active = True,
+            is_blocked = False
+        )
+    except:
+        pass
+    
+    appointment_logs = AppointmentLogs.objects.create( 
+        user = request.user,
+        location = appointment.business_address,
+        appointment = appointment,
+        log_type = 'Edit' if action_type == 'edit' else 'Reschedule',
+        member = active_user_staff
+    )
+
+    if appointments is not None:
+        if type(appointments) == str:
+            appointments = json.loads(appointments)
+
+        elif type(appointments) == list:
+            pass
+
+        for app in appointments:
+            appointment_date = appointment_date_g or app.get('appointment_date', None)
+            date_time = app.get('date_time', None)
+            service = app.get('service', None)
+            client_can_book = app.get('client_can_book', None)
+            slot_availible_for_online = app.get('slot_availible_for_online', None)
+            duration = app.get('duration', None)
+            price = app.get('price', None)
+            member = app.get('member', None)
+            is_deleted = app.get('is_deleted', None)
+            id = app.get('id', None)
             try:
-                notes = AppointmentNotes.objects.filter(appointment =appointment )
-                for no in notes:
-                    no.delete()
-                notes =  AppointmentNotes.objects.create(
-                    appointment =appointment ,
-                    text = appointment_notes 
-                )
-                
+                service_id =Service.objects.get(id=service)
             except Exception as err:
                 errors.append(str(err))
-                
-                
-        active_user_staff = None
-        try:
-            active_user_staff = Employee.objects.get(
-                email = request.user.email,
-                is_deleted = False,
-                is_active = True,
-                is_blocked = False
-            )
-        except:
-            pass
-        
-        appointment_logs = AppointmentLogs.objects.create( 
-            user = request.user,
-            location = appointment.business_address,
-            appointment = appointment,
-            log_type = 'Edit' if action_type == 'edit' else 'Reschedule',
-            member = active_user_staff
-        )
-
-        if appointments is not None:
-            if type(appointments) == str:
-                appointments = json.loads(appointments)
-
-            elif type(appointments) == list:
-                pass
-
-            for app in appointments:
-                appointment_date = appointment_date_g or app.get('appointment_date', None)
-                date_time = app.get('date_time', None)
-                service = app.get('service', None)
-                client_can_book = app.get('client_can_book', None)
-                slot_availible_for_online = app.get('slot_availible_for_online', None)
-                duration = app.get('duration', None)
-                price = app.get('price', None)
-                member = app.get('member', None)
-                is_deleted = app.get('is_deleted', None)
-                id = app.get('id', None)
+            try:
+                member_id =Employee.objects.get(id=member)
+            except Exception as err:
+                errors.append(str(err))
+            if id is not None:
                 try:
-                    service_id =Service.objects.get(id=service)
+                    service_appointment = AppointmentService.objects.get(id=str(id))
+                    #if str(is_deleted) == "true":
+                    if is_deleted == True:
+                        service_appointment.delete()
+                        continue
+                    service_appointment.appointment_date = appointment_date
+                    service_appointment.appointment_time = date_time
+                    service_appointment.service = service_id
+                    service_appointment.client_can_book = client_can_book
+                    service_appointment.slot_availible_for_online = slot_availible_for_online
+                    service_appointment.duration = duration
+                    service_appointment.price = price
+                    service_appointment.member = member_id
+                    service_appointment.save()
                 except Exception as err:
                     errors.append(str(err))
-                try:
-                    member_id =Employee.objects.get(id=member)
-                except Exception as err:
-                    errors.append(str(err))
-                if id is not None:
-                    try:
-                        service_appointment = AppointmentService.objects.get(id=str(id))
-                        #if str(is_deleted) == "true":
-                        if is_deleted == True:
-                            service_appointment.delete()
-                            continue
-                        service_appointment.appointment_date = appointment_date
-                        service_appointment.appointment_time = date_time
-                        service_appointment.service = service_id
-                        service_appointment.client_can_book = client_can_book
-                        service_appointment.slot_availible_for_online = slot_availible_for_online
-                        service_appointment.duration = duration
-                        service_appointment.price = price
-                        service_appointment.member = member_id
-                        service_appointment.save()
-                    except Exception as err:
-                        errors.append(str(err))
-                    else:
-                        LogDetails.objects.create(
-                            log = appointment_logs,
-                            appointment_service = service_appointment,
-                            start_time = service_appointment.appointment_time,
-                            duration = service_appointment.duration,
-                            member = service_appointment.member
-                        )
-                
-                # updating employee booking insight data
-                # on changing appointment service.
-                # taking client from appointment object
-                employee_insight_obj = EmployeeBookingDailyInsights.objects.get(appointment=appointment)
+                else:
+                    LogDetails.objects.create(
+                        log = appointment_logs,
+                        appointment_service = service_appointment,
+                        start_time = service_appointment.appointment_time,
+                        duration = service_appointment.duration,
+                        member = service_appointment.member
+                    )
+            
+            # updating employee booking insight data
+            # on changing appointment service.
+            # taking client from appointment object
+            employee_insight_obj = EmployeeBookingDailyInsights.objects.get(appointment=appointment)
 
-                if employee_insight_obj:
-                    employee_insight_obj.appointment_service = service_appointment
-                    employee_insight_obj.service = service_id
-                    employee_insight_obj.employee = member_id
-                    employee_insight_obj.set_employee_time(date_time)
-                    employee_insight_obj.save()
+            if employee_insight_obj:
+                employee_insight_obj.appointment_service = service_appointment
+                employee_insight_obj.service = service_id
+                employee_insight_obj.employee = member_id
+                employee_insight_obj.set_employee_time(date_time)
+                employee_insight_obj.save()
 
     
     try:
