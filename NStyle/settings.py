@@ -96,6 +96,7 @@ SHARED_APPS = [
     'django_crontab',
     'debug_toolbar',
     'fcm_django',
+    'django_filters',
     
 
     'Tenants.apps.TenantsConfig',
@@ -393,4 +394,8 @@ try:
     from .local_settings import LIVE_SERVER_PATH
 except:
     LIVE_SERVER_PATH = '/home/ubuntu/backend-nstyle/'
-    
+
+#DRF Filter 
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}

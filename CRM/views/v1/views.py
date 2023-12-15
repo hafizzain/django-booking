@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
+from rest_framework import filters
 
 from Client.models import Client
 from Business.models import Business
@@ -29,8 +30,16 @@ class SegmentAPIView(APIView):
     pagination_class = PageNumberPagination
     page_size = 10
     
+    queryset = Segment.objects.prefetch_related('client') \
+                            .filter(is_deleted=False) \
+                            .order_by('-created_at')
+    serializer_class = SegmentSerializer
+    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    search_fields = ['name', 'segment_type', 'is_active']
+    
     def get(self, request , pk=None):
         no_pagination = request.GET.get('no_pagination', None)
+        
         if pk is not None:
             segment = get_object_or_404(Segment, id=pk)
             serializer = SegmentSerializer(segment)
@@ -45,10 +54,24 @@ class SegmentAPIView(APIView):
                 }
             return Response(data, status=status.HTTP_200_OK)
         else:
-            segment = Segment.objects.all().filter(is_deleted=False)
-            
+            filtered_queryset = Segment.objects.all() \
+                            .filter(is_deleted=False) \
+                            .order_by('-created_at')
+                            
+            name = self.request.query_params.get('name', None)
+            if name:
+                filtered_queryset = filtered_queryset.filter(name=name)
+
+            segment_type = self.request.query_params.get('segment_type', None)
+            if segment_type:
+                filtered_queryset = filtered_queryset.filter(segment_type=segment_type)
+
+            is_active = self.request.query_params.get('is_active', None)
+            if is_active:
+                filtered_queryset = filtered_queryset.filter(is_active=is_active)
+              
             if no_pagination:
-                serializer = SegmentSerializer(segment, many=True)
+                serializer = SegmentSerializer(filtered_queryset, many=True)
                 data = {
                         "success": True,
                         "status_code" : 200,
@@ -61,7 +84,7 @@ class SegmentAPIView(APIView):
                 return Response(data, status=status.HTTP_200_OK)
             else:
                 paginator = self.pagination_class()
-                result_page = paginator.paginate_queryset(segment, request)
+                result_page = paginator.paginate_queryset(filtered_queryset, request)
                 serializer = SegmentSerializer(result_page, many=True)
                 data = {
                         'count': paginator.page.paginator.count,
@@ -78,8 +101,8 @@ class SegmentAPIView(APIView):
                             "data" : serializer.data
                         }
                     }
-                return Response(data, status=status.HTTP_200_OK)   
-        
+                return Response(data, status=status.HTTP_200_OK)
+             
     @transaction.atomic       
     def post(self, request):
         user = request.user
@@ -277,7 +300,19 @@ class CampaignsAPIView(APIView):
             }
         return Response(data, status=status.HTTP_200_OK)
 
+class SegmentFilter(ListAPIView):
+    
+    
+    def get_queryset(self):
         
+        
+        
+
+        # Filter by gender
+        
+
+        return queryset
+
 class RunCampaign(APIView):
     def check_campaign(self,request,pk=None):
         campaign = get_object_or_404(Campaign, id=pk)
