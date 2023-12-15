@@ -3266,28 +3266,30 @@ def appointment_service_status_update(request):
     appointment_service_id = request.data.get('appointment_service_id', None)
 
     #changing the status
+    appointment = Appointment.objects.get(id=appointment_id)
     appointment_service = AppointmentService.objects.get(id=appointment_service_id)
-    appointment_service.status = appointment_service_status
 
+    appointment_service.status = appointment_service_status
     if appointment_service_status == choices.AppointmentServiceStatus.STARTED:
         appointment_service.service_start_time = datetime.now()
-
     elif appointment_service_status == choices.AppointmentServiceStatus.FINISHED:
         appointment_service.service_end_time = datetime.now()
-
     appointment_service.save()
 
-    # check if any service has status of started
-    query = Q(status__in=[choices.AppointmentServiceStatus.STARTED,
-                          choices.AppointmentServiceStatus.FINISHED,
-                          choices.AppointmentServiceStatus.VOID])
     
-    appointment_service_check = AppointmentService.objects.filter(query)
-    if appointment_service_check:
-        appointment = Appointment.objects.get(id=appointment_id)
-        appointment.status = choices.AppointmentStatus.STARTED
-        appointment.save()
+    appoint_service_statuses = list(AppointmentService.objects.filter(appointment=appointment).values_list('status', flat=True))
 
+    is_all_finished = all([True if status == choices.AppointmentServiceStatus.FINISHED else False for status in appoint_service_statuses])
+    is_one_started = any([True if status == choices.AppointmentServiceStatus.STARTED else False for status in appoint_service_statuses])
+
+    if is_one_started:
+        appointment_status = choices.AppointmentStatus.STARTED
+    if is_all_finished:
+        appointment_status = choices.AppointmentStatus.FINISHED
+
+    appointment.status = appointment_status
+    appointment.save()
+    
     serialized = AppointmentServiceSerializerBasic(appointment_service)
 
     return Response(
