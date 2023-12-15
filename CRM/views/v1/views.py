@@ -46,6 +46,7 @@ class SegmentAPIView(APIView):
             return Response(data, status=status.HTTP_200_OK)
         else:
             segment = Segment.objects.all().filter(is_deleted=False)
+            
             if no_pagination:
                 serializer = SegmentSerializer(segment, many=True)
                 data = {
@@ -66,6 +67,9 @@ class SegmentAPIView(APIView):
                         'count': paginator.page.paginator.count,
                         'next': paginator.get_next_link(),
                         'previous': paginator.get_previous_link(),
+                        'current_page': paginator.page.number,
+                        'per_page': self.page_size,
+                        'total_pages': paginator.page.paginator.num_pages,
                         "success": True,
                         "status_code" : 200,
                         "response" : {
@@ -110,10 +114,7 @@ class SegmentAPIView(APIView):
 
     @transaction.atomic
     def put(self, request, pk):
-        return self.update_segment(request, pk)
-    
-    def update_segment(self, request, pk):
-        segment = get_object_or_404(id=pk)
+        segment = get_object_or_404(Segment, id=pk)
         serializer = SegmentSerializer(segment, data=request.data)
         if not segment.is_static():
             if serializer.is_valid():
@@ -152,7 +153,7 @@ class SegmentAPIView(APIView):
                 return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
     @transaction.atomic
-    def destroy(self, request, pk):
+    def delete(self, request, pk):
         segment = get_object_or_404(Segment, id=pk)
         segment.is_deleted = True
         segment.save() 
