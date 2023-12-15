@@ -215,11 +215,11 @@ def get_client_dropdown(request):
     if number_visit:
         query &= Q(total_visit=number_visit)
         
-    # if spend_amount:
-    #     # total_spend_amount = list(AppointmentCheckout.objects \
-    #     #             .filter(total_price = spend_amount) \
-    #     #             .values_list('appointment__client__id'))
-    #     # query &= Q(id__in=total_spend_amount) 
+    if spend_amount:
+        total_spend_amount = list(AppointmentCheckout.objects \
+                    .filter(total_price = spend_amount) \
+                    .values_list('appointment__client__id', flat=True))
+        query &= Q(id__in=total_spend_amount)
         
     if search_text:
         query &= Q(full_name__icontains=search_text) | \
