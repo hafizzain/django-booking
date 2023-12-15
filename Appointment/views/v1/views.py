@@ -3448,7 +3448,7 @@ class MissedOpportunityListCreate(generics.ListAPIView,
         self.perform_destroy(instance)
         return Response({
             'status': True,
-            'status_code': 204,
+            'status_code': 200,
             'response' : {
                 'message' : 'Missed opportunity deleted successfully',
                 'error_message' : None,
