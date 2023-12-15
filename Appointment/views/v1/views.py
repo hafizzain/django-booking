@@ -1243,6 +1243,7 @@ def update_appointment_service(request):
         elif type(appointments) == list:
             pass
         
+        transaction.commit()
         for app in appointments:
             appointment_date = appointment_date_g or app.get('appointment_date', None)
             date_time = app.get('date_time', None)
