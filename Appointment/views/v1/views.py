@@ -1144,7 +1144,6 @@ def update_appointment_device(request):
         status=status.HTTP_200_OK
     )
 
-# @transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_appointment_service(request):

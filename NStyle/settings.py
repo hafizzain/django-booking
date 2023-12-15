@@ -391,7 +391,7 @@ FRONTEND_DOMAIN = env('FRONTEND_DOMAIN')
 
 
 # Set Atomic Requests Globally
-ATOMIC_REQUESTS = True
+# ATOMIC_REQUESTS = True
 try:
     from .local_settings import LIVE_SERVER_PATH
 except:
