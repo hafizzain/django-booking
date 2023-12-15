@@ -55,6 +55,7 @@ from Notification.notification_processor import NotificationProcessor
 from Analytics.models import EmployeeBookingDailyInsights
 from django.db.models import Sum
 from django.db import transaction
+from django.db import connection
 from Utility.json_utilities import format_json_string
 
 from ... import choices
@@ -1144,7 +1145,6 @@ def update_appointment_device(request):
         status=status.HTTP_200_OK
     )
 
-@transaction.atomic
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_appointment_service(request):
@@ -1156,6 +1156,7 @@ def update_appointment_service(request):
     client = request.data.get('client', None)
     action_type = request.data.get('action_type', None)
     
+
     errors = []
     if appointment_id is None: 
        return Response(
@@ -1243,7 +1244,7 @@ def update_appointment_service(request):
 
         elif type(appointments) == list:
             pass
-        
+
         for app in appointments:
             appointment_date = appointment_date_g or app.get('appointment_date', None)
             date_time = app.get('date_time', None)
@@ -1293,16 +1294,14 @@ def update_appointment_service(request):
             # updating employee booking insight data
             # on changing appointment service.
             # taking client from appointment object
-            employee_insight_obj = EmployeeBookingDailyInsights.objects.filter(
-                appointment=appointment,
-            ).first()
+            # employee_insight_obj = EmployeeBookingDailyInsights.objects.get(appointment=appointment)
 
-            if employee_insight_obj:
-                employee_insight_obj.appointment_service = service_appointment
-                employee_insight_obj.service = service_id
-                employee_insight_obj.employee = member_id
-                employee_insight_obj.set_employee_time(date_time)
-                employee_insight_obj.save()
+            # if employee_insight_obj:
+            #     employee_insight_obj.appointment_service = service_appointment
+            #     employee_insight_obj.service = service_id
+            #     employee_insight_obj.employee = member_id
+            #     employee_insight_obj.set_employee_time(date_time)
+            #     employee_insight_obj.save()
 
     
     try:
@@ -3395,12 +3394,16 @@ def create_missed_opportunity(request):
 
 
 
-class MissedOpportunityListCreate(generics.ListAPIView):
+class MissedOpportunityListCreate(generics.ListAPIView,
+                                  generics.DestroyAPIView,
+                                  generics.RetrieveAPIView):
 
     serializer_class = MissedOpportunityBasicSerializer
     queryset = ClientMissedOpportunity.objects \
                 .select_related('client')
     pagination_class = PageNumberPagination
+    lookup_field = 'id'  # Specify the lookup field as 'id' for UUID
+    lookup_url_kwarg = 'id'
     
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -3423,10 +3426,31 @@ class MissedOpportunityListCreate(generics.ListAPIView):
                 'missed_opportunities' : data
             }
         }, status=status.HTTP_200_OK)
+
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response({
+            'status': True,
+            'status_code': 200,
+            'response': {
+                'message': 'Missed opportunity retrieved successfully',
+                'error_message': None,
+                'missed_opportunity': serializer.data
+            }
+        }, status=status.HTTP_200_OK)
     
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({
+            'status': True,
+            'status_code': 200,
+            'response' : {
+                'message' : 'Missed opportunity deleted successfully',
+                'error_message' : None,
+            }
+        }, status=status.HTTP_200_OK)
 
