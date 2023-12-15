@@ -1155,95 +1155,95 @@ def update_appointment_service(request):
     appointment_date_g = request.data.get('appointment_date', None)
     client = request.data.get('client', None)
     action_type = request.data.get('action_type', None)
+    
 
-    with transaction.atomic():
-        errors = []
-        if appointment_id is None: 
-            return Response(
-                    {
-                        'status' : False,
-                        'status_code' : StatusCodes.MISSING_FIELDS_4001,
-                        'status_code_text' : 'MISSING_FIELDS_4001',
-                        'response' : {
-                            'message' : 'Invalid Data!',
-                            'error_message' : 'fields are required.',
-                            'fields' : [
-                                'id'                         
-                            ]
-                        }
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
-        try:
-            appointment = Appointment.objects.get(id=appointment_id)
-        except Exception as err:
-            return Response(
-                {
-                    'status' : False,
-                    'status_code' : 404,
-                    'status_code_text' : '404',
-                    'response' : {
-                        'message' : 'Invalid Appointment ID!',
-                        'error_message' : str(err),
-                    }
-                },
-                status=status.HTTP_404_NOT_FOUND
-            )
-            
-        if client:
-            try:
-                client = Client.objects.get(id=client)
-                appointment.client = client
-                customer_type = client.full_name
-                appointment.save()
-            except Exception as err:
-                client = None
-                customer_type = 'WALKIN'
-            
-        if client_type:
-            appointment.client_type = client_type
-            appointment.save()
-        
-        if appointment_notes:
-            try:
-                notes = AppointmentNotes.objects.filter(appointment =appointment )
-                for no in notes:
-                    no.delete()
-                notes =  AppointmentNotes.objects.create(
-                    appointment =appointment ,
-                    text = appointment_notes 
-                )
-                
-            except Exception as err:
-                errors.append(str(err))
-                
-                
-        active_user_staff = None
-        try:
-            active_user_staff = Employee.objects.get(
-                email = request.user.email,
-                is_deleted = False,
-                is_active = True,
-                is_blocked = False
-            )
-        except:
-            pass
-        
-        appointment_logs = AppointmentLogs.objects.create( 
-            user = request.user,
-            location = appointment.business_address,
-            appointment = appointment,
-            log_type = 'Edit' if action_type == 'edit' else 'Reschedule',
-            member = active_user_staff
+    errors = []
+    if appointment_id is None: 
+       return Response(
+            {
+                'status' : False,
+                'status_code' : StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text' : 'MISSING_FIELDS_4001',
+                'response' : {
+                    'message' : 'Invalid Data!',
+                    'error_message' : 'fields are required.',
+                    'fields' : [
+                        'id'                         
+                    ]
+                }
+            },
+            status=status.HTTP_400_BAD_REQUEST
         )
+          
+    try:
+        appointment = Appointment.objects.get(id=appointment_id)
+    except Exception as err:
+        return Response(
+            {
+                'status' : False,
+                'status_code' : 404,
+                'status_code_text' : '404',
+                'response' : {
+                    'message' : 'Invalid Appointment ID!',
+                    'error_message' : str(err),
+                }
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+        
+    if client:
+        try:
+            client = Client.objects.get(id=client)
+            appointment.client = client
+            customer_type = client.full_name
+            appointment.save()
+        except Exception as err:
+            client = None
+            customer_type = 'WALKIN'
+        
+    if client_type:
+        appointment.client_type = client_type
+        appointment.save()
+    
+    if appointment_notes:
+        try:
+            notes = AppointmentNotes.objects.filter(appointment =appointment )
+            for no in notes:
+                no.delete()
+            notes =  AppointmentNotes.objects.create(
+                appointment =appointment ,
+                text = appointment_notes 
+            )
+            
+        except Exception as err:
+            errors.append(str(err))
+            
+            
+    active_user_staff = None
+    try:
+        active_user_staff = Employee.objects.get(
+            email = request.user.email,
+            is_deleted = False,
+            is_active = True,
+            is_blocked = False
+        )
+    except:
+        pass
+    
+    appointment_logs = AppointmentLogs.objects.create( 
+        user = request.user,
+        location = appointment.business_address,
+        appointment = appointment,
+        log_type = 'Edit' if action_type == 'edit' else 'Reschedule',
+        member = active_user_staff
+    )
 
-        if appointments is not None:
-            if type(appointments) == str:
-                appointments = json.loads(appointments)
+    if appointments is not None:
+        if type(appointments) == str:
+            appointments = json.loads(appointments)
 
-            elif type(appointments) == list:
-                pass
+        elif type(appointments) == list:
+            pass
 
         for app in appointments:
             appointment_date = appointment_date_g or app.get('appointment_date', None)
