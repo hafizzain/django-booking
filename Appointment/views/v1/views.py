@@ -1156,6 +1156,7 @@ def update_appointment_service(request):
     appointment_date_g = request.data.get('appointment_date', None)
     client = request.data.get('client', None)
     action_type = request.data.get('action_type', None)
+    appo_created = None
     
 
     errors = []
@@ -1283,6 +1284,7 @@ def update_appointment_service(request):
                 service_appointment.member = member_id
 
                 if created:
+                    appo_created = 'Ahho Create te hoya'
                     service_appointment.appointment = appointment
                     service_appointment.user = request.user
                     service_appointment.business = appointment.business
@@ -1339,6 +1341,7 @@ def update_appointment_service(request):
                 'message' : 'Update Appointment Successfully',
                 'error_message' : None,
                 'errors': errors,
+                'created': appo_created
                 #'Appointment' : serializer.data
             }
         },
