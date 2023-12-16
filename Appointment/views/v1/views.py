@@ -1156,7 +1156,6 @@ def update_appointment_service(request):
     appointment_date_g = request.data.get('appointment_date', None)
     client = request.data.get('client', None)
     action_type = request.data.get('action_type', None)
-    business = request.data.get()
     
 
     errors = []
@@ -1288,7 +1287,7 @@ def update_appointment_service(request):
                     service_appointment.user = request.user
                     service_appointment.business = appointment.business
                     service_appointment.business_address = appointment.business_address
-                    
+
                 service_appointment.save()
             except Exception as err:
                 errors.append(str(err))
