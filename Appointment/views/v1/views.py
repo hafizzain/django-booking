@@ -1296,7 +1296,7 @@ def update_appointment_service(request):
             # updating employee booking insight data
             # on changing appointment service.
             # taking client from appointment object
-            employee_insight_obj = EmployeeBookingDailyInsights.objects.get(appointment=appointment)
+            employee_insight_obj = EmployeeBookingDailyInsights.objects.filter(appointment=appointment).first()
 
             if employee_insight_obj:
                 employee_insight_obj.appointment_service = service_appointment
