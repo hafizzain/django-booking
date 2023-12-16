@@ -1267,13 +1267,26 @@ def update_appointment_service(request):
                 member_id =Employee.objects.get(id=member)
             except Exception as err:
                 errors.append(str(err))
-            # if id is not None:
+            
+
             try:
-                service_appointment, created = AppointmentService.objects.get_or_create(id=str(id))
-                #if str(is_deleted) == "true":
-                if is_deleted == True:
-                    service_appointment.delete()
-                    continue
+                # below is just a workaround
+                if id:
+                    service_appointment = AppointmentService.objects.get(id=str(id))
+                    if is_deleted == True:
+                        service_appointment.delete()
+                        continue
+                else:
+                    service_appointment = AppointmentService()
+                    appo_created = 'Ahho Create te hoya'
+                    service_appointment.appointment = appointment
+                    service_appointment.user = request.user
+                    service_appointment.business = appointment.business
+                    service_appointment.business_address = appointment.business_address
+
+                    appo_created = True
+
+                
                 service_appointment.appointment_date = appointment_date
                 service_appointment.appointment_time = date_time
                 service_appointment.service = service_id
@@ -1282,13 +1295,6 @@ def update_appointment_service(request):
                 service_appointment.duration = duration
                 service_appointment.price = price
                 service_appointment.member = member_id
-
-                if created:
-                    appo_created = 'Ahho Create te hoya'
-                    service_appointment.appointment = appointment
-                    service_appointment.user = request.user
-                    service_appointment.business = appointment.business
-                    service_appointment.business_address = appointment.business_address
 
                 service_appointment.save()
             except Exception as err:
