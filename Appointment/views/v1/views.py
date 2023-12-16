@@ -1156,6 +1156,7 @@ def update_appointment_service(request):
     appointment_date_g = request.data.get('appointment_date', None)
     client = request.data.get('client', None)
     action_type = request.data.get('action_type', None)
+    business = request.data.get()
     
 
     errors = []
@@ -1259,39 +1260,46 @@ def update_appointment_service(request):
             is_deleted = app.get('is_deleted', None)
             id = app.get('id', None)
             try:
-                service_id =Service.objects.get(id=service)
+                service_id = Service.objects.get(id=service)
             except Exception as err:
                 errors.append(str(err))
             try:
                 member_id =Employee.objects.get(id=member)
             except Exception as err:
                 errors.append(str(err))
-            if id is not None:
-                try:
-                    service_appointment = AppointmentService.objects.get(id=str(id))
-                    #if str(is_deleted) == "true":
-                    if is_deleted == True:
-                        service_appointment.delete()
-                        continue
-                    service_appointment.appointment_date = appointment_date
-                    service_appointment.appointment_time = date_time
-                    service_appointment.service = service_id
-                    service_appointment.client_can_book = client_can_book
-                    service_appointment.slot_availible_for_online = slot_availible_for_online
-                    service_appointment.duration = duration
-                    service_appointment.price = price
-                    service_appointment.member = member_id
-                    service_appointment.save()
-                except Exception as err:
-                    errors.append(str(err))
-                else:
-                    LogDetails.objects.create(
-                        log = appointment_logs,
-                        appointment_service = service_appointment,
-                        start_time = service_appointment.appointment_time,
-                        duration = service_appointment.duration,
-                        member = service_appointment.member
-                    )
+            # if id is not None:
+            try:
+                service_appointment, created = AppointmentService.objects.get_or_create(id=str(id))
+                #if str(is_deleted) == "true":
+                if is_deleted == True:
+                    service_appointment.delete()
+                    continue
+                service_appointment.appointment_date = appointment_date
+                service_appointment.appointment_time = date_time
+                service_appointment.service = service_id
+                service_appointment.client_can_book = client_can_book
+                service_appointment.slot_availible_for_online = slot_availible_for_online
+                service_appointment.duration = duration
+                service_appointment.price = price
+                service_appointment.member = member_id
+
+                if created:
+                    service_appointment.appointment = appointment
+                    service_appointment.user = request.user
+                    service_appointment.business = appointment.business
+                    service_appointment.business_address = appointment.business_address
+                    
+                service_appointment.save()
+            except Exception as err:
+                errors.append(str(err))
+            else:
+                LogDetails.objects.create(
+                    log = appointment_logs,
+                    appointment_service = service_appointment,
+                    start_time = service_appointment.appointment_time,
+                    duration = service_appointment.duration,
+                    member = service_appointment.member
+                )
             
             # updating employee booking insight data
             # on changing appointment service.
