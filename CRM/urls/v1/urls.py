@@ -13,6 +13,6 @@ urlpatterns = [
     path('campaign-create/', CampaignsAPIView.as_view()),
     path('campaign-update/<str:pk>/', CampaignsAPIView.as_view()),
     path('campaign-delete/<str:pk>/', CampaignsAPIView.as_view()),
-    path('client-filter/', get_client_dropdown)
-   
+    path('client-filter/', get_client_dropdown),
+    
 ]

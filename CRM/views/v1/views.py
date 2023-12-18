@@ -107,9 +107,22 @@ class SegmentAPIView(APIView):
     def post(self, request):
         user = request.user
         request.data['user'] = user.id
-         
+        name = request.data['name']
+        
         serializer = SegmentSerializer(data=request.data,
                                        context={'request': request})
+        
+        if Segment.objects.filter(name=name).exists():
+            data = {
+                    "success": False,
+                    "status_code" : 200,
+                    "response" : {
+                        "message" : "Segment with this name already exist",
+                        "error_message" : None,
+                        "data" : None
+                    }
+                }
+            return Response(data, status=status.HTTP_200_OK)
         
         if serializer.is_valid():
             serializer.save()
@@ -190,7 +203,6 @@ class SegmentAPIView(APIView):
                 }
             }
         return Response(data, status=status.HTTP_200_OK)
-
 
 class CampaignsAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -357,16 +369,16 @@ class RunCampaign(APIView):
                         .filter(id=pk) \
                         .values_list(
                             'segment__client__email',
-                        )
+                        ) , flat=True
                     )
                 content = Campaign.objects \
                         .filter(id=pk) \
-                        .values_list(
+                        .values(
                             'content',
                         )
                 title = Campaign.objects \
                         .filter(id=pk) \
-                        .values_list(
+                        .values(
                             'title',
                         )
                 email_campaign = EmailMultiAlternatives(
