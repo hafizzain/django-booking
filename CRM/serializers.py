@@ -31,12 +31,12 @@ class SegmentDropdownSerializer(serializers.ModelSerializer):
         
                
 class CampaignsSerializer(serializers.ModelSerializer):
-    segment_data = SegmentSerializer(many=True, read_only=True, source='segment')
+    segment_data = SegmentSerializer(read_only=True, source='segment')
     
     class Meta:
         model =  Campaign
         fields = '__all__'
     
     def get_segment_data(self, obj):
-        segments = obj.segment.all()
-        return [{'id': segment.id, 'name': segment.name} for segment in segments]
+        segment = obj.segment
+        return {'id': segment.id, 'name': segment.name}
