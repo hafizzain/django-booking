@@ -38,5 +38,5 @@ class CampaignsSerializer(serializers.ModelSerializer):
         fields = '__all__'
     
     def get_segment_data(self, obj):
-        segments = obj.segment.all()
+        segments = obj.Segment.all()
         return [{'id': segment.id, 'name': segment.name} for segment in segments]
