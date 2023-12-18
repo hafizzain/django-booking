@@ -209,7 +209,7 @@ class SegmentDropdownAPIView(APIView):
     permission_classes = [IsAuthenticated]
     pagination_class = PageNumberPagination
     page_size = 10
-    
+    is_search = False
     queryset = Segment.objects.prefetch_related('client') \
                             .select_related('user', 'business') \
                             .filter(is_deleted=False) \
@@ -227,11 +227,13 @@ class SegmentDropdownAPIView(APIView):
         name = self.request.query_params.get('search_text', None)
         if name:
             filtered_queryset = filtered_queryset.filter(name__icontains=name)
-        
+            is_search = True
+            
         paginator = self.pagination_class()
         result_page = paginator.paginate_queryset(filtered_queryset, request)
         serializer = SegmentDropdownSerializer(result_page, many=True)
         data = {
+                
                 'count': paginator.page.paginator.count,
                 'next': paginator.get_next_link(),
                 'previous': paginator.get_previous_link(),
@@ -243,7 +245,8 @@ class SegmentDropdownAPIView(APIView):
                 "response" : {
                     "message" : "Segment get Successfully",
                     "error_message" : None,
-                    "data" : serializer.data
+                    "data" : serializer.data,
+                    'is_search': is_search
                 }
             }
         return Response(data, status=status.HTTP_200_OK)
@@ -254,8 +257,7 @@ class CampaignsAPIView(APIView):
     pagination_class = PageNumberPagination
     page_size = 10
     
-    queryset =  Campaign.objects.prefetch_related('segment') \
-                            .select_related('user') \
+    queryset =  Campaign.objects.select_related('user', 'segment') \
                             .filter(is_deleted=False) \
                             .order_by('-created_at')
                             
