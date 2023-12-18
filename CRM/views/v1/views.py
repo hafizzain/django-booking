@@ -9,6 +9,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import filters
+from rest_framework.authentication import SessionAuthentication
 
 from CRM.models import *
 from CRM.serializers import *
@@ -251,7 +252,9 @@ class SegmentDropdownAPIView(APIView):
             }
         return Response(data, status=status.HTTP_200_OK)
                         
-                        
+
+@authentication_classes([SessionAuthentication])
+@permission_classes([IsAuthenticated])                        
 class CampaignsAPIView(APIView):
     permission_classes = [IsAuthenticated]
     pagination_class = PageNumberPagination
@@ -330,10 +333,11 @@ class CampaignsAPIView(APIView):
                 return Response(data, status=status.HTTP_200_OK)
             
     @transaction.atomic
+    @permission_classes([IsAuthenticated])
     def post(self, request):
         user = request.user
         request.data['user'] = user.id
-         
+        
         serializer = CampaignsSerializer(data=request.data,
                                        context={'request': request})
     
