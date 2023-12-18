@@ -210,7 +210,7 @@ class SegmentDropdownAPIView(APIView):
     permission_classes = [IsAuthenticated]
     pagination_class = PageNumberPagination
     page_size = 10
-    is_search = False
+    
     queryset = Segment.objects.prefetch_related('client') \
                             .select_related('user', 'business') \
                             .filter(is_deleted=False) \
@@ -221,6 +221,7 @@ class SegmentDropdownAPIView(APIView):
     search_fields = ['name']
     
     def get(self, request):
+        is_search = False
         filtered_queryset = Segment.objects.filter(is_deleted=False) \
                             .order_by('-created_at')
                             
