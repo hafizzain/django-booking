@@ -35,7 +35,7 @@ class CampaignsSerializer(serializers.ModelSerializer):
     
     class Meta:
         model =  Campaign
-        fields = ['id', 'title', 'content', 'start_date', 'end_date', 'campaign_type', 'segment_data', 'segment']
+        fields = ['id', 'title', 'content', 'start_date', 'end_date', 'campaign_type', 'segment_data']
     
     def get_segment_data(self, obj):
         segment = obj.segment
