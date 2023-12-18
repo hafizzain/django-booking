@@ -648,7 +648,7 @@ def create_appointment(request):
         app_duration = appoinmnt['duration']
         price = appoinmnt.get('price', 0)
         date_time = appoinmnt['date_time']
-        fav = appoinmnt.get('favourite', None)
+        fav = appoinmnt.get('is_favourite', None)
         client_can_book = appoinmnt.get('client_can_book', None)
         slot_availible_for_online = appoinmnt.get('slot_availible_for_online', None)
         discount_price = appoinmnt.get('discount_price', None)
