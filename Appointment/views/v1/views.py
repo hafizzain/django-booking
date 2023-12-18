@@ -1824,7 +1824,8 @@ def create_checkout(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-        
+    appointments.status = 'Done'
+    appointments.save()
     if type(tip) == str:
         tip = json.loads(tip)
     if type(tip) == list:
