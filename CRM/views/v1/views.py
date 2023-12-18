@@ -108,7 +108,7 @@ class SegmentAPIView(APIView):
     def post(self, request):
         user = request.user
         request.data['user'] = user.id
-        name = request.data['name']
+        name = request.data.get('name', None)
         
         serializer = SegmentSerializer(data=request.data,
                                        context={'request': request})
@@ -221,8 +221,7 @@ class SegmentDropdownAPIView(APIView):
     search_fields = ['name']
     
     def get(self, request):
-        filtered_queryset = Segment.objects.all() \
-                            .filter(is_deleted=False) \
+        filtered_queryset = Segment.objects.filter(is_deleted=False) \
                             .order_by('-created_at')
                             
         name = self.request.query_params.get('search_text', None)
@@ -253,8 +252,7 @@ class SegmentDropdownAPIView(APIView):
         return Response(data, status=status.HTTP_200_OK)
                         
 
-@authentication_classes([SessionAuthentication])
-@permission_classes([IsAuthenticated])                        
+@permission_classes([IsAuthenticated])                       
 class CampaignsAPIView(APIView):
     permission_classes = [IsAuthenticated]
     pagination_class = PageNumberPagination
@@ -419,8 +417,8 @@ class RunCampaign(APIView):
                 email = list(Campaign.objects \
                         .filter(id=pk) \
                         .values_list(
-                            'segment__client__email',
-                        ) , flat=True
+                            'segment__client__email', flat=True
+                        )
                     )
                 content = Campaign.objects \
                         .filter(id=pk) \
