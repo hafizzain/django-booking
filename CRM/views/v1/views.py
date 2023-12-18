@@ -352,7 +352,7 @@ class CampaignsAPIView(APIView):
                     }
             }
             return Response(serializer.data, status=status.HTTP_200_OK)
-        else:   
+        else: 
             data = {
                     "success": False,
                     "status_code" : 400,
