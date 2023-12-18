@@ -467,7 +467,8 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                         'date': app_date,
                         'range_start': appointment_time,
                         'range_end': end_time,
-                        'ids': [app_id]
+                        'ids': [app_id],
+                        'is_favourite': appointment.is_favourite,
                     })
 
             # serialize the data
