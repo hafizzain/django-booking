@@ -9,6 +9,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import filters
+from rest_framework.authentication import SessionAuthentication
 
 from CRM.models import *
 from CRM.serializers import *
@@ -107,9 +108,22 @@ class SegmentAPIView(APIView):
     def post(self, request):
         user = request.user
         request.data['user'] = user.id
-         
+        name = request.data.get('name', None)
+        
         serializer = SegmentSerializer(data=request.data,
                                        context={'request': request})
+        
+        if Segment.objects.filter(name=name).exists():
+            data = {
+                    "success": False,
+                    "status_code" : 200,
+                    "response" : {
+                        "message" : "Segment with this name already exist",
+                        "error_message" : None,
+                        "data" : None
+                    }
+                }
+            return Response(data, status=status.HTTP_200_OK)
         
         if serializer.is_valid():
             serializer.save()
@@ -192,12 +206,69 @@ class SegmentAPIView(APIView):
         return Response(data, status=status.HTTP_200_OK)
 
 
+class SegmentDropdownAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    pagination_class = PageNumberPagination
+    page_size = 10
+    is_search = False
+    queryset = Segment.objects.prefetch_related('client') \
+                            .select_related('user', 'business') \
+                            .filter(is_deleted=False) \
+                            .order_by('-created_at')
+    
+    serializer_class = SegmentDropdownSerializer
+    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    search_fields = ['name']
+    
+    def get(self, request):
+        filtered_queryset = Segment.objects.filter(is_deleted=False) \
+                            .order_by('-created_at')
+                            
+        name = self.request.query_params.get('search_text', None)
+        if name:
+            filtered_queryset = filtered_queryset.filter(name__icontains=name)
+            is_search = True
+            
+        paginator = self.pagination_class()
+        result_page = paginator.paginate_queryset(filtered_queryset, request)
+        serializer = SegmentDropdownSerializer(result_page, many=True)
+        data = {
+                
+                'count': paginator.page.paginator.count,
+                'next': paginator.get_next_link(),
+                'previous': paginator.get_previous_link(),
+                'current_page': paginator.page.number,
+                'per_page': self.page_size,
+                'total_pages': paginator.page.paginator.num_pages,
+                "success": True,
+                "status_code" : 200,
+                "response" : {
+                    "message" : "Segment get Successfully",
+                    "error_message" : None,
+                    "data" : serializer.data,
+                    'is_search': is_search
+                }
+            }
+        return Response(data, status=status.HTTP_200_OK)
+                        
+
+@permission_classes([IsAuthenticated])                       
 class CampaignsAPIView(APIView):
     permission_classes = [IsAuthenticated]
     pagination_class = PageNumberPagination
     page_size = 10
     
+    queryset =  Campaign.objects.select_related('user', 'segment') \
+                            .filter(is_deleted=False) \
+                            .order_by('-created_at')
+                            
+    serializer_class = CampaignsSerializer
+    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    search_fields = ['name', 'campaign_type', 'is_active']
+    
     def get(self, request , pk=None):
+        no_pagination = request.GET.get('no_pagination', None)
+        
         if pk is not None:
             campaign = get_object_or_404(Campaign, id=pk)
             serialized = CampaignsSerializer(campaign)
@@ -212,23 +283,62 @@ class CampaignsAPIView(APIView):
                 }
             return Response(data, status=status.HTTP_200_OK)
         else:
-            campaigns = Campaign.objects.all().filter(is_deleted=False)
-            serialized = CampaignsSerializer(campaigns, many=True)
-            data = {
-                    "success": True,
-                    "status_code" : 200,
-                    "response" : {
-                        "message" : "Campaign get Successfully",
-                        "error_message" : None,
-                        "data" : serialized.data
+            filtered_queryset = Campaign.objects.all().filter(is_deleted=False)
+            serialized = CampaignsSerializer(filtered_queryset, many=True)
+            
+            name = self.request.query_params.get('search_text', None)
+            if name:
+                filtered_queryset = filtered_queryset.filter(name__icontains=name)
+            
+            campaign_type = self.request.query_params.get('campaign_type', None)
+            if campaign_type:
+                filtered_queryset = filtered_queryset.filter(campaign_type=campaign_type)
+                
+            is_active = self.request.query_params.get('is_active', None)
+            if is_active:
+                filtered_queryset = filtered_queryset.filter(is_active=is_active)
+                
+            if no_pagination:    
+                data = {
+                        "success": True,
+                        "status_code" : 200,
+                        "response" : {
+                            "message" : "Campaign get Successfully",
+                            "error_message" : None,
+                            "data" : serialized.data
+                        }
                     }
-            }
-            return Response(data, status=status.HTTP_200_OK) 
-          
+                return Response(data, status=status.HTTP_200_OK) 
+            else:
+                paginator = self.pagination_class()
+                result_page = paginator.paginate_queryset(filtered_queryset, request)
+                serializer = CampaignsSerializer(result_page, many=True)
+                data = {
+                        'count': paginator.page.paginator.count,
+                        'next': paginator.get_next_link(),
+                        'previous': paginator.get_previous_link(),
+                        'current_page': paginator.page.number,
+                        'per_page': self.page_size,
+                        'total_pages': paginator.page.paginator.num_pages,
+                        "success": True,
+                        "status_code" : 200,
+                        "response" : {
+                            "message" : "Campaign get Successfully",
+                            "error_message" : None,
+                            "data" : serializer.data
+                        }
+                    }
+                return Response(data, status=status.HTTP_200_OK)
+            
     @transaction.atomic
+    @permission_classes([IsAuthenticated])
     def post(self, request):
-        serializer = CampaignsSerializer(data=request.data)
+        user = request.user
+        request.data['user'] = user.id
         
+        serializer = CampaignsSerializer(data=request.data,
+                                       context={'request': request})
+    
         if serializer.is_valid():
             serializer.save()
             data = {
@@ -307,17 +417,17 @@ class RunCampaign(APIView):
                 email = list(Campaign.objects \
                         .filter(id=pk) \
                         .values_list(
-                            'segment__client__email',
+                            'segment__client__email', flat=True
                         )
                     )
                 content = Campaign.objects \
                         .filter(id=pk) \
-                        .values_list(
+                        .values(
                             'content',
                         )
                 title = Campaign.objects \
                         .filter(id=pk) \
-                        .values_list(
+                        .values(
                             'title',
                         )
                 email_campaign = EmailMultiAlternatives(
