@@ -331,7 +331,6 @@ class CampaignsAPIView(APIView):
                 return Response(data, status=status.HTTP_200_OK)
             
     @transaction.atomic
-    @permission_classes([IsAuthenticated])
     def post(self, request):
         user = request.user
         request.data['user'] = user.id
