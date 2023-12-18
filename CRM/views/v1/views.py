@@ -413,7 +413,7 @@ class RunCampaign(APIView):
     def check_campaign(self,request,pk=None):
         campaign = get_object_or_404(Campaign, id=pk)
         serialized = CampaignsSerializer(campaign)
-        if campaign.is_start_date() and campaign.is_end_date():
+        if campaign.is_start_date() and campaign.is_past_end_date():
             if campaign.is_email():
                 email = list(Campaign.objects \
                         .filter(id=pk) \

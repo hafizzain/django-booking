@@ -53,5 +53,5 @@ class Campaign(CommonField):
     def is_start_date(self):
         return self.start_date >= datetime.now().date()
     
-    def end_date(self):
+    def is_past_end_date(self):
         return self.end_date <= datetime.now().date()
