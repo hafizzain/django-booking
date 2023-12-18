@@ -21,6 +21,11 @@ class SegmentSerializer(serializers.ModelSerializer):
     def get_client_data(self, obj):
         return [{'full_name': client.full_name,
                     'image': client.image} for client in obj.client.all()]
+        
+class SegmentDropdownSerializer(serializers.ModelSerializer):
+    class Meta:
+        model =  Segment
+        fields = ['id', 'name']
 
         
 class CampaignsSerializer(serializers.ModelSerializer):

@@ -204,6 +204,51 @@ class SegmentAPIView(APIView):
             }
         return Response(data, status=status.HTTP_200_OK)
 
+
+class SegmentDropdownAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    pagination_class = PageNumberPagination
+    page_size = 10
+    
+    queryset = Segment.objects.prefetch_related('client') \
+                            .select_related('user', 'business') \
+                            .filter(is_deleted=False) \
+                            .order_by('-created_at')
+    
+    serializer_class = SegmentDropdownSerializer
+    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    search_fields = ['name']
+    
+    def get(self, request):
+        filtered_queryset = Segment.objects.all() \
+                            .filter(is_deleted=False) \
+                            .order_by('-created_at')
+                            
+        name = self.request.query_params.get('search_text', None)
+        if name:
+            filtered_queryset = filtered_queryset.filter(name__icontains=name)
+        
+        paginator = self.pagination_class()
+        result_page = paginator.paginate_queryset(filtered_queryset, request)
+        serializer = SegmentDropdownSerializer(result_page, many=True)
+        data = {
+                'count': paginator.page.paginator.count,
+                'next': paginator.get_next_link(),
+                'previous': paginator.get_previous_link(),
+                'current_page': paginator.page.number,
+                'per_page': self.page_size,
+                'total_pages': paginator.page.paginator.num_pages,
+                "success": True,
+                "status_code" : 200,
+                "response" : {
+                    "message" : "Segment get Successfully",
+                    "error_message" : None,
+                    "data" : serializer.data
+                }
+            }
+        return Response(data, status=status.HTTP_200_OK)
+                        
+                        
 class CampaignsAPIView(APIView):
     permission_classes = [IsAuthenticated]
     pagination_class = PageNumberPagination
