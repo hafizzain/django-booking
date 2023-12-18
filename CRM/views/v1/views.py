@@ -243,11 +243,12 @@ class SegmentDropdownAPIView(APIView):
                 'total_pages': paginator.page.paginator.num_pages,
                 "success": True,
                 "status_code" : 200,
+                'is_search': is_search,
                 "response" : {
                     "message" : "Segment get Successfully",
                     "error_message" : None,
                     "data" : serializer.data,
-                    'is_search': is_search
+                    
                 }
             }
         return Response(data, status=status.HTTP_200_OK)
