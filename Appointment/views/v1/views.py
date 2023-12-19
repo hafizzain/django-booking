@@ -1284,8 +1284,10 @@ def update_appointment_service(request):
                     service_appointment.business = appointment.business
                     service_appointment.business_address = appointment.business_address
 
-                    appo_created = True
-
+                    # If a new service is added change the status of 
+                    # appointment to started
+                    appointment.status = choices.AppointmentStatus.STARTED
+                    appointment.save()
                 
                 service_appointment.appointment_date = appointment_date
                 service_appointment.appointment_time = date_time
@@ -1347,7 +1349,6 @@ def update_appointment_service(request):
                 'message' : 'Update Appointment Successfully',
                 'error_message' : None,
                 'errors': errors,
-                'created': appo_created
                 #'Appointment' : serializer.data
             }
         },

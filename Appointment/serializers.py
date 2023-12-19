@@ -135,6 +135,11 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField(read_only=True)
     currency = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
+    appointment_status = serializers.SerializerMethodField(read_only=True)
+
+
+    def get_appointment_status(self, obj):
+        return obj.appointment.status
     
     def get_location(self, obj):
         try:
@@ -197,7 +202,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
         'appointment_time', 
         'end_time','is_favourite',
         'client_type','duration', 'currency','created_at','service', 'client','location', 'is_blocked' ,'details',
-        'status'
+        'status', 'appointment_status'
         ]
 
 
