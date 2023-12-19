@@ -1285,7 +1285,7 @@ def update_appointment_service(request):
 
                     # If a new service is added change the status of 
                     # appointment to started
-                    appointment.status = choices.AppointmentStatus.STARTED
+                    appointment.status = choices.AppointmentStatus.BOOKED
                     appointment.save()
                 
                 service_appointment.appointment_date = appointment_date
