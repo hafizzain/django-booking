@@ -43,7 +43,7 @@ from Appointment.serializers import (CheckoutSerializer, AppoinmentSerializer, S
                                        EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer, 
                                        AppointmenttLogSerializer, AppointmentSerializerDashboard, AppointmentServiceSerializerBasic,
                                        PaidUnpaidAppointmentSerializer, MissedOpportunityBasicSerializer, OpportunityEmployeeServiceSerializer,
-                                       )
+                                       AppointmentSerializerForStatus)
 from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
 from Utility.models import ExceptionRecord
@@ -260,7 +260,8 @@ def get_today_appointments(request):
 
     today = date.today()
     include_query = Q(is_blocked=False, appointment_date__icontains = today,)
-    exclude_query = Q(appointment_status__in=['Cancel', 'Done', 'Paid'])
+    exclude_query = Q(appointment_status__in=['Cancel', 'Done', 'Paid']) | \
+                    Q(appointment__status=choices.AppointmentStatus.CANCELLED)
 
 
     if location_id:
@@ -1156,7 +1157,6 @@ def update_appointment_service(request):
     appointment_date_g = request.data.get('appointment_date', None)
     client = request.data.get('client', None)
     action_type = request.data.get('action_type', None)
-    appo_created = None
     
 
     errors = []
@@ -1278,14 +1278,15 @@ def update_appointment_service(request):
                         continue
                 else:
                     service_appointment = AppointmentService()
-                    appo_created = 'Ahho Create te hoya'
                     service_appointment.appointment = appointment
                     service_appointment.user = request.user
                     service_appointment.business = appointment.business
                     service_appointment.business_address = appointment.business_address
 
-                    appo_created = True
-
+                    # If a new service is added change the status of 
+                    # appointment to started
+                    appointment.status = choices.AppointmentStatus.STARTED
+                    appointment.save()
                 
                 service_appointment.appointment_date = appointment_date
                 service_appointment.appointment_time = date_time
@@ -1347,7 +1348,6 @@ def update_appointment_service(request):
                 'message' : 'Update Appointment Successfully',
                 'error_message' : None,
                 'errors': errors,
-                'created': appo_created
                 #'Appointment' : serializer.data
             }
         },
@@ -3289,9 +3289,9 @@ def get_appointment_logs(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def appointment_service_status_update(request):
-    appointment_service_status = request.data.get('status', None)
     appointment_id = request.data.get('appointment_id', None)
     appointment_service_id = request.data.get('appointment_service_id', None)
+    appointment_service_status = request.data.get('status', None)
 
     #changing the status
     appointment = Appointment.objects.get(id=appointment_id)
@@ -3304,18 +3304,15 @@ def appointment_service_status_update(request):
         appointment_service.service_end_time = datetime.now()
     appointment_service.save()
 
-    STARTED_OR_VOID = [choices.AppointmentServiceStatus.STARTED, choices.AppointmentServiceStatus.VOID]
     
     appoint_service_statuses = list(AppointmentService.objects.filter(appointment=appointment).values_list('status', flat=True))
 
     is_all_finished = all([True if status == choices.AppointmentServiceStatus.FINISHED else False for status in appoint_service_statuses])
     is_all_void = all([True if status == choices.AppointmentServiceStatus.VOID else False for status in appoint_service_statuses])
+    is_all_started = all([True if status == choices.AppointmentServiceStatus.STARTED else False for status in appoint_service_statuses])
 
-    # is_one_started = any([True if status in STARTED_OR_VOID else False for status in appoint_service_statuses])
-
-    # if is_one_started:
         
-    if is_all_finished or is_all_void:
+    if (is_all_finished or is_all_void) or (not is_all_started):
         appointment.status = choices.AppointmentStatus.FINISHED
         appointment.save()
     else:
@@ -3491,4 +3488,31 @@ class MissedOpportunityListCreate(generics.ListAPIView,
                 'error_message' : None,
             }
         }, status=status.HTTP_200_OK)
+
+
+@api_view(['PUT'])
+def cancel_appointment(request):
+    appointment_id = request.data.get('appointment_id', None)
+    cancel_reason = request.data.get('reason', None)
+    cancel_note = request.data.get('cancel_note', None)
+
+    if appointment_id:
+        appointment = Appointment.objects.get(id=appointment_id)
+        appointment.status = choices.AppointmentStatus.CANCELLED
+        appointment.cancel_reason = cancel_reason
+        appointment.cancel_note = cancel_note
+
+        appointment.save()
+
+    serializer = AppointmentSerializerForStatus(appointment)
+
+    return Response({
+            'status': True,
+            'status_code': 200,
+            'response': {
+                'message': 'Appointment Cancelled',
+                'error_message': None,
+                'appointment': serializer.data
+            }
+    }, status=status.HTTP_200_OK)
 

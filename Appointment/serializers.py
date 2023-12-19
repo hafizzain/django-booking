@@ -135,6 +135,11 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField(read_only=True)
     currency = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
+    appointment_status = serializers.SerializerMethodField(read_only=True)
+
+
+    def get_appointment_status(self, obj):
+        return obj.appointment.status
     
     def get_location(self, obj):
         try:
@@ -197,7 +202,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
         'appointment_time', 
         'end_time','is_favourite',
         'client_type','duration', 'currency','created_at','service', 'client','location', 'is_blocked' ,'details',
-        'status'
+        'status', 'appointment_status'
         ]
 
 
@@ -205,7 +210,7 @@ class AppointmentSerializerForStatus(serializers.ModelSerializer):
 
     class Meta:
         model = Appointment
-        fields = ['id', 'status']
+        fields = ['id', 'status', 'cancel_note', 'cancel_reason']
 
 class AppointmentServiceSerializerBasic(serializers.ModelSerializer):
 
@@ -233,7 +238,6 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
     def get_appointment_id(self, obj):
         return None
     
-
     def get_unavailable_time(self, employee_instance):
         return self.retreive_unavailable_time(employee_instance)
 
@@ -402,36 +406,18 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
 
         # data.append(single_data)
         return data
-    
-
-# "appointment_status": "Appointment Booked",
-# "price": 0,
-# "total_price": 0,
-# "discount_price": 0,
-# "is_favourite": false,
-# "client_type": null,
-# "currency": "AED",
-# "service": {
-#     "name": "",
-#     "price": null
-# },
-# "client": null,
-# "location": null,
-# "details": "asdf"
-
 
     def get_appointments(self, obj):
         selected_date = self.context.get('selected_date', None)
         if not selected_date:
             return []
-        excluded_list = ['Cancel']
         appoint_services = AppointmentService.objects.filter(
             member=obj,
             is_active = True,
             is_deleted = False,
             #is_blocked = False
             appointment_date = selected_date
-        ).exclude(appointment_status__in=excluded_list).distinct()
+        ).exclude(appointment__status=choices.AppointmentStatus.CANCELLED).distinct()
         
         
         try:
@@ -498,8 +484,6 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
                 text=f'errors happen on appointment {str(err)}'
             )
 
-        
-
     def get_employee(self, obj):
         try:
             return EmployeAppoinmentSerializer(obj, context=self.context ).data
@@ -550,12 +534,20 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
     service = serializers.SerializerMethodField(read_only=True)
     service_id = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)
-    #price = serializers.SerializerMethodField(read_only=True)
     booked_by = serializers.SerializerMethodField(read_only=True)
     booking_id = serializers.SerializerMethodField(read_only=True)
     appointment_type = serializers.SerializerMethodField(read_only=True)
     appointment_status = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
+    cancel_reason = serializers.SerializerMethodField(read_only=True)
+    cancel_note = serializers.SerializerMethodField(read_only=True)
+
+
+    def get_cancel_reason(self, obj):
+        return obj.appointment.cancel_reason
+    
+    def get_cancel_note(self, obj):
+        return obj.appointment.cancel_note
     
     def get_location(self, obj):
         try:
@@ -629,7 +621,7 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
         fields= ('id', 'service', 'member', 'price', 'client', 
                  'appointment_date', 'appointment_time', 'duration','member_id',
                  'booked_by' , 'booking_id', 'appointment_type','client_can_book','slot_availible_for_online','service_id',
-                 'appointment_status', 'location', 'created_at')
+                 'appointment_status', 'location', 'created_at', 'cancel_note', 'cancel_reason')
 class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
     #price = serializers.SerializerMethodField(read_only=True)
@@ -895,7 +887,10 @@ class PaidUnpaidAppointmentSerializer(serializers.ModelSerializer):
             return services_prices['sub_total_s']
         else:
             # if the checkout is not done
-            location = BusinessAddress.objects.filter(id=obj.business_address.id).select_related('currency').order_by('-created_at')
+            location = BusinessAddress.objects \
+                        .filter(id=obj.business_address.id) \
+                        .select_related('currency') \
+                        .order_by('-created_at')
             currency = location[0].currency
 
             query_for_price = Q(service=OuterRef('pk'), currency=currency)

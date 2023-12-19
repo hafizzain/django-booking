@@ -1,4 +1,3 @@
-import datetime
 from django.db import models
 from uuid import uuid4
 from Authentication.models import User
@@ -7,6 +6,7 @@ from django.utils.timezone import now
 from Client.models import Client
 from Utility.models import CommonField
 from .choices import *
+from datetime import datetime
 
 
 
@@ -31,7 +31,7 @@ class Campaign(CommonField):
     title = models.CharField(max_length=300, unique=True)
     content = models.TextField(default='')
     start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
+    end_date = models.DateTimeField(null=True)
     campaign_type = models.CharField(choices = CampaignChoices.choices, max_length=20)
     segment = models.ForeignKey(Segment, on_delete = models.CASCADE)
     user = models.ForeignKey(User, on_delete = models.CASCADE)
@@ -53,5 +53,5 @@ class Campaign(CommonField):
     def is_start_date(self):
         return self.start_date >= datetime.now().date()
     
-    def end_date(self):
+    def is_past_end_date(self):
         return self.end_date <= datetime.now().date()

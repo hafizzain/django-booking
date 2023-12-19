@@ -109,7 +109,8 @@ class Appointment(models.Model):
     service_commission = models.FloatField(default = 0 , null=True, blank=True)    
     service_commission_type = models.CharField( max_length=50 , default = '')
 
-
+    cancel_reason = models.CharField(max_length=150, null=True, blank=True)
+    cancel_note = models.TextField(null=True)
     is_promotion = models.BooleanField(default=False)
     selected_promotion_id = models.CharField(default='', max_length=800)
     selected_promotion_type = models.CharField(default='', max_length=400)

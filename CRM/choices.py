@@ -2,7 +2,7 @@ from django.db import models
 
 class CampaignChoices(models.TextChoices):
         EMAIL = 'email', 'Email'
-        APPNOTIFACTION = 'appnotifaction', 'AppNotifaction'
+        APPNOTIFACTION = 'App Notification', 'AppNotification'
         BOTH = 'both', 'Both'
         
 

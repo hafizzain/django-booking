@@ -31,7 +31,7 @@ class SegmentDropdownSerializer(serializers.ModelSerializer):
         
                
 class CampaignsSerializer(serializers.ModelSerializer):
-    segment_data = SegmentSerializer(read_only=True, source='segment')
+    segment_data = SegmentDropdownSerializer(read_only=True, source='segment')
     
     class Meta:
         model =  Campaign
