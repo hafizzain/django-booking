@@ -94,6 +94,7 @@ SHARED_APPS = [
     "corsheaders",
     'geoip2',
     'django_crontab',
+    'django_extensions',
     'debug_toolbar',
     'fcm_django',
     'django_filters',
