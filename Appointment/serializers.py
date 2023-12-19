@@ -210,7 +210,7 @@ class AppointmentSerializerForStatus(serializers.ModelSerializer):
 
     class Meta:
         model = Appointment
-        fields = ['id', 'status']
+        fields = ['id', 'status', 'cancel_note', 'cancel_reason']
 
 class AppointmentServiceSerializerBasic(serializers.ModelSerializer):
 
@@ -238,7 +238,6 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
     def get_appointment_id(self, obj):
         return None
     
-
     def get_unavailable_time(self, employee_instance):
         return self.retreive_unavailable_time(employee_instance)
 
@@ -407,36 +406,18 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
 
         # data.append(single_data)
         return data
-    
-
-# "appointment_status": "Appointment Booked",
-# "price": 0,
-# "total_price": 0,
-# "discount_price": 0,
-# "is_favourite": false,
-# "client_type": null,
-# "currency": "AED",
-# "service": {
-#     "name": "",
-#     "price": null
-# },
-# "client": null,
-# "location": null,
-# "details": "asdf"
-
 
     def get_appointments(self, obj):
         selected_date = self.context.get('selected_date', None)
         if not selected_date:
             return []
-        excluded_list = ['Cancel']
         appoint_services = AppointmentService.objects.filter(
             member=obj,
             is_active = True,
             is_deleted = False,
             #is_blocked = False
             appointment_date = selected_date
-        ).exclude(appointment_status__in=excluded_list).distinct()
+        ).exclude(appointment__status=choices.AppointmentStatus.CANCELLED).distinct()
         
         
         try:
@@ -493,8 +474,6 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
             ExceptionRecord.objects.create(
                 text=f'errors happen on appointment {str(err)}'
             )
-
-        
 
     def get_employee(self, obj):
         try:
