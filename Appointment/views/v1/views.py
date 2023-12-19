@@ -260,7 +260,8 @@ def get_today_appointments(request):
 
     today = date.today()
     include_query = Q(is_blocked=False, appointment_date__icontains = today,)
-    exclude_query = Q(appointment_status__in=['Cancel', 'Done', 'Paid'])
+    exclude_query = Q(appointment_status__in=['Cancel', 'Done', 'Paid'],
+                      appointment__status=choices.AppointmentStatus.CANCELLED)
 
 
     if location_id:
