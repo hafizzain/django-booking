@@ -886,7 +886,10 @@ class PaidUnpaidAppointmentSerializer(serializers.ModelSerializer):
             return services_prices['sub_total_s']
         else:
             # if the checkout is not done
-            location = BusinessAddress.objects.filter(id=obj.business_address.id).select_related('currency').order_by('-created_at')
+            location = BusinessAddress.objects \
+                        .filter(id=obj.business_address.id) \
+                        .select_related('currency') \
+                        .order_by('-created_at')
             currency = location[0].currency
 
             query_for_price = Q(service=OuterRef('pk'), currency=currency)
