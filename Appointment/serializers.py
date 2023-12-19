@@ -142,7 +142,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
 
     def get_client_info(self, obj):
         try:
-            client = obj.appoinment.client
+            client = obj.appointment.client
             first_appointment = None
             if client:
                 client_appointments = Appointment.objects.filter(client = client)
