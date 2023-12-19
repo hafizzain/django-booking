@@ -31,7 +31,7 @@ class Campaign(CommonField):
     title = models.CharField(max_length=300, unique=True)
     content = models.TextField(default='')
     start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
+    end_date = models.DateTimeField(null=True)
     campaign_type = models.CharField(choices = CampaignChoices.choices, max_length=20)
     segment = models.ForeignKey(Segment, on_delete = models.CASCADE)
     user = models.ForeignKey(User, on_delete = models.CASCADE)
