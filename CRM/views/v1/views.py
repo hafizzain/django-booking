@@ -113,7 +113,7 @@ class SegmentAPIView(APIView):
         serializer = SegmentSerializer(data=request.data,
                                        context={'request': request})
         
-        if Segment.objects.filter(name=name).exists():
+        if Segment.objects.filter(name=name, is_deleted=False).exists():
             data = {
                     "success": False,
                     "status_code" : 200,
@@ -343,12 +343,12 @@ class CampaignsAPIView(APIView):
                                        context={'request': request})
         
         title = request.data.get('title', None)
-        if Campaign.objects.filter(title=title).exists():
+        if Campaign.objects.filter(title=title, is_deleted=False).exists():
             if serializer.is_valid():
                 serializer.save()
                 data = {
                         "success": True,
-                        "status_code" : 200,
+                        "status_code" : 201,
                         "response" : {
                             "message" : "Campaign created successfully",
                             "error_message" : None,
@@ -370,7 +370,7 @@ class CampaignsAPIView(APIView):
         else:
             data = {
                     "success": False,
-                    "status_code" : 201,
+                    "status_code" : 200,
                     "response" : {
                         "message" : "Campaign with this title already exist",
                         "error_message" : None,
@@ -381,32 +381,44 @@ class CampaignsAPIView(APIView):
 
     @transaction.atomic
     def put(self, request, pk):
-        campaign = get_object_or_404(Campaign,id=pk)
+        campaign = get_object_or_404(Campaign, id=pk)
         serializer = CampaignsSerializer(campaign, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            data = {
-                    "success": True,
-                    "status_code" : 201,
-                    "response" : {
-                        "message" : "Campaign updated successfully",
-                        "error_message" : None,
-                        "data" : serializer.data
+        title = request.data.get('title')
+        if Campaign.objects.filter(title=title, id=pk).exists():
+            if serializer.is_valid():
+                serializer.save()
+                data = {
+                        "success": True,
+                        "status_code" : 201,
+                        "response" : {
+                            "message" : "Campaign updated successfully",
+                            "error_message" : None,
+                            "data" : serializer.data
+                        }
                     }
-                }
-            return Response(data, status=status.HTTP_200_OK)
-        else:    
+                return Response(data, status=status.HTTP_200_OK)
+            else:    
+                data = {
+                        "success": False,
+                        "status_code" : 400,
+                        "response" : {
+                            "message" : "Campaign not updated",
+                            "error_message" : serializer.errors,
+                            "data" : None
+                        }
+                    }
+                return Response(data, status=status.HTTP_400_BAD_REQUEST)
+        else:
             data = {
                     "success": False,
-                    "status_code" : 400,
+                    "status_code" : 201,
                     "response" : {
-                        "message" : "Campaign not updated",
-                        "error_message" : serializer.errors,
+                        "message" : "Campaign with this title already exist",
+                        "error_message" : None,
                         "data" : None
                     }
                 }
-            return Response(data, status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response(data, status=status.HTTP_200_OK)
     @transaction.atomic   
     def delete(self, request, pk):
         campaign = get_object_or_404(Campaign, id=pk)
