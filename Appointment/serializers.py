@@ -166,7 +166,9 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
 
 
     def get_appointment_status(self, obj):
-        return obj.appointment.status
+        if obj.appointment:
+            return obj.appointment.status
+        return None
     
     def get_location(self, obj):
         try:
