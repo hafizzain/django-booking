@@ -377,6 +377,19 @@ class CampaignsAPIView(APIView):
         campaign = get_object_or_404(Campaign, id=pk)
         serializer = CampaignsSerializer(campaign, data=request.data)
         title = request.data.get('title')
+        existing_campaign = Campaign.objects.filter(title=title).exclude(id=pk).first()
+        
+        if existing_campaign:
+            data = {
+                "success": False,
+                "status_code": 200,
+                "response": {
+                    "message": "Campaign with this title already exists",
+                    "data": None
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
+    
         if serializer.is_valid():
             serializer.save()
             data = {
