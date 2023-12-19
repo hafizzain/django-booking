@@ -138,6 +138,24 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     appointment_status = serializers.SerializerMethodField(read_only=True)
 
 
+    client_info = serializers.SerializerMethodField(read_only=True)
+
+    def get_client_info(self, obj):
+        try:
+            client = obj.appointment.client
+            first_appointment = None
+            if client:
+                client_appointments = Appointment.objects.filter(client = client)
+                first_appointment = client_appointments.order_by('created_at').last()
+            return {
+                'first_appointment': first_appointment.created_at if first_appointment else None,
+            }
+        except Exception as err:
+            return {
+                'error' : str(err)
+            }
+
+
     def get_appointment_status(self, obj):
         return obj.appointment.status
     
@@ -202,7 +220,8 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
         'appointment_time', 
         'end_time','is_favourite',
         'client_type','duration', 'currency','created_at','service', 'client','location', 'is_blocked' ,'details',
-        'status', 'appointment_status'
+        'status', 'appointment_status',
+        'client_info'
         ]
 
 
