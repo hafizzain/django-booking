@@ -260,7 +260,8 @@ def get_today_appointments(request):
 
     today = date.today()
     include_query = Q(is_blocked=False, appointment_date__icontains = today,)
-    exclude_query = Q(appointment_status__in=['Cancel', 'Done', 'Paid']) | Q(appointment__status=choices.AppointmentStatus.CANCELLED)
+    exclude_query = Q(appointment_status__in=['Cancel', 'Done', 'Paid']) | \
+                    Q(appointment__status=choices.AppointmentStatus.CANCELLED)
 
 
     if location_id:
@@ -3491,12 +3492,16 @@ class MissedOpportunityListCreate(generics.ListAPIView,
 
 @api_view(['PUT'])
 def cancel_appointment(request):
-
     appointment_id = request.data.get('appointment_id', None)
+    cancel_reason = request.data.get('reason', None)
+    cancel_note = request.data.get('note', None)
 
     if appointment_id:
         appointment = Appointment.objects.get(id=appointment_id)
         appointment.status = choices.AppointmentStatus.CANCELLED
+        appointment.cancel_reason = cancel_reason
+        appointment.cancel_note = cancel_note
+
         appointment.save()
 
     serializer = AppointmentSerializerForStatus(appointment)
