@@ -463,12 +463,21 @@ class EmployeeAppointmentSerializer(serializers.ModelSerializer):
 
                 # add a new entry if there is no overlap
                 if not overlap:
+                    client = appointment.appointment.client
+
+                    first_appointment = None
+                    
+                    if client:
+                        client_appointments = Appointment.objects.filter(client = client)
+                        first_appointment = client_appointments.order_by('created_at').last()
+                        
                     selected_data.append({
                         'date': app_date,
                         'range_start': appointment_time,
                         'range_end': end_time,
                         'ids': [app_id],
                         'is_favourite': appointment.is_favourite,
+                        'first_appointment': first_appointment.created_at if first_appointment else None,
                     })
 
             # serialize the data
