@@ -36,7 +36,8 @@ class AppointmentServiceAdmin(admin.ModelAdmin):
     ordering = ['-created_at']
     list_filter = [
         'business_address__address_name',
-        'created_at'
+        'created_at',
+        'is_blocked'
     ]
     list_display = [
         'id',
