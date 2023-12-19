@@ -31,7 +31,6 @@ class SegmentAPIView(APIView):
     
     queryset = Segment.objects.prefetch_related('client') \
                             .select_related('user', 'business') \
-                            .filter(is_deleted=False) \
                             .order_by('-created_at')
                             
     serializer_class = SegmentSerializer
@@ -56,7 +55,6 @@ class SegmentAPIView(APIView):
             return Response(data, status=status.HTTP_200_OK)
         else:
             filtered_queryset = Segment.objects.all() \
-                            .filter(is_deleted=False) \
                             .order_by('-created_at')
                             
             name = self.request.query_params.get('search_text', None)
@@ -110,7 +108,7 @@ class SegmentAPIView(APIView):
         request.data['user'] = user.id
         name = request.data.get('name', None)
         
-        if Segment.objects.filter(name=name, is_deleted=False).exists():
+        if Segment.objects.filter(name=name).exists():
             data = {
                     "success": False,
                     "status_code" : 200,
@@ -191,8 +189,7 @@ class SegmentAPIView(APIView):
     @transaction.atomic
     def delete(self, request, pk):
         segment = get_object_or_404(Segment, id=pk)
-        segment.is_deleted = True
-        segment.save() 
+        segment.delete()
         data = {
                 "success": True,
                 "status_code" : 200,
@@ -212,7 +209,6 @@ class SegmentDropdownAPIView(APIView):
     
     queryset = Segment.objects.prefetch_related('client') \
                             .select_related('user', 'business') \
-                            .filter(is_deleted=False) \
                             .order_by('-created_at')
     
     serializer_class = SegmentDropdownSerializer
@@ -221,7 +217,7 @@ class SegmentDropdownAPIView(APIView):
     
     def get(self, request):
         is_search = False
-        filtered_queryset = Segment.objects.filter(is_deleted=False) \
+        filtered_queryset = Segment.objects.filter(is_deleted=False)\
                             .order_by('-created_at')
                             
         name = self.request.query_params.get('search_text', None)
@@ -381,41 +377,29 @@ class CampaignsAPIView(APIView):
         campaign = get_object_or_404(Campaign, id=pk)
         serializer = CampaignsSerializer(campaign, data=request.data)
         title = request.data.get('title')
-        if Campaign.objects.filter(title=title, id=pk).exists():
-            if serializer.is_valid():
-                serializer.save()
-                data = {
-                        "success": True,
-                        "status_code" : 201,
-                        "response" : {
-                            "message" : "Campaign updated successfully",
-                            "error_message" : None,
-                            "data" : serializer.data
-                        }
-                    }
-                return Response(data, status=status.HTTP_200_OK)
-            else:    
-                data = {
-                        "success": False,
-                        "status_code" : 400,
-                        "response" : {
-                            "message" : "Campaign not updated",
-                            "error_message" : serializer.errors,
-                            "data" : None
-                        }
-                    }
-                return Response(data, status=status.HTTP_400_BAD_REQUEST)
-        else:
+        if serializer.is_valid():
+            serializer.save()
             data = {
-                    "success": False,
+                    "success": True,
                     "status_code" : 201,
                     "response" : {
-                        "message" : "Campaign with this title already exist",
+                        "message" : "Campaign updated successfully",
                         "error_message" : None,
-                        "data" : None
+                        "data" : serializer.data
                     }
                 }
             return Response(data, status=status.HTTP_200_OK)
+        else:    
+            data = {
+                    "success": False,
+                    "status_code" : 400,
+                    "response" : {
+                        "message" : "Campaign not updated",
+                        "error_message" : serializer.errors,
+                        "data" : None
+                    }
+                }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
         
     @transaction.atomic   
     def delete(self, request, pk):
