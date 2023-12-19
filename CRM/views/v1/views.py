@@ -150,6 +150,20 @@ class SegmentAPIView(APIView):
     def put(self, request, pk):
         segment = get_object_or_404(Segment, id=pk)
         serializer = SegmentSerializer(segment, data=request.data)
+        name = request.data.get('name')
+        existing_segment = Segment.objects.filter(name=name) \
+                            .exclude(id=pk).first()
+        if existing_segment:
+            data = {
+                "success": False,
+                "status_code": 200,
+                "response": {
+                    "message": "Segment with this name already exists",
+                    "data": None
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        
         if not segment.is_static():
             if serializer.is_valid():
                 serializer.save()
@@ -377,7 +391,8 @@ class CampaignsAPIView(APIView):
         campaign = get_object_or_404(Campaign, id=pk)
         serializer = CampaignsSerializer(campaign, data=request.data)
         title = request.data.get('title')
-        existing_campaign = Campaign.objects.filter(title=title).exclude(id=pk).first()
+        existing_campaign = Campaign.objects.filter(title=title) \
+                            .exclude(id=pk).first()
         
         if existing_campaign:
             data = {
