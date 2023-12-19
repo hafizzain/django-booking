@@ -1434,7 +1434,7 @@ def update_location(request):
 
     user = request.user
     # if business_address.user == user or business_address.business.user == user :
-    business_address.privacy_policy = request.data('privacy_policy', business_address.privacy_policy)
+    business_address.privacy_policy = request.data.get('privacy_policy', business_address.privacy_policy)
     business_address.address_name = request.data.get('address_name', business_address.address_name)
     business_address.address = request.data.get('address', business_address.address)
     business_address.postal_code = request.data.get('postal_code', business_address.postal_code)
