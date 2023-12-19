@@ -409,32 +409,32 @@ class CampaignsAPIView(APIView):
         return Response(data, status=status.HTTP_200_OK)
 
 
-class RunCampaign(APIView):
-    def check_campaign(self,request,pk=None):
-        campaign = get_object_or_404(Campaign, id=pk)
-        serialized = CampaignsSerializer(campaign)
-        if campaign.is_start_date() and campaign.is_past_end_date():
-            if campaign.is_email():
-                email = list(Campaign.objects \
-                        .filter(id=pk) \
-                        .values_list(
-                            'segment__client__email', flat=True
-                        )
-                    )
-                content = Campaign.objects \
-                        .filter(id=pk) \
-                        .values(
-                            'content',
-                        )
-                title = Campaign.objects \
-                        .filter(id=pk) \
-                        .values(
-                            'title',
-                        )
-                email_campaign = EmailMultiAlternatives(
-                                title,
-                                content,
-                                settings.EMAIL_HOST_USER,
-                                to = [email],                           
-                            )
-                email_campaign.send()
+# class RunCampaign(APIView):
+#     def check_campaign(self,request,pk=None):
+#         campaign = get_object_or_404(Campaign, id=pk)
+#         serialized = CampaignsSerializer(campaign)
+#         if campaign.is_start_date() and campaign.is_past_end_date():
+#             if campaign.is_email():
+#                 email = list(Campaign.objects \
+#                         .filter(id=pk) \
+#                         .values_list(
+#                             'segment__client__email', flat=True
+#                         )
+#                     )
+#                 content = Campaign.objects \
+#                         .filter(id=pk) \
+#                         .values(
+#                             'content',
+#                         )
+#                 title = Campaign.objects \
+#                         .filter(id=pk) \
+#                         .values(
+#                             'title',
+#                         )
+#                 email_campaign = EmailMultiAlternatives(
+#                                 title,
+#                                 content,
+#                                 settings.EMAIL_HOST_USER,
+#                                 to = [email],                           
+#                             )
+#                 email_campaign.send()
