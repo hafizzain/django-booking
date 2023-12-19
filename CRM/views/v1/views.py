@@ -158,7 +158,7 @@ class SegmentAPIView(APIView):
                 serializer.save()
                 data = {
                     "success": True,
-                    "status_code" : 200,
+                    "status_code" : 201,
                     "response" : {
                         "message" : "Segment updated successfully",
                         "error_message" : None,
@@ -285,21 +285,23 @@ class CampaignsAPIView(APIView):
                 }
             return Response(data, status=status.HTTP_200_OK)
         else:
-            filtered_queryset = Campaign.objects.all().filter(is_deleted=False)
-            serialized = CampaignsSerializer(filtered_queryset, many=True)
+            query = Q(is_deleted=False)
             
-            name = self.request.query_params.get('search_text', None)
-            if name:
-                filtered_queryset = filtered_queryset.filter(name__icontains=name)
+            title = self.request.query_params.get('search_text', None)
+            if title:
+                query &= Q(title__icontains=title)
             
             campaign_type = self.request.query_params.get('campaign_type', None)
             if campaign_type:
-                filtered_queryset = filtered_queryset.filter(campaign_type=campaign_type)
+                query &= Q(campaign_type=campaign_type)
                 
             is_active = self.request.query_params.get('is_active', None)
             if is_active:
-                filtered_queryset = filtered_queryset.filter(is_active=is_active)
-                
+                query &= Q(is_active=is_active)
+            
+            filtered_queryset = Campaign.objects.filter(query) \
+                            .order_by('-created_at')
+            serialized = CampaignsSerializer(filtered_queryset, many=True)    
             if no_pagination:    
                 data = {
                         "success": True,
@@ -339,30 +341,43 @@ class CampaignsAPIView(APIView):
         
         serializer = CampaignsSerializer(data=request.data,
                                        context={'request': request})
-    
-        if serializer.is_valid():
-            serializer.save()
-            data = {
-                    "success": True,
-                    "status_code" : 200,
-                    "response" : {
-                        "message" : "campaign created successfully",
-                        "error_message" : None,
-                        "data" : serializer.data
+        
+        title = request.data.get('title', None)
+        if Campaign.objects.filter(title=title).exists():
+            if serializer.is_valid():
+                serializer.save()
+                data = {
+                        "success": True,
+                        "status_code" : 200,
+                        "response" : {
+                            "message" : "Campaign created successfully",
+                            "error_message" : None,
+                            "data" : serializer.data
+                        }
+                }
+                return Response(data, status=status.HTTP_200_OK)
+            else: 
+                data = {
+                        "success": False,
+                        "status_code" : 400,
+                        "response" : {
+                            "message" : "Campaign not created",
+                            "error_message" : serializer.errors,
+                            "data" : None
+                        }
                     }
-            }
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else: 
+                return Response(data, status=status.HTTP_400_BAD_REQUEST)
+        else:
             data = {
                     "success": False,
-                    "status_code" : 400,
+                    "status_code" : 201,
                     "response" : {
-                        "message" : "campaign not created",
-                        "error_message" : serializer.errors,
+                        "message" : "Campaign with this title already exist",
+                        "error_message" : None,
                         "data" : None
                     }
                 }
-            return Response(data, status=status.HTTP_400_BAD_REQUEST) 
+            return Response(data, status=status.HTTP_200_OK) 
 
     @transaction.atomic
     def put(self, request, pk):
@@ -372,14 +387,14 @@ class CampaignsAPIView(APIView):
             serializer.save()
             data = {
                     "success": True,
-                    "status_code" : 200,
+                    "status_code" : 201,
                     "response" : {
                         "message" : "campaign updated successfully",
                         "error_message" : None,
                         "data" : serializer.data
                     }
                 }
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(data, status=status.HTTP_200_OK)
         else:    
             data = {
                     "success": False,
