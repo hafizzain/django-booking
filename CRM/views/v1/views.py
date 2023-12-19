@@ -339,45 +339,46 @@ class CampaignsAPIView(APIView):
         user = request.user
         request.data['user'] = user.id
         
-        serializer = CampaignsSerializer(data=request.data,
-                                       context={'request': request})
-        
         title = request.data.get('title', None)
+        
+        # Check if a campaign with the given title already exists and is not deleted
         if Campaign.objects.filter(title=title, is_deleted=False).exists():
-            if serializer.is_valid():
-                serializer.save()
-                data = {
-                        "success": True,
-                        "status_code" : 201,
-                        "response" : {
-                            "message" : "Campaign created successfully",
-                            "error_message" : None,
-                            "data" : serializer.data
-                        }
+            data = {
+                "success": False,
+                "status_code": 200,
+                "response": {
+                    "message": "Campaign with this title already exists",
+                    "error_message": None,
+                    "data": None
                 }
-                return Response(data, status=status.HTTP_200_OK)
-            else: 
-                data = {
-                        "success": False,
-                        "status_code" : 400,
-                        "response" : {
-                            "message" : "Campaign not created",
-                            "error_message" : serializer.errors,
-                            "data" : None
-                        }
-                    }
-                return Response(data, status=status.HTTP_400_BAD_REQUEST)
+            }
+            return Response(data, status=status.HTTP_200_OK)
+
+        # If the campaign with the title does not exist, proceed with creating a new campaign
+        serializer = CampaignsSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                "success": True,
+                "status_code": 201,
+                "response": {
+                    "message": "Campaign created successfully",
+                    "error_message": None,
+                    "data": serializer.data
+                }
+            }
+            return Response(data, status=status.HTTP_201_CREATED)
         else:
             data = {
-                    "success": False,
-                    "status_code" : 200,
-                    "response" : {
-                        "message" : "Campaign with this title already exist",
-                        "error_message" : None,
-                        "data" : None
-                    }
+                "success": False,
+                "status_code": 400,
+                "response": {
+                    "message": "Campaign not created",
+                    "error_message": serializer.errors,
+                    "data": None
                 }
-            return Response(data, status=status.HTTP_200_OK) 
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
     @transaction.atomic
     def put(self, request, pk):
