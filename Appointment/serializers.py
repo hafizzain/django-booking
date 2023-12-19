@@ -146,10 +146,19 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
             first_appointment = None
             if client:
                 client_appointments = Appointment.objects.filter(client = client)
-                first_appointment = client_appointments.order_by('created_at').last()
-            return {
-                'first_appointment': first_appointment.created_at if first_appointment else None,
-            }
+                if len(client_appointments) > 0:
+                    first_appointment = client_appointments.order_by('created_at').last()
+
+                    date_diff = client_appointments[0].created_at - first_appointment.created_at
+                    return {
+                        # 'first_appointment': first_appointment.created_at if first_appointment else None,
+                        'date_diff': date_diff,
+                        'date_diff_months': date_diff.months,
+                    }
+                else:
+                    return {}
+            else:
+                return {}
         except Exception as err:
             return {
                 'error' : str(err)
