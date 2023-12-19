@@ -3494,7 +3494,7 @@ class MissedOpportunityListCreate(generics.ListAPIView,
 def cancel_appointment(request):
     appointment_id = request.data.get('appointment_id', None)
     cancel_reason = request.data.get('reason', None)
-    cancel_note = request.data.get('note', None)
+    cancel_note = request.data.get('cancel_note', None)
 
     if appointment_id:
         appointment = Appointment.objects.get(id=appointment_id)
@@ -3512,7 +3512,7 @@ def cancel_appointment(request):
             'response': {
                 'message': 'Appointment Cancelled',
                 'error_message': None,
-                'missed_opportunity': serializer.data
+                'appointment': serializer.data
             }
     }, status=status.HTTP_200_OK)
 
