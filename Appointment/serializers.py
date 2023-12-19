@@ -135,6 +135,11 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField(read_only=True)
     currency = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
+    appointment_status = serializers.SerializerMethodField(read_only=True)
+
+
+    def get_appointment_status(self, obj):
+        return obj.appointment.status
     
     def get_location(self, obj):
         try:
@@ -197,7 +202,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
         'appointment_time', 
         'end_time','is_favourite',
         'client_type','duration', 'currency','created_at','service', 'client','location', 'is_blocked' ,'details',
-        'status'
+        'status', 'appointment_status'
         ]
 
 
@@ -886,7 +891,10 @@ class PaidUnpaidAppointmentSerializer(serializers.ModelSerializer):
             return services_prices['sub_total_s']
         else:
             # if the checkout is not done
-            location = BusinessAddress.objects.filter(id=obj.business_address.id).select_related('currency').order_by('-created_at')
+            location = BusinessAddress.objects \
+                        .filter(id=obj.business_address.id) \
+                        .select_related('currency') \
+                        .order_by('-created_at')
             currency = location[0].currency
 
             query_for_price = Q(service=OuterRef('pk'), currency=currency)

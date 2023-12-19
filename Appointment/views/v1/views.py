@@ -43,7 +43,7 @@ from Appointment.serializers import (CheckoutSerializer, AppoinmentSerializer, S
                                        EmployeeAppointmentSerializer, AppointmentServiceSerializer, UpdateAppointmentSerializer, 
                                        AppointmenttLogSerializer, AppointmentSerializerDashboard, AppointmentServiceSerializerBasic,
                                        PaidUnpaidAppointmentSerializer, MissedOpportunityBasicSerializer, OpportunityEmployeeServiceSerializer,
-                                       )
+                                       AppointmentSerializerForStatus)
 from Tenants.models import ClientTenantAppDetail, Tenant
 from django_tenants.utils import tenant_context
 from Utility.models import ExceptionRecord
@@ -1284,8 +1284,10 @@ def update_appointment_service(request):
                     service_appointment.business = appointment.business
                     service_appointment.business_address = appointment.business_address
 
-                    appo_created = True
-
+                    # If a new service is added change the status of 
+                    # appointment to started
+                    appointment.status = choices.AppointmentStatus.STARTED
+                    appointment.save()
                 
                 service_appointment.appointment_date = appointment_date
                 service_appointment.appointment_time = date_time
@@ -1347,7 +1349,6 @@ def update_appointment_service(request):
                 'message' : 'Update Appointment Successfully',
                 'error_message' : None,
                 'errors': errors,
-                'created': appo_created
                 #'Appointment' : serializer.data
             }
         },
@@ -3491,4 +3492,27 @@ class MissedOpportunityListCreate(generics.ListAPIView,
                 'error_message' : None,
             }
         }, status=status.HTTP_200_OK)
+
+
+@api_view(['PUT'])
+def cancel_appointment(request):
+
+    appointment_id = request.data.get('appointment_id', None)
+
+    if appointment_id:
+        appointment = Appointment.objects.get(id=appointment_id)
+        appointment.status = choices.AppointmentStatus.CANCELLED
+        appointment.save()
+
+    serializer = AppointmentSerializerForStatus(appointment)
+
+    return Response({
+            'status': True,
+            'status_code': 200,
+            'response': {
+                'message': 'Appointment Cancelled',
+                'error_message': None,
+                'missed_opportunity': serializer.data
+            }
+    }, status=status.HTTP_200_OK)
 
