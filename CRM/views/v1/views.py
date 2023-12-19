@@ -260,7 +260,6 @@ class CampaignsAPIView(APIView):
     page_size = 10
     
     queryset =  Campaign.objects.select_related('user', 'segment') \
-                            .filter(is_deleted=False) \
                             .order_by('-created_at')
                             
     serializer_class = CampaignsSerializer
@@ -284,7 +283,7 @@ class CampaignsAPIView(APIView):
                 }
             return Response(data, status=status.HTTP_200_OK)
         else:
-            query = Q(is_deleted=False)
+            query = Q()
             
             title = self.request.query_params.get('search_text', None)
             if title:
@@ -421,8 +420,7 @@ class CampaignsAPIView(APIView):
     @transaction.atomic   
     def delete(self, request, pk):
         campaign = get_object_or_404(Campaign, id=pk)
-        campaign.is_deleted = True
-        campaign.save() 
+        campaign.delete()
         data = {
                 "success": True,
                 "status_code" : 200,
