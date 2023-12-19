@@ -525,12 +525,20 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
     service = serializers.SerializerMethodField(read_only=True)
     service_id = serializers.SerializerMethodField(read_only=True)
     client = serializers.SerializerMethodField(read_only=True)
-    #price = serializers.SerializerMethodField(read_only=True)
     booked_by = serializers.SerializerMethodField(read_only=True)
     booking_id = serializers.SerializerMethodField(read_only=True)
     appointment_type = serializers.SerializerMethodField(read_only=True)
     appointment_status = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
+    cancel_reason = serializers.SerializerMethodField(read_only=True)
+    cancel_note = serializers.SerializerMethodField(read_only=True)
+
+
+    def get_cancel_reason(self, obj):
+        return obj.appointment.cancel_reason
+    
+    def get_cancel_note(self, obj):
+        return obj.appointment.cancel_note
     
     def get_location(self, obj):
         try:
@@ -604,7 +612,7 @@ class AllAppoinmentSerializer(serializers.ModelSerializer):
         fields= ('id', 'service', 'member', 'price', 'client', 
                  'appointment_date', 'appointment_time', 'duration','member_id',
                  'booked_by' , 'booking_id', 'appointment_type','client_can_book','slot_availible_for_online','service_id',
-                 'appointment_status', 'location', 'created_at')
+                 'appointment_status', 'location', 'created_at', 'cancel_note', 'cancel_reason')
 class AllAppoinment_EmployeeSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField(read_only=True)
     #price = serializers.SerializerMethodField(read_only=True)
