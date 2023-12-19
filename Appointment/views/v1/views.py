@@ -260,7 +260,8 @@ def get_today_appointments(request):
 
     today = date.today()
     include_query = Q(is_blocked=False, appointment_date__icontains = today,)
-    exclude_query = Q(appointment_status__in=['Cancel', 'Done', 'Paid'])
+    exclude_query = Q(appointment_status__in=['Cancel', 'Done', 'Paid'],
+                      appointment__status=choices.AppointmentStatus.CANCELLED)
 
 
     if location_id:
@@ -1156,7 +1157,6 @@ def update_appointment_service(request):
     appointment_date_g = request.data.get('appointment_date', None)
     client = request.data.get('client', None)
     action_type = request.data.get('action_type', None)
-    appo_created = None
     
 
     errors = []
@@ -1278,7 +1278,6 @@ def update_appointment_service(request):
                         continue
                 else:
                     service_appointment = AppointmentService()
-                    appo_created = 'Ahho Create te hoya'
                     service_appointment.appointment = appointment
                     service_appointment.user = request.user
                     service_appointment.business = appointment.business
