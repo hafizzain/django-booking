@@ -389,7 +389,7 @@ class CampaignsAPIView(APIView):
                     "success": True,
                     "status_code" : 201,
                     "response" : {
-                        "message" : "campaign updated successfully",
+                        "message" : "Campaign updated successfully",
                         "error_message" : None,
                         "data" : serializer.data
                     }
@@ -400,7 +400,7 @@ class CampaignsAPIView(APIView):
                     "success": False,
                     "status_code" : 400,
                     "response" : {
-                        "message" : "campaign not updated",
+                        "message" : "Campaign not updated",
                         "error_message" : serializer.errors,
                         "data" : None
                     }
@@ -416,7 +416,7 @@ class CampaignsAPIView(APIView):
                 "success": True,
                 "status_code" : 200,
                 "response" : {
-                    "message" : "campaign deleted successfully",
+                    "message" : "Campaign deleted successfully",
                     "error_message" : None,
                     "data" : None
                 }
