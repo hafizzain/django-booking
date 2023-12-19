@@ -61,22 +61,22 @@ from Utility.Constants.get_from_public_schema import get_country_from_public, ge
 from MultiLanguage.models import InvoiceTranslation
 from django.db import transaction
 
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_user_default_data(request):
     business_id = request.GET.get('business_id', None)
-    
 
     if not all([business_id]):
         return Response(
             {
-                'status' : False,
-                'status_code' : StatusCodes.MISSING_FIELDS_4001,
-                'status_code_text' : 'MISSING_FIELDS_4001',
-                'response' : {
-                    'message' : 'Invalid Data!',
-                    'error_message' : 'All fields are required.',
-                    'fields' : [
+                'status': False,
+                'status_code': StatusCodes.MISSING_FIELDS_4001,
+                'status_code_text': 'MISSING_FIELDS_4001',
+                'response': {
+                    'message': 'Invalid Data!',
+                    'error_message': 'All fields are required.',
+                    'fields': [
                         'business_id',
                     ]
                 }
@@ -1095,6 +1095,7 @@ def add_business_location(request):
     postal_code = request.data.get('postal_code', None)
     primary_translation_id = request.data.get('primary_translation_id', None)
     secondary_translation_id = request.data.get('secondary_translation_id', None)
+    privacy_policy = request.data.get('privacy_policy', None)
 
     email = request.data.get('email', None)
     mobile_number = request.data.get('mobile_number', None)
@@ -1212,6 +1213,7 @@ def add_business_location(request):
         is_active=True,
         is_deleted=False,
         is_closed=False,
+        privacy_policy=privacy_policy
     )
 
     if secondary_translation_id:
@@ -1432,6 +1434,7 @@ def update_location(request):
 
     user = request.user
     # if business_address.user == user or business_address.business.user == user :
+    business_address.privacy_policy = request.data('privacy_policy', business_address.privacy_policy)
     business_address.address_name = request.data.get('address_name', business_address.address_name)
     business_address.address = request.data.get('address', business_address.address)
     business_address.postal_code = request.data.get('postal_code', business_address.postal_code)
@@ -4496,25 +4499,24 @@ def get_common_tenant(request):
     business = '38a86f91-f0cb-4673-a68c-11645d0046b4'
     address = 'MR lahore'
     address_name = 'Multan Road, Samanabad Town, Lahore, Pakistan'
-    
-    
+
     return Response(
-            {
-                'status' : True,
-                'status_code' : 200,
-                'status_code_text' : '200',
-                'response' : {
-                    'message' : 'Tenant Details!',
-                    'error_message' : None,
-                    'hash' : tenant_id,
-                    'business' : business,
-                    'business_location' : business_location,
-                    'address' : address,
-                    'address_name' : address_name,
-                }
-            },
-            status=status.HTTP_200_OK
-        )
+        {
+            'status': True,
+            'status_code': 200,
+            'status_code_text': '200',
+            'response': {
+                'message': 'Tenant Details!',
+                'error_message': None,
+                'hash': tenant_id,
+                'business': business,
+                'business_location': business_location,
+                'address': address,
+                'address_name': address_name,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
 
 
 class getUserBusinessProfileCompletionProgress(APIView):
@@ -4525,38 +4527,36 @@ class getUserBusinessProfileCompletionProgress(APIView):
         total_modules = 4
         completed_modules = 0
 
-
         if len(self.business.business_types.all()) > 0:
             completed_modules += 1
-        
+
         if self.business.how_find_us:
             completed_modules += 1
-        
+
         if self.business.team_size:
             completed_modules += 1
 
         if self.business.currency:
             completed_modules += 1
 
-
         return {
-            'total_modules' : total_modules,
-            'completed_modules' : completed_modules,
+            'total_modules': total_modules,
+            'completed_modules': completed_modules,
         }
 
     def get_business_setting_progress(self, request):
-        
+
         total_modules = 6
         completed_modules = 0
 
         if self.business.business_name:
             completed_modules += 1
-        
+
         if self.business.logo:
             completed_modules += 1
-        
+
         business_locations = BusinessAddress.objects.filter(
-            business = self.business
+            business=self.business
         )
 
         if len(business_locations) > 0:
@@ -4564,7 +4564,7 @@ class getUserBusinessProfileCompletionProgress(APIView):
 
         try:
             social_links = BusinessSocial.objects.get(
-                business = self.business
+                business=self.business
             )
         except:
             pass
@@ -4577,8 +4577,8 @@ class getUserBusinessProfileCompletionProgress(APIView):
                 completed_modules += 1
 
         return {
-            'total_modules' : total_modules,
-            'completed_modules' : completed_modules,
+            'total_modules': total_modules,
+            'completed_modules': completed_modules,
         }
 
     def get_financial_settings_progress(self, request):
@@ -4586,13 +4586,13 @@ class getUserBusinessProfileCompletionProgress(APIView):
         completed_modules = 0
 
         payment_methods = BusinessPaymentMethod.objects.filter(
-            business = self.business
+            business=self.business
         )
         if len(payment_methods) > 0:
             completed_modules += 1
-        
+
         business_taxes = BusinessTax.objects.filter(
-            business = self.business
+            business=self.business
         ).values_list('tax_type', flat=True)
         business_taxes = list(business_taxes)
 
@@ -4600,10 +4600,9 @@ class getUserBusinessProfileCompletionProgress(APIView):
             if business_taxes.count(tax_type) > 0:
                 completed_modules += 1
 
-
         return {
-            'total_modules' : total_modules,
-            'completed_modules' : completed_modules,
+            'total_modules': total_modules,
+            'completed_modules': completed_modules,
         }
 
     def get_business_services_progress(self, request):
@@ -4611,26 +4610,25 @@ class getUserBusinessProfileCompletionProgress(APIView):
         completed_modules = 0
 
         services = Service.objects.filter(
-            business = self.business,
-            is_deleted = False
+            business=self.business,
+            is_deleted=False
         )
 
-        if len(services) > 0 :
+        if len(services) > 0:
             completed_modules += 1
 
-
             service_groups = ServiceGroup.objects.filter(
-                is_deleted = False,
-                is_active = True,
-                is_blocked = False
+                is_deleted=False,
+                is_active=True,
+                is_blocked=False
             )
 
             if len(service_groups) > 0:
                 completed_modules += 1
 
         return {
-            'total_modules' : total_modules,
-            'completed_modules' : completed_modules,
+            'total_modules': total_modules,
+            'completed_modules': completed_modules,
         }
 
     def get(self, request):
@@ -4639,13 +4637,13 @@ class getUserBusinessProfileCompletionProgress(APIView):
         if not business_id:
             return Response(
                 {
-                    'status' : False,
-                    'status_code' : StatusCodes.MISSING_FIELDS_4001,
-                    'status_code_text' : 'MISSING_FIELDS_4001',
-                    'response' : {
-                        'message' : 'Invalid Data!',
-                        'error_message' : 'Following fields are required',
-                        'fields' : [
+                    'status': False,
+                    'status_code': StatusCodes.MISSING_FIELDS_4001,
+                    'status_code_text': 'MISSING_FIELDS_4001',
+                    'response': {
+                        'message': 'Invalid Data!',
+                        'error_message': 'Following fields are required',
+                        'fields': [
                             'business_id',
                         ]
                     }
@@ -4655,17 +4653,17 @@ class getUserBusinessProfileCompletionProgress(APIView):
 
         try:
             business = Business.objects.get(
-                id = business_id
+                id=business_id
             )
         except Exception as err:
             return Response(
                 {
-                    'status' : False,
-                    'status_code' : StatusCodes.BUSINESS_NOT_FOUND_4015,
-                    'status_code_text' : 'BUSINESS_NOT_FOUND_4015',
-                    'response' : {
-                        'message' : 'Business Doest exist',
-                        'error_message' : str(err)
+                    'status': False,
+                    'status_code': StatusCodes.BUSINESS_NOT_FOUND_4015,
+                    'status_code_text': 'BUSINESS_NOT_FOUND_4015',
+                    'response': {
+                        'message': 'Business Doest exist',
+                        'error_message': str(err)
                     }
                 },
                 status=status.HTTP_404_NOT_FOUND
@@ -4673,12 +4671,12 @@ class getUserBusinessProfileCompletionProgress(APIView):
         else:
             self.business = business
             # Do everything after this Line self.business is IMP.
-        
+
         data = {
-            'business_info' : self.get_business_info_progress(request),
-            'business_settings' : self.get_business_setting_progress(request),
-            'financial_settings' : self.get_financial_settings_progress(request),
-            'service_management' : self.get_business_services_progress(request),
+            'business_info': self.get_business_info_progress(request),
+            'business_settings': self.get_business_setting_progress(request),
+            'financial_settings': self.get_financial_settings_progress(request),
+            'service_management': self.get_business_services_progress(request),
         }
 
         total_modules = 0
@@ -4687,28 +4685,27 @@ class getUserBusinessProfileCompletionProgress(APIView):
         for value in data.values():
             total_modules += value['total_modules']
             completed_modules += value['completed_modules']
-        
+
         percentage_value = (completed_modules / total_modules) * 100
 
         data['completion_percentage'] = percentage_value
 
         return Response(
             {
-                'status' : True,
-                'status_code' : 200,
-                'status_code_text' : '200',
-                'response' : {
-                    'message' : 'Profile completion progress!',
-                    'error_message' : None,
-                    'data' : data
+                'status': True,
+                'status_code': 200,
+                'status_code_text': '200',
+                'response': {
+                    'message': 'Profile completion progress!',
+                    'error_message': None,
+                    'data': data
                 }
             },
             status=status.HTTP_200_OK
         )
-    
+
 
 class BusinessTaxSettingView(APIView):
-
     serializer = BusinessTaxSettingSerializer
     permission_classes = [IsAuthenticated]
 
@@ -4721,7 +4718,7 @@ class BusinessTaxSettingView(APIView):
         except:
             bu_tax_setting = BusinessTaxSetting.objects.create(
                 business=business,
-                user = request.user
+                user=request.user
             )
 
         serializer = self.serializer(bu_tax_setting)
@@ -4732,18 +4729,18 @@ class BusinessTaxSettingView(APIView):
         }
         return Response(
             {
-                'status' : True,
-                'status_code' : 200,
-                'status_code_text' : '200',
-                'response' : {
-                    'message' : 'Created tax setting',
-                    'error_message' : None,
-                    'data' : data
+                'status': True,
+                'status_code': 200,
+                'status_code_text': '200',
+                'response': {
+                    'message': 'Created tax setting',
+                    'error_message': None,
+                    'data': data
                 }
             },
             status=status.HTTP_200_OK
         )
-    
+
     def put(self, request, *args, **kwargs):
         bu_tax_setting = BusinessTaxSetting.objects.get(id=request.data.get('business_tax_id'))
         bu_tax_setting.tax_setting = request.data.get('tax_setting')
@@ -4758,20 +4755,18 @@ class BusinessTaxSettingView(APIView):
 
         return Response(
             {
-                'status' : True,
-                'status_code' : 200,
-                'status_code_text' : '200',
-                'response' : {
-                    'message' : 'Updated tax setting',
-                    'error_message' : None,
-                    'data' : data
+                'status': True,
+                'status_code': 200,
+                'status_code_text': '200',
+                'response': {
+                    'message': 'Updated tax setting',
+                    'error_message': None,
+                    'data': data
                 }
             },
             status=status.HTTP_200_OK
         )
 
-
-    
     def get_choices(self):
         """
         Get available choices for business tax setting    
@@ -4782,25 +4777,31 @@ class BusinessTaxSettingView(APIView):
 """
 Below are the API's for Business Policy
 """
+
+
 class BusinessPrivacyCreateView(CreateAPIView):
     authentication_classes = [IsAuthenticated]
     queryset = BusinessPrivacy.objects.all()
     serializer_class = BusinessPolicySerializer
+
 
 class BusinessPrivacyListView(ListAPIView):
     authentication_classes = [IsAuthenticated]
     queryset = BusinessPrivacy.objects.all()
     serializer_class = BusinessPolicySerializer
 
+
 class BusinessPrivacyUpdateView(UpdateAPIView):
     authentication_classes = [IsAuthenticated]
     queryset = BusinessPrivacy.objects.all()
     serializer_class = BusinessPolicySerializer
 
+
 class BusinessPrivacyRetreiveView(RetrieveAPIView):
     authentication_classes = [IsAuthenticated]
     queryset = BusinessPrivacy.objects.all()
     serializer_class = BusinessPolicySerializer
+
 
 class BusinessPrivacyDestroyView(DestroyAPIView):
     authentication_classes = [IsAuthenticated]
@@ -4818,20 +4819,24 @@ class BusinessPolicyCreateView(CreateAPIView):
     queryset = BusinessPolicy.objects.all()
     serializer_class = BusinessPolicy.objects.all()
 
+
 class BusinessPolicyListView(ListAPIView):
     authentication_classes = [IsAuthenticated]
     queryset = BusinessPolicy.objects.all()
     serializer_class = BusinessPolicy.objects.all()
+
 
 class BusinessPolicyUpdateView(UpdateAPIView):
     authentication_classes = [IsAuthenticated]
     queryset = BusinessPolicy.objects.all()
     serializer_class = BusinessPolicy.objects.all()
 
+
 class BusinessPolicyRetreiveView(RetrieveAPIView):
     authentication_classes = [IsAuthenticated]
     queryset = BusinessPolicy.objects.all()
     serializer_class = BusinessPolicy.objects.all()
+
 
 class BusinessPolicyDestroyView(DestroyAPIView):
     authentication_classes = [IsAuthenticated]
@@ -4843,4 +4848,3 @@ class BusinessPolicyViewSet(viewsets.ModelViewSet):
     authentication_classes = [AllowAny]
     queryset = BusinessPolicy.objects.all()
     serializer_class = BusinessPolicySerializer
-
