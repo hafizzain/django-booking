@@ -110,9 +110,6 @@ class SegmentAPIView(APIView):
         request.data['user'] = user.id
         name = request.data.get('name', None)
         
-        serializer = SegmentSerializer(data=request.data,
-                                       context={'request': request})
-        
         if Segment.objects.filter(name=name, is_deleted=False).exists():
             data = {
                     "success": False,
@@ -125,6 +122,8 @@ class SegmentAPIView(APIView):
                 }
             return Response(data, status=status.HTTP_200_OK)
         
+        serializer = SegmentSerializer(data=request.data,
+                                       context={'request': request})
         if serializer.is_valid():
             serializer.save()
             data = {
@@ -340,8 +339,6 @@ class CampaignsAPIView(APIView):
         request.data['user'] = user.id
         
         title = request.data.get('title', None)
-        
-        # Check if a campaign with the given title already exists and is not deleted
         if Campaign.objects.filter(title=title, is_deleted=False).exists():
             data = {
                 "success": False,
@@ -367,7 +364,7 @@ class CampaignsAPIView(APIView):
                     "data": serializer.data
                 }
             }
-            return Response(data, status=status.HTTP_201_CREATED)
+            return Response(data, status=status.HTTP_200_OK)
         else:
             data = {
                 "success": False,
@@ -420,6 +417,7 @@ class CampaignsAPIView(APIView):
                     }
                 }
             return Response(data, status=status.HTTP_200_OK)
+        
     @transaction.atomic   
     def delete(self, request, pk):
         campaign = get_object_or_404(Campaign, id=pk)
