@@ -141,13 +141,13 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
     client_info = serializers.SerializerMethodField(read_only=True)
 
     def get_client_info(self, obj):
-        client = obj.appoinment.client
-        first_appointment = None
-        if client:
-            client_appointments = Appointment.objects.filter(client = client)
-            first_appointment = client_appointments.order_by('created_at').last()
+        # client = obj.appoinment.client
+        # first_appointment = None
+        # if client:
+        #     client_appointments = Appointment.objects.filter(client = client)
+        #     first_appointment = client_appointments.order_by('created_at').last()
         return {
-            'first_appointment': first_appointment.created_at if first_appointment else None,
+            'first_appointment': 'first_appointment.created_at if first_appointment else None',
         }
 
 
