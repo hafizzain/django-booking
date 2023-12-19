@@ -3493,10 +3493,10 @@ class MissedOpportunityListCreate(generics.ListAPIView,
         }, status=status.HTTP_200_OK)
 
 
-@api_view(['POST'])
+@api_view(['PUT'])
 def cancel_appointment(request):
 
-    appointment_id = request.GET.get('appointment_id', None)
+    appointment_id = request.data.get('appointment_id', None)
 
     if appointment_id:
         appointment = Appointment.objects.get(id=appointment_id)
