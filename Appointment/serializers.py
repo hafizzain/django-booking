@@ -146,14 +146,49 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
             first_appointment = None
             if client:
                 client_appointments = Appointment.objects.filter(client = client)
+                
                 if len(client_appointments) > 0:
-                    first_appointment = client_appointments.order_by('created_at').last()
+                    total_spend = AppointmentCheckout.objects.filter(appointment__client = client)
+                    price = 0
+                    for ck in total_spend:
+                        price = price + ck.total_price
 
-                    date_diff = client_appointments[0].created_at - first_appointment.created_at
+
+                    last_app = client_appointments.order_by('created_at').last()
+                    last_month = int(last_app.created_at.strftime('%m'))
+
+
+                    first_appointment = client_appointments[0]
+                    first_month = int(first_appointment.created_at.strftime('%m'))
+
+                    months = 0
+                    monthly_spending = 0
+                    tag = ''
+
+                    if len(client_appointments) == 1 or first_month == last_month:
+                        months = 1
+                        monthly_spending = price
+                        tag = 'Least Visitor'
+                    else:
+                        months = first_month - last_month
+                        monthly_spending = price / months
+                        if monthly_spending >= 100:
+                            tag = 'Most Spender'
+                        else:
+                            tag = 'Most Visitor'
+                            
                     return {
-                        # 'first_appointment': first_appointment.created_at if first_appointment else None,
-                        'date_diff': date_diff,
-                        'date_diff_months': date_diff.months,
+                        # 'months' : months,
+                        'tag' : tag,
+                        # 'monthly_spending' : monthly_spending,
+                        # 'first_appointment': {
+                            # 'date' : last_app.created_at.strftime('%Y %m %d')
+                        # },
+                        # 'last_appointment' : {
+                            # 'date' : first_appointment.created_at.strftime('%Y %m %d')
+                        # },
+                        # 'total_spend' : price,
+                        # 'appointments' : client_appointments.count()
                     }
                 else:
                     return {}
@@ -1158,16 +1193,23 @@ class OpportunityEmployeeServiceSerializer(serializers.ModelSerializer):
 
 class MissedOpportunityBasicSerializer(serializers.ModelSerializer):
     services = serializers.SerializerMethodField(read_only=True)
+    client_name = serializers.SerializerMethodField(read_only=True)
 
     def get_services(self, obj):
         services = OpportunityEmployeeService.objects \
                     .filter(client_missed_opportunity=obj) \
                     .select_related('service', 'employee')
         return OpportunityEmployeeServiceSerializer(services, many=True).data
+    
+    def get_client_name(self, obj):
+        if obj.client:
+            return obj.client.full_name
+        else:
+            return None
 
     class Meta:
         model = ClientMissedOpportunity
-        fields = ['id', 'client', 'client_type', 'note', 'date_time', 'services', 'dependency']
+        fields = ['id', 'client_name', 'client_type', 'note', 'date_time', 'services', 'dependency']
 
 
 
