@@ -178,7 +178,6 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                             tag = 'Most Visitor'
                             
                     return {
-                        # 'first_appointment': first_appointment.created_at if first_appointment else None,
                         'months' : months,
                         'tag' : tag,
                         'monthly_spending' : monthly_spending,
