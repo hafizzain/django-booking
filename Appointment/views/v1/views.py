@@ -3448,7 +3448,7 @@ class MissedOpportunityListCreate(generics.ListAPIView,
             query &= Q(client__full_name__icontains=search_text)
 
         if start_date and end_date:
-            query &= Q(datetime__date__range=get_date_range_tuple(start_date, end_date))
+            query &= Q(date_time__date__range=get_date_range_tuple(start_date, end_date))
 
         queryset = self.get_queryset().filter(query)
 
