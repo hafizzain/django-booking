@@ -153,7 +153,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                     return {
                         # 'first_appointment': first_appointment.created_at if first_appointment else None,
                         'date_diff': date_diff,
-                        'date_diff_months': date_diff.months,
+                        'date_diff_months': date_diff.strftime('%m'),
                     }
                 else:
                     return {}
