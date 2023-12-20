@@ -445,13 +445,3 @@ class CampaignsAPIView(APIView):
                 }
             }
         return Response(data, status=status.HTTP_200_OK)
-    
-    def send_client_email(self, client_email_list, subject, message):
-        send_mail(
-            subject,
-            message,
-            settings.EMAIL_HOST_USER,
-            client_email_list,
-            fail_silently=False,
-        )
-        return True
