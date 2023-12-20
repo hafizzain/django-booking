@@ -1059,11 +1059,11 @@ class EmployeeSerializerResponse(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'first_name']
+        fields = ['id', 'first_name','last_name']
 
 
 class AppointmentServiceResponseSeriailzer(serializers.ModelSerializer):
-    # member = EmployeeSerializerResponse(many=True)
+    member = EmployeeSerializerResponse(many=False)
     user = UserSerializer(many=False)
 
 
