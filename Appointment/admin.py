@@ -20,6 +20,9 @@ class AppointmentCheckoutAdmin(admin.ModelAdmin):
 @admin.register(Appointment)
 class AppointmentAdmin(admin.ModelAdmin):
     ordering = ['-created_at']
+    list_filter = [
+        'status'
+    ]
 
     list_display = [
         'id',
@@ -37,7 +40,8 @@ class AppointmentServiceAdmin(admin.ModelAdmin):
     list_filter = [
         'business_address__address_name',
         'created_at',
-        'is_blocked'
+        'is_blocked',
+        'status'
     ]
     list_display = [
         'id',
