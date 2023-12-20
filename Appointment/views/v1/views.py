@@ -3581,7 +3581,7 @@ def get_available_appointments(request):
                 'response': {
                     'message': 'All Appointments',
                     'error_message': None,
-                    'appointment': serialized.data
+                    'data': serialized.data
                 }
             },
             status=status.HTTP_200_OK
