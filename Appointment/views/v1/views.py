@@ -3450,7 +3450,7 @@ class MissedOpportunityListCreate(generics.ListAPIView,
         if start_date and end_date:
             query &= Q(date_time__date__range=get_date_range_tuple(start_date, end_date))
 
-        queryset = self.get_queryset().filter(query)
+        queryset = self.get_queryset().filter(query).order_by('-created_at')
 
         page = self.paginate_queryset(queryset)
         data = None
