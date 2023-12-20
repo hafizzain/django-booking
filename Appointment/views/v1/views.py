@@ -1,7 +1,7 @@
 from Appointment.Constants.Reschedulen import reschedule_appointment_n
 from Appointment.Constants.Reschedulen import reschedule_appointment_n
 from Appointment.Constants.ConvertTime import convert_24_to_12
-
+from django.utils import timezone
 from Appointment.Constants.Reschedule import reschedule_appointment
 from Appointment.Constants.AddAppointment import Add_appointment
 from Appointment.Constants.cancelappointment import cancel_appointment
@@ -3538,8 +3538,8 @@ def get_available_appointments(request):
         if start_date and end_date:
             start_datetime = datetime.strptime(start_date, '%Y-%m-%d')
             end_datetime = datetime.strptime(end_date, '%Y-%m-%d')
-            query &= (Q(start_time__range=(start_datetime, end_datetime)) |
-                      Q(end_time__range=(start_datetime, end_datetime)))
+            end_datetime = end_datetime + timezone.timedelta(days=1)  # Adjust for end of day
+            query &= Q(created_at__range=(start_datetime, end_datetime))
         if location_id is not None:
             query &= Q(business_address__id=location_id)
         if appointment_id is not None:
@@ -3557,6 +3557,8 @@ def get_available_appointments(request):
                 pass
                 # query &= Q(status__in=cancelled_flags)
         appointment = Appointment.objects.filter(query)
+        if appointment:
+            appointment = appointment.order_by('-created_at')
     except Exception as err:
         return Response(
             {
@@ -3586,11 +3588,11 @@ def get_available_appointments(request):
             status=status.HTTP_200_OK
         )
     else:
-        # paginator = AppointmentsPagination()
-        # paginator.page_size = 10
-        # paginated_appointments = paginator.paginate_queryset(appointment, request)
-        # serialized = SingleNoteResponseSerializer(paginated_appointments, many=True)
-        serialized = SingleNoteResponseSerializer(appointment, many=True)
+        paginator = AppointmentsPagination()
+        paginator.page_size = 10
+        paginated_appointments = paginator.paginate_queryset(appointment, request)
+        serialized = SingleNoteResponseSerializer(paginated_appointments, many=True)
+        # serialized = SingleNoteResponseSerializer(appointment, many=True)
 
         data = {
             'status': True,
@@ -3600,12 +3602,12 @@ def get_available_appointments(request):
                 "message": "Appointments  get Successfully",
                 "error_message": None,
                 "data": serialized.data,
-                # 'count': paginator.page.paginator.count,
-                # 'next': paginator.get_next_link(),
-                # 'previous': paginator.get_previous_link(),
-                # 'current_page': paginator.page.number,
-                # 'per_page': paginator.page_size,
-                # 'total_pages': paginator.page.paginator.num_pages,
+                'count': paginator.page.paginator.count,
+                'next': paginator.get_next_link(),
+                'previous': paginator.get_previous_link(),
+                'current_page': paginator.page.number,
+                'per_page': paginator.page_size,
+                'total_pages': paginator.page.paginator.num_pages,
             }
         }
         return Response(data, status=status.HTTP_200_OK)
