@@ -186,7 +186,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                         client_type = 'Most Spender'
 
                     return {
-                        'months' : months,
+                        'months': months,
                         'tag': tag,
                         'client_type': client_type,
                     }
@@ -1044,34 +1044,41 @@ class SingleNoteSerializer(serializers.ModelSerializer):
 
 
 class EmployeeSerializerResponse(serializers.ModelSerializer):
-    model = Employee
-    fields = ['id', 'name']
+    class Meta:
+        model = Employee
+        fields = ['id', 'full_name']
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'first_name','last_name']
+        fields = ['id', 'first_name', 'last_name']
+
+
+class ServiceSerializeresponse(serializers.ModelSerializer):
+    class Meta:
+        model = Service
+        fields = ['id', 'name']
 
 
 class AppointmentServiceResponseSeriailzer(serializers.ModelSerializer):
-    # member = EmployeeSerializerResponse(many=False)
+    member = EmployeeSerializerResponse(many=False)
     user = UserSerializer(many=False)
-
-
+    service = ServiceSerializeresponse(many=False)
 
     class Meta:
         model = AppointmentService
-        fields = ['id', 'user', 'service_end_time', 'member']
+        fields = ['id', 'service', 'status', 'duration', 'price', 'service_start_time', 'service_end_time', 'user',
+                  'service_end_time', 'member', 'appointment_date', 'appointment_time']
 
 
 class SingleNoteResponseSerializer(serializers.ModelSerializer):
-    # client = ClientSerializerresponse(read_only=True, many=True)
+    client = ClientSerializerresponse(read_only=True, many=False)
     appointment_services = AppointmentServiceResponseSeriailzer(many=True)
 
     class Meta:
         model = Appointment
-        fields = ['id', 'created_at', 'client_type', 'status', 'appointment_services']
+        fields = ['id', 'client', 'created_at', 'client_type', 'status', 'appointment_services']
 
 
 class AppointmentServiceSeriailzer(serializers.ModelSerializer):
