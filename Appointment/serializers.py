@@ -1053,7 +1053,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class AppointmentServiceResponseSeriailzer(serializers.ModelSerializer):
-    member = EmployeeSerializerResponse(many=False)
+    # member = EmployeeSerializerResponse(many=False)
     user = UserSerializer(many=False)
 
 
