@@ -263,7 +263,7 @@ class AppointmentCheckout(models.Model):
         ('Paypal', 'Paypal'),
         ('GooglePay', 'Google Pay'),
         ('ApplePay', 'Apple Pay')
-    ]    
+    ]
     
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, null=True, blank=True , related_name='appointment_checkout')
@@ -398,7 +398,7 @@ class ClientMissedOpportunity(CommonField):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client_missed_opportunities', null=True)
     client_type = models.CharField(max_length=200, choices=choices.ClientType.choices, null=True, blank=True)
     dependency = models.CharField(max_length=200, choices=choices.MissedOpportunityReason.choices, null=True, blank=True)
-    note = models.TextField()
+    note = models.TextField(null=True)
     date_time = models.DateTimeField()
 
 class OpportunityEmployeeService(CommonField):

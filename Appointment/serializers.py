@@ -900,50 +900,50 @@ class PaidUnpaidAppointmentSerializer(serializers.ModelSerializer):
     
     def get_subtotal(self, obj):
         # if the checkout is done
-        # if obj.status == choices.AppointmentStatus.DONE:
-        services_prices = AppointmentService.objects \
-            .filter(appointment=obj) \
-            .annotate(
-                final_total=Coalesce(
-                    Case(
-                        When(is_redeemed=True, then="redeemed_price"),
-                        When(discount_price__isnull=False, then="discount_price"),
-                        When(price__isnull=False, then="price"),
-                        default="total_price"
-                    ),
-                    0.0,
-                    output_field=FloatField()
-                    )
-            ).aggregate(sub_total_s=Sum('final_total'))
-        return services_prices['sub_total_s']
-        # else:
-        #     # if the checkout is not done
-        #     location = BusinessAddress.objects \
-        #                 .filter(id=obj.business_address.id) \
-        #                 .select_related('currency') \
-        #                 .order_by('-created_at')
-        #     currency = location[0].currency
+        if obj.status == choices.AppointmentStatus.DONE:
+            services_prices = AppointmentService.objects \
+                .filter(appointment=obj) \
+                .annotate(
+                    final_total=Coalesce(
+                        Case(
+                            When(is_redeemed=True, then="redeemed_price"),
+                            When(discount_price__isnull=False, then="discount_price"),
+                            When(price__isnull=False, then="price"),
+                            default="total_price"
+                        ),
+                        0.0,
+                        output_field=FloatField()
+                        )
+                ).aggregate(sub_total_s=Sum('final_total'))
+            return services_prices['sub_total_s']
+        else:
+            # if the checkout is not done
+            location = BusinessAddress.objects \
+                        .filter(id=obj.business_address.id) \
+                        .select_related('currency') \
+                        .order_by('-created_at')
+            currency = location[0].currency
 
-        #     query_for_price = Q(service=OuterRef('pk'), currency=currency)
-        #     service_ids = list(obj.appointment_services.values_list('service__id', flat=True))
+            query_for_price = Q(service=OuterRef('pk'), currency=currency)
+            service_ids = list(obj.appointment_services.values_list('service__id', flat=True))
 
-        #     services_prices = Service.objects \
-        #                         .filter(id__in=service_ids) \
-        #                         .annotate(
-        #                             currency_price=Coalesce(
-        #                                 Subquery(
-        #                                     PriceService.objects \
-        #                                         .filter(query_for_price)
-        #                                         .order_by('-created_at')
-        #                                         .values('price')[:1]
-        #                                 ),
-        #                                 0.0,
-        #                                 output_field=FloatField()
-        #                             )
-        #                         ).aggregate(
-        #                             final_price=Sum('currency_price')
-        #                         )
-        #     return services_prices['final_price']
+            services_prices = Service.objects \
+                                .filter(id__in=service_ids) \
+                                .annotate(
+                                    currency_price=Coalesce(
+                                        Subquery(
+                                            PriceService.objects \
+                                                .filter(query_for_price)
+                                                .order_by('-created_at')
+                                                .values('price')[:1]
+                                        ),
+                                        0.0,
+                                        output_field=FloatField()
+                                    )
+                                ).aggregate(
+                                    final_price=Sum('currency_price')
+                                )
+            return services_prices['final_price']
         
 
     def get_payment_date(self, obj):

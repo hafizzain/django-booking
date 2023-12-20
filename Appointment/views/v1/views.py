@@ -1780,14 +1780,14 @@ def create_checkout(request):
     client_invoice = None
 
     try:
-        members=Employee.objects.get(id=member)
+        member = Employee.objects.get(id=member)
     except Exception as err:
-        members = None
+        member = None
     
     try:
-        services=Service.objects.get(id=service)
+        service = Service.objects.get(id=service)
     except Exception as err:
-        services = None
+        service = None
         
     try:
         service_appointment = AppointmentService.objects.get(id=appointment_service)
@@ -1795,7 +1795,7 @@ def create_checkout(request):
         service_appointment = None
        
     try:
-        appointments = Appointment.objects.get(id=appointment)
+        appointment = Appointment.objects.get(id=appointment)
     except Exception as err:
         return Response(
             {
@@ -1824,8 +1824,8 @@ def create_checkout(request):
             },
             status=status.HTTP_404_NOT_FOUND
         )
-    appointments.status = 'Done'
-    appointments.save()
+    appointment.status = 'Done'
+    appointment.save()
     if type(tip) == str:
         tip = json.loads(tip)
     if type(tip) == list:
@@ -1837,8 +1837,8 @@ def create_checkout(request):
                 employee_tips_id = Employee.objects.get(id=employee_id)
                 
                 if employee_tips_id is not None:
-                    create_tip = AppointmentEmployeeTip.objects.create(
-                        appointment = appointments,
+                     AppointmentEmployeeTip.objects.create(
+                        appointment = appointment,
                         member = employee_tips_id,
                         tip = checkout_tip,
                         business_address = business_address,
@@ -1877,7 +1877,7 @@ def create_checkout(request):
         
         try:
             service_appointment = AppointmentService.objects.get(id=id)
-            service_appointment.appointment_status= 'Done'
+            service_appointment.appointment_status = 'Done'
 
             # if membership is redeemed then set redeemed price and redeemed
             # membership id to redeemed_instance_id
@@ -1967,13 +1967,12 @@ def create_checkout(request):
         Errors.append(str(err))
         
     checkout = AppointmentCheckout.objects.create(
-        appointment = appointments,
+        appointment = appointment,
         appointment_service = service_appointment,
         payment_method = payment_method,
-        service = services,
-        member = members,
+        service = service,
+        member = member,
         business_address=business_address,
-        # tip = tip,
         gst = gst,
         gst1 = gst1,
         gst_price = gst_price,
@@ -1987,8 +1986,8 @@ def create_checkout(request):
     )
 
     # change the status of appointment after checkout
-    appointments.status = choices.AppointmentStatus.DONE
-    appointments.save()
+    appointment.status = choices.AppointmentStatus.DONE
+    appointment.save()
 
     for i_employee_commission in empl_commissions_instances:
         i_employee_commission.sale_id = checkout.id
@@ -1999,14 +1998,13 @@ def create_checkout(request):
 
     invoice = SaleInvoice.objects.create(
         client= client_invoice if client_invoice else None,
-        appointment = appointments,
+        appointment = appointment,
         appointment_service = f'{service_appointment.id}',
         payment_type = payment_method,
-        service = f'{services.id}' if services else '',
-        member = f'{members.id}' if members else '',
+        service = f'{service.id}' if service else '',
+        member = f'{member.id}' if member else '',
         business_address = f'{business_address.id}',
         location = business_address,
-        # tip = tip,
         gst = gst,
         gst_price = gst_price,
         service_price = service_price,
@@ -2045,7 +2043,7 @@ def create_checkout(request):
         disc_sale.save()
 
 
-    if appointments.client:
+    if appointment.client:
         logs_points_redeemed = 0
         logs_total_redeened_value = 0
         if all([is_redeemed, redeemed_id, redeemed_points]):
@@ -2078,18 +2076,12 @@ def create_checkout(request):
             is_deleted = False
         )
 
-        # spend_amount = 100
-        # will_get = 10 points 
-
-        # is_redeemed
-        # redeemed_id
-        # redeemed_points
         if len(allowed_points) > 0:
             point = allowed_points[0]
 
             client_points, created = ClientLoyaltyPoint.objects.get_or_create(
                 location = business_address,
-                client = appointments.client,
+                client = appointment.client,
                 loyalty_points = point,
             )
 
@@ -3361,7 +3353,10 @@ def paid_unpaid_clients(request):
 
     appointments = Appointment.objects \
                     .filter(query) \
-                    .select_related('client') \
+                    .select_related('client',
+                                    'business',
+                                    'business_address',
+                                    'business_address__currency') \
                     .order_by('-created_at')
     
     serialized = list(PaidUnpaidAppointmentSerializer(appointments, many=True).data)
