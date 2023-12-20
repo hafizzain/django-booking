@@ -412,6 +412,7 @@ def get_all_appointments(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_available_appointments(request):
+    appointment_status = request.GET.get('appointment_status', None)
     appointment_id = request.GET.get('appointment_id', None)
     client_id = request.GET.get('client_id', None)
     employee_id = request.GET.get('employee_id', None)
@@ -420,6 +421,11 @@ def get_available_appointments(request):
     end_date = request.GET.get('end_date', None)
     no_pagination = request.GET.get('no_pagination', None)
     location_id = request.GET.get('location', None)
+    paginator = CustomPagination()
+    paginator.page_size = 10
+    upcoming_flags = ['Appointment_Booked', 'Appointment Booked', 'Arrived', 'In Progress']
+    completed_flags = ['Done', 'Paid']
+    cancelled_flags = ['Cancel']
     paginator = CustomPagination()
     paginator.page_size = 10
     try:
@@ -439,6 +445,16 @@ def get_available_appointments(request):
             query &= Q(id=appointment_id)
         if booking_id is not None:
             query &= Q(appointment_services__id=booking_id)
+        if appointment_status is not None:
+            if appointment_status == 'Upcomming':
+                pass
+                # query &= Q(status__in=upcoming_flags)
+            elif appointment_status == 'Completed':
+                pass
+                # query &= Q(status__in=completed_flags)
+            elif appointment_status == 'Cancelled':
+                pass
+                # query &= Q(status__in=cancelled_flags)
         appointment = Appointment.objects.filter(query)
     except Exception as err:
         return Response(
