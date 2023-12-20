@@ -3,6 +3,8 @@ from getopt import error
 from pkgutil import read_code
 from pyexpat import model
 from re import A
+
+from Authentication.models import User
 from Client.models import Client
 
 from django.db.models.functions import Coalesce
@@ -1054,22 +1056,28 @@ class EmployeeSerializerResponse(serializers.ModelSerializer):
     fields = ['id', 'name']
 
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'first_name']
+
+
 class AppointmentServiceResponseSeriailzer(serializers.ModelSerializer):
-    member = EmployeeSerializerResponse(many=True)
+    # member = EmployeeSerializerResponse(many=True)
+    user = UserSerializer(many=True)
 
     class Meta:
         model = AppointmentService
-        fields = ['id', 'member', 'price', 'appointment_date', 'appointment_time', 'service_start_time', 'status']
-
+        fields = ['id', 'user', 'service_end_time', 'member', 'price', 'appointment_date', 'appointment_time', 'status']
 
 
 class SingleNoteResponseSerializer(serializers.ModelSerializer):
     # client = ClientSerializerresponse(read_only=True, many=True)
-    # appointment_services = AppointmentServiceResponseSeriailzer(many=True)
+    appointment_services = AppointmentServiceResponseSeriailzer(many=True)
 
     class Meta:
         model = Appointment
-        fields = ['id','created_at', 'client_type', 'status', 'appointment_services']
+        fields = ['id', 'created_at', 'client_type', 'status', 'appointment_services']
 
 
 class AppointmentServiceSeriailzer(serializers.ModelSerializer):
