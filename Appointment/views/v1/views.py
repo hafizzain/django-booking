@@ -3436,7 +3436,13 @@ class MissedOpportunityListCreate(generics.ListAPIView,
     lookup_url_kwarg = 'id'
     
     def list(self, request, *args, **kwargs):
+        search_text = request.query_params.get('search_text', None)
         queryset = self.get_queryset()
+
+        if search_text:
+            query = Q(client__full_name__icontains=search_text)
+            queryset = queryset.filter(query)
+            
         page = self.paginate_queryset(queryset)
         data = None
 
