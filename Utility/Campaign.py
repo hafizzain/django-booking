@@ -17,7 +17,7 @@ class CampaignUtility:
             message = campaign.content
             subject = campaign.title
             
-            if campaign.is_email():
+            if campaign.is_email() or campaign.is_both():
                 client_email_list = campaign.segment.client.all().values_list('email', flat=True)
                 send_mail(
                     subject,
@@ -26,14 +26,5 @@ class CampaignUtility:
                     client_email_list,
                     fail_silently=False,
                 )
-            elif campaign.is_appnotifaction():
+            elif campaign.is_appnotifaction() or campaign.is_both():
                 pass 
-            elif campaign.is_both():
-                client_email_list = campaign.segment.client.all().values_list('email', flat=True)
-                send_mail(
-                    subject,
-                    message,
-                    settings.EMAIL_HOST_USER,
-                    client_email_list,
-                    fail_silently=False,
-                )
