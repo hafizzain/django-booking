@@ -1053,7 +1053,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
 class AppointmentServiceResponseSeriailzer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentService
-        fields = ['id','service','status']
+        fields = "__all__"
 
 
 class SingleNoteResponseSerializer(serializers.ModelSerializer):
