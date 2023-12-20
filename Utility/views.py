@@ -13,7 +13,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework import status
-
+from django.conf import settings
+from django.core.mail import send_mail
 
 from .serializers import CurrencySerializer, SoftwareSerializer, CountrySerializer, StateSerializer, CitySerializer
 
@@ -232,3 +233,31 @@ def get_user_locations_data(request):
         },
         status=status.HTTP_200_OK
     )
+
+def run_campaign(self, campaign):
+        """
+        Send email for the given campaign.
+        """
+        message = campaign.content
+        subject = campaign.title
+        
+        if campaign.is_email():
+            client_email_list = campaign.segment.client.all().values_list('email', flat=True)
+            send_mail(
+                subject,
+                message,
+                settings.EMAIL_HOST_USER,
+                client_email_list,
+                fail_silently=False,
+            )
+        elif campaign.is_appnotifaction():
+            pass 
+        elif campaign.is_both():
+            client_email_list = campaign.segment.client.all().values_list('email', flat=True)
+            send_mail(
+                subject,
+                message,
+                settings.EMAIL_HOST_USER,
+                client_email_list,
+                fail_silently=False,
+            )
