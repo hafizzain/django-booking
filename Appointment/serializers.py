@@ -168,7 +168,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                     if len(client_appointments) == 1 or first_month == last_month:
                         months = 1
                         monthly_spending = price
-                        tag = 'Lest Visitor'
+                        tag = 'Least Visitor'
                     else:
                         months = first_month - last_month
                         monthly_spending = price / months
