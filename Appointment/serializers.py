@@ -1055,20 +1055,21 @@ class EmployeeSerializerResponse(serializers.ModelSerializer):
 
 
 class AppointmentServiceResponseSeriailzer(serializers.ModelSerializer):
-    member = EmployeeSerializerResponse(many=False)
+    member = EmployeeSerializerResponse(many=True)
 
     class Meta:
         model = AppointmentService
-        fields = ['id', 'member','id','price','appointment_date','appointment_time','service_start_time','service_end_time','status']
+        fields = ['id', 'member', 'price', 'appointment_date', 'appointment_time', 'service_start_time', 'status']
+
 
 
 class SingleNoteResponseSerializer(serializers.ModelSerializer):
-    client = ClientSerializerresponse(read_only=True, many=False)
-    appointment_services = AppointmentServiceResponseSeriailzer(many=True)
+    # client = ClientSerializerresponse(read_only=True, many=True)
+    # appointment_services = AppointmentServiceResponseSeriailzer(many=True)
 
     class Meta:
         model = Appointment
-        fields = ['id', 'client', 'created_at', 'client_type', 'status', 'appointment_services']
+        fields = ['id','created_at', 'client_type', 'status', 'appointment_services']
 
 
 class AppointmentServiceSeriailzer(serializers.ModelSerializer):
