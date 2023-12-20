@@ -1064,7 +1064,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 class AppointmentServiceResponseSeriailzer(serializers.ModelSerializer):
     # member = EmployeeSerializerResponse(many=True)
-    user = UserSerializer(many=True)
+    user = UserSerializer(many=False)
+
 
     class Meta:
         model = AppointmentService
