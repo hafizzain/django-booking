@@ -1059,6 +1059,7 @@ class AppointmentServiceResponseSeriailzer(serializers.ModelSerializer):
     user = UserSerializer(many=False)
 
 
+
     class Meta:
         model = AppointmentService
         fields = ['id', 'user', 'service_end_time', 'member']
