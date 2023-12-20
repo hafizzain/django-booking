@@ -167,7 +167,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                     first_appointment = client_appointments[0]
                     first_month = int(first_appointment.created_at.strftime('%m'))
 
-                    months = 0
+                    months = first_month - last_month
                     monthly_spending = 0
                     tag = ''
 
@@ -176,7 +176,6 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                         monthly_spending = price
                         tag = 'Least Visitor'
                     else:
-                        months = first_month - last_month
                         monthly_spending = price / months
                         if monthly_spending >= 100:
                             tag = 'Most Spender'
@@ -185,6 +184,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
 
                     return {
                         # 'months' : months,
+                        'months' : months,
                         'tag': tag,
                         # 'monthly_spending' : monthly_spending,
                         # 'first_appointment': {
