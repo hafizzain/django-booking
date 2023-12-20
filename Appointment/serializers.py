@@ -1186,17 +1186,23 @@ class OpportunityEmployeeServiceSerializer(serializers.ModelSerializer):
 
 class MissedOpportunityBasicSerializer(serializers.ModelSerializer):
     services = serializers.SerializerMethodField(read_only=True)
-    client = serializers.CharField(source='client__full_name')
+    client_name = serializers.SerializerMethodField(read_only=True)
 
     def get_services(self, obj):
         services = OpportunityEmployeeService.objects \
                     .filter(client_missed_opportunity=obj) \
                     .select_related('service', 'employee')
         return OpportunityEmployeeServiceSerializer(services, many=True).data
+    
+    def get_client_name(self, obj):
+        if obj.client:
+            return obj.client.full_name
+        else:
+            return None
 
     class Meta:
         model = ClientMissedOpportunity
-        fields = ['id', 'client', 'client_type', 'note', 'date_time', 'services', 'dependency']
+        fields = ['id', 'client_name', 'client_type', 'note', 'date_time', 'services', 'dependency']
 
 
 
