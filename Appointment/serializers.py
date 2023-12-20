@@ -167,7 +167,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                             'month' : last_app.created_at.strftime('%Y %m %d %H:%M:%s')
                         },
                         'spend_amount' : {
-                            'count' : total_spend.count()
+                            'count' : Sum([ck.total_price for ck in total_spend])
                         },
                         'appointments' : client_appointments.count()
                     }
