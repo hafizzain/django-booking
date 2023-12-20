@@ -57,6 +57,7 @@ from django.db.models import Sum
 from django.db import transaction
 from django.db import connection
 from Utility.json_utilities import format_json_string
+from Utility.date_range_utils import get_date_range_tuple
 
 from ... import choices
 
@@ -3447,7 +3448,7 @@ class MissedOpportunityListCreate(generics.ListAPIView,
             query &= Q(client__full_name__icontains=search_text)
 
         if start_date and end_date:
-            query &= Q(created_at__date__range=(start_date, end_date))
+            query &= Q(created_at__date__range=get_date_range_tuple(start_date, end_date))
 
         queryset = self.get_queryset().filter(query)
 
