@@ -13,7 +13,6 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import generics
-from rest_framework.pagination import PageNumberPagination
 
 from rest_framework import status
 from Appointment.Constants.durationchoice import DURATION_CHOICES
@@ -65,6 +64,7 @@ from django.db import transaction
 from django.db import connection
 from Utility.json_utilities import format_json_string
 from Utility.date_range_utils import get_date_range_tuple
+from rest_framework.pagination import PageNumberPagination
 
 from ... import choices
 
@@ -3529,8 +3529,6 @@ def get_available_appointments(request):
     upcoming_flags = ['Appointment_Booked', 'Appointment Booked', 'Arrived', 'In Progress']
     completed_flags = ['Done', 'Paid']
     cancelled_flags = ['Cancel']
-    paginator = CustomPagination()
-    paginator.page_size = 10
     try:
         query = Q(is_deleted=False)
         if client_id is not None:
@@ -3594,15 +3592,15 @@ def get_available_appointments(request):
             'status_code': 200,
             'status_code_text': '200',
             "response": {
-                "message": "Segment get Successfully",
+                "message": "Appointments  get Successfully",
                 "error_message": None,
                 "data": serialized.data,
-                # 'count': paginator.count,
-                'next': paginator.get_next_link(),
-                'previous': paginator.get_previous_link(),
-                'current_page': paginator.page.number,
-                'per_page': paginator.page_size,
-                'total_pages': paginator.page.paginator.num_pages,
+                # # 'count': paginator.count,
+                # 'next': paginator.get_next_link(),
+                # 'previous': paginator.get_previous_link(),
+                # 'current_page': paginator.page.number,
+                # 'per_page': paginator.page_size,
+                # 'total_pages': paginator.page.paginator.num_pages,
             }
         }
         return Response(data, status=status.HTTP_200_OK)
