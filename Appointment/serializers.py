@@ -152,6 +152,8 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
 
     def get_client_info(self, obj):
         try:
+            if not obj.appointment:
+                return {}
             client = obj.appointment.client
             first_appointment = None
             if client:
@@ -178,7 +180,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                     else:
                         tag = 'Least Visitor'
 
-                    client_type = ''
+                    client_type = None
                     monthly_spending = price / months
                     if monthly_spending >= 100:
                         client_type = 'Most Spender'
