@@ -109,7 +109,8 @@ class Appointment(models.Model):
     service_commission = models.FloatField(default = 0 , null=True, blank=True)    
     service_commission_type = models.CharField( max_length=50 , default = '')
 
-
+    cancel_reason = models.CharField(max_length=150, null=True, blank=True)
+    cancel_note = models.TextField(null=True)
     is_promotion = models.BooleanField(default=False)
     selected_promotion_id = models.CharField(default='', max_length=800)
     selected_promotion_type = models.CharField(default='', max_length=400)
@@ -262,7 +263,7 @@ class AppointmentCheckout(models.Model):
         ('Paypal', 'Paypal'),
         ('GooglePay', 'Google Pay'),
         ('ApplePay', 'Apple Pay')
-    ]    
+    ]
     
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, null=True, blank=True , related_name='appointment_checkout')
@@ -397,7 +398,7 @@ class ClientMissedOpportunity(CommonField):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client_missed_opportunities', null=True)
     client_type = models.CharField(max_length=200, choices=choices.ClientType.choices, null=True, blank=True)
     dependency = models.CharField(max_length=200, choices=choices.MissedOpportunityReason.choices, null=True, blank=True)
-    note = models.TextField()
+    note = models.TextField(null=True)
     date_time = models.DateTimeField()
 
 class OpportunityEmployeeService(CommonField):

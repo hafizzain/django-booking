@@ -50,8 +50,8 @@ class Campaign(CommonField):
     def is_both(self):
         return self.campaign_type == CampaignChoices.BOTH
     
-    # def is_start_date(self):
-    #     return self.start_date >= datetime.now().date()
+    def is_start_date(self):
+        return self.start_date >= datetime.now().date()
     
-    # def is_past_end_date(self):
-    #     return self.end_date <= datetime.now().date()
+    def is_past_end_date(self):
+        return self.end_date <= datetime.now().date()

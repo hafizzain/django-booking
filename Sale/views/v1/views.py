@@ -1380,29 +1380,6 @@ def get_all_sale_orders_optimized(request):
         invoice_checkout_ids = list(SaleInvoice.objects.filter(id__icontains=search_text).values_list('checkout', flat=True))
         sale_queries &= Q(id__in=invoice_checkout_ids) | Q(client__full_name__icontains=search_text)
         app_queries &= Q(id__in=invoice_checkout_ids) | Q(appointment__client__full_name__icontains=search_text)
-        # sale_checkouts = Checkout.objects.select_related(
-        #                     'location',
-        #                     'location__currency',
-        #                     'client',
-        #                     'member'
-        #                 ).prefetch_related(
-        #                     'checkout_orders',
-        #                     'checkout_orders__user',
-        #                     'checkout_orders__client',
-        #                     'checkout_orders__member',
-        #                     'checkout_orders__location',
-        #                     'checkout_orders__location__currency',
-        #                 ).filter(id__in=invoice_checkout_ids) \
-        #                 .distinct()
-        # appointment_checkouts = AppointmentCheckout.objects.select_related(
-        #                         'appointment_service',
-        #                         'business_address',
-        #                         'appointment',
-        #                         'appointment__client',
-        #                         'service',
-        #                     ).filter(
-        #                         id__in=invoice_checkout_ids
-        #                     ).distinct()
 
     checkout_order = Checkout.objects \
     .filter(sale_queries) \

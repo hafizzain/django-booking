@@ -1,5 +1,3 @@
-import json
-from threading import Thread
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -19,9 +17,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
-from django.conf import settings
 from Notification.notification_processor import NotificationProcessor
-from Utility.models import NstyleFile
 
 
 class SegmentAPIView(APIView):
@@ -31,7 +27,6 @@ class SegmentAPIView(APIView):
     
     queryset = Segment.objects.prefetch_related('client') \
                             .select_related('user', 'business') \
-                            .filter(is_deleted=False) \
                             .order_by('-created_at')
                             
     serializer_class = SegmentSerializer
@@ -56,7 +51,6 @@ class SegmentAPIView(APIView):
             return Response(data, status=status.HTTP_200_OK)
         else:
             filtered_queryset = Segment.objects.all() \
-                            .filter(is_deleted=False) \
                             .order_by('-created_at')
                             
             name = self.request.query_params.get('search_text', None)
@@ -110,7 +104,7 @@ class SegmentAPIView(APIView):
         request.data['user'] = user.id
         name = request.data.get('name', None)
         
-        if Segment.objects.filter(name=name, is_deleted=False).exists():
+        if Segment.objects.filter(name=name).exists():
             data = {
                     "success": False,
                     "status_code" : 200,
@@ -152,6 +146,20 @@ class SegmentAPIView(APIView):
     def put(self, request, pk):
         segment = get_object_or_404(Segment, id=pk)
         serializer = SegmentSerializer(segment, data=request.data)
+        name = request.data.get('name')
+        existing_segment = Segment.objects.filter(name=name) \
+                            .exclude(id=pk).first()
+        if existing_segment:
+            data = {
+                "success": False,
+                "status_code": 200,
+                "response": {
+                    "message": "Segment with this name already exists",
+                    "data": None
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        
         if not segment.is_static():
             if serializer.is_valid():
                 serializer.save()
@@ -191,8 +199,7 @@ class SegmentAPIView(APIView):
     @transaction.atomic
     def delete(self, request, pk):
         segment = get_object_or_404(Segment, id=pk)
-        segment.is_deleted = True
-        segment.save() 
+        segment.delete()
         data = {
                 "success": True,
                 "status_code" : 200,
@@ -212,7 +219,6 @@ class SegmentDropdownAPIView(APIView):
     
     queryset = Segment.objects.prefetch_related('client') \
                             .select_related('user', 'business') \
-                            .filter(is_deleted=False) \
                             .order_by('-created_at')
     
     serializer_class = SegmentDropdownSerializer
@@ -221,7 +227,7 @@ class SegmentDropdownAPIView(APIView):
     
     def get(self, request):
         is_search = False
-        filtered_queryset = Segment.objects.filter(is_deleted=False) \
+        filtered_queryset = Segment.objects.filter(is_deleted=False)\
                             .order_by('-created_at')
                             
         name = self.request.query_params.get('search_text', None)
@@ -260,7 +266,6 @@ class CampaignsAPIView(APIView):
     page_size = 10
     
     queryset =  Campaign.objects.select_related('user', 'segment') \
-                            .filter(is_deleted=False) \
                             .order_by('-created_at')
                             
     serializer_class = CampaignsSerializer
@@ -284,7 +289,7 @@ class CampaignsAPIView(APIView):
                 }
             return Response(data, status=status.HTTP_200_OK)
         else:
-            query = Q(is_deleted=False)
+            query = Q()
             
             title = self.request.query_params.get('search_text', None)
             if title:
@@ -382,47 +387,48 @@ class CampaignsAPIView(APIView):
         campaign = get_object_or_404(Campaign, id=pk)
         serializer = CampaignsSerializer(campaign, data=request.data)
         title = request.data.get('title')
-        if Campaign.objects.filter(title=title, id=pk).exists():
-            if serializer.is_valid():
-                serializer.save()
-                data = {
-                        "success": True,
-                        "status_code" : 201,
-                        "response" : {
-                            "message" : "Campaign updated successfully",
-                            "error_message" : None,
-                            "data" : serializer.data
-                        }
-                    }
-                return Response(data, status=status.HTTP_200_OK)
-            else:    
-                data = {
-                        "success": False,
-                        "status_code" : 400,
-                        "response" : {
-                            "message" : "Campaign not updated",
-                            "error_message" : serializer.errors,
-                            "data" : None
-                        }
-                    }
-                return Response(data, status=status.HTTP_400_BAD_REQUEST)
-        else:
+        existing_campaign = Campaign.objects.filter(title=title) \
+                            .exclude(id=pk).first()
+        
+        if existing_campaign:
             data = {
-                    "success": False,
+                "success": False,
+                "status_code": 200,
+                "response": {
+                    "message": "Campaign with this title already exists",
+                    "data": None
+                }
+            }
+            return Response(data, status=status.HTTP_200_OK)
+    
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                    "success": True,
                     "status_code" : 201,
                     "response" : {
-                        "message" : "Campaign with this title already exist",
+                        "message" : "Campaign updated successfully",
                         "error_message" : None,
-                        "data" : None
+                        "data" : serializer.data
                     }
                 }
             return Response(data, status=status.HTTP_200_OK)
+        else:    
+            data = {
+                    "success": False,
+                    "status_code" : 400,
+                    "response" : {
+                        "message" : "Campaign not updated",
+                        "error_message" : serializer.errors,
+                        "data" : None
+                    }
+                }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
         
     @transaction.atomic   
     def delete(self, request, pk):
         campaign = get_object_or_404(Campaign, id=pk)
-        campaign.is_deleted = True
-        campaign.save() 
+        campaign.delete()
         data = {
                 "success": True,
                 "status_code" : 200,
