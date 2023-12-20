@@ -1174,6 +1174,7 @@ class OpportunityEmployeeServiceSerializer(serializers.ModelSerializer):
 
 class MissedOpportunityBasicSerializer(serializers.ModelSerializer):
     services = serializers.SerializerMethodField(read_only=True)
+    client = serializers.CharField(source='client__full_name')
 
     def get_services(self, obj):
         services = OpportunityEmployeeService.objects \
