@@ -3437,12 +3437,20 @@ class MissedOpportunityListCreate(generics.ListAPIView,
     
     def list(self, request, *args, **kwargs):
         search_text = request.query_params.get('search_text', None)
-        queryset = self.get_queryset()
+        start_date = request.query_params.get('start_date', None)
+        end_date = request.query_params.get('end_date', None)
+
+        query =  Q()
+        
 
         if search_text:
-            query = Q(client__full_name__icontains=search_text)
-            queryset = queryset.filter(query)
-            
+            query &= Q(client__full_name__icontains=search_text)
+
+        if start_date and end_date:
+            query &= Q(created_at__date__range=(start_date, end_date))
+
+        queryset = self.get_queryset().filter(query)
+
         page = self.paginate_queryset(queryset)
         data = None
 
