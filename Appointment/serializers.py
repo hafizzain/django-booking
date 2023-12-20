@@ -178,7 +178,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                     else:
                         tag = 'Least Visitor'
 
-                    client_type = ''
+                    client_type = None
                     monthly_spending = price / months
                     if monthly_spending >= 100:
                         client_type = 'Most Spender'
