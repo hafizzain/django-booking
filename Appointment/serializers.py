@@ -188,9 +188,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                         'last_appointment' : {
                             'date' : first_appointment.created_at.strftime('%Y %m %d')
                         },
-                        'spend_amount' : {
-                            'count' : price
-                        },
+                        'total_spend' : price,
                         'appointments' : client_appointments.count()
                     }
                 else:
