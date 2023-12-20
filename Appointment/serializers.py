@@ -147,6 +147,9 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
             if client:
                 client_appointments = Appointment.objects.filter(client = client)
                 total_spend = AppointmentCheckout.objects.filter(appointment__client = client)
+                price = 0
+                for ck in total_spend:
+                    price = price + ck.total_price
                 if len(client_appointments) > 0:
                     first_appointment = client_appointments.order_by('created_at').last()
                     last_app = client_appointments[0]
@@ -167,7 +170,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                             'month' : last_app.created_at.strftime('%Y %m %d %H:%M:%s')
                         },
                         'spend_amount' : {
-                            'count' : Sum([ck.total_price for ck in total_spend])
+                            'count' : price
                         },
                         'appointments' : client_appointments.count()
                     }
