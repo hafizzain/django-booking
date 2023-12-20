@@ -7,7 +7,7 @@ from Appointment.Constants.AddAppointment import Add_appointment
 from Appointment.Constants.cancelappointment import cancel_appointment
 from Appointment.Constants.comisionCalculate import calculate_commission
 from Promotions.models import ComplimentaryDiscount, PackagesDiscount, ServiceDurationForSpecificTime
-# from Sale.Constants.Custom_pag import CustomPagination
+from Sale.Constants.Custom_pag import CustomPagination
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
