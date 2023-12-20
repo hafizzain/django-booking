@@ -1065,7 +1065,7 @@ class AppointmentServiceResponseSeriailzer(serializers.ModelSerializer):
 
 
 class SingleNoteResponseSerializer(serializers.ModelSerializer):
-    client = ClientSerializerresponse(read_only=True, many=True)
+    client = ClientSerializerresponse(read_only=True, many=False)
     appointment_services = AppointmentServiceResponseSeriailzer(many=True)
 
 
