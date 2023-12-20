@@ -359,8 +359,8 @@ def get_all_appointments(request):
     upcoming_flags = ['Appointment_Booked', 'Appointment Booked', 'Arrived', 'In Progress']
     completed_flags = ['Done', 'Paid']
     cancelled_flags = ['Cancel']
-    # paginator = CustomPagination()
-    # paginator.page_size = 10
+    paginator = CustomPagination()
+    paginator.page_size = 10
 
     query = Q(is_blocked=False)
 
@@ -3525,8 +3525,8 @@ def get_available_appointments(request):
     end_date = request.GET.get('end_date', None)
     no_pagination = request.GET.get('no_pagination', None)
     location_id = request.GET.get('location', None)
-    paginator = CustomPagination()
-    paginator.page_size = 10
+    # paginator = CustomPagination()
+    # paginator.page_size = 10
     upcoming_flags = ['Appointment_Booked', 'Appointment Booked', 'Arrived', 'In Progress']
     completed_flags = ['Done', 'Paid']
     cancelled_flags = ['Cancel']
