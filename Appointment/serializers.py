@@ -1046,7 +1046,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
 class EmployeeSerializerResponse(serializers.ModelSerializer):
     class Meta:
         model = Employee
-        fields = ['id', 'name']
+        fields = ['id', 'full_name']
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -1058,9 +1058,6 @@ class UserSerializer(serializers.ModelSerializer):
 class AppointmentServiceResponseSeriailzer(serializers.ModelSerializer):
     member = EmployeeSerializerResponse(many=False)
     user = UserSerializer(many=False)
-
-
-
 
     class Meta:
         model = AppointmentService
