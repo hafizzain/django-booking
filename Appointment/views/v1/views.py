@@ -3372,7 +3372,7 @@ def paid_unpaid_clients(request):
 @transaction.atomic
 def create_missed_opportunity(request):
     client_type = request.data.get('client_type', None)
-    client_id = request.data.get('client_id', None)
+    client_id = request.data.get('client', None)
     opportunity_date = request.data.get('opportunity_date', None)
     note = request.data.get('notes', None)
     dependency = request.data.get('dependency', None)
