@@ -1049,11 +1049,17 @@ class SingleNoteSerializer(serializers.ModelSerializer):
                   'client_type', 'appointmnet_service', 'customer_note', 'status']
 
 
+class EmployeeSerializerResponse(serializers.ModelSerializer):
+    model = Employee
+    fields = ['id', 'name']
+
 
 class AppointmentServiceResponseSeriailzer(serializers.ModelSerializer):
+    member = EmployeeSerializerResponse(many=True)
+
     class Meta:
         model = AppointmentService
-        fields = "__all__"
+        fields = ['id', 'member', 'appointment','business_address','service','is_favourite','appointment_date']
 
 
 class SingleNoteResponseSerializer(serializers.ModelSerializer):
@@ -1062,7 +1068,7 @@ class SingleNoteResponseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Appointment
-        fields = ['id', 'client', 'created_at','client_type','status','appointment_services']
+        fields = ['id', 'client', 'created_at', 'client_type', 'status', 'appointment_services']
 
 
 class AppointmentServiceSeriailzer(serializers.ModelSerializer):
