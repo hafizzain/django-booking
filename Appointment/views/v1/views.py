@@ -3591,7 +3591,7 @@ def get_available_appointments(request):
         paginator.page_size = 10
         paginated_appointments = paginator.paginate_queryset(appointment, request)
         serialized = SingleNoteResponseSerializer(paginated_appointments, many=True)
-        serialized = SingleNoteResponseSerializer(appointment, many=True)
+        # serialized = SingleNoteResponseSerializer(appointment, many=True)
 
         data = {
             'status': True,
