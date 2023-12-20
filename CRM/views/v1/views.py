@@ -1,5 +1,3 @@
-import json
-from threading import Thread
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -19,9 +17,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
-from django.conf import settings
 from Notification.notification_processor import NotificationProcessor
-from Utility.models import NstyleFile
 
 
 class SegmentAPIView(APIView):
