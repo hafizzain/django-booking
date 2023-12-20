@@ -155,23 +155,33 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
 
 
                     first_appointment = client_appointments.order_by('created_at').last()
-                    first_month = first_appointment.created_at.strftime('%m')
+                    first_month = int(first_appointment.created_at.strftime('%m'))
 
 
                     last_app = client_appointments[0]
-                    last_month = last_app.created_at.strftime('%m')
+                    last_month = int(last_app.created_at.strftime('%m'))
+
                     months = 0
-
+                    monthly_spending = 0
                     tag = ''
-                    if len(client_appointments) == 1 or int(first_month) == int(last_month):
-                        months = 1
-                    else:
-                        months = 10
 
+                    if len(client_appointments) == 1 or first_month == last_month:
+                        months = 1
+                        monthly_spending = price
+                        tag = 'Lest Visitor'
+                    else:
+                        months = last_month - first_month
+                        monthly_spending = price / months
+                        if monthly_spending >= 100:
+                            tag = 'Most Spender'
+                        else:
+                            tag = 'Most Visitor'
+                            
                     return {
                         # 'first_appointment': first_appointment.created_at if first_appointment else None,
                         'months' : months,
                         'tag' : tag,
+                        'monthly_spending' : monthly_spending,
                         'first_appointment': {
                             'date' : first_appointment.created_at.strftime('%Y %m %d')
                         },
