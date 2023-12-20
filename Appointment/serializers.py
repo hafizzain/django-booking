@@ -1055,11 +1055,11 @@ class EmployeeSerializerResponse(serializers.ModelSerializer):
 
 
 class AppointmentServiceResponseSeriailzer(serializers.ModelSerializer):
-    member = EmployeeSerializerResponse(many=False)
+    member = EmployeeSerializerResponse(many=True)
 
     class Meta:
         model = AppointmentService
-        fields = ['id', 'member', 'price', 'appointment_date', 'appointment_time', 'service_start_time', 'service_end_time', 'status']
+        fields = ['id', 'member', 'price', 'appointment_date', 'appointment_time', 'service_start_time','status']
 
 
 class SingleNoteResponseSerializer(serializers.ModelSerializer):
