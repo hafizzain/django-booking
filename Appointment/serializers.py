@@ -159,10 +159,10 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                     return {
                         # 'first_appointment': first_appointment.created_at if first_appointment else None,
                         'first_appointment': {
-                            'month' : first_appointment.created_at.strftime('%m')
+                            'month' : first_appointment.created_at.strftime('%Y %m %d %H:%M:%s')
                         },
                         'last_appointment' : {
-                            'month' : last_app.created_at.strftime('%m')
+                            'month' : last_app.created_at.strftime('%Y %m %d %H:%M:%s')
                         },
                     }
                 else:
