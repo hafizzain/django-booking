@@ -168,7 +168,8 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                         },
                         'spend_amount' : {
                             'count' : total_spend.count()
-                        }
+                        },
+                        'appointments' : client_appointments.count()
                     }
                 else:
                     return {}
