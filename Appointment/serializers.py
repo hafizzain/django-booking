@@ -1050,7 +1050,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
 
 
 class SingleNoteResponseSerializer(serializers.ModelSerializer):
-    client = ClientSerializerresponse(read_only=True, many=True)
+    client = ClientSerializerresponse(read_only=True, many=False)
 
     class Meta:
         model = Appointment
