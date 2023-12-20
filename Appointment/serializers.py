@@ -1049,6 +1049,7 @@ class SingleNoteSerializer(serializers.ModelSerializer):
                   'client_type', 'appointmnet_service', 'customer_note', 'status']
 
 
+
 class AppointmentServiceResponseSeriailzer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentService
