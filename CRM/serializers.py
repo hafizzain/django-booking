@@ -28,7 +28,7 @@ class SegmentSerializer(serializers.ModelSerializer):
     client_data = serializers.SerializerMethodField(read_only=True)
     def get_client_data(self, obj):
         clients = obj.client.all()
-        serializer = ClientSerializer(clients, many=True, context={'request':self.context['request']})
+        serializer = ClientSerializer(clients, many=True, context={'request': self.request})
         return serializer.data 
     class Meta:
         model =  Segment
