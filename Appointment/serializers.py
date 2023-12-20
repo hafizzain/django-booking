@@ -1059,7 +1059,7 @@ class AppointmentServiceResponseSeriailzer(serializers.ModelSerializer):
 
     class Meta:
         model = AppointmentService
-        fields = ['id', 'user','service_start_time', 'service_end_time', 'member', 'price', 'appointment_date', 'appointment_time', 'status']
+        fields = ['id', 'user', 'service_end_time', 'member']
 
 
 class SingleNoteResponseSerializer(serializers.ModelSerializer):
