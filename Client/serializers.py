@@ -125,7 +125,6 @@ class ClientDropdownSerializer(serializers.ModelSerializer):
 
     image = serializers.SerializerMethodField()
 
-
     def get_image(self, obj):
         if obj.image:
             try:
