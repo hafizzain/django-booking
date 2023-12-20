@@ -171,21 +171,21 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                     monthly_spending = 0
                     tag = ''
 
-                    if len(client_appointments) == 1 or first_month == last_month:
-                        months = 1
-                        monthly_spending = price
-                        tag = 'Least Visitor'
+                    if client_appointments >= months:
+                        tag = 'Most Visitor'
                     else:
-                        monthly_spending = price / months
-                        if monthly_spending >= 100:
-                            tag = 'Most Spender'
-                        else:
-                            tag = 'Most Visitor'
+                        tag = 'Least Visitor'
+
+                    client_type = ''
+                    monthly_spending = price / months
+                    if monthly_spending >= 100:
+                        client_type = 'Most Spender'
 
                     return {
                         # 'months' : months,
                         'months' : months,
                         'tag': tag,
+                        'client_type': client_type,
                         # 'monthly_spending' : monthly_spending,
                         # 'first_appointment': {
                         # 'date' : last_app.created_at.strftime('%Y %m %d')
