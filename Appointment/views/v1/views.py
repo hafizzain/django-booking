@@ -3424,9 +3424,13 @@ class MissedOpportunityListCreate(generics.ListAPIView,
         search_text = request.query_params.get('search_text', None)
         start_date = request.query_params.get('start_date', None)
         end_date = request.query_params.get('end_date', None)
+        location_id = request.query_params.get('location_id', None)
+
 
         query = Q()
 
+        if location_id:
+            query &= Q(location__id=location_id)
         if search_text:
             query &= Q(client__full_name__icontains=search_text)
 
