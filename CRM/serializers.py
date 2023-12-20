@@ -34,7 +34,7 @@ class SegmentSerializer(serializers.ModelSerializer):
     class Meta:
         model =  Segment
         fields = ['id', 'name', 'segment_type', 'description',
-                  'client_data', 'created_at', 'is_active', 'client']
+                  'client_data', 'created_at', 'is_active', 'client', 'business', 'user']
            
 class SegmentDropdownSerializer(serializers.ModelSerializer):
     
