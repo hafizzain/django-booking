@@ -173,7 +173,7 @@ class AppointmentServiceSerializer(serializers.ModelSerializer):
                     monthly_spending = 0
                     tag = ''
 
-                    if client_appointments >= months:
+                    if client_appointments.count() >= months:
                         tag = 'Most Visitor'
                     else:
                         tag = 'Least Visitor'
